@@ -41,6 +41,14 @@ import { PrioritizeThis } from '@/app/paragametools/components/PrioritizeThis';
 import { EnergyBudget } from '@/app/paragametools/components/EnergyBudget';
 import { ThisOrThat } from '@/app/paragametools/components/ThisOrThat';
 import { SortItOut } from '@/app/paragametools/components/SortItOut';
+import { PrincipalPlaybook } from '@/app/paragametools/components/PrincipalPlaybook';
+import { ConversationCompass } from '@/app/paragametools/components/ConversationCompass';
+import { PartnerUp } from '@/app/paragametools/components/PartnerUp';
+import { BoundaryGame } from '@/app/paragametools/components/BoundaryGame';
+import { LeanOnTdi } from '@/app/paragametools/components/LeanOnTdi';
+import { ResetRoulette } from '@/app/paragametools/components/ResetRoulette';
+import { FirstFiveDays } from '@/app/paragametools/components/FirstFiveDays';
+import { PlanYourYear } from '@/app/paragametools/components/PlanYourYear';
 import { Gamepad2, Users, Timer, Target, Lock } from 'lucide-react';
 import { useMembership, type MembershipTier, canAccessContent } from '@/lib/hub/use-membership';
 
@@ -325,6 +333,190 @@ const PRACTICE_GAME_MAP: Record<string, PracticeGameConfig> = {
     format: 'both',
     requiredTier: 'all_access',
   },
+  'principal-playbook': {
+    component: PrincipalPlaybook,
+    id: 'practice-principal-playbook',
+    contentUuid: 'a1000012-0000-0000-0000-000000000012',
+    title: { en: 'Principal Playbook', es: 'Manual del Director' },
+    description: { en: 'Step into the principal role. You will face real leadership decisions about staffing, discipline, parent conflicts, and school culture. Choose your response and see how experienced leaders would handle it. The leadership lenses reveal your instincts.', es: 'Ponte en el papel del director. Enfrentaras decisiones reales de liderazgo sobre personal, disciplina, conflictos con padres y cultura escolar. Elige tu respuesta y ve como lideres experimentados lo manejarian.' },
+    howToPlay: [
+      { en: 'Read the leadership scenario', es: 'Lee el escenario de liderazgo' },
+      { en: 'Choose the best response from the options', es: 'Elige la mejor respuesta de las opciones' },
+      { en: 'See instant feedback and the leadership lens', es: 'Ve retroalimentacion instantanea y la lente de liderazgo' },
+      { en: 'Track your score and leadership lens breakdown', es: 'Sigue tu puntuacion y desglose de lentes de liderazgo' },
+    ],
+    whatYouNeed: [
+      { en: 'Just yourself', es: 'Solo tu' },
+      { en: 'Great for aspiring leaders and leadership PD sessions', es: 'Excelente para aspirantes a lideres y sesiones de PD de liderazgo' },
+    ],
+    bestFor: { en: 'Principals, assistant principals, aspiring leaders, and instructional coaches', es: 'Directores, subdirectores, aspirantes a lideres y coaches instruccionales' },
+    time: '~12 min',
+    rounds: { en: '10 scenarios', es: '10 escenarios' },
+    color: '#E8B84B',
+    format: 'solo',
+    requiredTier: 'professional',
+  },
+  'conversation-compass': {
+    component: ConversationCompass,
+    id: 'practice-conversation-compass',
+    contentUuid: 'a1000013-0000-0000-0000-000000000013',
+    title: { en: 'Conversation Compass', es: 'Brujula de Conversacion' },
+    description: { en: 'Navigate tough conversations with colleagues, parents, and administrators. Read the situation, choose your approach, and learn which communication skills make or break the moment. Your skill breakdown shows your natural strengths.', es: 'Navega conversaciones dificiles con colegas, padres y administradores. Lee la situacion, elige tu enfoque y aprende que habilidades de comunicacion definen el momento.' },
+    howToPlay: [
+      { en: 'Read the conversation scenario', es: 'Lee el escenario de conversacion' },
+      { en: 'Choose the best response', es: 'Elige la mejor respuesta' },
+      { en: 'See feedback and the communication skill involved', es: 'Ve retroalimentacion y la habilidad de comunicacion involucrada' },
+      { en: 'Track your skill breakdown at the end', es: 'Ve tu desglose de habilidades al final' },
+    ],
+    whatYouNeed: [
+      { en: 'Just yourself', es: 'Solo tu' },
+      { en: 'Powerful for role-playing tough conversations in PD', es: 'Poderoso para practicar conversaciones dificiles en PD' },
+    ],
+    bestFor: { en: 'All educators who navigate difficult conversations with colleagues, parents, or administrators', es: 'Todos los educadores que navegan conversaciones dificiles con colegas, padres o administradores' },
+    time: '~10 min',
+    rounds: { en: '10 scenarios', es: '10 escenarios' },
+    color: '#22b8bd',
+    format: 'both',
+    requiredTier: 'professional',
+  },
+  'partner-up': {
+    component: PartnerUp,
+    id: 'practice-partner-up',
+    contentUuid: 'a1000014-0000-0000-0000-000000000014',
+    title: { en: 'Partner Up', es: 'En Equipo' },
+    description: { en: 'See classroom scenarios from both the para and teacher perspective. Choose the best response from each role, then get the insight that connects both. Build your co-teaching toolkit by understanding both sides.', es: 'Ve escenarios del salon desde la perspectiva del para y del maestro. Elige la mejor respuesta de cada rol, luego obtiene la perspectiva que conecta ambos. Construye tu kit de co-ensenanza entendiendo ambos lados.' },
+    howToPlay: [
+      { en: 'Read the classroom scenario', es: 'Lee el escenario del salon' },
+      { en: 'Choose the best response from the para perspective', es: 'Elige la mejor respuesta desde la perspectiva del para' },
+      { en: 'Then choose from the teacher perspective', es: 'Luego elige desde la perspectiva del maestro' },
+      { en: 'See the insight that connects both roles', es: 'Ve la perspectiva que conecta ambos roles' },
+    ],
+    whatYouNeed: [
+      { en: 'Just yourself, or play with your co-teaching partner', es: 'Solo tu, o juega con tu companero de co-ensenanza' },
+      { en: 'Best when a teacher and para play together', es: 'Mejor cuando un maestro y un para juegan juntos' },
+    ],
+    bestFor: { en: 'Paraprofessionals and teachers building co-teaching partnerships', es: 'Paraprofesionales y maestros construyendo alianzas de co-ensenanza' },
+    time: '~10 min',
+    rounds: { en: '10 scenarios (2 perspectives each)', es: '10 escenarios (2 perspectivas cada uno)' },
+    color: '#27AE60',
+    format: 'both',
+    requiredTier: 'professional',
+  },
+  'boundary-game': {
+    component: BoundaryGame,
+    id: 'practice-boundary-game',
+    contentUuid: 'a1000015-0000-0000-0000-000000000015',
+    title: { en: 'The Boundary Game', es: 'El Juego de Limites' },
+    description: { en: 'Practice setting healthy boundaries at work. Real scenarios about overcommitting, saying no to colleagues, protecting your time, and managing expectations. Choose your response and learn which boundary type you are building.', es: 'Practica establecer limites saludables en el trabajo. Escenarios reales sobre comprometerte de mas, decir no a colegas, proteger tu tiempo y manejar expectativas.' },
+    howToPlay: [
+      { en: 'Read the boundary scenario', es: 'Lee el escenario de limites' },
+      { en: 'Choose the best response', es: 'Elige la mejor respuesta' },
+      { en: 'See feedback and the boundary type', es: 'Ve retroalimentacion y el tipo de limite' },
+      { en: 'Track your boundary type breakdown', es: 'Ve tu desglose por tipo de limite' },
+    ],
+    whatYouNeed: [
+      { en: 'Just yourself', es: 'Solo tu' },
+      { en: 'Great for self-care conversations in PD', es: 'Excelente para conversaciones de autocuidado en PD' },
+    ],
+    bestFor: { en: 'All educators, especially those struggling with overcommitment or burnout', es: 'Todos los educadores, especialmente quienes luchan con el exceso de compromisos o el agotamiento' },
+    time: '~10 min',
+    rounds: { en: '10 scenarios', es: '10 escenarios' },
+    color: '#F43F5E',
+    format: 'solo',
+    requiredTier: 'professional',
+  },
+  'lean-on-tdi': {
+    component: LeanOnTdi,
+    id: 'practice-lean-on-tdi',
+    contentUuid: 'a1000016-0000-0000-0000-000000000016',
+    title: { en: 'When to Lean on Your TDI Team', es: 'Cuando Apoyarte en Tu Equipo TDI' },
+    description: { en: 'Know when and how to tap into your TDI support team. Choose your role, then face real scenarios where you decide whether to lean on your TDI team, use the platform, or connect with the community. Learn which support channels match each situation.', es: 'Sabe cuando y como recurrir a tu equipo de apoyo TDI. Elige tu rol, luego enfrenta escenarios reales donde decides si apoyarte en tu equipo TDI, usar la plataforma o conectarte con la comunidad.' },
+    howToPlay: [
+      { en: 'Choose your role: Leader, Teacher, Para, or Coach', es: 'Elige tu rol: Lider, Maestro, Para o Coach' },
+      { en: 'Read each scenario', es: 'Lee cada escenario' },
+      { en: 'Decide: Lean on TDI team, use platform, or connect with community', es: 'Decide: apoyarte en el equipo TDI, usar la plataforma o conectarte con la comunidad' },
+      { en: 'See the best support channel and why', es: 'Ve el mejor canal de apoyo y por que' },
+    ],
+    whatYouNeed: [
+      { en: 'Just yourself', es: 'Solo tu' },
+      { en: 'Great for new TDI partnership onboarding', es: 'Excelente para incorporacion de nuevas alianzas TDI' },
+    ],
+    bestFor: { en: 'Educators in TDI partnerships learning how to maximize their support', es: 'Educadores en alianzas TDI aprendiendo como maximizar su apoyo' },
+    time: '~8 min',
+    rounds: { en: '8 scenarios', es: '8 escenarios' },
+    color: '#E8B84B',
+    format: 'solo',
+    requiredTier: 'free',
+  },
+  'reset-roulette': {
+    component: ResetRoulette,
+    id: 'practice-reset-roulette',
+    contentUuid: 'a1000017-0000-0000-0000-000000000017',
+    title: { en: 'Reset Roulette', es: 'Ruleta de Reinicio' },
+    description: { en: 'Spin the wheel for a quick stress reset activity. Land on breathwork, movement, gratitude, grounding, laughter, or reframing. Each spin gives you a guided micro-activity. Different every time.', es: 'Gira la rueda para una actividad rapida de reinicio del estres. Cae en respiracion, movimiento, gratitud, conexion a tierra, risa o reencuadre. Cada giro te da una micro-actividad guiada.' },
+    howToPlay: [
+      { en: 'Spin the wheel', es: 'Gira la rueda' },
+      { en: 'Land on a reset category', es: 'Cae en una categoria de reinicio' },
+      { en: 'Follow the guided micro-activity', es: 'Sigue la micro-actividad guiada' },
+      { en: 'Spin again or check in with how you feel', es: 'Gira otra vez o reflexiona sobre como te sientes' },
+    ],
+    whatYouNeed: [
+      { en: 'Just yourself and 2-3 minutes', es: 'Solo tu y 2-3 minutos' },
+      { en: 'Perfect for between classes or during a break', es: 'Perfecto entre clases o durante un descanso' },
+    ],
+    bestFor: { en: 'Any educator needing a quick mental reset during a tough day', es: 'Cualquier educador que necesite un reinicio mental rapido durante un dia dificil' },
+    time: '~5 min',
+    rounds: { en: 'Unlimited spins', es: 'Giros ilimitados' },
+    color: '#F43F5E',
+    format: 'solo',
+    requiredTier: 'free',
+  },
+  'first-five-days': {
+    component: FirstFiveDays,
+    id: 'practice-first-five-days',
+    contentUuid: 'a1000018-0000-0000-0000-000000000018',
+    title: { en: 'First Five Days', es: 'Los Primeros Cinco Dias' },
+    description: { en: 'Plan your first week back to school. You see a list of things that need to happen during the first five days. Pick the 8 most important ones and see how they compare to what experienced educators prioritize. The gaps reveal what you might be overlooking.', es: 'Planifica tu primera semana de regreso a clases. Ves una lista de cosas que deben pasar durante los primeros cinco dias. Elige las 8 mas importantes y ve como se comparan con lo que educadores experimentados priorizan.' },
+    howToPlay: [
+      { en: 'Choose your role: Teacher, Para, or Leader', es: 'Elige tu rol: Maestro, Para o Lider' },
+      { en: 'Review the list of first-week priorities', es: 'Revisa la lista de prioridades de la primera semana' },
+      { en: 'Select the 8 most important items', es: 'Selecciona los 8 items mas importantes' },
+      { en: 'See how your picks compare to expert priorities', es: 'Ve como tus selecciones se comparan con las prioridades expertas' },
+    ],
+    whatYouNeed: [
+      { en: 'Just yourself', es: 'Solo tu' },
+      { en: 'Great for back-to-school PD sessions', es: 'Excelente para sesiones de PD de regreso a clases' },
+    ],
+    bestFor: { en: 'All educators preparing for the start of a new school year', es: 'Todos los educadores preparandose para el inicio de un nuevo ano escolar' },
+    time: '~15 min',
+    rounds: { en: '1 round, 8 picks', es: '1 ronda, 8 selecciones' },
+    color: '#F59E0B',
+    format: 'solo',
+    requiredTier: 'professional',
+  },
+  'plan-your-year': {
+    component: PlanYourYear,
+    id: 'practice-plan-your-year',
+    contentUuid: 'a1000019-0000-0000-0000-000000000019',
+    title: { en: 'Plan Your Year', es: 'Planifica Tu Ano' },
+    description: { en: 'Map out your professional growth goals month by month. Each month presents competing priorities. Choose 2 per month and see how your plan balances across the year. The burnout risk meter shows if your plan is sustainable.', es: 'Traza tus metas de crecimiento profesional mes a mes. Cada mes presenta prioridades en competencia. Elige 2 por mes y ve como tu plan se equilibra a lo largo del ano. El medidor de riesgo de agotamiento muestra si tu plan es sostenible.' },
+    howToPlay: [
+      { en: 'Navigate through 9 school months (September to May)', es: 'Navega por 9 meses escolares (septiembre a mayo)' },
+      { en: 'Select 2 priority items per month', es: 'Selecciona 2 items prioritarios por mes' },
+      { en: 'See insights about your monthly choices', es: 'Ve perspectivas sobre tus elecciones mensuales' },
+      { en: 'Review your full-year plan and burnout risk', es: 'Revisa tu plan anual y riesgo de agotamiento' },
+    ],
+    whatYouNeed: [
+      { en: 'Just yourself', es: 'Solo tu' },
+      { en: 'Great for goal-setting PD at the start of the year', es: 'Excelente para PD de establecimiento de metas al inicio del ano' },
+    ],
+    bestFor: { en: 'All educators planning their professional growth for the year', es: 'Todos los educadores planificando su crecimiento profesional para el ano' },
+    time: '~15 min',
+    rounds: { en: '9 months', es: '9 meses' },
+    color: '#3498DB',
+    format: 'solo',
+    requiredTier: 'professional',
+  },
 };
 
 // ─── Game Testimonials ──────────────────────────────────────────────────────
@@ -384,6 +576,46 @@ const GAME_TESTIMONIALS: Record<string, { quote: string; role: string }[]> = {
     { quote: "The para responsibilities set should be required for every new para orientation. Finally someone made it clear.", role: "Paraprofessional, K-2" },
     { quote: "The accommodation vs modification set finally made the difference click. I have been confusing them for years.", role: "Special education teacher" },
     { quote: "Used the Feedback or Praise set with my lead teacher. We had the best conversation about what we actually say to kids in small group.", role: "Paraprofessional, 3-5" },
+  ],
+  'principal-playbook': [
+    { quote: "I am an AP hoping to get my own building soon. This game showed me how I think under pressure and where my blind spots are.", role: "Assistant principal" },
+    { quote: "The staffing scenarios were the hardest. I kept choosing the empathetic option when the leadership move was to hold the standard.", role: "Principal, year 2" },
+    { quote: "We played this at our leadership retreat and the debates got HEATED. Best PD we have done all year.", role: "District leadership coach" },
+  ],
+  'conversation-compass': [
+    { quote: "I avoid hard conversations with parents. This game helped me see that the right opener changes everything.", role: "3rd grade teacher" },
+    { quote: "The colleague scenarios hit home. I have been avoiding a conversation with my co-teacher for months. Now I have a framework.", role: "Paraprofessional, 6-8" },
+    { quote: "We used this to train new teachers on parent communication. The skill breakdown at the end sparked great coaching conversations.", role: "Instructional coach" },
+  ],
+  'partner-up': [
+    { quote: "Playing both perspectives back to back changed everything. I finally understand why my teacher makes the decisions she does.", role: "Paraprofessional, 3-5" },
+    { quote: "My para and I played this together during our planning period. We learned more in 10 minutes than in 3 months of working together.", role: "4th grade teacher" },
+    { quote: "The insight that connects both perspectives is the real learning moment. That is where co-teaching clicks.", role: "Instructional coach" },
+  ],
+  'boundary-game': [
+    { quote: "I say yes to everything and then wonder why I am exhausted. This game made me see the pattern.", role: "2nd grade teacher" },
+    { quote: "The scenario about staying late to help a colleague pack up their classroom. I felt personally attacked in the best way.", role: "Paraprofessional, K-2" },
+    { quote: "We used this at our wellness PD day. Half the staff had the same boundary blind spots. Now we talk about it openly.", role: "School counselor" },
+  ],
+  'lean-on-tdi': [
+    { quote: "I did not even know half these support options existed. Now I actually use the platform instead of just logging in for PD.", role: "Paraprofessional, 3-5" },
+    { quote: "The role-specific scenarios made it feel personal. The leader scenarios addressed exactly what I deal with.", role: "Principal" },
+    { quote: "Perfect for onboarding. Every new partnership school should play this in their first week.", role: "TDI program coordinator" },
+  ],
+  'reset-roulette': [
+    { quote: "I spin this between 2nd and 3rd period every day now. The grounding exercises are my favorite.", role: "High school teacher" },
+    { quote: "My students saw me doing the breathing exercise and asked to join. Now we spin the wheel together after lunch.", role: "1st grade teacher" },
+    { quote: "The reframing prompts are surprisingly deep for a 2-minute activity. Changed how I process tough moments.", role: "Paraprofessional, 6-8" },
+  ],
+  'first-five-days': [
+    { quote: "I am a new teacher and this game showed me I was focused on all the wrong things for week one. Relationships first, systems second.", role: "1st-year teacher" },
+    { quote: "Played this as a team before school started. We realized we all had completely different priorities. Now we are aligned.", role: "Grade-level team lead" },
+    { quote: "The para version is gold. Nobody ever tells us what OUR first five days should look like. This does.", role: "Paraprofessional, K-2" },
+  ],
+  'plan-your-year': [
+    { quote: "I crammed everything into September and October. The burnout meter called me out immediately.", role: "3rd grade teacher" },
+    { quote: "Seeing my whole year mapped out month by month made me realize I never plan for sustainability. Just survival.", role: "Middle school science teacher" },
+    { quote: "We did this at our August PD and revisit it every quarter. The month-by-month format makes it actually usable.", role: "Instructional coach" },
   ],
 };
 
@@ -1346,6 +1578,15 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                   <Clock size={12} />
                   {quickWin.estimated_minutes} {tUI('min')}
                 </div>
+                {quickWin.content_type === 'quiz' ? (
+                <div
+                  className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full"
+                  style={{ background: 'rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.8)' }}
+                >
+                  <Zap size={12} />
+                  {tUI('Interactive Quiz')}
+                </div>
+                ) : (
                 <div
                   className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full"
                   style={{ background: 'rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.8)' }}
@@ -1353,6 +1594,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                   <BookOpen size={12} />
                   {tUI('PDF Download')}
                 </div>
+                )}
                 <div className="text-xs" style={{ color: 'rgba(255,255,255,0.45)' }}>
                   {tUI('by Teachers Deserve It')}
                 </div>
@@ -1361,8 +1603,19 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
 
             {/* Right: action card inside hero */}
             <div className="md:w-[280px] flex-shrink-0 p-6 md:p-8 flex flex-col justify-center gap-3">
-              {/* Download button */}
-              {quickWin.download_url ? (
+              {/* Download / Quiz button */}
+              {quickWin.content_type === 'quiz' && quickWin.download_url ? (
+                <a
+                  href={quickWin.download_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-2 py-3 px-4 font-semibold text-sm rounded-xl transition-opacity hover:opacity-90"
+                  style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
+                >
+                  <Play size={16} />
+                  {tUI('Take Quiz')}
+                </a>
+              ) : quickWin.download_url ? (
                 <a
                   href={quickWin.download_url}
                   target="_blank"
@@ -1373,6 +1626,14 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                   <Download size={16} />
                   {tUI('Download Tool')}
                 </a>
+              ) : quickWin.content_type === 'quiz' ? (
+                <div
+                  className="flex items-center justify-center gap-2 py-3 px-4 text-sm rounded-xl"
+                  style={{ backgroundColor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.35)' }}
+                >
+                  <Zap size={16} />
+                  {tUI('Quiz coming soon')}
+                </div>
               ) : (
                 <div
                   className="flex items-center justify-center gap-2 py-3 px-4 text-sm rounded-xl"
@@ -1426,6 +1687,32 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
               {/* Breathing Visual */}
               {/* Breathing exercise removed - all quick wins are PDF downloads */}
 
+              {/* Quiz type */}
+              {quickWin.content_type === 'quiz' && (
+                <div className="mb-6">
+                  {quickWin.download_url ? (
+                    <a
+                      href={quickWin.download_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-3 w-full py-4 font-semibold text-lg transition-opacity hover:opacity-90"
+                      style={{ backgroundColor: '#ffba06', color: '#1e2749', borderRadius: '12px' }}
+                    >
+                      <Play size={22} />
+                      {tUI('Take Quiz')}
+                    </a>
+                  ) : (
+                    <div
+                      className="flex items-center justify-center gap-3 w-full py-4 font-semibold text-lg"
+                      style={{ backgroundColor: '#E5E7EB', color: '#9CA3AF', borderRadius: '12px', cursor: 'not-allowed' }}
+                    >
+                      <Zap size={22} />
+                      {tUI('Quiz coming soon')}
+                    </div>
+                  )}
+                </div>
+              )}
+
               {/* Download button (for download type) */}
               {quickWin.content_type === 'download' && (
                 <div className="mb-6">
@@ -1453,7 +1740,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
               )}
 
               {/* Read type */}
-              {(quickWin.content_type === 'read' || (!quickWin.video_url && !quickWin.download_url && actionSteps.length === 0 && quickWin.content_type !== 'reflection')) && (
+              {(quickWin.content_type === 'read' || (!quickWin.video_url && !quickWin.download_url && actionSteps.length === 0 && quickWin.content_type !== 'reflection' && quickWin.content_type !== 'quiz')) && (
                 <div>
                   {quickWin.content && (
                     <div
