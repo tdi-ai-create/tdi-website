@@ -91,4 +91,12 @@ export const TIPS_BY_GAME = {
     "Works great as a staff meeting opener. Sets the tone for the whole session.",
     "If the group lands on Laugh Break, let the energy stay high. Do not rush back to business.",
   ] as string[],
+  firstconversation: [
+    "The ripple effect is the lesson. Let people sit with the consequences before discussing.",
+    "If someone says 'I would never do that,' gently remind them: the question is not what you would do in theory. It is what you do at 7:45 AM on Day 1.",
+    "The 'I have been there' moments build trust. Do not skip the debrief on those.",
+    "Pair a teacher and a para to play together. The dual perspective scenarios spark great conversations.",
+    "This game works best the week before school starts. Play it at your opening PD.",
+    "After the game, ask: 'Which ripple surprised you the most?' That is where the real learning lives.",
+  ] as string[],
 } as const;

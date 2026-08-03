@@ -26,6 +26,7 @@ export const GAME_ICONS = {
   resetroulette: RotateCcw,
   firstfivedays: Calendar,
   planyouryear: TrendingUp,
+  firstconversation: MessageCircle,
 } as const;
 
 interface GameWrapperProps {
