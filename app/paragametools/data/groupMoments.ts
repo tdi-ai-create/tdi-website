@@ -73,4 +73,10 @@ export const GROUP_MOMENTS_BY_GAME = {
     "What reset would you use mid-day, right after a hard class?",
     "Share with your table: when was the last time you paused on purpose during a school day?",
   ] as string[],
+  firstconversation: [
+    "Which ripple effect surprised you the most? Share with your table.",
+    "Raise your hand if you hit 'I have been there' on more than half the scenarios.",
+    "What is one first-week conversation you want to handle differently this year?",
+    "Share with your table: what is one thing you do in the first 48 hours that sets the tone for the whole year?",
+  ] as string[],
 } as const;

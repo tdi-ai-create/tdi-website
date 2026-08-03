@@ -45,6 +45,7 @@ const TIMES: Record<GameId, string> = {
   resetroulette: '~8 min',
   firstfivedays: '~10 min',
   planyouryear: '~12 min',
+  firstconversation: '~12 min',
 };
 
 interface HomeScreenProps {

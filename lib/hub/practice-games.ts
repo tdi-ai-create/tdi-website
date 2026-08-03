@@ -570,6 +570,34 @@ export const PRACTICE_GAME_REGISTRY: PracticeGameEntry[] = [
     capacity: 'medium',
     access_tier: 'professional',
   },
+  {
+    slug: 'first-conversation',
+    id: 'practice-first-conversation',
+    contentUuid: 'a1000020-0000-0000-0000-000000000020',
+    title: { en: 'The First Conversation', es: 'La Primera Conversacion' },
+    description: { en: 'Opening-week interactions that set the tone for the year. Choose your response, then watch the ripple effect unfold across three timeframes. First words matter more than you think.', es: 'Interacciones de la primera semana que establecen el tono del ano. Elige tu respuesta, luego mira el efecto domino en tres momentos. Las primeras palabras importan mas de lo que crees.' },
+    howToPlay: [
+      { en: 'Choose your role, grade band, and experience level', es: 'Elige tu rol, nivel de grado y experiencia' },
+      { en: 'Read a real opening-week scenario', es: 'Lee un escenario real de la primera semana' },
+      { en: 'Choose your response', es: 'Elige tu respuesta' },
+      { en: 'Watch the ripple: that moment, that week, that month', es: 'Mira el efecto domino: ese momento, esa semana, ese mes' },
+      { en: 'See the research behind why it matters', es: 'Ve la investigacion detras de por que importa' },
+    ],
+    whatYouNeed: [
+      { en: 'Just yourself', es: 'Solo tu' },
+      { en: 'Perfect for back-to-school PD or solo reflection before Day 1', es: 'Perfecto para PD de regreso a clases o reflexion antes del Dia 1' },
+    ],
+    bestFor: { en: 'All educators preparing for the first week. Personalized by role, grade band, and experience level.', es: 'Todos los educadores preparandose para la primera semana. Personalizado por rol, nivel de grado y experiencia.' },
+    time: '~12 min',
+    rounds: { en: '8 scenarios', es: '8 escenarios' },
+    color: '#22b8bd',
+    format: 'solo',
+    requiredTier: 'free',
+    category: 'Games',
+    estimated_minutes: 12,
+    capacity: 'medium',
+    access_tier: 'free',
+  },
 ];
 
 /** Set of all practice game slugs, for deduplication */

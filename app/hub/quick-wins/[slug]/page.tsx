@@ -49,6 +49,7 @@ import { LeanOnTdi } from '@/app/paragametools/components/LeanOnTdi';
 import { ResetRoulette } from '@/app/paragametools/components/ResetRoulette';
 import { FirstFiveDays } from '@/app/paragametools/components/FirstFiveDays';
 import { PlanYourYear } from '@/app/paragametools/components/PlanYourYear';
+import { FirstConversation } from '@/app/paragametools/components/FirstConversation';
 import { Gamepad2, Users, Timer, Target, Lock } from 'lucide-react';
 import { useMembership, type MembershipTier, canAccessContent } from '@/lib/hub/use-membership';
 import { PRACTICE_GAME_REGISTRY, type PracticeGameEntry } from '@/lib/hub/practice-games';
@@ -84,6 +85,7 @@ const PRACTICE_GAME_COMPONENTS: Record<string, React.ComponentType<{ onBack: () 
   'reset-roulette': ResetRoulette,
   'first-five-days': FirstFiveDays,
   'plan-your-year': PlanYourYear,
+  'first-conversation': FirstConversation,
 };
 
 // Build the full game config by merging registry data with components
@@ -195,6 +197,11 @@ const GAME_TESTIMONIALS: Record<string, { quote: string; role: string }[]> = {
     { quote: "I crammed everything into September and October. The burnout meter called me out immediately.", role: "3rd grade teacher" },
     { quote: "Seeing my whole year mapped out month by month made me realize I never plan for sustainability. Just survival.", role: "Middle school science teacher" },
     { quote: "We did this at our August PD and revisit it every quarter. The month-by-month format makes it actually usable.", role: "Instructional coach" },
+  ],
+  'first-conversation': [
+    { quote: "The ripple effect is what got me. I chose the quick reply to a parent email and then watched the trust erode over three timeframes. Changed how I approach every first interaction.", role: "4th grade teacher" },
+    { quote: "As a para, the scenario about meeting your lead teacher for the first time was my actual life. I wish I had this game before my first day.", role: "Paraprofessional, K-2" },
+    { quote: "We played this at our back-to-school PD and half the room hit the 'I have been there' button on every scenario. The solidarity was real.", role: "Instructional coach" },
   ],
 };
 
