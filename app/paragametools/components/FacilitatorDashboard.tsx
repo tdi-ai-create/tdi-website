@@ -46,6 +46,7 @@ const GAME_ICONS: Record<GameId, typeof Target> = {
   firstfivedays: Calendar,
   planyouryear: TrendingUp,
   firstconversation: MessageCircle,
+  readtheroom: Target,
 };
 
 interface FacilitatorDashboardProps {

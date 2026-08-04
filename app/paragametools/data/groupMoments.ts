@@ -79,4 +79,10 @@ export const GROUP_MOMENTS_BY_GAME = {
     "What is one first-week conversation you want to handle differently this year?",
     "Share with your table: what is one thing you do in the first 48 hours that sets the tone for the whole year?",
   ] as string[],
+  readtheroom: [
+    "What did you notice first in each scenario? Share with your table.",
+    "Which cue card category was your biggest blind spot? Why do you think that is?",
+    "The 'positive energy' scenario looks like chaos. Who flagged it as a problem? Who saw the learning? Discuss.",
+    "As a team: what observation habit do you want to build this year?",
+  ] as string[],
 } as const;
