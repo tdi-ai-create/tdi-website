@@ -27,6 +27,7 @@ export const GAME_ICONS = {
   firstfivedays: Calendar,
   planyouryear: TrendingUp,
   firstconversation: MessageCircle,
+  readtheroom: Target,
 } as const;
 
 interface GameWrapperProps {

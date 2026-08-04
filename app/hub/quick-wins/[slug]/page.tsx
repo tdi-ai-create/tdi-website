@@ -50,6 +50,7 @@ import { ResetRoulette } from '@/app/paragametools/components/ResetRoulette';
 import { FirstFiveDays } from '@/app/paragametools/components/FirstFiveDays';
 import { PlanYourYear } from '@/app/paragametools/components/PlanYourYear';
 import { FirstConversation } from '@/app/paragametools/components/FirstConversation';
+import { ReadTheRoom } from '@/app/paragametools/components/ReadTheRoom';
 import { Gamepad2, Users, Timer, Target, Lock } from 'lucide-react';
 import { useMembership, type MembershipTier, canAccessContent } from '@/lib/hub/use-membership';
 import { PRACTICE_GAME_REGISTRY, type PracticeGameEntry } from '@/lib/hub/practice-games';
@@ -86,6 +87,7 @@ const PRACTICE_GAME_COMPONENTS: Record<string, React.ComponentType<{ onBack: () 
   'first-five-days': FirstFiveDays,
   'plan-your-year': PlanYourYear,
   'first-conversation': FirstConversation,
+  'read-the-room': ReadTheRoom,
 };
 
 // Build the full game config by merging registry data with components
@@ -202,6 +204,11 @@ const GAME_TESTIMONIALS: Record<string, { quote: string; role: string }[]> = {
     { quote: "The ripple effect is what got me. I chose the quick reply to a parent email and then watched the trust erode over three timeframes. Changed how I approach every first interaction.", role: "4th grade teacher" },
     { quote: "As a para, the scenario about meeting your lead teacher for the first time was my actual life. I wish I had this game before my first day.", role: "Paraprofessional, K-2" },
     { quote: "We played this at our back-to-school PD and half the room hit the 'I have been there' button on every scenario. The solidarity was real.", role: "Instructional coach" },
+  ],
+  'read-the-room': [
+    { quote: "The classroom observation scenario humbled me. I went straight to the head-down student and completely missed the single-writer group. That was my biggest blind spot.", role: "Instructional coach" },
+    { quote: "The recess scenario about the group-hopper broke my heart. I have seen that kid and I never knew what to do. Now I do.", role: "Paraprofessional, 3-5" },
+    { quote: "We played this as a leadership team and discovered that every single one of us would have addressed the honking parent first during dismissal. The cue card collection at the end was eye-opening.", role: "Principal" },
   ],
 };
 

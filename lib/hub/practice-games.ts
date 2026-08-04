@@ -598,6 +598,34 @@ export const PRACTICE_GAME_REGISTRY: PracticeGameEntry[] = [
     capacity: 'medium',
     access_tier: 'essentials',
   },
+  {
+    slug: 'read-the-room',
+    id: 'practice-read-the-room',
+    contentUuid: 'a1000021-0000-0000-0000-000000000021',
+    title: { en: 'Read the Room', es: 'Lee el Salon' },
+    description: { en: 'You walk into a situation mid-stream. Read the scene, identify the key cues that others miss, then choose your response. Collect cue cards for the signals you spot. Train the observation muscle that separates experienced educators from new ones.', es: 'Caminas a una situacion a mitad de camino. Lee la escena, identifica las senales clave que otros pierden, luego elige tu respuesta. Colecciona tarjetas de senales mientras entrenas el musculo de observacion.' },
+    howToPlay: [
+      { en: 'Choose your role and grade band', es: 'Elige tu rol y nivel de grado' },
+      { en: 'Read the scene before the timer runs out', es: 'Lee la escena antes de que se acabe el tiempo' },
+      { en: 'Identify the 2 most important observations', es: 'Identifica las 2 observaciones mas importantes' },
+      { en: 'Choose your response', es: 'Elige tu respuesta' },
+      { en: 'See the expert analysis and research', es: 'Ve el analisis experto y la investigacion' },
+    ],
+    whatYouNeed: [
+      { en: 'Just yourself', es: 'Solo tu' },
+      { en: 'Great for coach-teacher pairs or staff PD', es: 'Excelente para parejas coach-maestro o PD de personal' },
+    ],
+    bestFor: { en: 'All educators building observation and situational awareness skills. Personalized by role and grade band.', es: 'Todos los educadores construyendo habilidades de observacion y conciencia situacional.' },
+    time: '~12 min',
+    rounds: { en: '8 scenarios', es: '8 escenarios' },
+    color: '#9333EA',
+    format: 'solo',
+    requiredTier: 'essentials',
+    category: 'Games',
+    estimated_minutes: 12,
+    capacity: 'medium',
+    access_tier: 'essentials',
+  },
 ];
 
 /** Set of all practice game slugs, for deduplication */

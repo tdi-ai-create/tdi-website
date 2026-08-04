@@ -99,4 +99,12 @@ export const TIPS_BY_GAME = {
     "This game works best the week before school starts. Play it at your opening PD.",
     "After the game, ask: 'Which ripple surprised you the most?' That is where the real learning lives.",
   ] as string[],
+  readtheroom: [
+    "After each scenario, ask your table: 'What did you see first?' The differences reveal observation habits.",
+    "The observation phase timer creates productive urgency. Do not extend it. The constraint is the point.",
+    "Debrief the 'missed cue' statistics together. They normalize the fact that everyone has blind spots.",
+    "This game is powerful for coach-teacher pairs. Coaches and teachers notice different things in the same room.",
+    "The positive energy scenario (the one that looks chaotic) always sparks the best discussion. Save time for it.",
+    "Ask: 'Which cue card category surprised you?' That is your growth edge as an observer.",
+  ] as string[],
 } as const;
