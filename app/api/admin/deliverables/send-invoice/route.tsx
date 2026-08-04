@@ -283,15 +283,21 @@ export async function POST(request: NextRequest) {
       risk_flag: false,
     });
 
+    // Auto-mark as delivered if still pending/scheduled, then set to invoiced
+    const deliverableUpdate: Record<string, unknown> = {
+      invoice_id: invoiceId,
+      invoice_type: 'intelligence_invoice',
+      invoiced_at: now.toISOString(),
+      delivery_status: 'invoiced',
+      updated_at: now.toISOString(),
+    };
+    if (!deliverable.delivery_date) {
+      deliverableUpdate.delivery_date = now.toISOString().split('T')[0];
+    }
+
     await supabase
       .from('contract_deliverables')
-      .update({
-        invoice_id: invoiceId,
-        invoice_type: 'intelligence_invoice',
-        invoiced_at: now.toISOString(),
-        delivery_status: 'invoiced',
-        updated_at: now.toISOString(),
-      })
+      .update(deliverableUpdate)
       .eq('id', deliverableId);
   }
 

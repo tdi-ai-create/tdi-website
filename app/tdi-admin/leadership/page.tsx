@@ -6,7 +6,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { useTDIAdmin } from '@/lib/tdi-admin/context';
 import { hasAnySectionPermission } from '@/lib/tdi-admin/permissions';
 import { PORTAL_THEMES } from '@/lib/tdi-admin/theme';
-import InvoicingOverview from '@/components/tdi-admin/leadership/InvoicingOverview';
+
 import { HorizontalBarChart, DonutChart, DonutLegend, ProgressRing, LiveSectionHeader } from '@/components/tdi-admin/hub-charts/HubCharts';
 import {
   Building2,
@@ -105,7 +105,6 @@ const TABS = [
   { id: 'reports', label: 'School Reports' },
   { id: 'actions', label: 'Action Items' },
   { id: 'pipeline', label: 'Onboarding Pipeline' },
-  { id: 'billing', label: 'Invoicing' },
 ] as const;
 
 type TabId = (typeof TABS)[number]['id'];
@@ -1660,10 +1659,6 @@ export default function LeadershipDashboardPage() {
           </div>
         )}
 
-        {/* =========== BILLING TAB =========== */}
-        {activeTab === 'billing' && (
-          <InvoicingOverview userEmail={teamMember?.email || ''} />
-        )}
       </div>
     </div>
     </div>

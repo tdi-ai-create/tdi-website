@@ -706,15 +706,7 @@ export default function BillingTab({
 
                   <div className="flex items-center gap-3 flex-shrink-0">
                     {/* Action buttons */}
-                    {d.delivery_status === 'pending' && !d.is_complimentary && (
-                      <button
-                        onClick={(e) => { e.stopPropagation(); markDelivered(d.id); }}
-                        className="text-xs font-semibold px-3 py-1.5 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors"
-                      >
-                        Mark Delivered
-                      </button>
-                    )}
-                    {d.delivery_status === 'delivered' && !d.is_complimentary && !d.invoice_id && (
+                    {(d.delivery_status === 'pending' || d.delivery_status === 'scheduled' || d.delivery_status === 'delivered') && !d.is_complimentary && !d.invoice_id && (
                       <button
                         onClick={(e) => { e.stopPropagation(); openInvoicePreview(d); }}
                         className="text-xs font-semibold px-3 py-1.5 rounded-lg text-white transition-colors flex items-center gap-1.5"
