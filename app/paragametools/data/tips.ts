@@ -107,6 +107,14 @@ export const TIPS_BY_GAME = {
     "Pair this game with The First Conversation for a powerful back-to-school PD arc: first impressions and first recoveries.",
     "Ask: 'Which recovery type was hardest for you?' That is your growth edge.",
   ] as string[],
+  whatwouldyousay: [
+    "The typing phase is where the real learning happens. Encourage people to write fast, from the gut. Do not overthink it.",
+    "After the reveal, ask: 'How close was your typed response to the reflective option?' The gap is the growth edge.",
+    "The word count comparison is subtle but powerful. Reflective responses tend to be longer because they name feelings and invite dialogue.",
+    "If a table debates reactive versus measured, that is the conversation you want. Let it breathe.",
+    "The framework tags are not meant to be memorized. They are meant to show that skilled communication has a name and a research base.",
+    "Ask: 'Which scenario made your jaw tighten?' That is the one you need to practice most.",
+  ] as string[],
   readtheroom: [
     "After each scenario, ask your table: 'What did you see first?' The differences reveal observation habits.",
     "The observation phase timer creates productive urgency. Do not extend it. The constraint is the point.",
@@ -114,5 +122,13 @@ export const TIPS_BY_GAME = {
     "This game is powerful for coach-teacher pairs. Coaches and teachers notice different things in the same room.",
     "The positive energy scenario (the one that looks chaotic) always sparks the best discussion. Save time for it.",
     "Ask: 'Which cue card category surprised you?' That is your growth edge as an observer.",
+  ] as string[],
+  namethatmove: [
+    "The 'I use this one' button is the real data. Watch for educators who recognize every strategy but mark none as their own.",
+    "The gap analysis at the end reveals blind spots. Most educators are strong in one or two categories and weak in others.",
+    "De-escalation moves trip people up the most. The strategies sound similar but work differently in practice.",
+    "Coaching stance shows up twice in the game. Both times, the distractors are close. That is by design.",
+    "The research citations are conversation starters. Ask tables to discuss one that surprised them.",
+    "Play this game early in a PD day. It gives educators a shared vocabulary for the rest of the session.",
   ] as string[],
 } as const;

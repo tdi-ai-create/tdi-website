@@ -1,6 +1,6 @@
 // Game configuration and shared utilities
 
-export type GameId = 'knockout' | 'tellorask' | 'levelup' | 'madlibs' | 'makeover' | 'whatsyourmove' | 'classroomshuffle' | 'prioritize' | 'energybudget' | 'principalplaybook' | 'conversationcompass' | 'partnerup' | 'boundarygame' | 'leanontdi' | 'resetroulette' | 'firstfivedays' | 'planyouryear' | 'firstconversation' | 'readtheroom' | 'thecomeback';
+export type GameId = 'knockout' | 'tellorask' | 'levelup' | 'madlibs' | 'makeover' | 'whatsyourmove' | 'classroomshuffle' | 'prioritize' | 'energybudget' | 'principalplaybook' | 'conversationcompass' | 'partnerup' | 'boundarygame' | 'leanontdi' | 'resetroulette' | 'firstfivedays' | 'planyouryear' | 'firstconversation' | 'readtheroom' | 'thecomeback' | 'whatwouldyousay' | 'namethatmove';
 
 export interface GameConfig {
   id: GameId;
