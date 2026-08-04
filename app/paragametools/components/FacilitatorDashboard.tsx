@@ -22,6 +22,8 @@ import {
   Shield,
   Handshake,
   Calendar,
+  Award,
+  MessageSquare,
 } from 'lucide-react';
 import { GAMES, COLORS, type GameId } from '../data/gameConfig';
 import { TIPS_BY_GAME } from '../data/tips';
@@ -48,6 +50,8 @@ const GAME_ICONS: Record<GameId, typeof Target> = {
   firstconversation: MessageCircle,
   readtheroom: Target,
   thecomeback: RotateCcw,
+  whatwouldyousay: MessageCircle,
+  namethatmove: Award,
 };
 
 interface FacilitatorDashboardProps {

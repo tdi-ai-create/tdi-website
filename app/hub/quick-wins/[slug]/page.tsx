@@ -52,6 +52,8 @@ import { PlanYourYear } from '@/app/paragametools/components/PlanYourYear';
 import { FirstConversation } from '@/app/paragametools/components/FirstConversation';
 import { ReadTheRoom } from '@/app/paragametools/components/ReadTheRoom';
 import { TheComeback } from '@/app/paragametools/components/TheComeback';
+import { WhatWouldYouSay } from '@/app/paragametools/components/WhatWouldYouSay';
+import { NameThatMove } from '@/app/paragametools/components/NameThatMove';
 import { Gamepad2, Users, Timer, Target, Lock } from 'lucide-react';
 import { useMembership, type MembershipTier, canAccessContent } from '@/lib/hub/use-membership';
 import { PRACTICE_GAME_REGISTRY, type PracticeGameEntry } from '@/lib/hub/practice-games';
@@ -90,6 +92,8 @@ const PRACTICE_GAME_COMPONENTS: Record<string, React.ComponentType<{ onBack: () 
   'first-conversation': FirstConversation,
   'read-the-room': ReadTheRoom,
   'the-comeback': TheComeback,
+  'what-would-you-say': WhatWouldYouSay,
+  'name-that-move': NameThatMove,
 };
 
 // Build the full game config by merging registry data with components
@@ -216,6 +220,16 @@ const GAME_TESTIMONIALS: Record<string, { quote: string; role: string }[]> = {
     { quote: "The wrong name scenario was my actual first week. I called a student by their sibling's name for days. This game taught me that moving on without apologizing is the worst option. The real story at the end made me cry.", role: "1st-year teacher" },
     { quote: "I have lost my temper in class before. This game did not judge me for it. It showed me what to do NEXT. That is what makes it different from every other PD I have done on classroom management.", role: "Paraprofessional, 6-8" },
     { quote: "The speed versus relationship meter is brilliant. Sometimes I choose the fast fix and sacrifice the relationship. Seeing that tradeoff scored changed how I think about recovery.", role: "Instructional coach" },
+  ],
+  'what-would-you-say': [
+    { quote: "Typing my response first was humbling. I wrote something reactive and then saw the reflective option and thought, that is what I WISH I had said. Now I practice saying it before the moment happens.", role: "3rd grade teacher" },
+    { quote: "The parent email scenario was my actual life last Tuesday. I responded defensively. This game showed me exactly why that was wrong and what to say instead. I am keeping the reflective response saved in my phone.", role: "Paraprofessional, 6-8" },
+    { quote: "We played this at our leadership PD and compared our typed responses at the table. The differences were striking. One person wrote 8 words. Another wrote 60. The word count comparison taught us more about communication styles than any lecture.", role: "Instructional coach" },
+  ],
+  'name-that-move': [
+    { quote: "I recognized 12 out of 15 strategies but only marked 4 as 'I use this one.' That gap between knowing and doing was my biggest takeaway. Now I have a list of moves to practice.", role: "4th grade teacher" },
+    { quote: "The 2x10 strategy blew my mind. Two minutes a day for ten days with the same student. I started it Monday. By Thursday, that student was a different kid in my small group.", role: "Paraprofessional, 3-5" },
+    { quote: "We played this at our coaching team meeting and it gave us a shared vocabulary we have been missing. Now when I observe a teacher, I can name exactly what they did well using the strategy names from the game.", role: "Instructional coach" },
   ],
 };
 

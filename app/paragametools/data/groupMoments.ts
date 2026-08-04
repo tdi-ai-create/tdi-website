@@ -85,10 +85,22 @@ export const GROUP_MOMENTS_BY_GAME = {
     "As a team: what is your school's culture around admitting mistakes? Does this game change how you think about it?",
     "What is one recovery you want to practice before it happens?",
   ] as string[],
+  whatwouldyousay: [
+    "Read your typed response out loud to your table. Then read the reflective option. What is different?",
+    "Which scenario hit closest to home? Share with your table (only if comfortable).",
+    "As a team: which communication framework do you use most naturally? Which one do you need to practice?",
+    "What is one phrase from the reflective responses that you want to steal for real life?",
+  ] as string[],
   readtheroom: [
     "What did you notice first in each scenario? Share with your table.",
     "Which cue card category was your biggest blind spot? Why do you think that is?",
     "The 'positive energy' scenario looks like chaos. Who flagged it as a problem? Who saw the learning? Discuss.",
     "As a team: what observation habit do you want to build this year?",
+  ] as string[],
+  namethatmove: [
+    "Which strategy name surprised you the most? Share with your table.",
+    "Look at your category gap analysis. Which area had the lowest recognition? Why do you think that is?",
+    "Raise your hand if you marked 'I use this one' on fewer than half the moves. What does that tell you about your growth edge?",
+    "As a team: pick one move from the game that you want to practice this week. Name it out loud.",
   ] as string[],
 } as const;

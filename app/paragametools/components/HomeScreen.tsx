@@ -48,6 +48,8 @@ const TIMES: Record<GameId, string> = {
   firstconversation: '~12 min',
   readtheroom: '~12 min',
   thecomeback: '~12 min',
+  whatwouldyousay: '~12 min',
+  namethatmove: '~12 min',
 };
 
 interface HomeScreenProps {
