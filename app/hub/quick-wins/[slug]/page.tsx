@@ -51,6 +51,7 @@ import { FirstFiveDays } from '@/app/paragametools/components/FirstFiveDays';
 import { PlanYourYear } from '@/app/paragametools/components/PlanYourYear';
 import { FirstConversation } from '@/app/paragametools/components/FirstConversation';
 import { ReadTheRoom } from '@/app/paragametools/components/ReadTheRoom';
+import { TheComeback } from '@/app/paragametools/components/TheComeback';
 import { Gamepad2, Users, Timer, Target, Lock } from 'lucide-react';
 import { useMembership, type MembershipTier, canAccessContent } from '@/lib/hub/use-membership';
 import { PRACTICE_GAME_REGISTRY, type PracticeGameEntry } from '@/lib/hub/practice-games';
@@ -88,6 +89,7 @@ const PRACTICE_GAME_COMPONENTS: Record<string, React.ComponentType<{ onBack: () 
   'plan-your-year': PlanYourYear,
   'first-conversation': FirstConversation,
   'read-the-room': ReadTheRoom,
+  'the-comeback': TheComeback,
 };
 
 // Build the full game config by merging registry data with components
@@ -209,6 +211,11 @@ const GAME_TESTIMONIALS: Record<string, { quote: string; role: string }[]> = {
     { quote: "The classroom observation scenario humbled me. I went straight to the head-down student and completely missed the single-writer group. That was my biggest blind spot.", role: "Instructional coach" },
     { quote: "The recess scenario about the group-hopper broke my heart. I have seen that kid and I never knew what to do. Now I do.", role: "Paraprofessional, 3-5" },
     { quote: "We played this as a leadership team and discovered that every single one of us would have addressed the honking parent first during dismissal. The cue card collection at the end was eye-opening.", role: "Principal" },
+  ],
+  'the-comeback': [
+    { quote: "The wrong name scenario was my actual first week. I called a student by their sibling's name for days. This game taught me that moving on without apologizing is the worst option. The real story at the end made me cry.", role: "1st-year teacher" },
+    { quote: "I have lost my temper in class before. This game did not judge me for it. It showed me what to do NEXT. That is what makes it different from every other PD I have done on classroom management.", role: "Paraprofessional, 6-8" },
+    { quote: "The speed versus relationship meter is brilliant. Sometimes I choose the fast fix and sacrifice the relationship. Seeing that tradeoff scored changed how I think about recovery.", role: "Instructional coach" },
   ],
 };
 

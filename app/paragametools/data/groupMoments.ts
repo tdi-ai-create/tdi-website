@@ -79,6 +79,12 @@ export const GROUP_MOMENTS_BY_GAME = {
     "What is one first-week conversation you want to handle differently this year?",
     "Share with your table: what is one thing you do in the first 48 hours that sets the tone for the whole year?",
   ] as string[],
+  thecomeback: [
+    "Which scenario has actually happened to you? Share with your table (only if comfortable).",
+    "Which real story hit the hardest? Why?",
+    "As a team: what is your school's culture around admitting mistakes? Does this game change how you think about it?",
+    "What is one recovery you want to practice before it happens?",
+  ] as string[],
   readtheroom: [
     "What did you notice first in each scenario? Share with your table.",
     "Which cue card category was your biggest blind spot? Why do you think that is?",

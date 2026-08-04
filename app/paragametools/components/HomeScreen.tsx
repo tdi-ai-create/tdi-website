@@ -47,6 +47,7 @@ const TIMES: Record<GameId, string> = {
   planyouryear: '~12 min',
   firstconversation: '~12 min',
   readtheroom: '~12 min',
+  thecomeback: '~12 min',
 };
 
 interface HomeScreenProps {

@@ -28,6 +28,7 @@ export const GAME_ICONS = {
   planyouryear: TrendingUp,
   firstconversation: MessageCircle,
   readtheroom: Target,
+  thecomeback: RotateCcw,
 } as const;
 
 interface GameWrapperProps {
