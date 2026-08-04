@@ -626,6 +626,34 @@ export const PRACTICE_GAME_REGISTRY: PracticeGameEntry[] = [
     capacity: 'medium',
     access_tier: 'essentials',
   },
+  {
+    slug: 'the-comeback',
+    id: 'practice-the-comeback',
+    contentUuid: 'a1000022-0000-0000-0000-000000000022',
+    title: { en: 'The Comeback', es: 'El Regreso' },
+    description: { en: 'Things went wrong. A mistake, a moment you wish you could take back. There is no redo option. Only forward moves. Choose your recovery and see how it balances speed with relationship preservation.', es: 'Algo salio mal. Un error, un momento que quisieras devolver. No hay opcion de rehacerlo. Solo movimientos hacia adelante. Elige tu recuperacion y ve como equilibra velocidad con preservacion de relaciones.' },
+    howToPlay: [
+      { en: 'Choose your role and grade band', es: 'Elige tu rol y nivel de grado' },
+      { en: 'Read what went wrong and the aftershock', es: 'Lee lo que salio mal y la sacudida' },
+      { en: 'Choose your forward move (no redo option)', es: 'Elige tu movimiento hacia adelante (sin opcion de rehacer)' },
+      { en: 'See your recovery score: speed vs relationship', es: 'Ve tu puntaje de recuperacion: velocidad vs relacion' },
+      { en: 'Read a real educator story about the same mistake', es: 'Lee una historia real de un educador sobre el mismo error' },
+    ],
+    whatYouNeed: [
+      { en: 'Just yourself', es: 'Solo tu' },
+      { en: 'Powerful for team PD. The real stories build trust and solidarity.', es: 'Poderoso para PD de equipo. Las historias reales construyen confianza y solidaridad.' },
+    ],
+    bestFor: { en: 'All educators. Normalizes mistakes and builds the recovery muscle. Personalized by role and grade band.', es: 'Todos los educadores. Normaliza los errores y construye el musculo de recuperacion.' },
+    time: '~12 min',
+    rounds: { en: '8 scenarios', es: '8 escenarios' },
+    color: '#F43F5E',
+    format: 'solo',
+    requiredTier: 'professional',
+    category: 'Games',
+    estimated_minutes: 12,
+    capacity: 'medium',
+    access_tier: 'professional',
+  },
 ];
 
 /** Set of all practice game slugs, for deduplication */

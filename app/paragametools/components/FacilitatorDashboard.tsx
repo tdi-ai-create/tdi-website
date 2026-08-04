@@ -47,6 +47,7 @@ const GAME_ICONS: Record<GameId, typeof Target> = {
   planyouryear: TrendingUp,
   firstconversation: MessageCircle,
   readtheroom: Target,
+  thecomeback: RotateCcw,
 };
 
 interface FacilitatorDashboardProps {

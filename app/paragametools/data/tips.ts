@@ -99,6 +99,14 @@ export const TIPS_BY_GAME = {
     "This game works best the week before school starts. Play it at your opening PD.",
     "After the game, ask: 'Which ripple surprised you the most?' That is where the real learning lives.",
   ] as string[],
+  thecomeback: [
+    "The real stories at the end of each scenario are the heart of this game. Give people time to sit with them.",
+    "If someone says 'I would never lose my temper,' gently push: 'Have you ever raised your voice even slightly?' Everybody has a comeback story.",
+    "The speed vs relationship meter creates great discussion. Is it always worth slowing down to preserve the relationship? When is speed more important?",
+    "This game normalizes mistakes. That is the point. Make sure the debrief reinforces: the skill is recovery, not perfection.",
+    "Pair this game with The First Conversation for a powerful back-to-school PD arc: first impressions and first recoveries.",
+    "Ask: 'Which recovery type was hardest for you?' That is your growth edge.",
+  ] as string[],
   readtheroom: [
     "After each scenario, ask your table: 'What did you see first?' The differences reveal observation habits.",
     "The observation phase timer creates productive urgency. Do not extend it. The constraint is the point.",
