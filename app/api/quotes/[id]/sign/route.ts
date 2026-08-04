@@ -136,31 +136,72 @@ export async function POST(
     } catch {}
   }
 
-  // 3. Auto-create partnership if one doesn't exist for this contact
-  if (contactEmail && fullQuote) {
+  // 3. Find or create partnership and link deliverables (must always succeed)
+  if (fullQuote) {
     const orgName = fullQuote.contact_organization || ''
-    const { data: existingPartnership } = await supabase
-      .from('partnerships')
-      .select('id')
-      .ilike('contact_email', contactEmail)
-      .limit(1)
-      .maybeSingle()
+    const quoteContactEmail = contactEmail || (fullQuote as any).contact_email || ''
+    let partnershipId: string | null = null
 
-    if (existingPartnership) {
-      // Link deliverables to existing partnership
-      await supabase.from('contract_deliverables')
-        .update({ partnership_id: existingPartnership.id })
-        .eq('quote_id', id)
-        .is('partnership_id', null)
-    } else if (orgName) {
-      const slug = orgName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+    // Strategy 1: Match by exact email
+    if (quoteContactEmail) {
+      const { data: byEmail } = await supabase
+        .from('partnerships')
+        .select('id')
+        .ilike('contact_email', quoteContactEmail)
+        .limit(1)
+        .maybeSingle()
+      if (byEmail) partnershipId = byEmail.id
+    }
+
+    // Strategy 2: Match by email domain (handles .com vs .org, different contacts at same school)
+    if (!partnershipId && quoteContactEmail) {
+      const domain = quoteContactEmail.split('@')[1]
+      if (domain && !['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'icloud.com', 'aol.com'].includes(domain.toLowerCase())) {
+        const { data: byDomain } = await supabase
+          .from('partnerships')
+          .select('id')
+          .ilike('contact_email', `%@${domain}`)
+          .eq('status', 'active')
+          .limit(1)
+          .maybeSingle()
+        if (byDomain) partnershipId = byDomain.id
+      }
+    }
+
+    // Strategy 3: Match by org name
+    if (!partnershipId && orgName) {
+      const { data: byOrg } = await supabase
+        .from('partnerships')
+        .select('id')
+        .ilike('org_name', orgName)
+        .limit(1)
+        .maybeSingle()
+      if (byOrg) partnershipId = byOrg.id
+    }
+
+    // Strategy 4: Match by district_id
+    if (!partnershipId && districtId) {
+      const { data: byDistrict } = await supabase
+        .from('partnerships')
+        .select('id')
+        .eq('district_id', districtId)
+        .eq('status', 'active')
+        .limit(1)
+        .maybeSingle()
+      if (byDistrict) partnershipId = byDistrict.id
+    }
+
+    // Strategy 5: Create new partnership
+    if (!partnershipId && (orgName || quoteContactEmail)) {
+      const name = orgName || quoteContactEmail.split('@')[0]
+      const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
       const { data: newPartnership, error: partnershipErr } = await supabase.from('partnerships').insert({
-        org_name: orgName,
+        org_name: orgName || null,
         partnership_type: 'school',
         contact_name: signedByName,
-        contact_email: contactEmail,
+        contact_email: quoteContactEmail,
         primary_contact_name: signedByName,
-        primary_contact_email: contactEmail,
+        primary_contact_email: quoteContactEmail,
         contract_phase: 'IGNITE',
         status: 'active',
         slug: slug,
@@ -171,22 +212,33 @@ export async function POST(
         observation_days_total: 0, observation_days_used: 0,
         virtual_sessions_total: 0, virtual_sessions_used: 0,
         executive_sessions_total: 0, executive_sessions_used: 0,
+        district_id: districtId || null,
         sales_deal_id: null,
       }).select('id').single()
 
       if (partnershipErr) {
         console.error('[quote-sign] Partnership auto-create failed:', partnershipErr.message)
-        // Still return success for signing, but log the issue so Bella can create manually
       }
+      if (newPartnership?.id) partnershipId = newPartnership.id
+    }
 
-      // Link deliverables to the new partnership
-      if (newPartnership?.id) {
-        const { error: linkErr } = await supabase.from('contract_deliverables')
-          .update({ partnership_id: newPartnership.id })
-          .eq('quote_id', id)
-          .is('partnership_id', null)
-        if (linkErr) console.error('[quote-sign] Failed to link deliverables to partnership:', linkErr.message)
+    // Link deliverables to partnership
+    if (partnershipId) {
+      const { error: linkErr } = await supabase.from('contract_deliverables')
+        .update({ partnership_id: partnershipId })
+        .eq('quote_id', id)
+        .is('partnership_id', null)
+      if (linkErr) console.error('[quote-sign] Failed to link deliverables:', linkErr.message)
+
+      // Also backfill org_name on partnership if it was missing
+      if (orgName) {
+        await supabase.from('partnerships')
+          .update({ org_name: orgName })
+          .eq('id', partnershipId)
+          .is('org_name', null)
       }
+    } else {
+      console.error(`[quote-sign] CRITICAL: Could not find or create partnership for quote ${id} (${orgName || quoteContactEmail}). Deliverables are orphaned.`)
     }
   }
 
