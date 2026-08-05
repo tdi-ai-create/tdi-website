@@ -841,7 +841,7 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
                       if (progressPct === 100) {
                         // Go to first lesson for completed courses
                         if (modules[0]?.lessons[0]) {
-                          router.push(`/hub/courses/${course.slug}/${modules[0].lessons[0].slug}`);
+                          router.push(`/hub/courses/${course.slug}/${modules[0].lessons[0].slug || modules[0].lessons[0].id}`);
                         }
                         return;
                       }
@@ -849,14 +849,14 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
                       for (const mod of modules) {
                         for (const l of mod.lessons) {
                           if (progress.lessonProgress.get(l.id)?.status !== 'completed') {
-                            router.push(`/hub/courses/${course.slug}/${l.slug}`);
+                            router.push(`/hub/courses/${course.slug}/${l.slug || l.id}`);
                             return;
                           }
                         }
                       }
                       // All complete, go to first lesson
                       if (modules[0]?.lessons[0]) {
-                        router.push(`/hub/courses/${course.slug}/${modules[0].lessons[0].slug}`);
+                        router.push(`/hub/courses/${course.slug}/${modules[0].lessons[0].slug || modules[0].lessons[0].id}`);
                       }
                     } else {
                       handleEnroll();
@@ -1121,7 +1121,7 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
                               {/* Lesson title (clickable if enrolled) */}
                               {isEnrolled ? (
                                 <Link
-                                  href={`/hub/courses/${course.slug}/${lesson.slug}`}
+                                  href={`/hub/courses/${course.slug}/${lesson.slug || lesson.id}`}
                                   className="flex-1 text-sm font-medium hover:underline"
                                   style={{ color: isComplete ? '#6B7280' : '#1B2A4A', textDecoration: isComplete ? 'line-through' : 'none' }}
                                 >

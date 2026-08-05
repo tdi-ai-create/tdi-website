@@ -271,8 +271,8 @@ export default function LessonPage({ params }: LessonPageProps) {
         finalModules.forEach((mod) => mod.lessons.forEach((l) => ordered.push(l)));
         setAllLessons(ordered);
 
-        // 6. Find current lesson
-        const current = ordered.find((l) => l.slug === lessonSlug);
+        // 6. Find current lesson (match by slug or ID since slugs may be null)
+        const current = ordered.find((l) => l.slug === lessonSlug || l.id === lessonSlug);
         if (!current) {
           router.push(`/hub/courses/${slug}`);
           return;
@@ -332,7 +332,7 @@ export default function LessonPage({ params }: LessonPageProps) {
     // Auto-advance
     if (autoAdvance && nextLesson) {
       setTimeout(() => {
-        router.push(`/hub/courses/${slug}/${nextLesson.slug}`);
+        router.push(`/hub/courses/${slug}/${nextLesson.slug || nextLesson.id}`);
       }, 800);
     }
   };
@@ -500,14 +500,14 @@ export default function LessonPage({ params }: LessonPageProps) {
               {(isExpanded || !showHeader) && (
                 <div className="space-y-0.5">
                   {mod.lessons.map((l, idx) => {
-                    const isActive = l.slug === lessonSlug;
+                    const isActive = l.id === currentLesson?.id;
                     const isDone = progress.lessonProgress.get(l.id)?.status === 'completed';
 
                     return (
                       <button
                         key={l.id}
                         onClick={() => {
-                          router.push(`/hub/courses/${slug}/${l.slug}`);
+                          router.push(`/hub/courses/${slug}/${l.slug || l.id}`);
                           setBottomSheetOpen(false);
                         }}
                         className="w-full flex items-center gap-2.5 py-2 px-2 rounded-lg text-left transition-colors"
@@ -855,7 +855,7 @@ export default function LessonPage({ params }: LessonPageProps) {
               {/* Previous */}
               {prevLesson ? (
                 <Link
-                  href={`/hub/courses/${slug}/${prevLesson.slug}`}
+                  href={`/hub/courses/${slug}/${prevLesson.slug || prevLesson.id}`}
                   className="flex items-center gap-2 px-4 py-3 rounded-lg transition-colors w-full sm:w-auto justify-center hover:opacity-80"
                   style={{ color: theme.text, fontFamily: "'DM Sans', sans-serif", fontSize: '14px' }}
                 >
@@ -905,7 +905,7 @@ export default function LessonPage({ params }: LessonPageProps) {
                 </button>
               ) : nextLesson ? (
                 <Link
-                  href={`/hub/courses/${slug}/${nextLesson.slug}`}
+                  href={`/hub/courses/${slug}/${nextLesson.slug || nextLesson.id}`}
                   className="flex items-center gap-2 px-4 py-3 rounded-lg transition-colors w-full sm:w-auto justify-center hover:opacity-80"
                   style={{
                     backgroundColor: dark ? 'rgba(255,255,255,0.05)' : '#F3F4F6',
