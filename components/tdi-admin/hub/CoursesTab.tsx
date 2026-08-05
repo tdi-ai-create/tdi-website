@@ -569,14 +569,14 @@ export function CoursesTab() {
         if (l.has_transcript) coverageMap[l.course_id].transcripts.done++;
       });
 
-      // Build check coverage per course
-      (checksData.lessons || []).forEach((l: { course_id: string; has_content: boolean; meets_minimum: boolean }) => {
-        if (!coverageMap[l.course_id]) {
-          coverageMap[l.course_id] = { transcripts: { total: 0, done: 0 }, checks: { total: 0, done: 0 } };
+      // Build check coverage per course (course-level: 5 checks per course)
+      (checksData.courses || []).forEach((c: { course_id: string; has_content: boolean; meets_minimum: boolean; check_count: number }) => {
+        if (!coverageMap[c.course_id]) {
+          coverageMap[c.course_id] = { transcripts: { total: 0, done: 0 }, checks: { total: 0, done: 0 } };
         }
-        if (l.has_content) {
-          coverageMap[l.course_id].checks.total++;
-          if (l.meets_minimum) coverageMap[l.course_id].checks.done++;
+        if (c.has_content) {
+          coverageMap[c.course_id].checks.total = 5;
+          coverageMap[c.course_id].checks.done = Math.min(c.check_count, 5);
         }
       });
 
@@ -750,10 +750,9 @@ export function CoursesTab() {
       {/* Bulk Generate All Panel */}
       {(() => {
         const allTranscripts = Object.values(coverage).reduce((a, c) => ({ total: a.total + c.transcripts.total, done: a.done + c.transcripts.done }), { total: 0, done: 0 });
-        const allChecks = Object.values(coverage).reduce((a, c) => ({ total: a.total + c.checks.total, done: a.done + c.checks.done }), { total: 0, done: 0 });
         const needsTranscripts = allTranscripts.total - allTranscripts.done;
-        const needsChecks = allChecks.total - allChecks.done;
-        if (coverageLoading || (needsTranscripts === 0 && needsChecks === 0)) return null;
+        const coursesNeedingChecks = Object.values(coverage).filter((c) => c.checks.total > 0 && c.checks.done < 5).length;
+        if (coverageLoading || (needsTranscripts === 0 && coursesNeedingChecks === 0)) return null;
 
         return (
           <div className="flex items-center gap-4 px-4 py-3 rounded-lg mb-4 border border-gray-200 bg-white">
@@ -761,8 +760,8 @@ export function CoursesTab() {
               <p className="text-sm font-medium text-gray-900">Bulk Generate All Courses</p>
               <p className="text-xs text-gray-500">
                 {needsTranscripts > 0 && `${needsTranscripts} lesson${needsTranscripts !== 1 ? 's' : ''} need transcripts`}
-                {needsTranscripts > 0 && needsChecks > 0 && ' · '}
-                {needsChecks > 0 && `${needsChecks} lesson${needsChecks !== 1 ? 's' : ''} need check-ins`}
+                {needsTranscripts > 0 && coursesNeedingChecks > 0 && ' · '}
+                {coursesNeedingChecks > 0 && `${coursesNeedingChecks} course${coursesNeedingChecks !== 1 ? 's' : ''} need check-ins`}
               </p>
             </div>
             {needsTranscripts > 0 && (
@@ -777,7 +776,7 @@ export function CoursesTab() {
                 Generate All Transcripts
               </button>
             )}
-            {needsChecks > 0 && (
+            {coursesNeedingChecks > 0 && (
               <button
                 onClick={() => runBulkChecks('all', 'All Courses')}
                 disabled={bulkAction?.status === 'running'}
@@ -995,7 +994,7 @@ export function CoursesTab() {
                           onClick={() => runBulkChecks(course.id, course.title)}
                           disabled={isRunningChecks || bulkAction?.status === 'running'}
                           className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-colors border border-purple-200 text-purple-700 hover:bg-purple-50 disabled:opacity-50"
-                          title={`Generate check-ins for ${checksTotal - checksDone} lessons`}
+                          title={`Generate 5 course-level check-ins`}
                         >
                           {isRunningChecks ? <Loader2 size={12} className="animate-spin" /> : <MessageSquare size={12} />}
                           {checksDone}/{checksTotal}
