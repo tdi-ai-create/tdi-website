@@ -14,7 +14,8 @@ function getHubServiceSupabase() {
 /**
  * GET /api/tdi-admin/courses/[id]/bulk-checks
  *
- * Returns engagement check coverage for all lessons in a course.
+ * Returns engagement check coverage at the COURSE level.
+ * Each course should have 5 check-ins total (not per lesson).
  * If id is "all", returns coverage across all courses.
  */
 export async function GET(
@@ -25,61 +26,75 @@ export async function GET(
     const { id } = await params
     const supabase = getHubServiceSupabase()
 
-    let lessonsQuery = supabase
-      .from('hub_lessons')
-      .select('id, title, content, transcript, module_id, hub_modules!inner(course_id, hub_courses!inner(id, title))')
+    // Get all courses (or one)
+    let coursesQuery = supabase
+      .from('hub_courses')
+      .select('id, title')
 
     if (id !== 'all') {
-      lessonsQuery = lessonsQuery.eq('hub_modules.course_id', id)
+      coursesQuery = coursesQuery.eq('id', id)
     }
 
-    const { data: lessons, error } = await lessonsQuery
+    const { data: courses, error: coursesError } = await coursesQuery
+    if (coursesError) return NextResponse.json({ error: coursesError.message }, { status: 500 })
 
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 })
-    }
+    // Get all lessons with their course mapping
+    const courseIds = (courses || []).map((c) => c.id)
+    const { data: lessons } = await supabase
+      .from('hub_lessons')
+      .select('id, title, content, transcript, module_id, hub_modules!inner(course_id)')
+      .in('hub_modules.course_id', courseIds.length > 0 ? courseIds : ['none'])
 
-    // Get all quiz questions
+    // Get all quiz questions for these lessons
     const lessonIds = (lessons || []).map((l) => l.id)
     const { data: questions } = await supabase
       .from('hub_quiz_questions')
       .select('lesson_id, question_type')
       .in('lesson_id', lessonIds.length > 0 ? lessonIds : ['none'])
 
-    const questionsByLesson = new Map<string, Array<{ question_type: string }>>()
-    questions?.forEach((q) => {
-      const arr = questionsByLesson.get(q.lesson_id) || []
-      arr.push(q)
-      questionsByLesson.set(q.lesson_id, arr)
+    // Count checks per course
+    const lessonToCourse = new Map<string, string>()
+    lessons?.forEach((l) => {
+      const courseId = (l as any).hub_modules?.course_id
+      if (courseId) lessonToCourse.set(l.id, courseId)
     })
 
-    const results = (lessons || []).map((l) => {
+    const courseCheckCounts = new Map<string, number>()
+    questions?.forEach((q) => {
+      const courseId = lessonToCourse.get(q.lesson_id)
+      if (courseId) {
+        courseCheckCounts.set(courseId, (courseCheckCounts.get(courseId) || 0) + 1)
+      }
+    })
+
+    // Check which courses have content (at least one lesson with content)
+    const courseHasContent = new Map<string, boolean>()
+    const courseLessonCount = new Map<string, number>()
+    lessons?.forEach((l) => {
+      const courseId = (l as any).hub_modules?.course_id
+      if (!courseId) return
+      courseLessonCount.set(courseId, (courseLessonCount.get(courseId) || 0) + 1)
       const content = l.content as Record<string, unknown> | null
-      const course = (l as any).hub_modules?.hub_courses
-      const lessonQuestions = questionsByLesson.get(l.id) || []
       const hasContent = !!(
         (content?.body_html && (content.body_html as string).length > 50) ||
         (content?.text && (content.text as string).length > 50) ||
         (content?.video_id) ||
         (l.transcript && (l.transcript as string).length > 50)
       )
+      if (hasContent) courseHasContent.set(courseId, true)
+    })
 
+    const results = (courses || []).map((c) => {
+      const checkCount = courseCheckCounts.get(c.id) || 0
+      const hasContent = courseHasContent.get(c.id) || false
+      const lessonCount = courseLessonCount.get(c.id) || 0
       return {
-        lesson_id: l.id,
-        lesson_title: l.title,
-        course_id: course?.id || '',
-        course_title: course?.title || '',
+        course_id: c.id,
+        course_title: c.title,
+        lesson_count: lessonCount,
         has_content: hasContent,
-        has_video: !!(content?.video_id),
-        has_transcript: !!(l.transcript && (l.transcript as string).length > 10),
-        check_count: lessonQuestions.length,
-        meets_minimum: lessonQuestions.length >= 4,
-        breakdown: {
-          comprehension: lessonQuestions.filter((q) => q.question_type === 'multiple_choice' || q.question_type === 'true_false').length,
-          reflection: lessonQuestions.filter((q) => q.question_type === 'reflection').length,
-          action_step: lessonQuestions.filter((q) => q.question_type === 'action_step').length,
-          checkpoint: lessonQuestions.filter((q) => q.question_type === 'checkpoint').length,
-        },
+        check_count: checkCount,
+        meets_minimum: checkCount >= 5,
       }
     })
 
@@ -88,7 +103,7 @@ export async function GET(
     const meetsMinimum = results.filter((r) => r.meets_minimum).length
 
     return NextResponse.json({
-      lessons: results,
+      courses: results,
       total,
       with_content: withContent,
       meets_minimum: meetsMinimum,
@@ -103,8 +118,9 @@ export async function GET(
 /**
  * POST /api/tdi-admin/courses/[id]/bulk-checks
  *
- * Generates AI engagement checks for all lessons in a course that need them.
- * Only generates for lessons with content (body, transcript, or video).
+ * Generates 5 AI engagement checks per COURSE (not per lesson).
+ * Synthesizes content across all lessons to create course-level checks.
+ * Assigns checks to the first lesson with content for DB storage.
  */
 export async function POST(
   request: NextRequest,
@@ -119,53 +135,79 @@ export async function POST(
       return NextResponse.json({ error: 'Anthropic API key not configured' }, { status: 500 })
     }
 
-    // Get all lessons for this course
-    let lessonsQuery = supabase
-      .from('hub_lessons')
-      .select('id, title, type, content, transcript, module_id, hub_modules!inner(course_id)')
+    // Get courses
+    let coursesQuery = supabase
+      .from('hub_courses')
+      .select('id, title, category, description')
 
     if (id !== 'all') {
-      lessonsQuery = lessonsQuery.eq('hub_modules.course_id', id)
+      coursesQuery = coursesQuery.eq('id', id)
     }
 
-    const { data: lessons, error } = await lessonsQuery
+    const { data: courses, error: coursesError } = await coursesQuery
+    if (coursesError) return NextResponse.json({ error: coursesError.message }, { status: 500 })
 
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 })
-    }
+    // Get all lessons for these courses
+    const courseIds = (courses || []).map((c) => c.id)
+    const { data: allLessons, error: lessonsError } = await supabase
+      .from('hub_lessons')
+      .select('id, title, type, content, transcript, module_id, hub_modules!inner(course_id)')
+      .in('hub_modules.course_id', courseIds.length > 0 ? courseIds : ['none'])
+      .order('sort_order', { ascending: true })
 
-    // Get existing question counts
-    const lessonIds = (lessons || []).map((l) => l.id)
+    if (lessonsError) return NextResponse.json({ error: lessonsError.message }, { status: 500 })
+
+    // Group lessons by course
+    const lessonsByCourse = new Map<string, typeof allLessons>()
+    allLessons?.forEach((l) => {
+      const courseId = (l as any).hub_modules?.course_id
+      if (!courseId) return
+      const arr = lessonsByCourse.get(courseId) || []
+      arr.push(l)
+      lessonsByCourse.set(courseId, arr)
+    })
+
+    // Get existing check counts per course
+    const allLessonIds = (allLessons || []).map((l) => l.id)
     const { data: existingQuestions } = await supabase
       .from('hub_quiz_questions')
       .select('lesson_id, sort_order')
-      .in('lesson_id', lessonIds.length > 0 ? lessonIds : ['none'])
+      .in('lesson_id', allLessonIds.length > 0 ? allLessonIds : ['none'])
 
-    const questionCounts = new Map<string, number>()
-    const maxSortOrders = new Map<string, number>()
-    existingQuestions?.forEach((q) => {
-      questionCounts.set(q.lesson_id, (questionCounts.get(q.lesson_id) || 0) + 1)
-      const current = maxSortOrders.get(q.lesson_id) ?? -1
-      if (q.sort_order > current) maxSortOrders.set(q.lesson_id, q.sort_order)
+    const lessonToCourse = new Map<string, string>()
+    allLessons?.forEach((l) => {
+      const courseId = (l as any).hub_modules?.course_id
+      if (courseId) lessonToCourse.set(l.id, courseId)
     })
 
-    // Filter to lessons that need checks
-    const needsChecks = (lessons || []).filter((l) => {
-      const content = l.content as Record<string, unknown> | null
-      const hasContent = !!(
-        (content?.body_html && (content.body_html as string).length > 50) ||
-        (content?.text && (content.text as string).length > 50) ||
-        (content?.markdown && (content.markdown as string).length > 50) ||
-        (content?.video_id) ||
-        (l.transcript && (l.transcript as string).length > 50)
-      )
-      return hasContent && (questionCounts.get(l.id) || 0) < 4
+    const courseCheckCounts = new Map<string, number>()
+    existingQuestions?.forEach((q) => {
+      const courseId = lessonToCourse.get(q.lesson_id)
+      if (courseId) {
+        courseCheckCounts.set(courseId, (courseCheckCounts.get(courseId) || 0) + 1)
+      }
+    })
+
+    // Filter to courses that need checks (< 5 total) and have content
+    const needsChecks = (courses || []).filter((c) => {
+      const lessons = lessonsByCourse.get(c.id) || []
+      const hasContent = lessons.some((l) => {
+        const content = l.content as Record<string, unknown> | null
+        return !!(
+          (content?.body_html && (content.body_html as string).length > 50) ||
+          (content?.text && (content.text as string).length > 50) ||
+          (content?.markdown && (content.markdown as string).length > 50) ||
+          (content?.video_id) ||
+          (l.transcript && (l.transcript as string).length > 50)
+        )
+      })
+      return hasContent && (courseCheckCounts.get(c.id) || 0) < 5
     })
 
     if (needsChecks.length === 0) {
       return NextResponse.json({
         success: true,
-        message: 'All lessons already have sufficient engagement checks.',
+        message: 'All courses already have check-ins.',
         processed: 0,
         results: [],
       })
@@ -174,67 +216,81 @@ export async function POST(
     const client = new Anthropic({ apiKey })
 
     const results: Array<{
-      lesson_id: string
-      lesson_title: string
+      course_id: string
+      course_title: string
       status: 'generated' | 'failed' | 'skipped'
       checks_created: number
       error?: string
     }> = []
 
-    for (const lesson of needsChecks) {
-      const content = lesson.content as Record<string, unknown> | null
-      const bodyHtml = (content?.body_html as string) || ''
-      const bodyText = (content?.text as string) || ''
-      const markdown = (content?.markdown as string) || ''
-      const transcript = (lesson.transcript as string) || ''
-      const lessonContent = bodyHtml || bodyText || markdown || transcript
+    for (const course of needsChecks) {
+      const lessons = lessonsByCourse.get(course.id) || []
 
-      if (!lessonContent || lessonContent.trim().length < 50) {
+      // Build a summary of the course content from all lessons
+      const lessonSummaries: string[] = []
+      let firstLessonWithContent: string | null = null
+
+      for (const lesson of lessons) {
+        const content = lesson.content as Record<string, unknown> | null
+        const bodyHtml = (content?.body_html as string) || ''
+        const bodyText = (content?.text as string) || ''
+        const markdown = (content?.markdown as string) || ''
+        const transcript = (lesson.transcript as string) || ''
+        const lessonContent = bodyHtml || bodyText || markdown || transcript
+
+        if (lessonContent && lessonContent.trim().length > 50) {
+          if (!firstLessonWithContent) firstLessonWithContent = lesson.id
+          // Take first 1500 chars of each lesson to stay within token limits
+          lessonSummaries.push(`LESSON: ${lesson.title}\n${lessonContent.substring(0, 1500)}`)
+        }
+      }
+
+      if (lessonSummaries.length === 0 || !firstLessonWithContent) {
         results.push({
-          lesson_id: lesson.id,
-          lesson_title: lesson.title,
+          course_id: course.id,
+          course_title: course.title,
           status: 'skipped',
           checks_created: 0,
         })
         continue
       }
 
+      // Cap total content to ~12K chars
+      let combinedContent = ''
+      for (const summary of lessonSummaries) {
+        if (combinedContent.length + summary.length > 12000) break
+        combinedContent += summary + '\n\n---\n\n'
+      }
+
       try {
-        let sectionCount = 0
-        if (bodyHtml) {
-          const breakPattern = /(?=<h[23][^>]*>)|(?:<!--\s*section-break\s*-->)/gi
-          const sections = bodyHtml.split(breakPattern).filter((s: string) => s.trim().length > 0)
-          sectionCount = sections.length
-        }
+        const prompt = `You are an instructional designer for Teachers Deserve It, an educator professional development platform. Generate 5 formative check-ins for this ENTIRE COURSE, not individual lessons. The check-ins should assess the course's key themes and big ideas.
 
-        const prompt = `You are an instructional designer for Teachers Deserve It, an educator professional development platform. Generate engagement checks for this lesson.
+COURSE TITLE: ${course.title}
+COURSE CATEGORY: ${course.category || 'General'}
+COURSE DESCRIPTION: ${course.description || 'N/A'}
+TOTAL LESSONS: ${lessons.length}
 
-LESSON TITLE: ${lesson.title}
-LESSON TYPE: ${lesson.type}
-CONTENT SECTIONS: ${sectionCount}
-
-CONTENT:
-${lessonContent.substring(0, 8000)}
+CONTENT FROM ACROSS THE COURSE:
+${combinedContent}
 
 ---
 
-Generate exactly:
-- 2 multiple choice comprehension checks (3-4 options, 1 correct)
-- 1 reflection prompt (connects content to educator's own practice)
-- 1 action step (specific classroom action they can try this week)
-- 1 checkpoint (3-4 key takeaways)
+Generate exactly 5 check-ins for the whole course:
+- 2 multiple choice comprehension checks (3-4 options, 1 correct) covering the course's core concepts
+- 1 reflection prompt that connects the course themes to the educator's own practice
+- 1 action step: a specific, practical thing they can try in their classroom this week based on what they learned
+- 1 checkpoint: 3-4 key takeaways from the entire course
 
 Rules:
-- Test real understanding, not surface recall
+- These should cover the WHOLE COURSE, not just one lesson
+- Test real understanding of the course's big ideas, not surface recall
 - Reflection should be personal: "Think about..." or "Consider a time when..."
 - Action step must be specific enough to do tomorrow
-- Tone: warm, professional, no emojis
+- Tone: warm, professional, no emojis, no dashes
 - Explanations should teach WHY, not just confirm
 
-${sectionCount > 1 ? `Position checks between sections (0-based content_position). Distribute evenly. Checkpoint goes at end (null).` : 'Set all content_position to null.'}
-
 Return ONLY a JSON array. Each object:
-{"question_text":"...","question_type":"multiple_choice"|"true_false"|"reflection"|"action_step"|"checkpoint","options":[...]|null,"correct_answer":"..."|null,"explanation":"..."|null,"content_position":number|null,"sort_order":number}
+{"question_text":"...","question_type":"multiple_choice"|"reflection"|"action_step"|"checkpoint","options":[...]|null,"correct_answer":"..."|null,"explanation":"..."|null,"sort_order":number}
 
 For multiple_choice: options = [{"text":"...","is_correct":boolean}]
 For checkpoint: options = [{"text":"..."}] (takeaways)
@@ -258,8 +314,8 @@ JSON array only, no markdown fences.`
 
         if (!Array.isArray(questions) || questions.length === 0) {
           results.push({
-            lesson_id: lesson.id,
-            lesson_title: lesson.title,
+            course_id: course.id,
+            course_title: course.title,
             status: 'failed',
             checks_created: 0,
             error: 'AI returned no questions',
@@ -267,17 +323,16 @@ JSON array only, no markdown fences.`
           continue
         }
 
-        let nextSortOrder = (maxSortOrders.get(lesson.id) ?? -1) + 1
-
-        const insertRows = questions.map((q: Record<string, unknown>) => ({
-          lesson_id: lesson.id,
+        // Store all 5 checks on the first lesson with content
+        const insertRows = questions.map((q: Record<string, unknown>, i: number) => ({
+          lesson_id: firstLessonWithContent,
           question_text: q.question_text || '',
           question_type: q.question_type || 'multiple_choice',
           options: q.options || null,
           correct_answer: q.correct_answer || null,
           explanation: q.explanation || null,
-          sort_order: q.sort_order ?? nextSortOrder++,
-          content_position: q.content_position ?? null,
+          sort_order: i,
+          content_position: null,
         }))
 
         const { data: created, error: insertError } = await supabase
@@ -287,24 +342,24 @@ JSON array only, no markdown fences.`
 
         if (insertError) {
           results.push({
-            lesson_id: lesson.id,
-            lesson_title: lesson.title,
+            course_id: course.id,
+            course_title: course.title,
             status: 'failed',
             checks_created: 0,
             error: insertError.message,
           })
         } else {
           results.push({
-            lesson_id: lesson.id,
-            lesson_title: lesson.title,
+            course_id: course.id,
+            course_title: course.title,
             status: 'generated',
             checks_created: created?.length || 0,
           })
         }
       } catch (err: unknown) {
         results.push({
-          lesson_id: lesson.id,
-          lesson_title: lesson.title,
+          course_id: course.id,
+          course_title: course.title,
           status: 'failed',
           checks_created: 0,
           error: err instanceof Error ? err.message : 'Unknown error',
@@ -318,7 +373,7 @@ JSON array only, no markdown fences.`
 
     return NextResponse.json({
       success: true,
-      message: `Generated ${totalChecks} checks across ${generated} lessons. ${failed > 0 ? `${failed} failed.` : ''}`,
+      message: `Generated ${totalChecks} check-ins across ${generated} courses. ${failed > 0 ? `${failed} failed.` : ''}`,
       processed: results.length,
       generated,
       total_checks: totalChecks,
