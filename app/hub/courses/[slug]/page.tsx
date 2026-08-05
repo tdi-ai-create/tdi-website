@@ -641,12 +641,12 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
       {/* ============================================================ */}
       {/* 1. HERO + CTA + SIDEBAR                                       */}
       {/* ============================================================ */}
-      <div className="grid lg:grid-cols-[1fr_320px] gap-8">
+      <div className="grid lg:grid-cols-[1fr_320px] gap-6">
         {/* Main Content */}
         <div>
           {/* Course Hero */}
           <section
-            className="relative text-white overflow-hidden rounded-2xl mb-5"
+            className="relative text-white overflow-hidden rounded-2xl"
             style={{ background: 'linear-gradient(135deg, #1B2A4A 0%, #2d3a5c 60%, #38618C 100%)' }}
           >
             {/* Decorative circle */}
@@ -990,7 +990,7 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
       {/* 2. CURRICULUM OUTLINE WITH PROGRESS                           */}
       {/* ============================================================ */}
       {totalLessons > 0 && (
-        <section className="mt-8">
+        <section className="mt-4">
           <div
             className="bg-white rounded-2xl overflow-hidden"
             style={{ border: '0.5px solid rgba(0,0,0,0.06)' }}
@@ -1194,7 +1194,7 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
       {/* 3. FORMATIVE CHECK-INS                                        */}
       {/* ============================================================ */}
       {checkInQuestions.length > 0 && (
-        <section className="mt-8">
+        <section className="mt-4">
           <h2
             className="font-bold mb-4"
             style={{
