@@ -68,9 +68,8 @@ interface Lesson {
   id: string;
   slug: string;
   title: string;
-  description: string | null;
   estimated_minutes: number;
-  content_type: 'video' | 'audio' | 'read' | 'activity' | 'download' | 'quiz' | 'reflection' | 'action_step' | 'checkpoint';
+  type: string;
   is_free_preview: boolean;
   is_quick_win: boolean;
   sort_order: number;
@@ -189,7 +188,7 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
         // Fetch lessons
         const { data: lessonsData, error: lessonsError } = await supabase
           .from('hub_lessons')
-          .select('id, slug, title, description, estimated_minutes, content_type, is_free_preview, is_quick_win, sort_order, module_id')
+          .select('id, slug, title, estimated_minutes, type, is_free_preview, is_quick_win, sort_order, module_id')
           .eq('course_id', courseData.id)
           .order('sort_order', { ascending: true });
 
