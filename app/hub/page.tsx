@@ -1095,7 +1095,7 @@ export default function HubDashboard() {
                           lineHeight: 1.5,
                         }}
                       >
-                        {tUI('You said you wanted to')} &ldquo;{userGoal.text}&rdquo;
+                        {tUI('You said you wanted to')} &ldquo;{userGoal.text.replace(/_/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase())}&rdquo;
                       </p>
                       {(userGoal.quickWin || featuredQuickWin) && (() => {
                         const qw = userGoal.quickWin || featuredQuickWin!;
