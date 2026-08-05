@@ -1,7 +1,10 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
+import { renderToBuffer } from '@react-pdf/renderer'
+import { QuickWinPDF, type QuickWinSections } from '@/lib/pdf/quick-win-template'
+import * as React from 'react'
 
-// PDF upload via base64 can be slow
+// PDF upload/generation can be slow
 export const maxDuration = 60
 
 /**
@@ -311,6 +314,76 @@ export async function POST(request: NextRequest) {
       if (updateErr) return NextResponse.json({ error: updateErr.message }, { status: 500 })
 
       return NextResponse.json({ success: true, thumbnail_url: thumbnailUrl })
+    }
+
+    // ── generate_pdf: create a branded PDF from structured content ──
+    if (action === 'generate_pdf') {
+      const { id, sections } = body as { id: string; sections: QuickWinSections }
+
+      if (!id) return NextResponse.json({ error: 'id is required' }, { status: 400 })
+      if (!sections) return NextResponse.json({ error: 'sections object is required' }, { status: 400 })
+
+      const required = ['overview', 'rationale', 'steps', 'try_it', 'reflection'] as const
+      const missingSections: string[] = []
+      for (const key of required) {
+        const val = sections[key]
+        if (!val || (typeof val === 'string' && !val.trim()) || (Array.isArray(val) && val.length === 0)) {
+          missingSections.push(key)
+        }
+      }
+      if (missingSections.length > 0) {
+        return NextResponse.json({ error: `Missing required sections: ${missingSections.join(', ')}` }, { status: 400 })
+      }
+
+      const { data: qw, error: fetchErr } = await supabase
+        .from('hub_quick_wins')
+        .select('*')
+        .eq('id', id)
+        .single()
+
+      if (fetchErr || !qw) return NextResponse.json({ error: 'Quick Win not found' }, { status: 404 })
+
+      const pdfBuffer = await renderToBuffer(
+        React.createElement(QuickWinPDF, {
+          data: {
+            title: qw.title,
+            category: qw.category || '',
+            description: qw.description || '',
+            roles: qw.roles || [],
+            lift: qw.lift || '',
+            duration_minutes: qw.duration_minutes,
+            sections,
+          },
+        })
+      )
+
+      const pdfFilename = `${qw.slug || 'quick-win'}.pdf`
+      const storagePath = `quick-wins/${qw.id}/${pdfFilename}`
+
+      const { error: uploadErr } = await supabase.storage
+        .from('hub-assets')
+        .upload(storagePath, pdfBuffer, { contentType: 'application/pdf', upsert: true })
+
+      if (uploadErr) return NextResponse.json({ error: `Upload failed: ${uploadErr.message}` }, { status: 500 })
+
+      const { data: urlData } = supabase.storage.from('hub-assets').getPublicUrl(storagePath)
+      const publicUrl = urlData?.publicUrl
+
+      const { error: updateErr } = await supabase
+        .from('hub_quick_wins')
+        .update({
+          file_url: publicUrl,
+          file_path: storagePath,
+          file_type: 'application/pdf',
+          content_type: 'pdf',
+          storage_path: storagePath,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', qw.id)
+
+      if (updateErr) return NextResponse.json({ error: updateErr.message }, { status: 500 })
+
+      return NextResponse.json({ success: true, file_url: publicUrl, storage_path: storagePath })
     }
 
     // ── publish: validate and publish a Quick Win ──
