@@ -397,7 +397,7 @@ export async function POST(request: NextRequest) {
     }))
 
     let response = await client.messages.create({
-      model: 'claude-sonnet-4-20250514',
+      model: 'claude-sonnet-4-6',
       max_tokens: 250,
       system: SYSTEM_PROMPT,
       messages: formattedMessages,
@@ -428,7 +428,7 @@ export async function POST(request: NextRequest) {
       )
 
       response = await client.messages.create({
-        model: 'claude-sonnet-4-20250514',
+        model: 'claude-sonnet-4-6',
         max_tokens: 250,
         system: SYSTEM_PROMPT,
         messages: formattedMessages,
@@ -440,7 +440,7 @@ export async function POST(request: NextRequest) {
     const { logAIUsage } = await import('@/lib/ai-usage')
     logAIUsage({
       endpoint: 'desi',
-      model: 'claude-sonnet-4-20250514',
+      model: 'claude-sonnet-4-6',
       inputTokens: response.usage?.input_tokens || 0,
       outputTokens: response.usage?.output_tokens || 0,
       metadata: { tool_use_rounds: loopCount },

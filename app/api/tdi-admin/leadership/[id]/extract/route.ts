@@ -87,7 +87,7 @@ export async function POST(
       const base64 = Buffer.from(arrayBuffer).toString('base64')
 
       const response = await anthropic.messages.create({
-        model: 'claude-sonnet-4-20250514',
+        model: 'claude-sonnet-4-6',
         max_tokens: 1024,
         messages: [
           {
@@ -113,7 +113,7 @@ export async function POST(
       // Log AI usage
       import('@/lib/ai-usage').then(({ logAIUsage }) => logAIUsage({
         endpoint: 'leadership_extract',
-        model: 'claude-sonnet-4-20250514',
+        model: 'claude-sonnet-4-6',
         inputTokens: response.usage?.input_tokens || 0,
         outputTokens: response.usage?.output_tokens || 0,
         metadata: { fileType: 'pdf' },
@@ -138,7 +138,7 @@ export async function POST(
       const mediaType = fileRecord.content_type as 'image/jpeg' | 'image/png' | 'image/gif' | 'image/webp'
 
       const response = await anthropic.messages.create({
-        model: 'claude-sonnet-4-20250514',
+        model: 'claude-sonnet-4-6',
         max_tokens: 1024,
         messages: [
           {
@@ -180,7 +180,7 @@ export async function POST(
       const text = await fileData.text()
 
       const response = await anthropic.messages.create({
-        model: 'claude-sonnet-4-20250514',
+        model: 'claude-sonnet-4-6',
         max_tokens: 1024,
         messages: [
           {

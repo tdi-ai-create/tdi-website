@@ -148,7 +148,7 @@ export async function POST(req: NextRequest) {
         completed_at: new Date().toISOString(),
         duration_ms: duration,
         raw_response: {
-          model: 'claude-sonnet-4-20250514',
+          model: 'claude-sonnet-4-6',
           enrichment: result.data,
         },
       })
