@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation';
 import { useHub } from '@/components/hub/HubContext';
 import { getHubSupabase as getSupabase } from '@/lib/supabase-hub';
 import { useProgressTracking } from '@/lib/hooks/useProgressTracking';
-import LessonContent from '@/components/hub/LessonContent';
 import CourseCompletionModal from '@/components/hub/CourseCompletionModal';
 import { useTranslation } from '@/lib/hub/useTranslation';
 import {
@@ -25,8 +24,13 @@ import {
 import {
   type QuizQuestion,
   type QuizResponse,
-  getLessonQuestions,
-  getUserResponses,
+  type QuizOption,
+  getCourseQuestions,
+  getCourseResponses,
+  computeGatePositions,
+  saveQuizResponse,
+  checkMultipleChoiceAnswer,
+  checkTrueFalseAnswer,
 } from '@/lib/hub/quiz';
 
 // ---------------------------------------------------------------------------
@@ -88,6 +92,22 @@ function extractVideoId(lesson: Lesson): string | null {
   return null;
 }
 
+function getGateHeader(questionType: string): string {
+  switch (questionType) {
+    case 'multiple_choice':
+    case 'true_false':
+      return "Let's make sure this clicked";
+    case 'reflection':
+      return 'Your turn to think on this';
+    case 'action_step':
+      return 'Something to try this week';
+    case 'checkpoint':
+      return 'Before you go, the big ideas';
+    default:
+      return "Let's make sure this clicked";
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Dark Mode hook (localStorage)
 // ---------------------------------------------------------------------------
@@ -135,6 +155,501 @@ function useAutoAdvance() {
 }
 
 // ---------------------------------------------------------------------------
+// Gate Card Component
+// ---------------------------------------------------------------------------
+
+interface GateCardProps {
+  question: QuizQuestion;
+  userId: string;
+  dark: boolean;
+  onGateCleared: () => void;
+}
+
+function GateCard({ question, userId, dark, onGateCleared }: GateCardProps) {
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  const [answered, setAnswered] = useState(false);
+  const [wasCorrect, setWasCorrect] = useState(false);
+  const [reflectionText, setReflectionText] = useState('');
+  const [actionNotes, setActionNotes] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [gateCleared, setGateCleared] = useState(false);
+
+  const header = getGateHeader(question.question_type);
+
+  const handleMultipleChoiceSelect = async (idx: number) => {
+    if (answered) return;
+    setSelectedIndex(idx);
+
+    const options = question.options as QuizOption[];
+    const correct = checkMultipleChoiceAnswer(options, idx);
+    setWasCorrect(correct);
+    setAnswered(true);
+
+    await saveQuizResponse(
+      userId,
+      question.id,
+      question.lesson_id,
+      options[idx].text,
+      correct
+    );
+  };
+
+  const handleTrueFalseSelect = async (answer: string) => {
+    if (answered) return;
+    const idx = answer === 'True' ? 0 : 1;
+    setSelectedIndex(idx);
+
+    const correct = checkTrueFalseAnswer(question.correct_answer || '', answer);
+    setWasCorrect(correct);
+    setAnswered(true);
+
+    await saveQuizResponse(
+      userId,
+      question.id,
+      question.lesson_id,
+      answer,
+      correct
+    );
+  };
+
+  const handleSaveReflection = async () => {
+    if (reflectionText.trim().length < 50) return;
+    setSaving(true);
+
+    await saveQuizResponse(
+      userId,
+      question.id,
+      question.lesson_id,
+      reflectionText,
+      null
+    );
+
+    setSaving(false);
+    setAnswered(true);
+  };
+
+  const handleActionCommit = async () => {
+    setSaving(true);
+
+    await saveQuizResponse(
+      userId,
+      question.id,
+      question.lesson_id,
+      actionNotes.trim() || 'Committed to try',
+      null
+    );
+
+    setSaving(false);
+    setAnswered(true);
+  };
+
+  const handleCheckpointContinue = async () => {
+    setSaving(true);
+
+    await saveQuizResponse(
+      userId,
+      question.id,
+      question.lesson_id,
+      'Reviewed',
+      null
+    );
+
+    setSaving(false);
+    setAnswered(true);
+    setGateCleared(true);
+    onGateCleared();
+  };
+
+  const handleContinue = () => {
+    setGateCleared(true);
+    onGateCleared();
+  };
+
+  const cardBg = dark ? 'rgba(254,249,238,0.04)' : '#FEF9EE';
+  const cardBorder = dark ? 'rgba(232,184,75,0.2)' : 'rgba(232,184,75,0.3)';
+
+  // Multiple choice / True-false gate
+  if (question.question_type === 'multiple_choice' || question.question_type === 'true_false') {
+    const options: QuizOption[] =
+      question.question_type === 'true_false'
+        ? [{ text: 'True' }, { text: 'False' }]
+        : (question.options as QuizOption[]) || [];
+
+    const correctIndex =
+      question.question_type === 'true_false'
+        ? question.correct_answer?.toLowerCase() === 'true'
+          ? 0
+          : 1
+        : options.findIndex((o) => o.is_correct);
+
+    return (
+      <div
+        className="rounded-xl p-6 mb-8"
+        style={{
+          backgroundColor: cardBg,
+          borderLeft: '3px solid #E8B84B',
+          border: `1px solid ${cardBorder}`,
+          borderLeftWidth: '3px',
+          borderLeftColor: '#E8B84B',
+        }}
+      >
+        <h3
+          className="text-lg font-semibold mb-4"
+          style={{
+            fontFamily: "'Source Serif 4', Georgia, serif",
+            color: dark ? '#F3F4F6' : '#1E2749',
+          }}
+        >
+          {header}
+        </h3>
+
+        <p
+          className="text-sm mb-5"
+          style={{
+            fontFamily: "'DM Sans', sans-serif",
+            color: dark ? '#D1D5DB' : '#374151',
+            lineHeight: '1.6',
+          }}
+        >
+          {question.question_text}
+        </p>
+
+        <div className="space-y-2.5">
+          {options.map((option, idx) => {
+            let borderColor = dark ? 'rgba(255,255,255,0.1)' : '#E5E7EB';
+            let bg = dark ? 'rgba(255,255,255,0.03)' : '#FFFFFF';
+            let textColor = dark ? '#E5E7EB' : '#374151';
+
+            if (answered) {
+              if (idx === correctIndex) {
+                borderColor = '#16A34A';
+                bg = dark ? 'rgba(22,163,74,0.1)' : '#F0FDF4';
+                textColor = '#15803D';
+              }
+              if (idx === selectedIndex && idx !== correctIndex) {
+                borderColor = '#DC2626';
+                bg = dark ? 'rgba(220,38,38,0.1)' : '#FEF2F2';
+                textColor = '#DC2626';
+              }
+            } else if (idx === selectedIndex) {
+              borderColor = '#E8B84B';
+              bg = dark ? 'rgba(232,184,75,0.1)' : '#FFF8E7';
+            }
+
+            return (
+              <button
+                key={idx}
+                onClick={() =>
+                  question.question_type === 'true_false'
+                    ? handleTrueFalseSelect(option.text)
+                    : handleMultipleChoiceSelect(idx)
+                }
+                disabled={answered}
+                className="w-full text-left px-4 py-3 rounded-lg transition-all"
+                style={{
+                  border: `1.5px solid ${borderColor}`,
+                  backgroundColor: bg,
+                  color: textColor,
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontSize: '14px',
+                  cursor: answered ? 'default' : 'pointer',
+                  opacity: answered && idx !== selectedIndex && idx !== correctIndex ? 0.5 : 1,
+                }}
+              >
+                {option.text}
+              </button>
+            );
+          })}
+        </div>
+
+        {answered && question.explanation && (
+          <div
+            className="mt-4 p-3 rounded-lg text-sm"
+            style={{
+              backgroundColor: dark ? 'rgba(255,255,255,0.04)' : '#F9FAFB',
+              color: dark ? '#D1D5DB' : '#4B5563',
+              fontFamily: "'DM Sans', sans-serif",
+              lineHeight: '1.5',
+            }}
+          >
+            {question.explanation}
+          </div>
+        )}
+
+        {answered && !gateCleared && (
+          <button
+            onClick={handleContinue}
+            className="mt-5 flex items-center gap-2 px-5 py-2.5 rounded-lg font-medium transition-colors text-sm"
+            style={{
+              backgroundColor: '#E8B84B',
+              color: '#1E2749',
+              fontFamily: "'DM Sans', sans-serif",
+            }}
+          >
+            {wasCorrect ? 'You got it. Keep going.' : 'Got it. On to the next one.'}
+            <ArrowRight size={14} />
+          </button>
+        )}
+      </div>
+    );
+  }
+
+  // Reflection gate
+  if (question.question_type === 'reflection') {
+    return (
+      <div
+        className="rounded-xl p-6 mb-8"
+        style={{
+          backgroundColor: cardBg,
+          borderLeft: '3px solid #E8B84B',
+          border: `1px solid ${cardBorder}`,
+          borderLeftWidth: '3px',
+          borderLeftColor: '#E8B84B',
+        }}
+      >
+        <h3
+          className="text-lg font-semibold mb-4"
+          style={{
+            fontFamily: "'Source Serif 4', Georgia, serif",
+            color: dark ? '#F3F4F6' : '#1E2749',
+          }}
+        >
+          {header}
+        </h3>
+
+        <p
+          className="text-sm mb-5"
+          style={{
+            fontFamily: "'DM Sans', sans-serif",
+            color: dark ? '#D1D5DB' : '#374151',
+            lineHeight: '1.6',
+          }}
+        >
+          {question.question_text}
+        </p>
+
+        {!answered ? (
+          <>
+            <textarea
+              value={reflectionText}
+              onChange={(e) => setReflectionText(e.target.value)}
+              placeholder="Write your reflection here..."
+              rows={4}
+              className="w-full rounded-lg p-3 text-sm resize-y"
+              style={{
+                border: `1.5px solid ${dark ? 'rgba(255,255,255,0.1)' : '#E5E7EB'}`,
+                backgroundColor: dark ? 'rgba(255,255,255,0.03)' : '#FFFFFF',
+                color: dark ? '#E5E7EB' : '#374151',
+                fontFamily: "'DM Sans', sans-serif",
+                outline: 'none',
+              }}
+            />
+            <div className="flex items-center justify-between mt-3">
+              <span
+                className="text-xs"
+                style={{
+                  color: reflectionText.length >= 50 ? '#16A34A' : (dark ? '#9CA3AF' : '#9CA3AF'),
+                  fontFamily: "'DM Sans', sans-serif",
+                }}
+              >
+                {reflectionText.length}/50 characters minimum
+              </span>
+              <button
+                onClick={handleSaveReflection}
+                disabled={reflectionText.trim().length < 50 || saving}
+                className="px-5 py-2.5 rounded-lg font-medium text-sm transition-colors"
+                style={{
+                  backgroundColor: reflectionText.trim().length >= 50 ? '#E8B84B' : (dark ? 'rgba(255,255,255,0.1)' : '#E5E7EB'),
+                  color: reflectionText.trim().length >= 50 ? '#1E2749' : (dark ? '#6B7280' : '#9CA3AF'),
+                  fontFamily: "'DM Sans', sans-serif",
+                  cursor: reflectionText.trim().length >= 50 ? 'pointer' : 'not-allowed',
+                }}
+              >
+                {saving ? 'Saving...' : 'Save Reflection'}
+              </button>
+            </div>
+          </>
+        ) : !gateCleared ? (
+          <button
+            onClick={handleContinue}
+            className="flex items-center gap-2 px-5 py-2.5 rounded-lg font-medium transition-colors text-sm"
+            style={{
+              backgroundColor: '#E8B84B',
+              color: '#1E2749',
+              fontFamily: "'DM Sans', sans-serif",
+            }}
+          >
+            Nice. On to the next one.
+            <ArrowRight size={14} />
+          </button>
+        ) : null}
+      </div>
+    );
+  }
+
+  // Action step gate
+  if (question.question_type === 'action_step') {
+    return (
+      <div
+        className="rounded-xl p-6 mb-8"
+        style={{
+          backgroundColor: cardBg,
+          borderLeft: '3px solid #E8B84B',
+          border: `1px solid ${cardBorder}`,
+          borderLeftWidth: '3px',
+          borderLeftColor: '#E8B84B',
+        }}
+      >
+        <h3
+          className="text-lg font-semibold mb-4"
+          style={{
+            fontFamily: "'Source Serif 4', Georgia, serif",
+            color: dark ? '#F3F4F6' : '#1E2749',
+          }}
+        >
+          {header}
+        </h3>
+
+        {/* Action step callout */}
+        <div
+          className="rounded-lg p-4 mb-4 text-sm"
+          style={{
+            backgroundColor: dark ? 'rgba(232,184,75,0.08)' : '#FFF8E7',
+            border: `1px solid ${dark ? 'rgba(232,184,75,0.2)' : '#FDE68A'}`,
+            color: dark ? '#E5E7EB' : '#374151',
+            fontFamily: "'DM Sans', sans-serif",
+            lineHeight: '1.6',
+          }}
+        >
+          {question.question_text}
+        </div>
+
+        {!answered ? (
+          <>
+            <textarea
+              value={actionNotes}
+              onChange={(e) => setActionNotes(e.target.value)}
+              placeholder="Optional: Add notes about how this went..."
+              rows={3}
+              className="w-full rounded-lg p-3 text-sm resize-y mb-3"
+              style={{
+                border: `1.5px solid ${dark ? 'rgba(255,255,255,0.1)' : '#E5E7EB'}`,
+                backgroundColor: dark ? 'rgba(255,255,255,0.03)' : '#FFFFFF',
+                color: dark ? '#E5E7EB' : '#374151',
+                fontFamily: "'DM Sans', sans-serif",
+                outline: 'none',
+              }}
+            />
+            <button
+              onClick={handleActionCommit}
+              disabled={saving}
+              className="px-5 py-2.5 rounded-lg font-medium text-sm transition-colors"
+              style={{
+                backgroundColor: '#E8B84B',
+                color: '#1E2749',
+                fontFamily: "'DM Sans', sans-serif",
+              }}
+            >
+              {saving ? 'Saving...' : "I'll try this"}
+            </button>
+          </>
+        ) : !gateCleared ? (
+          <button
+            onClick={handleContinue}
+            className="flex items-center gap-2 px-5 py-2.5 rounded-lg font-medium transition-colors text-sm"
+            style={{
+              backgroundColor: '#E8B84B',
+              color: '#1E2749',
+              fontFamily: "'DM Sans', sans-serif",
+            }}
+          >
+            Something to try this week. On to the next one.
+            <ArrowRight size={14} />
+          </button>
+        ) : null}
+      </div>
+    );
+  }
+
+  // Checkpoint gate
+  if (question.question_type === 'checkpoint') {
+    // Parse options as takeaway bullets if available, otherwise use question_text
+    const takeaways: string[] = [];
+    if (question.options && Array.isArray(question.options)) {
+      question.options.forEach((opt: QuizOption) => {
+        if (opt.text) takeaways.push(opt.text);
+      });
+    }
+    if (takeaways.length === 0 && question.question_text) {
+      // Split by newline if the question_text has multiple lines
+      question.question_text.split('\n').filter(Boolean).forEach((line) => takeaways.push(line));
+    }
+
+    return (
+      <div
+        className="rounded-xl p-6 mb-8"
+        style={{
+          backgroundColor: cardBg,
+          borderLeft: '3px solid #E8B84B',
+          border: `1px solid ${cardBorder}`,
+          borderLeftWidth: '3px',
+          borderLeftColor: '#E8B84B',
+        }}
+      >
+        <h3
+          className="text-lg font-semibold mb-4"
+          style={{
+            fontFamily: "'Source Serif 4', Georgia, serif",
+            color: dark ? '#F3F4F6' : '#1E2749',
+          }}
+        >
+          {header}
+        </h3>
+
+        <ul className="space-y-2.5 mb-5">
+          {takeaways.map((item, idx) => (
+            <li
+              key={idx}
+              className="flex items-start gap-2.5 text-sm"
+              style={{
+                color: dark ? '#D1D5DB' : '#374151',
+                fontFamily: "'DM Sans', sans-serif",
+                lineHeight: '1.6',
+              }}
+            >
+              <span
+                className="w-1.5 h-1.5 rounded-full mt-2 flex-shrink-0"
+                style={{ backgroundColor: '#E8B84B' }}
+              />
+              {item}
+            </li>
+          ))}
+        </ul>
+
+        {!gateCleared && (
+          <button
+            onClick={handleCheckpointContinue}
+            disabled={saving}
+            className="flex items-center gap-2 px-5 py-2.5 rounded-lg font-medium transition-colors text-sm"
+            style={{
+              backgroundColor: '#E8B84B',
+              color: '#1E2749',
+              fontFamily: "'DM Sans', sans-serif",
+            }}
+          >
+            {saving ? 'Saving...' : 'Ready to continue'}
+            <ArrowRight size={14} />
+          </button>
+        )}
+      </div>
+    );
+  }
+
+  // Fallback: render nothing
+  return null;
+}
+
+// ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
 
@@ -159,9 +674,13 @@ export default function LessonPage({ params }: LessonPageProps) {
   const [expandedModules, setExpandedModules] = useState<Set<string>>(new Set());
   const [isLoading, setIsLoading] = useState(true);
 
-  // Quiz state
-  const [questions, setQuestions] = useState<QuizQuestion[]>([]);
-  const [userResponses, setUserResponses] = useState<Record<string, QuizResponse>>({});
+  // Gate state (course-wide)
+  const [courseQuestions, setCourseQuestions] = useState<QuizQuestion[]>([]);
+  const [courseResponses, setCourseResponses] = useState<Record<string, QuizResponse>>({});
+  const [gates, setGates] = useState<Map<number, QuizQuestion>>(new Map());
+
+  // Gate cleared locally (so UI updates immediately without refetch)
+  const [locallyCleared, setLocallyCleared] = useState<Set<string>>(new Set());
 
   // UI state
   const [transcriptOpen, setTranscriptOpen] = useState(false);
@@ -279,13 +798,21 @@ export default function LessonPage({ params }: LessonPageProps) {
         }
         setCurrentLesson(current);
 
-        // 7. Load quiz questions + user responses
-        const [lessonQuestions, responseMap] = await Promise.all([
-          getLessonQuestions(current.id),
-          getUserResponses(user.id, current.id),
-        ]);
-        setQuestions(lessonQuestions);
-        setUserResponses(responseMap);
+        // 7. Load course-wide quiz questions + responses
+        const allLessonIds = ordered.map((l) => l.id);
+        const allQuestions = await getCourseQuestions(allLessonIds);
+        setCourseQuestions(allQuestions);
+
+        const questionIds = allQuestions.map((q) => q.id);
+        const responseMap = await getCourseResponses(user.id, questionIds);
+        setCourseResponses(responseMap);
+
+        // 8. Compute gate positions
+        const gateMap = computeGatePositions(allQuestions, ordered.length);
+        setGates(gateMap);
+
+        // Reset locally cleared set on lesson change
+        setLocallyCleared(new Set());
       } catch (error) {
         console.error('Error loading lesson data:', error);
       } finally {
@@ -314,6 +841,29 @@ export default function LessonPage({ params }: LessonPageProps) {
     : 'not_started';
   const isComplete = lessonStatus === 'completed';
 
+  // Gate logic
+  const currentGate = gates.get(currentIndex) || null;
+  const isGateActive = currentGate !== null && !courseResponses[currentGate.id] && !locallyCleared.has(currentGate.id);
+  const isNextLocked = currentGate !== null && !courseResponses[currentGate.id] && !locallyCleared.has(currentGate.id);
+
+  // Build a set of "locked" lesson indices: lessons after an uncleared gate
+  const lockedLessonIndices = new Set<number>();
+  if (gates.size > 0) {
+    // Walk through all gate positions. Any lesson after an uncleared gate is locked.
+    const gateIndices = Array.from(gates.keys()).sort((a, b) => a - b);
+    for (const gateIdx of gateIndices) {
+      const gateQ = gates.get(gateIdx)!;
+      const isCleared = !!courseResponses[gateQ.id] || locallyCleared.has(gateQ.id);
+      if (!isCleared) {
+        // Lock all lessons after this gate
+        for (let i = gateIdx + 1; i < allLessons.length; i++) {
+          lockedLessonIndices.add(i);
+        }
+        break; // First uncleared gate blocks everything after it
+      }
+    }
+  }
+
   // ---------------------------------------------------------------------------
   // Handlers
   // ---------------------------------------------------------------------------
@@ -329,8 +879,8 @@ export default function LessonPage({ params }: LessonPageProps) {
     await refetch();
     showToast(tUI('Lesson complete'), currentLesson.id);
 
-    // Auto-advance
-    if (autoAdvance && nextLesson) {
+    // Auto-advance (only if no uncleared gate on current lesson)
+    if (autoAdvance && nextLesson && !isNextLocked) {
       setTimeout(() => {
         router.push(`/hub/courses/${slug}/${nextLesson.slug || nextLesson.id}`);
       }, 800);
@@ -361,6 +911,12 @@ export default function LessonPage({ params }: LessonPageProps) {
   const handleCloseCelebration = () => {
     setShowCelebration(false);
     clearCertificateEarned();
+  };
+
+  const handleGateCleared = () => {
+    if (currentGate) {
+      setLocallyCleared((prev) => new Set(prev).add(currentGate.id));
+    }
   };
 
   // ---------------------------------------------------------------------------
@@ -429,6 +985,10 @@ export default function LessonPage({ params }: LessonPageProps) {
   // ---------------------------------------------------------------------------
   // Sidebar content (shared between desktop and mobile bottom sheet)
   // ---------------------------------------------------------------------------
+
+  // Build a flat index lookup for sidebar gate indicators
+  const flatLessonIndex = new Map<string, number>();
+  allLessons.forEach((l, idx) => flatLessonIndex.set(l.id, idx));
 
   const sidebarContent = (
     <div>
@@ -502,60 +1062,84 @@ export default function LessonPage({ params }: LessonPageProps) {
                   {mod.lessons.map((l, idx) => {
                     const isActive = l.id === currentLesson?.id;
                     const isDone = progress.lessonProgress.get(l.id)?.status === 'completed';
+                    const lessonGlobalIdx = flatLessonIndex.get(l.id) ?? -1;
+                    const isLocked = lockedLessonIndices.has(lessonGlobalIdx);
+                    const gateOnThisLesson = gates.get(lessonGlobalIdx);
+                    const gateCleared = gateOnThisLesson
+                      ? !!courseResponses[gateOnThisLesson.id] || locallyCleared.has(gateOnThisLesson.id)
+                      : false;
 
                     return (
-                      <button
-                        key={l.id}
-                        onClick={() => {
-                          router.push(`/hub/courses/${slug}/${l.slug || l.id}`);
-                          setBottomSheetOpen(false);
-                        }}
-                        className="w-full flex items-center gap-2.5 py-2 px-2 rounded-lg text-left transition-colors"
-                        style={{
-                          backgroundColor: isActive ? (dark ? 'rgba(232,184,75,0.1)' : '#FFF8E7') : 'transparent',
-                          borderLeft: isActive ? '3px solid #E8B84B' : '3px solid transparent',
-                        }}
-                      >
-                        {/* Status indicator */}
-                        <div
-                          className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
+                      <div key={l.id}>
+                        <button
+                          onClick={() => {
+                            if (isLocked) return;
+                            router.push(`/hub/courses/${slug}/${l.slug || l.id}`);
+                            setBottomSheetOpen(false);
+                          }}
+                          className="w-full flex items-center gap-2.5 py-2 px-2 rounded-lg text-left transition-colors"
                           style={{
-                            background: isDone ? '#16A34A' : 'transparent',
-                            border: isDone ? 'none' : `1.5px solid ${isActive ? '#E8B84B' : (dark ? 'rgba(255,255,255,0.2)' : '#D1D5DB')}`,
+                            backgroundColor: isActive ? (dark ? 'rgba(232,184,75,0.1)' : '#FFF8E7') : 'transparent',
+                            borderLeft: isActive ? '3px solid #E8B84B' : '3px solid transparent',
+                            opacity: isLocked ? 0.45 : 1,
+                            cursor: isLocked ? 'default' : 'pointer',
                           }}
                         >
-                          {isDone ? (
-                            <Check size={10} className="text-white" />
-                          ) : (
-                            <span
-                              className="text-[10px] font-medium"
-                              style={{ color: isActive ? '#E8B84B' : theme.textMuted }}
-                            >
-                              {idx + 1}
-                            </span>
-                          )}
-                        </div>
-
-                        {/* Title + duration */}
-                        <div className="flex-1 min-w-0">
-                          <span
-                            className="text-xs block truncate"
+                          {/* Status indicator */}
+                          <div
+                            className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
                             style={{
-                              color: isActive ? theme.title : theme.textMuted,
-                              fontWeight: isActive ? 600 : 400,
-                              fontFamily: "'DM Sans', sans-serif",
+                              background: isDone ? '#16A34A' : 'transparent',
+                              border: isDone ? 'none' : `1.5px solid ${isActive ? '#E8B84B' : (dark ? 'rgba(255,255,255,0.2)' : '#D1D5DB')}`,
                             }}
                           >
-                            {l.title}
-                          </span>
-                          {l.estimated_minutes > 0 && (
-                            <span className="text-[10px] flex items-center gap-1 mt-0.5" style={{ color: theme.textMuted }}>
-                              <Clock size={9} />
-                              {l.estimated_minutes} {tUI('min')}
+                            {isDone ? (
+                              <Check size={10} className="text-white" />
+                            ) : (
+                              <span
+                                className="text-[10px] font-medium"
+                                style={{ color: isActive ? '#E8B84B' : theme.textMuted }}
+                              >
+                                {idx + 1}
+                              </span>
+                            )}
+                          </div>
+
+                          {/* Title + duration */}
+                          <div className="flex-1 min-w-0">
+                            <span
+                              className="text-xs block truncate"
+                              style={{
+                                color: isActive ? theme.title : theme.textMuted,
+                                fontWeight: isActive ? 600 : 400,
+                                fontFamily: "'DM Sans', sans-serif",
+                              }}
+                            >
+                              {l.title}
                             </span>
-                          )}
-                        </div>
-                      </button>
+                            {l.estimated_minutes > 0 && (
+                              <span className="text-[10px] flex items-center gap-1 mt-0.5" style={{ color: theme.textMuted }}>
+                                <Clock size={9} />
+                                {l.estimated_minutes} {tUI('min')}
+                              </span>
+                            )}
+                          </div>
+                        </button>
+
+                        {/* Gate indicator between lessons */}
+                        {gateOnThisLesson && (
+                          <div className="flex items-center justify-center py-1">
+                            <div
+                              className="w-2 h-2 rounded-full"
+                              style={{
+                                backgroundColor: gateCleared ? '#16A34A' : '#E8B84B',
+                                animation: !gateCleared ? 'pulse 2s ease-in-out infinite' : 'none',
+                                boxShadow: !gateCleared ? '0 0 4px rgba(232,184,75,0.5)' : 'none',
+                              }}
+                            />
+                          </div>
+                        )}
+                      </div>
                     );
                   })}
                 </div>
@@ -564,6 +1148,14 @@ export default function LessonPage({ params }: LessonPageProps) {
           );
         })}
       </div>
+
+      {/* Pulse animation for gate indicators */}
+      <style>{`
+        @keyframes pulse {
+          0%, 100% { opacity: 1; transform: scale(1); }
+          50% { opacity: 0.6; transform: scale(1.2); }
+        }
+      `}</style>
     </div>
   );
 
@@ -746,43 +1338,32 @@ export default function LessonPage({ params }: LessonPageProps) {
               </div>
             )}
 
-            {/* Interleaved content + quiz, or standalone content */}
-            {(() => {
-              if (questions.length > 0 && user) {
-                return (
-                  <div className="mb-8">
-                    <LessonContent
-                      lessonId={currentLesson.id}
-                      lessonTitle=""
-                      contentHtml={bodyHtml}
-                      questions={questions}
-                      userResponses={userResponses}
-                      userId={user.id}
-                      onComplete={handleMarkComplete}
-                      isCompleted={isComplete}
-                    />
-                  </div>
-                );
-              }
-              if (bodyHtml) {
-                return (
-                  <div
-                    className="prose prose-gray max-w-none mb-6"
-                    style={{
-                      fontFamily: "'DM Sans', sans-serif",
-                      fontSize: '15px',
-                      color: theme.prose,
-                      lineHeight: '1.7',
-                    }}
-                    dangerouslySetInnerHTML={{ __html: bodyHtml }}
-                  />
-                );
-              }
-              return null;
-            })()}
+            {/* Body HTML content (always rendered if present) */}
+            {bodyHtml && (
+              <div
+                className="prose prose-gray max-w-none mb-6"
+                style={{
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontSize: '15px',
+                  color: theme.prose,
+                  lineHeight: '1.7',
+                }}
+                dangerouslySetInnerHTML={{ __html: bodyHtml }}
+              />
+            )}
 
-            {/* Mark as complete checkbox (only if no quiz questions handle it) */}
-            {questions.length === 0 && (
+            {/* Gate Card (between content and navigation) */}
+            {currentGate && user && (
+              <GateCard
+                question={currentGate}
+                userId={user.id}
+                dark={dark}
+                onGateCleared={handleGateCleared}
+              />
+            )}
+
+            {/* Mark as complete checkbox (only when no active gate blocking) */}
+            {!isGateActive && (
               <div className="mb-8">
                 <label
                   className="flex items-center gap-3 cursor-pointer select-none p-4 rounded-lg border transition-all"
@@ -888,8 +1469,20 @@ export default function LessonPage({ params }: LessonPageProps) {
                 </label>
               </div>
 
-              {/* Next or Complete Course */}
-              {isLastLesson && progress.progressPct === 100 ? (
+              {/* Next or Complete Course (hidden when gate is active) */}
+              {isGateActive ? (
+                <div
+                  className="flex items-center gap-2 px-4 py-3 rounded-lg w-full sm:w-auto justify-center text-sm"
+                  style={{
+                    color: theme.textMuted,
+                    fontFamily: "'DM Sans', sans-serif",
+                    backgroundColor: dark ? 'rgba(255,255,255,0.03)' : '#F9FAFB',
+                    border: `1px solid ${dark ? 'rgba(255,255,255,0.06)' : '#F3F4F6'}`,
+                  }}
+                >
+                  Complete the check-in above to continue
+                </div>
+              ) : isLastLesson && progress.progressPct === 100 ? (
                 <button
                   onClick={handleCompleteCourse}
                   className="flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-colors w-full sm:w-auto justify-center"
