@@ -1013,18 +1013,18 @@ export default function LessonPage({ params }: LessonPageProps) {
             className="text-xs font-medium"
             style={{ color: theme.textMuted, fontFamily: "'DM Sans', sans-serif" }}
           >
-            {progress.completedLessons} {tUI('of')} {allLessons.length} {tUI('complete')}
+            {progress.completedLessons + progress.completedChecks} {tUI('of')} {allLessons.length + progress.totalChecks} {tUI('complete')}
           </span>
           <span className="text-xs font-bold" style={{ color: '#E8B84B' }}>
-            {allLessons.length > 0 ? Math.round((progress.completedLessons / allLessons.length) * 100) : 0}%
+            {progress.progressPct}%
           </span>
         </div>
         <div className="h-1.5 rounded-full overflow-hidden" style={{ background: dark ? 'rgba(255,255,255,0.1)' : '#F3F4F6' }}>
           <div
             className="h-full rounded-full transition-all duration-500"
             style={{
-              width: `${allLessons.length > 0 ? Math.round((progress.completedLessons / allLessons.length) * 100) : 0}%`,
-              background: (allLessons.length > 0 && progress.completedLessons >= allLessons.length)
+              width: `${progress.progressPct}%`,
+              background: progress.isComplete
                 ? 'linear-gradient(90deg, #16A34A, #22C55E)'
                 : 'linear-gradient(90deg, #FFBA06, #E8B84B)',
             }}
@@ -1174,7 +1174,7 @@ export default function LessonPage({ params }: LessonPageProps) {
         <div
           className="h-full transition-all duration-500"
           style={{
-            width: `${allLessons.length > 0 ? Math.round((progress.completedLessons / allLessons.length) * 100) : 0}%`,
+            width: `${progress.progressPct}%`,
             background: 'linear-gradient(90deg, #FFBA06, #E8B84B)',
           }}
         />
@@ -1490,7 +1490,7 @@ export default function LessonPage({ params }: LessonPageProps) {
                 >
                   Complete the check-in above to continue
                 </div>
-              ) : isLastLesson && allLessons.length > 0 && progress.completedLessons >= allLessons.length ? (
+              ) : isLastLesson && progress.isComplete ? (
                 <button
                   onClick={handleCompleteCourse}
                   className="flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-colors w-full sm:w-auto justify-center"

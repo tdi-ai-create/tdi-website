@@ -19,6 +19,8 @@ export interface CourseProgress {
   progressPct: number;
   isComplete: boolean;
   lessonProgress: Map<string, LessonProgress>;
+  totalChecks: number;
+  completedChecks: number;
 }
 
 export interface CertificateInfo {
@@ -47,6 +49,8 @@ export function useProgressTracking(
     progressPct: 0,
     isComplete: false,
     lessonProgress: new Map(),
+    totalChecks: 0,
+    completedChecks: 0,
   });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -123,8 +127,30 @@ export function useProgressTracking(
         }
       });
 
-      const progressPct = totalLessons > 0 ? Math.round((completedCount / totalLessons) * 100) : 0;
-      const isComplete = totalLessons > 0 && completedCount === totalLessons;
+      // Get check-in completion (quiz questions + responses for this course)
+      const { data: courseQuestions } = await supabase
+        .from('hub_quiz_questions')
+        .select('id')
+        .in('lesson_id', lessonIds.length > 0 ? lessonIds : ['__none__']);
+
+      const totalChecks = courseQuestions?.length || 0;
+      let completedChecks = 0;
+
+      if (totalChecks > 0) {
+        const questionIds = courseQuestions!.map((q) => q.id);
+        const { data: responses } = await supabase
+          .from('hub_quiz_responses')
+          .select('question_id')
+          .eq('user_id', userId)
+          .in('question_id', questionIds);
+        completedChecks = responses?.length || 0;
+      }
+
+      // Progress = lessons + checks combined
+      const totalItems = totalLessons + totalChecks;
+      const completedItems = completedCount + completedChecks;
+      const progressPct = totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0;
+      const isComplete = totalItems > 0 && completedItems === totalItems;
 
       setProgress({
         totalLessons,
@@ -132,6 +158,8 @@ export function useProgressTracking(
         progressPct,
         isComplete,
         lessonProgress: lessonProgressMap,
+        totalChecks,
+        completedChecks,
       });
     } catch (err) {
       console.error('Error fetching progress:', err);
@@ -232,11 +260,10 @@ export function useProgressTracking(
         newCompletedCount++;
       }
 
-      const newProgressPct =
-        progress.totalLessons > 0
-          ? Math.round((newCompletedCount / progress.totalLessons) * 100)
-          : 0;
-      const isComplete = progress.totalLessons > 0 && newCompletedCount === progress.totalLessons;
+      const totalItems = progress.totalLessons + progress.totalChecks;
+      const completedItems = newCompletedCount + progress.completedChecks;
+      const newProgressPct = totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0;
+      const isComplete = totalItems > 0 && completedItems === totalItems;
 
       setProgress({
         totalLessons: progress.totalLessons,
@@ -244,6 +271,8 @@ export function useProgressTracking(
         progressPct: newProgressPct,
         isComplete,
         lessonProgress: newLessonProgress,
+        totalChecks: progress.totalChecks,
+        completedChecks: progress.completedChecks,
       });
 
       // Update enrollment progress
