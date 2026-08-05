@@ -209,7 +209,7 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
         // Fetch lessons (include transcript availability)
         const { data: lessonsData } = await supabase
           .from('hub_lessons')
-          .select('id, slug, title, estimated_minutes, type, is_free_preview, is_quick_win, sort_order, module_id, transcript_text, transcript_text_es')
+          .select('id, slug, title, estimated_minutes, type, is_free_preview, is_quick_win, sort_order, module_id, transcript, transcript_es')
           .eq('course_id', courseData.id)
           .order('sort_order', { ascending: true });
 
@@ -240,8 +240,8 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
             is_quick_win: raw.is_quick_win,
             sort_order: raw.sort_order,
             module_id: raw.module_id,
-            has_transcript_en: !!raw.transcript_text,
-            has_transcript_es: !!raw.transcript_text_es,
+            has_transcript_en: !!raw.transcript,
+            has_transcript_es: !!raw.transcript_es,
           };
           allLessonIds.push(raw.id);
           if (lesson.module_id && moduleMap.has(lesson.module_id)) {
