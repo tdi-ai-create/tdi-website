@@ -59,7 +59,7 @@ const faqs = [
     questions: [
       {
         q: 'How much does it cost?',
-        a: 'Individual teachers can access free resources through our blog and podcast, plus affordable courses in the Learning Hub. Schools partner with us through customized packages based on their size and needs. We believe cost should never be the reason a school can\'t support its teachers.',
+        a: 'Individual teachers can access free resources through our blog, plus affordable courses in the Learning Hub. Schools partner with us through customized packages based on their size and needs. We believe cost should never be the reason a school can\'t support its teachers.',
       },
       {
         q: 'We don\'t have budget for PD. Can you still help?',

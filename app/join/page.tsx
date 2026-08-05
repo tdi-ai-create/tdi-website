@@ -276,28 +276,6 @@ export default function JoinPage() {
             </a>
 
             <a
-              href="https://podcasts.apple.com/us/podcast/sustainable-teaching-with-rae-hughart/id1792030274"
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{ display: 'block', padding: 28, background: '#ffffff', borderRadius: 12, borderTop: '3px solid #ffba06', textDecoration: 'none', transition: 'transform 0.2s, box-shadow 0.2s' }}
-              onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(30,39,73,0.08)'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none'; }}
-            >
-              <p style={{ fontSize: 12, fontWeight: 600, letterSpacing: 1.2, textTransform: 'uppercase', color: '#2A9D8F', margin: '0 0 12px 0' }}>
-                Listen and learn
-              </p>
-              <h3 style={{ fontSize: 22, fontWeight: 700, color: '#1e2749', margin: '0 0 12px 0', lineHeight: 1.25 }}>
-                Sustainable Teaching, the podcast
-              </h3>
-              <p style={{ fontSize: 15, color: '#6B7280', margin: '0 0 16px 0', lineHeight: 1.5 }}>
-                Real talk about sustainable teaching from people who get it. New episodes every Friday.
-              </p>
-              <span style={{ fontSize: 15, fontWeight: 600, color: '#1e2749' }}>
-                Start listening →
-              </span>
-            </a>
-
-            <a
               href="https://www.teachersdeserveit.com/hub"
               target="_blank"
               rel="noopener noreferrer"

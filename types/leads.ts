@@ -4,7 +4,6 @@
 export type EnrichmentStatus = 'pending' | 'in_progress' | 'complete' | 'failed' | 'skipped';
 
 export type LeadSource =
-  | 'podcast_guest'
   | 'conference'
   | 'referral'
   | 'cold_inbound'
@@ -63,7 +62,7 @@ export interface FundingSignals {
 export interface WarmthSignals {
   geographic_proximity_to_tdi_partners: string;
   iasa_member: boolean | null;
-  podcast_or_linkedin_connection: string | null;
+  linkedin_connection: string | null;
   notes: string;
 }
 

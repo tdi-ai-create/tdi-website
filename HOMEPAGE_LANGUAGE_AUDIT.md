@@ -101,7 +101,7 @@
 | "Two Ways to Work With Us" | Neutral | |
 | **For Teachers Card** (entire card) | Teacher | Dedicated section |
 | "Classroom tools you can use Monday morning" | Teacher | |
-| "Weekly strategies from our blog and podcast" | Teacher | |
+| "Weekly strategies from our blog" | Teacher | |
 | "Free resources for teachers and paras" | Teacher | |
 | **For Schools & Districts Card** (entire card) | Admin | Dedicated section |
 | "Use the TDI Blueprint to transform your building" | Admin | |

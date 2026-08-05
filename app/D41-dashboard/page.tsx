@@ -29,7 +29,6 @@ import {
   User,
   BarChart3,
   Sparkles,
-  Headphones,
   Info,
   GraduationCap,
   Activity,
@@ -931,23 +930,6 @@ export default function D41Dashboard() {
                   </div>
                 </a>
 
-                <a
-                  href="https://podcasts.apple.com/us/podcast/sustainable-teaching-with-rae-hughart/id1792030274"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-gray-50 rounded-xl p-5 border border-gray-200 hover:border-[#35A7FF] hover:shadow-md transition-all group flex gap-4"
-                >
-                  <div className="w-12 h-12 bg-[#38618C]/10 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-[#35A7FF]/10 transition-colors">
-                    <Headphones className="w-6 h-6 text-[#38618C] group-hover:text-[#35A7FF]" />
-                  </div>
-                  <div>
-                    <div className="font-semibold text-[#1e2749] mb-1">Sustainable Teaching Podcast</div>
-                    <p className="text-xs text-gray-500 mb-2">Real conversations about what works</p>
-                    <span className="text-xs text-[#35A7FF] font-medium flex items-center gap-1">
-                      Listen now <ArrowRight className="w-3 h-3" />
-                    </span>
-                  </div>
-                </a>
               </div>
             </div>
 

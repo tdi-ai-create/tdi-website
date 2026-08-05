@@ -55,7 +55,7 @@ const SEED_MARKER = '[seeded:TEA-3027]';
 //   Mon — Substack newsletter send (educator audience post)
 //   Wed — Substack newsletter send (educator audience post)
 //   Thu — Quick Win drops weekly (pre-launch teaser cycle)
-//   Fri — Podcast episode post + weekly wrap
+//   Fri — Weekly wrap
 //   Jun 1 — Full platform launch (Hub goes live)
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -79,13 +79,6 @@ const CALENDAR_EVENTS = [
     scheduled_date: '2026-05-07',
     notes: 'Week 1 quick win tease. Stress Relief / low capacity. Pre-launch awareness. ' + SEED_MARKER,
   },
-  {
-    title: 'Podcast Post: Amy Storer Episode',
-    content_type: 'other',
-    scheduled_date: '2026-05-08',
-    notes: 'Friday podcast Substack drop. Amy Storer episode goes live. ' + SEED_MARKER,
-  },
-
   // ── WEEK 2 (May 8–14) ─────────────────────────────────────────────────────
   {
     title: 'Substack: [PARA] Monday Send',
@@ -141,12 +134,6 @@ const CALENDAR_EVENTS = [
   },
 
   // ── WEEK 5 (May 29–31) ────────────────────────────────────────────────────
-  {
-    title: 'Podcast Post: May Finale Episode',
-    content_type: 'other',
-    scheduled_date: '2026-05-29',
-    notes: 'Friday podcast drop. Final May episode. ' + SEED_MARKER,
-  },
   {
     title: 'Substack: [TEACHER] You Survived Another Year',
     content_type: 'announcement',
@@ -204,12 +191,6 @@ const CALENDAR_EVENTS = [
     content_type: 'quick-win',
     scheduled_date: '2026-06-11',
     notes: 'Week 2 post-launch quick win. Para-focused. Time Savers / reflect / low capacity. ' + SEED_MARKER,
-  },
-  {
-    title: 'Podcast + Week 2 Hub Roundup',
-    content_type: 'other',
-    scheduled_date: '2026-06-12',
-    notes: 'Friday podcast drop + second week Hub recap email to engaged users. ' + SEED_MARKER,
   },
 ];
 

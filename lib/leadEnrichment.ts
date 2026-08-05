@@ -85,7 +85,7 @@ no commentary, no code fences):
   "warmth_signals": {
     "geographic_proximity_to_tdi_partners": "Description of proximity",
     "iasa_member": true_false_or_null,
-    "podcast_or_linkedin_connection": "string_or_null",
+    "linkedin_connection": "string_or_null",
     "notes": "Any additional warmth context"
   },
   "scoring": {

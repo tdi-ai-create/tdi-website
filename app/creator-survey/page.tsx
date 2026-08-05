@@ -620,7 +620,6 @@ export default function CreatorSurveyPage() {
                   value={formData.q1_referral}
                   onChange={v => updateField('q1_referral', v)}
                   options={[
-                    { value: 'Podcast', label: 'Podcast' },
                     { value: 'LinkedIn', label: 'LinkedIn' },
                     { value: 'Colleague', label: 'Colleague' },
                     { value: 'Social media', label: 'Social media' },

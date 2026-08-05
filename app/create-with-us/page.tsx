@@ -639,7 +639,7 @@ export default function CreateWithUsPage() {
                   A True Partnership
                 </h3>
                 <p className="text-gray-600 leading-relaxed">
-                  This isn't just about creating content for us. Promote your social media, website, podcast, or other offerings directly within your content. We highlight you, and you grow your own platform too.
+                  This isn't just about creating content for us. Promote your social media, website, or other offerings directly within your content. We highlight you, and you grow your own platform too.
                 </p>
               </div>
             </div>

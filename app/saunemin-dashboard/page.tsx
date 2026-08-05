@@ -28,7 +28,6 @@ import {
   User,
   BarChart3,
   Sparkles,
-  Headphones,
   Info,
   GraduationCap,
   Activity,
@@ -1448,12 +1447,12 @@ export default function SauneminDashboard() {
               <div className="flex flex-col md:flex-row gap-6 items-center">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
-                    <Headphones className="w-5 h-5 text-[#35A7FF]" />
+                    <FileText className="w-5 h-5 text-[#35A7FF]" />
                     <span className="text-xs bg-[#35A7FF]/20 text-[#35A7FF] px-2 py-0.5 rounded-full">New This Week</span>
                   </div>
                   <h3 className="font-bold text-lg mb-2">Fresh Resources Every Week</h3>
                   <p className="text-sm text-white/70 mb-3">
-                    Get the latest strategies, research, and educator support tools delivered to your inbox. Plus, listen to the Teachers Deserve It podcast for real conversations about what&apos;s working in schools.
+                    Get the latest strategies, research, and educator support tools delivered to your inbox.
                   </p>
                   <div className="flex flex-wrap gap-3">
                     <a
@@ -1464,15 +1463,6 @@ export default function SauneminDashboard() {
                     >
                       <FileText className="w-4 h-4" />
                       Read the Blog
-                    </a>
-                    <a
-                      href="https://www.teachersdeserveit.com/podcast"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors"
-                    >
-                      <Headphones className="w-4 h-4" />
-                      Listen to Podcast
                     </a>
                   </div>
                 </div>

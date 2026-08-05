@@ -195,26 +195,6 @@ const WORKFLOWS: Workflow[] = [
     notes: 'Internal workflow. No QA gate for most tasks. Ops tasks producing external materials must route through QA.',
   },
   {
-    id: 'podcast',
-    project: 'Podcast Production',
-    keywords: ['podcast', 'audio', 'transcript', 'episode', 'guest', 'double-drop'],
-    stages: [
-      { name: 'Record', owner: 'Rae' },
-      { name: 'Transcript Receipt', owner: 'Izzy' },
-      { name: 'Approve', owner: 'Kristin' },
-      { name: 'Production', owner: 'Zara / Jasmine / Lily' },
-      { name: 'QA Gate', owner: 'Julie Lynn', isQAGate: true },
-      { name: 'Publish', owner: 'Rae' },
-    ],
-    qaGateName: 'QA Gate',
-    qaChecks: [
-      'All links resolve',
-      'No placeholder episode details',
-      'Correct guest / topic info',
-    ],
-    shipAction: 'Publish double-drop',
-  },
-  {
     id: 'sales',
     project: 'Sales',
     keywords: ['sales', 'outreach', 'lead', 'email', 'pipeline', 'prospect'],

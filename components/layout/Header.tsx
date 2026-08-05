@@ -60,7 +60,6 @@ export function Header() {
 
   const contentLinks = [
     { href: 'https://raehughart.substack.com', label: 'Blog', external: true },
-    { href: 'https://podcasts.apple.com/us/podcast/sustainable-teaching-with-rae-hughart/id1792030274', label: 'Podcast', external: true },
     { href: 'https://www.teachersdeserveit.com/hub', label: 'Learning Hub', external: true },
     { href: '/create-with-us', label: 'Apply to Create', featured: true },
   ];

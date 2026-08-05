@@ -24,7 +24,6 @@ const imagesToOptimize = [
   'hero-pd-plan.png',
   'card-resources.png',
   'hero-funding.png',
-  'card-podcast.png',
   'rae-headshot.png',
 ];
 

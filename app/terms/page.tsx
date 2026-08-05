@@ -27,7 +27,6 @@ export default function TermsPage() {
             <ul>
               <li>Online courses and learning materials</li>
               <li>Newsletter and blog content</li>
-              <li>Podcast content</li>
               <li>School and district partnership programs</li>
               <li>Live workshops and coaching sessions</li>
             </ul>

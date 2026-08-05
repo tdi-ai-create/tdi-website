@@ -341,7 +341,7 @@ export default function Home() {
                   <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="#ffba06" viewBox="0 0 24 24">
                     <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
                   </svg>
-                  <span style={{ color: '#1e2749' }}>Weekly strategies from our blog and podcast</span>
+                  <span style={{ color: '#1e2749' }}>Weekly strategies from our blog</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="#ffba06" viewBox="0 0 24 24">

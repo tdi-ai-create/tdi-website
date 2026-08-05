@@ -142,7 +142,7 @@ export const educatorTypeQuiz: QuizConfig = {
       answers: [
         { text: 'Organizing my files, templates, or lesson plans', types: ['architect'] },
         { text: 'Writing a note to a student, parent, or colleague', types: ['connector'] },
-        { text: 'Browsing ideas, podcasts, or something totally unrelated that might inspire a lesson', types: ['innovator', 'spark'] },
+        { text: 'Browsing ideas, articles, or something totally unrelated that might inspire a lesson', types: ['innovator', 'spark'] },
         { text: 'Planning ahead so next week is smoother than this one', types: ['strategist'] },
       ],
     },
@@ -325,7 +325,7 @@ export const growthStyleQuiz: QuizConfig = {
       key: 'self_starter',
       title: 'The Self-Starter',
       subtitle: 'You do not wait for PD day.',
-      description: 'You have a podcast queue, a bookmark folder full of articles, and a list of things to try. You do not need anyone to assign you growth -- you seek it out on your own terms, on your own schedule. You are your own best PD provider.',
+      description: 'You have a bookmark folder full of articles, a list of things to try, and resources saved for later. You do not need anyone to assign you growth -- you seek it out on your own terms, on your own schedule. You are your own best PD provider.',
       color: '#D97706',
       bg: '#FEF3C7',
       icon: 'S',

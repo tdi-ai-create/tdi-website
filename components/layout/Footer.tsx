@@ -96,11 +96,6 @@ export function Footer() {
                   </a>
                 </li>
                 <li>
-                  <a href="https://podcasts.apple.com/us/podcast/sustainable-teaching-with-rae-hughart/id1792030274" target="_blank" rel="noopener noreferrer" className="text-sm hover:underline hover-color-shift" style={{ color: 'white', opacity: 0.7 }}>
-                    Podcast
-                  </a>
-                </li>
-                <li>
                   <Link href="/faq" className="text-sm hover:underline hover-color-shift" style={{ color: 'white', opacity: 0.7 }}>
                     FAQ
                   </Link>
