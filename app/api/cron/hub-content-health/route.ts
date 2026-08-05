@@ -102,7 +102,7 @@ export async function GET() {
       .from('hub_quick_wins')
       .select('id, title, created_at')
       .eq('is_published', false)
-      .is('pdf_url', null)
+      .is('file_url', null)
       .lt('created_at', new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString());
 
     if (staleDrafts && staleDrafts.length > 0) {
