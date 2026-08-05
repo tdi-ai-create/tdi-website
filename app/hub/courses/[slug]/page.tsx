@@ -13,14 +13,20 @@ import {
   ArrowLeft,
   BookOpen,
   Award,
-  User,
   CheckCircle,
   Zap,
+  ChevronDown,
+  ChevronRight,
+  Play,
+  FileText,
+  Download,
+  Clock,
 } from 'lucide-react';
 import CourseCard from '@/components/hub/CourseCard';
 import CommunityTabs from '@/components/hub/CommunityTabs';
 import AchievementInsights from '@/components/hub/AchievementInsights';
 import CapacityFeedbackPrompt, { shouldShowCapacityFeedback } from '@/components/hub/CapacityFeedbackPrompt';
+import type { QuizQuestion, QuizOption, QuizResponse } from '@/lib/hub/quiz';
 
 // Category colors
 const CATEGORY_COLORS: Record<string, string> = {
@@ -61,8 +67,15 @@ function getTestimonials(id: string): typeof TESTIMONIALS {
   return result;
 }
 
-// Coming Soon is now dynamic — a course is "coming soon" if it has no lessons
-// Once lessons exist, the course becomes startable automatically
+// Difficulty label + color
+function getDifficultyDisplay(difficulty: string | null | undefined) {
+  switch (difficulty) {
+    case 'beginner': return { label: 'Beginner', color: '#6BA368' };
+    case 'intermediate': return { label: 'Intermediate', color: '#E8B84B' };
+    case 'advanced': return { label: 'Advanced', color: '#E8927C' };
+    default: return { label: 'All Levels', color: '#7C9CBF' };
+  }
+}
 
 interface Lesson {
   id: string;
@@ -74,6 +87,8 @@ interface Lesson {
   is_quick_win: boolean;
   sort_order: number;
   module_id: string | null;
+  has_transcript_en: boolean;
+  has_transcript_es: boolean;
 }
 
 interface Module {
@@ -144,6 +159,12 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
   const [showCapacityFeedback, setShowCapacityFeedback] = useState(false);
   const capacityFeedbackShownRef = useRef(false);
 
+  // Formative check-ins state
+  const [checkInQuestions, setCheckInQuestions] = useState<QuizQuestion[]>([]);
+  const [checkInResponses, setCheckInResponses] = useState<Record<string, QuizResponse>>({});
+  const [checkInDrafts, setCheckInDrafts] = useState<Record<string, string>>({});
+  const [checkInSubmitting, setCheckInSubmitting] = useState<string | null>(null);
+
   const { enrollment, isEnrolled, isEnrolling, enroll } = useEnrollment(course?.id || null, user?.id || null);
   const { progress, toggleLessonComplete } = useProgressTracking(course?.id || null, user?.id || null);
   const { language, t } = useLanguage();
@@ -172,29 +193,30 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
 
         setCourse(courseData);
 
-        // Fetch enrolled count (service role endpoint — bypasses RLS)
+        // Fetch enrolled count (service role endpoint - bypasses RLS)
         fetch(`/api/hub/enrollment-count?courseId=${courseData.id}`)
           .then((r) => r.ok ? r.json() : null)
           .then((data) => { if (data?.count != null) setEnrolledCount(data.count); })
           .catch(() => {});
 
         // Fetch modules with lessons
-        const { data: modulesData, error: modulesError } = await supabase
+        const { data: modulesData } = await supabase
           .from('hub_modules')
           .select('id, title, sort_order')
           .eq('course_id', courseData.id)
           .order('sort_order', { ascending: true });
 
-        // Fetch lessons
-        const { data: lessonsData, error: lessonsError } = await supabase
+        // Fetch lessons (include transcript availability)
+        const { data: lessonsData } = await supabase
           .from('hub_lessons')
-          .select('id, slug, title, estimated_minutes, type, is_free_preview, is_quick_win, sort_order, module_id')
+          .select('id, slug, title, estimated_minutes, type, is_free_preview, is_quick_win, sort_order, module_id, transcript_text, transcript_text_es')
           .eq('course_id', courseData.id)
           .order('sort_order', { ascending: true });
 
         // Group lessons by module
         const moduleMap = new Map<string, Module>();
         const unassignedLessons: Lesson[] = [];
+        const allLessonIds: string[] = [];
 
         // Initialize modules
         modulesData?.forEach((mod) => {
@@ -206,12 +228,26 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
           });
         });
 
-        // Assign lessons to modules
-        lessonsData?.forEach((lesson) => {
+        // Assign lessons to modules (convert transcript presence to boolean flags)
+        lessonsData?.forEach((raw) => {
+          const lesson: Lesson = {
+            id: raw.id,
+            slug: raw.slug,
+            title: raw.title,
+            estimated_minutes: raw.estimated_minutes,
+            type: raw.type,
+            is_free_preview: raw.is_free_preview,
+            is_quick_win: raw.is_quick_win,
+            sort_order: raw.sort_order,
+            module_id: raw.module_id,
+            has_transcript_en: !!raw.transcript_text,
+            has_transcript_es: !!raw.transcript_text_es,
+          };
+          allLessonIds.push(raw.id);
           if (lesson.module_id && moduleMap.has(lesson.module_id)) {
-            moduleMap.get(lesson.module_id)!.lessons.push(lesson as Lesson);
+            moduleMap.get(lesson.module_id)!.lessons.push(lesson);
           } else {
-            unassignedLessons.push(lesson as Lesson);
+            unassignedLessons.push(lesson);
           }
         });
 
@@ -221,7 +257,6 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
         // If there are unassigned lessons, create a default module
         if (unassignedLessons.length > 0) {
           if (finalModules.length === 0) {
-            // All lessons are unassigned, create single module
             finalModules = [{
               id: 'default',
               title: 'Course Content',
@@ -229,7 +264,6 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
               lessons: unassignedLessons,
             }];
           } else {
-            // Add unassigned to first module or create separate
             finalModules[0].lessons = [...unassignedLessons, ...finalModules[0].lessons];
           }
         }
@@ -238,6 +272,19 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
 
         // Expand all modules by default
         setExpandedModules(new Set(finalModules.map((m) => m.id)));
+
+        // Fetch formative check-in questions for all lessons in this course
+        if (allLessonIds.length > 0) {
+          const { data: questionsData } = await supabase
+            .from('hub_quiz_questions')
+            .select('*')
+            .in('lesson_id', allLessonIds)
+            .order('sort_order', { ascending: true });
+
+          if (questionsData && questionsData.length > 0) {
+            setCheckInQuestions(questionsData);
+          }
+        }
 
         // Fetch related courses (same category, different course)
         const { data: relatedData } = await supabase
@@ -249,7 +296,6 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
           .limit(3);
 
         if (relatedData) {
-          // Convert null thumbnail_url to undefined for type compatibility
           setRelatedCourses(relatedData.map(c => ({
             ...c,
             thumbnail_url: c.thumbnail_url || undefined,
@@ -267,7 +313,6 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
             .limit(3);
 
           if (authorData) {
-            // Convert null thumbnail_url to undefined for type compatibility
             setAuthorCourses(authorData.map(c => ({
               ...c,
               thumbnail_url: c.thumbnail_url || undefined,
@@ -296,6 +341,32 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
     loadCourse();
   }, [slug]);
 
+  // Fetch user responses for check-in questions
+  useEffect(() => {
+    if (!user?.id || checkInQuestions.length === 0) return;
+
+    async function loadResponses() {
+      const supabase = getSupabase();
+      const lessonIds = [...new Set(checkInQuestions.map(q => q.lesson_id))];
+
+      const { data } = await supabase
+        .from('hub_quiz_responses')
+        .select('*')
+        .eq('user_id', user!.id)
+        .in('lesson_id', lessonIds);
+
+      if (data) {
+        const responseMap: Record<string, QuizResponse> = {};
+        data.forEach((r: QuizResponse) => {
+          responseMap[r.question_id] = r;
+        });
+        setCheckInResponses(responseMap);
+      }
+    }
+
+    loadResponses();
+  }, [user?.id, checkInQuestions]);
+
   // Show capacity feedback prompt once the educator has completed at least one lesson
   useEffect(() => {
     if (!course?.capacity || !user?.id || !progress.completedLessons) return;
@@ -312,7 +383,7 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
   // Auto-translate course when Spanish is selected and content is missing
   useEffect(() => {
     if (language !== 'es' || !course) return;
-    if (course.title_es && course.description_es) return; // Already translated
+    if (course.title_es && course.description_es) return;
 
     fetch('/api/hub/translate', {
       method: 'POST',
@@ -326,7 +397,6 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
       if (res.ok) return res.json();
     }).then(data => {
       if (data) {
-        // Update local state with translated content
         setCourse(prev => prev ? {
           ...prev,
           title_es: data.title_es || prev.title_es,
@@ -344,7 +414,7 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
       const countMsg = newCount > 1
         ? `You're joining ${newCount.toLocaleString()} educators in this course.`
         : 'Welcome to the course!';
-      showToast(`You're in! ${countMsg} 🎉`, 'success');
+      showToast(`You're in! ${countMsg}`, 'success');
     } else {
       showToast('Failed to enroll. Please try again.', 'error');
     }
@@ -362,6 +432,56 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
         newStatus === 'completed' ? 'Lesson marked complete' : 'Lesson marked incomplete',
         'success'
       );
+    }
+  };
+
+  const handleCheckInSubmit = async (question: QuizQuestion, answer: string) => {
+    if (!user?.id || !answer.trim()) return;
+    setCheckInSubmitting(question.id);
+
+    try {
+      let isCorrect: boolean | null = null;
+
+      if (question.question_type === 'multiple_choice' && question.options) {
+        const selectedIdx = parseInt(answer, 10);
+        isCorrect = question.options[selectedIdx]?.is_correct === true;
+      } else if (question.question_type === 'true_false' && question.correct_answer) {
+        isCorrect = question.correct_answer.toLowerCase() === answer.toLowerCase();
+      }
+
+      const supabase = getSupabase();
+      const { error } = await supabase
+        .from('hub_quiz_responses')
+        .upsert(
+          {
+            user_id: user.id,
+            question_id: question.id,
+            lesson_id: question.lesson_id,
+            response: answer,
+            is_correct: isCorrect,
+          },
+          { onConflict: 'user_id,question_id' }
+        );
+
+      if (!error) {
+        setCheckInResponses(prev => ({
+          ...prev,
+          [question.id]: {
+            id: question.id,
+            user_id: user.id,
+            question_id: question.id,
+            lesson_id: question.lesson_id,
+            response: answer,
+            is_correct: isCorrect,
+            created_at: new Date().toISOString(),
+          },
+        }));
+        showToast('Response saved', 'success');
+      }
+    } catch {
+      showToast('Failed to save response', 'error');
+    } finally {
+      setCheckInSubmitting(null);
     }
   };
 
@@ -471,6 +591,18 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
   const comingSoon = totalLessons === 0;
   const completedLessons = progress.completedLessons || 0;
   const progressPct = progress.progressPct || 0;
+  const difficultyInfo = getDifficultyDisplay(course.difficulty);
+
+  // CTA button label
+  const ctaLabel = comingSoon
+    ? (notified ? tUI('We will notify you!') : tUI('Notify me when this launches'))
+    : isEnrolled
+      ? (progressPct === 100 ? tUI('Completed') : tUI('Continue'))
+      : isEnrolling
+        ? tUI('Enrolling...')
+        : !user
+          ? tUI('Sign in to enroll')
+          : tUI('Start Course');
 
   return (
     <div style={{ background: '#F5F7FA', minHeight: '100vh' }}>
@@ -503,6 +635,9 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
         </ol>
       </nav>
 
+      {/* ============================================================ */}
+      {/* 1. HERO + CTA + SIDEBAR                                       */}
+      {/* ============================================================ */}
       <div className="grid lg:grid-cols-[1fr_320px] gap-8">
         {/* Main Content */}
         <div>
@@ -546,23 +681,37 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
                 </p>
               )}
 
-              {/* Stats row - PD Hours, Lessons, and Capacity */}
+              {/* Stats row: Lessons, Estimated Time, Difficulty, Capacity, Enrolled */}
               <div
-                className="flex gap-0 pt-5"
+                className="flex flex-wrap gap-0 pt-5"
                 style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}
               >
-                {course.pd_hours != null && course.pd_hours > 0 && (
-                  <div className="pr-6" style={{ borderRight: '1px solid rgba(255,255,255,0.08)' }}>
-                    <div className="text-xl font-bold" style={{ color: '#FFBA06' }}>{course.pd_hours}</div>
-                    <div className="text-xs font-bold tracking-widest uppercase mt-0.5" style={{ color: 'rgba(255,255,255,0.4)', letterSpacing: '0.06em' }}>PD Hours</div>
-                  </div>
-                )}
                 {totalLessons > 0 && (
-                  <div className="px-6" style={(course.capacity || (enrolledCount !== null && enrolledCount > 0)) ? { borderRight: '1px solid rgba(255,255,255,0.08)' } : {}}>
+                  <div className="pr-6" style={{ borderRight: '1px solid rgba(255,255,255,0.08)' }}>
                     <div className="text-xl font-bold text-white">{totalLessons}</div>
                     <div className="text-xs font-bold tracking-widest uppercase mt-0.5" style={{ color: 'rgba(255,255,255,0.4)', letterSpacing: '0.06em' }}>Lessons</div>
                   </div>
                 )}
+                {course.estimated_minutes != null && course.estimated_minutes > 0 && (
+                  <div className="px-6" style={{ borderRight: '1px solid rgba(255,255,255,0.08)' }}>
+                    <div className="text-xl font-bold text-white">
+                      {course.estimated_minutes >= 60
+                        ? `${Math.floor(course.estimated_minutes / 60)}h ${course.estimated_minutes % 60 > 0 ? `${course.estimated_minutes % 60}m` : ''}`
+                        : `${course.estimated_minutes}m`}
+                    </div>
+                    <div className="text-xs font-bold tracking-widest uppercase mt-0.5" style={{ color: 'rgba(255,255,255,0.4)', letterSpacing: '0.06em' }}>Est. Time</div>
+                  </div>
+                )}
+                <div className="px-6" style={
+                  (course.capacity || (enrolledCount !== null && enrolledCount > 0))
+                    ? { borderRight: '1px solid rgba(255,255,255,0.08)' }
+                    : {}
+                }>
+                  <div className="text-xl font-bold" style={{ color: difficultyInfo.color }}>
+                    {difficultyInfo.label}
+                  </div>
+                  <div className="text-xs font-bold tracking-widest uppercase mt-0.5" style={{ color: 'rgba(255,255,255,0.4)', letterSpacing: '0.06em' }}>Difficulty</div>
+                </div>
                 {course.capacity && (
                   <div className="px-6" style={(enrolledCount !== null && enrolledCount > 0) ? { borderRight: '1px solid rgba(255,255,255,0.08)' } : {}}>
                     <div
@@ -641,12 +790,11 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
               </div>
             </div>
           )}
-
         </div>
 
         {/* Sidebar */}
         <div className="space-y-3">
-          {/* Resume / Start button + progress */}
+          {/* Resume / Start / Completed button + progress */}
           <div
             className="bg-white rounded-2xl p-5"
             style={{ border: '0.5px solid rgba(0,0,0,0.06)' }}
@@ -676,7 +824,7 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
                     : { backgroundColor: '#ffba06', color: '#1e2749' }
                   }
                 >
-                  {notified ? tUI('We will notify you!') : tUI('Notify me when this launches')}
+                  {ctaLabel}
                 </button>
                 <p className="text-xs mt-2" style={{ color: '#9CA3AF' }}>
                   {tUI('This course is launching any day now.')}
@@ -687,6 +835,13 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
                 <button
                   onClick={() => {
                     if (isEnrolled) {
+                      if (progressPct === 100) {
+                        // Go to first lesson for completed courses
+                        if (modules[0]?.lessons[0]) {
+                          router.push(`/hub/courses/${course.slug}/${modules[0].lessons[0].slug}`);
+                        }
+                        return;
+                      }
                       // Find next incomplete lesson
                       for (const mod of modules) {
                         for (const l of mod.lessons) {
@@ -706,9 +861,11 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
                   }}
                   disabled={isEnrolling || !user}
                   className="w-full py-3 rounded-xl text-sm font-semibold text-white mb-4 disabled:opacity-50"
-                  style={{ background: '#1B2A4A' }}
+                  style={{
+                    background: progressPct === 100 ? '#16A34A' : '#1B2A4A',
+                  }}
                 >
-                  {isEnrolled ? 'Resume Course →' : isEnrolling ? 'Enrolling...' : !user ? 'Sign in to enroll' : 'Start Course →'}
+                  {ctaLabel}
                 </button>
 
                 {enrollment && (
@@ -723,7 +880,7 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
                       Lesson {completedLessons} of {totalLessons}
                     </div>
                     <div className="text-xs font-medium" style={{ color: '#16A34A' }}>
-                      {progressPct === 100 ? 'Course complete!' : "You're doing great - keep going!"}
+                      {progressPct === 100 ? 'Course complete!' : "You're doing great. Keep going!"}
                     </div>
                   </>
                 )}
@@ -731,24 +888,22 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
             )}
           </div>
 
-          {/* PD Hours badge */}
-          {course.pd_hours != null && course.pd_hours > 0 && (
+          {/* Certificate Preview */}
+          <div
+            className="rounded-xl p-4 flex items-center gap-3"
+            style={{ background: '#FEF3C7' }}
+          >
             <div
-              className="rounded-xl p-4 flex items-center gap-3"
-              style={{ background: '#FEF3C7' }}
+              className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+              style={{ background: '#FDE68A' }}
             >
-              <div
-                className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-                style={{ background: '#FDE68A' }}
-              >
-                <Award size={16} style={{ color: '#D97706' }} />
-              </div>
-              <div>
-                <div className="text-base font-bold" style={{ color: '#1B2A4A' }}>{course.pd_hours} PD Hours</div>
-                <div className="text-xs" style={{ color: '#9CA3AF' }}>Earned on completion</div>
-              </div>
+              <Award size={16} style={{ color: '#D97706' }} />
             </div>
-          )}
+            <div>
+              <div className="text-sm font-bold" style={{ color: '#1B2A4A' }}>Certificate of Completion</div>
+              <div className="text-xs" style={{ color: '#9CA3AF' }}>Complete all lessons to earn your certificate</div>
+            </div>
+          </div>
 
           {/* Meet Your Instructor */}
           <div
@@ -818,7 +973,7 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
                       className="text-xs"
                       style={{ color: '#9CA3AF' }}
                     >
-                      -- {testimonial.role}, {testimonial.time}
+                      {testimonial.role}, {testimonial.time}
                     </p>
                   </div>
                 ))}
@@ -828,22 +983,362 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
         </div>
       </div>
 
-      {/* Section Divider */}
-      <hr
-        className="my-10 border-none border-t-2 border-dashed relative"
-        style={{ borderColor: 'rgba(255,186,6,0.3)' }}
-      />
+      {/* ============================================================ */}
+      {/* 2. CURRICULUM OUTLINE WITH PROGRESS                           */}
+      {/* ============================================================ */}
+      {totalLessons > 0 && (
+        <section className="mt-8">
+          <div
+            className="bg-white rounded-2xl overflow-hidden"
+            style={{ border: '0.5px solid rgba(0,0,0,0.06)' }}
+          >
+            {/* Curriculum header with progress bar */}
+            <div className="px-6 py-5" style={{ borderBottom: '1px solid #F3F4F6' }}>
+              <div className="flex items-center justify-between mb-3">
+                <h2
+                  className="font-bold"
+                  style={{
+                    fontFamily: "'Source Serif 4', Georgia, serif",
+                    fontSize: '22px',
+                    color: '#1B2A4A',
+                  }}
+                >
+                  {tUI('Curriculum')}
+                </h2>
+                {isEnrolled && (
+                  <span className="text-sm font-medium" style={{ color: '#9CA3AF' }}>
+                    {completedLessons}/{totalLessons} {tUI('complete')}
+                  </span>
+                )}
+              </div>
+              {isEnrolled && (
+                <div className="h-2 rounded-full overflow-hidden" style={{ background: '#F3F4F6' }}>
+                  <div
+                    className="h-full rounded-full transition-all duration-500"
+                    style={{
+                      width: `${progressPct}%`,
+                      background: progressPct === 100
+                        ? 'linear-gradient(90deg, #16A34A, #22C55E)'
+                        : 'linear-gradient(90deg, #FFBA06, #F59E0B)',
+                    }}
+                  />
+                </div>
+              )}
+            </div>
 
-      {/* Community: Conversation + Q&A tabs */}
-      <CommunityTabs
-        contentId={course.id}
-        userId={user?.id}
-        isAdmin={!!user?.email?.toLowerCase().endsWith('@teachersdeserveit.com')}
-        conversationApiPath={`/api/hub/courses/${course.id}/conversation`}
-        qaApiPath={`/api/hub/courses/${course.id}/qa`}
-      />
+            {/* Modules + lessons */}
+            <div>
+              {modules.map((mod, modIdx) => {
+                const isExpanded = expandedModules.has(mod.id);
+                const modCompleted = mod.lessons.filter(
+                  l => progress.lessonProgress.get(l.id)?.status === 'completed'
+                ).length;
+                const showModuleHeader = modules.length > 1 || mod.title !== 'Course Content';
 
-      {/* AI Growth Insights */}
+                return (
+                  <div key={mod.id}>
+                    {/* Module header (collapsible) */}
+                    {showModuleHeader && (
+                      <button
+                        onClick={() => toggleModule(mod.id)}
+                        className="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-gray-50 transition-colors"
+                        style={{ borderBottom: isExpanded ? '1px solid #F3F4F6' : 'none' }}
+                      >
+                        <div className="flex items-center gap-3">
+                          {isExpanded
+                            ? <ChevronDown size={18} style={{ color: '#9CA3AF' }} />
+                            : <ChevronRight size={18} style={{ color: '#9CA3AF' }} />
+                          }
+                          <span
+                            className="font-semibold text-sm"
+                            style={{ color: '#1B2A4A', fontFamily: "'Source Serif 4', Georgia, serif" }}
+                          >
+                            {mod.title}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <span className="text-xs" style={{ color: '#9CA3AF' }}>
+                            {mod.lessons.length} {mod.lessons.length === 1 ? 'lesson' : 'lessons'}
+                          </span>
+                          {isEnrolled && (
+                            <span className="text-xs font-medium" style={{ color: modCompleted === mod.lessons.length ? '#16A34A' : '#9CA3AF' }}>
+                              {modCompleted}/{mod.lessons.length}
+                            </span>
+                          )}
+                        </div>
+                      </button>
+                    )}
+
+                    {/* Lessons list */}
+                    {(isExpanded || !showModuleHeader) && (
+                      <div>
+                        {mod.lessons.map((lesson, lessonIdx) => {
+                          const isComplete = progress.lessonProgress.get(lesson.id)?.status === 'completed';
+                          const isVideo = lesson.type === 'video';
+
+                          return (
+                            <div
+                              key={lesson.id}
+                              className="flex items-center gap-3 px-6 py-3 group hover:bg-gray-50 transition-colors"
+                              style={{
+                                borderBottom: lessonIdx < mod.lessons.length - 1 ? '1px solid #F9FAFB' : 'none',
+                              }}
+                            >
+                              {/* Completion checkbox / lesson number */}
+                              {isEnrolled ? (
+                                <button
+                                  onClick={() => handleLessonToggle(lesson.id)}
+                                  className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center transition-colors"
+                                  style={{
+                                    background: isComplete ? '#16A34A' : '#F3F4F6',
+                                    border: isComplete ? 'none' : '1.5px solid #D1D5DB',
+                                  }}
+                                  title={isComplete ? 'Mark incomplete' : 'Mark complete'}
+                                >
+                                  {isComplete && <CheckCircle size={14} style={{ color: 'white' }} />}
+                                </button>
+                              ) : (
+                                <div
+                                  className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium"
+                                  style={{ background: '#F3F4F6', color: '#9CA3AF' }}
+                                >
+                                  {lessonIdx + 1}
+                                </div>
+                              )}
+
+                              {/* Type icon */}
+                              <div className="flex-shrink-0">
+                                {isVideo ? (
+                                  <Play size={14} style={{ color: '#7C9CBF' }} />
+                                ) : (
+                                  <FileText size={14} style={{ color: '#9B7CB8' }} />
+                                )}
+                              </div>
+
+                              {/* Lesson title (clickable if enrolled) */}
+                              {isEnrolled ? (
+                                <Link
+                                  href={`/hub/courses/${course.slug}/${lesson.slug}`}
+                                  className="flex-1 text-sm font-medium hover:underline"
+                                  style={{ color: isComplete ? '#6B7280' : '#1B2A4A', textDecoration: isComplete ? 'line-through' : 'none' }}
+                                >
+                                  {lesson.title}
+                                </Link>
+                              ) : (
+                                <span className="flex-1 text-sm font-medium" style={{ color: '#1B2A4A' }}>
+                                  {lesson.title}
+                                  {lesson.is_free_preview && (
+                                    <span
+                                      className="ml-2 text-xs px-1.5 py-0.5 rounded"
+                                      style={{ background: '#E0F2FE', color: '#0284C7', fontSize: '10px' }}
+                                    >
+                                      Free Preview
+                                    </span>
+                                  )}
+                                </span>
+                              )}
+
+                              {/* Transcript downloads */}
+                              {isVideo && (lesson.has_transcript_en || lesson.has_transcript_es) && (
+                                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                  {lesson.has_transcript_en && (
+                                    <a
+                                      href={`/api/hub/transcripts/${lesson.id}?lang=en`}
+                                      title="Download English transcript"
+                                      className="p-1 rounded hover:bg-gray-100"
+                                    >
+                                      <Download size={12} style={{ color: '#9CA3AF' }} />
+                                    </a>
+                                  )}
+                                  {lesson.has_transcript_es && (
+                                    <a
+                                      href={`/api/hub/transcripts/${lesson.id}?lang=es`}
+                                      title="Download Spanish transcript"
+                                      className="p-1 rounded hover:bg-gray-100"
+                                    >
+                                      <span className="text-xs" style={{ color: '#9CA3AF', fontSize: '10px' }}>ES</span>
+                                    </a>
+                                  )}
+                                </div>
+                              )}
+
+                              {/* Duration */}
+                              {lesson.estimated_minutes != null && lesson.estimated_minutes > 0 && (
+                                <span className="flex-shrink-0 text-xs flex items-center gap-1" style={{ color: '#9CA3AF' }}>
+                                  <Clock size={11} />
+                                  {lesson.estimated_minutes}m
+                                </span>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+
+                    {/* Module separator */}
+                    {modIdx < modules.length - 1 && (
+                      <div style={{ borderBottom: '1px solid #F3F4F6' }} />
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ============================================================ */}
+      {/* 3. FORMATIVE CHECK-INS                                        */}
+      {/* ============================================================ */}
+      {checkInQuestions.length > 0 && (
+        <section className="mt-8">
+          <h2
+            className="font-bold mb-4"
+            style={{
+              fontFamily: "'Source Serif 4', Georgia, serif",
+              fontSize: '22px',
+              color: '#1B2A4A',
+            }}
+          >
+            {tUI('Formative Check-ins')}
+          </h2>
+          <div className="grid gap-4 md:grid-cols-2">
+            {checkInQuestions.map((question) => {
+              const existing = checkInResponses[question.id];
+              const draft = checkInDrafts[question.id] || '';
+              const isSubmitting = checkInSubmitting === question.id;
+
+              return (
+                <div
+                  key={question.id}
+                  className="bg-white rounded-2xl p-5"
+                  style={{ border: '0.5px solid rgba(0,0,0,0.06)' }}
+                >
+                  {/* Question text */}
+                  <p
+                    className="text-sm font-medium mb-3"
+                    style={{ color: '#1B2A4A', lineHeight: '1.5' }}
+                  >
+                    {question.question_text}
+                  </p>
+
+                  {/* Already answered */}
+                  {existing ? (
+                    <div
+                      className="rounded-lg p-3"
+                      style={{ background: '#F0FDF4', border: '1px solid #BBF7D0' }}
+                    >
+                      <p className="text-xs font-medium mb-1" style={{ color: '#16A34A' }}>
+                        Your answer
+                      </p>
+                      <p className="text-sm" style={{ color: '#374151' }}>
+                        {question.question_type === 'multiple_choice' && question.options
+                          ? question.options[parseInt(existing.response, 10)]?.text || existing.response
+                          : existing.response
+                        }
+                      </p>
+                      {existing.is_correct !== null && (
+                        <p className="text-xs mt-1 font-medium" style={{ color: existing.is_correct ? '#16A34A' : '#EF4444' }}>
+                          {existing.is_correct ? 'Correct' : 'Incorrect'}
+                        </p>
+                      )}
+                      {existing.is_correct === false && question.explanation && (
+                        <p className="text-xs mt-1" style={{ color: '#6B7280' }}>
+                          {question.explanation}
+                        </p>
+                      )}
+                    </div>
+                  ) : !user ? (
+                    <p className="text-xs" style={{ color: '#9CA3AF' }}>
+                      Sign in to answer
+                    </p>
+                  ) : (
+                    <>
+                      {/* Multiple choice options */}
+                      {(question.question_type === 'multiple_choice' && question.options) && (
+                        <div className="space-y-2">
+                          {question.options.map((opt: QuizOption, optIdx: number) => (
+                            <button
+                              key={optIdx}
+                              onClick={() => handleCheckInSubmit(question, String(optIdx))}
+                              disabled={isSubmitting}
+                              className="w-full text-left px-3 py-2 rounded-lg text-sm transition-colors hover:bg-gray-50 disabled:opacity-50"
+                              style={{ border: '1px solid #E5E7EB', color: '#374151' }}
+                            >
+                              {opt.text}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* True/False */}
+                      {question.question_type === 'true_false' && (
+                        <div className="flex gap-3">
+                          {['True', 'False'].map((val) => (
+                            <button
+                              key={val}
+                              onClick={() => handleCheckInSubmit(question, val)}
+                              disabled={isSubmitting}
+                              className="flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors hover:bg-gray-50 disabled:opacity-50"
+                              style={{ border: '1px solid #E5E7EB', color: '#374151' }}
+                            >
+                              {val}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Reflection / Action step / Checkpoint (text input) */}
+                      {(question.question_type === 'reflection' || question.question_type === 'action_step' || question.question_type === 'checkpoint') && (
+                        <div>
+                          <textarea
+                            value={draft}
+                            onChange={(e) => setCheckInDrafts(prev => ({ ...prev, [question.id]: e.target.value }))}
+                            placeholder={
+                              question.question_type === 'reflection'
+                                ? 'Share your reflection...'
+                                : question.question_type === 'action_step'
+                                  ? 'Describe your action step...'
+                                  : 'Your response...'
+                            }
+                            className="w-full p-3 rounded-lg text-sm resize-none"
+                            style={{ border: '1px solid #E5E7EB', minHeight: '80px', color: '#374151' }}
+                          />
+                          <button
+                            onClick={() => handleCheckInSubmit(question, draft)}
+                            disabled={isSubmitting || !draft.trim()}
+                            className="mt-2 px-4 py-2 rounded-lg text-xs font-semibold transition-colors disabled:opacity-50"
+                            style={{ background: '#1B2A4A', color: 'white' }}
+                          >
+                            {isSubmitting ? 'Saving...' : 'Submit'}
+                          </button>
+                        </div>
+                      )}
+                    </>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
+      {/* ============================================================ */}
+      {/* 4. COMMUNITY                                                  */}
+      {/* ============================================================ */}
+      <div className="mt-10">
+        <CommunityTabs
+          contentId={course.id}
+          userId={user?.id}
+          isAdmin={!!user?.email?.toLowerCase().endsWith('@teachersdeserveit.com')}
+          conversationApiPath={`/api/hub/courses/${course.id}/conversation`}
+          qaApiPath={`/api/hub/courses/${course.id}/qa`}
+        />
+      </div>
+
+      {/* ============================================================ */}
+      {/* 5. AI GROWTH INSIGHTS                                         */}
+      {/* ============================================================ */}
       <div className="mt-8">
         <AchievementInsights
           data={{
@@ -857,7 +1352,7 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
             topCategories: [course.category || ''],
             communityPosts: 0,
             coursesCompleted: 0,
-            pdHours: course.pd_hours || 0,
+            pdHours: 0,
           }}
         />
       </div>
@@ -958,12 +1453,31 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
         >
           {comingSoon ? (
             <div className="text-center">
-              <div
-                className="w-full py-3 rounded-xl text-sm font-semibold"
-                style={{ backgroundColor: '#F3F4F6', color: '#6B7280', cursor: 'default' }}
+              <button
+                onClick={async () => {
+                  if (notified) return;
+                  try {
+                    await fetch('/api/hub/notify-course-interest', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        courseTitle: course.title,
+                        courseSlug: course.slug,
+                        userEmail: user?.email,
+                        userName: user?.email?.split('@')[0] || 'Educator',
+                      }),
+                    });
+                  } catch {}
+                  setNotified(true);
+                }}
+                className="w-full py-3 rounded-xl text-sm font-semibold transition-colors"
+                style={notified
+                  ? { backgroundColor: '#D1FAE5', color: '#065F46' }
+                  : { backgroundColor: '#ffba06', color: '#1e2749' }
+                }
               >
-                {tUI('Coming Soon')}
-              </div>
+                {notified ? tUI('We will notify you!') : tUI('Notify me when this launches')}
+              </button>
               <p className="text-xs mt-2" style={{ color: '#9CA3AF' }}>
                 {tUI('This course is launching on our new platform any day now. We will let you know the moment it goes live.')}
               </p>
@@ -981,7 +1495,7 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
                 minHeight: '52px',
               }}
             >
-              {isEnrolling ? 'Enrolling...' : !user ? 'Sign in to Enroll' : 'Join this course'}
+              {isEnrolling ? 'Enrolling...' : !user ? 'Sign in to Enroll' : 'Start Course'}
             </button>
           )}
         </div>
