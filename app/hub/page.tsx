@@ -70,15 +70,79 @@ const DAILY_MESSAGES = [
 ];
 
 // Fallback TDI tips when no tips in database
-const FALLBACK_TIPS = [
-  'Take one thing off your plate today. Not because you have to. Because you can.',
-  'You became a teacher to make a difference. You already are.',
-  'Rest is not a reward. It is a requirement.',
-  'The best lesson you can teach today is that you matter too.',
-  'Progress over perfection. Every single time.',
-  'Your students do not need you to be perfect. They need you to be present.',
-  'Five minutes of silence can change your entire afternoon.',
-];
+// Tips rotate daily and vary by month for seasonal relevance
+const TIPS_BY_SEASON: Record<string, string[]> = {
+  // Back to school (Aug-Sep)
+  'aug-sep': [
+    'The first week is about relationships, not rules. Procedures can wait. Connection cannot.',
+    'Your room does not need to be Pinterest-perfect. It needs to feel safe.',
+    'Learn every student name by Friday. Everything else is secondary.',
+    'The best lesson plan for day one is listening.',
+    'You do not need to have it all figured out by September. Give yourself the same grace you give your students.',
+    'Start the year with one routine that protects your energy. Not five. One.',
+    'Your students are nervous too. Lead with that.',
+  ],
+  // Testing season (Mar-Apr)
+  'mar-apr': [
+    'Test prep does not have to mean worksheets. The best review is the one students actually engage with.',
+    'Your worth as an educator is not measured by a standardized test. Neither is theirs.',
+    'The most important thing you can do during testing season is stay calm. They mirror you.',
+    'Spring break exists for a reason. Use every minute of it.',
+    'You have gotten your students this far. Trust the work you have already done.',
+    'One deep breath before the test starts costs nothing and changes everything.',
+  ],
+  // End of year (May-Jun)
+  'may-jun': [
+    'Finish strong does not mean finish exhausted. Pace yourself.',
+    'The last week matters. Make it count with connection, not content.',
+    'Write yourself a note about what worked this year. Future you will thank you.',
+    'Celebrate the growth you cannot see on a report card. It is there.',
+    'You made it through another year. That is not small.',
+    'The students who challenged you the most taught you the most. Sit with that.',
+  ],
+  // Year-round (used for months without seasonal content)
+  'default': [
+    'Take one thing off your plate today. Not because you have to. Because you can.',
+    'You became a teacher to make a difference. You already are.',
+    'Rest is not a reward. It is a requirement.',
+    'The best lesson you can teach today is that you matter too.',
+    'Progress over perfection. Every single time.',
+    'Your students do not need you to be perfect. They need you to be present.',
+    'Five minutes of silence can change your entire afternoon.',
+    'The teacher across the hall is struggling too. Check in.',
+    'You are allowed to have a bad day and still be a great educator.',
+    'Stop comparing your chapter one to someone else\'s chapter twenty.',
+    'The best PD is the kind that makes you want to try something tomorrow.',
+    'Your energy is your most valuable resource. Protect it.',
+    'Every expert was once a beginner. Every mentor was once lost.',
+    'The thing you think is too small to matter is probably the thing a student will remember forever.',
+    'You do not owe anyone your weekends.',
+    'Asking for help is not weakness. It is the most experienced move you can make.',
+    'If you taught one kid something today, it was a good day.',
+    'The system is hard. You are not the system. You are the reason kids come back.',
+    'Your classroom is someone\'s safest place. You built that.',
+    'Done is better than perfect. Submitted is better than polished. Present is better than prepared.',
+  ],
+};
+
+function getSeasonalTip(): string {
+  const now = new Date();
+  const month = now.getMonth(); // 0-indexed
+  const day = now.getDate();
+  const year = now.getFullYear();
+
+  let seasonKey = 'default';
+  if (month === 7 || month === 8) seasonKey = 'aug-sep'; // Aug-Sep
+  else if (month === 2 || month === 3) seasonKey = 'mar-apr'; // Mar-Apr
+  else if (month === 4 || month === 5) seasonKey = 'may-jun'; // May-Jun
+
+  const tips = TIPS_BY_SEASON[seasonKey];
+  // Rotate by day of year so it changes daily
+  const dayOfYear = Math.floor((now.getTime() - new Date(year, 0, 0).getTime()) / 86400000);
+  return tips[dayOfYear % tips.length];
+}
+
+const FALLBACK_TIPS = TIPS_BY_SEASON['default'];
 
 const CELEBRATION_CATEGORIES = [
   { key: 'showed-up', label: 'I showed up for myself today' },
@@ -229,7 +293,7 @@ export default function HubDashboard() {
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
   const [quickWins, setQuickWins] = useState<QuickWin[]>([]);
   const [featuredQuickWins, setFeaturedQuickWins] = useState<QuickWin[]>([]);
-  const [tip, setTip] = useState<string>(FALLBACK_TIPS[0]);
+  const [tip, setTip] = useState<string>(getSeasonalTip());
   const [certificateCount, setCertificateCount] = useState<number>(0);
   const [fieldNotesCount, setFieldNotesCount] = useState<number>(0);
   const [currentStreak, setCurrentStreak] = useState<number>(0);

@@ -11,6 +11,7 @@ export type LeadSource =
   | 'existing_customer_renewal'
   | 'iasa'
   | 'linkedin'
+  | 'podcast_guest'
   | 'other';
 
 export type LeadHeat = 'hot' | 'warm' | 'cold';
@@ -63,6 +64,7 @@ export interface WarmthSignals {
   geographic_proximity_to_tdi_partners: string;
   iasa_member: boolean | null;
   linkedin_connection: string | null;
+  podcast_or_linkedin_connection: string | null;
   notes: string;
 }
 
