@@ -17,6 +17,11 @@ import {
   ChevronLeft,
   ChevronRight,
   X,
+  Mic,
+  MessageSquare,
+  Loader2,
+  CheckCircle2,
+  AlertCircle,
 } from 'lucide-react';
 
 const theme = {
@@ -508,6 +513,12 @@ function DeleteConfirmModal({
   );
 }
 
+// Coverage data per course
+interface CourseCoverage {
+  transcripts: { total: number; done: number };
+  checks: { total: number; done: number };
+}
+
 // Main CoursesTab Component
 export function CoursesTab() {
   const router = useRouter();
@@ -522,6 +533,101 @@ export function CoursesTab() {
   }>({ isOpen: false, course: null });
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 20;
+
+  // Bulk operations state
+  const [coverage, setCoverage] = useState<Record<string, CourseCoverage>>({});
+  const [coverageLoading, setCoverageLoading] = useState(false);
+  const [bulkAction, setBulkAction] = useState<{
+    type: 'transcripts' | 'checks';
+    courseId: string;
+    courseName: string;
+    status: 'idle' | 'running' | 'done' | 'error';
+    message: string;
+  } | null>(null);
+
+  // Load coverage data for all courses
+  const loadCoverage = async () => {
+    setCoverageLoading(true);
+    try {
+      const [transcriptRes, checksRes] = await Promise.all([
+        fetch('/api/tdi-admin/courses/all/bulk-transcripts'),
+        fetch('/api/tdi-admin/courses/all/bulk-checks'),
+      ]);
+      const [transcriptData, checksData] = await Promise.all([
+        transcriptRes.json(),
+        checksRes.json(),
+      ]);
+
+      const coverageMap: Record<string, CourseCoverage> = {};
+
+      // Build transcript coverage per course
+      (transcriptData.lessons || []).forEach((l: { course_id: string; has_transcript: boolean }) => {
+        if (!coverageMap[l.course_id]) {
+          coverageMap[l.course_id] = { transcripts: { total: 0, done: 0 }, checks: { total: 0, done: 0 } };
+        }
+        coverageMap[l.course_id].transcripts.total++;
+        if (l.has_transcript) coverageMap[l.course_id].transcripts.done++;
+      });
+
+      // Build check coverage per course
+      (checksData.lessons || []).forEach((l: { course_id: string; has_content: boolean; meets_minimum: boolean }) => {
+        if (!coverageMap[l.course_id]) {
+          coverageMap[l.course_id] = { transcripts: { total: 0, done: 0 }, checks: { total: 0, done: 0 } };
+        }
+        if (l.has_content) {
+          coverageMap[l.course_id].checks.total++;
+          if (l.meets_minimum) coverageMap[l.course_id].checks.done++;
+        }
+      });
+
+      setCoverage(coverageMap);
+    } catch (error) {
+      console.error('Error loading coverage:', error);
+    } finally {
+      setCoverageLoading(false);
+    }
+  };
+
+  // Run bulk transcript generation for a course
+  const runBulkTranscripts = async (courseId: string, courseName: string) => {
+    setBulkAction({ type: 'transcripts', courseId, courseName, status: 'running', message: 'Generating transcripts...' });
+    try {
+      const res = await fetch(`/api/tdi-admin/courses/${courseId}/bulk-transcripts`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ lang: 'en' }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setBulkAction({ type: 'transcripts', courseId, courseName, status: 'done', message: data.message });
+        loadCoverage();
+      } else {
+        setBulkAction({ type: 'transcripts', courseId, courseName, status: 'error', message: data.error || 'Failed' });
+      }
+    } catch {
+      setBulkAction({ type: 'transcripts', courseId, courseName, status: 'error', message: 'Network error' });
+    }
+  };
+
+  // Run bulk check generation for a course
+  const runBulkChecks = async (courseId: string, courseName: string) => {
+    setBulkAction({ type: 'checks', courseId, courseName, status: 'running', message: 'Generating check-ins...' });
+    try {
+      const res = await fetch(`/api/tdi-admin/courses/${courseId}/bulk-checks`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setBulkAction({ type: 'checks', courseId, courseName, status: 'done', message: data.message });
+        loadCoverage();
+      } else {
+        setBulkAction({ type: 'checks', courseId, courseName, status: 'error', message: data.error || 'Failed' });
+      }
+    } catch {
+      setBulkAction({ type: 'checks', courseId, courseName, status: 'error', message: 'Network error' });
+    }
+  };
 
   // Load courses via API route (uses service key, bypasses RLS so all admins see courses)
   const loadCourses = async () => {
@@ -550,6 +656,7 @@ export function CoursesTab() {
 
   useEffect(() => {
     loadCourses();
+    loadCoverage();
   }, [statusFilter]);
 
   // Filter courses by search (client-side for responsiveness)
@@ -640,6 +747,36 @@ export function CoursesTab() {
         <StatCard label="Drafts" value={stats.drafts} color="amber" />
       </div>
 
+      {/* Bulk Action Status Banner */}
+      {bulkAction && bulkAction.status !== 'idle' && (
+        <div className={`flex items-center gap-3 px-4 py-3 rounded-lg mb-4 border ${
+          bulkAction.status === 'running' ? 'bg-blue-50 border-blue-200' :
+          bulkAction.status === 'done' ? 'bg-green-50 border-green-200' :
+          'bg-red-50 border-red-200'
+        }`}>
+          {bulkAction.status === 'running' && <Loader2 size={16} className="text-blue-600 animate-spin" />}
+          {bulkAction.status === 'done' && <CheckCircle2 size={16} className="text-green-600" />}
+          {bulkAction.status === 'error' && <AlertCircle size={16} className="text-red-600" />}
+          <div className="flex-1">
+            <p className={`text-sm font-medium ${
+              bulkAction.status === 'running' ? 'text-blue-900' :
+              bulkAction.status === 'done' ? 'text-green-900' : 'text-red-900'
+            }`}>
+              {bulkAction.type === 'transcripts' ? 'Transcripts' : 'Check-ins'}: {bulkAction.courseName}
+            </p>
+            <p className={`text-xs ${
+              bulkAction.status === 'running' ? 'text-blue-700' :
+              bulkAction.status === 'done' ? 'text-green-700' : 'text-red-700'
+            }`}>{bulkAction.message}</p>
+          </div>
+          {bulkAction.status !== 'running' && (
+            <button onClick={() => setBulkAction(null)} className="p-1 rounded hover:bg-black/5">
+              <X size={14} className="text-gray-500" />
+            </button>
+          )}
+        </div>
+      )}
+
       {/* Action Bar */}
       <div className="flex flex-wrap gap-3 mb-6">
         {/* Search */}
@@ -701,23 +838,21 @@ export function CoursesTab() {
                     Course
                   </th>
                   <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">
-                    Category
-                  </th>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">
-                    Difficulty
-                  </th>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">
                     Content
                   </th>
                   <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">
-                    Production
+                    Videos
+                  </th>
+                  <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">
+                    <Mic size={12} className="inline mr-1" />
+                    Transcripts
+                  </th>
+                  <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">
+                    <MessageSquare size={12} className="inline mr-1" />
+                    Check-ins
                   </th>
                   <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">
                     Status
-                  </th>
-                  <th className="text-center px-4 py-3 text-xs font-medium text-gray-500 uppercase">
-                    <Clock size={14} className="inline mr-1" />
-                    PD Hours
                   </th>
                   <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">
                     Updated
@@ -728,7 +863,16 @@ export function CoursesTab() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {paginatedCourses.map((course) => (
+                {paginatedCourses.map((course) => {
+                  const cov = coverage[course.id];
+                  const transcriptDone = cov?.transcripts.done ?? 0;
+                  const transcriptTotal = cov?.transcripts.total ?? 0;
+                  const checksDone = cov?.checks.done ?? 0;
+                  const checksTotal = cov?.checks.total ?? 0;
+                  const isRunningTranscripts = bulkAction?.status === 'running' && bulkAction.type === 'transcripts' && bulkAction.courseId === course.id;
+                  const isRunningChecks = bulkAction?.status === 'running' && bulkAction.type === 'checks' && bulkAction.courseId === course.id;
+
+                  return (
                   <tr
                     key={course.id}
                     onClick={() => handleEdit(course)}
@@ -736,6 +880,9 @@ export function CoursesTab() {
                   >
                     <td className="px-5 py-4">
                       <p className="text-sm font-medium text-gray-900">{course.title}</p>
+                      <p className="text-xs text-gray-400">
+                        {course.module_count} module{course.module_count !== 1 ? 's' : ''} · {course.lesson_count} lesson{course.lesson_count !== 1 ? 's' : ''} · {course.pd_hours}h PD
+                      </p>
                     </td>
                     <td className="px-4 py-4">
                       <span className="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
@@ -743,23 +890,9 @@ export function CoursesTab() {
                       </span>
                     </td>
                     <td className="px-4 py-4">
-                      <span
-                        className={`px-2 py-1 rounded-full text-xs font-medium capitalize ${
-                          DIFFICULTY_COLORS[course.difficulty] || 'bg-gray-100 text-gray-700'
-                        }`}
-                      >
-                        {course.difficulty}
-                      </span>
-                    </td>
-                    <td className="px-4 py-4">
-                      <span className="text-sm text-gray-600">
-                        {course.module_count} module{course.module_count !== 1 ? 's' : ''}, {course.lesson_count} lesson{course.lesson_count !== 1 ? 's' : ''}
-                      </span>
-                    </td>
-                    <td className="px-4 py-4">
                       {course.video_total > 0 ? (
                         <div className="flex items-center gap-2">
-                          <div className="w-16 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                          <div className="w-14 h-1.5 bg-gray-200 rounded-full overflow-hidden">
                             <div
                               className={`h-full rounded-full ${
                                 course.video_uploaded === course.video_total ? 'bg-green-500' :
@@ -779,6 +912,50 @@ export function CoursesTab() {
                         <span className="text-xs text-gray-300">--</span>
                       )}
                     </td>
+                    <td className="px-4 py-4" onClick={(e) => e.stopPropagation()}>
+                      {coverageLoading ? (
+                        <span className="text-xs text-gray-300">...</span>
+                      ) : transcriptTotal === 0 ? (
+                        <span className="text-xs text-gray-300">--</span>
+                      ) : transcriptDone === transcriptTotal ? (
+                        <span className="inline-flex items-center gap-1 text-xs font-medium text-green-600">
+                          <CheckCircle2 size={12} />
+                          {transcriptDone}/{transcriptTotal}
+                        </span>
+                      ) : (
+                        <button
+                          onClick={() => runBulkTranscripts(course.id, course.title)}
+                          disabled={isRunningTranscripts || bulkAction?.status === 'running'}
+                          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-colors border border-blue-200 text-blue-700 hover:bg-blue-50 disabled:opacity-50"
+                          title={`Generate transcripts for ${transcriptTotal - transcriptDone} lessons`}
+                        >
+                          {isRunningTranscripts ? <Loader2 size={12} className="animate-spin" /> : <Mic size={12} />}
+                          {transcriptDone}/{transcriptTotal}
+                        </button>
+                      )}
+                    </td>
+                    <td className="px-4 py-4" onClick={(e) => e.stopPropagation()}>
+                      {coverageLoading ? (
+                        <span className="text-xs text-gray-300">...</span>
+                      ) : checksTotal === 0 ? (
+                        <span className="text-xs text-gray-300">--</span>
+                      ) : checksDone === checksTotal ? (
+                        <span className="inline-flex items-center gap-1 text-xs font-medium text-green-600">
+                          <CheckCircle2 size={12} />
+                          {checksDone}/{checksTotal}
+                        </span>
+                      ) : (
+                        <button
+                          onClick={() => runBulkChecks(course.id, course.title)}
+                          disabled={isRunningChecks || bulkAction?.status === 'running'}
+                          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-colors border border-purple-200 text-purple-700 hover:bg-purple-50 disabled:opacity-50"
+                          title={`Generate check-ins for ${checksTotal - checksDone} lessons`}
+                        >
+                          {isRunningChecks ? <Loader2 size={12} className="animate-spin" /> : <MessageSquare size={12} />}
+                          {checksDone}/{checksTotal}
+                        </button>
+                      )}
+                    </td>
                     <td className="px-4 py-4">
                       <span
                         className={`px-2 py-1 rounded-full text-xs font-medium ${
@@ -789,9 +966,6 @@ export function CoursesTab() {
                       >
                         {course.is_published ? 'Published' : 'Draft'}
                       </span>
-                    </td>
-                    <td className="px-4 py-4 text-center text-sm text-gray-600">
-                      {course.pd_hours}
                     </td>
                     <td className="px-4 py-4 text-sm text-gray-500">
                       {formatDate(course.updated_at)}
@@ -806,7 +980,8 @@ export function CoursesTab() {
                       />
                     </td>
                   </tr>
-                ))}
+                  );
+                })}
               </tbody>
             </table>
           </div>
