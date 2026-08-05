@@ -206,12 +206,15 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
           .eq('course_id', courseData.id)
           .order('sort_order', { ascending: true });
 
-        // Fetch lessons (include transcript availability)
-        const { data: lessonsData } = await supabase
-          .from('hub_lessons')
-          .select('id, slug, title, estimated_minutes, type, is_free_preview, is_quick_win, sort_order, module_id, transcript, transcript_es')
-          .eq('course_id', courseData.id)
-          .order('sort_order', { ascending: true });
+        // Fetch lessons via module IDs (hub_lessons.course_id is often null; modules are the reliable FK)
+        const moduleIds = (modulesData || []).map((m) => m.id);
+        const { data: lessonsData } = moduleIds.length > 0
+          ? await supabase
+              .from('hub_lessons')
+              .select('id, slug, title, estimated_minutes, type, is_free_preview, is_quick_win, sort_order, module_id, transcript, transcript_es')
+              .in('module_id', moduleIds)
+              .order('sort_order', { ascending: true })
+          : { data: [] as any[] };
 
         // Group lessons by module
         const moduleMap = new Map<string, Module>();
