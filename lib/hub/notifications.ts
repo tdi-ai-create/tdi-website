@@ -1,9 +1,15 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
-const hubSupabase = createClient(
-  process.env.LEARNING_HUB_SUPABASE_URL || process.env.NEXT_PUBLIC_LEARNING_HUB_SUPABASE_URL!,
-  process.env.LEARNING_HUB_SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+let _hubSupabase: SupabaseClient | null = null;
+function hubSupabase() {
+  if (!_hubSupabase) {
+    _hubSupabase = createClient(
+      process.env.LEARNING_HUB_SUPABASE_URL || process.env.NEXT_PUBLIC_LEARNING_HUB_SUPABASE_URL!,
+      process.env.LEARNING_HUB_SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+  }
+  return _hubSupabase;
+}
 
 /**
  * Create a notification for a user.
@@ -33,7 +39,7 @@ export async function createNotification({
   if (!highPriority.includes(type)) {
     try {
       const today = new Date().toISOString().split('T')[0];
-      const { count } = await hubSupabase
+      const { count } = await hubSupabase()
         .from('hub_notifications')
         .select('id', { count: 'exact', head: true })
         .eq('user_id', userId)
@@ -46,7 +52,7 @@ export async function createNotification({
   }
 
   try {
-    await hubSupabase.from('hub_notifications').insert({
+    await hubSupabase().from('hub_notifications').insert({
       user_id: userId,
       type,
       title,
@@ -77,7 +83,7 @@ export async function notifyQAReply({
 }) {
   try {
     // Get the parent post to find who to notify
-    const { data: parentPost } = await hubSupabase
+    const { data: parentPost } = await hubSupabase()
       .from('hub_qa_posts')
       .select('user_id')
       .eq('id', parentPostId)
@@ -86,7 +92,7 @@ export async function notifyQAReply({
     if (!parentPost?.user_id) return;
 
     // Get replier's name
-    const { data: replier } = await hubSupabase
+    const { data: replier } = await hubSupabase()
       .from('hub_profiles')
       .select('display_name, first_name')
       .eq('id', replyUserId)
@@ -126,7 +132,7 @@ export async function notifyHelpfulMarked({
   markedByUserId: string;
 }) {
   try {
-    const { data: post } = await hubSupabase
+    const { data: post } = await hubSupabase()
       .from('hub_qa_posts')
       .select('user_id, body')
       .eq('id', postId)
