@@ -913,8 +913,10 @@ export default function LessonPage({ params }: LessonPageProps) {
     clearCertificateEarned();
   };
 
-  const handleGateCleared = () => {
-    if (currentGate) {
+  const handleGateCleared = async () => {
+    if (currentGate && currentLesson) {
+      await markLessonStatus(currentLesson.id, 'completed');
+      await refetch();
       setLocallyCleared((prev) => new Set(prev).add(currentGate.id));
     }
   };
@@ -1011,18 +1013,18 @@ export default function LessonPage({ params }: LessonPageProps) {
             className="text-xs font-medium"
             style={{ color: theme.textMuted, fontFamily: "'DM Sans', sans-serif" }}
           >
-            {progress.completedLessons} {tUI('of')} {progress.totalLessons} {tUI('complete')}
+            {progress.completedLessons} {tUI('of')} {allLessons.length} {tUI('complete')}
           </span>
           <span className="text-xs font-bold" style={{ color: '#E8B84B' }}>
-            {progress.progressPct}%
+            {allLessons.length > 0 ? Math.round((progress.completedLessons / allLessons.length) * 100) : 0}%
           </span>
         </div>
         <div className="h-1.5 rounded-full overflow-hidden" style={{ background: dark ? 'rgba(255,255,255,0.1)' : '#F3F4F6' }}>
           <div
             className="h-full rounded-full transition-all duration-500"
             style={{
-              width: `${progress.progressPct}%`,
-              background: progress.progressPct === 100
+              width: `${allLessons.length > 0 ? Math.round((progress.completedLessons / allLessons.length) * 100) : 0}%`,
+              background: (allLessons.length > 0 && progress.completedLessons >= allLessons.length)
                 ? 'linear-gradient(90deg, #16A34A, #22C55E)'
                 : 'linear-gradient(90deg, #FFBA06, #E8B84B)',
             }}
@@ -1079,7 +1081,9 @@ export default function LessonPage({ params }: LessonPageProps) {
                           }}
                           className="w-full flex items-center gap-2.5 py-2 px-2 rounded-lg text-left transition-colors"
                           style={{
-                            backgroundColor: isActive ? (dark ? 'rgba(232,184,75,0.1)' : '#FFF8E7') : 'transparent',
+                            backgroundColor: isActive
+                              ? (dark ? 'rgba(232,184,75,0.12)' : '#FFF6E0')
+                              : 'transparent',
                             borderLeft: isActive ? '3px solid #E8B84B' : '3px solid transparent',
                             opacity: isLocked ? 0.45 : 1,
                             cursor: isLocked ? 'default' : 'pointer',
@@ -1110,7 +1114,7 @@ export default function LessonPage({ params }: LessonPageProps) {
                             <span
                               className="text-xs block truncate"
                               style={{
-                                color: isActive ? theme.title : theme.textMuted,
+                                color: isActive ? theme.title : (isDone && !isActive) ? (dark ? '#6B7280' : '#9CA3AF') : theme.textMuted,
                                 fontWeight: isActive ? 600 : 400,
                                 fontFamily: "'DM Sans', sans-serif",
                               }}
@@ -1170,7 +1174,7 @@ export default function LessonPage({ params }: LessonPageProps) {
         <div
           className="h-full transition-all duration-500"
           style={{
-            width: `${progress.progressPct}%`,
+            width: `${allLessons.length > 0 ? Math.round((progress.completedLessons / allLessons.length) * 100) : 0}%`,
             background: 'linear-gradient(90deg, #FFBA06, #E8B84B)',
           }}
         />
@@ -1241,6 +1245,21 @@ export default function LessonPage({ params }: LessonPageProps) {
                 {tUI('Lesson')} {currentIndex + 1} {tUI('of')} {allLessons.length}
               </span>
             </div>
+
+            {/* Orientation hint */}
+            {videoId && (
+              <p
+                className="text-sm mb-4"
+                style={{
+                  fontFamily: "'DM Sans', sans-serif",
+                  color: dark ? '#9CA3AF' : '#6B7280',
+                }}
+              >
+                {currentGate
+                  ? 'Watch the video, then answer a quick check before moving on.'
+                  : 'Watch the video, then scroll down to continue.'}
+              </p>
+            )}
 
             {/* Transcript Panel */}
             {(hasTranscript || hasTranscriptEs) && (
@@ -1341,7 +1360,7 @@ export default function LessonPage({ params }: LessonPageProps) {
             {/* Body HTML content (always rendered if present) */}
             {bodyHtml && (
               <div
-                className="prose prose-gray max-w-none mb-6"
+                className="prose prose-gray max-w-none mb-4"
                 style={{
                   fontFamily: "'DM Sans', sans-serif",
                   fontSize: '15px',
@@ -1362,64 +1381,53 @@ export default function LessonPage({ params }: LessonPageProps) {
               />
             )}
 
-            {/* Mark as complete checkbox (only when no active gate blocking) */}
-            {!isGateActive && (
-              <div className="mb-8">
-                <label
-                  className="flex items-center gap-3 cursor-pointer select-none p-4 rounded-lg border transition-all"
-                  style={{
-                    borderColor: isComplete ? '#10B981' : (dark ? 'rgba(255,255,255,0.1)' : '#E5E7EB'),
-                    backgroundColor: isComplete ? (dark ? 'rgba(16,185,129,0.1)' : '#D1FAE5') : theme.card,
-                  }}
-                >
-                  <div
-                    className="w-6 h-6 rounded border-2 flex items-center justify-center transition-all"
-                    style={{
-                      borderColor: isComplete ? '#10B981' : (dark ? 'rgba(255,255,255,0.2)' : '#D1D5DB'),
-                      backgroundColor: isComplete ? '#10B981' : 'transparent',
-                    }}
-                  >
-                    {isComplete && <Check size={14} className="text-white" />}
-                  </div>
-                  <input
-                    type="checkbox"
-                    checked={isComplete}
-                    onChange={handleMarkComplete}
-                    className="sr-only"
-                  />
+            {/* Mark complete (only for non-gated lessons, since gated lessons auto-complete on gate clear) */}
+            {!currentGate && !isGateActive && (
+              <div className="mb-4">
+                {isComplete ? (
                   <span
-                    className="text-sm font-medium"
+                    className="inline-flex items-center gap-1.5 text-sm"
                     style={{
                       fontFamily: "'DM Sans', sans-serif",
-                      color: isComplete ? '#065F46' : theme.text,
+                      color: '#16A34A',
                     }}
                   >
-                    {isComplete ? tUI('Lesson completed!') : tUI('I have completed this lesson')}
+                    <Check size={14} />
+                    {tUI('Lesson completed!')}
                   </span>
-                </label>
+                ) : (
+                  <button
+                    onClick={handleMarkComplete}
+                    className="inline-flex items-center gap-1.5 text-sm font-medium hover:opacity-80 transition-opacity"
+                    style={{
+                      fontFamily: "'DM Sans', sans-serif",
+                      color: '#E8B84B',
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      padding: 0,
+                    }}
+                  >
+                    <Check size={14} />
+                    Mark complete
+                  </button>
+                )}
               </div>
             )}
 
-            {/* Community Prompt Card */}
-            <div
-              className="rounded-xl p-5 mb-8"
-              style={{
-                backgroundColor: dark ? 'rgba(232,184,75,0.06)' : '#FFF8E7',
-                border: `1px solid ${dark ? 'rgba(232,184,75,0.15)' : '#FDE68A'}`,
-              }}
-            >
+            {/* Community Prompt */}
+            <div className="mt-6 mb-4">
               <p
-                className="text-sm font-medium mb-3"
-                style={{ color: theme.title, fontFamily: "'DM Sans', sans-serif" }}
+                className="text-sm mb-2"
+                style={{ color: theme.textMuted, fontFamily: "'DM Sans', sans-serif" }}
               >
                 {tUI('How did this land for you?')}
               </p>
               <Link
                 href={`/hub/courses/${slug}#community`}
-                className="inline-flex items-center gap-2 text-sm font-medium px-4 py-2 rounded-lg transition-colors hover:opacity-90"
+                className="inline-flex items-center gap-1.5 text-sm font-medium hover:opacity-80 transition-opacity"
                 style={{
-                  backgroundColor: '#E8B84B',
-                  color: '#1E2749',
+                  color: '#E8B84B',
                   fontFamily: "'DM Sans', sans-serif",
                 }}
               >
@@ -1482,7 +1490,7 @@ export default function LessonPage({ params }: LessonPageProps) {
                 >
                   Complete the check-in above to continue
                 </div>
-              ) : isLastLesson && progress.progressPct === 100 ? (
+              ) : isLastLesson && allLessons.length > 0 && progress.completedLessons >= allLessons.length ? (
                 <button
                   onClick={handleCompleteCourse}
                   className="flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-colors w-full sm:w-auto justify-center"
