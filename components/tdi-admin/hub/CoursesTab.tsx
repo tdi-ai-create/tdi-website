@@ -747,6 +747,52 @@ export function CoursesTab() {
         <StatCard label="Drafts" value={stats.drafts} color="amber" />
       </div>
 
+      {/* Bulk Generate All Panel */}
+      {(() => {
+        const allTranscripts = Object.values(coverage).reduce((a, c) => ({ total: a.total + c.transcripts.total, done: a.done + c.transcripts.done }), { total: 0, done: 0 });
+        const allChecks = Object.values(coverage).reduce((a, c) => ({ total: a.total + c.checks.total, done: a.done + c.checks.done }), { total: 0, done: 0 });
+        const needsTranscripts = allTranscripts.total - allTranscripts.done;
+        const needsChecks = allChecks.total - allChecks.done;
+        if (coverageLoading || (needsTranscripts === 0 && needsChecks === 0)) return null;
+
+        return (
+          <div className="flex items-center gap-4 px-4 py-3 rounded-lg mb-4 border border-gray-200 bg-white">
+            <div className="flex-1">
+              <p className="text-sm font-medium text-gray-900">Bulk Generate All Courses</p>
+              <p className="text-xs text-gray-500">
+                {needsTranscripts > 0 && `${needsTranscripts} lesson${needsTranscripts !== 1 ? 's' : ''} need transcripts`}
+                {needsTranscripts > 0 && needsChecks > 0 && ' · '}
+                {needsChecks > 0 && `${needsChecks} lesson${needsChecks !== 1 ? 's' : ''} need check-ins`}
+              </p>
+            </div>
+            {needsTranscripts > 0 && (
+              <button
+                onClick={() => runBulkTranscripts('all', 'All Courses')}
+                disabled={bulkAction?.status === 'running'}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors border border-blue-200 text-blue-700 hover:bg-blue-50 disabled:opacity-50"
+              >
+                {bulkAction?.status === 'running' && bulkAction.type === 'transcripts' && bulkAction.courseId === 'all'
+                  ? <Loader2 size={14} className="animate-spin" />
+                  : <Mic size={14} />}
+                Generate All Transcripts
+              </button>
+            )}
+            {needsChecks > 0 && (
+              <button
+                onClick={() => runBulkChecks('all', 'All Courses')}
+                disabled={bulkAction?.status === 'running'}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors border border-purple-200 text-purple-700 hover:bg-purple-50 disabled:opacity-50"
+              >
+                {bulkAction?.status === 'running' && bulkAction.type === 'checks' && bulkAction.courseId === 'all'
+                  ? <Loader2 size={14} className="animate-spin" />
+                  : <MessageSquare size={14} />}
+                Generate All Check-ins
+              </button>
+            )}
+          </div>
+        );
+      })()}
+
       {/* Bulk Action Status Banner */}
       {bulkAction && bulkAction.status !== 'idle' && (
         <div className={`flex items-center gap-3 px-4 py-3 rounded-lg mb-4 border ${
