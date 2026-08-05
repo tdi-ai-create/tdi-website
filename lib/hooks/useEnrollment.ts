@@ -111,15 +111,15 @@ export function useEnrollment(courseId: string | null, userId: string | null): U
         throw enrollError;
       }
 
-      // Step 2: Get all lessons for this course (via modules)
-      const { data: lessons, error: lessonsError } = await supabase
-        .from('hub_lessons')
-        .select('id')
-        .eq('course_id', courseId);
+      // Step 2: Get all lessons for this course via modules (course_id on lessons is often null)
+      const { data: mods } = await supabase.from('hub_modules').select('id').eq('course_id', courseId);
+      const modIds = (mods || []).map((m) => m.id);
+      const { data: lessons, error: lessonsError } = modIds.length > 0
+        ? await supabase.from('hub_lessons').select('id').in('module_id', modIds)
+        : { data: [] as { id: string }[], error: null };
 
       if (lessonsError) {
         console.error('Error fetching lessons:', lessonsError);
-        // Don't fail enrollment, just log the error
       }
 
       // Step 3: Create lesson progress records for each lesson
@@ -210,12 +210,13 @@ export async function enrollInCourse(courseId: string, userId: string): Promise<
       throw enrollError;
     }
 
-    // Get lessons and create progress records
+    // Get lessons via modules (course_id on lessons is often null)
     console.log('[enrollInCourse] Getting lessons for progress records...');
-    const { data: lessons, error: lessonsError } = await supabase
-      .from('hub_lessons')
-      .select('id')
-      .eq('course_id', courseId);
+    const { data: mods2 } = await supabase.from('hub_modules').select('id').eq('course_id', courseId);
+    const modIds2 = (mods2 || []).map((m) => m.id);
+    const { data: lessons, error: lessonsError } = modIds2.length > 0
+      ? await supabase.from('hub_lessons').select('id').in('module_id', modIds2)
+      : { data: [] as { id: string }[], error: null };
 
     console.log('[enrollInCourse] Lessons result:', { lessons, lessonsError });
 

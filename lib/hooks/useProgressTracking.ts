@@ -63,11 +63,20 @@ export function useProgressTracking(
     const supabase = getSupabase();
 
     try {
-      // Get all lessons for the course
-      const { data: lessons, error: lessonsError } = await supabase
-        .from('hub_lessons')
+      // Get lessons via modules (hub_lessons.course_id is often null)
+      const { data: modules } = await supabase
+        .from('hub_modules')
         .select('id')
         .eq('course_id', courseId);
+
+      const moduleIds = (modules || []).map((m) => m.id);
+
+      const { data: lessons, error: lessonsError } = moduleIds.length > 0
+        ? await supabase
+            .from('hub_lessons')
+            .select('id')
+            .in('module_id', moduleIds)
+        : { data: [] as { id: string }[], error: null };
 
       if (lessonsError) {
         throw lessonsError;
