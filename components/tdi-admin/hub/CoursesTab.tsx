@@ -516,6 +516,7 @@ function DeleteConfirmModal({
 // Coverage data per course
 interface CourseCoverage {
   transcripts: { total: number; done: number };
+  transcriptsEs: { total: number; done: number };
   checks: { total: number; done: number };
 }
 
@@ -560,19 +561,21 @@ export function CoursesTab() {
 
       const coverageMap: Record<string, CourseCoverage> = {};
 
-      // Build transcript coverage per course
-      (transcriptData.lessons || []).forEach((l: { course_id: string; has_transcript: boolean }) => {
+      // Build transcript coverage per course (EN + ES)
+      (transcriptData.lessons || []).forEach((l: { course_id: string; has_transcript: boolean; has_transcript_es: boolean }) => {
         if (!coverageMap[l.course_id]) {
-          coverageMap[l.course_id] = { transcripts: { total: 0, done: 0 }, checks: { total: 0, done: 0 } };
+          coverageMap[l.course_id] = { transcripts: { total: 0, done: 0 }, transcriptsEs: { total: 0, done: 0 }, checks: { total: 0, done: 0 } };
         }
         coverageMap[l.course_id].transcripts.total++;
         if (l.has_transcript) coverageMap[l.course_id].transcripts.done++;
+        coverageMap[l.course_id].transcriptsEs.total++;
+        if (l.has_transcript_es) coverageMap[l.course_id].transcriptsEs.done++;
       });
 
       // Build check coverage per course (course-level: 5 checks per course)
       (checksData.courses || []).forEach((c: { course_id: string; has_content: boolean; meets_minimum: boolean; check_count: number }) => {
         if (!coverageMap[c.course_id]) {
-          coverageMap[c.course_id] = { transcripts: { total: 0, done: 0 }, checks: { total: 0, done: 0 } };
+          coverageMap[c.course_id] = { transcripts: { total: 0, done: 0 }, transcriptsEs: { total: 0, done: 0 }, checks: { total: 0, done: 0 } };
         }
         if (c.has_content) {
           coverageMap[c.course_id].checks.total = 5;
@@ -596,6 +599,27 @@ export function CoursesTab() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ lang: 'en' }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setBulkAction({ type: 'transcripts', courseId, courseName, status: 'done', message: data.message });
+        loadCoverage();
+      } else {
+        setBulkAction({ type: 'transcripts', courseId, courseName, status: 'error', message: data.error || 'Failed' });
+      }
+    } catch {
+      setBulkAction({ type: 'transcripts', courseId, courseName, status: 'error', message: 'Network error' });
+    }
+  };
+
+  // Run bulk Spanish translation for a course
+  const runBulkTranslate = async (courseId: string, courseName: string) => {
+    setBulkAction({ type: 'transcripts', courseId, courseName, status: 'running', message: 'Translating transcripts to Spanish...' });
+    try {
+      const res = await fetch(`/api/tdi-admin/courses/${courseId}/bulk-transcripts`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ translate: true }),
       });
       const data = await res.json();
       if (res.ok) {
@@ -750,17 +774,21 @@ export function CoursesTab() {
       {/* Bulk Generate All Panel */}
       {(() => {
         const allTranscripts = Object.values(coverage).reduce((a, c) => ({ total: a.total + c.transcripts.total, done: a.done + c.transcripts.done }), { total: 0, done: 0 });
+        const allTranscriptsEs = Object.values(coverage).reduce((a, c) => ({ total: a.total + c.transcriptsEs.total, done: a.done + c.transcriptsEs.done }), { total: 0, done: 0 });
         const needsTranscripts = allTranscripts.total - allTranscripts.done;
+        const needsTranslation = allTranscriptsEs.total > 0 ? allTranscriptsEs.total - allTranscriptsEs.done : 0;
         const coursesNeedingChecks = Object.values(coverage).filter((c) => c.checks.total > 0 && c.checks.done < 5).length;
-        if (coverageLoading || (needsTranscripts === 0 && coursesNeedingChecks === 0)) return null;
+        if (coverageLoading || (needsTranscripts === 0 && needsTranslation === 0 && coursesNeedingChecks === 0)) return null;
 
         return (
-          <div className="flex items-center gap-4 px-4 py-3 rounded-lg mb-4 border border-gray-200 bg-white">
-            <div className="flex-1">
+          <div className="flex flex-wrap items-center gap-3 px-4 py-3 rounded-lg mb-4 border border-gray-200 bg-white">
+            <div className="flex-1 min-w-[200px]">
               <p className="text-sm font-medium text-gray-900">Bulk Generate All Courses</p>
               <p className="text-xs text-gray-500">
                 {needsTranscripts > 0 && `${needsTranscripts} lesson${needsTranscripts !== 1 ? 's' : ''} need transcripts`}
-                {needsTranscripts > 0 && coursesNeedingChecks > 0 && ' · '}
+                {needsTranscripts > 0 && (needsTranslation > 0 || coursesNeedingChecks > 0) && ' · '}
+                {needsTranslation > 0 && `${needsTranslation} need Spanish translation`}
+                {needsTranslation > 0 && coursesNeedingChecks > 0 && ' · '}
                 {coursesNeedingChecks > 0 && `${coursesNeedingChecks} course${coursesNeedingChecks !== 1 ? 's' : ''} need check-ins`}
               </p>
             </div>
@@ -768,24 +796,36 @@ export function CoursesTab() {
               <button
                 onClick={() => runBulkTranscripts('all', 'All Courses')}
                 disabled={bulkAction?.status === 'running'}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors border border-blue-200 text-blue-700 hover:bg-blue-50 disabled:opacity-50"
+                className="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors border border-blue-200 text-blue-700 hover:bg-blue-50 disabled:opacity-50"
               >
                 {bulkAction?.status === 'running' && bulkAction.type === 'transcripts' && bulkAction.courseId === 'all'
                   ? <Loader2 size={14} className="animate-spin" />
                   : <Mic size={14} />}
-                Generate All Transcripts
+                Transcripts (EN)
+              </button>
+            )}
+            {needsTranslation > 0 && (
+              <button
+                onClick={() => runBulkTranslate('all', 'All Courses')}
+                disabled={bulkAction?.status === 'running'}
+                className="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors border border-teal-200 text-teal-700 hover:bg-teal-50 disabled:opacity-50"
+              >
+                {bulkAction?.status === 'running' && bulkAction.type === 'transcripts' && bulkAction.courseId === 'all'
+                  ? <Loader2 size={14} className="animate-spin" />
+                  : <Mic size={14} />}
+                Translate (ES)
               </button>
             )}
             {coursesNeedingChecks > 0 && (
               <button
                 onClick={() => runBulkChecks('all', 'All Courses')}
                 disabled={bulkAction?.status === 'running'}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors border border-purple-200 text-purple-700 hover:bg-purple-50 disabled:opacity-50"
+                className="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors border border-purple-200 text-purple-700 hover:bg-purple-50 disabled:opacity-50"
               >
                 {bulkAction?.status === 'running' && bulkAction.type === 'checks' && bulkAction.courseId === 'all'
                   ? <Loader2 size={14} className="animate-spin" />
                   : <MessageSquare size={14} />}
-                Generate All Check-ins
+                Check-ins
               </button>
             )}
           </div>

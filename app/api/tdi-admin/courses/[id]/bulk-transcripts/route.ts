@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import Anthropic from '@anthropic-ai/sdk'
 
-export const maxDuration = 120
+export const maxDuration = 300
 
 function getHubServiceSupabase() {
   const url = process.env.LEARNING_HUB_SUPABASE_URL || process.env.NEXT_PUBLIC_LEARNING_HUB_SUPABASE_URL
@@ -26,7 +27,7 @@ export async function GET(
 
     let lessonsQuery = supabase
       .from('hub_lessons')
-      .select('id, title, content, transcript, module_id, hub_modules!inner(course_id, hub_courses!inner(id, title))')
+      .select('id, title, content, transcript, transcript_es, module_id, hub_modules!inner(course_id, hub_courses!inner(id, title))')
 
     if (id !== 'all') {
       lessonsQuery = lessonsQuery.eq('hub_modules.course_id', id)
@@ -53,17 +54,21 @@ export async function GET(
           course_title: course?.title || '',
           video_id: content.video_id as string,
           has_transcript: !!(l.transcript && (l.transcript as string).length > 10),
+          has_transcript_es: !!(l.transcript_es && (l.transcript_es as string).length > 10),
         }
       })
 
     const total = results.length
     const withTranscript = results.filter((r) => r.has_transcript).length
+    const withTranscriptEs = results.filter((r) => r.has_transcript_es).length
 
     return NextResponse.json({
       lessons: results,
       total,
       with_transcript: withTranscript,
       without_transcript: total - withTranscript,
+      with_transcript_es: withTranscriptEs,
+      without_transcript_es: total - withTranscriptEs,
     })
   } catch (e: unknown) {
     return NextResponse.json({ error: e instanceof Error ? e.message : 'Unknown error' }, { status: 500 })
@@ -86,14 +91,20 @@ export async function POST(
     const { id } = await params
     const body = await request.json().catch(() => ({}))
     const lang = (body.lang as string) || 'en'
+    const translate = body.translate === true
+
+    const supabase = getHubServiceSupabase()
+
+    // Translation mode: translate existing English transcripts to Spanish
+    if (translate) {
+      return handleTranslation(id, supabase)
+    }
 
     const cfToken = process.env.CLOUDFLARE_STREAM_API_TOKEN
     const cfAccountId = process.env.CF_ACCOUNT_ID
     if (!cfToken || !cfAccountId) {
       return NextResponse.json({ error: 'Cloudflare not configured' }, { status: 500 })
     }
-
-    const supabase = getHubServiceSupabase()
 
     // Get all video lessons for this course (or all courses)
     let lessonsQuery = supabase
@@ -234,4 +245,113 @@ export async function POST(
   } catch (e: unknown) {
     return NextResponse.json({ error: e instanceof Error ? e.message : 'Unknown error' }, { status: 500 })
   }
+}
+
+/**
+ * Translate English transcripts to Spanish using Claude.
+ * Only processes lessons that have an English transcript but no Spanish one.
+ */
+async function handleTranslation(courseId: string, supabase: ReturnType<typeof getHubServiceSupabase>) {
+  const apiKey = process.env.ANTHROPIC_API_KEY
+  if (!apiKey) {
+    return NextResponse.json({ error: 'Anthropic API key not configured' }, { status: 500 })
+  }
+
+  let lessonsQuery = supabase
+    .from('hub_lessons')
+    .select('id, title, transcript, transcript_es, module_id, hub_modules!inner(course_id)')
+
+  if (courseId !== 'all') {
+    lessonsQuery = lessonsQuery.eq('hub_modules.course_id', courseId)
+  }
+
+  const { data: lessons, error } = await lessonsQuery
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+  // Filter to lessons with English transcript but no Spanish
+  const needsTranslation = (lessons || []).filter((l) => {
+    const hasEn = l.transcript && (l.transcript as string).length > 50
+    const hasEs = l.transcript_es && (l.transcript_es as string).length > 50
+    return hasEn && !hasEs
+  })
+
+  if (needsTranslation.length === 0) {
+    return NextResponse.json({
+      success: true,
+      message: 'All lessons with English transcripts already have Spanish translations.',
+      processed: 0,
+      results: [],
+    })
+  }
+
+  const client = new Anthropic({ apiKey })
+
+  const results: Array<{
+    lesson_id: string
+    lesson_title: string
+    status: 'translated' | 'failed'
+    error?: string
+  }> = []
+
+  for (const lesson of needsTranslation) {
+    try {
+      const enTranscript = lesson.transcript as string
+
+      const response = await client.messages.create({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 16000,
+        messages: [{
+          role: 'user',
+          content: `Translate the following English transcript to Spanish. This is a professional development transcript for educators. Maintain the same tone, meaning, and structure. Do not add any commentary or notes. Return only the Spanish translation.
+
+${enTranscript.substring(0, 30000)}`,
+        }],
+      })
+
+      const translatedText = response.content
+        .filter((block): block is Anthropic.TextBlock => block.type === 'text')
+        .map((block) => block.text)
+        .join('')
+        .trim()
+
+      if (translatedText && translatedText.length > 50) {
+        await supabase
+          .from('hub_lessons')
+          .update({ transcript_es: translatedText })
+          .eq('id', lesson.id)
+
+        results.push({
+          lesson_id: lesson.id,
+          lesson_title: lesson.title,
+          status: 'translated',
+        })
+      } else {
+        results.push({
+          lesson_id: lesson.id,
+          lesson_title: lesson.title,
+          status: 'failed',
+          error: 'Translation returned empty result',
+        })
+      }
+    } catch (err: unknown) {
+      results.push({
+        lesson_id: lesson.id,
+        lesson_title: lesson.title,
+        status: 'failed',
+        error: err instanceof Error ? err.message : 'Unknown error',
+      })
+    }
+  }
+
+  const translated = results.filter((r) => r.status === 'translated').length
+  const failed = results.filter((r) => r.status === 'failed').length
+
+  return NextResponse.json({
+    success: true,
+    message: `Translated ${translated} transcripts to Spanish. ${failed > 0 ? `${failed} failed.` : ''}`,
+    processed: results.length,
+    translated,
+    failed,
+    results,
+  })
 }
