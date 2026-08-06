@@ -201,23 +201,26 @@ export default function InvoiceClient({ quote: initialQuote }: { quote: Quote })
   if (signed || quote.status === 'signed') {
     const pkg = quote.quote_packages?.[quote.selected_package_index ?? 0]
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <div className="text-center max-w-md">
-          <img src="/images/logo.webp" alt="Teachers Deserve It" className="h-10 mx-auto mb-6" onError={e => (e.currentTarget.style.display = 'none')} />
-          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-8 h-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-            </svg>
-          </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Agreement Approved</h2>
-          <p className="text-gray-600 mb-1">
-            Signed by <strong>{quote.signed_by_name}</strong>
-          </p>
-          {quote.signed_at && (
-            <p className="text-sm text-gray-400 mb-6">
-              {new Date(quote.signed_at).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+      <div className="min-h-screen flex items-center justify-center p-4 bg-white">
+        <div className="w-full max-w-lg">
+          <div className="text-center mb-8">
+            <img src="/images/logo.webp" alt="Teachers Deserve It" className="h-10 mx-auto mb-6" onError={e => (e.currentTarget.style.display = 'none')} />
+            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Agreement Approved</h2>
+            <p className="text-gray-600 mb-1">
+              Signed by <strong>{quote.signed_by_name}</strong>
             </p>
-          )}
+            {quote.signed_at && (
+              <p className="text-sm text-gray-400">
+                {new Date(quote.signed_at).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+              </p>
+            )}
+          </div>
+
           {pkg && (
             <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 mb-6 text-left">
               <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Selected Package</p>
@@ -225,8 +228,41 @@ export default function InvoiceClient({ quote: initialQuote }: { quote: Quote })
               <p className="text-lg font-bold text-amber-600 mt-1">${Number(pkg.total_amount).toLocaleString()}</p>
             </div>
           )}
-          <p className="text-sm text-gray-500">A signed copy has been sent to your email. Our team will be in touch shortly to coordinate next steps.</p>
-          <p className="text-xs text-gray-400 mt-4">Questions? <a href="mailto:Billing@Teachersdeserveit.com" className="text-amber-600 hover:underline">Billing@Teachersdeserveit.com</a></p>
+
+          <div className="bg-gray-50 border border-gray-200 rounded-xl p-6 mb-6">
+            <p className="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-4">What happens next</p>
+            <div className="space-y-4">
+              <div className="flex items-start gap-4">
+                <div className="w-7 h-7 rounded-full bg-amber-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <span className="text-xs font-bold text-white">1</span>
+                </div>
+                <div>
+                  <p className="font-semibold text-gray-900 text-sm">Check your inbox</p>
+                  <p className="text-sm text-gray-500 mt-0.5">A signed copy of your agreement has been sent to your email.</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-4">
+                <div className="w-7 h-7 rounded-full bg-amber-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <span className="text-xs font-bold text-white">2</span>
+                </div>
+                <div>
+                  <p className="font-semibold text-gray-900 text-sm">Look for your welcome email</p>
+                  <p className="text-sm text-gray-500 mt-0.5">You'll receive a link to set up your partnership dashboard, create your account, and add your team roster.</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-4">
+                <div className="w-7 h-7 rounded-full bg-amber-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <span className="text-xs font-bold text-white">3</span>
+                </div>
+                <div>
+                  <p className="font-semibold text-gray-900 text-sm">Get your team started</p>
+                  <p className="text-sm text-gray-500 mt-0.5">Your onboarding dashboard will walk you through everything, including adding your staff and scheduling your first check-in call.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <p className="text-xs text-center text-gray-400">Questions? <a href="mailto:Billing@Teachersdeserveit.com" className="text-amber-600 hover:underline">Billing@Teachersdeserveit.com</a></p>
         </div>
       </div>
     )

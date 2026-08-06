@@ -61,10 +61,43 @@ export async function contractViewed(quoteNumber: string, org: string, viewCount
   )
 }
 
-export async function contractSigned(quoteNumber: string, org: string, signedBy: string, amount: number) {
-  await postToSlack(
-    `*Contract Signed* — ${quoteNumber}\n${org} | Signed by ${signedBy} | $${amount.toLocaleString()}\nDeliverables created. Ready for onboarding.`
-  )
+export async function contractSigned(
+  quoteNumber: string,
+  org: string,
+  signedBy: string,
+  amount: number,
+  details?: {
+    partnershipStatus?: 'new' | 'matched';
+    observations?: number;
+    virtuals?: number;
+    executives?: number;
+    hubSeats?: number;
+    grantSupported?: boolean;
+    partnershipSlug?: string;
+  }
+) {
+  const portalUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.teachersdeserveit.com'
+  const lines: string[] = [
+    `*Contract Signed* -- ${quoteNumber}`,
+    `${org} | Signed by ${signedBy} | $${amount.toLocaleString()}`,
+    'Deliverables created. Ready for onboarding.',
+  ]
+  if (details) {
+    if (details.partnershipStatus === 'new') {
+      lines.push('New partnership created.')
+    } else if (details.partnershipStatus === 'matched') {
+      lines.push('Matched to existing partnership.')
+    }
+    const sessions: string[] = []
+    if (details.observations) sessions.push(`${details.observations} observation${details.observations !== 1 ? 's' : ''}`)
+    if (details.virtuals) sessions.push(`${details.virtuals} virtual${details.virtuals !== 1 ? 's' : ''}`)
+    if (details.executives) sessions.push(`${details.executives} executive session${details.executives !== 1 ? 's' : ''}`)
+    if (details.hubSeats) sessions.push(`${details.hubSeats} Hub seat${details.hubSeats !== 1 ? 's' : ''}`)
+    if (sessions.length > 0) lines.push(sessions.join(' | '))
+    if (details.grantSupported) lines.push('Grant funding pursuit created.')
+    if (details.partnershipSlug) lines.push(`<${portalUrl}/tdi-admin/leadership/${details.partnershipSlug}|View partnership>`)
+  }
+  await postToSlack(lines.join('\n'))
 }
 
 // ── Invoice Events ──

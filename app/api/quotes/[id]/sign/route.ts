@@ -107,22 +107,24 @@ export async function POST(
     }
   }
 
-  // Slack notifications
-  if (fullQuote) {
-    const amount = (fullQuote as any).quote_packages?.[0]?.total_amount || 0
-    contractSigned(fullQuote.quote_number, fullQuote.contact_organization || '', signedByName, Number(amount)).catch(() => {})
-    quoteSigned(signedByName, fullQuote.contact_organization || '', fullQuote.quote_number || id, Number(amount)).catch(() => {})
-  }
-
   // --- Post-signing automation ---
-  // 1. Update sales opportunity to "signed"
+
+  // 1. Find and update sales opportunity to "signed", capture data for later
   const contactEmail = signedByEmail?.trim()
+  let matchedOpportunity: any = null
   if (contactEmail) {
     try {
-      await supabase.from('sales_opportunities')
-        .update({ stage: 'signed', heat: 'hot', last_activity_at: new Date().toISOString(), updated_at: new Date().toISOString() })
+      const { data: opps } = await supabase.from('sales_opportunities')
+        .select('id, notes, enrichment_data, grant_support, city, state, website')
         .ilike('contact_email', contactEmail)
         .is('deleted_at', null)
+        .limit(1)
+      if (opps?.[0]) {
+        matchedOpportunity = opps[0]
+        await supabase.from('sales_opportunities')
+          .update({ stage: 'signed', heat: 'hot', last_activity_at: new Date().toISOString(), updated_at: new Date().toISOString() })
+          .eq('id', matchedOpportunity.id)
+      }
     } catch {}
   }
 
@@ -141,6 +143,7 @@ export async function POST(
     const orgName = fullQuote.contact_organization || ''
     const quoteContactEmail = contactEmail || (fullQuote as any).contact_email || ''
     let partnershipId: string | null = null
+    let isNewPartnership = false
 
     // Strategy 1: Match by exact email
     if (quoteContactEmail) {
@@ -179,22 +182,32 @@ export async function POST(
       if (byOrg) partnershipId = byOrg.id
     }
 
-    // Strategy 4: Match by district_id
+    // Strategy 4: Match by district_id (through districts.partnership_id)
     if (!partnershipId && districtId) {
-      const { data: byDistrict } = await supabase
-        .from('partnerships')
-        .select('id')
-        .eq('district_id', districtId)
-        .eq('status', 'active')
-        .limit(1)
+      const { data: district } = await supabase
+        .from('districts')
+        .select('partnership_id')
+        .eq('id', districtId)
+        .not('partnership_id', 'is', null)
         .maybeSingle()
-      if (byDistrict) partnershipId = byDistrict.id
+      if (district?.partnership_id) partnershipId = district.partnership_id
     }
 
     // Strategy 5: Create new partnership
     if (!partnershipId && (orgName || quoteContactEmail)) {
+      isNewPartnership = true
       const name = orgName || quoteContactEmail.split('@')[0]
       const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+
+      // Use quote dates if available, otherwise default to today + 1 year
+      const contractStart = (fullQuote as any).service_start_date || new Date().toISOString().split('T')[0]
+      const contractEnd = (fullQuote as any).service_end_date || new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+
+      // Build address from enrichment data or opportunity
+      const enrichment = matchedOpportunity?.enrichment_data
+      const address = enrichment?.school_address || null
+      const website = matchedOpportunity?.website || enrichment?.district_website || null
+
       const { data: newPartnership, error: partnershipErr } = await supabase.from('partnerships').insert({
         org_name: orgName || null,
         partnership_type: 'school',
@@ -205,15 +218,17 @@ export async function POST(
         contract_phase: 'IGNITE',
         status: 'active',
         slug: slug,
-        contract_start: new Date().toISOString().split('T')[0],
-        contract_end: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        contract_start: contractStart,
+        contract_end: contractEnd,
         staff_enrolled: 0,
         base_staff_enrolled: 0,
         observation_days_total: 0, observation_days_used: 0,
         virtual_sessions_total: 0, virtual_sessions_used: 0,
         executive_sessions_total: 0, executive_sessions_used: 0,
-        district_id: districtId || null,
-        sales_deal_id: null,
+        sales_deal_id: matchedOpportunity?.id || null,
+        has_grant_support: matchedOpportunity?.grant_support || false,
+        address: address,
+        website: website,
       }).select('id').single()
 
       if (partnershipErr) {
@@ -230,16 +245,129 @@ export async function POST(
         .is('partnership_id', null)
       if (linkErr) console.error('[quote-sign] Failed to link deliverables:', linkErr.message)
 
-      // Also backfill org_name on partnership if it was missing
+      // Backfill org_name on partnership if it was missing
       if (orgName) {
         await supabase.from('partnerships')
           .update({ org_name: orgName })
           .eq('id', partnershipId)
           .is('org_name', null)
       }
+
+      // 4. Link district to partnership (districts.partnership_id)
+      if (districtId) {
+        await supabase.from('districts')
+          .update({ partnership_id: partnershipId })
+          .eq('id', districtId)
+          .is('partnership_id', null)
+      }
+
+      // 5. Sum deliverables into partnership session counts
+      const { data: deliverables } = await supabase.from('contract_deliverables')
+        .select('service_type, quantity')
+        .eq('quote_id', id)
+      if (deliverables?.length) {
+        let observations = 0, virtuals = 0, executives = 0, staffCount = 0
+        for (const d of deliverables) {
+          if (d.service_type === 'observation') observations += d.quantity
+          else if (d.service_type === 'virtual_session') virtuals += d.quantity
+          else if (d.service_type === 'executive_session') executives += d.quantity
+          else if (d.service_type === 'hub_membership') staffCount += d.quantity
+        }
+        await supabase.from('partnerships')
+          .update({
+            observation_days_total: observations,
+            base_observation_days: observations,
+            virtual_sessions_total: virtuals,
+            base_virtual_sessions: virtuals,
+            executive_sessions_total: executives,
+            base_executive_sessions: executives,
+            staff_enrolled: staffCount,
+            base_staff_enrolled: staffCount,
+          })
+          .eq('id', partnershipId)
+      }
+
+      // 6. Carry over sales data to existing partnerships (for matched, not just new)
+      if (matchedOpportunity && !isNewPartnership) {
+        const updates: Record<string, any> = {}
+        if (matchedOpportunity.id) updates.sales_deal_id = matchedOpportunity.id
+        if (matchedOpportunity.grant_support) updates.has_grant_support = true
+        if (matchedOpportunity.website) updates.website = matchedOpportunity.website
+        if (Object.keys(updates).length > 0) {
+          await supabase.from('partnerships').update(updates).eq('id', partnershipId)
+        }
+      }
+
+      // 7. Create initial partnership note with sales context
+      if (matchedOpportunity?.notes) {
+        await supabase.from('partnership_notes').insert({
+          partnership_id: partnershipId,
+          content: `Sales context from initial inquiry:\n\n${matchedOpportunity.notes}`,
+          author: 'System',
+          note_type: 'internal',
+          visible_to_partner: false,
+        })
+      }
+
+      // 8. Auto-create funding pursuit if grant-supported
+      const isGrantSupported = matchedOpportunity?.grant_support || (fullQuote as any).contract_type === 'grant_funded'
+      if (isGrantSupported) {
+        const { data: existingPursuit } = await supabase.from('funding_pursuits')
+          .select('id')
+          .eq('partnership_id', partnershipId)
+          .limit(1)
+          .maybeSingle()
+        if (!existingPursuit) {
+          const pkg = (fullQuote as any).quote_packages?.[0]
+          await supabase.from('funding_pursuits').insert({
+            pursuit_name: `${orgName || 'New Partnership'} - Grant Funding`,
+            district_name: orgName || null,
+            partnership_id: partnershipId,
+            sales_deal_id: matchedOpportunity?.id || null,
+            total_amount: pkg?.total_amount || null,
+            contract_year: new Date().getFullYear() + '-' + (new Date().getFullYear() + 1).toString().slice(-2),
+            current_phase: 'identified',
+            client_contact_name: signedByName,
+            client_contact_email: quoteContactEmail,
+            operational_owner_email: 'bella@teachersdeserveit.com',
+            internal_notes: `Auto-created from signed quote ${(fullQuote as any).quote_number || id}. Contract type: grant_funded.`,
+          })
+        }
+      }
     } else {
       console.error(`[quote-sign] CRITICAL: Could not find or create partnership for quote ${id} (${orgName || quoteContactEmail}). Deliverables are orphaned.`)
     }
+
+    // Slack notifications -- fired here so we have session counts + partnership info
+    const amount = (fullQuote as any).quote_packages?.[0]?.total_amount || 0
+    let partnershipSlug: string | undefined
+    if (partnershipId) {
+      const { data: pRow } = await supabase.from('partnerships').select('slug').eq('id', partnershipId).single()
+      partnershipSlug = pRow?.slug || undefined
+    }
+    // Build deliverable counts from what was just inserted
+    const { data: slackDeliverables } = await supabase.from('contract_deliverables')
+      .select('service_type, quantity')
+      .eq('quote_id', id)
+    let slackObs = 0, slackVirt = 0, slackExec = 0, slackHub = 0
+    for (const d of slackDeliverables || []) {
+      if (d.service_type === 'observation') slackObs += d.quantity
+      else if (d.service_type === 'virtual_session') slackVirt += d.quantity
+      else if (d.service_type === 'executive_session') slackExec += d.quantity
+      else if (d.service_type === 'hub_membership') slackHub += d.quantity
+    }
+    const isGrantSupported = matchedOpportunity?.grant_support || (fullQuote as any).contract_type === 'grant_funded'
+    const slackDetails = {
+      partnershipStatus: (isNewPartnership ? 'new' : partnershipId ? 'matched' : undefined) as 'new' | 'matched' | undefined,
+      observations: slackObs || undefined,
+      virtuals: slackVirt || undefined,
+      executives: slackExec || undefined,
+      hubSeats: slackHub || undefined,
+      grantSupported: isGrantSupported || undefined,
+      partnershipSlug,
+    }
+    contractSigned(fullQuote.quote_number, fullQuote.contact_organization || '', signedByName, Number(amount), slackDetails).catch(() => {})
+    quoteSigned(signedByName, fullQuote.contact_organization || '', fullQuote.quote_number || id, Number(amount), slackDetails).catch(() => {})
   }
 
   return NextResponse.json({ success: true })

@@ -69,6 +69,7 @@ interface Partnership {
   invite_accepted_at: string | null;
   status: 'invited' | 'setup_in_progress' | 'active' | 'paused' | 'completed';
   created_at: string;
+  sales_deal_id?: string | null;
 }
 
 interface Organization {
@@ -121,6 +122,25 @@ interface StaffMember {
   building_id?: string;
   hub_enrolled?: boolean;
   buildings?: { name: string } | null;
+}
+
+interface DistrictEnrichmentData {
+  district_enrollment?: number;
+  school_enrollment?: number;
+  per_pupil_spending?: number;
+  student_teacher_ratio?: number;
+  math_proficiency?: number;
+  reading_proficiency?: number;
+  enriched_at?: string;
+  [key: string]: unknown;
+}
+
+interface SalesOpportunityEnrichment {
+  enrichment_data: DistrictEnrichmentData | null;
+  notes: string | null;
+  city: string | null;
+  state: string | null;
+  website: string | null;
 }
 
 // Check if user is TDI admin
@@ -228,6 +248,7 @@ export default function PartnershipDetailPage() {
   const [metricSnapshots, setMetricSnapshots] = useState<MetricSnapshot[]>([]);
   const [staffCount, setStaffCount] = useState(0);
   const [staffMembers, setStaffMembers] = useState<StaffMember[]>([]);
+  const [salesEnrichment, setSalesEnrichment] = useState<SalesOpportunityEnrichment | null>(null);
 
   // UI state
   const [isLoading, setIsLoading] = useState(true);
@@ -237,6 +258,7 @@ export default function PartnershipDetailPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [editForm, setEditForm] = useState<Partial<Partnership>>({});
   const [showActivityLog, setShowActivityLog] = useState(false);
+  const [showOnboardingChecklist, setShowOnboardingChecklist] = useState(true);
 
   // Modal state
   const [showMetricsModal, setShowMetricsModal] = useState(false);
@@ -362,6 +384,29 @@ export default function PartnershipDetailPage() {
       );
     }
   }, [organization]);
+
+  // Fetch sales enrichment data when partnership loads and has a sales_deal_id
+  useEffect(() => {
+    const fetchEnrichment = async () => {
+      if (!partnership?.sales_deal_id || !userEmail) return;
+
+      try {
+        const { data, error } = await supabase
+          .from('sales_opportunities')
+          .select('enrichment_data, notes, city, state, website')
+          .eq('id', partnership.sales_deal_id)
+          .maybeSingle();
+
+        if (!error && data) {
+          setSalesEnrichment(data as SalesOpportunityEnrichment);
+        }
+      } catch (err) {
+        console.error('Failed to fetch sales enrichment:', err);
+      }
+    };
+
+    fetchEnrichment();
+  }, [partnership?.sales_deal_id, userEmail]);
 
   // Download staff roster as CSV
   const downloadStaffCSV = () => {
@@ -1341,6 +1386,239 @@ export default function PartnershipDetailPage() {
 
           {/* Right Column - Activity Log */}
           <div className="space-y-6">
+            {/* Onboarding Checklist */}
+            {(() => {
+              const steps = [
+                {
+                  label: 'Contract signed',
+                  checked: true,
+                  owner: 'System',
+                },
+                {
+                  label: 'Partnership and deliverables created',
+                  checked: true,
+                  owner: 'Rae / Bella',
+                },
+                {
+                  label: 'Welcome email sent',
+                  checked: !!partnership.invite_sent_at,
+                  owner: 'Rae / Bella',
+                },
+                {
+                  label: 'Partner account created',
+                  checked: !!partnership.invite_accepted_at,
+                  owner: 'Partner',
+                },
+                {
+                  label: 'Staff roster uploaded',
+                  checked: staffCount > 0,
+                  owner: 'Partner',
+                },
+                {
+                  label: 'Check-in call scheduled',
+                  checked: false,
+                  owner: 'Rae',
+                },
+                {
+                  label: 'Observation dates set',
+                  checked: false,
+                  owner: 'Rae / Partner',
+                },
+              ];
+              const completedCount = steps.filter((s) => s.checked).length;
+              const totalCount = steps.length;
+              const progressPct = Math.round((completedCount / totalCount) * 100);
+              const firstUncheckedIndex = steps.findIndex((s) => !s.checked);
+
+              return (
+                <div className="bg-white rounded-xl border border-gray-200 p-6">
+                  <button
+                    onClick={() => setShowOnboardingChecklist(!showOnboardingChecklist)}
+                    className="w-full flex items-center justify-between"
+                  >
+                    <h2 className="text-lg font-semibold text-[#1e2749]">Onboarding Progress</h2>
+                    <div className="flex items-center gap-3">
+                      <span className="text-sm font-medium text-amber-600">
+                        {completedCount} of {totalCount}
+                      </span>
+                      {showOnboardingChecklist ? (
+                        <ChevronUp className="w-5 h-5 text-gray-400" />
+                      ) : (
+                        <ChevronDown className="w-5 h-5 text-gray-400" />
+                      )}
+                    </div>
+                  </button>
+
+                  <div className="mt-3 w-full bg-gray-100 rounded-full h-1.5">
+                    <div
+                      className="h-1.5 rounded-full transition-all"
+                      style={{
+                        width: `${progressPct}%`,
+                        backgroundColor: '#c9a84c',
+                      }}
+                    />
+                  </div>
+
+                  {showOnboardingChecklist && (
+                    <div className="mt-4 space-y-3">
+                      {steps.map((step, idx) => {
+                        const isActive = !step.checked && idx === firstUncheckedIndex;
+                        return (
+                          <div key={idx} className="flex items-center justify-between gap-3">
+                            <div className="flex items-center gap-3 flex-1 min-w-0">
+                              <div
+                                className="flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center border-2 transition-colors"
+                                style={
+                                  step.checked
+                                    ? { backgroundColor: '#c9a84c', borderColor: '#c9a84c' }
+                                    : isActive
+                                      ? { borderColor: '#c9a84c', backgroundColor: 'transparent' }
+                                      : { borderColor: '#d1d5db', backgroundColor: 'transparent' }
+                                }
+                              >
+                                {step.checked && (
+                                  <Check className="w-3 h-3 text-white" strokeWidth={3} />
+                                )}
+                              </div>
+                              <span
+                                className={`text-sm ${
+                                  step.checked
+                                    ? 'line-through text-gray-400'
+                                    : isActive
+                                      ? 'font-medium text-[#1e2749]'
+                                      : 'text-gray-600'
+                                }`}
+                              >
+                                {step.label}
+                              </span>
+                            </div>
+                            <span className="text-xs text-gray-400 flex-shrink-0">{step.owner}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
+
+            {/* District Intelligence Panel */}
+            {salesEnrichment?.enrichment_data && (() => {
+              const ed = salesEnrichment.enrichment_data;
+              const enrichedAt = ed.enriched_at
+                ? new Date(ed.enriched_at).toLocaleDateString()
+                : null;
+
+              const stats = [
+                {
+                  label: 'District enrollment',
+                  value: ed.district_enrollment != null
+                    ? ed.district_enrollment.toLocaleString()
+                    : null,
+                  gold: false,
+                },
+                {
+                  label: 'School enrollment',
+                  value: ed.school_enrollment != null
+                    ? ed.school_enrollment.toLocaleString()
+                    : null,
+                  gold: false,
+                },
+                {
+                  label: 'Per-pupil spending',
+                  value: ed.per_pupil_spending != null
+                    ? `$${ed.per_pupil_spending.toLocaleString()}`
+                    : null,
+                  gold: true,
+                },
+                {
+                  label: 'Student:teacher ratio',
+                  value: ed.student_teacher_ratio != null
+                    ? `${ed.student_teacher_ratio}:1`
+                    : null,
+                  gold: false,
+                },
+              ].filter((s) => s.value !== null);
+
+              const hasMath = ed.math_proficiency != null;
+              const hasReading = ed.reading_proficiency != null;
+
+              return (
+                <div className="bg-white rounded-xl border border-gray-200 p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-lg font-semibold text-[#1e2749]">District Intelligence</h2>
+                    {enrichedAt && (
+                      <span className="text-xs text-gray-400">Enriched {enrichedAt}</span>
+                    )}
+                  </div>
+
+                  {stats.length > 0 && (
+                    <div className="grid grid-cols-2 gap-3 mb-4">
+                      {stats.map((stat) => (
+                        <div key={stat.label} className="bg-gray-50 rounded-lg p-3">
+                          <p className="text-xs text-gray-500 mb-1">{stat.label}</p>
+                          <p
+                            className="text-sm font-semibold"
+                            style={stat.gold ? { color: '#c9a84c' } : { color: '#1e2749' }}
+                          >
+                            {stat.value}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {(hasMath || hasReading) && (
+                    <div className="space-y-2 mb-4">
+                      {hasMath && (
+                        <div>
+                          <div className="flex justify-between text-xs text-gray-500 mb-1">
+                            <span>Math proficiency</span>
+                            <span>{ed.math_proficiency}%</span>
+                          </div>
+                          <div className="w-full bg-gray-100 rounded-full h-1.5">
+                            <div
+                              className="h-1.5 rounded-full"
+                              style={{
+                                width: `${ed.math_proficiency}%`,
+                                backgroundColor: '#80a4ed',
+                              }}
+                            />
+                          </div>
+                        </div>
+                      )}
+                      {hasReading && (
+                        <div>
+                          <div className="flex justify-between text-xs text-gray-500 mb-1">
+                            <span>Reading proficiency</span>
+                            <span>{ed.reading_proficiency}%</span>
+                          </div>
+                          <div className="w-full bg-gray-100 rounded-full h-1.5">
+                            <div
+                              className="h-1.5 rounded-full"
+                              style={{
+                                width: `${ed.reading_proficiency}%`,
+                                backgroundColor: '#80a4ed',
+                              }}
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {salesEnrichment.notes && (
+                    <div className="border-t border-gray-100 pt-3">
+                      <p className="text-xs font-medium text-gray-500 mb-1">Sales Context</p>
+                      <p className="text-xs text-gray-600 leading-relaxed line-clamp-4">
+                        {salesEnrichment.notes}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
+
             {/* Recent Metrics */}
             <div className="bg-white rounded-xl border border-gray-200 p-6">
               <div className="flex items-center justify-between mb-4">

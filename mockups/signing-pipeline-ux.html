@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TDI Signing Pipeline UX Mockups</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f5; color: #1a1a1a; padding: 40px 20px; }
+
+  .container { max-width: 900px; margin: 0 auto; }
+
+  h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; }
+  .subtitle { font-size: 14px; color: #666; margin-bottom: 48px; }
+
+  .mockup-section { margin-bottom: 64px; }
+  .mockup-section h2 { font-size: 20px; font-weight: 600; margin-bottom: 6px; }
+  .mockup-section .desc { font-size: 13px; color: #666; margin-bottom: 20px; line-height: 1.5; }
+
+  .mockup-card { background: #fff; border-radius: 12px; border: 1px solid #e0e0e0; overflow: hidden; }
+
+  /* ── Mockup 1: Slack Notification ── */
+  .slack-mock { padding: 20px; font-family: 'Lato', -apple-system, sans-serif; font-size: 15px; background: #fff; }
+  .slack-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .slack-avatar { width: 36px; height: 36px; border-radius: 4px; background: linear-gradient(135deg, #c9a84c, #b8943f); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 14px; }
+  .slack-name { font-weight: 700; font-size: 15px; }
+  .slack-time { font-size: 12px; color: #999; margin-left: 6px; }
+  .slack-body { padding-left: 46px; }
+  .slack-attachment { border-left: 4px solid #c9a84c; padding: 12px 16px; margin-top: 8px; background: #fafafa; border-radius: 0 8px 8px 0; }
+  .slack-attachment-title { font-weight: 700; font-size: 15px; margin-bottom: 8px; color: #1264a3; }
+  .slack-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 24px; font-size: 13px; }
+  .slack-field-label { font-weight: 700; color: #333; }
+  .slack-field-value { color: #555; }
+  .slack-tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+  .slack-tag-new { background: #e8f5e9; color: #2e7d32; }
+  .slack-tag-matched { background: #e3f2fd; color: #1565c0; }
+  .slack-tag-grant { background: #fff3e0; color: #e65100; }
+  .slack-actions { margin-top: 12px; display: flex; gap: 8px; }
+  .slack-btn { padding: 4px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; background: #fff; cursor: pointer; color: #333; }
+  .slack-divider { height: 1px; background: #eee; margin: 12px 0; }
+  .slack-counts { display: flex; gap: 16px; margin-top: 8px; }
+  .slack-count-item { text-align: center; }
+  .slack-count-num { font-size: 20px; font-weight: 700; color: #c9a84c; }
+  .slack-count-label { font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  /* ── Mockup 2: Onboarding Checklist ── */
+  .onboarding-mock { padding: 0; }
+  .onboarding-header { padding: 20px 24px 16px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+  .onboarding-header h3 { font-size: 16px; font-weight: 600; }
+  .onboarding-progress { display: flex; align-items: center; gap: 8px; }
+  .progress-bar { width: 120px; height: 6px; background: #eee; border-radius: 3px; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, #c9a84c, #b8943f); border-radius: 3px; width: 33%; }
+  .progress-text { font-size: 12px; color: #888; }
+  .onboarding-list { padding: 8px 24px 20px; }
+  .onboarding-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; border-bottom: 1px solid #f5f5f5; }
+  .onboarding-item:last-child { border-bottom: none; }
+  .check-circle { width: 22px; height: 22px; border-radius: 50%; border: 2px solid #ddd; flex-shrink: 0; margin-top: 1px; display: flex; align-items: center; justify-content: center; }
+  .check-circle.done { background: #c9a84c; border-color: #c9a84c; }
+  .check-circle.done::after { content: ''; display: block; width: 6px; height: 10px; border: solid #fff; border-width: 0 2px 2px 0; transform: rotate(45deg); margin-top: -2px; }
+  .check-circle.active { border-color: #c9a84c; }
+  .onboarding-content { flex: 1; }
+  .onboarding-title { font-size: 14px; font-weight: 500; }
+  .onboarding-title.done-text { color: #999; text-decoration: line-through; }
+  .onboarding-meta { font-size: 12px; color: #999; margin-top: 2px; }
+  .onboarding-action { margin-top: 6px; }
+  .onboarding-btn { padding: 5px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; border: none; cursor: pointer; }
+  .onboarding-btn-primary { background: #c9a84c; color: #fff; }
+  .onboarding-btn-secondary { background: #f5f5f5; color: #555; border: 1px solid #ddd; }
+  .onboarding-owner { font-size: 11px; color: #aaa; margin-left: auto; white-space: nowrap; }
+
+  /* ── Mockup 3: Enrichment Panel ── */
+  .enrichment-mock { padding: 0; }
+  .enrichment-header { padding: 16px 24px 12px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+  .enrichment-header h3 { font-size: 16px; font-weight: 600; }
+  .enrichment-source { font-size: 11px; color: #999; }
+  .enrichment-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; }
+  .enrichment-stat { padding: 16px 20px; border-right: 1px solid #f0f0f0; border-bottom: 1px solid #f0f0f0; }
+  .enrichment-stat:nth-child(4n) { border-right: none; }
+  .enrichment-stat:nth-last-child(-n+4) { border-bottom: none; }
+  .enrichment-stat-value { font-size: 22px; font-weight: 700; color: #1a1a1a; }
+  .enrichment-stat-value.gold { color: #c9a84c; }
+  .enrichment-stat-label { font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+  .enrichment-stat-sub { font-size: 11px; color: #aaa; margin-top: 2px; }
+  .enrichment-bar-container { margin-top: 8px; }
+  .enrichment-bar { height: 4px; background: #eee; border-radius: 2px; overflow: hidden; }
+  .enrichment-bar-fill { height: 100%; border-radius: 2px; }
+  .enrichment-bar-fill.math { background: #c9a84c; width: 50%; }
+  .enrichment-bar-fill.reading { background: #7cb342; width: 51%; }
+  .enrichment-notes { padding: 16px 24px; background: #fafafa; border-top: 1px solid #eee; }
+  .enrichment-notes-title { font-size: 12px; font-weight: 600; color: #888; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+  .enrichment-notes-text { font-size: 13px; color: #555; line-height: 1.5; }
+
+  /* ── Mockup 4: Signer Confirmation ── */
+  .confirm-mock { padding: 0; background: linear-gradient(180deg, #fafaf5 0%, #fff 100%); text-align: center; }
+  .confirm-top { padding: 48px 40px 32px; }
+  .confirm-icon { width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, #c9a84c, #b8943f); margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; }
+  .confirm-icon svg { width: 32px; height: 32px; fill: none; stroke: #fff; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+  .confirm-title { font-size: 24px; font-weight: 700; margin-bottom: 8px; }
+  .confirm-subtitle { font-size: 15px; color: #666; max-width: 440px; margin: 0 auto; line-height: 1.5; }
+  .confirm-steps { padding: 0 40px 40px; }
+  .confirm-step { display: flex; align-items: flex-start; gap: 16px; text-align: left; padding: 16px 0; }
+  .confirm-step-num { width: 32px; height: 32px; border-radius: 50%; background: #f5f0e0; color: #c9a84c; font-weight: 700; font-size: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .confirm-step-content h4 { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+  .confirm-step-content p { font-size: 13px; color: #777; line-height: 1.4; }
+  .confirm-receipt { padding: 20px 40px; background: #f9f9f9; border-top: 1px solid #eee; display: flex; align-items: center; justify-content: center; gap: 12px; }
+  .confirm-receipt-icon { color: #c9a84c; }
+  .confirm-receipt-text { font-size: 13px; color: #666; }
+
+  /* ── Mockup 5: CRM Partnership Link ── */
+  .crm-mock { padding: 20px 24px; }
+  .crm-stage-row { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+  .crm-stage-badge { padding: 4px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; background: #e8f5e9; color: #2e7d32; }
+  .crm-stage-label { font-size: 13px; color: #888; }
+  .crm-link-card { background: #f9f9f9; border: 1px solid #eee; border-radius: 8px; padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; }
+  .crm-link-left { display: flex; align-items: center; gap: 10px; }
+  .crm-link-dot { width: 8px; height: 8px; border-radius: 50%; background: #4caf50; }
+  .crm-link-info h4 { font-size: 14px; font-weight: 600; }
+  .crm-link-info p { font-size: 12px; color: #888; }
+  .crm-link-arrow { font-size: 18px; color: #c9a84c; cursor: pointer; }
+  .crm-divider { height: 1px; background: #eee; margin: 16px 0; }
+  .crm-counts-header { font-size: 12px; font-weight: 600; color: #888; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+  .crm-counts-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .crm-count-box { background: #f9f9f9; border-radius: 6px; padding: 10px; text-align: center; }
+  .crm-count-val { font-size: 18px; font-weight: 700; }
+  .crm-count-label { font-size: 10px; color: #888; text-transform: uppercase; }
+  .crm-count-diff { font-size: 10px; margin-top: 2px; }
+  .crm-count-diff.up { color: #2e7d32; }
+  .crm-count-diff.same { color: #999; }
+
+  /* ── Tab Switcher ── */
+  .tab-strip { display: flex; gap: 0; margin-bottom: 0; border-bottom: 2px solid #eee; }
+  .tab-item { padding: 10px 20px; font-size: 13px; font-weight: 500; color: #888; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; }
+  .tab-item.active { color: #c9a84c; border-bottom-color: #c9a84c; font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Signing Pipeline UX Mockups</h1>
+  <p class="subtitle">August 5, 2026. What users see after a quote is signed.</p>
+
+  <!-- ── MOCKUP 1: Slack Notification ── -->
+  <div class="mockup-section">
+    <h2>1. Richer Slack Notification</h2>
+    <p class="desc">Current Slack message just says "contract signed" with an amount. This version shows what was auto-created, session counts, and direct links. Fires to both #billing and #sales channels.</p>
+    <div class="mockup-card slack-mock">
+      <div class="slack-header">
+        <div class="slack-avatar">T</div>
+        <div>
+          <span class="slack-name">TDI System</span>
+          <span class="slack-time">11:49 AM</span>
+        </div>
+      </div>
+      <div class="slack-body">
+        <div class="slack-attachment">
+          <div class="slack-attachment-title">Contract Signed: Van Zant Elementary</div>
+          <div class="slack-fields">
+            <div><span class="slack-field-label">Signed by</span><br><span class="slack-field-value">Amanda Fry</span></div>
+            <div><span class="slack-field-label">Amount</span><br><span class="slack-field-value">$4,250.00</span></div>
+            <div><span class="slack-field-label">Quote</span><br><span class="slack-field-value">#Q-2026-0042</span></div>
+            <div><span class="slack-field-label">Contract Type</span><br><span class="slack-field-value">New Business</span></div>
+          </div>
+          <div class="slack-divider"></div>
+          <div style="margin-bottom: 8px;">
+            <span class="slack-field-label">Partnership</span><br>
+            <span class="slack-tag slack-tag-new">New partnership created</span>
+          </div>
+          <div class="slack-counts">
+            <div class="slack-count-item">
+              <div class="slack-count-num">2</div>
+              <div class="slack-count-label">Observations</div>
+            </div>
+            <div class="slack-count-item">
+              <div class="slack-count-num">1</div>
+              <div class="slack-count-label">Virtual</div>
+            </div>
+            <div class="slack-count-item">
+              <div class="slack-count-num">2</div>
+              <div class="slack-count-label">Executive</div>
+            </div>
+            <div class="slack-count-item">
+              <div class="slack-count-num">15</div>
+              <div class="slack-count-label">Hub Seats</div>
+            </div>
+          </div>
+          <div class="slack-divider"></div>
+          <div class="slack-actions">
+            <button class="slack-btn">View Partnership</button>
+            <button class="slack-btn">View Quote</button>
+            <button class="slack-btn">View in CRM</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── MOCKUP 2: Onboarding Checklist ── -->
+  <div class="mockup-section">
+    <h2>2. Onboarding Checklist (Partnership Record in Admin)</h2>
+    <p class="desc">
+      <strong>What exists today:</strong> The partner-setup flow (/partner-setup/[token]) handles account creation, org info, and roster upload in a 3-step wizard. The welcome email (POST /api/partners/welcome-email) sends a branded email with "Get Started" CTA linking to the setup wizard. But both must be triggered manually, and the admin portal has no visibility into which steps are done.
+      <br><br>
+      <strong>Recommendation:</strong> Surface the onboarding status on the admin partnership page so Rae and Bella can see at a glance what's been done vs. what's waiting. The actions already exist, this just tracks them.
+    </p>
+    <div class="mockup-card onboarding-mock">
+      <div class="onboarding-header">
+        <h3>Onboarding</h3>
+        <div class="onboarding-progress">
+          <div class="progress-bar"><div class="progress-fill"></div></div>
+          <span class="progress-text">2 of 7</span>
+        </div>
+      </div>
+      <div class="onboarding-list">
+        <div class="onboarding-item">
+          <div class="check-circle done"></div>
+          <div class="onboarding-content">
+            <div class="onboarding-title done-text">Contract signed</div>
+            <div class="onboarding-meta">Completed Aug 5, 2026. Quote #Q-2026-0042.</div>
+          </div>
+          <div class="onboarding-owner">System</div>
+        </div>
+        <div class="onboarding-item">
+          <div class="check-circle done"></div>
+          <div class="onboarding-content">
+            <div class="onboarding-title done-text">Partnership + deliverables created</div>
+            <div class="onboarding-meta">Auto-created with 2 obs, 1 virtual, 2 exec, 15 hub seats</div>
+          </div>
+          <div class="onboarding-owner">System</div>
+        </div>
+        <div class="onboarding-item">
+          <div class="check-circle active"></div>
+          <div class="onboarding-content">
+            <div class="onboarding-title">Send welcome email</div>
+            <div class="onboarding-meta">To Amanda Fry (frya@evesham.k12.nj.us). Includes setup link for account creation + roster upload.</div>
+            <div class="onboarding-action">
+              <button class="onboarding-btn onboarding-btn-primary">Send Welcome Email</button>
+            </div>
+          </div>
+          <div class="onboarding-owner">Rae / Bella</div>
+        </div>
+        <div class="onboarding-item">
+          <div class="check-circle"></div>
+          <div class="onboarding-content">
+            <div class="onboarding-title">Partner creates account</div>
+            <div class="onboarding-meta">Partner-setup step 1: Google OAuth or email/password via invite link</div>
+          </div>
+          <div class="onboarding-owner">Partner (self-serve)</div>
+        </div>
+        <div class="onboarding-item">
+          <div class="check-circle"></div>
+          <div class="onboarding-content">
+            <div class="onboarding-title">Staff roster uploaded</div>
+            <div class="onboarding-meta">Partner-setup step 2: CSV upload or manual entry. 15 hub seats available. Educators get access within 24 hours.</div>
+          </div>
+          <div class="onboarding-owner">Partner (self-serve)</div>
+        </div>
+        <div class="onboarding-item">
+          <div class="check-circle"></div>
+          <div class="onboarding-content">
+            <div class="onboarding-title">Schedule check-in call</div>
+            <div class="onboarding-meta">Recommended within first 5 business days of signing</div>
+            <div class="onboarding-action">
+              <button class="onboarding-btn onboarding-btn-secondary">Schedule Call</button>
+            </div>
+          </div>
+          <div class="onboarding-owner">Rae / Omar</div>
+        </div>
+        <div class="onboarding-item">
+          <div class="check-circle"></div>
+          <div class="onboarding-content">
+            <div class="onboarding-title">Set observation dates</div>
+            <div class="onboarding-meta">2 observation visits need scheduling once school calendar is confirmed</div>
+          </div>
+          <div class="onboarding-owner">Rae</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── MOCKUP 3: Enrichment Panel ── -->
+  <div class="mockup-section">
+    <h2>3. Enrichment Data on Leadership Dashboard</h2>
+    <p class="desc">District intelligence from the sales enrichment, surfaced on the partnership/leadership view. Useful context for observation visits, renewal conversations, and funding research.</p>
+    <div class="mockup-card enrichment-mock">
+      <div class="enrichment-header">
+        <h3>District Intelligence</h3>
+        <span class="enrichment-source">Enriched Aug 5, 2026</span>
+      </div>
+      <div class="enrichment-grid">
+        <div class="enrichment-stat">
+          <div class="enrichment-stat-value">4,513</div>
+          <div class="enrichment-stat-label">District Students</div>
+          <div class="enrichment-stat-sub">8 schools in district</div>
+        </div>
+        <div class="enrichment-stat">
+          <div class="enrichment-stat-value">621</div>
+          <div class="enrichment-stat-label">School Students</div>
+          <div class="enrichment-stat-sub">K-5, Van Zant Elementary</div>
+        </div>
+        <div class="enrichment-stat">
+          <div class="enrichment-stat-value gold">$21,361</div>
+          <div class="enrichment-stat-label">Per-Pupil Spend</div>
+          <div class="enrichment-stat-sub">$104M annual revenue</div>
+        </div>
+        <div class="enrichment-stat">
+          <div class="enrichment-stat-value">15.7</div>
+          <div class="enrichment-stat-label">Student:Teacher</div>
+          <div class="enrichment-stat-sub">39.5 FTE teachers</div>
+        </div>
+        <div class="enrichment-stat">
+          <div class="enrichment-stat-value" style="font-size: 16px;">50%</div>
+          <div class="enrichment-stat-label">Math Proficiency</div>
+          <div class="enrichment-bar-container">
+            <div class="enrichment-bar"><div class="enrichment-bar-fill math"></div></div>
+          </div>
+        </div>
+        <div class="enrichment-stat">
+          <div class="enrichment-stat-value" style="font-size: 16px;">51%</div>
+          <div class="enrichment-stat-label">Reading Proficiency</div>
+          <div class="enrichment-bar-container">
+            <div class="enrichment-bar"><div class="enrichment-bar-fill reading"></div></div>
+          </div>
+        </div>
+        <div class="enrichment-stat">
+          <div class="enrichment-stat-value" style="font-size: 16px;">Evesham Township SD</div>
+          <div class="enrichment-stat-label">District</div>
+          <div class="enrichment-stat-sub">Marlton, NJ</div>
+        </div>
+        <div class="enrichment-stat">
+          <div class="enrichment-stat-value" style="font-size: 16px;">Yes</div>
+          <div class="enrichment-stat-label">Gifted & Talented</div>
+          <div class="enrichment-stat-sub">Program available</div>
+        </div>
+      </div>
+      <div class="enrichment-notes">
+        <div class="enrichment-notes-title">Sales Context</div>
+        <div class="enrichment-notes-text">Building Leader. PD Plan Request submitted via /get-started. Audience: Classroom teachers, New teacher onboarding. Scope: Small pilot (select group or one department). Pain point: Time to meet with staff.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── MOCKUP 4: Enhanced Post-Signing Confirmation ── -->
+  <div class="mockup-section">
+    <h2>4. Enhanced Post-Signing Confirmation (What the Client Sees)</h2>
+    <p class="desc">
+      <strong>What exists today:</strong> After signing, Amanda sees a static card with "Agreement Approved", her name, the date, the selected package amount, and "Our team will be in touch shortly to coordinate next steps."
+      <br><br>
+      <strong>What already exists later in the flow:</strong> The partner-setup page (triggered by invite link) has a 3-step onboarding wizard (account creation, org info, roster upload) that ends with "What happens next" showing: (1) educators get Hub access within 24 hours, (2) dashboard updates in real time, (3) TDI will schedule a check-in call. The welcome email has 3 steps: log in, add your team, watch your team grow.
+      <br><br>
+      <strong>Recommendation:</strong> Bridge the gap between signing and the partner-setup invite. Right now the confirmation page is a dead end. Add a preview of what's coming so Amanda isn't just waiting for an email.
+    </p>
+    <div class="mockup-card confirm-mock">
+      <div class="confirm-top">
+        <div class="confirm-icon">
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        </div>
+        <div class="confirm-title">Agreement Approved</div>
+        <div class="confirm-subtitle">Signed by <strong>Amanda Fry</strong> on Tuesday, August 5, 2026</div>
+      </div>
+
+      <!-- Existing package info (already built) -->
+      <div style="padding: 0 40px 24px;">
+        <div style="background: #f9f9f9; border: 1px solid #e0e0e0; border-radius: 12px; padding: 16px; text-align: left;">
+          <p style="font-size: 11px; font-weight: 600; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">Selected Package</p>
+          <p style="font-size: 15px; font-weight: 600;">IGNITE Partnership</p>
+          <p style="font-size: 18px; font-weight: 700; color: #c9a84c; margin-top: 4px;">$4,250.00</p>
+        </div>
+      </div>
+
+      <!-- NEW: What happens next (bridging the gap) -->
+      <div class="confirm-steps" style="border-top: 1px solid #eee; padding-top: 28px;">
+        <p style="font-size: 14px; font-weight: 600; color: #1a1a1a; margin-bottom: 16px; padding-left: 0;">What happens next:</p>
+        <div class="confirm-step">
+          <div class="confirm-step-num">1</div>
+          <div class="confirm-step-content">
+            <h4>Check your inbox</h4>
+            <p>A signed copy of your agreement has been sent to frya@evesham.k12.nj.us.</p>
+          </div>
+        </div>
+        <div class="confirm-step">
+          <div class="confirm-step-num">2</div>
+          <div class="confirm-step-content">
+            <h4>Look for your welcome email</h4>
+            <p>You'll receive a link to set up your partnership dashboard, create your account, and add your team roster.</p>
+          </div>
+        </div>
+        <div class="confirm-step">
+          <div class="confirm-step-num">3</div>
+          <div class="confirm-step-content">
+            <h4>Get your team started</h4>
+            <p>Your onboarding dashboard will walk you through everything, including adding your staff and scheduling your first check-in call.</p>
+          </div>
+        </div>
+      </div>
+      <div class="confirm-receipt">
+        <span class="confirm-receipt-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+        </span>
+        <span class="confirm-receipt-text">Questions? <span style="color: #c9a84c;">Billing@Teachersdeserveit.com</span></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── MOCKUP 5: CRM Partnership Link + Renewal Diff ── -->
+  <div class="mockup-section">
+    <h2>5. CRM Partnership Link + Renewal Diff</h2>
+    <p class="desc">On the sales opportunity, show that a partnership was created and link directly to it. For renewals, show how session counts changed from the previous contract.</p>
+    <div class="mockup-card crm-mock">
+      <div class="crm-stage-row">
+        <span class="crm-stage-badge">Signed</span>
+        <span class="crm-stage-label">Stage updated Aug 5, 2026</span>
+      </div>
+      <div class="crm-link-card">
+        <div class="crm-link-left">
+          <div class="crm-link-dot"></div>
+          <div class="crm-link-info">
+            <h4>Van Zant Elementary</h4>
+            <p>Partnership active. Created Aug 5, 2026.</p>
+          </div>
+        </div>
+        <div class="crm-link-arrow">&rarr;</div>
+      </div>
+      <div class="crm-divider"></div>
+      <div class="crm-counts-header">Contract Deliverables (Renewal View)</div>
+      <div class="crm-counts-grid">
+        <div class="crm-count-box">
+          <div class="crm-count-val">4</div>
+          <div class="crm-count-label">Observations</div>
+          <div class="crm-count-diff up">+2 from last year</div>
+        </div>
+        <div class="crm-count-box">
+          <div class="crm-count-val">2</div>
+          <div class="crm-count-label">Virtual</div>
+          <div class="crm-count-diff up">+1 from last year</div>
+        </div>
+        <div class="crm-count-box">
+          <div class="crm-count-val">2</div>
+          <div class="crm-count-label">Executive</div>
+          <div class="crm-count-diff same">Same as last year</div>
+        </div>
+        <div class="crm-count-box">
+          <div class="crm-count-val">25</div>
+          <div class="crm-count-label">Hub Seats</div>
+          <div class="crm-count-diff up">+10 from last year</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

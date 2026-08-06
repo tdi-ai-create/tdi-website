@@ -123,6 +123,20 @@ export function OpportunityDetailPanel({ opportunityId, onClose, onUpdate, onDel
   const [showPartnershipModal, setShowPartnershipModal] = useState(false)
   const [creatingPartnership, setCreatingPartnership] = useState(false)
   const [partnershipCreated, setPartnershipCreated] = useState(false)
+  const [linkedPartnership, setLinkedPartnership] = useState<{
+    id: string
+    slug: string
+    orgName: string
+    createdAt?: string
+    observationDays?: number
+    virtualSessions?: number
+    executiveSessions?: number
+    staffEnrolled?: number
+    baseObservationDays?: number | null
+    baseVirtualSessions?: number | null
+    baseExecutiveSessions?: number | null
+    baseStaffEnrolled?: number | null
+  } | null>(null)
   const [pType, setPType] = useState<'school' | 'district'>('school')
   const [pStaff, setPStaff] = useState('')
   const [pObsDays, setPObsDays] = useState('2')
@@ -151,6 +165,8 @@ export function OpportunityDetailPanel({ opportunityId, onClose, onUpdate, onDel
   async function loadOpp(id: string) {
     setLoading(true)
     setFetchError('')
+    setLinkedPartnership(null)
+    setPartnershipCreated(false)
     try {
       const res = await fetch(`/api/sales/opportunities/${id}`)
       if (!res.ok) throw new Error('Failed to load opportunity')
@@ -160,10 +176,39 @@ export function OpportunityDetailPanel({ opportunityId, onClose, onUpdate, onDel
         notes_list: data.notes_list ?? [],
         activity: data.activity ?? [],
       })
+      // Look up any existing linked partnership
+      void fetchLinkedPartnership(id)
     } catch (e: unknown) {
       setFetchError(e instanceof Error ? e.message : 'Failed to load')
     } finally {
       setLoading(false)
+    }
+  }
+
+  async function fetchLinkedPartnership(dealId: string) {
+    try {
+      const res = await fetch(`/api/admin/partnerships/by-deal?dealId=${encodeURIComponent(dealId)}`)
+      if (!res.ok) return
+      const data = await res.json()
+      if (data && data.id) {
+        setLinkedPartnership({
+          id: data.id,
+          slug: data.slug,
+          orgName: data.org_name || data.contact_name || '',
+          createdAt: data.created_at,
+          observationDays: data.observation_days_total ?? 0,
+          virtualSessions: data.virtual_sessions_total ?? 0,
+          executiveSessions: data.executive_sessions_total ?? 0,
+          staffEnrolled: data.staff_enrolled ?? 0,
+          baseObservationDays: data.base_observation_days ?? null,
+          baseVirtualSessions: data.base_virtual_sessions ?? null,
+          baseExecutiveSessions: data.base_executive_sessions ?? null,
+          baseStaffEnrolled: data.base_staff_enrolled ?? null,
+        })
+        setPartnershipCreated(true)
+      }
+    } catch {
+      // Non-fatal: partnership lookup failure doesn't break the panel
     }
   }
 
@@ -282,6 +327,20 @@ export function OpportunityDetailPanel({ opportunityId, onClose, onUpdate, onDel
       if (res.ok && result.success) {
         showToast(`Partnership created! Dashboard: ${result.partnership.slug}`, 'success')
         setPartnershipCreated(true)
+        setLinkedPartnership({
+          id: result.partnership.id,
+          slug: result.partnership.slug,
+          orgName: result.partnership.orgName || opp.name,
+          createdAt: new Date().toISOString(),
+          observationDays: parseInt(pObsDays) || 0,
+          virtualSessions: parseInt(pVirtual) || 0,
+          executiveSessions: parseInt(pExecutive) || 0,
+          staffEnrolled: parseInt(pStaff) || 0,
+          baseObservationDays: null,
+          baseVirtualSessions: null,
+          baseExecutiveSessions: null,
+          baseStaffEnrolled: null,
+        })
         setShowPartnershipModal(false)
         patchOpp({ stage: 'signed' })
       } else {
@@ -698,11 +757,76 @@ export function OpportunityDetailPanel({ opportunityId, onClose, onUpdate, onDel
                     </div>
                   </>
                 )}
-                {partnershipCreated && (
+                {partnershipCreated && linkedPartnership && (
                   <>
                     <div style={{ margin: '0 16px', height: 1, background: '#E5E7EB' }} />
-                    <div style={{ padding: '10px 16px', textAlign: 'center' }}>
-                      <p style={{ fontSize: 12, fontWeight: 600, color: '#2A9D8F', margin: 0 }}>Partnership created. Dashboard live.</p>
+                    <div style={{ padding: '12px 16px' }}>
+                      {/* Partnership header card */}
+                      <div style={{
+                        background: '#F0FDF4', border: '1px solid #BBF7D0', borderRadius: 8,
+                        padding: '10px 12px', marginBottom: 10,
+                        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                      }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+                          <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#4caf50', flexShrink: 0 }} />
+                          <div style={{ minWidth: 0 }}>
+                            <div style={{ fontSize: 13, fontWeight: 700, color: '#1e2749', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                              {linkedPartnership.orgName}
+                            </div>
+                            <div style={{ fontSize: 11, color: '#6B7280', marginTop: 1 }}>
+                              Partnership active.{linkedPartnership.createdAt ? ` Created ${new Date(linkedPartnership.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}.` : ''}
+                            </div>
+                          </div>
+                        </div>
+                        <a
+                          href={`/admin/partnerships/${linkedPartnership.id}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          title="Open partnership dashboard"
+                          style={{
+                            flexShrink: 0, marginLeft: 8, color: '#c9a84c', textDecoration: 'none',
+                            display: 'flex', alignItems: 'center',
+                          }}
+                        >
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M5 12h14M12 5l7 7-7 7" />
+                          </svg>
+                        </a>
+                      </div>
+
+                      {/* Contract deliverables grid */}
+                      <div style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.5px', color: '#9CA3AF', fontWeight: 700, marginBottom: 6 }}>
+                        Contract Deliverables
+                      </div>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+                        {[
+                          { label: 'Observations', value: linkedPartnership.observationDays ?? 0, base: linkedPartnership.baseObservationDays },
+                          { label: 'Virtual', value: linkedPartnership.virtualSessions ?? 0, base: linkedPartnership.baseVirtualSessions },
+                          { label: 'Executive', value: linkedPartnership.executiveSessions ?? 0, base: linkedPartnership.baseExecutiveSessions },
+                          { label: 'Hub Seats', value: linkedPartnership.staffEnrolled ?? 0, base: linkedPartnership.baseStaffEnrolled },
+                        ].map(({ label, value, base }) => {
+                          const isRenewal = opp.type === 'renewal' || opp.name?.toUpperCase().includes('RENEWAL')
+                          let diffEl = null
+                          if (isRenewal && base !== null && base !== undefined) {
+                            const diff = value - base
+                            if (diff > 0) {
+                              diffEl = <div style={{ fontSize: 10, color: '#2e7d32', fontWeight: 600, marginTop: 2 }}>+{diff} from last year</div>
+                            } else {
+                              diffEl = <div style={{ fontSize: 10, color: '#999', marginTop: 2 }}>Same as last year</div>
+                            }
+                          }
+                          return (
+                            <div key={label} style={{
+                              background: '#F9FAFB', borderRadius: 6, border: '1px solid #E5E7EB',
+                              padding: '8px 6px', textAlign: 'center',
+                            }}>
+                              <div style={{ fontSize: 10, color: '#9CA3AF', fontWeight: 600, marginBottom: 2 }}>{label}</div>
+                              <div style={{ fontSize: 18, fontWeight: 800, color: '#1e2749' }}>{value}</div>
+                              {diffEl}
+                            </div>
+                          )
+                        })}
+                      </div>
                     </div>
                   </>
                 )}
