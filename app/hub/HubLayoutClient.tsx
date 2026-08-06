@@ -78,7 +78,7 @@ function HubLayoutInner({ children }: { children: React.ReactNode }) {
       <main className="flex-1" style={showNav ? { paddingTop: 'calc(60px + var(--admin-banner-h, 0px) + var(--partnership-banner-h, 0px))' } : undefined}>
         {children}
       </main>
-      {showNav && <HubFooter />}
+      {showNav && !isLessonPlayer && <HubFooter />}
       {showCheckIn && !isLessonPlayer && (
         <CheckInSlideUp onDismiss={() => setShowCheckIn(false)} />
       )}
