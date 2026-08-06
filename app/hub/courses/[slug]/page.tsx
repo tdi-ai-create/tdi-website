@@ -398,12 +398,10 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
   const handleEnroll = async () => {
     const success = await enroll();
     if (success) {
-      const newCount = (enrolledCount ?? 0) + 1;
-      setEnrolledCount(newCount);
-      const countMsg = newCount > 1
-        ? `You're joining ${newCount.toLocaleString()} educators in this course.`
-        : 'Welcome to the course!';
-      showToast(`You're in! ${countMsg}`, 'success');
+      // Go straight to the first lesson. No second click needed.
+      if (modules[0]?.lessons[0]) {
+        router.push(`/hub/courses/${course.slug}/${modules[0].lessons[0].slug || modules[0].lessons[0].id}`);
+      }
     } else {
       showToast('Failed to enroll. Please try again.', 'error');
     }
