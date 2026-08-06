@@ -51,7 +51,7 @@ export async function POST(
   // Auto-create deliverables from signed contract
   const { data: fullQuote } = await supabase
     .from('quotes')
-    .select('quote_number, contact_organization, contract_type, district_id, quote_packages(id, total_amount, line_items)')
+    .select('quote_number, contact_organization, contract_type, district_id, service_start_date, service_end_date, quote_packages(id, total_amount, line_items)')
     .eq('id', id)
     .single()
 
@@ -197,7 +197,10 @@ export async function POST(
     if (!partnershipId && (orgName || quoteContactEmail)) {
       isNewPartnership = true
       const name = orgName || quoteContactEmail.split('@')[0]
-      const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+      let slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+      // Ensure slug uniqueness (partnerships.slug has a UNIQUE constraint)
+      const { data: slugCheck } = await supabase.from('partnerships').select('id').eq('slug', slug).maybeSingle()
+      if (slugCheck) slug = `${slug}-${Date.now().toString(36)}`
 
       // Use quote dates if available, otherwise default to today + 1 year
       const contractStart = (fullQuote as any).service_start_date || new Date().toISOString().split('T')[0]
@@ -273,18 +276,37 @@ export async function POST(
           else if (d.service_type === 'executive_session') executives += d.quantity
           else if (d.service_type === 'hub_membership') staffCount += d.quantity
         }
-        await supabase.from('partnerships')
-          .update({
-            observation_days_total: observations,
-            base_observation_days: observations,
-            virtual_sessions_total: virtuals,
-            base_virtual_sessions: virtuals,
-            executive_sessions_total: executives,
-            base_executive_sessions: executives,
-            staff_enrolled: staffCount,
-            base_staff_enrolled: staffCount,
-          })
-          .eq('id', partnershipId)
+        if (isNewPartnership) {
+          // New partnership: set counts directly
+          await supabase.from('partnerships')
+            .update({
+              observation_days_total: observations,
+              base_observation_days: observations,
+              virtual_sessions_total: virtuals,
+              base_virtual_sessions: virtuals,
+              executive_sessions_total: executives,
+              base_executive_sessions: executives,
+              staff_enrolled: staffCount,
+              base_staff_enrolled: staffCount,
+            })
+            .eq('id', partnershipId)
+        } else {
+          // Existing partnership: add to current counts (handles add-on quotes)
+          const { data: current } = await supabase.from('partnerships')
+            .select('observation_days_total, virtual_sessions_total, executive_sessions_total, staff_enrolled')
+            .eq('id', partnershipId)
+            .single()
+          if (current) {
+            await supabase.from('partnerships')
+              .update({
+                observation_days_total: (current.observation_days_total || 0) + observations,
+                virtual_sessions_total: (current.virtual_sessions_total || 0) + virtuals,
+                executive_sessions_total: (current.executive_sessions_total || 0) + executives,
+                staff_enrolled: (current.staff_enrolled || 0) + staffCount,
+              })
+              .eq('id', partnershipId)
+          }
+        }
       }
 
       // 6. Carry over sales data to existing partnerships (for matched, not just new)

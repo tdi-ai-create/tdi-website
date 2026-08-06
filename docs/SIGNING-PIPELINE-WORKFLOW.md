@@ -113,7 +113,7 @@ Renewals follow the same signing flow, but the partnership matching (Strategies 
 - A new partnership note is created with the renewal's sales context
 - District link is preserved (not overwritten if already set)
 
-**Important:** If a renewal changes the number of observations, virtuals, or executives, the new counts replace the old ones. Base counts are also reset. The `_used` counts are NOT reset (those track actual delivery).
+**Important:** For matched (existing) partnerships, session counts from the new quote are ADDED to the existing counts. This handles both renewals and add-on quotes safely. For brand-new partnerships, counts are set directly. The `_used` counts are never modified by signing (those track actual delivery).
 
 ---
 
