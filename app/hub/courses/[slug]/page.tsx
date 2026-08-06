@@ -665,7 +665,7 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
             {/* Back link */}
             <Link
               href="/hub/courses"
-              className="inline-flex items-center gap-1.5 mb-4 text-sm"
+              className="flex items-center gap-1.5 mb-4 text-sm w-fit"
               style={{ color: 'rgba(255,255,255,0.4)', textDecoration: 'none' }}
             >
               <ArrowLeft size={14} />
