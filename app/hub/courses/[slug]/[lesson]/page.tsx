@@ -1144,11 +1144,35 @@ export default function LessonPage({ params }: LessonPageProps) {
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
 
           {/* Content body: video OR gate */}
-          <div style={{ flex: 1, position: 'relative', overflow: 'hidden' }}>
+          <div style={{ flex: 1, position: 'relative', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+
+            {/* Lesson header (above video, always visible for video/resource state) */}
+            {!isGateActive && (
+              <div style={{
+                padding: '12px 24px', flexShrink: 0,
+                background: dark ? '#151922' : 'white',
+                borderBottom: `1px solid ${theme.border}`,
+              }}>
+                <h1 style={{
+                  fontFamily: "'Source Serif 4', Georgia, serif", fontSize: 20, fontWeight: 600,
+                  color: theme.title, margin: 0,
+                }}>
+                  {currentLesson.title}
+                </h1>
+                <p style={{
+                  fontSize: 13, color: theme.textMuted, marginTop: 2,
+                  fontFamily: "'DM Sans', sans-serif",
+                }}>
+                  {tUI('Lesson')} {currentIndex + 1} {tUI('of')} {allLessons.length}
+                  {durationStr ? ` . ${durationStr}` : ''}
+                  {nextLesson ? ` . ${currentGate && isGateActive ? tUI('Answer the check-in, then continue') : tUI('Watch, then continue to') + ' ' + nextLesson.title}` : ''}
+                </p>
+              </div>
+            )}
 
             {/* VIDEO STATE */}
             {!isGateActive && (
-              <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
                 {/* Video player or resource card */}
                 {videoId ? (
                   <div style={{
@@ -1323,38 +1347,37 @@ export default function LessonPage({ params }: LessonPageProps) {
           {/* ================================================================ */}
           <div style={{
             display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-            padding: '10px 24px', background: theme.barBg,
+            padding: '8px 24px', background: theme.barBg,
             borderTop: `1px solid ${theme.barBorder}`, flexShrink: 0,
           }}>
-            {/* Left: lesson title + meta */}
-            <div>
-              <div style={{
-                fontFamily: "'Source Serif 4', Georgia, serif", fontSize: 16, fontWeight: 600,
-                color: theme.title,
-              }}>
-                {currentLesson.title}
-              </div>
-              <div style={{ fontSize: 12, color: theme.textMuted, marginTop: 1 }}>
-                {videoId ? 'Video' : resource ? 'Resource' : 'Lesson'}
-                {durationStr ? `, ${durationStr}` : ''}
-                {!isGateActive && !currentGate && !isComplete && (
-                  <button
-                    onClick={handleMarkComplete}
-                    style={{
-                      marginLeft: 12, background: 'none', border: 'none', cursor: 'pointer',
-                      color: '#E8B84B', fontSize: 12, fontWeight: 500,
-                      fontFamily: "'DM Sans', sans-serif", padding: 0,
-                    }}
-                  >
-                    Mark complete
-                  </button>
-                )}
-                {isComplete && !currentGate && (
-                  <span style={{ marginLeft: 12, color: '#16A34A', fontSize: 12 }}>
-                    Completed
-                  </span>
-                )}
-              </div>
+            {/* Left: mark complete / completed status */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              {!isGateActive && !currentGate && !isComplete && (
+                <button
+                  onClick={handleMarkComplete}
+                  style={{
+                    background: 'none', border: `1px solid ${dark ? 'rgba(255,255,255,0.1)' : '#E5E7EB'}`,
+                    borderRadius: 8, padding: '6px 14px', cursor: 'pointer',
+                    color: '#E8B84B', fontSize: 12, fontWeight: 600,
+                    fontFamily: "'DM Sans', sans-serif",
+                    display: 'flex', alignItems: 'center', gap: 5,
+                  }}
+                >
+                  <Check size={13} />
+                  {tUI('Mark complete')}
+                </button>
+              )}
+              {isComplete && !currentGate && (
+                <span style={{ color: '#16A34A', fontSize: 12, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 5 }}>
+                  <Check size={13} />
+                  {tUI('Completed')}
+                </span>
+              )}
+              {isGateActive && (
+                <span style={{ color: '#E8B84B', fontSize: 12, fontWeight: 500 }}>
+                  {tUI('Complete the check-in to continue')}
+                </span>
+              )}
             </div>
 
             {/* Right: transcript toggle, nav arrows, next button */}
