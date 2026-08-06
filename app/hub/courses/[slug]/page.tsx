@@ -14,18 +14,14 @@ import {
   BookOpen,
   Award,
   CheckCircle,
-  Zap,
-  ChevronDown,
-  ChevronRight,
   Play,
   FileText,
-  Download,
-  Clock,
 } from 'lucide-react';
 import CourseCard from '@/components/hub/CourseCard';
 import CommunityTabs from '@/components/hub/CommunityTabs';
 import AchievementInsights from '@/components/hub/AchievementInsights';
 import CapacityFeedbackPrompt, { shouldShowCapacityFeedback } from '@/components/hub/CapacityFeedbackPrompt';
+import { computeGatePositions } from '@/lib/hub/quiz';
 import type { QuizQuestion, QuizOption, QuizResponse } from '@/lib/hub/quiz';
 
 // Category colors
@@ -38,7 +34,7 @@ const CATEGORY_COLORS: Record<string, string> = {
   'New Teacher': '#5BBEC4',
 };
 
-// Testimonials pool - varied roles across K-12
+// Testimonials pool
 const TESTIMONIALS = [
   { quote: "I printed this out and taped it to my desk. It's the first thing I look at every morning now.", role: "3rd grade teacher", time: "2 days ago" },
   { quote: "Shared this with my whole team at our PLC meeting. Three of them started using it that same week.", role: "Instructional coach", time: "4 days ago" },
@@ -54,26 +50,57 @@ const TESTIMONIALS = [
   { quote: "As a building sub, I need tools that work anywhere. This delivers.", role: "Substitute teacher", time: "4 days ago" },
 ];
 
-// Pick 1-3 testimonials deterministically based on course ID
+// Pick 3 testimonials deterministically based on course ID
 function getTestimonials(id: string): typeof TESTIMONIALS {
   let hash = 0;
   for (let i = 0; i < id.length; i++) hash = ((hash << 5) - hash + id.charCodeAt(i)) | 0;
   const idx = Math.abs(hash) % TESTIMONIALS.length;
-  const count = (Math.abs(hash) % 3) + 1; // 1-3 testimonials
   const result = [];
-  for (let i = 0; i < count; i++) {
+  for (let i = 0; i < 3; i++) {
     result.push(TESTIMONIALS[(idx + i) % TESTIMONIALS.length]);
   }
   return result;
 }
 
-// Difficulty label + color
-function getDifficultyDisplay(difficulty: string | null | undefined) {
-  switch (difficulty) {
-    case 'beginner': return { label: 'Beginner', color: '#6BA368' };
-    case 'intermediate': return { label: 'Intermediate', color: '#E8B84B' };
-    case 'advanced': return { label: 'Advanced', color: '#E8927C' };
-    default: return { label: 'All Levels', color: '#7C9CBF' };
+// Format duration_seconds to m:ss
+function formatDuration(seconds: number | null | undefined): string | null {
+  if (!seconds || seconds <= 0) return null;
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  return `${mins}:${secs.toString().padStart(2, '0')}`;
+}
+
+// Gate type display text
+function getGateLabel(type: string): string {
+  switch (type) {
+    case 'multiple_choice':
+    case 'true_false':
+      return "Quick check: Let's make sure this clicked";
+    case 'reflection':
+      return 'Reflection: Your turn to think on this';
+    case 'action_step':
+      return 'Action step: Something to try this week';
+    case 'checkpoint':
+      return 'Checkpoint: Before you go, the big ideas';
+    default:
+      return "Quick check: Let's make sure this clicked";
+  }
+}
+
+// Gate type icon character
+function getGateIcon(type: string): string {
+  switch (type) {
+    case 'multiple_choice':
+    case 'true_false':
+      return '?';
+    case 'reflection':
+      return '\u270E'; // pencil
+    case 'action_step':
+      return '\u2713'; // checkmark
+    case 'checkpoint':
+      return '\u2605'; // star
+    default:
+      return '?';
   }
 }
 
@@ -81,6 +108,7 @@ interface Lesson {
   id: string;
   slug: string;
   title: string;
+  duration_seconds: number | null;
   estimated_minutes: number;
   type: string;
   is_free_preview: boolean;
@@ -128,14 +156,6 @@ interface RelatedCourse {
   thumbnail_url?: string;
 }
 
-interface RelatedQuickWin {
-  id: string;
-  slug: string;
-  title: string;
-  category: string;
-  duration_minutes: number;
-}
-
 interface CourseDetailPageProps {
   params: Promise<{ slug: string }>;
 }
@@ -148,16 +168,14 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
 
   const [course, setCourse] = useState<Course | null>(null);
   const [modules, setModules] = useState<Module[]>([]);
-  const [expandedModules, setExpandedModules] = useState<Set<string>>(new Set());
   const [relatedCourses, setRelatedCourses] = useState<RelatedCourse[]>([]);
   const [notified, setNotified] = useState(false);
-  const [authorCourses, setAuthorCourses] = useState<RelatedCourse[]>([]);
   const [enrolledCount, setEnrolledCount] = useState<number | null>(null);
-  const [relatedQuickWins, setRelatedQuickWins] = useState<RelatedQuickWin[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const [showCapacityFeedback, setShowCapacityFeedback] = useState(false);
   const capacityFeedbackShownRef = useRef(false);
+  const [activeTab, setActiveTab] = useState<'course' | 'community'>('course');
 
   // Formative check-ins state
   const [checkInQuestions, setCheckInQuestions] = useState<QuizQuestion[]>([]);
@@ -207,11 +225,11 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
           .order('sort_order', { ascending: true });
 
         // Fetch lessons via module IDs (hub_lessons.course_id is often null; modules are the reliable FK)
-        const moduleIds = (modulesData || []).map((m) => m.id);
+        const moduleIds = (modulesData || []).map((m: { id: string }) => m.id);
         const { data: lessonsData } = moduleIds.length > 0
           ? await supabase
               .from('hub_lessons')
-              .select('id, slug, title, estimated_minutes, type, is_free_preview, is_quick_win, sort_order, module_id, transcript, transcript_es')
+              .select('id, slug, title, duration_seconds, estimated_minutes, type, is_free_preview, is_quick_win, sort_order, module_id, transcript, transcript_es')
               .in('module_id', moduleIds)
               .order('sort_order', { ascending: true })
           : { data: [] as any[] };
@@ -222,7 +240,7 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
         const allLessonIds: string[] = [];
 
         // Initialize modules
-        modulesData?.forEach((mod) => {
+        modulesData?.forEach((mod: { id: string; title: string; sort_order: number }) => {
           moduleMap.set(mod.id, {
             id: mod.id,
             title: mod.title,
@@ -231,12 +249,13 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
           });
         });
 
-        // Assign lessons to modules (convert transcript presence to boolean flags)
-        lessonsData?.forEach((raw) => {
+        // Assign lessons to modules
+        lessonsData?.forEach((raw: any) => {
           const lesson: Lesson = {
             id: raw.id,
             slug: raw.slug,
             title: raw.title,
+            duration_seconds: raw.duration_seconds,
             estimated_minutes: raw.estimated_minutes,
             type: raw.type,
             is_free_preview: raw.is_free_preview,
@@ -273,9 +292,6 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
 
         setModules(finalModules);
 
-        // Expand all modules by default
-        setExpandedModules(new Set(finalModules.map((m) => m.id)));
-
         // Fetch formative check-in questions for all lessons in this course
         if (allLessonIds.length > 0) {
           const { data: questionsData } = await supabase
@@ -299,40 +315,10 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
           .limit(3);
 
         if (relatedData) {
-          setRelatedCourses(relatedData.map(c => ({
+          setRelatedCourses(relatedData.map((c: any) => ({
             ...c,
             thumbnail_url: c.thumbnail_url || undefined,
           })));
-        }
-
-        // Fetch other courses by same author (if author exists)
-        if (courseData.author_name) {
-          const { data: authorData } = await supabase
-            .from('hub_courses')
-            .select('id, slug, title, description, category, pd_hours, estimated_minutes, thumbnail_url')
-            .eq('author_name', courseData.author_name)
-            .eq('is_published', true)
-            .neq('id', courseData.id)
-            .limit(3);
-
-          if (authorData) {
-            setAuthorCourses(authorData.map(c => ({
-              ...c,
-              thumbnail_url: c.thumbnail_url || undefined,
-            })));
-          }
-        }
-
-        // Fetch related quick wins (same category)
-        const { data: relatedQW } = await supabase
-          .from('hub_quick_wins')
-          .select('id, slug, title, category, duration_minutes')
-          .eq('is_published', true)
-          .eq('category', courseData.category)
-          .limit(4);
-
-        if (relatedQW) {
-          setRelatedQuickWins(relatedQW as RelatedQuickWin[]);
         }
       } catch (error) {
         console.error('Error loading course:', error);
@@ -493,47 +479,37 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
     setTimeout(() => setToast(null), 3000);
   };
 
-  const toggleModule = (moduleId: string) => {
-    const newExpanded = new Set(expandedModules);
-    if (newExpanded.has(moduleId)) {
-      newExpanded.delete(moduleId);
-    } else {
-      newExpanded.add(moduleId);
-    }
-    setExpandedModules(newExpanded);
-  };
-
   const getTotalLessons = () => {
     return modules.reduce((acc, mod) => acc + mod.lessons.length, 0);
   };
 
-  const categoryColor = course ? CATEGORY_COLORS[course.category] || '#E8B84B' : '#E8B84B';
+  // Flatten all lessons for gate computation
+  const allLessonsFlat = modules.flatMap(mod => mod.lessons);
+  const gatePositions = computeGatePositions(checkInQuestions, allLessonsFlat.length);
 
   // Loading skeleton
   if (isLoading) {
     return (
-      <div className="p-4 md:p-8 max-w-[1100px] mx-auto">
-        <div className="h-5 bg-gray-200 rounded w-48 mb-6 animate-pulse" />
-        <div className="grid lg:grid-cols-[1fr_320px] gap-8">
-          <div>
-            <div className="hub-card animate-pulse">
-              <div className="h-8 bg-gray-200 rounded w-3/4 mb-4" />
-              <div className="h-6 bg-gray-100 rounded w-24 mb-4" />
-              <div className="h-20 bg-gray-100 rounded mb-4" />
-              <div className="h-10 bg-gray-200 rounded w-40" />
-            </div>
-            <div className="hub-card mt-6 animate-pulse">
-              <div className="h-6 bg-gray-200 rounded w-40 mb-4" />
-              <div className="space-y-3">
-                {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="h-14 bg-gray-100 rounded" />
-                ))}
+      <div style={{ background: '#F5F7FA', minHeight: '100vh' }}>
+        {/* Hero skeleton */}
+        <div style={{ background: 'linear-gradient(135deg, #1B2A4A 0%, #1E3A5F 50%, #2B4A72 100%)' }}>
+          <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '48px 40px 52px' }}>
+            <div className="animate-pulse">
+              <div className="h-4 bg-white/10 rounded w-32 mb-6" />
+              <div className="h-6 bg-white/10 rounded w-24 mb-4" />
+              <div className="h-10 bg-white/10 rounded w-3/4 mb-4" />
+              <div className="h-16 bg-white/10 rounded w-2/3 mb-6" />
+              <div className="flex gap-3">
+                <div className="h-8 bg-white/10 rounded-full w-24" />
+                <div className="h-8 bg-white/10 rounded-full w-24" />
               </div>
             </div>
           </div>
-          <div className="space-y-4">
-            <div className="hub-card h-40 animate-pulse" />
-            <div className="hub-card h-48 animate-pulse" />
+        </div>
+        <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '24px 40px' }}>
+          <div className="animate-pulse">
+            <div className="bg-white rounded-2xl h-48 mb-5" />
+            <div className="bg-white rounded-2xl h-64" />
           </div>
         </div>
       </div>
@@ -594,7 +570,6 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
   const comingSoon = totalLessons === 0;
   const completedLessons = progress.completedLessons || 0;
   const progressPct = progress.progressPct || 0;
-  const difficultyInfo = getDifficultyDisplay(course.difficulty);
 
   // CTA button label
   const ctaLabel = comingSoon
@@ -605,11 +580,54 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
         ? tUI('Enrolling...')
         : !user
           ? tUI('Sign in to enroll')
-          : tUI('Start Course');
+          : tUI('Start Learning');
+
+  const handleCtaClick = () => {
+    if (comingSoon) {
+      if (notified) return;
+      fetch('/api/hub/notify-course-interest', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          courseTitle: course.title,
+          courseSlug: course.slug,
+          userEmail: user?.email,
+          userName: user?.email?.split('@')[0] || 'Educator',
+        }),
+      }).catch(() => {});
+      setNotified(true);
+      return;
+    }
+
+    if (isEnrolled) {
+      if (progressPct === 100) {
+        if (modules[0]?.lessons[0]) {
+          router.push(`/hub/courses/${course.slug}/${modules[0].lessons[0].slug || modules[0].lessons[0].id}`);
+        }
+        return;
+      }
+      // Find next incomplete lesson
+      for (const mod of modules) {
+        for (const l of mod.lessons) {
+          if (progress.lessonProgress.get(l.id)?.status !== 'completed') {
+            router.push(`/hub/courses/${course.slug}/${l.slug || l.id}`);
+            return;
+          }
+        }
+      }
+      // All complete, go to first lesson
+      if (modules[0]?.lessons[0]) {
+        router.push(`/hub/courses/${course.slug}/${modules[0].lessons[0].slug || modules[0].lessons[0].id}`);
+      }
+    } else {
+      handleEnroll();
+    }
+  };
+
+  const testimonials = getTestimonials(course.id);
 
   return (
     <div style={{ background: '#F5F7FA', minHeight: '100vh' }}>
-    <div className="p-4 md:p-8 max-w-[1100px] mx-auto">
       {/* Toast notification */}
       {toast && (
         <div
@@ -625,133 +643,111 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
         </div>
       )}
 
-      {/* Breadcrumb */}
-      <nav className="mb-6">
-        <ol className="flex items-center gap-2 text-sm" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-          <li>
-            <Link href="/hub/courses" className="text-gray-500 hover:text-gray-700">
-              Courses
+      {/* ============================================================ */}
+      {/* HERO (full-width navy gradient)                               */}
+      {/* ============================================================ */}
+      <div
+        className="relative overflow-hidden"
+        style={{ background: 'linear-gradient(135deg, #1B2A4A 0%, #1E3A5F 50%, #2B4A72 100%)' }}
+      >
+        {/* Decorative circle */}
+        <div
+          className="absolute rounded-full pointer-events-none"
+          style={{ right: '-100px', top: '-100px', width: '500px', height: '500px', background: 'rgba(232,184,75,0.04)' }}
+        />
+
+        <div
+          className="relative z-10"
+          style={{ maxWidth: '1100px', margin: '0 auto', padding: '48px 40px 52px', display: 'grid', gridTemplateColumns: '1fr 380px', gap: '48px', alignItems: 'start' }}
+        >
+          {/* Left column */}
+          <div>
+            {/* Back link */}
+            <Link
+              href="/hub/courses"
+              className="inline-flex items-center gap-1.5 mb-4 text-sm"
+              style={{ color: 'rgba(255,255,255,0.4)', textDecoration: 'none' }}
+            >
+              <ArrowLeft size={14} />
+              {tUI('Back to Courses')}
             </Link>
-          </li>
-          <li className="text-gray-400">/</li>
-          <li className="text-gray-700 truncate max-w-[200px]">{t(course.title, course.title_es)}</li>
-        </ol>
-      </nav>
 
-      {/* ============================================================ */}
-      {/* 1. HERO + CTA + SIDEBAR                                       */}
-      {/* ============================================================ */}
-      <div className="grid lg:grid-cols-[1fr_320px] gap-6">
-        {/* Main Content */}
-        <div>
-          {/* Course Hero */}
-          <section
-            className="relative text-white overflow-hidden rounded-2xl"
-            style={{ background: 'linear-gradient(135deg, #1B2A4A 0%, #2d3a5c 60%, #38618C 100%)' }}
-          >
-            {/* Decorative circle */}
-            <div
-              className="absolute rounded-full pointer-events-none"
-              style={{ right: '-40px', top: '-60px', width: '240px', height: '240px', background: 'rgba(255,186,6,0.06)' }}
-            />
+            {/* Category tag */}
+            {course.category && (
+              <div
+                className="inline-block text-xs font-bold px-3.5 py-1 rounded-full mb-4"
+                style={{
+                  background: 'rgba(232,184,75,0.15)',
+                  border: '1px solid rgba(232,184,75,0.3)',
+                  color: '#E8B84B',
+                  letterSpacing: '1.5px',
+                  textTransform: 'uppercase',
+                }}
+              >
+                {course.category}
+              </div>
+            )}
 
-            <div className="relative z-10 px-9 py-8">
-              {/* Category tag */}
-              {course.category && (
-                <div
-                  className="inline-block text-xs font-bold px-3 py-1 rounded-full mb-3"
+            {/* Title */}
+            <h1
+              className="font-bold text-white mb-4 leading-tight"
+              style={{
+                fontFamily: "'Source Serif 4', Georgia, serif",
+                fontSize: '38px',
+                lineHeight: '1.15',
+              }}
+            >
+              {t(course.title, course.title_es)}
+            </h1>
+
+            {/* Description */}
+            {course.description && (
+              <p
+                className="mb-6"
+                style={{
+                  fontSize: '15px',
+                  lineHeight: '1.7',
+                  color: 'rgba(255,255,255,0.6)',
+                  maxWidth: '520px',
+                }}
+              >
+                {t(course.description, course.description_es)}
+              </p>
+            )}
+
+            {/* Hero pills: only lessons + check-ins */}
+            <div className="flex gap-3 flex-wrap">
+              {totalLessons > 0 && (
+                <span
+                  className="rounded-full px-4 py-1.5 text-sm font-medium"
                   style={{
-                    background: 'rgba(254,243,199,0.15)',
-                    border: '1px solid rgba(255,186,6,0.3)',
-                    color: '#FFBA06',
-                    letterSpacing: '0.06em',
-                    textTransform: 'uppercase',
+                    background: 'rgba(255,255,255,0.08)',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    color: 'rgba(255,255,255,0.7)',
                   }}
                 >
-                  {course.category.replace(/-/g, ' ').replace(/&/g, '&').replace(/\b\w/g, c => c.toUpperCase())}
-                </div>
+                  <strong className="text-white">{totalLessons}</strong> {totalLessons === 1 ? 'lesson' : 'lessons'}
+                </span>
               )}
-
-              {/* Title */}
-              <h1 className="text-2xl font-bold text-white mb-2 leading-snug" style={{ maxWidth: '560px' }}>
-                {t(course.title, course.title_es)}
-              </h1>
-
-              {/* Description */}
-              {course.description && (
-                <p className="text-sm mb-6 leading-relaxed" style={{ color: 'rgba(255,255,255,0.6)', maxWidth: '560px' }}>
-                  {t(course.description, course.description_es)}
-                </p>
+              {checkInQuestions.length > 0 && (
+                <span
+                  className="rounded-full px-4 py-1.5 text-sm font-medium"
+                  style={{
+                    background: 'rgba(255,255,255,0.08)',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    color: 'rgba(255,255,255,0.7)',
+                  }}
+                >
+                  <strong className="text-white">{checkInQuestions.length}</strong> check-in{checkInQuestions.length !== 1 ? 's' : ''}
+                </span>
               )}
-
-              {/* Stats row: Lessons, Estimated Time, Difficulty, Capacity, Enrolled */}
-              <div
-                className="flex flex-wrap gap-0 pt-5"
-                style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}
-              >
-                {totalLessons > 0 && (
-                  <div className="pr-6" style={{ borderRight: '1px solid rgba(255,255,255,0.08)' }}>
-                    <div className="text-xl font-bold text-white">{totalLessons}</div>
-                    <div className="text-xs font-bold tracking-widest uppercase mt-0.5" style={{ color: 'rgba(255,255,255,0.4)', letterSpacing: '0.06em' }}>Lessons</div>
-                  </div>
-                )}
-                {course.estimated_minutes != null && course.estimated_minutes > 0 && (
-                  <div className="px-6" style={{ borderRight: '1px solid rgba(255,255,255,0.08)' }}>
-                    <div className="text-xl font-bold text-white">
-                      {course.estimated_minutes >= 60
-                        ? `${Math.floor(course.estimated_minutes / 60)}h ${course.estimated_minutes % 60 > 0 ? `${course.estimated_minutes % 60}m` : ''}`
-                        : `${course.estimated_minutes}m`}
-                    </div>
-                    <div className="text-xs font-bold tracking-widest uppercase mt-0.5" style={{ color: 'rgba(255,255,255,0.4)', letterSpacing: '0.06em' }}>Est. Time</div>
-                  </div>
-                )}
-                <div className="px-6" style={
-                  (course.capacity || (enrolledCount !== null && enrolledCount > 0))
-                    ? { borderRight: '1px solid rgba(255,255,255,0.08)' }
-                    : {}
-                }>
-                  <div className="text-xl font-bold" style={{ color: difficultyInfo.color }}>
-                    {difficultyInfo.label}
-                  </div>
-                  <div className="text-xs font-bold tracking-widest uppercase mt-0.5" style={{ color: 'rgba(255,255,255,0.4)', letterSpacing: '0.06em' }}>Difficulty</div>
-                </div>
-                {course.capacity && (
-                  <div className="px-6" style={(enrolledCount !== null && enrolledCount > 0) ? { borderRight: '1px solid rgba(255,255,255,0.08)' } : {}}>
-                    <div
-                      className="text-xl font-bold capitalize"
-                      style={{
-                        color: course.capacity === 'low' ? '#6BA368' : course.capacity === 'medium' ? '#E8B84B' : '#E8927C',
-                      }}
-                    >
-                      {course.capacity.charAt(0).toUpperCase() + course.capacity.slice(1)}
-                    </div>
-                    <div
-                      className="text-xs font-bold tracking-widest uppercase mt-0.5"
-                      style={{ color: 'rgba(255,255,255,0.4)', letterSpacing: '0.06em' }}
-                      title="How action-ready a resource is"
-                    >
-                      Lift
-                    </div>
-                  </div>
-                )}
-                {enrolledCount !== null && enrolledCount > 0 && (
-                  <div className="px-6">
-                    <div className="text-xl font-bold" style={{ color: '#E8927C' }}>
-                      {enrolledCount.toLocaleString()}
-                    </div>
-                    <div className="text-xs font-bold tracking-widest uppercase mt-0.5" style={{ color: 'rgba(255,255,255,0.4)', letterSpacing: '0.06em' }}>
-                      Enrolled
-                    </div>
-                  </div>
-                )}
-              </div>
             </div>
 
-            {/* Progress strip - only show if enrolled */}
+            {/* Progress strip (enrolled only) */}
             {enrollment && (
               <div
-                className="px-9 py-4 flex items-center gap-4"
-                style={{ background: 'rgba(255,255,255,0.05)', borderTop: '1px solid rgba(255,255,255,0.06)' }}
+                className="flex items-center gap-4 mt-6 pt-5"
+                style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}
               >
                 <span className="text-xs font-medium" style={{ color: 'rgba(255,255,255,0.4)', whiteSpace: 'nowrap' }}>
                   Your progress
@@ -759,748 +755,462 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
                 <div className="flex-1 h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.1)' }}>
                   <div
                     className="h-full rounded-full transition-all duration-500"
-                    style={{ width: `${progressPct}%`, background: 'linear-gradient(90deg, #FFBA06, #F59E0B)' }}
+                    style={{ width: `${progressPct}%`, background: 'linear-gradient(90deg, #E8B84B, #F59E0B)' }}
                   />
                 </div>
-                <span className="text-sm font-bold" style={{ color: '#FFBA06', whiteSpace: 'nowrap' }}>
+                <span className="text-sm font-bold" style={{ color: '#E8B84B', whiteSpace: 'nowrap' }}>
                   {progressPct}%
                 </span>
               </div>
             )}
-          </section>
+          </div>
 
-          {/* More from this instructor */}
-          {authorCourses.length > 0 && (
-            <div className="mt-8">
-              <h2
-                className="font-semibold mb-4"
-                style={{
-                  fontFamily: "'Source Serif 4', Georgia, serif",
-                  fontSize: '20px',
-                  color: '#2B3A67',
-                }}
-              >
-                More from this instructor
-              </h2>
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {authorCourses.map((c) => (
-                  <CourseCard
-                    key={c.id}
-                    course={c}
-                    enrollment={null}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Sidebar */}
-        <div className="space-y-3">
-          {/* Resume / Start / Completed button + progress */}
+          {/* Right column: CTA card */}
           <div
-            className="bg-white rounded-2xl p-5"
-            style={{ border: '0.5px solid rgba(0,0,0,0.06)' }}
+            className="bg-white rounded-2xl"
+            style={{ padding: '28px' }}
           >
             {comingSoon ? (
               <div className="text-center">
                 <button
-                  onClick={async () => {
-                    if (notified) return;
-                    try {
-                      await fetch('/api/hub/notify-course-interest', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                          courseTitle: course.title,
-                          courseSlug: course.slug,
-                          userEmail: user?.email,
-                          userName: user?.email?.split('@')[0] || 'Educator',
-                        }),
-                      });
-                    } catch {}
-                    setNotified(true);
+                  onClick={handleCtaClick}
+                  className="w-full py-4 rounded-xl text-base font-bold transition-colors cursor-pointer"
+                  style={{
+                    background: notified ? '#D1FAE5' : '#E8B84B',
+                    color: notified ? '#065F46' : '#1E2749',
+                    border: 'none',
+                    fontFamily: "'DM Sans', sans-serif",
                   }}
-                  className="w-full py-3 rounded-xl text-sm font-semibold transition-colors"
-                  style={notified
-                    ? { backgroundColor: '#D1FAE5', color: '#065F46' }
-                    : { backgroundColor: '#ffba06', color: '#1e2749' }
-                  }
                 >
                   {ctaLabel}
                 </button>
-                <p className="text-xs mt-2" style={{ color: '#9CA3AF' }}>
+                <p className="text-sm mt-3" style={{ color: '#9CA3AF' }}>
                   {tUI('This course is launching any day now.')}
                 </p>
               </div>
             ) : (
               <>
                 <button
-                  onClick={() => {
-                    if (isEnrolled) {
-                      if (progressPct === 100) {
-                        // Go to first lesson for completed courses
-                        if (modules[0]?.lessons[0]) {
-                          router.push(`/hub/courses/${course.slug}/${modules[0].lessons[0].slug || modules[0].lessons[0].id}`);
-                        }
-                        return;
-                      }
-                      // Find next incomplete lesson
-                      for (const mod of modules) {
-                        for (const l of mod.lessons) {
-                          if (progress.lessonProgress.get(l.id)?.status !== 'completed') {
-                            router.push(`/hub/courses/${course.slug}/${l.slug || l.id}`);
-                            return;
-                          }
-                        }
-                      }
-                      // All complete, go to first lesson
-                      if (modules[0]?.lessons[0]) {
-                        router.push(`/hub/courses/${course.slug}/${modules[0].lessons[0].slug || modules[0].lessons[0].id}`);
-                      }
-                    } else {
-                      handleEnroll();
-                    }
-                  }}
+                  onClick={handleCtaClick}
                   disabled={isEnrolling || !user}
-                  className="w-full py-3 rounded-xl text-sm font-semibold text-white mb-4 disabled:opacity-50"
+                  className="w-full py-4 rounded-xl text-base font-bold transition-colors cursor-pointer disabled:opacity-50"
                   style={{
-                    background: progressPct === 100 ? '#16A34A' : '#1B2A4A',
+                    background: progressPct === 100 ? '#16A34A' : '#E8B84B',
+                    color: progressPct === 100 ? 'white' : '#1E2749',
+                    border: 'none',
+                    fontFamily: "'DM Sans', sans-serif",
+                    marginBottom: '12px',
                   }}
                 >
                   {ctaLabel}
                 </button>
 
-                {enrollment && (
-                  <>
-                    <div className="h-1.5 rounded-full overflow-hidden mb-1.5" style={{ background: '#F3F4F6' }}>
-                      <div
-                        className="h-full rounded-full transition-all duration-500"
-                        style={{ width: `${progressPct}%`, background: 'linear-gradient(90deg, #FFBA06, #F59E0B)' }}
+                <p className="text-center text-sm mb-5" style={{ color: '#9CA3AF' }}>
+                  Go at your own pace. Pick up where you left off.
+                </p>
+
+                {/* Feature list */}
+                <div>
+                  {[
+                    'Watch short video lessons',
+                    'Answer quick check-ins',
+                    'Download resource packet',
+                    'Earn certificate',
+                  ].map((feature) => (
+                    <div key={feature} className="flex items-center gap-2.5 py-1.5" style={{ fontSize: '13px', color: '#4B5563' }}>
+                      <span
+                        className="flex-shrink-0 rounded-full"
+                        style={{ width: '6px', height: '6px', background: '#E8B84B' }}
                       />
+                      {feature}
                     </div>
-                    <div className="text-xs mb-3" style={{ color: '#9CA3AF' }}>
-                      Lesson {completedLessons} of {totalLessons}
-                    </div>
-                    <div className="text-xs font-medium" style={{ color: '#16A34A' }}>
-                      {progressPct === 100 ? 'Course complete!' : "You're doing great. Keep going!"}
-                    </div>
-                  </>
-                )}
+                  ))}
+                </div>
+
+                {/* Divider */}
+                <div style={{ height: '1px', background: '#F3F4F6', margin: '16px 0' }} />
+
+                {/* Certificate badge */}
+                <div className="flex items-center gap-2.5">
+                  <Award size={18} style={{ color: '#D97706' }} />
+                  <span className="text-sm" style={{ color: '#6B7280' }}>Certificate of Completion included</span>
+                </div>
               </>
             )}
           </div>
+        </div>
+      </div>
 
-          {/* Certificate Preview */}
-          <div
-            className="rounded-xl p-4 flex items-center gap-3"
-            style={{ background: '#FEF3C7' }}
+      {/* ============================================================ */}
+      {/* TABS + CONTENT AREA                                           */}
+      {/* ============================================================ */}
+      <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '0 40px' }}>
+
+        {/* Tab bar */}
+        <div className="flex gap-0" style={{ borderBottom: '1px solid #E5E7EB', marginTop: '24px', marginBottom: '20px' }}>
+          <button
+            onClick={() => setActiveTab('course')}
+            className="px-5 py-3 text-sm font-medium transition-colors"
+            style={{
+              fontFamily: "'DM Sans', sans-serif",
+              color: activeTab === 'course' ? '#1E2749' : '#9CA3AF',
+              borderBottom: activeTab === 'course' ? '2px solid #E8B84B' : '2px solid transparent',
+              marginBottom: '-1px',
+              background: 'none',
+              border: 'none',
+              borderBottomWidth: '2px',
+              borderBottomStyle: 'solid',
+              borderBottomColor: activeTab === 'course' ? '#E8B84B' : 'transparent',
+              cursor: 'pointer',
+            }}
           >
-            <div
-              className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-              style={{ background: '#FDE68A' }}
-            >
-              <Award size={16} style={{ color: '#D97706' }} />
-            </div>
-            <div>
-              <div className="text-sm font-bold" style={{ color: '#1B2A4A' }}>Certificate of Completion</div>
-              <div className="text-xs" style={{ color: '#9CA3AF' }}>Complete all lessons to earn your certificate</div>
-            </div>
-          </div>
-
-          {/* Meet Your Instructor */}
-          <div
-            className="bg-white rounded-2xl p-5"
-            style={{ border: '0.5px solid rgba(0,0,0,0.06)' }}
+            {tUI('Course')}
+          </button>
+          <button
+            onClick={() => setActiveTab('community')}
+            className="px-5 py-3 text-sm font-medium transition-colors"
+            style={{
+              fontFamily: "'DM Sans', sans-serif",
+              color: activeTab === 'community' ? '#1E2749' : '#9CA3AF',
+              background: 'none',
+              border: 'none',
+              borderBottomWidth: '2px',
+              borderBottomStyle: 'solid',
+              borderBottomColor: activeTab === 'community' ? '#E8B84B' : 'transparent',
+              marginBottom: '-1px',
+              cursor: 'pointer',
+            }}
           >
-            <h3 className="text-sm font-semibold mb-4 whitespace-nowrap" style={{ color: '#1B2A4A', fontSize: '14px' }}>
-              Meet Your Instructor
-            </h3>
+            {tUI('Community')}
+          </button>
+        </div>
 
-            <div className="flex gap-3">
-              <div className="flex-shrink-0">
-                <img
-                  src={course.author_avatar_url || '/team/rae-hughart.jpg'}
-                  alt={course.author_name || 'Teachers Deserve It Team'}
-                  className="w-[50px] h-[50px] rounded-full object-cover"
-                />
-              </div>
-
-              <div className="flex-1 min-w-0">
-                <h4 className="text-sm font-semibold" style={{ color: '#1B2A4A' }}>
-                  {(course.author_name === 'Teachers Deserve It Team' || !course.author_name) ? <>{tUI('Teachers Deserve It')}<br />{tUI('Team')}</> : course.author_name}
-                </h4>
-                <p className="text-xs" style={{ color: '#9CA3AF' }}>
-                  {course.author_name ? 'Educator & Course Creator' : 'Educators supporting teachers'}
-                </p>
-              </div>
-            </div>
-
-            <p className="mt-3 text-xs line-clamp-3" style={{ color: '#6B7280' }}>
-              {course.author_bio ||
-                'Built by educators who believe every teacher deserves support, growth, and a community that gets it.'}
-            </p>
-          </div>
-
-          {/* Testimonials */}
-          {course && (
+        {/* ============================================================ */}
+        {/* COURSE TAB                                                    */}
+        {/* ============================================================ */}
+        {activeTab === 'course' && (
+          <>
+            {/* How This Course Works */}
             <div
-              className="bg-white rounded-2xl p-5"
-              style={{ border: '0.5px solid rgba(0,0,0,0.06)' }}
+              className="bg-white rounded-2xl mb-5"
+              style={{ padding: '32px 36px', border: '0.5px solid rgba(0,0,0,0.06)' }}
             >
-              <p
-                className="mb-3"
-                style={{ color: '#9CA3AF', fontFamily: "'DM Sans', sans-serif", letterSpacing: '0.05em', textTransform: 'uppercase' as const, fontSize: '11px', fontWeight: 600 }}
+              <h2
+                className="font-semibold mb-6"
+                style={{ fontFamily: "'Source Serif 4', Georgia, serif", fontSize: '22px', color: '#1E2749' }}
               >
-                {tUI('What educators are saying')}
-              </p>
-              <div className="space-y-4">
-                {getTestimonials(course.id).map((testimonial, i) => (
-                  <div
-                    key={i}
-                    className="pl-3"
-                    style={{ borderLeft: '3px solid #ffba06' }}
-                  >
-                    <p
-                      className="text-sm mb-1"
-                      style={{
-                        fontFamily: "'Source Serif 4', Georgia, serif",
-                        fontStyle: 'italic',
-                        color: '#374151',
-                        lineHeight: '1.5',
-                      }}
+                {tUI('How This Course Works')}
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {[
+                  { num: 1, title: tUI('Watch'), desc: 'Short video lessons you can fit into a prep period or planning block.' },
+                  { num: 2, title: tUI('Check In'), desc: 'Answer a quick question between sections to make sure the ideas are clicking.' },
+                  { num: 3, title: tUI('Apply'), desc: 'Walk away with strategies you can use in your classroom tomorrow.' },
+                ].map((step) => (
+                  <div key={step.num} className="text-center">
+                    <div
+                      className="mx-auto mb-3 flex items-center justify-center rounded-full font-bold text-white"
+                      style={{ width: '44px', height: '44px', background: '#1E2749', fontSize: '18px' }}
                     >
-                      &ldquo;{testimonial.quote}&rdquo;
-                    </p>
-                    <p
-                      className="text-xs"
-                      style={{ color: '#9CA3AF' }}
-                    >
-                      {testimonial.role}, {testimonial.time}
-                    </p>
+                      {step.num}
+                    </div>
+                    <div className="font-semibold text-sm mb-1.5" style={{ color: '#1E2749' }}>
+                      {step.title}
+                    </div>
+                    <div className="text-sm leading-relaxed" style={{ color: '#6B7280' }}>
+                      {step.desc}
+                    </div>
                   </div>
                 ))}
               </div>
             </div>
-          )}
-        </div>
-      </div>
 
-      {/* ============================================================ */}
-      {/* 2. CURRICULUM OUTLINE WITH PROGRESS                           */}
-      {/* ============================================================ */}
-      {totalLessons > 0 && (
-        <section className="mt-4">
-          <div
-            className="bg-white rounded-2xl overflow-hidden"
-            style={{ border: '0.5px solid rgba(0,0,0,0.06)' }}
-          >
-            {/* Curriculum header with progress bar */}
-            <div className="px-6 py-5" style={{ borderBottom: '1px solid #F3F4F6' }}>
-              <div className="flex items-center justify-between mb-3">
-                <h2
-                  className="font-bold"
-                  style={{
-                    fontFamily: "'Source Serif 4', Georgia, serif",
-                    fontSize: '22px',
-                    color: '#1B2A4A',
-                  }}
+            {/* Curriculum */}
+            {totalLessons > 0 && (
+              <div
+                className="bg-white rounded-2xl overflow-hidden"
+                style={{ border: '0.5px solid rgba(0,0,0,0.06)' }}
+              >
+                {/* Curriculum header */}
+                <div
+                  className="flex items-center justify-between"
+                  style={{ padding: '24px 36px', borderBottom: '1px solid #F3F4F6' }}
                 >
-                  {tUI('Curriculum')}
-                </h2>
-                {isEnrolled && (
-                  <span className="text-sm font-medium" style={{ color: '#9CA3AF' }}>
-                    {completedLessons}/{totalLessons} {tUI('complete')}
+                  <span
+                    className="font-semibold"
+                    style={{ fontFamily: "'Source Serif 4', Georgia, serif", fontSize: '22px', color: '#1E2749' }}
+                  >
+                    {tUI('Course Curriculum')}
                   </span>
-                )}
-              </div>
-              {isEnrolled && (
-                <div className="h-2 rounded-full overflow-hidden" style={{ background: '#F3F4F6' }}>
-                  <div
-                    className="h-full rounded-full transition-all duration-500"
-                    style={{
-                      width: `${progressPct}%`,
-                      background: progressPct === 100
-                        ? 'linear-gradient(90deg, #16A34A, #22C55E)'
-                        : 'linear-gradient(90deg, #FFBA06, #F59E0B)',
-                    }}
-                  />
+                  <span className="text-sm" style={{ color: '#9CA3AF' }}>
+                    {totalLessons} {totalLessons === 1 ? 'lesson' : 'lessons'}
+                    {checkInQuestions.length > 0 && ` + ${checkInQuestions.length} check-in${checkInQuestions.length !== 1 ? 's' : ''}`}
+                  </span>
                 </div>
-              )}
-            </div>
 
-            {/* Modules + lessons */}
-            <div>
-              {modules.map((mod, modIdx) => {
-                const isExpanded = expandedModules.has(mod.id);
-                const modCompleted = mod.lessons.filter(
-                  l => progress.lessonProgress.get(l.id)?.status === 'completed'
-                ).length;
-                const showModuleHeader = modules.length > 1 || mod.title !== 'Course Content';
+                {/* Lesson rows with gate indicators */}
+                <div>
+                  {(() => {
+                    let globalIndex = 0;
+                    return modules.map((mod) =>
+                      mod.lessons.map((lesson) => {
+                        const idx = globalIndex;
+                        globalIndex++;
+                        const isComplete = progress.lessonProgress.get(lesson.id)?.status === 'completed';
+                        const isResource = lesson.type === 'resource' || lesson.type === 'download';
+                        const isVideo = !isResource;
+                        const duration = formatDuration(lesson.duration_seconds);
+                        const gate = gatePositions.get(idx);
 
-                return (
-                  <div key={mod.id}>
-                    {/* Module header (collapsible) */}
-                    {showModuleHeader && (
-                      <button
-                        onClick={() => toggleModule(mod.id)}
-                        className="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-gray-50 transition-colors"
-                        style={{ borderBottom: isExpanded ? '1px solid #F3F4F6' : 'none' }}
-                      >
-                        <div className="flex items-center gap-3">
-                          {isExpanded
-                            ? <ChevronDown size={18} style={{ color: '#9CA3AF' }} />
-                            : <ChevronRight size={18} style={{ color: '#9CA3AF' }} />
-                          }
-                          <span
-                            className="font-semibold text-sm"
-                            style={{ color: '#1B2A4A', fontFamily: "'Source Serif 4', Georgia, serif" }}
-                          >
-                            {mod.title}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <span className="text-xs" style={{ color: '#9CA3AF' }}>
-                            {mod.lessons.length} {mod.lessons.length === 1 ? 'lesson' : 'lessons'}
-                          </span>
-                          {isEnrolled && (
-                            <span className="text-xs font-medium" style={{ color: modCompleted === mod.lessons.length ? '#16A34A' : '#9CA3AF' }}>
-                              {modCompleted}/{mod.lessons.length}
-                            </span>
-                          )}
-                        </div>
-                      </button>
-                    )}
-
-                    {/* Lessons list */}
-                    {(isExpanded || !showModuleHeader) && (
-                      <div>
-                        {mod.lessons.map((lesson, lessonIdx) => {
-                          const isComplete = progress.lessonProgress.get(lesson.id)?.status === 'completed';
-                          const isVideo = lesson.type === 'video';
-
-                          return (
+                        return (
+                          <div key={lesson.id}>
+                            {/* Lesson row */}
                             <div
-                              key={lesson.id}
-                              className="flex items-center gap-3 px-6 py-3 group hover:bg-gray-50 transition-colors"
-                              style={{
-                                borderBottom: lessonIdx < mod.lessons.length - 1 ? '1px solid #F9FAFB' : 'none',
+                              className="flex items-center gap-4 transition-colors hover:bg-gray-50"
+                              style={{ padding: '16px 36px', borderBottom: '1px solid #FAFBFC', cursor: 'pointer' }}
+                              onClick={() => {
+                                if (isEnrolled) {
+                                  router.push(`/hub/courses/${course.slug}/${lesson.slug || lesson.id}`);
+                                }
                               }}
                             >
-                              {/* Completion checkbox / lesson number */}
+                              {/* Number circle or completion indicator */}
                               {isEnrolled ? (
                                 <button
-                                  onClick={() => handleLessonToggle(lesson.id)}
-                                  className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center transition-colors"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleLessonToggle(lesson.id);
+                                  }}
+                                  className="flex-shrink-0 flex items-center justify-center rounded-full transition-colors"
                                   style={{
-                                    background: isComplete ? '#16A34A' : '#F3F4F6',
-                                    border: isComplete ? 'none' : '1.5px solid #D1D5DB',
+                                    width: '34px',
+                                    height: '34px',
+                                    background: isComplete ? '#16A34A' : 'transparent',
+                                    border: isComplete ? 'none' : '2px solid #E5E7EB',
+                                    fontSize: '13px',
+                                    fontWeight: 600,
+                                    color: isComplete ? 'white' : '#9CA3AF',
+                                    cursor: 'pointer',
                                   }}
                                   title={isComplete ? 'Mark incomplete' : 'Mark complete'}
                                 >
-                                  {isComplete && <CheckCircle size={14} style={{ color: 'white' }} />}
+                                  {isComplete ? <CheckCircle size={16} style={{ color: 'white' }} /> : idx + 1}
                                 </button>
                               ) : (
                                 <div
-                                  className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium"
-                                  style={{ background: '#F3F4F6', color: '#9CA3AF' }}
+                                  className="flex-shrink-0 flex items-center justify-center rounded-full"
+                                  style={{
+                                    width: '34px',
+                                    height: '34px',
+                                    border: '2px solid #E5E7EB',
+                                    fontSize: '13px',
+                                    fontWeight: 600,
+                                    color: '#9CA3AF',
+                                  }}
                                 >
-                                  {lessonIdx + 1}
+                                  {idx + 1}
                                 </div>
                               )}
 
-                              {/* Type icon */}
-                              <div className="flex-shrink-0">
-                                {isVideo ? (
-                                  <Play size={14} style={{ color: '#7C9CBF' }} />
-                                ) : (
-                                  <FileText size={14} style={{ color: '#9B7CB8' }} />
-                                )}
-                              </div>
-
-                              {/* Lesson title (clickable if enrolled) */}
-                              {isEnrolled ? (
-                                <Link
-                                  href={`/hub/courses/${course.slug}/${lesson.slug || lesson.id}`}
-                                  className="flex-1 text-sm font-medium hover:underline"
-                                  style={{ color: isComplete ? '#6B7280' : '#1B2A4A', textDecoration: isComplete ? 'line-through' : 'none' }}
-                                >
-                                  {lesson.title}
-                                </Link>
-                              ) : (
-                                <span className="flex-1 text-sm font-medium" style={{ color: '#1B2A4A' }}>
-                                  {lesson.title}
-                                  {lesson.is_free_preview && (
-                                    <span
-                                      className="ml-2 text-xs px-1.5 py-0.5 rounded"
-                                      style={{ background: '#E0F2FE', color: '#0284C7', fontSize: '10px' }}
+                              {/* Lesson info */}
+                              <div className="flex-1">
+                                <div className="text-sm font-medium" style={{ color: isComplete ? '#6B7280' : '#1E2749' }}>
+                                  {isEnrolled ? (
+                                    <Link
+                                      href={`/hub/courses/${course.slug}/${lesson.slug || lesson.id}`}
+                                      className="hover:underline"
+                                      style={{ color: 'inherit', textDecoration: 'none' }}
+                                      onClick={(e) => e.stopPropagation()}
                                     >
-                                      Free Preview
+                                      {lesson.title}
+                                    </Link>
+                                  ) : (
+                                    <span>
+                                      {lesson.title}
+                                      {lesson.is_free_preview && (
+                                        <span
+                                          className="ml-2 text-xs px-1.5 py-0.5 rounded"
+                                          style={{ background: '#E0F2FE', color: '#0284C7', fontSize: '10px' }}
+                                        >
+                                          Free Preview
+                                        </span>
+                                      )}
                                     </span>
                                   )}
-                                </span>
-                              )}
-
-                              {/* Transcript downloads */}
-                              {isVideo && (lesson.has_transcript_en || lesson.has_transcript_es) && (
-                                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                  {lesson.has_transcript_en && (
-                                    <a
-                                      href={`/api/hub/transcripts/${lesson.id}?lang=en`}
-                                      title="Download English transcript"
-                                      className="p-1 rounded hover:bg-gray-100"
-                                    >
-                                      <Download size={12} style={{ color: '#9CA3AF' }} />
-                                    </a>
-                                  )}
-                                  {lesson.has_transcript_es && (
-                                    <a
-                                      href={`/api/hub/transcripts/${lesson.id}?lang=es`}
-                                      title="Download Spanish transcript"
-                                      className="p-1 rounded hover:bg-gray-100"
-                                    >
-                                      <span className="text-xs" style={{ color: '#9CA3AF', fontSize: '10px' }}>ES</span>
-                                    </a>
-                                  )}
                                 </div>
-                              )}
+                                <div className="flex items-center gap-2 mt-0.5">
+                                  <span
+                                    className="text-xs text-white rounded-full px-2 py-0.5"
+                                    style={{
+                                      background: isResource ? '#6BA368' : '#1E2749',
+                                      fontSize: '11px',
+                                    }}
+                                  >
+                                    {isResource ? 'Resource' : 'Video'}
+                                  </span>
+                                </div>
+                              </div>
 
                               {/* Duration */}
-                              {lesson.estimated_minutes != null && lesson.estimated_minutes > 0 && (
-                                <span className="flex-shrink-0 text-xs flex items-center gap-1" style={{ color: '#9CA3AF' }}>
-                                  <Clock size={11} />
-                                  {lesson.estimated_minutes}m
+                              {isVideo && duration && (
+                                <span className="flex-shrink-0 text-xs font-medium" style={{ color: '#9CA3AF' }}>
+                                  {duration}
                                 </span>
                               )}
                             </div>
-                          );
-                        })}
-                      </div>
-                    )}
 
-                    {/* Module separator */}
-                    {modIdx < modules.length - 1 && (
-                      <div style={{ borderBottom: '1px solid #F3F4F6' }} />
-                    )}
-                  </div>
-                );
-              })}
+                            {/* Gate indicator after this lesson */}
+                            {gate && (
+                              <div
+                                className="flex items-center gap-2.5 text-sm font-medium"
+                                style={{
+                                  padding: '11px 36px 11px 56px',
+                                  background: 'linear-gradient(90deg, #FEF9EE 0%, #FFFDF7 100%)',
+                                  borderBottom: '1px solid rgba(232,184,75,0.08)',
+                                  color: '#92400E',
+                                }}
+                              >
+                                <span
+                                  className="flex-shrink-0 flex items-center justify-center rounded-full text-white text-xs font-bold"
+                                  style={{ width: '20px', height: '20px', background: '#E8B84B' }}
+                                >
+                                  {getGateIcon(gate.question_type)}
+                                </span>
+                                {getGateLabel(gate.question_type)}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })
+                    );
+                  })()}
+                </div>
+              </div>
+            )}
+          </>
+        )}
+
+        {/* ============================================================ */}
+        {/* COMMUNITY TAB                                                 */}
+        {/* ============================================================ */}
+        {activeTab === 'community' && (
+          <div>
+            <CommunityTabs
+              contentId={course.id}
+              userId={user?.id}
+              isAdmin={!!user?.email?.toLowerCase().endsWith('@teachersdeserveit.com')}
+              conversationApiPath={`/api/hub/courses/${course.id}/conversation`}
+              qaApiPath={`/api/hub/courses/${course.id}/qa`}
+            />
+
+            <div className="mt-8">
+              <AchievementInsights
+                data={{
+                  name: user?.user_metadata?.display_name || 'Educator',
+                  role: 'Educator',
+                  toolsExplored: 0,
+                  hoursSaved: '0',
+                  daysActive: 0,
+                  recognitionsEarned: 0,
+                  earnedNames: [],
+                  topCategories: [course.category || ''],
+                  communityPosts: 0,
+                  coursesCompleted: 0,
+                  pdHours: 0,
+                }}
+              />
             </div>
           </div>
-        </section>
-      )}
+        )}
 
-      {/* ============================================================ */}
-      {/* 3. FORMATIVE CHECK-INS                                        */}
-      {/* ============================================================ */}
-      {checkInQuestions.length > 0 && (
-        <section className="mt-4">
+        {/* ============================================================ */}
+        {/* TESTIMONIALS (below tabs, always visible)                     */}
+        {/* ============================================================ */}
+        <div style={{ marginTop: '32px', marginBottom: '40px' }}>
           <h2
-            className="font-bold mb-4"
-            style={{
-              fontFamily: "'Source Serif 4', Georgia, serif",
-              fontSize: '22px',
-              color: '#1B2A4A',
-            }}
+            className="font-semibold mb-4"
+            style={{ fontFamily: "'Source Serif 4', Georgia, serif", fontSize: '20px', color: '#1E2749' }}
           >
-            {tUI('Formative Check-ins')}
+            {tUI('What Educators Are Saying')}
           </h2>
-          <div className="grid gap-4 md:grid-cols-2">
-            {checkInQuestions.map((question) => {
-              const existing = checkInResponses[question.id];
-              const draft = checkInDrafts[question.id] || '';
-              const isSubmitting = checkInSubmitting === question.id;
-
-              return (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {testimonials.map((testimonial, i) => (
+              <div
+                key={i}
+                className="bg-white rounded-xl"
+                style={{ padding: '20px', border: '0.5px solid rgba(0,0,0,0.06)' }}
+              >
                 <div
-                  key={question.id}
-                  className="bg-white rounded-2xl p-5"
-                  style={{ border: '0.5px solid rgba(0,0,0,0.06)' }}
+                  className="mb-2.5"
+                  style={{
+                    fontFamily: "'Source Serif 4', Georgia, serif",
+                    fontStyle: 'italic',
+                    fontSize: '14px',
+                    lineHeight: '1.6',
+                    color: '#374151',
+                    borderLeft: '3px solid #E8B84B',
+                    paddingLeft: '14px',
+                  }}
                 >
-                  {/* Question text */}
-                  <p
-                    className="text-sm font-medium mb-3"
-                    style={{ color: '#1B2A4A', lineHeight: '1.5' }}
-                  >
-                    {question.question_text}
-                  </p>
-
-                  {/* Already answered */}
-                  {existing ? (
-                    <div
-                      className="rounded-lg p-3"
-                      style={{ background: '#F0FDF4', border: '1px solid #BBF7D0' }}
-                    >
-                      <p className="text-xs font-medium mb-1" style={{ color: '#16A34A' }}>
-                        Your answer
-                      </p>
-                      <p className="text-sm" style={{ color: '#374151' }}>
-                        {question.question_type === 'multiple_choice' && question.options
-                          ? question.options[parseInt(existing.response, 10)]?.text || existing.response
-                          : existing.response
-                        }
-                      </p>
-                      {existing.is_correct !== null && (
-                        <p className="text-xs mt-1 font-medium" style={{ color: existing.is_correct ? '#16A34A' : '#EF4444' }}>
-                          {existing.is_correct ? 'Correct' : 'Incorrect'}
-                        </p>
-                      )}
-                      {existing.is_correct === false && question.explanation && (
-                        <p className="text-xs mt-1" style={{ color: '#6B7280' }}>
-                          {question.explanation}
-                        </p>
-                      )}
-                    </div>
-                  ) : !user ? (
-                    <p className="text-xs" style={{ color: '#9CA3AF' }}>
-                      Sign in to answer
-                    </p>
-                  ) : (
-                    <>
-                      {/* Multiple choice options */}
-                      {(question.question_type === 'multiple_choice' && question.options) && (
-                        <div className="space-y-2">
-                          {question.options.map((opt: QuizOption, optIdx: number) => (
-                            <button
-                              key={optIdx}
-                              onClick={() => handleCheckInSubmit(question, String(optIdx))}
-                              disabled={isSubmitting}
-                              className="w-full text-left px-3 py-2 rounded-lg text-sm transition-colors hover:bg-gray-50 disabled:opacity-50"
-                              style={{ border: '1px solid #E5E7EB', color: '#374151' }}
-                            >
-                              {opt.text}
-                            </button>
-                          ))}
-                        </div>
-                      )}
-
-                      {/* True/False */}
-                      {question.question_type === 'true_false' && (
-                        <div className="flex gap-3">
-                          {['True', 'False'].map((val) => (
-                            <button
-                              key={val}
-                              onClick={() => handleCheckInSubmit(question, val)}
-                              disabled={isSubmitting}
-                              className="flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors hover:bg-gray-50 disabled:opacity-50"
-                              style={{ border: '1px solid #E5E7EB', color: '#374151' }}
-                            >
-                              {val}
-                            </button>
-                          ))}
-                        </div>
-                      )}
-
-                      {/* Reflection / Action step / Checkpoint (text input) */}
-                      {(question.question_type === 'reflection' || question.question_type === 'action_step' || question.question_type === 'checkpoint') && (
-                        <div>
-                          <textarea
-                            value={draft}
-                            onChange={(e) => setCheckInDrafts(prev => ({ ...prev, [question.id]: e.target.value }))}
-                            placeholder={
-                              question.question_type === 'reflection'
-                                ? 'Share your reflection...'
-                                : question.question_type === 'action_step'
-                                  ? 'Describe your action step...'
-                                  : 'Your response...'
-                            }
-                            className="w-full p-3 rounded-lg text-sm resize-none"
-                            style={{ border: '1px solid #E5E7EB', minHeight: '80px', color: '#374151' }}
-                          />
-                          <button
-                            onClick={() => handleCheckInSubmit(question, draft)}
-                            disabled={isSubmitting || !draft.trim()}
-                            className="mt-2 px-4 py-2 rounded-lg text-xs font-semibold transition-colors disabled:opacity-50"
-                            style={{ background: '#1B2A4A', color: 'white' }}
-                          >
-                            {isSubmitting ? 'Saving...' : 'Submit'}
-                          </button>
-                        </div>
-                      )}
-                    </>
-                  )}
+                  &ldquo;{testimonial.quote}&rdquo;
                 </div>
-              );
-            })}
-          </div>
-        </section>
-      )}
-
-      {/* ============================================================ */}
-      {/* 4. COMMUNITY                                                  */}
-      {/* ============================================================ */}
-      <div className="mt-10">
-        <CommunityTabs
-          contentId={course.id}
-          userId={user?.id}
-          isAdmin={!!user?.email?.toLowerCase().endsWith('@teachersdeserveit.com')}
-          conversationApiPath={`/api/hub/courses/${course.id}/conversation`}
-          qaApiPath={`/api/hub/courses/${course.id}/qa`}
-        />
-      </div>
-
-      {/* ============================================================ */}
-      {/* 5. AI GROWTH INSIGHTS                                         */}
-      {/* ============================================================ */}
-      <div className="mt-8">
-        <AchievementInsights
-          data={{
-            name: user?.user_metadata?.display_name || 'Educator',
-            role: 'Educator',
-            toolsExplored: 0,
-            hoursSaved: '0',
-            daysActive: 0,
-            recognitionsEarned: 0,
-            earnedNames: [],
-            topCategories: [course.category || ''],
-            communityPosts: 0,
-            coursesCompleted: 0,
-            pdHours: 0,
-          }}
-        />
-      </div>
-
-      {/* Related Quick Wins */}
-      {relatedQuickWins.length > 0 && (
-        <div className="mt-10 mb-8">
-          <h2
-            className="font-bold mb-1"
-            style={{
-              fontSize: '22px',
-              color: '#1e2749',
-              fontFamily: "'Source Serif 4', Georgia, serif",
-            }}
-          >
-            {tUI('Related Quick Wins')}
-          </h2>
-          <p className="text-sm mb-6" style={{ color: '#9CA3AF' }}>
-            {tUI('Grab these tools while you wait')}
-          </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {relatedQuickWins.map((qw) => {
-              const qwColor = CATEGORY_COLORS[qw.category] || '#ffba06';
-              return (
-                <Link
-                  key={qw.id}
-                  href={`/hub/quick-wins/${qw.slug}`}
-                  className="bg-white rounded-xl p-4 transition-colors group"
-                  style={{ border: '0.5px solid rgba(0,0,0,0.06)' }}
-                  onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#F9FAFB')}
-                  onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'white')}
-                >
-                  <div
-                    className="w-10 h-10 rounded-lg flex items-center justify-center mb-3"
-                    style={{ backgroundColor: `${qwColor}18` }}
-                  >
-                    <Zap size={18} style={{ color: qwColor }} />
-                  </div>
-                  <p
-                    className="text-sm font-medium leading-tight mb-2"
-                    style={{ color: '#1e2749' }}
-                  >
-                    {qw.title}
-                  </p>
-                  <div className="flex items-center gap-2">
-                    <span
-                      className="text-xs px-2 py-0.5 rounded-full"
-                      style={{ background: `${qwColor}18`, color: qwColor, fontSize: '10px' }}
-                    >
-                      {qw.category}
-                    </span>
-                    {qw.duration_minutes != null && qw.duration_minutes > 0 && (
-                      <span className="text-xs" style={{ color: '#9CA3AF' }}>
-                        {qw.duration_minutes} {tUI('min')}
-                      </span>
-                    )}
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
-      {/* Related Courses */}
-      {relatedCourses.length > 0 && (
-        <div className="mt-10 mb-8">
-          <h2
-            className="font-bold mb-1"
-            style={{
-              fontSize: '22px',
-              color: '#1e2749',
-              fontFamily: "'Source Serif 4', Georgia, serif",
-            }}
-          >
-            {tUI('Related Courses')}
-          </h2>
-          <p className="text-sm mb-6" style={{ color: '#9CA3AF' }}>
-            {tUI('More courses in this category')}
-          </p>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {relatedCourses.map((c) => (
-              <CourseCard
-                key={c.id}
-                course={c}
-                enrollment={null}
-              />
+                <div className="text-xs" style={{ color: '#9CA3AF' }}>
+                  {testimonial.role}
+                </div>
+              </div>
             ))}
           </div>
         </div>
-      )}
+
+        {/* Related Courses */}
+        {relatedCourses.length > 0 && (
+          <div style={{ marginBottom: '40px' }}>
+            <h2
+              className="font-bold mb-1"
+              style={{
+                fontSize: '22px',
+                color: '#1E2749',
+                fontFamily: "'Source Serif 4', Georgia, serif",
+              }}
+            >
+              {tUI('Related Courses')}
+            </h2>
+            <p className="text-sm mb-6" style={{ color: '#9CA3AF' }}>
+              {tUI('More courses in this category')}
+            </p>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {relatedCourses.map((c) => (
+                <CourseCard
+                  key={c.id}
+                  course={c}
+                  enrollment={null}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* Mobile Sticky Enroll Button */}
-      {!isEnrolled && (
+      {!isEnrolled && !comingSoon && (
         <div
           className="lg:hidden fixed bottom-0 left-0 right-0 p-4 bg-white border-t shadow-lg"
           style={{ borderColor: '#E5E5E5' }}
         >
-          {comingSoon ? (
-            <div className="text-center">
-              <button
-                onClick={async () => {
-                  if (notified) return;
-                  try {
-                    await fetch('/api/hub/notify-course-interest', {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({
-                        courseTitle: course.title,
-                        courseSlug: course.slug,
-                        userEmail: user?.email,
-                        userName: user?.email?.split('@')[0] || 'Educator',
-                      }),
-                    });
-                  } catch {}
-                  setNotified(true);
-                }}
-                className="w-full py-3 rounded-xl text-sm font-semibold transition-colors"
-                style={notified
-                  ? { backgroundColor: '#D1FAE5', color: '#065F46' }
-                  : { backgroundColor: '#ffba06', color: '#1e2749' }
-                }
-              >
-                {notified ? tUI('We will notify you!') : tUI('Notify me when this launches')}
-              </button>
-              <p className="text-xs mt-2" style={{ color: '#9CA3AF' }}>
-                {tUI('This course is launching on our new platform any day now. We will let you know the moment it goes live.')}
-              </p>
-            </div>
-          ) : (
-            <button
-              onClick={handleEnroll}
-              disabled={isEnrolling || !user}
-              className="w-full py-4 rounded-lg font-medium transition-colors disabled:opacity-50"
-              style={{
-                backgroundColor: '#E8B84B',
-                color: '#2B3A67',
-                fontFamily: "'DM Sans', sans-serif",
-                fontSize: '16px',
-                minHeight: '52px',
-              }}
-            >
-              {isEnrolling ? 'Enrolling...' : !user ? 'Sign in to Enroll' : 'Start Course'}
-            </button>
-          )}
+          <button
+            onClick={handleEnroll}
+            disabled={isEnrolling || !user}
+            className="w-full py-4 rounded-lg font-medium transition-colors disabled:opacity-50"
+            style={{
+              backgroundColor: '#E8B84B',
+              color: '#1E2749',
+              fontFamily: "'DM Sans', sans-serif",
+              fontSize: '16px',
+              minHeight: '52px',
+            }}
+          >
+            {isEnrolling ? 'Enrolling...' : !user ? 'Sign in to Enroll' : 'Start Learning'}
+          </button>
         </div>
       )}
 
@@ -1512,7 +1222,6 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
           onDismiss={() => setShowCapacityFeedback(false)}
         />
       )}
-    </div>
     </div>
   );
 }
