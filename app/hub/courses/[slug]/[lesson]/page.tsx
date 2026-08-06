@@ -1024,7 +1024,7 @@ export default function LessonPage({ params }: LessonPageProps) {
             }}
           >
             <ArrowLeft size={14} />
-            Back to {course.title}
+            {tUI('Back to course')}
           </Link>
           <div style={{ width: 1, height: 16, background: dark ? 'rgba(255,255,255,0.1)' : '#E5E7EB' }} />
           <span style={{
@@ -1037,6 +1037,11 @@ export default function LessonPage({ params }: LessonPageProps) {
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <span style={{ fontSize: 12, color: theme.textMuted }}>
             {tUI('Lesson')} {currentIndex + 1} {tUI('of')} {allLessons.length}
+            {currentGate && !isGateActive && (
+              <span style={{ marginLeft: 8, color: '#16A34A' }}>
+                {tUI('Check-in cleared')}
+              </span>
+            )}
           </span>
           <button
             onClick={toggleDark}
