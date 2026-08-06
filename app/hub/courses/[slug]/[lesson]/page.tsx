@@ -1277,16 +1277,14 @@ export default function LessonPage({ params }: LessonPageProps) {
                       <FileText size={28} style={{ color: '#E8B84B' }} />
                     </div>
                     <p style={{
-                      fontSize: 16, fontWeight: 600, color: theme.title,
-                      fontFamily: "'Source Serif 4', Georgia, serif", marginBottom: 4,
+                      fontSize: 18, fontWeight: 600, color: theme.title,
+                      fontFamily: "'Source Serif 4', Georgia, serif", marginBottom: 6,
                     }}>
-                      {resource.filename}
+                      Course Resource Packet
                     </p>
-                    {resource.fileSize > 0 && (
-                      <p style={{ fontSize: 12, color: theme.textMuted, marginBottom: 20 }}>
-                        {formatFileSize(resource.fileSize)}
-                      </p>
-                    )}
+                    <p style={{ fontSize: 13, color: theme.textMuted, marginBottom: 20, lineHeight: 1.5 }}>
+                      Download the resource packet for this course.{resource.fileSize > 0 ? ` (${formatFileSize(resource.fileSize)})` : ''}
+                    </p>
                     <a
                       href={resource.url}
                       target="_blank"
