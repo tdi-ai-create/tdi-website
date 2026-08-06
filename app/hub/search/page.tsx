@@ -16,6 +16,7 @@ interface SearchResult {
   category?: string;
   type: 'quick_win' | 'course' | 'conversation';
   meta?: string;
+  roles?: string[];
 }
 
 const CATEGORY_COLORS: Record<string, string> = {
@@ -46,6 +47,7 @@ export default function HubSearchPage() {
   const [conversations, setConversations] = useState<SearchResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
+  const [roleFilter, setRoleFilter] = useState('all');
 
   // Search on mount if query param exists
   useEffect(() => {
@@ -63,13 +65,20 @@ export default function HubSearchPage() {
     const q = `%${searchQuery.trim()}%`;
 
     try {
-      const [qwResult, courseResult, convResult] = await Promise.all([
-        // Quick Wins
+      const [qwResult, qwTagResult, courseResult, convResult] = await Promise.all([
+        // Quick Wins - text search on title/description/category
         supabase
           .from('hub_quick_wins')
-          .select('id, slug, title, description, category')
+          .select('id, slug, title, description, category, roles, topic_tags')
           .eq('is_published', true)
           .or(`title.ilike.${q},description.ilike.${q},category.ilike.${q}`)
+          .limit(20),
+        // Quick Wins - array search on topic_tags (contains the search term)
+        supabase
+          .from('hub_quick_wins')
+          .select('id, slug, title, description, category, roles, topic_tags')
+          .eq('is_published', true)
+          .contains('topic_tags', [searchQuery.trim().toLowerCase()])
           .limit(12),
         // Courses
         supabase
@@ -85,15 +94,24 @@ export default function HubSearchPage() {
           .limit(8),
       ]);
 
-      // Map quick wins
+      // Merge and deduplicate quick wins from text search + tag search
+      const allQw = [...(qwResult.data || []), ...(qwTagResult.data || [])];
+      const seen = new Set<string>();
+      const deduped = allQw.filter(qw => {
+        if (seen.has(qw.id)) return false;
+        seen.add(qw.id);
+        return true;
+      });
+
       setQuickWins(
-        (qwResult.data || []).map(qw => ({
+        deduped.slice(0, 20).map(qw => ({
           id: qw.id,
           slug: qw.slug,
           title: qw.title,
           description: qw.description?.slice(0, 120) || undefined,
           category: qw.category,
           type: 'quick_win' as const,
+          roles: qw.roles,
         }))
       );
 
@@ -149,7 +167,8 @@ export default function HubSearchPage() {
     window.history.replaceState({}, '', `/hub/search?q=${encodeURIComponent(query)}`);
   };
 
-  const totalResults = quickWins.length + courses.length + conversations.length;
+  const filteredQuickWins = roleFilter === 'all' ? quickWins : quickWins.filter(qw => qw.roles?.includes(roleFilter));
+  const totalResults = filteredQuickWins.length + courses.length + conversations.length;
 
   return (
     <div style={{ background: '#F5F7FA', minHeight: '100vh' }}>
@@ -182,6 +201,32 @@ export default function HubSearchPage() {
               autoFocus
             />
           </form>
+          {/* Role filter */}
+          <div className="flex items-center gap-3 mt-3">
+            <span className="text-xs font-medium" style={{ color: 'rgba(255,255,255,0.6)', fontFamily: "'DM Sans', sans-serif" }}>
+              {tUI('Filter by role:')}
+            </span>
+            {[
+              { value: 'all', label: 'All' },
+              { value: 'teacher', label: 'Teacher' },
+              { value: 'para', label: 'Para' },
+              { value: 'leader', label: 'Leader' },
+              { value: 'coach', label: 'Coach' },
+            ].map(({ value, label }) => (
+              <button
+                key={value}
+                onClick={() => { setRoleFilter(value); if (query.trim()) performSearch(query); }}
+                className="px-3 py-1 rounded-full text-xs font-medium transition-all"
+                style={{
+                  backgroundColor: roleFilter === value ? '#E8B84B' : 'rgba(255,255,255,0.15)',
+                  color: roleFilter === value ? '#1B2A4A' : 'rgba(255,255,255,0.8)',
+                  fontFamily: "'DM Sans', sans-serif",
+                }}
+              >
+                {tUI(label)}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -213,16 +258,16 @@ export default function HubSearchPage() {
             </p>
 
             {/* Quick Wins */}
-            {quickWins.length > 0 && (
+            {filteredQuickWins.length > 0 && (
               <div>
                 <div className="flex items-center gap-2 mb-3">
                   <Lightbulb size={16} style={{ color: '#D97706' }} />
                   <h2 className="text-sm font-semibold" style={{ color: '#1B2A4A' }}>
-                    {tUI('Quick Wins')} ({quickWins.length})
+                    {tUI('Quick Wins')} ({filteredQuickWins.length})
                   </h2>
                 </div>
                 <div className="space-y-2">
-                  {quickWins.map((qw) => {
+                  {filteredQuickWins.map((qw) => {
                     const accent = CATEGORY_ACCENTS[qw.category || ''] || '#7C9CBF';
                     return (
                       <Link

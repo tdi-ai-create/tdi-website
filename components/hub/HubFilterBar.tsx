@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Heart, Info, ChevronDown, ChevronUp } from 'lucide-react';
+import { Heart, Info, ChevronDown, ChevronUp, Search, X } from 'lucide-react';
 
 export const ROLE_FILTERS = [
   { value: 'all', label: 'All Roles', short: 'All Roles' },
@@ -36,6 +36,9 @@ interface HubFilterBarProps {
   itemLabel: string;
   /** Static subtitle shown when no filters active */
   subtitle: string;
+  /** Optional search query for inline text search */
+  searchQuery?: string;
+  setSearchQuery?: (value: string) => void;
 }
 
 export default function HubFilterBar({
@@ -54,11 +57,14 @@ export default function HubFilterBar({
   tUI,
   itemLabel,
   subtitle,
+  searchQuery = '',
+  setSearchQuery,
 }: HubFilterBarProps) {
   const [moreFiltersOpen, setMoreFiltersOpen] = useState(false);
 
   const hasAdvancedFilters = capacityFilter !== 'all' || danielsonFilter.length > 0;
-  const isFiltered = activeFilter !== 'All' || roleFilter !== 'all' || hasAdvancedFilters;
+  const hasSearch = searchQuery.trim().length > 0;
+  const isFiltered = activeFilter !== 'All' || roleFilter !== 'all' || hasAdvancedFilters || hasSearch;
 
   return (
     <>
@@ -75,8 +81,41 @@ export default function HubFilterBar({
           : `${totalCount} ${tUI(itemLabel)} · ${tUI(subtitle)}`}
       </p>
 
+      {/* Inline search bar */}
+      {setSearchQuery && (
+        <div className="relative mt-4 mb-1">
+          <Search
+            size={16}
+            className="absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none"
+            style={{ color: '#9CA3AF' }}
+          />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder={`Search ${itemLabel}...`}
+            className="w-full pl-10 pr-10 py-2.5 rounded-xl text-sm transition-all"
+            style={{
+              backgroundColor: '#F9FAFB',
+              border: hasSearch ? '1.5px solid #1B2A4A' : '1px solid #E5E7EB',
+              color: '#1E2749',
+              fontFamily: "'DM Sans', sans-serif",
+              outline: 'none',
+            }}
+          />
+          {hasSearch && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 rounded-full hover:bg-gray-200 transition-colors"
+            >
+              <X size={14} style={{ color: '#6B7280' }} />
+            </button>
+          )}
+        </div>
+      )}
+
       {/* Role dropdown + Category pills row */}
-      <div className="flex items-center gap-3 mt-5 mb-2">
+      <div className="flex items-center gap-3 mt-3 mb-2">
         {/* Role dropdown - pinned left */}
         <div className="relative flex-shrink-0">
           <select

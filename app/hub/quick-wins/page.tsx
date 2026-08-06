@@ -63,6 +63,7 @@ interface QuickWin {
   capacity?: 'low' | 'medium' | 'high' | null;
   danielson_domains?: string[];
   roles?: string[];
+  topic_tags?: string[];
   title_es?: string | null;
   description_es?: string | null;
 }
@@ -77,6 +78,7 @@ export default function QuickWinsPage() {
   const [capacityFilter, setCapacityFilter] = useState<'all' | 'low' | 'medium' | 'high'>('all');
   const [roleFilter, setRoleFilter] = useState<string>('all');
   const [danielsonFilter, setDanielsonFilter] = useState<string[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const [visibleCount, setVisibleCount] = useState(18);
   const [isLoading, setIsLoading] = useState(true);
   const { isFavorite, toggleFavorite } = useFavorites();
@@ -117,6 +119,7 @@ export default function QuickWinsPage() {
           capacity: qw.lift === 'LOW' ? 'low' : qw.lift === 'MED' ? 'medium' : qw.lift === 'HIGH' ? 'high' : null,
           danielson_domains: qw.danielson_domains || [],
           roles: qw.roles || [],
+          topic_tags: qw.topic_tags || [],
           title_es: qw.title_es,
           description_es: qw.description_es,
         }));
@@ -191,7 +194,16 @@ export default function QuickWinsPage() {
     const capacityMatch = capacityFilter === 'all' || qw.capacity === capacityFilter;
     const danielsonMatch = danielsonFilter.length === 0 || danielsonFilter.some(d => qw.danielson_domains?.includes(d));
     const roleMatch = roleFilter === 'all' || qw.roles?.includes(roleFilter);
-    return categoryMatch && capacityMatch && danielsonMatch && roleMatch;
+    const searchMatch = !searchQuery.trim() || (() => {
+      const q = searchQuery.trim().toLowerCase();
+      return (
+        qw.title?.toLowerCase().includes(q) ||
+        qw.description?.toLowerCase().includes(q) ||
+        qw.category?.toLowerCase().includes(q) ||
+        qw.topic_tags?.some(t => t.toLowerCase().includes(q))
+      );
+    })();
+    return categoryMatch && capacityMatch && danielsonMatch && roleMatch && searchMatch;
   });
 
   // Interleave by category for variety when showing "All" unfiltered
@@ -352,6 +364,8 @@ export default function QuickWinsPage() {
           tUI={tUI}
           itemLabel="quick wins"
           subtitle="Short, practical tools you can use right now"
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
         />
 
         {/* Games Discovery Banner -- shown when not already filtering by Games */}
