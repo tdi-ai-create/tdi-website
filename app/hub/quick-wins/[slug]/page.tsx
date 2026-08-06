@@ -777,7 +777,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
     // Fetch role-aware recommendations
     // Prioritize items that share the same roles as the current quick win,
     // then fill with same-category items
-    const currentRoles = (quickWin as Record<string, unknown>).roles as string[] || [];
+    const currentRoles = (quickWin as unknown as { roles?: string[] }).roles || [];
     const primaryRole = currentRoles[0];
 
     Promise.all([
