@@ -1282,9 +1282,14 @@ export default function LessonPage({ params }: LessonPageProps) {
                     }}>
                       Course Resource Packet
                     </p>
-                    <p style={{ fontSize: 13, color: theme.textMuted, marginBottom: 20, lineHeight: 1.5 }}>
-                      Download the resource packet for this course.{resource.fileSize > 0 ? ` (${formatFileSize(resource.fileSize)})` : ''}
+                    <p style={{ fontSize: 13, color: theme.textMuted, marginBottom: 6, lineHeight: 1.6 }}>
+                      This is yours. Print it, mark it up, dog-ear the pages, share it with a colleague, stick it on your desk, toss it in your bag. Whatever helps you put these ideas into practice.
                     </p>
+                    {resource.fileSize > 0 && (
+                      <p style={{ fontSize: 11, color: theme.textMuted, marginBottom: 20, opacity: 0.6 }}>
+                        PDF, {formatFileSize(resource.fileSize)}
+                      </p>
+                    )}
                     <a
                       href={resource.url}
                       target="_blank"
