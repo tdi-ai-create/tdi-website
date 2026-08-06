@@ -1357,6 +1357,44 @@ export default function HubDashboard() {
             </div>
           )}
 
+          {/* Browse by Topic */}
+          <div
+            className="bg-white rounded-2xl p-5"
+            style={{ border: '1px solid rgba(27,42,74,0.06)', boxShadow: '0 1px 3px rgba(27,42,74,0.04), 0 4px 16px rgba(27,42,74,0.03)' }}
+          >
+            <div className="text-xs font-bold tracking-widest uppercase mb-1" style={{ color: '#9CA3AF', letterSpacing: '0.08em' }}>
+              {tUI('Browse by Topic')}
+            </div>
+            <p className="text-xs mb-3" style={{ color: '#9CA3AF' }}>
+              {tUI('Find tools for what you need right now')}
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {[
+                { label: 'Back to School', query: 'back-to-school', color: '#FEF3C7', accent: '#D97706' },
+                { label: 'Classroom Management', query: 'classroom-management', color: '#FEE2E2', accent: '#DC2626' },
+                { label: 'Coaching', query: 'coaching', color: '#E0F2FE', accent: '#0284C7' },
+                { label: 'Wellness', query: 'wellness', color: '#DCFCE7', accent: '#16A34A' },
+                { label: 'Communication', query: 'communication', color: '#F3E8FF', accent: '#9333EA' },
+                { label: 'Assessment', query: 'assessment', color: '#FFF7ED', accent: '#EA580C' },
+                { label: 'Behavior', query: 'behavior', color: '#FFE4E6', accent: '#E11D48' },
+                { label: 'Relationships', query: 'relationships', color: '#FCE7F3', accent: '#DB2777' },
+                { label: 'Leadership', query: 'leadership', color: '#EFF6FF', accent: '#2563EB' },
+                { label: 'Special Ed', query: 'special-education', color: '#F0FDF4', accent: '#15803D' },
+                { label: 'De-escalation', query: 'de-escalation', color: '#FEF9C3', accent: '#CA8A04' },
+                { label: 'Inclusion', query: 'inclusion', color: '#E0E7FF', accent: '#4F46E5' },
+              ].map(({ label, query, color, accent }) => (
+                <Link
+                  key={query}
+                  href={`/hub/quick-wins?search=${encodeURIComponent(query.replace(/-/g, ' '))}`}
+                  className="px-3 py-1.5 rounded-full text-xs font-medium transition-all hover:shadow-sm"
+                  style={{ backgroundColor: color, color: accent, fontFamily: "'DM Sans', sans-serif" }}
+                >
+                  {tUI(label)}
+                </Link>
+              ))}
+            </div>
+          </div>
+
           {/* Curated for You moved to sidebar */}
 
           {/* Saved (moved from sidebar) */}

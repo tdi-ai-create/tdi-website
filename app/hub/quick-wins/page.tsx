@@ -71,6 +71,7 @@ interface QuickWin {
 export default function QuickWinsPage() {
   const searchParams = useSearchParams();
   const initialFilter = searchParams.get('filter') ?? 'All';
+  const initialSearch = searchParams.get('search') ?? '';
   const [quickWins, setQuickWins] = useState<QuickWin[]>([]);
   const [activeFilter, setActiveFilter] = useState(
     FILTER_CATEGORIES.includes(initialFilter) ? initialFilter : 'All'
@@ -78,7 +79,7 @@ export default function QuickWinsPage() {
   const [capacityFilter, setCapacityFilter] = useState<'all' | 'low' | 'medium' | 'high'>('all');
   const [roleFilter, setRoleFilter] = useState<string>('all');
   const [danielsonFilter, setDanielsonFilter] = useState<string[]>([]);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState(initialSearch);
   const [visibleCount, setVisibleCount] = useState(18);
   const [isLoading, setIsLoading] = useState(true);
   const { isFavorite, toggleFavorite } = useFavorites();

@@ -61,6 +61,19 @@ export default function HubFilterBar({
   setSearchQuery,
 }: HubFilterBarProps) {
   const [moreFiltersOpen, setMoreFiltersOpen] = useState(false);
+  const [searchFocused, setSearchFocused] = useState(false);
+
+  // Popular search suggestions (common topic tags)
+  const POPULAR_TOPICS = [
+    'back-to-school', 'classroom-management', 'coaching', 'wellness',
+    'communication', 'assessment', 'relationships', 'behavior',
+    'lesson-planning', 'leadership', 'special-education', 'de-escalation',
+    'para', 'feedback', 'time-management', 'inclusion',
+  ];
+
+  const matchingSuggestions = searchQuery.trim().length >= 2
+    ? POPULAR_TOPICS.filter(t => t.includes(searchQuery.trim().toLowerCase())).slice(0, 5)
+    : [];
 
   const hasAdvancedFilters = capacityFilter !== 'all' || danielsonFilter.length > 0;
   const hasSearch = searchQuery.trim().length > 0;
@@ -93,6 +106,8 @@ export default function HubFilterBar({
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
+            onFocus={() => setSearchFocused(true)}
+            onBlur={() => setTimeout(() => setSearchFocused(false), 200)}
             placeholder={`Search ${itemLabel}...`}
             className="w-full pl-10 pr-10 py-2.5 rounded-xl text-sm transition-all"
             style={{
@@ -110,6 +125,47 @@ export default function HubFilterBar({
             >
               <X size={14} style={{ color: '#6B7280' }} />
             </button>
+          )}
+          {/* Search suggestions */}
+          {searchFocused && !hasSearch && (
+            <div
+              className="absolute top-full left-0 right-0 mt-1 bg-white rounded-xl shadow-lg border p-3 z-20"
+              style={{ borderColor: '#E5E7EB' }}
+            >
+              <p className="text-xs font-medium mb-2" style={{ color: '#9CA3AF', fontFamily: "'DM Sans', sans-serif" }}>
+                Popular topics
+              </p>
+              <div className="flex flex-wrap gap-1.5">
+                {POPULAR_TOPICS.slice(0, 8).map((topic) => (
+                  <button
+                    key={topic}
+                    onMouseDown={(e) => { e.preventDefault(); setSearchQuery(topic.replace(/-/g, ' ')); }}
+                    className="px-2.5 py-1 rounded-full text-xs transition-colors hover:bg-gray-100"
+                    style={{ backgroundColor: '#F3F4F6', color: '#4B5563', fontFamily: "'DM Sans', sans-serif" }}
+                  >
+                    {topic.replace(/-/g, ' ')}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+          {searchFocused && matchingSuggestions.length > 0 && (
+            <div
+              className="absolute top-full left-0 right-0 mt-1 bg-white rounded-xl shadow-lg border py-1 z-20"
+              style={{ borderColor: '#E5E7EB' }}
+            >
+              {matchingSuggestions.map((topic) => (
+                <button
+                  key={topic}
+                  onMouseDown={(e) => { e.preventDefault(); setSearchQuery(topic.replace(/-/g, ' ')); }}
+                  className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors flex items-center gap-2"
+                  style={{ color: '#1E2749', fontFamily: "'DM Sans', sans-serif" }}
+                >
+                  <Search size={12} style={{ color: '#9CA3AF' }} />
+                  {topic.replace(/-/g, ' ')}
+                </button>
+              ))}
+            </div>
           )}
         </div>
       )}

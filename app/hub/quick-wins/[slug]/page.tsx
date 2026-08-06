@@ -774,56 +774,68 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
     if (!quickWin) return;
     const supabase = getSupabase();
 
-    // Fetch same-category recommendations
-    supabase
-      .from('hub_quick_wins')
-      .select('*')
-      .eq('is_published', true)
-      .eq('category', quickWin.category || '')
-      .neq('id', quickWin.id)
-      .limit(3)
-      .then(({ data }) => {
-        const mapped = (data || []).map((d: Record<string, unknown>) => ({
-          id: d.id as string,
-          slug: d.slug as string,
-          title: d.title as string,
-          description: (d.description as string) || null,
-          content: (d.content as string) || null,
-          category: (d.category as string) || 'Classroom Tools',
-          estimated_minutes: (d.duration_minutes as number) || 5,
-          content_type: (d.quick_win_type as string) || 'activity',
-          video_url: null,
-          download_url: (d.file_url as string) || null,
-        }));
+    // Fetch role-aware recommendations
+    // Prioritize items that share the same roles as the current quick win,
+    // then fill with same-category items
+    const currentRoles = (quickWin as Record<string, unknown>).roles as string[] || [];
+    const primaryRole = currentRoles[0];
 
-        if (mapped.length < 3) {
-          // Fill remaining slots from other categories
-          supabase
-            .from('hub_quick_wins')
-            .select('*')
-            .eq('is_published', true)
-            .neq('id', quickWin.id)
-            .neq('category', quickWin.category || '')
-            .limit(3 - mapped.length)
-            .then(({ data: extraData }) => {
-              const extra = (extraData || []).map((d: Record<string, unknown>) => ({
-                id: d.id as string,
-                slug: d.slug as string,
-                title: d.title as string,
-                description: (d.description as string) || null,
-                content: (d.content as string) || null,
-                category: (d.category as string) || 'Classroom Tools',
-                estimated_minutes: (d.duration_minutes as number) || 5,
-                content_type: (d.quick_win_type as string) || 'activity',
-                video_url: null,
-                download_url: (d.file_url as string) || null,
-              }));
-              setRecommendations([...mapped, ...extra]);
-            });
-        } else {
-          setRecommendations(mapped);
-        }
+    Promise.all([
+      // Same role + same category (best match)
+      primaryRole ? supabase
+        .from('hub_quick_wins')
+        .select('*')
+        .eq('is_published', true)
+        .eq('category', quickWin.category || '')
+        .contains('roles', [primaryRole])
+        .neq('id', quickWin.id)
+        .limit(3) : Promise.resolve({ data: [] }),
+      // Same role, different category (role-relevant variety)
+      primaryRole ? supabase
+        .from('hub_quick_wins')
+        .select('*')
+        .eq('is_published', true)
+        .neq('category', quickWin.category || '')
+        .contains('roles', [primaryRole])
+        .neq('id', quickWin.id)
+        .limit(3) : Promise.resolve({ data: [] }),
+      // Same category, any role (fallback)
+      supabase
+        .from('hub_quick_wins')
+        .select('*')
+        .eq('is_published', true)
+        .eq('category', quickWin.category || '')
+        .neq('id', quickWin.id)
+        .limit(3),
+    ]).then(([roleCategory, roleOther, categoryOnly]) => {
+      const mapItem = (d: Record<string, unknown>) => ({
+        id: d.id as string,
+        slug: d.slug as string,
+        title: d.title as string,
+        description: (d.description as string) || null,
+        content: (d.content as string) || null,
+        category: (d.category as string) || 'Classroom Tools',
+        estimated_minutes: (d.duration_minutes as number) || 5,
+        content_type: (d.quick_win_type as string) || 'activity',
+        video_url: null,
+        download_url: (d.file_url as string) || null,
       });
+
+      // Merge and deduplicate, prioritizing role+category matches
+      const seen = new Set<string>();
+      const results: QuickWin[] = [];
+      for (const item of [
+        ...(roleCategory.data || []),
+        ...(roleOther.data || []),
+        ...(categoryOnly.data || []),
+      ]) {
+        if (seen.has(item.id as string)) continue;
+        seen.add(item.id as string);
+        results.push(mapItem(item));
+        if (results.length >= 3) break;
+      }
+      setRecommendations(results);
+    });
 
     // Fetch 6 random quick wins for bottom section
     supabase
@@ -1659,7 +1671,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                     {tUI('You might also like')}
                   </h3>
                   <p className="text-xs mb-4" style={{ color: '#9CA3AF' }}>
-                    {tUI("Based on this tool's category")}
+                    {tUI("Tools like this one, for your role")}
                   </p>
                   <div className="space-y-3">
                     {recommendations.map((rec) => {
