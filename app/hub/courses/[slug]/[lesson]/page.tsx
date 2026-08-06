@@ -204,6 +204,8 @@ function GateCard({ question, allQuestions, userId, dark, onGateCleared }: GateC
   const [saving, setSaving] = useState(false);
   const [gateCleared, setGateCleared] = useState(false);
   const [committed, setCommitted] = useState(false);
+  const [wrongReflection, setWrongReflection] = useState('');
+  const [wrongReflectionSaved, setWrongReflectionSaved] = useState(false);
 
   const header = getGateHeader(question.question_type);
   const label = getGateLabel(question, allQuestions);
@@ -342,7 +344,7 @@ function GateCard({ question, allQuestions, userId, dark, onGateCleared }: GateC
           </div>
         )}
 
-        {answered && !gateCleared && (
+        {answered && !gateCleared && wasCorrect && (
           <button onClick={handleContinue} style={{
             display: 'inline-flex', alignItems: 'center', gap: 8,
             marginTop: 20, padding: '14px 32px', background: '#E8B84B',
@@ -350,9 +352,72 @@ function GateCard({ question, allQuestions, userId, dark, onGateCleared }: GateC
             fontSize: 15, fontWeight: 700, cursor: 'pointer',
             fontFamily: "'DM Sans', sans-serif",
           }}>
-            {wasCorrect ? 'You got it. Keep going.' : 'Got it. On to the next one.'}
+            You got it. Keep going.
             <ArrowRight size={16} />
           </button>
+        )}
+
+        {answered && !gateCleared && !wasCorrect && (
+          <div style={{ marginTop: 20 }}>
+            {!wrongReflectionSaved ? (
+              <>
+                <p style={{
+                  fontSize: 15, fontWeight: 600, color: dark ? '#F3F4F6' : '#1E2749',
+                  fontFamily: "'Source Serif 4', Georgia, serif", marginBottom: 8,
+                }}>
+                  Make this yours.
+                </p>
+                <p style={{
+                  fontSize: 14, color: dark ? '#D1D5DB' : '#4B5563',
+                  fontFamily: "'DM Sans', sans-serif", marginBottom: 14, lineHeight: 1.6,
+                }}>
+                  How does this connect to your classroom? One or two sentences is all it takes.
+                </p>
+                <textarea
+                  value={wrongReflection}
+                  onChange={(e) => setWrongReflection(e.target.value)}
+                  placeholder="Connect this to something you have experienced or want to try..."
+                  style={{
+                    width: '100%', padding: 14, minHeight: 80,
+                    background: dark ? 'rgba(255,255,255,0.04)' : 'white',
+                    border: `1.5px solid ${dark ? 'rgba(255,255,255,0.12)' : '#E5E7EB'}`,
+                    borderRadius: 12, color: dark ? '#E5E7EB' : '#1E2749',
+                    fontSize: 14, fontFamily: "'DM Sans', sans-serif",
+                    lineHeight: 1.6, resize: 'none' as const,
+                  }}
+                />
+                <button
+                  onClick={async () => {
+                    if (wrongReflection.trim().length < 10) return;
+                    await saveQuizResponse(userId, question.id + '_reflection', question.lesson_id, wrongReflection, null);
+                    setWrongReflectionSaved(true);
+                  }}
+                  disabled={wrongReflection.trim().length < 10}
+                  style={{
+                    marginTop: 10, padding: '10px 24px',
+                    background: wrongReflection.trim().length >= 10 ? (dark ? 'rgba(255,255,255,0.08)' : 'white') : 'transparent',
+                    border: `1.5px solid ${wrongReflection.trim().length >= 10 ? (dark ? 'rgba(255,255,255,0.15)' : '#E5E7EB') : 'transparent'}`,
+                    borderRadius: 10, color: wrongReflection.trim().length >= 10 ? (dark ? '#E5E7EB' : '#4B5563') : (dark ? '#6B7280' : '#D1D5DB'),
+                    fontSize: 14, fontWeight: 500, cursor: wrongReflection.trim().length >= 10 ? 'pointer' : 'default',
+                    fontFamily: "'DM Sans', sans-serif",
+                  }}
+                >
+                  Save
+                </button>
+              </>
+            ) : (
+              <button onClick={handleContinue} style={{
+                display: 'inline-flex', alignItems: 'center', gap: 8,
+                padding: '14px 32px', background: '#E8B84B',
+                color: '#1E2749', border: 'none', borderRadius: 12,
+                fontSize: 15, fontWeight: 700, cursor: 'pointer',
+                fontFamily: "'DM Sans', sans-serif",
+              }}>
+                Nice reflection. Keep going.
+                <ArrowRight size={16} />
+              </button>
+            )}
+          </div>
         )}
       </div>
     );
