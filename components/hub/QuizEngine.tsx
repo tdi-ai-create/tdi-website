@@ -312,8 +312,31 @@ interface QuizResultBadgeProps {
 
 export function QuizResultBadge({ quiz, resultKey, compact }: QuizResultBadgeProps) {
   const [expanded, setExpanded] = useState(false)
+  const [recQW, setRecQW] = useState<{ id: string; slug: string; title: string; category: string }[]>([])
+  const [recCourses, setRecCourses] = useState<{ id: string; slug: string; title: string; category: string }[]>([])
+  const [recLoaded, setRecLoaded] = useState(false)
   const result = quiz.results[resultKey]
   if (!result) return null
+
+  // Fetch recommendations when expanded for the first time
+  const loadRecommendations = () => {
+    if (recLoaded) return
+    setRecLoaded(true)
+    const rec = getQuizRecommendations(quiz.id, result.key)
+    if (!rec || rec.categories.length === 0) return
+    const supabase = getSupabase()
+    supabase.from('hub_quick_wins').select('id, slug, title, category').eq('is_published', true).in('category', rec.categories).limit(3)
+      .then(({ data }) => { if (data) setRecQW(data) })
+    const keywords = getCourseKeywords(quiz.id, result.key)
+    if (keywords.length > 0) {
+      supabase.from('hub_courses').select('id, slug, title, category').eq('is_published', true).limit(20)
+        .then(({ data }) => {
+          if (!data) return
+          const matches = data.filter(c => { const t = `${c.title} ${c.category}`.toLowerCase(); return keywords.some(kw => t.includes(kw)) }).slice(0, 2)
+          setRecCourses(matches)
+        })
+    }
+  }
 
   if (compact) {
     return (
@@ -345,7 +368,7 @@ export function QuizResultBadge({ quiz, resultKey, compact }: QuizResultBadgePro
     <div
       className="rounded-2xl overflow-hidden cursor-pointer transition-all"
       style={{ border: '1px solid rgba(27,42,74,0.06)', boxShadow: '0 2px 8px rgba(27,42,74,0.06)' }}
-      onClick={() => setExpanded(!expanded)}
+      onClick={() => { if (!expanded) loadRecommendations(); setExpanded(!expanded); }}
     >
       <div className="p-5 flex items-center gap-4" style={{ backgroundColor: result.bg }}>
         <div
@@ -392,6 +415,55 @@ export function QuizResultBadge({ quiz, resultKey, compact }: QuizResultBadgePro
             >
               {result.ctaLabel}
             </Link>
+          )}
+          {(recQW.length > 0 || recCourses.length > 0) && (
+            <div className="mt-4 p-4 rounded-xl" style={{ backgroundColor: 'rgba(255,255,255,0.7)', border: '1px solid rgba(27,42,74,0.06)' }}>
+              <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: '#9CA3AF' }}>
+                Recommended for you
+              </p>
+              {(() => {
+                const rec = getQuizRecommendations(quiz.id, result.key)
+                return rec ? (
+                  <p className="text-xs mb-3" style={{ color: '#6B7280', fontFamily: "'DM Sans', sans-serif" }}>
+                    {rec.message}
+                  </p>
+                ) : null
+              })()}
+              <div className="space-y-2">
+                {recQW.map(qw => (
+                  <Link
+                    key={qw.id}
+                    href={`/hub/quick-wins/${qw.slug}`}
+                    className="flex items-center gap-3 p-2.5 rounded-lg bg-white hover:shadow-sm transition-shadow"
+                    style={{ border: '1px solid rgba(27,42,74,0.06)' }}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <div className="w-2 h-8 rounded-full flex-shrink-0" style={{ backgroundColor: result.color }} />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium truncate" style={{ color: '#1B2A4A' }}>{qw.title}</p>
+                      <p className="text-xs" style={{ color: '#9CA3AF' }}>{qw.category}</p>
+                    </div>
+                    <ChevronRight size={14} style={{ color: '#D1D5DB' }} />
+                  </Link>
+                ))}
+                {recCourses.map(course => (
+                  <Link
+                    key={course.id}
+                    href={`/hub/courses/${course.slug}`}
+                    className="flex items-center gap-3 p-2.5 rounded-lg bg-white hover:shadow-sm transition-shadow"
+                    style={{ border: '1px solid rgba(27,42,74,0.06)' }}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <div className="w-2 h-8 rounded-full flex-shrink-0" style={{ backgroundColor: '#1B2A4A' }} />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium truncate" style={{ color: '#1B2A4A' }}>{course.title}</p>
+                      <p className="text-xs" style={{ color: '#9CA3AF' }}>Course</p>
+                    </div>
+                    <ChevronRight size={14} style={{ color: '#D1D5DB' }} />
+                  </Link>
+                ))}
+              </div>
+            </div>
           )}
         </div>
       )}
