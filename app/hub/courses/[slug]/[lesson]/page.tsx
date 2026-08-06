@@ -1178,7 +1178,7 @@ export default function LessonPage({ params }: LessonPageProps) {
                   <div style={{
                     flex: transcriptOpen ? undefined : 1,
                     height: transcriptOpen ? '50%' : undefined,
-                    maxHeight: 'calc(100vh - 280px)',
+                    maxHeight: 'calc(100vh - 340px)',
                     background: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center',
                   }}>
                     <iframe
