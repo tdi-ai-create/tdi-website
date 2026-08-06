@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useHub } from '@/components/hub/HubContext';
@@ -38,6 +38,8 @@ import {
   Check,
   Lightbulb,
   Target,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 
 // Shared category colors -- used across all QW card instances
@@ -285,6 +287,47 @@ interface SavedCourse {
   category: string;
 }
 
+// ── Carousel card type ──
+interface CarouselCard {
+  type: 'course' | 'quick_win' | 'game' | 'quiz' | 'quiz_result';
+  title: string;
+  description: string;
+  slug: string;
+  href: string;
+  gradient?: string;
+  dot?: string;
+  quizIcon?: string;
+  quizIconBg?: string;
+  quizIconColor?: string;
+  titleColor?: string;
+}
+
+// ── Browse topics ──
+const BROWSE_TOPICS = [
+  { label: 'Classroom Management', query: 'classroom-management' },
+  { label: 'Communication', query: 'communication' },
+  { label: 'Self-Care', query: 'self-care' },
+  { label: 'Time Savers', query: 'time-savers' },
+  { label: 'Leadership', query: 'leadership' },
+  { label: 'Stress Relief', query: 'stress-relief' },
+  { label: 'Coaching', query: 'coaching' },
+  { label: 'Behavior', query: 'behavior' },
+  { label: 'Relationships', query: 'relationships' },
+  { label: 'Back to School', query: 'back-to-school' },
+  { label: 'Inclusion', query: 'inclusion' },
+  { label: 'Assessment', query: 'assessment' },
+];
+
+// Course gradient palette
+const COURSE_GRADIENTS = [
+  'linear-gradient(135deg, #1B2A4A, #38618C)',
+  'linear-gradient(135deg, #E8927C, #D06050)',
+  'linear-gradient(135deg, #7C3AED, #5B21B6)',
+  'linear-gradient(135deg, #059669, #34D399)',
+  'linear-gradient(135deg, #D97706, #F59E0B)',
+  'linear-gradient(135deg, #0891B2, #22D3EE)',
+];
+
 export default function HubDashboard() {
   const router = useRouter();
   const { profile, user } = useHub();
@@ -324,6 +367,8 @@ export default function HubDashboard() {
   const [likeYouCohortSize, setLikeYouCohortSize] = useState(0);
   const [likeYouType, setLikeYouType] = useState<string | null>(null);
 
+  // Carousel state
+  const [carouselIndex, setCarouselIndex] = useState(0);
 
   const firstName = profile?.display_name?.split(' ')[0] || user?.email?.split('@')[0] || 'Teacher';
   const dailyMessage = DAILY_MESSAGES[new Date().getDay()];
@@ -914,7 +959,191 @@ export default function HubDashboard() {
     }
   }, []);
 
-  // Loading skeleton
+  // ── Build carousel cards ──
+  const carouselCards: CarouselCard[] = useMemo(() => {
+    const cards: CarouselCard[] = [];
+    let gradientIdx = 0;
+
+    // Add recommended courses
+    if (recommendations.length > 0) {
+      recommendations.slice(0, 3).forEach((course) => {
+        cards.push({
+          type: 'course',
+          title: course.title,
+          description: course.reason || course.category || 'Course',
+          slug: course.slug,
+          href: `/hub/courses/${course.slug}`,
+          gradient: COURSE_GRADIENTS[gradientIdx++ % COURSE_GRADIENTS.length],
+        });
+      });
+    }
+
+    // Add enrolled courses (in progress)
+    enrollments.slice(0, 2).forEach((enrollment) => {
+      // Skip if already in recommendations
+      if (cards.some(c => c.slug === enrollment.course?.slug)) return;
+      cards.push({
+        type: 'course',
+        title: enrollment.course?.title || 'Course',
+        description: `${enrollment.progress_percentage || 0}% complete`,
+        slug: enrollment.course?.slug || '',
+        href: `/hub/courses/${enrollment.course?.slug}`,
+        gradient: COURSE_GRADIENTS[gradientIdx++ % COURSE_GRADIENTS.length],
+      });
+    });
+
+    // Add featured quick wins
+    featuredQuickWins.slice(0, 3).forEach((qw) => {
+      cards.push({
+        type: 'quick_win',
+        title: qw.title,
+        description: `${qw.category} . Download`,
+        slug: qw.slug,
+        href: `/hub/quick-wins/${qw.slug}`,
+        dot: CATEGORY_ACCENTS[qw.category] || '#7C9CBF',
+      });
+    });
+
+    // Add games
+    const gameEntries = [
+      { slug: 'tell-or-ask', title: 'Tell or Ask?', desc: 'Communication . Interactive' },
+      { slug: 'feedback-level-up', title: 'Feedback Level Up', desc: 'Communication . Interactive' },
+      { slug: 'whats-your-move', title: "What's Your Move?", desc: 'Management . Interactive' },
+      { slug: 'classroom-shuffle', title: 'Classroom Shuffle', desc: 'Management . Quick play' },
+      { slug: 'first-conversation', title: 'First Conversation', desc: 'Relationships . Interactive' },
+    ];
+    gameEntries.slice(0, 3).forEach((game) => {
+      cards.push({
+        type: 'game',
+        title: game.title,
+        description: game.desc,
+        slug: game.slug,
+        href: `/hub/quick-wins/${game.slug}`,
+      });
+    });
+
+    // Add quiz results (taken quizzes)
+    const takenQuizzes = ALL_QUIZZES.filter(q => dashboardQuizResults[q.id]);
+    takenQuizzes.slice(0, 2).forEach((quiz) => {
+      const resultKey = dashboardQuizResults[quiz.id];
+      const result = quiz.results[resultKey];
+      if (result) {
+        cards.push({
+          type: 'quiz_result',
+          title: result.title,
+          description: result.subtitle,
+          slug: quiz.id,
+          href: '/hub/settings/profile?tab=educator_profile',
+          quizIcon: result.icon,
+          quizIconBg: result.color,
+          quizIconColor: 'white',
+          titleColor: result.color,
+        });
+      }
+    });
+
+    // Add untaken quizzes
+    const untakenQuizzes = ALL_QUIZZES.filter(q => !dashboardQuizResults[q.id]);
+    untakenQuizzes.slice(0, 3).forEach((quiz) => {
+      cards.push({
+        type: 'quiz',
+        title: quiz.title,
+        description: `${quiz.questionCount} questions. Takes ${quiz.durationLabel}.`,
+        slug: quiz.id,
+        href: '/hub/settings/profile?tab=educator_profile',
+        quizIcon: '?',
+        quizIconBg: '#F3F4F6',
+        quizIconColor: '#9CA3AF',
+      });
+    });
+
+    // Shuffle the cards for variety (deterministic by day)
+    const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000);
+    const shuffled = [...cards];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = (dayOfYear * (i + 1) * 7) % (i + 1);
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+
+    return shuffled.length > 0 ? shuffled : [];
+  }, [recommendations, enrollments, featuredQuickWins, dashboardQuizResults]);
+
+  // Carousel helpers
+  const shiftLeft = useCallback(() => {
+    if (carouselCards.length === 0) return;
+    setCarouselIndex((prev) => (prev - 1 + carouselCards.length) % carouselCards.length);
+  }, [carouselCards.length]);
+
+  const shiftRight = useCallback(() => {
+    if (carouselCards.length === 0) return;
+    setCarouselIndex((prev) => (prev + 1) % carouselCards.length);
+  }, [carouselCards.length]);
+
+  // ── Derive insight card data ──
+
+  // Goal text from userGoal
+  const goalText = userGoal?.text
+    ? userGoal.text.replace(/_/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase())
+    : null;
+
+  // Vibe observation: most viewed category
+  const vibeMessage = useMemo(() => {
+    // Derive from featured quick wins category pattern
+    if (featuredQuickWins.length > 0) {
+      const categoryCounts: Record<string, number> = {};
+      featuredQuickWins.forEach(qw => {
+        categoryCounts[qw.category] = (categoryCounts[qw.category] || 0) + 1;
+      });
+      const topCategory = Object.entries(categoryCounts).sort((a, b) => b[1] - a[1])[0]?.[0];
+      if (topCategory) {
+        return `You have been exploring a lot of ${topCategory.toLowerCase()} resources lately. That matters. Taking care of yourself is not optional.`;
+      }
+    }
+    return 'You have been showing up for yourself consistently. That matters more than you think.';
+  }, [featuredQuickWins]);
+
+  // Recent win: most recently completed course or recent check-in
+  const recentWin = useMemo(() => {
+    // Check for completed enrollments first
+    const completedEnrollment = enrollments.find(e => e.progress_percentage >= 100);
+    if (completedEnrollment) {
+      return {
+        text: completedEnrollment.course?.title || 'a course',
+        detail: 'completed and earned your certificate',
+        date: 'Recently',
+      };
+    }
+    // Fall back to certificate count
+    if (certificateCount > 0) {
+      return {
+        text: `${certificateCount} course${certificateCount > 1 ? 's' : ''}`,
+        detail: 'completed so far',
+        date: 'This month',
+      };
+    }
+    // Fall back to check-ins
+    if (personalStats && personalStats.toolsExplored > 0) {
+      return {
+        text: `${personalStats.toolsExplored} tools`,
+        detail: 'explored this month',
+        date: 'This month',
+      };
+    }
+    // Fall back to streak
+    if (currentStreak >= 2) {
+      return {
+        text: `${currentStreak} day learning streak`,
+        detail: 'and counting',
+        date: 'Active now',
+      };
+    }
+    return null;
+  }, [enrollments, certificateCount, personalStats, currentStreak]);
+
+  // Continue learning: top enrollment
+  const continueEnrollment = enrollments.length > 0 ? enrollments[0] : null;
+
+  // ── Loading skeleton ──
   if (isLoading) {
     return (
       <div style={{ background: '#F5F7FA', minHeight: '100vh' }}>
@@ -922,151 +1151,489 @@ export default function HubDashboard() {
           className="animate-pulse"
           style={{ background: 'linear-gradient(135deg, #1B2A4A 0%, #2d3a5c 60%, #38618C 100%)' }}
         >
-          <div className="max-w-5xl mx-auto px-4 md:px-6 py-10">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-full bg-white/20" />
+          <div className="max-w-[1100px] mx-auto px-8 py-7">
+            <div className="flex items-start justify-between">
               <div>
-                <div className="h-8 bg-white/20 rounded w-64 mb-2" />
-                <div className="h-5 bg-white/10 rounded w-48" />
+                <div className="h-5 bg-white/20 rounded w-20 mb-2" />
+                <div className="h-7 bg-white/20 rounded w-64 mb-2" />
+                <div className="h-4 bg-white/10 rounded w-96" />
+              </div>
+              <div className="flex gap-6">
+                {[1,2,3,4].map(i => (
+                  <div key={i} className="text-center">
+                    <div className="h-6 bg-white/20 rounded w-8 mx-auto mb-1" />
+                    <div className="h-3 bg-white/10 rounded w-16" />
+                  </div>
+                ))}
               </div>
             </div>
+            <div className="mt-5 h-20 bg-white/5 rounded-xl" />
           </div>
         </div>
-        <div className="max-w-5xl mx-auto px-4 md:px-6 py-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
-            {[1,2,3,4].map(i => (
-              <div key={i} className="text-center animate-pulse">
-                <div className="h-8 bg-gray-200 rounded w-16 mx-auto mb-2" />
-                <div className="h-3 bg-gray-100 rounded w-24 mx-auto" />
-              </div>
+        <div className="max-w-[1100px] mx-auto px-8 -mt-5">
+          <div className="grid grid-cols-3 gap-3.5">
+            {[1,2,3].map(i => (
+              <div key={i} className="bg-white rounded-xl h-32 animate-pulse" style={{ border: '0.5px solid rgba(0,0,0,0.06)' }} />
             ))}
           </div>
-          <div className="grid lg:grid-cols-[1fr_380px] gap-8">
-            <div className="space-y-8">
-              <div className="bg-white rounded-2xl p-6 animate-pulse" style={{ border: '1px solid rgba(27,42,74,0.06)' }}>
-                <div className="h-4 bg-gray-200 rounded w-48 mb-4" />
-                <div className="h-24 bg-gray-100 rounded" />
-              </div>
-              <div className="bg-white rounded-2xl p-6 animate-pulse" style={{ border: '1px solid rgba(27,42,74,0.06)' }}>
-                <div className="h-4 bg-gray-200 rounded w-32 mb-4" />
-                <div className="h-16 bg-gray-100 rounded" />
-              </div>
-            </div>
-            <div className="space-y-4">
-              <div className="rounded-2xl h-36 animate-pulse" style={{ background: '#1B2A4A' }} />
-              <div className="bg-white rounded-2xl h-28 animate-pulse" style={{ border: '1px solid rgba(27,42,74,0.06)' }} />
-              <div className="bg-white rounded-2xl h-40 animate-pulse" style={{ border: '1px solid rgba(27,42,74,0.06)' }} />
-            </div>
-          </div>
+        </div>
+        <div className="max-w-[1100px] mx-auto px-8 mt-8">
+          <div className="h-5 bg-gray-200 rounded w-48 mb-5" />
+          <div className="h-80 bg-gray-100 rounded-2xl animate-pulse" />
         </div>
       </div>
     );
   }
 
-  return (
-    <div style={{ background: '#F5F7FA', minHeight: '100vh' }}>
-      {/* ============ HERO ============ */}
-      <section
-        className="relative text-white"
-        style={{ background: 'linear-gradient(135deg, #1B2A4A 0%, #2d3a5c 60%, #38618C 100%)' }}
-      >
-        <div className="absolute rounded-full pointer-events-none"
-          style={{ right: '-50px', top: '-70px', width: '260px', height: '260px', background: 'rgba(255,186,6,0.07)' }} />
-        <div className="absolute rounded-full pointer-events-none"
-          style={{ right: '50px', bottom: '-90px', width: '180px', height: '180px', background: 'rgba(56,97,140,0.5)' }} />
+  // ── Carousel card render helper ──
+  function renderCarouselCardContent(card: CarouselCard, sizeClass: 'center' | 'side' | 'far') {
+    const titleSize = sizeClass === 'center' ? '18px' : sizeClass === 'side' ? '14px' : '12px';
+    const headerH = sizeClass === 'center' ? 130 : sizeClass === 'side' ? 90 : 70;
 
-        <div className="relative z-10 max-w-5xl mx-auto px-4 md:px-6 py-10">
-          {/* Role tag */}
-          {profile?.role && (
-            <div
-              className="inline-flex items-center mb-3 px-3 py-1 rounded-full text-xs font-bold tracking-wide uppercase"
-              style={{
-                background: 'rgba(255,186,6,0.15)',
-                border: '1px solid rgba(255,186,6,0.3)',
-                color: '#FFBA06',
-                letterSpacing: '0.06em',
-              }}
-            >
-              {roleLabel}
+    return (
+      <>
+        {card.type === 'course' && card.gradient && (
+          <div style={{ background: card.gradient, height: headerH, padding: '14px', display: 'flex', alignItems: 'flex-end' }} />
+        )}
+        <div style={{ padding: '16px' }}>
+          {card.dot && (
+            <div style={{ width: 8, height: 8, borderRadius: '50%', background: card.dot, marginBottom: 10 }} />
+          )}
+          {card.quizIcon && (
+            <div style={{
+              width: 40, height: 40, borderRadius: '50%',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              background: card.quizIconBg || '#F3F4F6',
+              color: card.quizIconColor || '#9CA3AF',
+              fontFamily: "'Source Serif 4', serif", fontWeight: 700, fontSize: 16,
+              marginBottom: 8,
+            }}>
+              {card.quizIcon}
             </div>
           )}
+          {card.type === 'game' && (
+            <div style={{
+              width: 40, height: 40, borderRadius: 10,
+              background: '#F0FDF4', display: 'flex',
+              alignItems: 'center', justifyContent: 'center',
+              marginBottom: 8, fontSize: 18, color: '#166534',
+            }}>
+              &#9881;
+            </div>
+          )}
+          <span style={{
+            display: 'inline-block', fontSize: 9, fontWeight: 700,
+            letterSpacing: '1px', textTransform: 'uppercase' as const,
+            padding: '3px 8px', borderRadius: 6, marginBottom: 8,
+            ...(card.type === 'course' ? { background: '#1E2749', color: 'white' } :
+              card.type === 'quick_win' ? { background: '#FEF9EE', color: '#92400E' } :
+              card.type === 'game' ? { background: '#F0FDF4', color: '#166534' } :
+              { background: '#EDE9FE', color: '#5B21B6' }),
+          }}>
+            {card.type === 'course' ? 'Course' :
+              card.type === 'quick_win' ? 'Quick Win' :
+              card.type === 'game' ? 'Game' :
+              card.type === 'quiz_result' ? 'Your Result' : 'Quiz'}
+          </span>
+          <div style={{
+            fontFamily: "'Source Serif 4', serif", fontWeight: 600,
+            color: card.titleColor || '#1E2749',
+            lineHeight: 1.3, marginBottom: 6,
+            fontSize: titleSize,
+          }}>
+            {card.title}
+          </div>
+          <div style={{ fontSize: 12, color: '#9CA3AF', lineHeight: 1.4 }}>
+            {card.description}
+          </div>
+        </div>
+      </>
+    );
+  }
 
-          {/* Avatar + Name */}
-          <div className="flex items-center gap-4 mb-2">
-            <AvatarDisplay
-              size={48}
-              avatarId={profile?.avatar_id}
-              avatarUrl={profile?.avatar_url}
-              displayName={profile?.display_name}
-            />
+  // Carousel positions (5 visible cards)
+  const carouselPositions = [
+    { offset: -2, left: '2%',  w: 180, opacity: 0.35, scale: 0.75, z: 1 },
+    { offset: -1, left: '15%', w: 220, opacity: 0.65, scale: 0.88, z: 2 },
+    { offset:  0, left: '50%', w: 300, opacity: 1,    scale: 1,    z: 3, translateX: '-50%' },
+    { offset:  1, left: '63%', w: 220, opacity: 0.65, scale: 0.88, z: 2 },
+    { offset:  2, left: '82%', w: 180, opacity: 0.35, scale: 0.75, z: 1 },
+  ];
+
+  return (
+    <div style={{ background: '#F5F7FA', minHeight: '100vh' }}>
+
+      {/* ============ HERO ============ */}
+      <section
+        className="relative overflow-hidden"
+        style={{ background: 'linear-gradient(135deg, #1B2A4A 0%, #2d3a5c 60%, #38618C 100%)', padding: '28px 0 32px' }}
+      >
+        {/* Decorative circle */}
+        <div
+          className="absolute rounded-full pointer-events-none"
+          style={{ right: '-50px', top: '-70px', width: 260, height: 260, background: 'rgba(255,186,6,0.06)' }}
+        />
+
+        <div className="relative z-10" style={{ maxWidth: 1100, margin: '0 auto', padding: '0 32px' }}>
+          {/* Top row: greeting left, stats right */}
+          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 20 }}>
             <div>
-              <h1
-                className="text-3xl font-bold text-white"
-                style={{ letterSpacing: '-0.3px', fontFamily: "'Source Serif 4', Georgia, serif" }}
-              >
+              {/* Role badge */}
+              {profile?.role && (
+                <div
+                  style={{
+                    display: 'inline-block',
+                    background: 'rgba(255,186,6,0.15)',
+                    border: '1px solid rgba(255,186,6,0.3)',
+                    color: '#E8B84B',
+                    fontSize: 10, fontWeight: 700,
+                    letterSpacing: '1.5px',
+                    textTransform: 'uppercase' as const,
+                    padding: '3px 10px',
+                    borderRadius: 20,
+                    marginBottom: 8,
+                  }}
+                >
+                  {roleLabel}
+                </div>
+              )}
+              <h1 style={{
+                fontFamily: "'Source Serif 4', serif",
+                fontSize: 26, fontWeight: 700, color: 'white',
+              }}>
                 Welcome back, {firstName}
               </h1>
-              {/* Gold accent line */}
-              <div
-                style={{ width: '60px', height: '2px', background: 'rgba(255,186,6,0.4)', marginTop: '6px' }}
-              />
+              <p style={{
+                fontFamily: "'Source Serif 4', serif",
+                fontStyle: 'italic',
+                fontSize: 14,
+                color: 'rgba(255,255,255,0.45)',
+                marginTop: 6,
+                maxWidth: 420,
+              }}>
+                &ldquo;{tip}&rdquo;
+              </p>
+            </div>
+
+            {/* Stats */}
+            <div style={{ display: 'flex', gap: 24 }}>
+              <div style={{ textAlign: 'center' }}>
+                <div style={{ fontFamily: "'Source Serif 4', serif", fontSize: 24, fontWeight: 700, color: 'white' }}>
+                  {enrollments.length}
+                </div>
+                <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' as const, letterSpacing: '0.5px', marginTop: 2 }}>
+                  In Progress
+                </div>
+              </div>
+              <div style={{ textAlign: 'center' }}>
+                <div style={{ fontFamily: "'Source Serif 4', serif", fontSize: 24, fontWeight: 700, color: 'white' }}>
+                  {personalStats?.toolsExplored || 0}
+                </div>
+                <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' as const, letterSpacing: '0.5px', marginTop: 2 }}>
+                  Tools Used
+                </div>
+              </div>
+              <div style={{ textAlign: 'center' }}>
+                <div style={{ fontFamily: "'Source Serif 4', serif", fontSize: 24, fontWeight: 700, color: 'white' }}>
+                  {communityPulse?.shared || currentStreak || 0}
+                </div>
+                <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' as const, letterSpacing: '0.5px', marginTop: 2 }}>
+                  Check-ins
+                </div>
+              </div>
+              <div style={{ textAlign: 'center' }}>
+                <div style={{ fontFamily: "'Source Serif 4', serif", fontSize: 24, fontWeight: 700, color: 'white' }}>
+                  {certificateCount}
+                </div>
+                <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' as const, letterSpacing: '0.5px', marginTop: 2 }}>
+                  {certificateCount === 1 ? 'Certificate' : 'Certificates'}
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Daily message -- italic, Source Serif */}
-          <p
-            style={{
-              color: 'rgba(255,255,255,0.65)',
-              fontFamily: "'Source Serif 4', Georgia, serif",
-              fontStyle: 'italic',
-              fontSize: '15px',
-              marginTop: '8px',
-            }}
-          >
-            {dailyMessage}
-          </p>
+          {/* Continue where you left off card */}
+          {continueEnrollment && (
+            <div style={{
+              background: 'rgba(255,255,255,0.06)',
+              border: '1px solid rgba(255,255,255,0.08)',
+              borderRadius: 14,
+              padding: '14px 20px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 16,
+            }}>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' as const, letterSpacing: '1px', marginBottom: 3 }}>
+                  Continue where you left off
+                </div>
+                <div style={{
+                  fontFamily: "'Source Serif 4', serif",
+                  fontSize: 15, fontWeight: 600, color: 'white',
+                }}>
+                  {continueEnrollment.course?.title}
+                </div>
+                <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)', marginTop: 2 }}>
+                  {continueEnrollment.lessons_completed} of {continueEnrollment.total_lessons} lessons completed
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 5 }}>
+                  <div style={{ flex: 1, maxWidth: 180, height: 3, borderRadius: 2, background: 'rgba(255,255,255,0.1)' }}>
+                    <div style={{
+                      height: '100%', borderRadius: 2,
+                      background: '#E8B84B',
+                      width: `${continueEnrollment.progress_percentage || 0}%`,
+                    }} />
+                  </div>
+                  <span style={{ fontSize: 11, color: '#E8B84B', fontWeight: 600 }}>
+                    {continueEnrollment.progress_percentage || 0}%
+                  </span>
+                </div>
+              </div>
+              <Link
+                href={`/hub/courses/${continueEnrollment.course?.slug}`}
+                style={{
+                  padding: '9px 22px',
+                  background: '#E8B84B',
+                  color: '#1E2749',
+                  border: 'none',
+                  borderRadius: 10,
+                  fontSize: 13, fontWeight: 700,
+                  fontFamily: "'DM Sans', sans-serif",
+                  textDecoration: 'none',
+                  display: 'inline-block',
+                }}
+              >
+                Continue
+              </Link>
+            </div>
+          )}
         </div>
       </section>
 
-      {/* ============ STATUS BAR ============ */}
-      <div className="max-w-5xl mx-auto px-4 md:px-6 py-8">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
-          <div className="text-center">
-            <div style={{ fontFamily: "'Source Serif 4', serif", fontSize: '28px', fontWeight: 700, color: '#1B2A4A' }}>
-              {personalStats?.toolsExplored || 0}
-            </div>
-            <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: '11px', color: '#9CA3AF', marginTop: '2px' }}>
-              {tUI('tools explored')}
-            </div>
+      {/* ============ INSIGHT CARDS (overlapping hero) ============ */}
+      <div style={{
+        maxWidth: 1100, margin: '-20px auto 0', padding: '0 32px',
+        position: 'relative', zIndex: 2,
+        display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 14,
+      }}>
+        {/* Goal card */}
+        <div style={{
+          background: 'white', borderRadius: 14, padding: '18px 20px',
+          border: '0.5px solid rgba(0,0,0,0.06)',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+        }}>
+          <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase' as const, marginBottom: 8, color: '#E8B84B' }}>
+            Your Current Goal
           </div>
-          <div className="text-center">
-            <div style={{ fontFamily: "'Source Serif 4', serif", fontSize: '28px', fontWeight: 700, color: '#1B2A4A' }}>
-              ~{personalStats?.hoursSaved || 0}
-            </div>
-            <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: '11px', color: '#9CA3AF', marginTop: '2px' }}>
-              {tUI('hours reclaimed')}
-            </div>
+          {goalText ? (
+            <>
+              <div style={{
+                fontFamily: "'Source Serif 4', serif",
+                fontSize: 15, fontWeight: 600, color: '#1E2749',
+                lineHeight: 1.4, marginBottom: 10,
+              }}>
+                &ldquo;{goalText}&rdquo;
+              </div>
+              <Link
+                href="/hub/settings/profile"
+                style={{ fontSize: 12, color: '#E8B84B', fontWeight: 600, textDecoration: 'none' }}
+              >
+                Update my goals
+              </Link>
+            </>
+          ) : (
+            <>
+              <div style={{
+                fontFamily: "'Source Serif 4', serif",
+                fontSize: 15, fontWeight: 600, color: '#1E2749',
+                lineHeight: 1.4, marginBottom: 10,
+              }}>
+                Set a goal to get personalized recommendations
+              </div>
+              <Link
+                href="/hub/settings/profile"
+                style={{ fontSize: 12, color: '#E8B84B', fontWeight: 600, textDecoration: 'none' }}
+              >
+                Set my goals
+              </Link>
+            </>
+          )}
+        </div>
+
+        {/* Vibe card */}
+        <div style={{
+          background: 'white', borderRadius: 14, padding: '18px 20px',
+          border: '0.5px solid rgba(0,0,0,0.06)',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+        }}>
+          <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase' as const, marginBottom: 8, color: '#7C9CBF' }}>
+            We've Noticed
           </div>
-          <div className="text-center">
-            <div style={{ fontFamily: "'Source Serif 4', serif", fontSize: '28px', fontWeight: 700, color: '#1B2A4A' }}>
-              {certificateCount + fieldNotesCount}
-            </div>
-            <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: '11px', color: '#9CA3AF', marginTop: '2px' }}>
-              {tUI('achievements earned')}
-            </div>
+          <div style={{ fontSize: 13, color: '#4B5563', lineHeight: 1.5, marginBottom: 10 }}>
+            {vibeMessage}
           </div>
-          <div className="text-center">
-            <div style={{ fontFamily: "'Source Serif 4', serif", fontSize: '28px', fontWeight: 700, color: '#1B2A4A' }}>
-              50
-            </div>
-            <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: '11px', color: '#9CA3AF', marginTop: '2px' }}>
-              {tUI('states represented')}
-            </div>
+          <Link
+            href="/hub/settings/profile"
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: 6,
+              padding: '7px 16px', borderRadius: 10,
+              border: '1.5px solid #E5E7EB', background: 'white',
+              fontSize: 12, fontWeight: 600, color: '#4B5563',
+              fontFamily: "'DM Sans', sans-serif",
+              textDecoration: 'none',
+            }}
+          >
+            How are you feeling today?
+          </Link>
+        </div>
+
+        {/* Recent win card */}
+        <div style={{
+          background: 'white', borderRadius: 14, padding: '18px 20px',
+          border: '0.5px solid rgba(0,0,0,0.06)',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+        }}>
+          <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase' as const, marginBottom: 8, color: '#22C55E' }}>
+            Recent Win
           </div>
+          {recentWin ? (
+            <>
+              <div style={{ fontSize: 13, color: '#4B5563', lineHeight: 1.5, marginBottom: 4 }}>
+                You {recentWin.detail}{' '}
+                <span style={{ fontWeight: 600, color: '#1E2749' }}>{recentWin.text}</span>.
+              </div>
+              <div style={{ fontSize: 11, color: '#9CA3AF' }}>
+                {recentWin.date}
+              </div>
+            </>
+          ) : (
+            <div style={{ fontSize: 13, color: '#4B5563', lineHeight: 1.5 }}>
+              Your first win is right around the corner. Start exploring to earn it.
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Tour welcome overlay */}
+      {/* ============ CAROUSEL ============ */}
+      {carouselCards.length > 0 && (
+        <div style={{ padding: '32px 0 20px' }}>
+          <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 32px', marginBottom: 20 }}>
+            <span style={{ fontFamily: "'Source Serif 4', serif", fontSize: 20, fontWeight: 600, color: '#1E2749' }}>
+              Suggestions for You
+            </span>
+          </div>
+
+          <div style={{ position: 'relative', maxWidth: 1100, margin: '0 auto', padding: '0 32px' }}>
+            {/* Left arrow */}
+            <button
+              onClick={shiftLeft}
+              style={{
+                position: 'absolute', top: '50%', transform: 'translateY(-50%)',
+                left: 8, width: 40, height: 40, borderRadius: '50%',
+                background: 'white', border: '1.5px solid #E5E7EB',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                cursor: 'pointer', color: '#6B7280', fontSize: 18,
+                zIndex: 10, boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+              }}
+              aria-label="Previous"
+            >
+              <ChevronLeft size={18} />
+            </button>
+
+            {/* Right arrow */}
+            <button
+              onClick={shiftRight}
+              style={{
+                position: 'absolute', top: '50%', transform: 'translateY(-50%)',
+                right: 8, width: 40, height: 40, borderRadius: '50%',
+                background: 'white', border: '1.5px solid #E5E7EB',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                cursor: 'pointer', color: '#6B7280', fontSize: 18,
+                zIndex: 10, boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+              }}
+              aria-label="Next"
+            >
+              <ChevronRight size={18} />
+            </button>
+
+            {/* Carousel track */}
+            <div style={{ position: 'relative', minHeight: 340, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              {carouselPositions.map((pos) => {
+                if (carouselCards.length === 0) return null;
+                const idx = (carouselIndex + pos.offset + carouselCards.length) % carouselCards.length;
+                const card = carouselCards[idx];
+                const sizeClass: 'center' | 'side' | 'far' = pos.offset === 0 ? 'center' : (Math.abs(pos.offset) === 1 ? 'side' : 'far');
+
+                const handleCardClick = () => {
+                  if (pos.offset < 0) shiftLeft();
+                  else if (pos.offset > 0) shiftRight();
+                  else router.push(card.href);
+                };
+
+                return (
+                  <div
+                    key={`${pos.offset}-${idx}`}
+                    onClick={handleCardClick}
+                    style={{
+                      position: 'absolute',
+                      width: pos.w,
+                      left: pos.left,
+                      opacity: pos.opacity,
+                      transform: `${pos.translateX ? `translateX(${pos.translateX})` : ''} scale(${pos.scale})`,
+                      zIndex: pos.z,
+                      background: 'white',
+                      borderRadius: 16,
+                      overflow: 'hidden',
+                      border: '0.5px solid rgba(0,0,0,0.06)',
+                      boxShadow: pos.offset === 0 ? '0 8px 32px rgba(30,39,73,0.12)' : '0 2px 8px rgba(0,0,0,0.06)',
+                      cursor: 'pointer',
+                      transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
+                    }}
+                  >
+                    {renderCarouselCardContent(card, sizeClass)}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ============ BROWSE BY TOPIC ============ */}
+      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '12px 32px 48px' }}>
+        <div style={{
+          fontFamily: "'Source Serif 4', serif",
+          fontSize: 16, fontWeight: 600, color: '#1E2749',
+          marginBottom: 12,
+        }}>
+          Browse by Topic
+        </div>
+        <div style={{ display: 'flex', flexWrap: 'wrap' as const, gap: 8 }}>
+          {BROWSE_TOPICS.map(({ label, query }) => (
+            <Link
+              key={query}
+              href={`/hub/quick-wins?search=${encodeURIComponent(query.replace(/-/g, ' '))}`}
+              style={{
+                padding: '8px 18px',
+                borderRadius: 20,
+                fontSize: 13, fontWeight: 500,
+                textDecoration: 'none',
+                border: '1.5px solid #E5E7EB',
+                color: '#4B5563',
+                background: 'white',
+                transition: 'all 0.15s',
+                fontFamily: "'DM Sans', sans-serif",
+              }}
+              onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.borderColor = '#E8B84B'; }}
+              onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.borderColor = '#E5E7EB'; }}
+            >
+              {label}
+            </Link>
+          ))}
+        </div>
+      </div>
+
+      {/* ============ TOUR WELCOME OVERLAY ============ */}
       {tourChecked && !tourCompleted && !showTour && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4"
@@ -1088,7 +1655,7 @@ export default function HubDashboard() {
             <p className="text-sm mb-8" style={{ color: 'rgba(255,255,255,0.7)', lineHeight: '1.7' }}>
               {tUI(tourResumeStep > 0
                 ? `You made it through step ${tourResumeStep} of 10. Want to continue the tour from where you stopped?`
-                : 'We built something new for you. A quick tour will show you the highlights -- it takes about 60 seconds and you can skip anytime.'
+                : 'We built something new for you. A quick tour will show you the highlights. It takes about 60 seconds and you can skip anytime.'
               )}
             </p>
             <div className="flex flex-col gap-3 items-center">
@@ -1123,1034 +1690,25 @@ export default function HubDashboard() {
         </div>
       )}
 
-      {/* ============ MAIN GRID ============ */}
-      <div className="max-w-5xl mx-auto px-4 md:px-6 pb-8">
+      {/* Recognition Celebration */}
+      {newRecognition && (
+        <RecognitionCelebration
+          recognition={newRecognition}
+          onDismiss={() => {
+            // Mark as seen
+            if (user?.id) {
+              fetch('/api/hub/recognitions', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId: user.id, markSeen: [newRecognition.id] }),
+              }).catch(() => {});
+            }
+            setNewRecognition(null);
+          }}
+        />
+      )}
 
-        <div className="grid lg:grid-cols-[1fr_380px] gap-8">
-
-        {/* ===== LEFT COLUMN ===== */}
-        <div className="space-y-8">
-
-          {/* A. Goal + Next Step (or Today's Pick for new users) */}
-          {(userGoal || featuredQuickWin) && (
-            <div
-              className="bg-white rounded-2xl overflow-hidden"
-              style={{ border: '1px solid rgba(27,42,74,0.06)', boxShadow: '0 1px 3px rgba(27,42,74,0.04), 0 4px 16px rgba(27,42,74,0.03)' }}
-            >
-              {/* Gold left border accent */}
-              <div className="flex">
-                <div style={{ width: '4px', background: '#FFBA06', flexShrink: 0 }} />
-                <div className="flex-1 p-6">
-                  {userGoal ? (
-                    <>
-                      <div className="flex items-center gap-2 mb-3">
-                        <Target size={14} style={{ color: '#D97706' }} />
-                        <span className="text-xs font-semibold" style={{ color: '#D97706' }}>
-                          {tUI('Your goal')}
-                        </span>
-                      </div>
-                      <p
-                        className="mb-4"
-                        style={{
-                          fontFamily: "'Source Serif 4', Georgia, serif",
-                          fontSize: '16px',
-                          fontWeight: 600,
-                          color: '#1B2A4A',
-                          lineHeight: 1.5,
-                        }}
-                      >
-                        {tUI('You said you wanted to')} &ldquo;{userGoal.text.replace(/_/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase())}&rdquo;
-                      </p>
-                      {(userGoal.quickWin || featuredQuickWin) && (() => {
-                        const qw = userGoal.quickWin || featuredQuickWin!;
-                        const categoryBg = CATEGORY_COLORS[qw.category] || '#F3F4F6';
-                        const accentColor = CATEGORY_ACCENTS[qw.category] || '#7C9CBF';
-                        return (
-                          <div
-                            className="rounded-xl overflow-hidden flex"
-                            style={{ border: '1px solid #E9E7E2' }}
-                          >
-                            {/* Thumbnail or gradient block */}
-                            <div className="w-24 flex-shrink-0 relative" style={{
-                              background: qw.thumbnail_url ? undefined : `linear-gradient(135deg, ${accentColor} 0%, ${accentColor}cc 100%)`,
-                            }}>
-                              {qw.thumbnail_url ? (
-                                <img src={qw.thumbnail_url} alt={qw.title || 'Quick win thumbnail'} className="w-full h-full object-cover" />
-                              ) : (
-                                <div className="w-full h-full flex items-center justify-center">
-                                  <BookOpen size={24} style={{ color: 'rgba(255,255,255,0.6)' }} />
-                                </div>
-                              )}
-                            </div>
-                            <div className="flex-1 p-4" style={{ background: '#FAFAF8' }}>
-                              <div className="text-xs font-semibold mb-1" style={{ color: '#9CA3AF' }}>
-                                {tUI('Your next step')}
-                              </div>
-                              <span
-                                className="inline-block text-xs font-bold px-2 py-0.5 rounded mb-1.5"
-                                style={{ background: categoryBg, color: '#1e2749', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}
-                              >
-                                {qw.category}
-                              </span>
-                              <div className="text-sm font-semibold mb-1" style={{ color: '#1B2A4A' }}>{qw.title}</div>
-                              <div className="flex items-center justify-between gap-3">
-                                <span className="text-xs" style={{ color: '#9CA3AF' }}>{qw.duration_minutes} min</span>
-                                <Link
-                                  href={`/hub/quick-wins/${qw.slug}`}
-                                  className="flex-shrink-0 text-xs font-semibold rounded-lg px-4 py-1.5 whitespace-nowrap"
-                                  style={{ background: '#FFBA06', color: '#1e2749' }}
-                                >
-                                  {tUI('Try it')}
-                                </Link>
-                              </div>
-                            </div>
-                          </div>
-                        );
-                      })()}
-                    </>
-                  ) : featuredQuickWin && (
-                    <>
-                      <div className="flex items-center gap-2 mb-3">
-                        <Lightbulb size={14} style={{ color: '#D97706' }} />
-                        <span className="text-xs font-semibold" style={{ color: '#D97706' }}>
-                          {profile?.role
-                            ? tUI(`Picked for ${roleLabel.toLowerCase()}s`)
-                            : tUI("Today's pick for you")}
-                        </span>
-                      </div>
-                      <span
-                        className="inline-block text-xs font-bold px-2 py-0.5 rounded mb-2"
-                        style={{ background: CATEGORY_COLORS[featuredQuickWin.category] || '#F3F4F6', color: '#1e2749', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}
-                      >
-                        {featuredQuickWin.category}
-                      </span>
-                      <div
-                        className="text-lg font-semibold mb-1"
-                        style={{ color: '#1e2749', fontFamily: "'Source Serif 4', serif" }}
-                      >
-                        {featuredQuickWin.title}
-                      </div>
-                      {featuredQuickWin.description && (
-                        <p className="text-sm mb-3" style={{ color: '#6B7280', lineHeight: '1.5' }}>
-                          {featuredQuickWin.description.slice(0, 120)}{featuredQuickWin.description.length > 120 ? '...' : ''}
-                        </p>
-                      )}
-                      <div className="flex items-center gap-3">
-                        <Link
-                          href={`/hub/quick-wins/${featuredQuickWin.slug}`}
-                          className="text-sm font-semibold rounded-lg px-5 py-2 whitespace-nowrap"
-                          style={{ background: '#FFBA06', color: '#1e2749' }}
-                        >
-                          {tUI('Try it')}
-                        </Link>
-                        <span className="text-xs" style={{ color: '#9CA3AF' }}>
-                          {featuredQuickWin.duration_minutes} min
-                        </span>
-                      </div>
-                    </>
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* TDI Tip (navy accent) */}
-          <div
-            className="rounded-2xl p-5"
-            style={{ background: '#1B2A4A', borderTop: '2px solid #E8B84B' }}
-          >
-            <div className="text-xs font-bold tracking-widest uppercase mb-2" style={{ color: '#E8B84B', letterSpacing: '0.1em' }}>
-              {tUI('TDI Tip')}
-            </div>
-            <p style={{ fontFamily: "'Source Serif 4', serif", fontStyle: 'italic', fontSize: 15, color: 'rgba(255,255,255,0.85)', lineHeight: 1.6 }}>
-              &ldquo;{tip}&rdquo;
-            </p>
-          </div>
-
-          {/* B. Continue Learning (max 2 enrollments) */}
-          {enrollments.length > 0 && (
-            <div>
-              <div className="text-sm font-semibold mb-3" style={{ color: '#1B2A4A', fontFamily: "'DM Sans', sans-serif" }}>
-                {tUI('Pick up where you left off')}
-              </div>
-              <div
-                className="bg-white rounded-2xl"
-                style={{ border: '1px solid rgba(27,42,74,0.06)', boxShadow: '0 1px 3px rgba(27,42,74,0.04), 0 4px 16px rgba(27,42,74,0.03)' }}
-              >
-                <div className="divide-y" style={{ borderColor: '#F3F4F6' }}>
-                  {enrollments.slice(0, 2).map((enrollment, index) => {
-                    const iconColors = ['#E0F4FF', '#E8F5E9', '#FEF3C7'];
-                    const iconBg = iconColors[index % iconColors.length];
-                    const pct = enrollment.progress_percentage || 0;
-                    return (
-                      <div key={enrollment.id} className="p-5 flex items-center gap-4">
-                        <div
-                          className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0"
-                          style={{ background: iconBg }}
-                        >
-                          <BookOpen size={20} style={{ color: '#1B2A4A' }} />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="text-sm font-semibold" style={{ color: '#1B2A4A', fontSize: '15px' }}>
-                            {enrollment.course?.title}
-                          </div>
-                          <div className="text-xs" style={{ color: '#9CA3AF' }}>
-                            {enrollment.lessons_completed} of {enrollment.total_lessons} lessons
-                          </div>
-                          <div className="flex items-center gap-2 mt-2">
-                            <div className="flex-1 h-2 rounded-full" style={{ background: '#F3F4F6' }}>
-                              <div
-                                className="h-full rounded-full"
-                                style={{
-                                  width: `${pct}%`,
-                                  background: pct >= 75
-                                    ? 'linear-gradient(90deg, #FFBA06, #F59E0B)'
-                                    : '#FFBA06',
-                                }}
-                              />
-                            </div>
-                            <span className="text-xs font-bold" style={{ color: pct >= 75 ? '#D97706' : '#9CA3AF', minWidth: '32px', textAlign: 'right' }}>
-                              {pct}%
-                            </span>
-                          </div>
-                        </div>
-                        <Link
-                          href={`/hub/courses/${enrollment.course?.slug}`}
-                          className="ml-2 flex-shrink-0 text-xs font-semibold text-white rounded-lg px-4 py-2 whitespace-nowrap"
-                          style={{ background: '#1B2A4A' }}
-                        >
-                          {tUI('Resume')}
-                        </Link>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-              <Link
-                href="/hub/courses"
-                className="inline-flex items-center gap-2 text-sm font-medium hover:underline mt-3"
-                style={{ color: '#1B2A4A', fontFamily: "'DM Sans', sans-serif" }}
-              >
-                {tUI('View all courses')}
-                <ArrowRight size={14} />
-              </Link>
-            </div>
-          )}
-
-          {/* New user: Browse buttons (only when no enrollments, no goal) */}
-          {enrollments.length === 0 && !userGoal && (
-            <div className="flex gap-3">
-              <Link
-                href="/hub/courses"
-                className="flex-1 text-center text-sm font-semibold rounded-xl px-4 py-3"
-                style={{ background: '#1B2A4A', color: 'white' }}
-              >
-                {tUI('Browse Courses')}
-              </Link>
-              <Link
-                href="/hub/quick-wins"
-                className="flex-1 text-center text-sm font-semibold rounded-xl px-4 py-3"
-                style={{ background: 'white', color: '#1B2A4A', border: '1px solid rgba(27,42,74,0.12)' }}
-              >
-                {tUI('Explore Quick Wins')}
-              </Link>
-            </div>
-          )}
-
-          {/* Browse by Topic */}
-          <div
-            className="bg-white rounded-2xl p-5"
-            style={{ border: '1px solid rgba(27,42,74,0.06)', boxShadow: '0 1px 3px rgba(27,42,74,0.04), 0 4px 16px rgba(27,42,74,0.03)' }}
-          >
-            <div className="text-xs font-bold tracking-widest uppercase mb-1" style={{ color: '#9CA3AF', letterSpacing: '0.08em' }}>
-              {tUI('Browse by Topic')}
-            </div>
-            <p className="text-xs mb-3" style={{ color: '#9CA3AF' }}>
-              {tUI('Find tools for what you need right now')}
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {[
-                { label: 'Back to School', query: 'back-to-school', color: '#FEF3C7', accent: '#D97706' },
-                { label: 'Classroom Management', query: 'classroom-management', color: '#FEE2E2', accent: '#DC2626' },
-                { label: 'Coaching', query: 'coaching', color: '#E0F2FE', accent: '#0284C7' },
-                { label: 'Wellness', query: 'wellness', color: '#DCFCE7', accent: '#16A34A' },
-                { label: 'Communication', query: 'communication', color: '#F3E8FF', accent: '#9333EA' },
-                { label: 'Assessment', query: 'assessment', color: '#FFF7ED', accent: '#EA580C' },
-                { label: 'Behavior', query: 'behavior', color: '#FFE4E6', accent: '#E11D48' },
-                { label: 'Relationships', query: 'relationships', color: '#FCE7F3', accent: '#DB2777' },
-                { label: 'Leadership', query: 'leadership', color: '#EFF6FF', accent: '#2563EB' },
-                { label: 'Special Ed', query: 'special-education', color: '#F0FDF4', accent: '#15803D' },
-                { label: 'De-escalation', query: 'de-escalation', color: '#FEF9C3', accent: '#CA8A04' },
-                { label: 'Inclusion', query: 'inclusion', color: '#E0E7FF', accent: '#4F46E5' },
-              ].map(({ label, query, color, accent }) => (
-                <Link
-                  key={query}
-                  href={`/hub/quick-wins?search=${encodeURIComponent(query.replace(/-/g, ' '))}`}
-                  className="px-3 py-1.5 rounded-full text-xs font-medium transition-all hover:shadow-sm"
-                  style={{ backgroundColor: color, color: accent, fontFamily: "'DM Sans', sans-serif" }}
-                >
-                  {tUI(label)}
-                </Link>
-              ))}
-            </div>
-          </div>
-
-          {/* Curated for You moved to sidebar */}
-
-          {/* Saved (moved from sidebar) */}
-          <div
-            data-tour="favorites"
-            className="bg-white rounded-2xl p-5"
-            style={{ border: '1px solid rgba(27,42,74,0.06)', boxShadow: '0 1px 3px rgba(27,42,74,0.04), 0 4px 16px rgba(27,42,74,0.03)' }}
-          >
-            <div className="text-xs font-bold tracking-widest uppercase mb-3" style={{ color: '#9CA3AF', letterSpacing: '0.08em' }}>
-              {tUI('Saved')}
-            </div>
-            {savedCourses.length > 0 ? (
-              <>
-                <div className="space-y-2">
-                  {savedCourses.slice(0, 3).map(item => {
-                    const isQW = 'type' in item && (item as any).type === 'quick_win';
-                    const href = isQW ? `/hub/quick-wins/${item.slug}` : `/hub/courses/${item.slug}`;
-                    return (
-                      <div
-                        key={item.id}
-                        className="flex items-center gap-3 py-2 cursor-pointer hover:opacity-80 transition-opacity"
-                        onClick={() => router.push(href)}
-                      >
-                        <Heart size={12} style={{ color: '#E53935', fill: '#E53935', flexShrink: 0 }} />
-                        <span className="text-sm font-medium flex-1" style={{ color: '#1B2A4A' }}>{item.title}</span>
-                        {isQW && (
-                          <span className="text-xs px-1.5 py-0.5 rounded" style={{ background: '#E8F5E9', color: '#2E7D32', fontSize: '9px' }}>
-                            {tUI('Tool')}
-                          </span>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-                {savedCourses.length > 3 && (
-                  <Link href="/hub/courses?filter=Saved" className="text-xs font-semibold mt-2 inline-block" style={{ color: '#38618C' }}>
-                    {tUI('View all')} {savedCourses.length} {tUI('saved')} →
-                  </Link>
-                )}
-              </>
-            ) : (
-              <p className="text-xs" style={{ color: '#9CA3AF' }}>
-                {tUI('Heart any course or quick win to save it here.')}
-              </p>
-            )}
-
-            {/* Community bookmarks */}
-            <CommunityBookmarks userId={user?.id} tUI={tUI} />
-          </div>
-
-          {/* Hub Pioneer card removed -- tour-specific */}
-          {false && fieldNotesCount > 0 && (
-            <div
-              data-tour="field-notes"
-              className="rounded-2xl overflow-hidden"
-              style={{ background: 'linear-gradient(135deg, #1B2A4A 0%, #2d3a5c 100%)', boxShadow: '0 4px 20px rgba(27,42,74,0.15)' }}
-            >
-              <div className="p-6 flex items-center gap-5">
-                <div
-                  className="w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0"
-                  style={{ background: 'rgba(255,186,6,0.15)' }}
-                >
-                  <Award size={28} style={{ color: '#FFBA06' }} />
-                </div>
-                <div className="flex-1">
-                  <div className="text-xs font-bold uppercase tracking-wider mb-1" style={{ color: '#FFBA06', letterSpacing: '0.08em' }}>
-                    {tUI('Your first Field Note')}
-                  </div>
-                  <p className="text-sm font-semibold text-white mb-1">
-                    {tUI('Hub Pioneer')}
-                  </p>
-                  <p className="text-xs" style={{ color: 'rgba(255,255,255,0.6)', fontStyle: 'italic', lineHeight: 1.5 }}>
-                    {tUI('You are one of the first educators to explore this space. That says everything about who you are.')}
-                  </p>
-                </div>
-                <Link
-                  href="/hub/certificates"
-                  className="flex-shrink-0 text-xs font-semibold px-4 py-2 rounded-lg"
-                  style={{ background: '#FFBA06', color: '#1B2A4A' }}
-                >
-                  {tUI('View all')}
-                </Link>
-              </div>
-            </div>
-          )}
-
-          {/* Know Yourself -- quiz recommendations */}
-          {(() => {
-            const untaken = ALL_QUIZZES.filter(q => !dashboardQuizResults[q.id]);
-            const taken = ALL_QUIZZES.filter(q => dashboardQuizResults[q.id]);
-            if (untaken.length === 0 && taken.length === 0) return null;
-            const showUntaken = untaken.slice(0, 2);
-            const showTaken = taken.slice(0, 1);
-            return (
-              <div
-                className="bg-white rounded-2xl p-5"
-                style={{ border: '1px solid rgba(27,42,74,0.06)', boxShadow: '0 1px 3px rgba(27,42,74,0.04), 0 4px 16px rgba(27,42,74,0.03)' }}
-              >
-                <div className="text-xs font-bold tracking-widest uppercase mb-3" style={{ color: '#9CA3AF', letterSpacing: '0.08em' }}>
-                  {tUI('Know Yourself')}
-                </div>
-                <div className="space-y-2.5">
-                  {showTaken.map(quiz => (
-                    <QuizResultBadge key={quiz.id} quiz={quiz} resultKey={dashboardQuizResults[quiz.id]} compact />
-                  ))}
-                  {showUntaken.map(quiz => (
-                    <Link
-                      key={quiz.id}
-                      href="/hub/settings/profile?tab=educator_profile"
-                      className="block rounded-xl overflow-hidden hover:shadow-sm transition-shadow"
-                      style={{ border: '1px solid #E9E7E2' }}
-                    >
-                      <div className="flex items-center">
-                        <div
-                          className="w-12 flex-shrink-0 flex items-center justify-center self-stretch"
-                          style={{ background: quiz.accentGradient }}
-                        >
-                          <span className="text-sm font-bold text-white" style={{ fontFamily: "'Source Serif 4', serif" }}>?</span>
-                        </div>
-                        <div className="flex-1 min-w-0 p-3">
-                          <div className="text-sm font-medium" style={{ color: '#1B2A4A', fontFamily: "'DM Sans', sans-serif" }}>
-                            {quiz.title}
-                          </div>
-                          <div className="text-xs" style={{ color: '#9CA3AF' }}>
-                            {quiz.questionCount} {tUI('questions')} &middot; {quiz.durationLabel}
-                          </div>
-                        </div>
-                        <ArrowRight size={14} className="mr-3" style={{ color: quiz.accentColor }} />
-                      </div>
-                    </Link>
-                  ))}
-                  {(untaken.length > 2 || taken.length > 1) && (
-                    <Link
-                      href="/hub/settings/profile?tab=educator_profile"
-                      className="block text-center text-xs font-medium py-2 transition-colors hover:text-gray-700"
-                      style={{ color: '#9CA3AF', fontFamily: "'DM Sans', sans-serif" }}
-                    >
-                      {tUI('See all quizzes')} &rarr;
-                    </Link>
-                  )}
-                </div>
-              </div>
-            );
-          })()}
-
-          {/* AI Growth Insight */}
-          {(aiInsight || aiInsightLoading) && (
-            <div
-              className="rounded-2xl p-5"
-              style={{ background: 'linear-gradient(135deg, #1B2A4A 0%, #263554 100%)', borderLeft: '3px solid #E8B84B' }}
-            >
-              <div className="flex items-center gap-1.5 mb-2">
-                <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#E8B84B', display: 'inline-block', animation: 'pulse 2s infinite' }} />
-                <span style={{ fontSize: 10, fontWeight: 700, color: '#E8B84B', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
-                  AI Growth Insight
-                </span>
-              </div>
-              <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.8)', lineHeight: 1.6, margin: 0 }}>
-                {aiInsightLoading ? 'Generating your personalized insight...' : (
-                  aiInsight && !aiInsightExpanded && aiInsight.length > 150
-                    ? aiInsight.slice(0, 150).trim() + '...'
-                    : aiInsight
-                )}
-              </p>
-              {aiInsight && aiInsight.length > 150 && (
-                <button
-                  onClick={() => setAiInsightExpanded(!aiInsightExpanded)}
-                  className="mt-2 text-xs font-medium transition-colors hover:opacity-80"
-                  style={{ color: '#E8B84B', fontFamily: "'DM Sans', sans-serif", background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
-                >
-                  {aiInsightExpanded ? 'Show less' : 'Read more'}
-                </button>
-              )}
-              <style>{`@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }`}</style>
-            </div>
-          )}
-
-          {/* Community Bookmarks */}
-          <CommunityBookmarks userId={user?.id} tUI={tUI} />
-
-        </div>
-
-        {/* ===== RIGHT COLUMN (SIDEBAR) ===== */}
-        <div className="space-y-4">
-          {/* Gift Element -- deferred to post-launch for polish */}
-
-          {/* TDI Tip removed -- low signal for dashboard */}
-          {false && <div
-            className="rounded-2xl p-6"
-            style={{ background: '#1B2A4A', borderTop: '2px solid #FFBA06' }}
-          >
-            <div
-              className="text-xs font-bold tracking-widest uppercase mb-3"
-              style={{ color: '#FFBA06', letterSpacing: '0.1em' }}
-            >
-              {tUI('TDI Tip')}
-            </div>
-            <p
-              className="leading-relaxed mb-4"
-              style={{
-                color: 'rgba(255,255,255,0.85)',
-                fontFamily: "'Source Serif 4', Georgia, serif",
-                fontStyle: 'italic',
-                fontSize: '14px',
-                lineHeight: 1.7,
-              }}
-            >
-              &ldquo;{tip}&rdquo;
-            </p>
-            <button
-              onClick={() => setShowCelebrateModal(true)}
-              className="flex items-center gap-2 text-xs font-semibold rounded-full px-4 py-2 transition-opacity hover:opacity-80"
-              style={{ background: 'rgba(255,186,6,0.15)', color: '#FFBA06', border: '1px solid rgba(255,186,6,0.3)' }}
-            >
-              <Share2 size={12} />
-              {tUI('Share your wins')}
-            </button>
-          </div>}
-
-          {/* 3. Your Progress -- merged Achievements + Streak + Tracker */}
-          <div
-            data-tour="transformation-tracker"
-            className="bg-white rounded-2xl p-5"
-            style={{ border: '1px solid rgba(27,42,74,0.08)' }}
-          >
-            {/* Streak */}
-            {currentStreak >= 2 && (
-              <>
-                <div className="flex items-center gap-3.5 mb-4">
-                  <div
-                    className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0"
-                    style={{ background: '#FFF8E7' }}
-                  >
-                    <span style={{ fontSize: '20px' }}>&#9679;</span>
-                  </div>
-                  <div className="flex-1">
-                    <div className="text-xl font-bold" style={{ color: '#1B2A4A' }}>{currentStreak} {tUI('days')}</div>
-                    <div className="text-xs mt-0.5" style={{ color: '#9CA3AF' }}>{tUI('Learning streak')}</div>
-                  </div>
-                </div>
-                <p className="text-xs mb-4" style={{ color: '#9CA3AF' }}>
-                  {currentStreak >= 7
-                    ? tUI("You've shown up consistently. That's what growth looks like.")
-                    : tUI("You're building momentum. Keep it going.")}
-                </p>
-                <div style={{ borderTop: '1px solid #F3F4F6', marginBottom: '16px' }} />
-              </>
-            )}
-
-            {/* Achievements section */}
-            <div className="flex items-center gap-3.5 mb-4">
-              <div
-                className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0"
-                style={{ background: '#FEF3C7' }}
-              >
-                <Award size={20} style={{ color: '#D97706' }} />
-              </div>
-              <div className="flex-1">
-                <div className="text-xl font-bold" style={{ color: '#1B2A4A' }}>{certificateCount + fieldNotesCount}</div>
-                <div className="text-xs mt-0.5" style={{ color: '#9CA3AF' }}>{tUI('Achievements earned')}</div>
-              </div>
-              <Link href="/hub/certificates" className="text-xs font-semibold" style={{ color: '#38618C' }}>
-                {tUI('View all')} →
-              </Link>
-            </div>
-            {(certificateCount > 0 || fieldNotesCount > 0) && (
-              <div className="flex gap-4 text-xs mb-4" style={{ color: '#6B7280' }}>
-                {certificateCount > 0 && <span>{certificateCount} {tUI('Certificates')}</span>}
-                {fieldNotesCount > 0 && <span>{fieldNotesCount} {tUI('Field Notes')}</span>}
-              </div>
-            )}
-
-            {/* Tracker progress */}
-            {trackerEligibility && (
-              <>
-                <div style={{ borderTop: '1px solid #F3F4F6', marginBottom: '16px' }} />
-                {trackerEligibility.isEligible ? (
-                  <Link
-                    href="/hub/transformation"
-                    className="flex items-center gap-3 hover:opacity-80 transition-opacity"
-                  >
-                    <div
-                      className="w-9 h-9 rounded-full flex items-center justify-center"
-                      style={{ backgroundColor: '#FFF8E7' }}
-                    >
-                      <TrendingUp size={16} style={{ color: '#FFBA06' }} />
-                    </div>
-                    <div className="flex-1">
-                      <div className="text-sm font-semibold" style={{ color: '#1B2A4A' }}>{tUI('Growth Dashboard')}</div>
-                      <div className="text-xs" style={{ color: '#9CA3AF' }}>{tUI('View your progress')}</div>
-                    </div>
-                    <ArrowRight size={14} style={{ color: '#38618C' }} />
-                  </Link>
-                ) : (
-                  <div>
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="text-xs font-semibold" style={{ color: '#1B2A4A' }}>{tUI('Growth Dashboard')}</div>
-                      <div
-                        className="text-xs font-bold px-2 py-0.5 rounded"
-                        style={{ background: '#F3F4F6', color: '#6B7280', fontSize: '10px' }}
-                      >
-                        {tUI('Locked')}
-                      </div>
-                    </div>
-                    <p className="text-xs mb-3" style={{ color: '#9CA3AF' }}>
-                      {tUI('Complete 1 course and 2 check-ins to unlock.')}
-                    </p>
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2.5">
-                        <div className="text-xs w-14 flex-shrink-0" style={{ color: '#6B7280' }}>{tUI('Courses')}</div>
-                        <div className="flex-1 h-1.5 rounded-full overflow-hidden" style={{ background: '#F3F4F6' }}>
-                          <div
-                            className="h-full rounded-full"
-                            style={{ width: `${Math.min(100, (trackerEligibility.completedCourses / trackerEligibility.requiredCourses) * 100)}%`, background: '#FFBA06' }}
-                          />
-                        </div>
-                        <div className="text-xs font-semibold w-7 text-right" style={{ color: '#1B2A4A' }}>
-                          {trackerEligibility.completedCourses}/{trackerEligibility.requiredCourses}
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2.5">
-                        <div className="text-xs w-14 flex-shrink-0" style={{ color: '#6B7280' }}>{tUI('Check-ins')}</div>
-                        <div className="flex-1 h-1.5 rounded-full overflow-hidden" style={{ background: '#F3F4F6' }}>
-                          <div
-                            className="h-full rounded-full"
-                            style={{ width: `${Math.min(100, (trackerEligibility.totalAssessments / trackerEligibility.requiredAssessments) * 100)}%`, background: '#4ecdc4' }}
-                          />
-                        </div>
-                        <div className="text-xs font-semibold w-7 text-right" style={{ color: '#1B2A4A' }}>
-                          {trackerEligibility.totalAssessments}/{trackerEligibility.requiredAssessments}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </>
-            )}
-          </div>
-
-          {/* Curated for You */}
-          {showRecommendations && recommendations.length > 0 && (
-            <div
-              className="bg-white rounded-2xl p-5"
-              style={{ border: '1px solid rgba(27,42,74,0.08)' }}
-            >
-              <div className="text-xs font-bold tracking-widest uppercase mb-3" style={{ color: '#9CA3AF', letterSpacing: '0.08em' }}>
-                {tUI('Curated for you')}
-              </div>
-              <div className="space-y-2.5">
-                {recommendations.slice(0, 1).map((course) => {
-                  const catAccent = CATEGORY_ACCENTS[course.category] || '#38618C';
-                  return (
-                    <Link
-                      key={course.id}
-                      href={`/hub/courses/${course.slug}`}
-                      className="rounded-xl overflow-hidden flex hover:shadow-sm transition-shadow block"
-                      style={{ border: '1px solid #E9E7E2' }}
-                    >
-                      <div className="w-16 flex-shrink-0" style={{
-                        background: course.thumbnail_url ? undefined : `linear-gradient(135deg, ${catAccent} 0%, ${catAccent}99 100%)`,
-                      }}>
-                        {course.thumbnail_url ? (
-                          <img src={course.thumbnail_url} alt={course.title || 'Course thumbnail'} className="w-full h-full object-cover" style={{ objectPosition: 'top' }} />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center min-h-[60px]">
-                            <BookOpen size={16} style={{ color: 'rgba(255,255,255,0.5)' }} />
-                          </div>
-                        )}
-                      </div>
-                      <div className="flex-1 p-3">
-                        <div className="text-sm font-semibold leading-snug mb-0.5" style={{ color: '#1B2A4A' }}>{course.title}</div>
-                        <div className="text-xs" style={{ color: '#9CA3AF' }}>{course.reason || tUI('Popular with educators')}</div>
-                      </div>
-                    </Link>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-
-          {/* Educators Like You */}
-          {likeYouRecs.length > 0 && likeYouType && (
-            <div
-              className="bg-white rounded-2xl p-5"
-              style={{ border: '1px solid rgba(27,42,74,0.08)' }}
-            >
-              <div className="text-xs font-bold tracking-widest uppercase mb-1" style={{ color: '#9CA3AF', letterSpacing: '0.08em' }}>
-                {tUI('Educators like you')}
-              </div>
-              <p className="text-xs mb-3" style={{ color: '#9CA3AF' }}>
-                {tUI('Popular with')} {likeYouCohortSize} {tUI('other')} {likeYouType}s
-              </p>
-              <div className="space-y-2.5">
-                {likeYouRecs.map(qw => (
-                  <Link
-                    key={qw.id}
-                    href={`/hub/quick-wins/${qw.slug}`}
-                    className="block bg-white rounded-xl p-3 hover:shadow-sm transition-shadow"
-                    style={{ border: '1px solid #E9E7E2' }}
-                  >
-                    <div className="text-sm font-medium" style={{ color: '#1B2A4A' }}>{qw.title}</div>
-                    <div className="text-xs mt-0.5" style={{ color: '#9CA3AF' }}>{qw.category}</div>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* 4. Quick Wins Explorer */}
-          {quickWins.length > 0 && (
-            <div
-              data-tour="quick-wins"
-              className="rounded-2xl p-5"
-              style={{ background: '#FAFAF8', border: '1px solid rgba(27,42,74,0.08)' }}
-            >
-              <div className="text-xs font-bold tracking-widest uppercase mb-3" style={{ color: '#9CA3AF', letterSpacing: '0.08em' }}>
-                {tUI('Quick Wins')}
-              </div>
-              <div className="space-y-2.5">
-                {quickWins.map((qw) => {
-                  const categoryBg = CATEGORY_COLORS[qw.category] || '#F3F4F6';
-                  const accentColor = CATEGORY_ACCENTS[qw.category] || '#7C9CBF';
-                  return (
-                    <Link
-                      key={qw.id}
-                      href={`/hub/quick-wins/${qw.slug}`}
-                      className="block bg-white rounded-xl overflow-hidden hover:shadow-sm transition-shadow"
-                      style={{ border: '1px solid #E9E7E2' }}
-                    >
-                      {/* Thumbnail strip or gradient */}
-                      {qw.thumbnail_url ? (
-                        <div className="w-full h-20 overflow-hidden">
-                          <img src={qw.thumbnail_url} alt={qw.title || 'Quick win thumbnail'} className="w-full h-full object-cover" style={{ objectPosition: 'top' }} />
-                        </div>
-                      ) : (
-                        <div className="w-full h-2.5" style={{ background: `linear-gradient(90deg, ${accentColor}, ${accentColor}88)` }} />
-                      )}
-                      <div className="p-3.5">
-                        <span
-                          className="inline-block text-xs font-bold px-2 py-0.5 rounded mb-1.5"
-                          style={{ background: categoryBg, color: '#1e2749', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}
-                        >
-                          {qw.category}
-                        </span>
-                        <div className="text-sm font-semibold leading-snug" style={{ color: '#1B2A4A' }}>
-                          {qw.title}
-                        </div>
-                        <div className="text-xs mt-1" style={{ color: '#9CA3AF' }}>{qw.duration_minutes} min</div>
-                      </div>
-                    </Link>
-                  );
-                })}
-              </div>
-              <Link
-                href="/hub/quick-wins"
-                className="inline-flex items-center gap-1.5 text-xs font-semibold mt-3 hover:underline"
-                style={{ color: '#38618C' }}
-              >
-                {tUI('Explore all Quick Wins')}
-                <ArrowRight size={12} />
-              </Link>
-            </div>
-          )}
-
-          {/* 5. Practice Games */}
-          <div
-            className="rounded-2xl overflow-hidden"
-            style={{ background: 'linear-gradient(135deg, #1B2A4A 0%, #2d3a5c 60%, #38618C 100%)', border: '1px solid rgba(255,255,255,0.08)' }}
-          >
-            <div className="p-5">
-              <div className="text-xs font-bold tracking-widest uppercase mb-3" style={{ color: '#E8B84B', letterSpacing: '0.08em' }}>
-                {tUI('Practice Games')}
-              </div>
-              <p className="text-sm mb-4" style={{ color: 'rgba(255,255,255,0.6)', lineHeight: 1.5 }}>
-                {tUI('Sharpen your classroom skills with interactive games. Play solo or with your team.')}
-              </p>
-              <div className="space-y-2">
-                {[
-                  { slug: 'tell-or-ask', title: 'Tell or Ask?', time: '10 min', color: '#F1C40F' },
-                  { slug: 'feedback-level-up', title: 'Feedback Level Up', time: '12 min', color: '#27AE60' },
-                  { slug: 'whats-your-move', title: "What's Your Move?", time: '10 min', color: '#22b8bd' },
-                ].map((game) => (
-                  <Link
-                    key={game.slug}
-                    href={`/hub/quick-wins/${game.slug}`}
-                    className="flex items-center gap-3 px-3.5 py-3 rounded-xl transition-colors hover:bg-white/10"
-                    style={{ border: '1px solid rgba(255,255,255,0.08)' }}
-                  >
-                    <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: game.color }} />
-                    <span className="text-sm font-medium text-white flex-1">{game.title}</span>
-                    <span className="text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>{game.time}</span>
-                  </Link>
-                ))}
-              </div>
-              <Link
-                href="/hub/quick-wins?filter=Games"
-                className="inline-flex items-center gap-1.5 text-xs font-semibold mt-3 hover:underline"
-                style={{ color: '#E8B84B' }}
-              >
-                {tUI('All 19 games')}
-                <ArrowRight size={12} />
-              </Link>
-            </div>
-          </div>
-
-          {/* LIFT + Vibe Check moved to tour card and Profile settings */}
-        </div>
-      </div>
-    </div>
-
-    {/* Vibe Check moved to Profile settings */}
-    {false && (
-      <div className="max-w-5xl mx-auto px-4 md:px-6 pb-8">
-      <div
-        data-tour="vibe-check"
-        className="rounded-2xl overflow-hidden"
-        style={{ border: '1px solid rgba(27,42,74,0.08)', boxShadow: '0 1px 3px rgba(27,42,74,0.04), 0 4px 16px rgba(27,42,74,0.03)' }}
-      >
-        <div className="md:flex">
-          {/* Left: header + description */}
-          <div className="md:w-2/5 px-6 py-6" style={{ background: 'linear-gradient(135deg, #FFF8E7 0%, #FAFAF8 100%)' }}>
-            <div className="text-xs font-bold tracking-widest uppercase mb-2" style={{ color: '#D97706', letterSpacing: '0.08em' }}>
-              {tUI('Vibe Check')}
-            </div>
-            <p className="text-sm mb-4" style={{ color: '#4B5563', lineHeight: 1.6 }}>
-              {tUI('Quick prompts that pop up randomly while you explore. Our team sends them because we genuinely care how you are doing. They are always easy to answer and completely private.')}
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {[
-                { label: 'Mood', color: '#DC2626', bg: '#FEE2E2' },
-                { label: 'Energy', color: '#D97706', bg: '#FEF3C7' },
-                { label: 'Belonging', color: '#7C3AED', bg: '#F3E8FF' },
-                { label: 'Purpose', color: '#0891B2', bg: '#E0F4FF' },
-                { label: 'Needs', color: '#16A34A', bg: '#D1FAE5' },
-              ].map((dim) => (
-                <div
-                  key={dim.label}
-                  className="flex items-center gap-1.5 rounded-full px-3 py-1.5"
-                  style={{ background: dim.bg }}
-                >
-                  <span className="w-2 h-2 rounded-full" style={{ background: dim.color }} />
-                  <span className="text-xs font-medium" style={{ color: dim.color }}>{tUI(dim.label)}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-          {/* Right: sample questions */}
-          <div className="md:w-3/5 bg-white px-6 py-6 flex flex-col justify-center" style={{ borderLeft: '1px solid #F3F4F6' }}>
-            <div className="space-y-2.5">
-              {[
-                'How are you feeling right now?',
-                'Do you have the energy to finish the day strong?',
-                'How connected do you feel to your school community?',
-              ].map((q, i) => (
-                <div
-                  key={i}
-                  className="rounded-lg px-4 py-3"
-                  style={{ background: '#FAFAF8', border: '1px solid #F3F4F6' }}
-                >
-                  <span className="text-sm" style={{ color: '#4B5563', fontStyle: 'italic' }}>
-                    &ldquo;{tUI(q)}&rdquo;
-                  </span>
-                </div>
-              ))}
-            </div>
-            <Link
-              href="/hub/settings/profile"
-              className="inline-flex items-center gap-1.5 text-xs font-semibold mt-3"
-              style={{ color: '#D97706' }}
-            >
-              {tUI('View your history')}
-              <ArrowRight size={12} />
-            </Link>
-          </div>
-        </div>
-      </div>
-    </div>
-    )}
-
-    {/* Recognition Celebration */}
-    {newRecognition && (
-      <RecognitionCelebration
-        recognition={newRecognition}
-        onDismiss={() => {
-          // Mark as seen
-          if (user?.id) {
-            fetch('/api/hub/recognitions', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ userId: user.id, markSeen: [newRecognition.id] }),
-            }).catch(() => {});
-          }
-          setNewRecognition(null);
-        }}
-      />
-    )}
-
-    {/* Celebrate & Share Modal */}
-    {showCelebrateModal && (
-      <div
-        className="fixed inset-0 z-50 flex items-center justify-center p-4"
-        style={{ background: 'rgba(0,0,0,0.5)' }}
-        onClick={() => setShowCelebrateModal(false)}
-      >
-        <div
-          className="w-full max-w-md rounded-2xl overflow-hidden shadow-2xl max-h-[90vh] flex flex-col bg-white"
-          onClick={(e) => e.stopPropagation()}
-        >
-          {/* Compact header */}
-          <div className="px-5 py-4 flex items-center justify-between" style={{ background: '#1e2749' }}>
-            <div>
-              <p style={{ fontSize: '13px', fontWeight: 600, color: 'white' }}>
-                {tUI('Share your win')}
-              </p>
-              <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.5)' }}>
-                {tUI('Pick one, we will write the rest')}
-              </p>
-            </div>
-            <button
-              onClick={() => setShowCelebrateModal(false)}
-              className="text-white/60 hover:text-white"
-            >
-              <X size={18} />
-            </button>
-          </div>
-
-          <div className="overflow-y-auto flex-1">
-            {/* Step 1: Pick your win (always visible) */}
-            <div className="px-5 py-4">
-              <div className="grid grid-cols-2 gap-2">
-                {CELEBRATION_CATEGORIES.map((cat) => (
-                  <button
-                    key={cat.key}
-                    onClick={() => {
-                      setSelectedCelebration(cat.key);
-                      setCelebrateCopied(false);
-                    }}
-                    className="text-left px-3 py-2.5 rounded-xl text-xs font-medium transition-all border"
-                    style={
-                      selectedCelebration === cat.key
-                        ? { background: '#FFBA06', borderColor: '#FFBA06', color: '#1e2749' }
-                        : { background: 'white', borderColor: '#E5E7EB', color: '#4B5563' }
-                    }
-                  >
-                    {tUI(cat.label)}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Step 2: Message + share (only after selection) */}
-            {selectedCelebration && (() => {
-              const message = getCelebrationMessage(selectedCelebration, tip);
-              const encodedMessage = encodeURIComponent(message);
-              return (
-                <div className="px-5 pb-5" style={{ borderTop: '1px solid #F3F4F6' }}>
-                  {/* The message -- this is the star */}
-                  <div
-                    className="my-4 p-4 rounded-xl"
-                    style={{ background: '#1e2749' }}
-                  >
-                    <p style={{ fontSize: '14px', color: 'white', lineHeight: '1.6', fontStyle: 'italic' }}>
-                      &ldquo;{message}&rdquo;
-                    </p>
-                  </div>
-
-                  {/* Copy -- primary action */}
-                  <button
-                    onClick={() => {
-                      navigator.clipboard.writeText(message);
-                      setCelebrateCopied(true);
-                      setTimeout(() => setCelebrateCopied(false), 2000);
-                    }}
-                    className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold mb-4"
-                    style={
-                      celebrateCopied
-                        ? { background: '#D1FAE5', color: '#065F46' }
-                        : { background: '#FFBA06', color: '#1e2749' }
-                    }
-                  >
-                    {celebrateCopied ? <Check size={14} /> : <Copy size={14} />}
-                    {celebrateCopied ? tUI('Copied!') : tUI('Copy and paste anywhere')}
-                  </button>
-
-                  {/* Email options */}
-                  <p className="text-xs font-semibold mb-2 uppercase tracking-wider" style={{ color: '#9CA3AF' }}>
-                    {tUI('Email it')}
-                  </p>
-                  <div className="grid grid-cols-3 gap-2 mb-4">
-                    <a href={`mailto:?subject=${encodeURIComponent('My teacher win today')}&body=${encodedMessage}`}
-                      className="flex flex-col items-center gap-1 py-3 px-2 rounded-lg text-xs font-medium border transition-colors hover:bg-gray-50"
-                      style={{ borderColor: '#E5E7EB', color: '#374151' }}>
-                      <span style={{ fontSize: '20px' }}>@</span>{tUI('Default')}
-                    </a>
-                    <a href={`https://mail.google.com/mail/?view=cm&su=${encodeURIComponent('My teacher win today')}&body=${encodedMessage}`}
-                      target="_blank" rel="noopener noreferrer"
-                      className="flex flex-col items-center gap-1 py-3 px-2 rounded-lg text-xs font-medium border transition-colors hover:bg-gray-50"
-                      style={{ borderColor: '#E5E7EB', color: '#374151' }}>
-                      <span style={{ fontSize: '20px', color: '#EA4335' }}>G</span>{tUI('Gmail')}
-                    </a>
-                    <a href={`https://outlook.live.com/mail/0/deeplink/compose?subject=${encodeURIComponent('My teacher win today')}&body=${encodedMessage}`}
-                      target="_blank" rel="noopener noreferrer"
-                      className="flex flex-col items-center gap-1 py-3 px-2 rounded-lg text-xs font-medium border transition-colors hover:bg-gray-50"
-                      style={{ borderColor: '#E5E7EB', color: '#374151' }}>
-                      <span style={{ fontSize: '20px', color: '#0078D4' }}>O</span>{tUI('Outlook')}
-                    </a>
-                  </div>
-
-                  {/* Share options */}
-                  <p className="text-xs font-semibold mb-2 uppercase tracking-wider" style={{ color: '#9CA3AF' }}>
-                    {tUI('Share it')}
-                  </p>
-                  <div className="grid grid-cols-3 gap-2">
-                    <a href={`sms:?&body=${encodedMessage}`}
-                      className="flex flex-col items-center gap-1 py-3 px-2 rounded-lg text-xs font-medium border transition-colors hover:bg-gray-50"
-                      style={{ borderColor: '#E5E7EB', color: '#374151' }}>
-                      <span style={{ fontSize: '20px', color: '#34C759' }}>+</span>{tUI('Text')}
-                    </a>
-                    <a href={`https://www.facebook.com/sharer/sharer.php?quote=${encodedMessage}`}
-                      target="_blank" rel="noopener noreferrer"
-                      className="flex flex-col items-center gap-1 py-3 px-2 rounded-lg text-xs font-medium border transition-colors hover:bg-gray-50"
-                      style={{ borderColor: '#E5E7EB', color: '#374151' }}>
-                      <span style={{ fontSize: '20px', color: '#1877F2' }}>f</span>{tUI('Facebook')}
-                    </a>
-                    <a href={`https://twitter.com/intent/tweet?text=${encodedMessage}`}
-                      target="_blank" rel="noopener noreferrer"
-                      className="flex flex-col items-center gap-1 py-3 px-2 rounded-lg text-xs font-medium border transition-colors hover:bg-gray-50"
-                      style={{ borderColor: '#E5E7EB', color: '#374151' }}>
-                      <span style={{ fontSize: '20px' }}>X</span>{tUI('Twitter')}
-                    </a>
-                    <a href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent('https://teachersdeserveit.com')}`}
-                      target="_blank" rel="noopener noreferrer"
-                      className="flex flex-col items-center gap-1 py-3 px-2 rounded-lg text-xs font-medium border transition-colors hover:bg-gray-50"
-                      style={{ borderColor: '#E5E7EB', color: '#374151' }}>
-                      <span style={{ fontSize: '20px', color: '#0A66C2' }}>in</span>{tUI('LinkedIn')}
-                    </a>
-                    <a href={`https://wa.me/?text=${encodedMessage}`}
-                      target="_blank" rel="noopener noreferrer"
-                      className="flex flex-col items-center gap-1 py-3 px-2 rounded-lg text-xs font-medium border transition-colors hover:bg-gray-50"
-                      style={{ borderColor: '#E5E7EB', color: '#374151' }}>
-                      <span style={{ fontSize: '20px', color: '#25D366' }}>W</span>{tUI('WhatsApp')}
-                    </a>
-                    <button onClick={() => { navigator.clipboard.writeText('https://teachersdeserveit.com'); }}
-                      className="flex flex-col items-center gap-1 py-3 px-2 rounded-lg text-xs font-medium border transition-colors hover:bg-gray-50"
-                      style={{ borderColor: '#E5E7EB', color: '#374151' }}>
-                      <span style={{ fontSize: '20px' }}>~</span>{tUI('Link')}
-                    </button>
-                  </div>
-                </div>
-              );
-            })()}
-          </div>
-        </div>
-      </div>
-    )}
-    {showTour && <OnboardingTour onComplete={handleTourComplete} resumeFromStep={tourResumeStep} />}
+      {showTour && <OnboardingTour onComplete={handleTourComplete} resumeFromStep={tourResumeStep} />}
     </div>
   );
 }
