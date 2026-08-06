@@ -400,7 +400,7 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
     if (success) {
       // Go straight to the first lesson. No second click needed.
       if (modules[0]?.lessons[0]) {
-        router.push(`/hub/courses/${course.slug}/${modules[0].lessons[0].slug || modules[0].lessons[0].id}`);
+        router.push(`/hub/courses/${course?.slug}/${modules[0].lessons[0].slug || modules[0].lessons[0].id}`);
       }
     } else {
       showToast('Failed to enroll. Please try again.', 'error');
@@ -600,7 +600,7 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
     if (isEnrolled) {
       if (progressPct === 100) {
         if (modules[0]?.lessons[0]) {
-          router.push(`/hub/courses/${course.slug}/${modules[0].lessons[0].slug || modules[0].lessons[0].id}`);
+          router.push(`/hub/courses/${course?.slug}/${modules[0].lessons[0].slug || modules[0].lessons[0].id}`);
         }
         return;
       }
@@ -615,7 +615,7 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
       }
       // All complete, go to first lesson
       if (modules[0]?.lessons[0]) {
-        router.push(`/hub/courses/${course.slug}/${modules[0].lessons[0].slug || modules[0].lessons[0].id}`);
+        router.push(`/hub/courses/${course?.slug}/${modules[0].lessons[0].slug || modules[0].lessons[0].id}`);
       }
     } else {
       handleEnroll();
