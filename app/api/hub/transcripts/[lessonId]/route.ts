@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+function getHubServiceSupabase() {
+  const url = process.env.LEARNING_HUB_SUPABASE_URL || process.env.NEXT_PUBLIC_LEARNING_HUB_SUPABASE_URL
+  const key = process.env.LEARNING_HUB_SUPABASE_SERVICE_KEY
+  if (!url || !key) throw new Error('Learning Hub Supabase not configured')
+  return createClient(url, key, { auth: { autoRefreshToken: false, persistSession: false } })
+}
 
 export async function GET(
   request: NextRequest,
@@ -14,9 +16,11 @@ export async function GET(
   const lang = request.nextUrl.searchParams.get('lang') || 'en'
 
   try {
+    const supabase = getHubServiceSupabase()
+
     const { data: lesson, error } = await supabase
       .from('hub_lessons')
-      .select('id, title, transcript_text, transcript_text_es')
+      .select('id, title, transcript, transcript_es')
       .eq('id', lessonId)
       .single()
 
@@ -25,8 +29,8 @@ export async function GET(
     }
 
     const transcriptText = lang === 'es'
-      ? lesson.transcript_text_es
-      : lesson.transcript_text
+      ? lesson.transcript_es
+      : lesson.transcript
 
     if (!transcriptText) {
       return NextResponse.json(
@@ -35,20 +39,16 @@ export async function GET(
       )
     }
 
-    // Format transcript as clean text file
     const langLabel = lang === 'es' ? 'Spanish' : 'English'
     const filename = `${lesson.title.replace(/[^a-z0-9]/gi, '-').toLowerCase()}-transcript-${lang}.txt`
 
     const content = [
-      `TDI Learning Hub - Lesson Transcript`,
+      `TDI Learning Hub Lesson Transcript`,
       `Lesson: ${lesson.title}`,
       `Language: ${langLabel}`,
       ``,
-      `─────────────────────────────────────`,
-      ``,
       transcriptText,
       ``,
-      `─────────────────────────────────────`,
       `Teachers Deserve It | teachersdeserveit.com`,
     ].join('\n')
 
