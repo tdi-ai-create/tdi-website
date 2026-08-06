@@ -1125,8 +1125,8 @@ export default function LessonPage({ params }: LessonPageProps) {
                 <Link
                   href={`/hub/courses/${slug}`}
                   style={{
-                    color: '#9CA3AF', textDecoration: 'none', fontSize: 12,
-                    display: 'flex', alignItems: 'center', gap: 5,
+                    color: '#9CA3AF', textDecoration: 'none', fontSize: 14,
+                    display: 'flex', alignItems: 'center', gap: 6,
                   }}
                 >
                   <ArrowLeft size={12} />
@@ -1141,13 +1141,13 @@ export default function LessonPage({ params }: LessonPageProps) {
               }}>
                 <div>
                   <h1 style={{
-                    fontFamily: "'Source Serif 4', Georgia, serif", fontSize: 22, fontWeight: 600,
+                    fontFamily: "'Source Serif 4', Georgia, serif", fontSize: 28, fontWeight: 600,
                     color: dark ? '#F3F4F6' : '#1E2749', lineHeight: 1.2, margin: 0,
                   }}>
                     {currentLesson.title}
                   </h1>
                   <p style={{
-                    fontSize: 12, color: '#9CA3AF', marginTop: 3,
+                    fontSize: 14, color: '#9CA3AF', marginTop: 4,
                     fontFamily: "'DM Sans', sans-serif",
                   }}>
                     {nextLesson
