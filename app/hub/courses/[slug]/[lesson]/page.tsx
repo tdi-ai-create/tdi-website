@@ -1348,8 +1348,10 @@ export default function LessonPage({ params }: LessonPageProps) {
           {/* ================================================================ */}
           <div style={{
             display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-            padding: '8px 24px', background: theme.barBg,
-            borderTop: `1px solid ${theme.barBorder}`, flexShrink: 0,
+            padding: '10px 24px', background: theme.barBg,
+            borderTop: `1px solid ${theme.barBorder}`,
+            position: 'fixed' as const, bottom: 0, left: 0, right: 0,
+            zIndex: 40,
           }}>
             {/* Left: mark complete / completed status */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
