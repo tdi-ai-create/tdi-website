@@ -1,6 +1,6 @@
 # TDI Funding System -- Workflow Guide
 
-**Last updated: July 14, 2026**
+**Last updated: August 6, 2026**
 **For: Bella (Operations), Rae (CEO), and the Paperclip agent team**
 
 ---
@@ -21,7 +21,7 @@ Every pursuit moves through these phases in order:
 
 | Phase | What happens | Who owns it |
 |-------|-------------|-------------|
-| **Intake** | School enrolled. Gather contacts, sign contracts, verify employment. | Bella |
+| **Intake** | School enrolled. For grant-supported deals, pursuit is auto-created when the quote is signed (assigned to Bella at phase `identified`). For existing partnerships that add grant support later, Bella creates the pursuit manually. | Bella / System |
 | **Research** | Find matching grant opportunities for this school. | Agents (Amara) |
 | **Strategy** | Map funding paths, set A/B/C/D priorities, timeline. | Bella |
 | **Writing** | Draft grant narratives and application materials. | Agents (Vanessa) |
