@@ -18,8 +18,8 @@ import {
   Moon,
   List,
   X,
-  Clock,
-  MessageCircle,
+  Download,
+  FileText,
 } from 'lucide-react';
 import {
   type QuizQuestion,
@@ -42,6 +42,10 @@ interface LessonContentJson {
   video_id?: string;
   text?: string;
   markdown?: string;
+  resource_url?: string;
+  resource_filename?: string;
+  resource_file_size?: number;
+  resource_content_type?: string;
   [key: string]: unknown;
 }
 
@@ -51,6 +55,7 @@ interface Lesson {
   title: string;
   content: LessonContentJson | string | null;
   estimated_minutes: number;
+  duration_seconds: number | null;
   type: string;
   sort_order: number;
   module_id: string | null;
@@ -76,20 +81,39 @@ interface Course {
 // Helpers
 // ---------------------------------------------------------------------------
 
-function extractBodyHtml(content: LessonContentJson | string | null): string | null {
-  if (!content) return null;
-  if (typeof content === 'string') return content;
-  if (content.body_html && typeof content.body_html === 'string') return content.body_html;
-  if (content.text && typeof content.text === 'string') return content.text;
-  if (content.markdown && typeof content.markdown === 'string') return content.markdown;
-  return null;
-}
-
 function extractVideoId(lesson: Lesson): string | null {
   if (lesson.content && typeof lesson.content === 'object' && lesson.content.video_id) {
     return lesson.content.video_id as string;
   }
   return null;
+}
+
+function extractResource(lesson: Lesson): { url: string; filename: string; fileSize: number; contentType: string } | null {
+  if (!lesson.content || typeof lesson.content !== 'object') return null;
+  const c = lesson.content;
+  if (c.resource_url) {
+    return {
+      url: c.resource_url as string,
+      filename: (c.resource_filename as string) || 'Download',
+      fileSize: (c.resource_file_size as number) || 0,
+      contentType: (c.resource_content_type as string) || '',
+    };
+  }
+  return null;
+}
+
+function formatDuration(seconds: number): string {
+  if (!seconds || seconds <= 0) return '';
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return `${m}:${s.toString().padStart(2, '0')}`;
+}
+
+function formatFileSize(bytes: number): string {
+  if (!bytes) return '';
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
 function getGateHeader(questionType: string): string {
@@ -106,6 +130,12 @@ function getGateHeader(questionType: string): string {
     default:
       return "Let's make sure this clicked";
   }
+}
+
+function getGateLabel(question: QuizQuestion, allQuestions: QuizQuestion[]): string {
+  // Find the index of this question among all course questions
+  const idx = allQuestions.findIndex((q) => q.id === question.id);
+  return `Check-in ${idx + 1} of ${allQuestions.length}`;
 }
 
 // ---------------------------------------------------------------------------
@@ -155,26 +185,28 @@ function useAutoAdvance() {
 }
 
 // ---------------------------------------------------------------------------
-// Gate Card Component
+// Gate Card Component (full-screen, centered)
 // ---------------------------------------------------------------------------
 
 interface GateCardProps {
   question: QuizQuestion;
+  allQuestions: QuizQuestion[];
   userId: string;
   dark: boolean;
   onGateCleared: () => void;
 }
 
-function GateCard({ question, userId, dark, onGateCleared }: GateCardProps) {
+function GateCard({ question, allQuestions, userId, dark, onGateCleared }: GateCardProps) {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [answered, setAnswered] = useState(false);
   const [wasCorrect, setWasCorrect] = useState(false);
   const [reflectionText, setReflectionText] = useState('');
-  const [actionNotes, setActionNotes] = useState('');
   const [saving, setSaving] = useState(false);
   const [gateCleared, setGateCleared] = useState(false);
+  const [committed, setCommitted] = useState(false);
 
   const header = getGateHeader(question.question_type);
+  const label = getGateLabel(question, allQuestions);
 
   const handleMultipleChoiceSelect = async (idx: number) => {
     if (answered) return;
@@ -185,13 +217,7 @@ function GateCard({ question, userId, dark, onGateCleared }: GateCardProps) {
     setWasCorrect(correct);
     setAnswered(true);
 
-    await saveQuizResponse(
-      userId,
-      question.id,
-      question.lesson_id,
-      options[idx].text,
-      correct
-    );
+    await saveQuizResponse(userId, question.id, question.lesson_id, options[idx].text, correct);
   };
 
   const handleTrueFalseSelect = async (answer: string) => {
@@ -203,57 +229,28 @@ function GateCard({ question, userId, dark, onGateCleared }: GateCardProps) {
     setWasCorrect(correct);
     setAnswered(true);
 
-    await saveQuizResponse(
-      userId,
-      question.id,
-      question.lesson_id,
-      answer,
-      correct
-    );
+    await saveQuizResponse(userId, question.id, question.lesson_id, answer, correct);
   };
 
   const handleSaveReflection = async () => {
     if (reflectionText.trim().length < 50) return;
     setSaving(true);
-
-    await saveQuizResponse(
-      userId,
-      question.id,
-      question.lesson_id,
-      reflectionText,
-      null
-    );
-
+    await saveQuizResponse(userId, question.id, question.lesson_id, reflectionText, null);
     setSaving(false);
     setAnswered(true);
   };
 
   const handleActionCommit = async () => {
     setSaving(true);
-
-    await saveQuizResponse(
-      userId,
-      question.id,
-      question.lesson_id,
-      actionNotes.trim() || 'Committed to try',
-      null
-    );
-
+    await saveQuizResponse(userId, question.id, question.lesson_id, 'Committed to try', null);
     setSaving(false);
+    setCommitted(true);
     setAnswered(true);
   };
 
   const handleCheckpointContinue = async () => {
     setSaving(true);
-
-    await saveQuizResponse(
-      userId,
-      question.id,
-      question.lesson_id,
-      'Reviewed',
-      null
-    );
-
+    await saveQuizResponse(userId, question.id, question.lesson_id, 'Reviewed', null);
     setSaving(false);
     setAnswered(true);
     setGateCleared(true);
@@ -265,9 +262,6 @@ function GateCard({ question, userId, dark, onGateCleared }: GateCardProps) {
     onGateCleared();
   };
 
-  const cardBg = dark ? 'rgba(254,249,238,0.04)' : '#FEF9EE';
-  const cardBorder = dark ? 'rgba(232,184,75,0.2)' : 'rgba(232,184,75,0.3)';
-
   // Multiple choice / True-false gate
   if (question.question_type === 'multiple_choice' || question.question_type === 'true_false') {
     const options: QuizOption[] =
@@ -277,63 +271,41 @@ function GateCard({ question, userId, dark, onGateCleared }: GateCardProps) {
 
     const correctIndex =
       question.question_type === 'true_false'
-        ? question.correct_answer?.toLowerCase() === 'true'
-          ? 0
-          : 1
+        ? question.correct_answer?.toLowerCase() === 'true' ? 0 : 1
         : options.findIndex((o) => o.is_correct);
 
     return (
-      <div
-        className="rounded-xl p-6 mb-8"
-        style={{
-          backgroundColor: cardBg,
-          borderLeft: '3px solid #E8B84B',
-          border: `1px solid ${cardBorder}`,
-          borderLeftWidth: '3px',
-          borderLeftColor: '#E8B84B',
-        }}
-      >
-        <h3
-          className="text-lg font-semibold mb-4"
-          style={{
-            fontFamily: "'Source Serif 4', Georgia, serif",
-            color: dark ? '#F3F4F6' : '#1E2749',
-          }}
-        >
-          {header}
-        </h3>
+      <div className="gate-card-center" style={{ maxWidth: 580, width: '100%' }}>
+        <div style={{
+          fontSize: 11, fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase' as const,
+          color: '#E8B84B', marginBottom: 10, fontFamily: "'DM Sans', sans-serif",
+        }}>{label}</div>
+        <h2 style={{
+          fontFamily: "'Source Serif 4', Georgia, serif", fontSize: 26, fontWeight: 600,
+          color: dark ? '#F3F4F6' : '#1E2749', marginBottom: 10, lineHeight: 1.3,
+        }}>{header}</h2>
+        <p style={{
+          fontSize: 15, lineHeight: 1.7, color: dark ? '#D1D5DB' : '#4B5563',
+          marginBottom: 24, fontFamily: "'DM Sans', sans-serif",
+        }}>{question.question_text}</p>
 
-        <p
-          className="text-sm mb-5"
-          style={{
-            fontFamily: "'DM Sans', sans-serif",
-            color: dark ? '#D1D5DB' : '#374151',
-            lineHeight: '1.6',
-          }}
-        >
-          {question.question_text}
-        </p>
-
-        <div className="space-y-2.5">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {options.map((option, idx) => {
-            let borderColor = dark ? 'rgba(255,255,255,0.1)' : '#E5E7EB';
-            let bg = dark ? 'rgba(255,255,255,0.03)' : '#FFFFFF';
-            let textColor = dark ? '#E5E7EB' : '#374151';
+            let borderColor = dark ? 'rgba(255,255,255,0.15)' : '#E5E7EB';
+            let bg = dark ? 'rgba(255,255,255,0.05)' : '#FFFFFF';
+            let textColor = dark ? '#E5E7EB' : '#1E2749';
 
             if (answered) {
               if (idx === correctIndex) {
-                borderColor = '#16A34A';
-                bg = dark ? 'rgba(22,163,74,0.1)' : '#F0FDF4';
-                textColor = '#15803D';
+                borderColor = '#22C55E';
+                bg = dark ? 'rgba(34,197,94,0.1)' : '#F0FDF4';
+                textColor = '#166534';
               }
               if (idx === selectedIndex && idx !== correctIndex) {
-                borderColor = '#DC2626';
-                bg = dark ? 'rgba(220,38,38,0.1)' : '#FEF2F2';
-                textColor = '#DC2626';
+                borderColor = '#EF4444';
+                bg = dark ? 'rgba(239,68,68,0.1)' : '#FEF2F2';
+                textColor = '#991B1B';
               }
-            } else if (idx === selectedIndex) {
-              borderColor = '#E8B84B';
-              bg = dark ? 'rgba(232,184,75,0.1)' : '#FFF8E7';
             }
 
             return (
@@ -345,14 +317,12 @@ function GateCard({ question, userId, dark, onGateCleared }: GateCardProps) {
                     : handleMultipleChoiceSelect(idx)
                 }
                 disabled={answered}
-                className="w-full text-left px-4 py-3 rounded-lg transition-all"
                 style={{
-                  border: `1.5px solid ${borderColor}`,
-                  backgroundColor: bg,
-                  color: textColor,
-                  fontFamily: "'DM Sans', sans-serif",
-                  fontSize: '14px',
-                  cursor: answered ? 'default' : 'pointer',
+                  display: 'block', width: '100%', padding: '16px 20px',
+                  background: bg, border: `1.5px solid ${borderColor}`,
+                  borderRadius: 12, fontSize: 14, color: textColor,
+                  cursor: answered ? 'default' : 'pointer', textAlign: 'left' as const,
+                  fontFamily: "'DM Sans', sans-serif", transition: 'all 0.2s',
                   opacity: answered && idx !== selectedIndex && idx !== correctIndex ? 0.5 : 1,
                 }}
               >
@@ -363,31 +333,25 @@ function GateCard({ question, userId, dark, onGateCleared }: GateCardProps) {
         </div>
 
         {answered && question.explanation && (
-          <div
-            className="mt-4 p-3 rounded-lg text-sm"
-            style={{
-              backgroundColor: dark ? 'rgba(255,255,255,0.04)' : '#F9FAFB',
-              color: dark ? '#D1D5DB' : '#4B5563',
-              fontFamily: "'DM Sans', sans-serif",
-              lineHeight: '1.5',
-            }}
-          >
+          <div style={{
+            background: dark ? 'rgba(34,197,94,0.1)' : '#F0FDF4', borderRadius: 10,
+            padding: '16px 20px', marginTop: 12, fontSize: 14, lineHeight: 1.6,
+            color: dark ? '#86EFAC' : '#166534', fontFamily: "'DM Sans', sans-serif",
+          }}>
             {question.explanation}
           </div>
         )}
 
         {answered && !gateCleared && (
-          <button
-            onClick={handleContinue}
-            className="mt-5 flex items-center gap-2 px-5 py-2.5 rounded-lg font-medium transition-colors text-sm"
-            style={{
-              backgroundColor: '#E8B84B',
-              color: '#1E2749',
-              fontFamily: "'DM Sans', sans-serif",
-            }}
-          >
+          <button onClick={handleContinue} style={{
+            display: 'inline-flex', alignItems: 'center', gap: 8,
+            marginTop: 20, padding: '14px 32px', background: '#E8B84B',
+            color: '#1E2749', border: 'none', borderRadius: 12,
+            fontSize: 15, fontWeight: 700, cursor: 'pointer',
+            fontFamily: "'DM Sans', sans-serif",
+          }}>
             {wasCorrect ? 'You got it. Keep going.' : 'Got it. On to the next one.'}
-            <ArrowRight size={14} />
+            <ArrowRight size={16} />
           </button>
         )}
       </div>
@@ -397,36 +361,19 @@ function GateCard({ question, userId, dark, onGateCleared }: GateCardProps) {
   // Reflection gate
   if (question.question_type === 'reflection') {
     return (
-      <div
-        className="rounded-xl p-6 mb-8"
-        style={{
-          backgroundColor: cardBg,
-          borderLeft: '3px solid #E8B84B',
-          border: `1px solid ${cardBorder}`,
-          borderLeftWidth: '3px',
-          borderLeftColor: '#E8B84B',
-        }}
-      >
-        <h3
-          className="text-lg font-semibold mb-4"
-          style={{
-            fontFamily: "'Source Serif 4', Georgia, serif",
-            color: dark ? '#F3F4F6' : '#1E2749',
-          }}
-        >
-          {header}
-        </h3>
-
-        <p
-          className="text-sm mb-5"
-          style={{
-            fontFamily: "'DM Sans', sans-serif",
-            color: dark ? '#D1D5DB' : '#374151',
-            lineHeight: '1.6',
-          }}
-        >
-          {question.question_text}
-        </p>
+      <div className="gate-card-center" style={{ maxWidth: 580, width: '100%' }}>
+        <div style={{
+          fontSize: 11, fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase' as const,
+          color: '#E8B84B', marginBottom: 10, fontFamily: "'DM Sans', sans-serif",
+        }}>{label}</div>
+        <h2 style={{
+          fontFamily: "'Source Serif 4', Georgia, serif", fontSize: 26, fontWeight: 600,
+          color: dark ? '#F3F4F6' : '#1E2749', marginBottom: 10, lineHeight: 1.3,
+        }}>{header}</h2>
+        <p style={{
+          fontSize: 15, lineHeight: 1.7, color: dark ? '#D1D5DB' : '#4B5563',
+          marginBottom: 24, fontFamily: "'DM Sans', sans-serif",
+        }}>{question.question_text}</p>
 
         {!answered ? (
           <>
@@ -434,53 +381,48 @@ function GateCard({ question, userId, dark, onGateCleared }: GateCardProps) {
               value={reflectionText}
               onChange={(e) => setReflectionText(e.target.value)}
               placeholder="Write your reflection here..."
-              rows={4}
-              className="w-full rounded-lg p-3 text-sm resize-y"
               style={{
-                border: `1.5px solid ${dark ? 'rgba(255,255,255,0.1)' : '#E5E7EB'}`,
-                backgroundColor: dark ? 'rgba(255,255,255,0.03)' : '#FFFFFF',
-                color: dark ? '#E5E7EB' : '#374151',
-                fontFamily: "'DM Sans', sans-serif",
-                outline: 'none',
+                width: '100%', padding: 16, minHeight: 120,
+                background: dark ? 'rgba(255,255,255,0.05)' : '#FFFFFF',
+                border: `1.5px solid ${dark ? 'rgba(255,255,255,0.15)' : '#E5E7EB'}`,
+                borderRadius: 12, color: dark ? '#E5E7EB' : '#1E2749',
+                fontSize: 14, fontFamily: "'DM Sans', sans-serif",
+                lineHeight: 1.6, resize: 'none' as const, outline: 'none',
               }}
+              onFocus={(e) => { e.target.style.borderColor = '#E8B84B'; }}
+              onBlur={(e) => { e.target.style.borderColor = dark ? 'rgba(255,255,255,0.15)' : '#E5E7EB'; }}
             />
-            <div className="flex items-center justify-between mt-3">
-              <span
-                className="text-xs"
-                style={{
-                  color: reflectionText.length >= 50 ? '#16A34A' : (dark ? '#9CA3AF' : '#9CA3AF'),
-                  fontFamily: "'DM Sans', sans-serif",
-                }}
-              >
-                {reflectionText.length}/50 characters minimum
-              </span>
-              <button
-                onClick={handleSaveReflection}
-                disabled={reflectionText.trim().length < 50 || saving}
-                className="px-5 py-2.5 rounded-lg font-medium text-sm transition-colors"
-                style={{
-                  backgroundColor: reflectionText.trim().length >= 50 ? '#E8B84B' : (dark ? 'rgba(255,255,255,0.1)' : '#E5E7EB'),
-                  color: reflectionText.trim().length >= 50 ? '#1E2749' : (dark ? '#6B7280' : '#9CA3AF'),
-                  fontFamily: "'DM Sans', sans-serif",
-                  cursor: reflectionText.trim().length >= 50 ? 'pointer' : 'not-allowed',
-                }}
-              >
-                {saving ? 'Saving...' : 'Save Reflection'}
-              </button>
+            <div style={{
+              fontSize: 12, color: reflectionText.length >= 50 ? '#16A34A' : '#9CA3AF',
+              marginTop: 6, fontFamily: "'DM Sans', sans-serif",
+            }}>
+              {reflectionText.length}/50 characters minimum. This is just for you. We will never share your reflections.
             </div>
+            <button
+              onClick={handleSaveReflection}
+              disabled={reflectionText.trim().length < 50 || saving}
+              style={{
+                marginTop: 14, padding: '12px 28px',
+                background: reflectionText.trim().length >= 50 ? (dark ? 'rgba(255,255,255,0.08)' : 'white') : (dark ? 'rgba(255,255,255,0.03)' : '#F9FAFB'),
+                border: `1.5px solid ${reflectionText.trim().length >= 50 ? (dark ? 'rgba(255,255,255,0.2)' : '#D1D5DB') : (dark ? 'rgba(255,255,255,0.08)' : '#E5E7EB')}`,
+                borderRadius: 10, color: reflectionText.trim().length >= 50 ? (dark ? '#E5E7EB' : '#374151') : '#9CA3AF',
+                fontSize: 14, fontWeight: 500, cursor: reflectionText.trim().length >= 50 ? 'pointer' : 'not-allowed',
+                fontFamily: "'DM Sans', sans-serif",
+              }}
+            >
+              {saving ? 'Saving...' : 'Save Reflection'}
+            </button>
           </>
         ) : !gateCleared ? (
-          <button
-            onClick={handleContinue}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-lg font-medium transition-colors text-sm"
-            style={{
-              backgroundColor: '#E8B84B',
-              color: '#1E2749',
-              fontFamily: "'DM Sans', sans-serif",
-            }}
-          >
+          <button onClick={handleContinue} style={{
+            display: 'inline-flex', alignItems: 'center', gap: 8,
+            marginTop: 20, padding: '14px 32px', background: '#E8B84B',
+            color: '#1E2749', border: 'none', borderRadius: 12,
+            fontSize: 15, fontWeight: 700, cursor: 'pointer',
+            fontFamily: "'DM Sans', sans-serif",
+          }}>
             Nice. On to the next one.
-            <ArrowRight size={14} />
+            <ArrowRight size={16} />
           </button>
         ) : null}
       </div>
@@ -490,81 +432,50 @@ function GateCard({ question, userId, dark, onGateCleared }: GateCardProps) {
   // Action step gate
   if (question.question_type === 'action_step') {
     return (
-      <div
-        className="rounded-xl p-6 mb-8"
-        style={{
-          backgroundColor: cardBg,
-          borderLeft: '3px solid #E8B84B',
-          border: `1px solid ${cardBorder}`,
-          borderLeftWidth: '3px',
-          borderLeftColor: '#E8B84B',
-        }}
-      >
-        <h3
-          className="text-lg font-semibold mb-4"
-          style={{
-            fontFamily: "'Source Serif 4', Georgia, serif",
-            color: dark ? '#F3F4F6' : '#1E2749',
-          }}
-        >
-          {header}
-        </h3>
+      <div className="gate-card-center" style={{ maxWidth: 580, width: '100%' }}>
+        <div style={{
+          fontSize: 11, fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase' as const,
+          color: '#E8B84B', marginBottom: 10, fontFamily: "'DM Sans', sans-serif",
+        }}>{label}</div>
+        <h2 style={{
+          fontFamily: "'Source Serif 4', Georgia, serif", fontSize: 26, fontWeight: 600,
+          color: dark ? '#F3F4F6' : '#1E2749', marginBottom: 10, lineHeight: 1.3,
+        }}>{header}</h2>
 
-        {/* Action step callout */}
-        <div
-          className="rounded-lg p-4 mb-4 text-sm"
-          style={{
-            backgroundColor: dark ? 'rgba(232,184,75,0.08)' : '#FFF8E7',
-            border: `1px solid ${dark ? 'rgba(232,184,75,0.2)' : '#FDE68A'}`,
-            color: dark ? '#E5E7EB' : '#374151',
-            fontFamily: "'DM Sans', sans-serif",
-            lineHeight: '1.6',
-          }}
-        >
+        <div style={{
+          background: dark ? 'rgba(232,184,75,0.08)' : '#FEF9EE',
+          border: `1px solid ${dark ? 'rgba(232,184,75,0.2)' : '#FDE68A'}`,
+          borderLeft: '4px solid #E8B84B',
+          borderRadius: '0 12px 12px 0', padding: '20px 24px', marginBottom: 20,
+          fontSize: 15, lineHeight: 1.7, color: dark ? '#D1D5DB' : '#4B5563',
+          fontFamily: "'DM Sans', sans-serif",
+        }}>
           {question.question_text}
         </div>
 
-        {!answered ? (
-          <>
-            <textarea
-              value={actionNotes}
-              onChange={(e) => setActionNotes(e.target.value)}
-              placeholder="Optional: Add notes about how this went..."
-              rows={3}
-              className="w-full rounded-lg p-3 text-sm resize-y mb-3"
-              style={{
-                border: `1.5px solid ${dark ? 'rgba(255,255,255,0.1)' : '#E5E7EB'}`,
-                backgroundColor: dark ? 'rgba(255,255,255,0.03)' : '#FFFFFF',
-                color: dark ? '#E5E7EB' : '#374151',
-                fontFamily: "'DM Sans', sans-serif",
-                outline: 'none',
-              }}
-            />
-            <button
-              onClick={handleActionCommit}
-              disabled={saving}
-              className="px-5 py-2.5 rounded-lg font-medium text-sm transition-colors"
-              style={{
-                backgroundColor: '#E8B84B',
-                color: '#1E2749',
-                fontFamily: "'DM Sans', sans-serif",
-              }}
-            >
-              {saving ? 'Saving...' : "I'll try this"}
-            </button>
-          </>
-        ) : !gateCleared ? (
+        {!committed ? (
           <button
-            onClick={handleContinue}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-lg font-medium transition-colors text-sm"
+            onClick={handleActionCommit}
+            disabled={saving}
             style={{
-              backgroundColor: '#E8B84B',
-              color: '#1E2749',
-              fontFamily: "'DM Sans', sans-serif",
+              padding: '14px 32px', background: dark ? 'rgba(255,255,255,0.05)' : 'white',
+              border: '2px solid #E8B84B', borderRadius: 12,
+              color: dark ? '#E8B84B' : '#92400E', fontSize: 15, fontWeight: 600,
+              cursor: 'pointer', fontFamily: "'DM Sans', sans-serif",
             }}
           >
-            Something to try this week. On to the next one.
-            <ArrowRight size={14} />
+            {saving ? 'Saving...' : 'I will try this'}
+          </button>
+        ) : !gateCleared ? (
+          <button onClick={handleContinue} style={{
+            display: 'inline-flex', alignItems: 'center', gap: 8,
+            marginTop: 20, padding: '14px 32px', background: '#E8B84B',
+            color: '#1E2749', border: 'none', borderRadius: 12,
+            fontSize: 15, fontWeight: 700, cursor: 'pointer',
+            fontFamily: "'DM Sans', sans-serif",
+          }}>
+            On to the next one.
+            <ArrowRight size={16} />
           </button>
         ) : null}
       </div>
@@ -573,7 +484,6 @@ function GateCard({ question, userId, dark, onGateCleared }: GateCardProps) {
 
   // Checkpoint gate
   if (question.question_type === 'checkpoint') {
-    // Parse options as takeaway bullets if available, otherwise use question_text
     const takeaways: string[] = [];
     if (question.options && Array.isArray(question.options)) {
       question.options.forEach((opt: QuizOption) => {
@@ -581,71 +491,56 @@ function GateCard({ question, userId, dark, onGateCleared }: GateCardProps) {
       });
     }
     if (takeaways.length === 0 && question.question_text) {
-      // Split by newline if the question_text has multiple lines
       question.question_text.split('\n').filter(Boolean).forEach((line) => takeaways.push(line));
     }
 
     return (
-      <div
-        className="rounded-xl p-6 mb-8"
-        style={{
-          backgroundColor: cardBg,
-          borderLeft: '3px solid #E8B84B',
-          border: `1px solid ${cardBorder}`,
-          borderLeftWidth: '3px',
-          borderLeftColor: '#E8B84B',
-        }}
-      >
-        <h3
-          className="text-lg font-semibold mb-4"
-          style={{
-            fontFamily: "'Source Serif 4', Georgia, serif",
-            color: dark ? '#F3F4F6' : '#1E2749',
-          }}
-        >
-          {header}
-        </h3>
+      <div className="gate-card-center" style={{ maxWidth: 580, width: '100%' }}>
+        <div style={{
+          fontSize: 11, fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase' as const,
+          color: '#E8B84B', marginBottom: 10, fontFamily: "'DM Sans', sans-serif",
+        }}>{label}</div>
+        <h2 style={{
+          fontFamily: "'Source Serif 4', Georgia, serif", fontSize: 26, fontWeight: 600,
+          color: dark ? '#F3F4F6' : '#1E2749', marginBottom: 16, lineHeight: 1.3,
+        }}>{header}</h2>
 
-        <ul className="space-y-2.5 mb-5">
+        <div style={{ marginBottom: 20 }}>
           {takeaways.map((item, idx) => (
-            <li
-              key={idx}
-              className="flex items-start gap-2.5 text-sm"
-              style={{
-                color: dark ? '#D1D5DB' : '#374151',
-                fontFamily: "'DM Sans', sans-serif",
-                lineHeight: '1.6',
-              }}
-            >
-              <span
-                className="w-1.5 h-1.5 rounded-full mt-2 flex-shrink-0"
-                style={{ backgroundColor: '#E8B84B' }}
-              />
-              {item}
-            </li>
+            <div key={idx} style={{
+              display: 'flex', alignItems: 'flex-start', gap: 12,
+              padding: '10px 0', fontSize: 15, lineHeight: 1.6,
+              color: dark ? '#D1D5DB' : '#4B5563', fontFamily: "'DM Sans', sans-serif",
+            }}>
+              <div style={{
+                width: 8, height: 8, borderRadius: '50%', background: '#E8B84B',
+                flexShrink: 0, marginTop: 8,
+              }} />
+              <span>{item}</span>
+            </div>
           ))}
-        </ul>
+        </div>
 
         {!gateCleared && (
           <button
             onClick={handleCheckpointContinue}
             disabled={saving}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-lg font-medium transition-colors text-sm"
             style={{
-              backgroundColor: '#E8B84B',
-              color: '#1E2749',
+              display: 'inline-flex', alignItems: 'center', gap: 8,
+              marginTop: 0, padding: '14px 32px', background: '#E8B84B',
+              color: '#1E2749', border: 'none', borderRadius: 12,
+              fontSize: 15, fontWeight: 700, cursor: 'pointer',
               fontFamily: "'DM Sans', sans-serif",
             }}
           >
             {saving ? 'Saving...' : 'Ready to continue'}
-            <ArrowRight size={14} />
+            <ArrowRight size={16} />
           </button>
         )}
       </div>
     );
   }
 
-  // Fallback: render nothing
   return null;
 }
 
@@ -664,7 +559,7 @@ export default function LessonPage({ params }: LessonPageProps) {
   const { user } = useHub();
   const { tUI } = useTranslation();
   const { dark, toggle: toggleDark } = useDarkMode();
-  const { enabled: autoAdvance, toggle: toggleAutoAdvance } = useAutoAdvance();
+  const { enabled: autoAdvance } = useAutoAdvance();
 
   // Data state
   const [course, setCourse] = useState<Course | null>(null);
@@ -674,19 +569,16 @@ export default function LessonPage({ params }: LessonPageProps) {
   const [expandedModules, setExpandedModules] = useState<Set<string>>(new Set());
   const [isLoading, setIsLoading] = useState(true);
 
-  // Gate state (course-wide)
+  // Gate state
   const [courseQuestions, setCourseQuestions] = useState<QuizQuestion[]>([]);
   const [courseResponses, setCourseResponses] = useState<Record<string, QuizResponse>>({});
   const [gates, setGates] = useState<Map<number, QuizQuestion>>(new Map());
-
-  // Gate cleared locally (so UI updates immediately without refetch)
   const [locallyCleared, setLocallyCleared] = useState<Set<string>>(new Set());
 
   // UI state
   const [transcriptOpen, setTranscriptOpen] = useState(false);
   const [transcriptLang, setTranscriptLang] = useState<'en' | 'es'>('en');
   const [bottomSheetOpen, setBottomSheetOpen] = useState(false);
-  const [toast, setToast] = useState<{ message: string; undoLessonId?: string } | null>(null);
 
   // Progress tracking
   const { progress, certificateEarned, clearCertificateEarned, markLessonStatus, refetch } =
@@ -707,7 +599,6 @@ export default function LessonPage({ params }: LessonPageProps) {
       setIsLoading(true);
 
       try {
-        // 1. Fetch course by slug
         const { data: courseData, error: courseError } = await supabase
           .from('hub_courses')
           .select('id, slug, title, pd_hours')
@@ -720,7 +611,6 @@ export default function LessonPage({ params }: LessonPageProps) {
         }
         setCourse(courseData);
 
-        // 2. Check enrollment
         const { data: enrollment } = await supabase
           .from('hub_enrollments')
           .select('id')
@@ -733,7 +623,6 @@ export default function LessonPage({ params }: LessonPageProps) {
           return;
         }
 
-        // 3. Fetch modules for this course
         const { data: modulesData } = await supabase
           .from('hub_modules')
           .select('id, title, sort_order')
@@ -742,11 +631,10 @@ export default function LessonPage({ params }: LessonPageProps) {
 
         const moduleIds = (modulesData || []).map((m) => m.id);
 
-        // 4. Fetch lessons via module_id (NOT course_id)
         const { data: lessonsData } = moduleIds.length > 0
           ? await supabase
               .from('hub_lessons')
-              .select('id, slug, title, content, estimated_minutes, type, sort_order, module_id, transcript, transcript_es')
+              .select('id, slug, title, content, estimated_minutes, duration_seconds, type, sort_order, module_id, transcript, transcript_es')
               .in('module_id', moduleIds)
               .order('sort_order', { ascending: true })
           : { data: [] as Lesson[] };
@@ -756,7 +644,6 @@ export default function LessonPage({ params }: LessonPageProps) {
           return;
         }
 
-        // 5. Build module/lesson structure
         const moduleMap = new Map<string, Module>();
         const unassigned: Lesson[] = [];
 
@@ -785,12 +672,10 @@ export default function LessonPage({ params }: LessonPageProps) {
         setModules(finalModules);
         setExpandedModules(new Set(finalModules.map((m) => m.id)));
 
-        // Flat ordered lesson list
         const ordered: Lesson[] = [];
         finalModules.forEach((mod) => mod.lessons.forEach((l) => ordered.push(l)));
         setAllLessons(ordered);
 
-        // 6. Find current lesson (match by slug or ID since slugs may be null)
         const current = ordered.find((l) => l.slug === lessonSlug || l.id === lessonSlug);
         if (!current) {
           router.push(`/hub/courses/${slug}`);
@@ -798,7 +683,6 @@ export default function LessonPage({ params }: LessonPageProps) {
         }
         setCurrentLesson(current);
 
-        // 7. Load course-wide quiz questions + responses
         const allLessonIds = ordered.map((l) => l.id);
         const allQuestions = await getCourseQuestions(allLessonIds);
         setCourseQuestions(allQuestions);
@@ -807,11 +691,9 @@ export default function LessonPage({ params }: LessonPageProps) {
         const responseMap = await getCourseResponses(user.id, questionIds);
         setCourseResponses(responseMap);
 
-        // 8. Compute gate positions
         const gateMap = computeGatePositions(allQuestions, ordered.length);
         setGates(gateMap);
 
-        // Reset locally cleared set on lesson change
         setLocallyCleared(new Set());
       } catch (error) {
         console.error('Error loading lesson data:', error);
@@ -823,7 +705,6 @@ export default function LessonPage({ params }: LessonPageProps) {
     loadData();
   }, [slug, lessonSlug, user?.id, router, tUI]);
 
-  // Show celebration modal when certificate is earned
   useEffect(() => {
     if (certificateEarned) setShowCelebration(true);
   }, [certificateEarned]);
@@ -844,22 +725,19 @@ export default function LessonPage({ params }: LessonPageProps) {
   // Gate logic
   const currentGate = gates.get(currentIndex) || null;
   const isGateActive = currentGate !== null && !courseResponses[currentGate.id] && !locallyCleared.has(currentGate.id);
-  const isNextLocked = currentGate !== null && !courseResponses[currentGate.id] && !locallyCleared.has(currentGate.id);
 
-  // Build a set of "locked" lesson indices: lessons after an uncleared gate
+  // Locked lesson indices (lessons after first uncleared gate)
   const lockedLessonIndices = new Set<number>();
   if (gates.size > 0) {
-    // Walk through all gate positions. Any lesson after an uncleared gate is locked.
     const gateIndices = Array.from(gates.keys()).sort((a, b) => a - b);
     for (const gateIdx of gateIndices) {
       const gateQ = gates.get(gateIdx)!;
       const isCleared = !!courseResponses[gateQ.id] || locallyCleared.has(gateQ.id);
       if (!isCleared) {
-        // Lock all lessons after this gate
         for (let i = gateIdx + 1; i < allLessons.length; i++) {
           lockedLessonIndices.add(i);
         }
-        break; // First uncleared gate blocks everything after it
+        break;
       }
     }
   }
@@ -868,30 +746,16 @@ export default function LessonPage({ params }: LessonPageProps) {
   // Handlers
   // ---------------------------------------------------------------------------
 
-  const showToast = (message: string, undoLessonId?: string) => {
-    setToast({ message, undoLessonId });
-    setTimeout(() => setToast(null), 5000);
-  };
-
   const handleMarkComplete = async () => {
     if (!currentLesson) return;
     await markLessonStatus(currentLesson.id, 'completed');
     await refetch();
-    showToast(tUI('Lesson complete'), currentLesson.id);
 
-    // Auto-advance (only if no uncleared gate on current lesson)
-    if (autoAdvance && nextLesson && !isNextLocked) {
+    if (autoAdvance && nextLesson && !isGateActive) {
       setTimeout(() => {
         router.push(`/hub/courses/${slug}/${nextLesson.slug || nextLesson.id}`);
       }, 800);
     }
-  };
-
-  const handleUndoComplete = async () => {
-    if (!toast?.undoLessonId) return;
-    await markLessonStatus(toast.undoLessonId, 'not_started');
-    await refetch();
-    setToast(null);
   };
 
   const handleCompleteCourse = async () => {
@@ -918,6 +782,12 @@ export default function LessonPage({ params }: LessonPageProps) {
       await markLessonStatus(currentLesson.id, 'completed');
       await refetch();
       setLocallyCleared((prev) => new Set(prev).add(currentGate.id));
+
+      if (autoAdvance && nextLesson) {
+        setTimeout(() => {
+          router.push(`/hub/courses/${slug}/${nextLesson.slug || nextLesson.id}`);
+        }, 800);
+      }
     }
   };
 
@@ -930,12 +800,13 @@ export default function LessonPage({ params }: LessonPageProps) {
         bg: '#0F1219',
         text: '#E5E7EB',
         textMuted: '#9CA3AF',
-        sidebar: '#1A1F2E',
+        sidebar: '#151922',
         card: '#1A1F2E',
-        cardBorder: 'rgba(255,255,255,0.06)',
         border: 'rgba(255,255,255,0.08)',
         title: '#F3F4F6',
-        prose: '#D1D5DB',
+        barBg: '#151922',
+        barBorder: 'rgba(255,255,255,0.06)',
+        gateBg: 'linear-gradient(180deg, #14171F 0%, #0F1219 100%)',
       }
     : {
         bg: '#F5F7FA',
@@ -943,10 +814,11 @@ export default function LessonPage({ params }: LessonPageProps) {
         textMuted: '#9CA3AF',
         sidebar: '#FFFFFF',
         card: '#FFFFFF',
-        cardBorder: 'rgba(0,0,0,0.06)',
         border: '#F3F4F6',
         title: '#1E2749',
-        prose: '#374151',
+        barBg: '#FFFFFF',
+        barBorder: '#F3F4F6',
+        gateBg: 'linear-gradient(180deg, #FAFBFC 0%, #F0F2F7 100%)',
       };
 
   // ---------------------------------------------------------------------------
@@ -955,211 +827,173 @@ export default function LessonPage({ params }: LessonPageProps) {
 
   if (isLoading || !course || !currentLesson) {
     return (
-      <div className="min-h-screen" style={{ backgroundColor: '#F5F7FA' }}>
-        <div className="h-[2px] bg-gray-200" />
-        <div className="p-4 md:p-8 max-w-[1400px] mx-auto">
-          <div className="h-4 bg-gray-200 rounded w-32 mb-6 animate-pulse" />
-          <div className="lg:grid lg:grid-cols-[1fr_320px] gap-0">
-            <div className="p-4 md:p-8">
-              <div className="aspect-video bg-gray-200 rounded-xl mb-6 animate-pulse" />
-              <div className="h-8 bg-gray-200 rounded w-3/4 mb-4 animate-pulse" />
-              <div className="h-20 bg-gray-100 rounded mb-6 animate-pulse" />
-            </div>
-            <div className="hidden lg:block p-6">
-              <div className="h-6 bg-gray-200 rounded w-40 mb-4 animate-pulse" />
-              <div className="space-y-3">
-                {[1, 2, 3, 4, 5].map((i) => (
-                  <div key={i} className="h-8 bg-gray-100 rounded animate-pulse" />
-                ))}
-              </div>
-            </div>
-          </div>
+      <div style={{ height: '100vh', overflow: 'hidden', backgroundColor: '#F5F7FA', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ height: 2, background: '#E5E7EB' }} />
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ width: 48, height: 48, border: '3px solid #E5E7EB', borderTopColor: '#E8B84B', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
+          <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
         </div>
       </div>
     );
   }
 
   const videoId = extractVideoId(currentLesson);
-  const bodyHtml = extractBodyHtml(currentLesson.content);
+  const resource = extractResource(currentLesson);
   const hasTranscript = !!currentLesson.transcript;
   const hasTranscriptEs = !!currentLesson.transcript_es;
+  const durationStr = currentLesson.duration_seconds ? formatDuration(currentLesson.duration_seconds) : '';
 
-  // ---------------------------------------------------------------------------
-  // Sidebar content (shared between desktop and mobile bottom sheet)
-  // ---------------------------------------------------------------------------
-
-  // Build a flat index lookup for sidebar gate indicators
+  // Flat index lookup for sidebar
   const flatLessonIndex = new Map<string, number>();
   allLessons.forEach((l, idx) => flatLessonIndex.set(l.id, idx));
 
-  const sidebarContent = (
-    <div>
-      {/* Course title */}
-      <Link
-        href={`/hub/courses/${slug}`}
-        className="block text-sm font-semibold mb-4 hover:opacity-80 transition-opacity"
-        style={{
-          fontFamily: "'Source Serif 4', Georgia, serif",
-          color: theme.title,
-        }}
-      >
-        {course.title}
-      </Link>
+  // ---------------------------------------------------------------------------
+  // Sidebar content
+  // ---------------------------------------------------------------------------
 
-      {/* Progress bar */}
-      <div className="mb-5">
-        <div className="flex items-center justify-between mb-1.5">
-          <span
-            className="text-xs font-medium"
-            style={{ color: theme.textMuted, fontFamily: "'DM Sans', sans-serif" }}
-          >
+  const sidebarContent = (
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
+      {/* Sidebar header */}
+      <div style={{ padding: '16px 18px', borderBottom: `1px solid ${theme.border}`, flexShrink: 0 }}>
+        <Link
+          href={`/hub/courses/${slug}`}
+          style={{
+            fontFamily: "'Source Serif 4', Georgia, serif", fontSize: 14, fontWeight: 600,
+            color: theme.title, textDecoration: 'none', display: 'block', marginBottom: 10,
+          }}
+        >
+          {course.title}
+        </Link>
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+          <span style={{ fontSize: 11, color: theme.textMuted, fontFamily: "'DM Sans', sans-serif" }}>
             {progress.completedLessons + progress.completedChecks} {tUI('of')} {allLessons.length + progress.totalChecks} {tUI('complete')}
           </span>
-          <span className="text-xs font-bold" style={{ color: '#E8B84B' }}>
+          <span style={{ fontSize: 11, fontWeight: 700, color: '#E8B84B' }}>
             {progress.progressPct}%
           </span>
         </div>
-        <div className="h-1.5 rounded-full overflow-hidden" style={{ background: dark ? 'rgba(255,255,255,0.1)' : '#F3F4F6' }}>
-          <div
-            className="h-full rounded-full transition-all duration-500"
-            style={{
-              width: `${progress.progressPct}%`,
-              background: progress.isComplete
-                ? 'linear-gradient(90deg, #16A34A, #22C55E)'
-                : 'linear-gradient(90deg, #FFBA06, #E8B84B)',
-            }}
-          />
+        <div style={{ height: 3, borderRadius: 2, background: dark ? 'rgba(255,255,255,0.1)' : '#F3F4F6' }}>
+          <div style={{
+            height: '100%', borderRadius: 2,
+            width: `${progress.progressPct}%`,
+            background: progress.isComplete
+              ? 'linear-gradient(90deg, #16A34A, #22C55E)'
+              : 'linear-gradient(90deg, #E8B84B, #F59E0B)',
+            transition: 'width 0.5s',
+          }} />
         </div>
       </div>
 
-      {/* Module list */}
-      <div className="overflow-y-auto" style={{ maxHeight: 'calc(100vh - 14rem)' }}>
+      {/* Scrollable lesson list */}
+      <div style={{ flex: 1, overflowY: 'auto', padding: '6px 0' }}>
         {modules.map((mod) => {
           const isExpanded = expandedModules.has(mod.id);
           const showHeader = modules.length > 1 || mod.title !== tUI('Course Content');
 
           return (
-            <div key={mod.id} className="mb-2">
+            <div key={mod.id}>
               {showHeader && (
                 <button
                   onClick={() => toggleModule(mod.id)}
-                  className="w-full flex items-center gap-2 py-2 text-left hover:opacity-80 transition-opacity"
+                  style={{
+                    width: '100%', display: 'flex', alignItems: 'center', gap: 6,
+                    padding: '8px 18px', background: 'none', border: 'none',
+                    cursor: 'pointer', textAlign: 'left' as const,
+                  }}
                 >
                   {isExpanded ? (
-                    <ChevronDown size={14} style={{ color: theme.textMuted }} />
+                    <ChevronDown size={12} style={{ color: theme.textMuted }} />
                   ) : (
-                    <ChevronRight size={14} style={{ color: theme.textMuted }} />
+                    <ChevronRight size={12} style={{ color: theme.textMuted }} />
                   )}
-                  <span
-                    className="text-xs font-semibold uppercase tracking-wider"
-                    style={{ color: theme.textMuted, letterSpacing: '0.06em' }}
-                  >
+                  <span style={{
+                    fontSize: 10, fontWeight: 600, textTransform: 'uppercase' as const,
+                    letterSpacing: '0.06em', color: theme.textMuted,
+                  }}>
                     {mod.title}
                   </span>
                 </button>
               )}
 
-              {(isExpanded || !showHeader) && (
-                <div className="space-y-0.5">
-                  {mod.lessons.map((l, idx) => {
-                    const isActive = l.id === currentLesson?.id;
-                    const isDone = progress.lessonProgress.get(l.id)?.status === 'completed';
-                    const lessonGlobalIdx = flatLessonIndex.get(l.id) ?? -1;
-                    const isLocked = lockedLessonIndices.has(lessonGlobalIdx);
-                    const gateOnThisLesson = gates.get(lessonGlobalIdx);
-                    const gateCleared = gateOnThisLesson
-                      ? !!courseResponses[gateOnThisLesson.id] || locallyCleared.has(gateOnThisLesson.id)
-                      : false;
+              {(isExpanded || !showHeader) && mod.lessons.map((l) => {
+                const isActive = l.id === currentLesson?.id;
+                const isDone = progress.lessonProgress.get(l.id)?.status === 'completed';
+                const lessonGlobalIdx = flatLessonIndex.get(l.id) ?? -1;
+                const isLocked = lockedLessonIndices.has(lessonGlobalIdx);
+                const gateOnThisLesson = gates.get(lessonGlobalIdx);
+                const gateIsCleared = gateOnThisLesson
+                  ? !!courseResponses[gateOnThisLesson.id] || locallyCleared.has(gateOnThisLesson.id)
+                  : false;
+                const lessonDuration = l.duration_seconds ? formatDuration(l.duration_seconds) : '';
 
-                    return (
-                      <div key={l.id}>
-                        <button
-                          onClick={() => {
-                            if (isLocked) return;
-                            router.push(`/hub/courses/${slug}/${l.slug || l.id}`);
-                            setBottomSheetOpen(false);
-                          }}
-                          className="w-full flex items-center gap-2.5 py-2 px-2 rounded-lg text-left transition-colors"
-                          style={{
-                            backgroundColor: isActive
-                              ? (dark ? 'rgba(232,184,75,0.12)' : '#FFF6E0')
-                              : 'transparent',
-                            borderLeft: isActive ? '3px solid #E8B84B' : '3px solid transparent',
-                            opacity: isLocked ? 0.45 : 1,
-                            cursor: isLocked ? 'default' : 'pointer',
-                          }}
-                        >
-                          {/* Status indicator */}
-                          <div
-                            className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
-                            style={{
-                              background: isDone ? '#16A34A' : 'transparent',
-                              border: isDone ? 'none' : `1.5px solid ${isActive ? '#E8B84B' : (dark ? 'rgba(255,255,255,0.2)' : '#D1D5DB')}`,
-                            }}
-                          >
-                            {isDone ? (
-                              <Check size={10} className="text-white" />
-                            ) : (
-                              <span
-                                className="text-[10px] font-medium"
-                                style={{ color: isActive ? '#E8B84B' : theme.textMuted }}
-                              >
-                                {idx + 1}
-                              </span>
-                            )}
-                          </div>
-
-                          {/* Title + duration */}
-                          <div className="flex-1 min-w-0">
-                            <span
-                              className="text-xs block truncate"
-                              style={{
-                                color: isActive ? theme.title : (isDone && !isActive) ? (dark ? '#6B7280' : '#9CA3AF') : theme.textMuted,
-                                fontWeight: isActive ? 600 : 400,
-                                fontFamily: "'DM Sans', sans-serif",
-                              }}
-                            >
-                              {l.title}
-                            </span>
-                            {l.estimated_minutes > 0 && (
-                              <span className="text-[10px] flex items-center gap-1 mt-0.5" style={{ color: theme.textMuted }}>
-                                <Clock size={9} />
-                                {l.estimated_minutes} {tUI('min')}
-                              </span>
-                            )}
-                          </div>
-                        </button>
-
-                        {/* Gate indicator between lessons */}
-                        {gateOnThisLesson && (
-                          <div className="flex items-center justify-center py-1">
-                            <div
-                              className="w-2 h-2 rounded-full"
-                              style={{
-                                backgroundColor: gateCleared ? '#16A34A' : '#E8B84B',
-                                animation: !gateCleared ? 'pulse 2s ease-in-out infinite' : 'none',
-                                boxShadow: !gateCleared ? '0 0 4px rgba(232,184,75,0.5)' : 'none',
-                              }}
-                            />
-                          </div>
-                        )}
+                return (
+                  <div key={l.id}>
+                    <button
+                      onClick={() => {
+                        if (isLocked) return;
+                        router.push(`/hub/courses/${slug}/${l.slug || l.id}`);
+                        setBottomSheetOpen(false);
+                      }}
+                      style={{
+                        display: 'flex', alignItems: 'center', gap: 10,
+                        padding: isActive ? '10px 15px' : '10px 18px', width: '100%',
+                        background: isActive ? (dark ? 'rgba(232,184,75,0.12)' : '#FFF8E7') : 'transparent',
+                        borderLeft: isActive ? '3px solid #E8B84B' : '3px solid transparent',
+                        border: 'none', cursor: isLocked ? 'default' : 'pointer',
+                        opacity: isLocked ? 0.3 : 1, textAlign: 'left' as const,
+                        transition: 'background 0.15s', fontSize: 13,
+                        color: isDone && !isActive ? theme.textMuted : (isActive ? theme.title : (dark ? '#D1D5DB' : '#4B5563')),
+                        fontWeight: isActive ? 600 : 400,
+                        fontFamily: "'DM Sans', sans-serif",
+                        borderRight: 'none', borderTop: 'none', borderBottom: 'none',
+                      }}
+                    >
+                      {/* Number/check circle */}
+                      <div style={{
+                        width: 26, height: 26, borderRadius: '50%', flexShrink: 0,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontSize: isDone ? 9 : 11, fontWeight: 600,
+                        border: isDone ? 'none' : `2px solid ${isActive ? '#E8B84B' : (dark ? 'rgba(255,255,255,0.2)' : '#E5E7EB')}`,
+                        background: isDone ? '#22C55E' : (isActive ? (dark ? 'rgba(232,184,75,0.1)' : '#FFFDF7') : 'transparent'),
+                        color: isDone ? 'white' : (isActive ? '#E8B84B' : theme.textMuted),
+                      }}>
+                        {isDone ? <Check size={11} /> : (flatLessonIndex.get(l.id) ?? 0) + 1}
                       </div>
-                    );
-                  })}
-                </div>
-              )}
+
+                      {/* Title */}
+                      <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
+                        {l.title}
+                      </span>
+
+                      {/* Duration */}
+                      {lessonDuration && (
+                        <span style={{ fontSize: 10, color: dark ? 'rgba(255,255,255,0.25)' : '#D1D5DB', fontWeight: 500, flexShrink: 0 }}>
+                          {lessonDuration}
+                        </span>
+                      )}
+                    </button>
+
+                    {/* Gate indicator between lessons */}
+                    {gateOnThisLesson && (
+                      <div style={{
+                        display: 'flex', alignItems: 'center', gap: 6,
+                        padding: '4px 18px 4px 34px', fontSize: 10, fontWeight: 500,
+                        color: gateIsCleared ? '#16A34A' : '#B45309',
+                      }}>
+                        <div style={{
+                          width: 6, height: 6, borderRadius: '50%',
+                          background: gateIsCleared ? '#22C55E' : '#E8B84B',
+                        }} />
+                        {gateIsCleared ? 'Quick check (done)' : 'Quick check'}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           );
         })}
       </div>
-
-      {/* Pulse animation for gate indicators */}
-      <style>{`
-        @keyframes pulse {
-          0%, 100% { opacity: 1; transform: scale(1); }
-          50% { opacity: 0.6; transform: scale(1.2); }
-        }
-      `}</style>
     </div>
   );
 
@@ -1168,391 +1002,408 @@ export default function LessonPage({ params }: LessonPageProps) {
   // ---------------------------------------------------------------------------
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: theme.bg }}>
-      {/* Thin progress bar at very top */}
-      <div className="h-[2px] w-full" style={{ background: dark ? 'rgba(255,255,255,0.06)' : '#E5E7EB' }}>
-        <div
-          className="h-full transition-all duration-500"
-          style={{
-            width: `${progress.progressPct}%`,
-            background: 'linear-gradient(90deg, #FFBA06, #E8B84B)',
-          }}
-        />
+    <div style={{
+      height: '100vh', overflow: 'hidden', display: 'flex', flexDirection: 'column',
+      backgroundColor: theme.bg, fontFamily: "'DM Sans', sans-serif",
+    }}>
+
+      {/* ================================================================ */}
+      {/* Course context bar                                                */}
+      {/* ================================================================ */}
+      <div style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        padding: '8px 24px', background: theme.barBg,
+        borderBottom: `1px solid ${theme.barBorder}`, flexShrink: 0,
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+          <Link
+            href={`/hub/courses/${slug}`}
+            style={{
+              color: dark ? '#9CA3AF' : '#6B7280', textDecoration: 'none', fontSize: 13,
+              display: 'flex', alignItems: 'center', gap: 6, fontFamily: "'DM Sans', sans-serif",
+            }}
+          >
+            <ArrowLeft size={14} />
+            Back to {course.title}
+          </Link>
+          <div style={{ width: 1, height: 16, background: dark ? 'rgba(255,255,255,0.1)' : '#E5E7EB' }} />
+          <span style={{
+            fontFamily: "'Source Serif 4', Georgia, serif", fontSize: 14, fontWeight: 600,
+            color: theme.title,
+          }}>
+            {course.title}
+          </span>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <span style={{ fontSize: 12, color: theme.textMuted }}>
+            {tUI('Lesson')} {currentIndex + 1} {tUI('of')} {allLessons.length}
+          </span>
+          <button
+            onClick={toggleDark}
+            style={{
+              width: 30, height: 30, borderRadius: 6,
+              border: `1px solid ${dark ? 'rgba(255,255,255,0.1)' : '#E5E7EB'}`,
+              background: theme.barBg, cursor: 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              color: dark ? '#9CA3AF' : '#6B7280',
+            }}
+            title={dark ? 'Light mode' : 'Dark mode'}
+          >
+            {dark ? <Sun size={14} /> : <Moon size={14} />}
+          </button>
+        </div>
       </div>
 
-      {/* Top bar: back link + dark mode toggle */}
-      <div className="flex items-center justify-between px-4 md:px-8 py-3 max-w-[1400px] mx-auto">
-        <Link
-          href={`/hub/courses/${slug}`}
-          className="inline-flex items-center gap-2 text-sm hover:opacity-80 transition-opacity"
-          style={{ fontFamily: "'DM Sans', sans-serif", color: theme.textMuted }}
-        >
-          <ArrowLeft size={16} />
-          {tUI('Back to course')}
-        </Link>
-
-        <button
-          onClick={toggleDark}
-          className="p-2 rounded-lg hover:opacity-80 transition-opacity"
-          title={dark ? tUI('Light mode') : tUI('Dark mode')}
-          style={{ color: theme.textMuted }}
-        >
-          {dark ? <Sun size={18} /> : <Moon size={18} />}
-        </button>
+      {/* ================================================================ */}
+      {/* Progress strip                                                    */}
+      {/* ================================================================ */}
+      <div style={{ height: 2, background: dark ? 'rgba(255,255,255,0.06)' : '#E5E7EB', flexShrink: 0 }}>
+        <div style={{
+          height: '100%', width: `${progress.progressPct}%`,
+          background: 'linear-gradient(90deg, #E8B84B, #F59E0B)',
+          transition: 'width 0.5s',
+        }} />
       </div>
 
-      {/* Main layout: content + sidebar */}
-      <div className="max-w-[1400px] mx-auto px-4 md:px-8 pb-24 lg:pb-8">
-        <div className="lg:grid lg:grid-cols-[1fr_320px] lg:gap-0">
+      {/* ================================================================ */}
+      {/* Main area: content + sidebar                                      */}
+      {/* ================================================================ */}
+      <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
 
-          {/* ================================================================ */}
-          {/* Content Area                                                      */}
-          {/* ================================================================ */}
-          <div className="lg:pr-8">
+        {/* Content area */}
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
 
-            {/* Video Player */}
-            {videoId && (
-              <div className="w-full aspect-video rounded-xl mb-6 overflow-hidden bg-black">
-                <iframe
-                  src={`https://customer-4n38x6badamh5yps.cloudflarestream.com/${videoId}/iframe`}
-                  style={{ width: '100%', height: '100%', border: 'none' }}
-                  allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
-                  allowFullScreen
-                />
-              </div>
-            )}
+          {/* Content body: video OR gate */}
+          <div style={{ flex: 1, position: 'relative', overflow: 'hidden' }}>
 
-            {/* Lesson Title */}
-            <h1
-              className="text-xl md:text-2xl font-bold mb-2"
-              style={{
-                fontFamily: "'Source Serif 4', Georgia, serif",
-                color: theme.title,
-              }}
-            >
-              {currentLesson.title}
-            </h1>
-
-            {/* Meta row */}
-            <div className="flex items-center gap-3 text-xs mb-5" style={{ color: theme.textMuted }}>
-              {currentLesson.estimated_minutes > 0 && (
-                <span className="flex items-center gap-1">
-                  <Clock size={12} />
-                  {currentLesson.estimated_minutes} {tUI('min')}
-                </span>
-              )}
-              <span>
-                {tUI('Lesson')} {currentIndex + 1} {tUI('of')} {allLessons.length}
-              </span>
-            </div>
-
-            {/* Orientation hint */}
-            {videoId && (
-              <p
-                className="text-sm mb-4"
-                style={{
-                  fontFamily: "'DM Sans', sans-serif",
-                  color: dark ? '#9CA3AF' : '#6B7280',
-                }}
-              >
-                {currentGate
-                  ? 'Watch the video, then answer a quick check before moving on.'
-                  : 'Watch the video, then scroll down to continue.'}
-              </p>
-            )}
-
-            {/* Transcript Panel */}
-            {(hasTranscript || hasTranscriptEs) && (
-              <div className="mb-6">
-                <button
-                  onClick={() => setTranscriptOpen(!transcriptOpen)}
-                  className="flex items-center gap-2 text-sm font-medium px-4 py-2 rounded-lg transition-colors"
-                  style={{
-                    backgroundColor: dark ? 'rgba(255,255,255,0.05)' : '#F3F4F6',
-                    color: theme.text,
-                    fontFamily: "'DM Sans', sans-serif",
-                  }}
-                >
-                  {transcriptOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-                  {transcriptOpen ? tUI('Hide Transcript') : tUI('Show Transcript')}
-                </button>
-
-                {transcriptOpen && (
-                  <div
-                    className="mt-3 rounded-lg p-4"
-                    style={{
-                      backgroundColor: dark ? 'rgba(255,255,255,0.03)' : '#FAFAF8',
-                      border: `1px solid ${theme.border}`,
-                    }}
-                  >
-                    {/* Language tabs (only if both exist) */}
-                    {hasTranscript && hasTranscriptEs && (
-                      <div className="flex gap-0 border-b mb-3" style={{ borderColor: theme.border }}>
-                        <button
-                          onClick={() => setTranscriptLang('en')}
-                          className="px-3 py-1.5 text-xs font-medium transition-colors"
-                          style={{
-                            color: transcriptLang === 'en' ? theme.title : theme.textMuted,
-                            borderBottom: transcriptLang === 'en' ? '2px solid #E8B84B' : '2px solid transparent',
-                            marginBottom: '-1px',
-                          }}
-                        >
-                          English
-                        </button>
-                        <button
-                          onClick={() => setTranscriptLang('es')}
-                          className="px-3 py-1.5 text-xs font-medium transition-colors"
-                          style={{
-                            color: transcriptLang === 'es' ? theme.title : theme.textMuted,
-                            borderBottom: transcriptLang === 'es' ? '2px solid #E8B84B' : '2px solid transparent',
-                            marginBottom: '-1px',
-                          }}
-                        >
-                          Espa&ntilde;ol
-                        </button>
+            {/* VIDEO STATE */}
+            {!isGateActive && (
+              <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
+                {/* Video player or resource card */}
+                {videoId ? (
+                  <div style={{
+                    flex: transcriptOpen ? undefined : 1,
+                    height: transcriptOpen ? '60%' : undefined,
+                    background: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}>
+                    <iframe
+                      src={`https://customer-4n38x6badamh5yps.cloudflarestream.com/${videoId}/iframe`}
+                      style={{
+                        width: '100%', height: '100%', border: 'none',
+                        maxWidth: '100%', maxHeight: '100%',
+                      }}
+                      allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
+                      allowFullScreen
+                    />
+                  </div>
+                ) : resource ? (
+                  <div style={{
+                    flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    background: dark ? '#14171F' : '#FAFBFC',
+                  }}>
+                    <div style={{
+                      background: theme.card, borderRadius: 16,
+                      border: `1px solid ${theme.border}`, padding: '40px 48px',
+                      textAlign: 'center' as const, maxWidth: 400,
+                    }}>
+                      <div style={{
+                        width: 64, height: 64, borderRadius: 16, margin: '0 auto 20px',
+                        background: dark ? 'rgba(232,184,75,0.1)' : '#FEF9EE',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      }}>
+                        <FileText size={28} style={{ color: '#E8B84B' }} />
                       </div>
-                    )}
-
-                    {/* Transcript text */}
-                    <div
-                      className="text-sm leading-relaxed whitespace-pre-wrap max-h-[300px] overflow-y-auto"
-                      style={{ color: theme.prose, fontFamily: "'DM Sans', sans-serif" }}
-                    >
-                      {transcriptLang === 'es' && hasTranscriptEs
-                        ? currentLesson.transcript_es
-                        : currentLesson.transcript}
+                      <p style={{
+                        fontSize: 16, fontWeight: 600, color: theme.title,
+                        fontFamily: "'Source Serif 4', Georgia, serif", marginBottom: 4,
+                      }}>
+                        {resource.filename}
+                      </p>
+                      {resource.fileSize > 0 && (
+                        <p style={{ fontSize: 12, color: theme.textMuted, marginBottom: 20 }}>
+                          {formatFileSize(resource.fileSize)}
+                        </p>
+                      )}
+                      <a
+                        href={resource.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          display: 'inline-flex', alignItems: 'center', gap: 8,
+                          padding: '12px 28px', background: '#E8B84B', color: '#1E2749',
+                          borderRadius: 10, fontSize: 14, fontWeight: 600,
+                          textDecoration: 'none', fontFamily: "'DM Sans', sans-serif",
+                        }}
+                      >
+                        <Download size={16} />
+                        Download
+                      </a>
                     </div>
+                  </div>
+                ) : (
+                  <div style={{
+                    flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    background: dark ? '#14171F' : '#FAFBFC',
+                  }}>
+                    <p style={{ color: theme.textMuted, fontSize: 14 }}>No content available for this lesson.</p>
+                  </div>
+                )}
 
-                    {/* Download links */}
-                    <div className="flex items-center gap-3 mt-3 pt-3" style={{ borderTop: `1px solid ${theme.border}` }}>
-                      {hasTranscript && (
-                        <a
-                          href={`/api/hub/transcripts/${currentLesson.id}?lang=en`}
-                          download
-                          className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg transition-all hover:opacity-80"
-                          style={{ background: dark ? 'rgba(30,64,175,0.2)' : '#EFF6FF', color: '#1E40AF', border: `0.5px solid ${dark ? 'rgba(30,64,175,0.4)' : '#BFDBFE'}` }}
-                        >
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" />
-                          </svg>
-                          {tUI('English')}
-                        </a>
+                {/* Transcript panel (below video, collapsible) */}
+                {transcriptOpen && (hasTranscript || hasTranscriptEs) && (
+                  <div style={{
+                    background: dark ? '#151922' : '#FAFBFC',
+                    borderTop: `1px solid ${theme.border}`,
+                    flexShrink: 0, overflow: 'hidden',
+                    maxHeight: 180,
+                  }}>
+                    <div style={{ padding: '14px 24px' }}>
+                      {/* Language tabs */}
+                      {hasTranscript && hasTranscriptEs && (
+                        <div style={{ display: 'flex', gap: 14, marginBottom: 8, borderBottom: `1px solid ${theme.border}` }}>
+                          <button
+                            onClick={() => setTranscriptLang('en')}
+                            style={{
+                              fontSize: 12, color: transcriptLang === 'en' ? theme.title : theme.textMuted,
+                              cursor: 'pointer', padding: '4px 0', border: 'none', background: 'none',
+                              fontFamily: "'DM Sans', sans-serif", fontWeight: 500,
+                              borderBottom: transcriptLang === 'en' ? '2px solid #E8B84B' : '2px solid transparent',
+                              marginBottom: -1,
+                            }}
+                          >
+                            English
+                          </button>
+                          <button
+                            onClick={() => setTranscriptLang('es')}
+                            style={{
+                              fontSize: 12, color: transcriptLang === 'es' ? theme.title : theme.textMuted,
+                              cursor: 'pointer', padding: '4px 0', border: 'none', background: 'none',
+                              fontFamily: "'DM Sans', sans-serif", fontWeight: 500,
+                              borderBottom: transcriptLang === 'es' ? '2px solid #E8B84B' : '2px solid transparent',
+                              marginBottom: -1,
+                            }}
+                          >
+                            Espa&ntilde;ol
+                          </button>
+                        </div>
                       )}
-                      {hasTranscriptEs && (
-                        <a
-                          href={`/api/hub/transcripts/${currentLesson.id}?lang=es`}
-                          download
-                          className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg transition-all hover:opacity-80"
-                          style={{ background: dark ? 'rgba(22,101,52,0.2)' : '#F0FDF4', color: '#166534', border: `0.5px solid ${dark ? 'rgba(22,101,52,0.4)' : '#BBF7D0'}` }}
-                        >
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" />
-                          </svg>
-                          Espa&ntilde;ol
-                        </a>
-                      )}
+                      <div style={{
+                        fontSize: 12, lineHeight: 1.7, color: dark ? '#9CA3AF' : '#6B7280',
+                        maxHeight: 90, overflowY: 'auto', whiteSpace: 'pre-wrap' as const,
+                        fontFamily: "'DM Sans', sans-serif",
+                      }}>
+                        {transcriptLang === 'es' && hasTranscriptEs
+                          ? currentLesson.transcript_es
+                          : currentLesson.transcript}
+                      </div>
+                      <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+                        {hasTranscript && (
+                          <a
+                            href={`/api/hub/transcripts/${currentLesson.id}?lang=en`}
+                            download
+                            style={{
+                              fontSize: 11, color: theme.title, textDecoration: 'none',
+                              padding: '3px 10px', border: `1px solid ${theme.border}`,
+                              borderRadius: 5, fontFamily: "'DM Sans', sans-serif",
+                            }}
+                          >
+                            English
+                          </a>
+                        )}
+                        {hasTranscriptEs && (
+                          <a
+                            href={`/api/hub/transcripts/${currentLesson.id}?lang=es`}
+                            download
+                            style={{
+                              fontSize: 11, color: theme.title, textDecoration: 'none',
+                              padding: '3px 10px', border: `1px solid ${theme.border}`,
+                              borderRadius: 5, fontFamily: "'DM Sans', sans-serif",
+                            }}
+                          >
+                            Espa&ntilde;ol
+                          </a>
+                        )}
+                      </div>
                     </div>
                   </div>
                 )}
               </div>
             )}
 
-            {/* Body HTML content (always rendered if present) */}
-            {bodyHtml && (
-              <div
-                className="prose prose-gray max-w-none mb-4"
-                style={{
-                  fontFamily: "'DM Sans', sans-serif",
-                  fontSize: '15px',
-                  color: theme.prose,
-                  lineHeight: '1.7',
-                }}
-                dangerouslySetInnerHTML={{ __html: bodyHtml }}
-              />
+            {/* GATE STATE (replaces video) */}
+            {isGateActive && currentGate && user && (
+              <div style={{
+                width: '100%', height: '100%', display: 'flex', flexDirection: 'column',
+                alignItems: 'center', justifyContent: 'center',
+                background: theme.gateBg, padding: 40, overflowY: 'auto',
+              }}>
+                <GateCard
+                  question={currentGate}
+                  allQuestions={courseQuestions}
+                  userId={user.id}
+                  dark={dark}
+                  onGateCleared={handleGateCleared}
+                />
+              </div>
             )}
+          </div>
 
-            {/* Gate Card (between content and navigation) */}
-            {currentGate && user && (
-              <GateCard
-                question={currentGate}
-                userId={user.id}
-                dark={dark}
-                onGateCleared={handleGateCleared}
-              />
-            )}
-
-            {/* Mark complete (only for non-gated lessons, since gated lessons auto-complete on gate clear) */}
-            {!currentGate && !isGateActive && (
-              <div className="mb-4">
-                {isComplete ? (
-                  <span
-                    className="inline-flex items-center gap-1.5 text-sm"
-                    style={{
-                      fontFamily: "'DM Sans', sans-serif",
-                      color: '#16A34A',
-                    }}
-                  >
-                    <Check size={14} />
-                    {tUI('Lesson completed!')}
-                  </span>
-                ) : (
+          {/* ================================================================ */}
+          {/* Bottom bar (always visible)                                       */}
+          {/* ================================================================ */}
+          <div style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            padding: '10px 24px', background: theme.barBg,
+            borderTop: `1px solid ${theme.barBorder}`, flexShrink: 0,
+          }}>
+            {/* Left: lesson title + meta */}
+            <div>
+              <div style={{
+                fontFamily: "'Source Serif 4', Georgia, serif", fontSize: 16, fontWeight: 600,
+                color: theme.title,
+              }}>
+                {currentLesson.title}
+              </div>
+              <div style={{ fontSize: 12, color: theme.textMuted, marginTop: 1 }}>
+                {videoId ? 'Video' : resource ? 'Resource' : 'Lesson'}
+                {durationStr ? `, ${durationStr}` : ''}
+                {!isGateActive && !currentGate && !isComplete && (
                   <button
                     onClick={handleMarkComplete}
-                    className="inline-flex items-center gap-1.5 text-sm font-medium hover:opacity-80 transition-opacity"
                     style={{
-                      fontFamily: "'DM Sans', sans-serif",
-                      color: '#E8B84B',
-                      background: 'none',
-                      border: 'none',
-                      cursor: 'pointer',
-                      padding: 0,
+                      marginLeft: 12, background: 'none', border: 'none', cursor: 'pointer',
+                      color: '#E8B84B', fontSize: 12, fontWeight: 500,
+                      fontFamily: "'DM Sans', sans-serif", padding: 0,
                     }}
                   >
-                    <Check size={14} />
                     Mark complete
                   </button>
                 )}
+                {isComplete && !currentGate && (
+                  <span style={{ marginLeft: 12, color: '#16A34A', fontSize: 12 }}>
+                    Completed
+                  </span>
+                )}
               </div>
-            )}
-
-            {/* Community Prompt */}
-            <div className="mt-6 mb-4">
-              <p
-                className="text-sm mb-2"
-                style={{ color: theme.textMuted, fontFamily: "'DM Sans', sans-serif" }}
-              >
-                {tUI('How did this land for you?')}
-              </p>
-              <Link
-                href={`/hub/courses/${slug}#community`}
-                className="inline-flex items-center gap-1.5 text-sm font-medium hover:opacity-80 transition-opacity"
-                style={{
-                  color: '#E8B84B',
-                  fontFamily: "'DM Sans', sans-serif",
-                }}
-              >
-                <MessageCircle size={14} />
-                {tUI('Share with other educators')}
-              </Link>
             </div>
 
-            {/* Lesson Navigation */}
-            <div
-              className="flex flex-col sm:flex-row items-center justify-between gap-4 py-6 border-t"
-              style={{ borderColor: theme.border }}
-            >
-              {/* Previous */}
-              {prevLesson ? (
-                <Link
-                  href={`/hub/courses/${slug}/${prevLesson.slug || prevLesson.id}`}
-                  className="flex items-center gap-2 px-4 py-3 rounded-lg transition-colors w-full sm:w-auto justify-center hover:opacity-80"
-                  style={{ color: theme.text, fontFamily: "'DM Sans', sans-serif", fontSize: '14px' }}
-                >
-                  <ArrowLeft size={16} />
-                  <span className="truncate max-w-[150px]">{prevLesson.title}</span>
-                </Link>
-              ) : (
-                <div />
-              )}
-
-              {/* Counter + auto-advance */}
-              <div className="flex flex-col items-center gap-1 order-first sm:order-none">
-                <span
-                  className="text-sm"
-                  style={{ color: theme.textMuted, fontFamily: "'DM Sans', sans-serif" }}
-                >
-                  {tUI('Lesson')} {currentIndex + 1} {tUI('of')} {allLessons.length}
-                </span>
-                <label
-                  className="flex items-center gap-1.5 cursor-pointer text-xs"
-                  style={{ color: theme.textMuted, fontFamily: "'DM Sans', sans-serif" }}
-                >
-                  <input
-                    type="checkbox"
-                    checked={autoAdvance}
-                    onChange={toggleAutoAdvance}
-                    className="w-3 h-3 rounded"
-                  />
-                  {tUI('Auto-advance')}
-                </label>
-              </div>
-
-              {/* Next or Complete Course (hidden when gate is active) */}
-              {isGateActive ? (
-                <div
-                  className="flex items-center gap-2 px-4 py-3 rounded-lg w-full sm:w-auto justify-center text-sm"
+            {/* Right: transcript toggle, nav arrows, next button */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              {/* Transcript toggle (only for video lessons with transcripts) */}
+              {videoId && (hasTranscript || hasTranscriptEs) && (
+                <button
+                  onClick={() => setTranscriptOpen(!transcriptOpen)}
                   style={{
-                    color: theme.textMuted,
+                    background: theme.barBg,
+                    border: `1px solid ${dark ? 'rgba(255,255,255,0.1)' : '#E5E7EB'}`,
+                    borderRadius: 8, padding: '7px 14px', fontSize: 12,
+                    color: dark ? '#9CA3AF' : '#6B7280', cursor: 'pointer',
                     fontFamily: "'DM Sans', sans-serif",
-                    backgroundColor: dark ? 'rgba(255,255,255,0.03)' : '#F9FAFB',
-                    border: `1px solid ${dark ? 'rgba(255,255,255,0.06)' : '#F3F4F6'}`,
+                    display: 'flex', alignItems: 'center', gap: 5,
                   }}
                 >
-                  Complete the check-in above to continue
-                </div>
+                  <List size={13} />
+                  Transcript
+                </button>
+              )}
+
+              {/* Prev arrow */}
+              <button
+                onClick={() => prevLesson && router.push(`/hub/courses/${slug}/${prevLesson.slug || prevLesson.id}`)}
+                disabled={!prevLesson}
+                style={{
+                  width: 34, height: 34, borderRadius: 8,
+                  border: `1px solid ${dark ? 'rgba(255,255,255,0.1)' : '#E5E7EB'}`,
+                  background: theme.barBg,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  color: dark ? '#9CA3AF' : '#6B7280', cursor: prevLesson ? 'pointer' : 'default',
+                  opacity: prevLesson ? 1 : 0.25,
+                }}
+                title={prevLesson ? `Previous: ${prevLesson.title}` : ''}
+              >
+                <ArrowLeft size={16} />
+              </button>
+
+              {/* Next button or locked message */}
+              {isGateActive ? (
+                <button
+                  disabled
+                  style={{
+                    background: dark ? 'rgba(254,249,238,0.08)' : '#FEF9EE',
+                    border: `1px solid ${dark ? 'rgba(253,230,138,0.2)' : '#FDE68A'}`,
+                    borderRadius: 8, padding: '8px 18px',
+                    color: dark ? '#E8B84B' : '#92400E', fontSize: 13, fontWeight: 600,
+                    cursor: 'default', fontFamily: "'DM Sans', sans-serif",
+                  }}
+                >
+                  Complete the check-in to continue
+                </button>
               ) : isLastLesson && progress.isComplete ? (
                 <button
                   onClick={handleCompleteCourse}
-                  className="flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-colors w-full sm:w-auto justify-center"
                   style={{
-                    backgroundColor: '#E8B84B',
-                    color: '#1E2749',
-                    fontFamily: "'DM Sans', sans-serif",
-                    fontSize: '14px',
+                    background: '#E8B84B', border: 'none', borderRadius: 8,
+                    padding: '8px 18px', color: '#1E2749', fontSize: 13, fontWeight: 600,
+                    cursor: 'pointer', fontFamily: "'DM Sans', sans-serif",
+                    display: 'flex', alignItems: 'center', gap: 6,
                   }}
                 >
                   {tUI('Complete Course')}
-                  <Check size={16} />
+                  <Check size={14} />
                 </button>
               ) : nextLesson ? (
-                <Link
-                  href={`/hub/courses/${slug}/${nextLesson.slug || nextLesson.id}`}
-                  className="flex items-center gap-2 px-4 py-3 rounded-lg transition-colors w-full sm:w-auto justify-center hover:opacity-80"
+                <button
+                  onClick={() => router.push(`/hub/courses/${slug}/${nextLesson.slug || nextLesson.id}`)}
                   style={{
-                    backgroundColor: dark ? 'rgba(255,255,255,0.05)' : '#F3F4F6',
-                    color: theme.text,
-                    fontFamily: "'DM Sans', sans-serif",
-                    fontSize: '14px',
+                    background: dark ? '#1E2749' : '#1E2749', border: 'none', borderRadius: 8,
+                    padding: '8px 18px', color: 'white', fontSize: 13, fontWeight: 600,
+                    cursor: 'pointer', fontFamily: "'DM Sans', sans-serif",
+                    display: 'flex', alignItems: 'center', gap: 6,
                   }}
                 >
-                  <span className="truncate max-w-[150px]">{nextLesson.title}</span>
-                  <ArrowRight size={16} />
-                </Link>
+                  <span style={{ maxWidth: 180, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
+                    {nextLesson.title}
+                  </span>
+                  <ArrowRight size={14} />
+                </button>
               ) : (
                 <div />
               )}
             </div>
           </div>
-
-          {/* ================================================================ */}
-          {/* Desktop Sidebar                                                   */}
-          {/* ================================================================ */}
-          <aside
-            className="hidden lg:block p-6 sticky top-0 self-start"
-            style={{
-              borderLeft: `1px solid ${theme.border}`,
-              backgroundColor: theme.sidebar,
-              maxHeight: '100vh',
-              overflowY: 'auto',
-            }}
-          >
-            {sidebarContent}
-          </aside>
         </div>
+
+        {/* ================================================================ */}
+        {/* Desktop Sidebar (300px fixed)                                     */}
+        {/* ================================================================ */}
+        <aside
+          className="hidden lg:flex"
+          style={{
+            width: 300, background: theme.sidebar,
+            borderLeft: `1px solid ${theme.border}`,
+            flexDirection: 'column', flexShrink: 0, overflow: 'hidden',
+          }}
+        >
+          {sidebarContent}
+        </aside>
       </div>
 
       {/* ================================================================ */}
       {/* Mobile: Fixed bottom button to open bottom sheet                  */}
       {/* ================================================================ */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40">
+      <div className="lg:hidden" style={{
+        position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 40,
+      }}>
         <button
           onClick={() => setBottomSheetOpen(true)}
-          className="w-full flex items-center justify-center gap-2 py-4 text-sm font-medium shadow-lg"
           style={{
-            backgroundColor: dark ? '#1A1F2E' : '#FFFFFF',
-            color: theme.title,
+            width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            gap: 8, padding: '14px 0', fontSize: 14, fontWeight: 500,
+            background: theme.barBg, color: theme.title,
             borderTop: `1px solid ${theme.border}`,
-            fontFamily: "'DM Sans', sans-serif",
+            border: 'none', borderTopWidth: 1, borderTopStyle: 'solid', borderTopColor: theme.border,
+            cursor: 'pointer', fontFamily: "'DM Sans', sans-serif",
+            boxShadow: '0 -2px 10px rgba(0,0,0,0.1)',
           }}
         >
           <List size={18} />
@@ -1564,77 +1415,42 @@ export default function LessonPage({ params }: LessonPageProps) {
       {/* Mobile Bottom Sheet                                               */}
       {/* ================================================================ */}
       {bottomSheetOpen && (
-        <div className="lg:hidden fixed inset-0 z-50">
-          {/* Backdrop */}
+        <div className="lg:hidden" style={{ position: 'fixed', inset: 0, zIndex: 50 }}>
           <div
-            className="absolute inset-0 bg-black/50"
+            style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.5)' }}
             onClick={() => setBottomSheetOpen(false)}
           />
-
-          {/* Sheet */}
-          <div
-            className="absolute bottom-0 left-0 right-0 rounded-t-2xl shadow-xl"
-            style={{
-              backgroundColor: theme.sidebar,
-              maxHeight: '60vh',
-              overflowY: 'auto',
-            }}
-          >
-            {/* Drag handle */}
-            <div className="flex justify-center py-3">
-              <div
-                className="w-10 h-1 rounded-full"
-                style={{ backgroundColor: dark ? 'rgba(255,255,255,0.2)' : '#D1D5DB' }}
-              />
+          <div style={{
+            position: 'absolute', bottom: 0, left: 0, right: 0,
+            borderRadius: '16px 16px 0 0',
+            background: theme.sidebar, maxHeight: '70vh',
+            display: 'flex', flexDirection: 'column',
+            boxShadow: '0 -4px 24px rgba(0,0,0,0.2)',
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'center', padding: '12px 0 4px' }}>
+              <div style={{
+                width: 40, height: 4, borderRadius: 2,
+                background: dark ? 'rgba(255,255,255,0.2)' : '#D1D5DB',
+              }} />
             </div>
-
-            {/* Close button */}
-            <div className="flex items-center justify-between px-5 pb-3">
-              <span
-                className="text-sm font-semibold"
-                style={{ color: theme.title, fontFamily: "'DM Sans', sans-serif" }}
-              >
+            <div style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              padding: '0 20px 12px',
+            }}>
+              <span style={{ fontSize: 14, fontWeight: 600, color: theme.title, fontFamily: "'DM Sans', sans-serif" }}>
                 {tUI('Course Outline')}
               </span>
               <button
                 onClick={() => setBottomSheetOpen(false)}
-                className="p-1.5 rounded-lg hover:opacity-80"
-                style={{ color: theme.textMuted }}
+                style={{ padding: 6, background: 'none', border: 'none', cursor: 'pointer', color: theme.textMuted }}
               >
                 <X size={18} />
               </button>
             </div>
-
-            {/* Content */}
-            <div className="px-5 pb-6">
+            <div style={{ flex: 1, overflowY: 'auto', padding: '0 20px 24px' }}>
               {sidebarContent}
             </div>
           </div>
-        </div>
-      )}
-
-      {/* ================================================================ */}
-      {/* Toast                                                             */}
-      {/* ================================================================ */}
-      {toast && (
-        <div
-          className="fixed bottom-20 lg:bottom-8 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg"
-          style={{
-            backgroundColor: '#10B981',
-            color: 'white',
-            fontFamily: "'DM Sans', sans-serif",
-          }}
-        >
-          <Check size={16} />
-          <span className="text-sm font-medium">{toast.message}</span>
-          {toast.undoLessonId && (
-            <button
-              onClick={handleUndoComplete}
-              className="text-sm font-bold underline ml-2"
-            >
-              {tUI('Undo')}
-            </button>
-          )}
         </div>
       )}
 

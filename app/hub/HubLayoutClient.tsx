@@ -23,9 +23,9 @@ function HubLayoutInner({ children }: { children: React.ReactNode }) {
   const { profile, user } = useHub();
   const [showCheckIn, setShowCheckIn] = useState(false);
 
-  // Hide nav on auth routes and lesson player (focused learning experience)
+  // Hide nav on auth routes only (lesson player now shows nav via its own layout)
   const isLessonPlayer = /^\/hub\/courses\/[^/]+\/[^/]+$/.test(pathname);
-  const showNav = !NO_NAV_ROUTES.some((route) => pathname.startsWith(route)) && !isLessonPlayer;
+  const showNav = !NO_NAV_ROUTES.some((route) => pathname.startsWith(route));
 
   useEffect(() => {
     if (!user?.id) return;
