@@ -410,60 +410,147 @@ export default function HubDashboard() {
       }
 
       try {
-        // Fetch enrollments with course data
-        const { data: enrollmentData } = await supabase
-          .from('hub_enrollments')
-          .select(`
-            id,
-            course_id,
-            status,
-            progress_percentage,
-            course:hub_courses(id, slug, title, category, estimated_minutes)
-          `)
-          .eq('user_id', user.id)
-          .eq('status', 'active')
-          .order('updated_at', { ascending: false })
-          .limit(3);
+        // Parallelize the major independent queries
+        const [enrollmentResult, quickWinResult, tipResult, trackerResult, quizResult, certResult] = await Promise.all([
+          // 1. Enrollments
+          supabase
+            .from('hub_enrollments')
+            .select('id, course_id, status, progress_percentage, course:hub_courses(id, slug, title, category, estimated_minutes)')
+            .eq('user_id', user.id)
+            .eq('status', 'active')
+            .order('updated_at', { ascending: false })
+            .limit(3),
+          // 2. Quick Wins
+          supabase
+            .from('hub_quick_wins')
+            .select('id, slug, title, description, duration_minutes, category, thumbnail_url')
+            .eq('is_published', true),
+          // 3. TDI Tips
+          supabase
+            .from('hub_tdi_tips')
+            .select('id, content')
+            .eq('approval_status', 'approved')
+            .order('created_at', { ascending: true }),
+          // 4. Tracker + Streak
+          Promise.all([checkTrackerEligibility(user.id), getLearningStats(user.id)]),
+          // 5. Quiz results
+          supabase
+            .from('hub_quiz_results')
+            .select('quiz_type, result_key')
+            .eq('user_id', user.id),
+          // 6. Certificate count
+          supabase
+            .from('hub_certificates')
+            .select('*', { count: 'exact', head: true })
+            .eq('user_id', user.id),
+        ]);
 
+        // Process enrollments
+        const enrollmentData = enrollmentResult.data;
         if (enrollmentData) {
-          // Get lesson counts for each enrollment
           const enrichedEnrollments = await Promise.all(
             enrollmentData.map(async (enrollment) => {
-              const { count: totalLessons } = await supabase
-                .from('hub_lessons')
-                .select('*', { count: 'exact', head: true })
-                .eq('course_id', enrollment.course_id);
-
-              const { count: completedLessons } = await supabase
-                .from('hub_lesson_progress')
-                .select('*', { count: 'exact', head: true })
-                .eq('user_id', user.id)
-                .eq('status', 'completed')
-                .in('lesson_id',
-                  (await supabase
-                    .from('hub_lessons')
-                    .select('id')
-                    .eq('course_id', enrollment.course_id)
-                  ).data?.map(l => l.id) || []
-                );
-
+              // Get modules first, then lessons via module_id
+              const { data: mods } = await supabase.from('hub_modules').select('id').eq('course_id', enrollment.course_id);
+              const modIds = (mods || []).map(m => m.id);
+              const [totalResult, lessonIdsResult] = await Promise.all([
+                modIds.length > 0
+                  ? supabase.from('hub_lessons').select('*', { count: 'exact', head: true }).in('module_id', modIds)
+                  : Promise.resolve({ count: 0 }),
+                modIds.length > 0
+                  ? supabase.from('hub_lessons').select('id').in('module_id', modIds)
+                  : Promise.resolve({ data: [] as { id: string }[] }),
+              ]);
+              const lessonIds = (lessonIdsResult as any).data?.map((l: { id: string }) => l.id) || [];
+              const { count: completedLessons } = lessonIds.length > 0
+                ? await supabase.from('hub_lesson_progress').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('status', 'completed').in('lesson_id', lessonIds)
+                : { count: 0 };
               return {
                 ...enrollment,
                 course: Array.isArray(enrollment.course) ? enrollment.course[0] : enrollment.course,
                 lessons_completed: completedLessons || 0,
-                total_lessons: totalLessons || 0,
+                total_lessons: (totalResult as any).count || 0,
               };
             })
           );
           setEnrollments(enrichedEnrollments as Enrollment[]);
         }
 
-        // Fetch ALL published quick wins for deterministic daily pick + role filtering
-        const { data: allQuickWinData } = await supabase
-          .from('hub_quick_wins')
-          .select('id, slug, title, description, duration_minutes, category, thumbnail_url')
-          .eq('is_published', true);
+        // Process tracker + streak
+        const [eligibility, learningStats] = trackerResult;
+        setTrackerEligibility(eligibility);
+        setCurrentStreak(learningStats.currentStreak);
 
+        // Process quiz results
+        const qResults: Record<string, string> = {};
+        const educatorType = (profile as unknown as Record<string, unknown>)?.educator_type as string | null;
+        if (educatorType) qResults['educator_type'] = educatorType;
+        if (quizResult.data) {
+          for (const row of quizResult.data) qResults[row.quiz_type] = row.result_key;
+        }
+        setDashboardQuizResults(qResults);
+
+        // Process certificates
+        setCertificateCount(certResult.count || 0);
+
+        // Process tips
+        const tipData = tipResult.data;
+        const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000);
+        if (tipData && tipData.length > 0) {
+          const tipIndex = dayOfYear % tipData.length;
+          setTip(tipData[tipIndex].content);
+        } else {
+          const tipIndex = dayOfYear % FALLBACK_TIPS.length;
+          setTip(FALLBACK_TIPS[tipIndex]);
+        }
+
+        // Process quick wins
+        const allQuickWinData = quickWinResult.data;
+
+        // Get recommendations (can run after quiz results are processed)
+        const onboardingDone = await hasCompletedOnboarding(user.id);
+        if (onboardingDone) {
+          const recs = await getRecommendations(user.id);
+          if (recs.courses.length > 0) {
+            setRecommendations(recs.courses);
+            setShowRecommendations(true);
+          }
+        }
+
+        // Educators like you (fire and forget)
+        if (qResults['educator_type']) {
+          fetch(`/api/hub/quiz-recommendations?userId=${user.id}`)
+            .then(res => res.json())
+            .then(data => {
+              if (data.recommendations?.length > 0) {
+                setLikeYouRecs(data.recommendations);
+                setLikeYouCohortSize(data.cohortSize || 0);
+                setLikeYouType(data.educatorType || null);
+              }
+            })
+            .catch(() => {});
+        }
+
+        // Check recognitions (fire and forget, non-critical)
+        checkRecognitions(user.id, supabase).then(async (recResult) => {
+          setFieldNotesCount(recResult.earned.length);
+          try {
+            const earnedRes = await fetch(`/api/hub/recognitions?userId=${user.id}`);
+            const { earned: previouslyEarned } = await earnedRes.json();
+            const previousTypes = new Set((previouslyEarned || []).map((e: { recognition_type: string }) => e.recognition_type));
+            const currentEarnedTypes = recResult.earned.map(e => e.recognition.id);
+            const brandNew = currentEarnedTypes.filter((t: string) => !previousTypes.has(t));
+            if (brandNew.length > 0) {
+              await fetch('/api/hub/recognitions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: user.id, newRecognitions: brandNew }) });
+              const celebrateRec = RECOGNITIONS.find(r => r.id === brandNew[0]);
+              if (celebrateRec) setNewRecognition(celebrateRec);
+            } else if (previouslyEarned.length === 0 && currentEarnedTypes.length > 0) {
+              await fetch('/api/hub/recognitions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: user.id, newRecognitions: currentEarnedTypes }) });
+            }
+          } catch {}
+        }).catch(() => {});
+
+        // Process quick wins
         if (allQuickWinData && allQuickWinData.length > 0) {
           let pool: QuickWin[] = allQuickWinData.map((qw) => ({
             id: qw.id,
@@ -509,117 +596,7 @@ export default function HubDashboard() {
           setFeaturedQuickWins([featured, ...remaining]);
         }
 
-        // Fetch TDI tip - pick based on date
-        const { data: tipData } = await supabase
-          .from('hub_tdi_tips')
-          .select('id, content')
-          .eq('approval_status', 'approved')
-          .order('created_at', { ascending: true });
-
-        const dayOfYear = Math.floor(
-          (Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000
-        );
-
-        if (tipData && tipData.length > 0) {
-          const tipIndex = dayOfYear % tipData.length;
-          setTip(tipData[tipIndex].content);
-        } else {
-          // Use fallback tips
-          const tipIndex = dayOfYear % FALLBACK_TIPS.length;
-          setTip(FALLBACK_TIPS[tipIndex]);
-        }
-
-        // Check tracker eligibility + streak
-        const [eligibility, learningStats] = await Promise.all([
-          checkTrackerEligibility(user.id),
-          getLearningStats(user.id),
-        ]);
-        setTrackerEligibility(eligibility);
-        setCurrentStreak(learningStats.currentStreak);
-
-        // Get recommendations if onboarding completed
-        const onboardingDone = await hasCompletedOnboarding(user.id);
-        if (onboardingDone) {
-          const recs = await getRecommendations(user.id);
-          if (recs.courses.length > 0) {
-            setRecommendations(recs.courses);
-            setShowRecommendations(true);
-          }
-        }
-
-        // Fetch quiz results for dashboard recommendations
-        const { data: quizRows } = await supabase
-          .from('hub_quiz_results')
-          .select('quiz_type, result_key')
-          .eq('user_id', user.id);
-        const qResults: Record<string, string> = {};
-        const educatorType = (profile as unknown as Record<string, unknown>)?.educator_type as string | null;
-        if (educatorType) qResults['educator_type'] = educatorType;
-        if (quizRows) {
-          for (const row of quizRows) qResults[row.quiz_type] = row.result_key;
-        }
-        setDashboardQuizResults(qResults);
-
-        // Fetch "Educators like you" recommendations
-        if (qResults['educator_type']) {
-          fetch(`/api/hub/quiz-recommendations?userId=${user.id}`)
-            .then(res => res.json())
-            .then(data => {
-              if (data.recommendations?.length > 0) {
-                setLikeYouRecs(data.recommendations);
-                setLikeYouCohortSize(data.cohortSize || 0);
-                setLikeYouType(data.educatorType || null);
-              }
-            })
-            .catch(() => {});
-        }
-
-        // Fetch certificate count
-        const { count: certCount } = await supabase
-          .from('hub_certificates')
-          .select('*', { count: 'exact', head: true })
-          .eq('user_id', user.id);
-
-        setCertificateCount(certCount || 0);
-
-        // Check Field Notes (recognitions) + detect new ones
-        try {
-          const recResult = await checkRecognitions(user.id, supabase);
-          setFieldNotesCount(recResult.earned.length);
-
-          // Compare against persisted earned recognitions to find new ones
-          const earnedRes = await fetch(`/api/hub/recognitions?userId=${user.id}`);
-          const { earned: previouslyEarned } = await earnedRes.json();
-          const previousTypes = new Set((previouslyEarned || []).map((e: { recognition_type: string }) => e.recognition_type));
-          const currentEarnedTypes = recResult.earned.map(e => e.recognition.id);
-          const brandNew = currentEarnedTypes.filter((t: string) => !previousTypes.has(t));
-
-          if (brandNew.length > 0) {
-            // Persist all newly earned recognitions
-            await fetch('/api/hub/recognitions', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ userId: user.id, newRecognitions: brandNew }),
-            });
-
-            // Show celebration for the first new one
-            const celebrateRec = RECOGNITIONS.find(r => r.id === brandNew[0]);
-            if (celebrateRec) {
-              setNewRecognition(celebrateRec);
-            }
-          } else if (previouslyEarned.length === 0 && currentEarnedTypes.length > 0) {
-            // First time -- persist all existing earned (backfill)
-            await fetch('/api/hub/recognitions', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ userId: user.id, newRecognitions: currentEarnedTypes }),
-            });
-          }
-        } catch {
-          // Silent fail -- recognition check is non-critical
-        }
-
-        // --- New dashboard enrichment queries (Features 1, 2, 5, 6) ---
+        // --- Dashboard enrichment queries (Features 1, 2, 5, 6) ---
         const now = new Date();
         const thirtyDaysAgo = new Date(now.getTime() - 30 * 86400000).toISOString();
         const sevenDaysAgo = new Date(now.getTime() - 7 * 86400000).toISOString();
