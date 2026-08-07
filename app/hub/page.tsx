@@ -364,8 +364,6 @@ export default function HubDashboard() {
   const [likeYouCohortSize, setLikeYouCohortSize] = useState(0);
   const [likeYouType, setLikeYouType] = useState<string | null>(null);
 
-  const [posterHover, setPosterHover] = useState<number | null>(null);
-
   // Carousel state
   const [carouselIndex, setCarouselIndex] = useState(0);
 
@@ -1399,39 +1397,24 @@ export default function HubDashboard() {
               <ChevronRight size={18} />
             </button>
 
-            {/* Carousel track - each card has a stable key so CSS transitions work */}
-            <div style={{ position: 'relative', minHeight: 380, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              {carouselCards.map((card, i) => {
-                const total = carouselCards.length;
-                let offset = i - carouselIndex;
-                if (offset > total / 2) offset -= total;
-                if (offset < -total / 2) offset += total;
-                const absOffset = Math.abs(offset);
-
-                const visible = absOffset <= 2;
-                const offscreenLeft = offset < 0 ? '-10%' : '110%';
-
-                const posMap: Record<number, { left: string; w: number; h: number; opacity: number; scale: number; z: number; tx: string }> = {
-                  0:  { left: '50%', w: 240, h: 340, opacity: 1,    scale: 1,    z: 3, tx: '-50%' },
-                  1:  { left: offset < 0 ? '15%' : '63%', w: 200, h: 290, opacity: 0.65, scale: 0.88, z: 2, tx: '0%' },
-                  2:  { left: offset < 0 ? '2%'  : '82%', w: 180, h: 260, opacity: 0.35, scale: 0.75, z: 1, tx: '0%' },
-                };
-                const pos = visible ? posMap[absOffset] : { left: offscreenLeft, w: 170, h: 250, opacity: 0, scale: 0.65, z: 0, tx: '0%' };
-                if (!pos) return null;
-
-                const isCenter = offset === 0;
-                const titleSize = isCenter ? 17 : (absOffset === 1 ? 14 : 12);
+            {/* Carousel track */}
+            <div style={{ position: 'relative', minHeight: 380, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+              {carouselPositions.map((pos) => {
+                if (carouselCards.length === 0) return null;
+                const idx = (carouselIndex + pos.offset + carouselCards.length) % carouselCards.length;
+                const card = carouselCards[idx];
+                const isCenter = pos.offset === 0;
+                const titleSize = isCenter ? 17 : (Math.abs(pos.offset) === 1 ? 14 : 12);
 
                 const handleCardClick = () => {
-                  if (!visible) return;
-                  if (offset < 0) shiftLeft();
-                  else if (offset > 0) shiftRight();
+                  if (pos.offset < 0) shiftLeft();
+                  else if (pos.offset > 0) shiftRight();
                   else router.push(card.href);
                 };
 
                 return (
                   <div
-                    key={`card-${i}`}
+                    key={`pos-${pos.offset}`}
                     onClick={handleCardClick}
                     style={{
                       position: 'absolute',
@@ -1439,14 +1422,13 @@ export default function HubDashboard() {
                       height: pos.h,
                       left: pos.left,
                       opacity: pos.opacity,
-                      transform: `translateX(${pos.tx}) scale(${pos.scale})`,
+                      transform: `${pos.translateX ? `translateX(${pos.translateX})` : ''} scale(${pos.scale})`,
                       zIndex: pos.z,
                       borderRadius: 16,
                       overflow: 'hidden',
-                      background: getPosterGradient(card, i),
+                      background: getPosterGradient(card, idx),
                       boxShadow: isCenter ? '0 12px 40px rgba(30,39,73,0.2)' : '0 4px 16px rgba(0,0,0,0.08)',
-                      cursor: visible ? 'pointer' : 'default',
-                      pointerEvents: visible ? 'auto' : 'none',
+                      cursor: 'pointer',
                     }}
                   >
                     {/* Accent bar */}
