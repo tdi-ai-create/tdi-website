@@ -3,6 +3,10 @@ import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
 import { renderToBuffer } from '@react-pdf/renderer'
 import { QuickWinPDF, type QuickWinSections } from '@/lib/pdf/quick-win-template'
+import { ChecklistPDF, type ChecklistData } from '@/lib/pdf/quick-win-checklist'
+import { FormPDF, type FormData } from '@/lib/pdf/quick-win-form'
+import { ReferencePDF, type ReferenceData } from '@/lib/pdf/quick-win-reference'
+import { ToolkitPDF, type ToolkitData } from '@/lib/pdf/quick-win-toolkit'
 import React from 'react'
 
 export const maxDuration = 60
@@ -46,10 +50,63 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json()
-    const { id, sections } = body as { id: string; sections: QuickWinSections }
     const supabase = db()
+    const action = body.action || 'generate_pdf'
 
-    if (!id) return NextResponse.json({ error: 'id is required' }, { status: 400 })
+    if (!body.id) return NextResponse.json({ error: 'id is required' }, { status: 400 })
+
+    // Route to generate_tool if action specified
+    if (action === 'generate_tool') {
+      const { id, tool_type, tool_content } = body
+      if (!tool_type) return NextResponse.json({ error: 'tool_type is required (checklist | form | reference_card | toolkit)' }, { status: 400 })
+      if (!tool_content) return NextResponse.json({ error: 'tool_content is required' }, { status: 400 })
+
+      const { data: qw, error: fetchErr } = await supabase
+        .from('hub_quick_wins')
+        .select('id, slug, title')
+        .eq('id', id)
+        .single()
+
+      if (fetchErr || !qw) return NextResponse.json({ error: 'Quick Win not found' }, { status: 404 })
+
+      let pdfBuffer: Buffer
+      if (tool_type === 'checklist') {
+        pdfBuffer = await renderToBuffer(<ChecklistPDF data={tool_content as ChecklistData} />)
+      } else if (tool_type === 'form') {
+        pdfBuffer = await renderToBuffer(<FormPDF data={tool_content as FormData} />)
+      } else if (tool_type === 'reference_card') {
+        pdfBuffer = await renderToBuffer(<ReferencePDF data={tool_content as ReferenceData} />)
+      } else if (tool_type === 'toolkit') {
+        pdfBuffer = await renderToBuffer(<ToolkitPDF data={tool_content as ToolkitData} />)
+      } else {
+        return NextResponse.json({ error: `Unknown tool_type: ${tool_type}` }, { status: 400 })
+      }
+
+      const toolFilename = `${qw.slug || 'tool'}-resource.pdf`
+      const storagePath = `quick-wins/${qw.id}/${toolFilename}`
+
+      const { error: uploadErr } = await supabase.storage
+        .from('hub-assets')
+        .upload(storagePath, pdfBuffer, { contentType: 'application/pdf', upsert: true })
+
+      if (uploadErr) return NextResponse.json({ error: `Upload failed: ${uploadErr.message}` }, { status: 500 })
+
+      const { data: urlData } = supabase.storage.from('hub-assets').getPublicUrl(storagePath)
+      const toolUrl = urlData?.publicUrl
+
+      const { error: updateErr } = await supabase
+        .from('hub_quick_wins')
+        .update({ tool_file_url: toolUrl, tool_file_path: storagePath, tool_type, updated_at: new Date().toISOString() })
+        .eq('id', qw.id)
+
+      if (updateErr) return NextResponse.json({ error: updateErr.message }, { status: 500 })
+
+      return NextResponse.json({ success: true, tool_file_url: toolUrl, storage_path: storagePath, tool_type })
+    }
+
+    // Default: generate_pdf (guide)
+    const { id, sections } = body as { id: string; sections: QuickWinSections }
+
     if (!sections) return NextResponse.json({ error: 'sections object is required' }, { status: 400 })
 
     // Validate required sections
