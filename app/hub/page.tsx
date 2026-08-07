@@ -1408,20 +1408,22 @@ export default function HubDashboard() {
                 if (offset < -total / 2) offset += total;
                 const absOffset = Math.abs(offset);
 
-                if (absOffset > 2) return null;
+                const visible = absOffset <= 2;
+                const offscreenLeft = offset < 0 ? '-10%' : '110%';
 
                 const posMap: Record<number, { left: string; w: number; h: number; opacity: number; scale: number; z: number; tx: string }> = {
                   0:  { left: '50%', w: 240, h: 340, opacity: 1,    scale: 1,    z: 3, tx: '-50%' },
                   1:  { left: offset < 0 ? '15%' : '63%', w: 200, h: 290, opacity: 0.65, scale: 0.88, z: 2, tx: '0%' },
                   2:  { left: offset < 0 ? '2%'  : '82%', w: 180, h: 260, opacity: 0.35, scale: 0.75, z: 1, tx: '0%' },
                 };
-                const pos = posMap[absOffset];
+                const pos = visible ? posMap[absOffset] : { left: offscreenLeft, w: 170, h: 250, opacity: 0, scale: 0.65, z: 0, tx: '0%' };
                 if (!pos) return null;
 
                 const isCenter = offset === 0;
                 const titleSize = isCenter ? 17 : (absOffset === 1 ? 14 : 12);
 
                 const handleCardClick = () => {
+                  if (!visible) return;
                   if (offset < 0) shiftLeft();
                   else if (offset > 0) shiftRight();
                   else router.push(card.href);
@@ -1443,8 +1445,9 @@ export default function HubDashboard() {
                       overflow: 'hidden',
                       background: getPosterGradient(card, i),
                       boxShadow: isCenter ? '0 12px 40px rgba(30,39,73,0.2)' : '0 4px 16px rgba(0,0,0,0.08)',
-                      cursor: 'pointer',
-                      transition: 'left 0.6s cubic-bezier(0.25, 0.1, 0.25, 1), width 0.6s cubic-bezier(0.25, 0.1, 0.25, 1), height 0.6s cubic-bezier(0.25, 0.1, 0.25, 1), opacity 0.6s cubic-bezier(0.25, 0.1, 0.25, 1), transform 0.6s cubic-bezier(0.25, 0.1, 0.25, 1), box-shadow 0.6s cubic-bezier(0.25, 0.1, 0.25, 1)',
+                      cursor: visible ? 'pointer' : 'default',
+                      pointerEvents: visible ? 'auto' : 'none',
+                      transition: 'left 0.8s cubic-bezier(0.4, 0, 0.2, 1), width 0.8s cubic-bezier(0.4, 0, 0.2, 1), height 0.8s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), transform 0.8s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.8s cubic-bezier(0.4, 0, 0.2, 1)',
                     }}
                   >
                     {/* Accent bar */}
