@@ -398,6 +398,7 @@ interface QuickWin {
   content_type: string;
   video_url: string | null;
   download_url: string | null;
+  tool_file_url?: string | null;
   capacity?: 'low' | 'medium' | 'high' | null;
   title_es?: string | null;
   description_es?: string | null;
@@ -706,6 +707,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
           content_type: data.quick_win_type || 'activity',
           video_url: null,
           download_url: data.file_url || null,
+          tool_file_url: data.tool_file_url || null,
           capacity: data.lift === 'LOW' ? 'low' : data.lift === 'MED' ? 'medium' : data.lift === 'HIGH' ? 'high' : null,
           title_es: data.title_es || null,
           description_es: data.description_es || null,
@@ -1241,6 +1243,31 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                   <Play size={16} />
                   {tUI('Take Quiz')}
                 </a>
+              ) : quickWin.tool_file_url ? (
+                <>
+                  <a
+                    href={quickWin.tool_file_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-2 py-3 px-4 font-semibold text-sm rounded-xl transition-opacity hover:opacity-90"
+                    style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
+                  >
+                    <Download size={16} />
+                    {tUI('Download Tool')}
+                  </a>
+                  {quickWin.download_url ? (
+                    <a
+                      href={quickWin.download_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-2 py-2.5 px-4 text-xs rounded-xl transition-opacity hover:opacity-80"
+                      style={{ backgroundColor: 'rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.8)' }}
+                    >
+                      <Download size={14} />
+                      {tUI('View Guide')}
+                    </a>
+                  ) : null}
+                </>
               ) : quickWin.download_url ? (
                 <a
                   href={quickWin.download_url}
