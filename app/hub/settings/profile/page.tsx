@@ -249,12 +249,18 @@ export default function ProfileSettingsPage() {
   // Active tab
   const [activeTab, setActiveTab] = useState<GrowthTab>('profile');
 
-  // Respect ?tab= query param on initial load
+  // Respect ?tab= and ?quiz= query params on initial load
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const tab = params.get('tab') as GrowthTab | null;
     if (tab && ['profile', 'educator_profile', 'growth', 'vibe_check'].includes(tab)) {
       setActiveTab(tab);
+    }
+    const quizParam = params.get('quiz');
+    if (quizParam) {
+      setActiveTab('educator_profile');
+      const quiz = getQuizById(quizParam);
+      if (quiz) setActiveQuiz(quiz);
     }
   }, []);
 
