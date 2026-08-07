@@ -304,18 +304,15 @@ interface CarouselCard {
 
 // ── Browse topics ──
 const BROWSE_TOPICS = [
-  { label: 'Classroom Management', query: 'classroom-management' },
-  { label: 'Communication', query: 'communication' },
-  { label: 'Self-Care', query: 'self-care' },
-  { label: 'Time Savers', query: 'time-savers' },
-  { label: 'Leadership', query: 'leadership' },
-  { label: 'Stress Relief', query: 'stress-relief' },
-  { label: 'Coaching', query: 'coaching' },
-  { label: 'Behavior', query: 'behavior' },
-  { label: 'Relationships', query: 'relationships' },
-  { label: 'Back to School', query: 'back-to-school' },
-  { label: 'Inclusion', query: 'inclusion' },
-  { label: 'Assessment', query: 'assessment' },
+  { label: 'Classroom Tools', query: 'Classroom Tools' },
+  { label: 'Stress Relief', query: 'Stress Relief' },
+  { label: 'Time Savers', query: 'Time Savers' },
+  { label: 'Communication', query: 'Communication' },
+  { label: 'Self-Care', query: 'Self-Care' },
+  { label: 'Leadership', query: 'Leadership' },
+  { label: 'Para', query: 'Para' },
+  { label: 'Games', query: 'Games' },
+  { label: 'Coaching', query: 'Coaching' },
 ];
 
 // Course gradient palette
@@ -367,8 +364,7 @@ export default function HubDashboard() {
   const [likeYouCohortSize, setLikeYouCohortSize] = useState(0);
   const [likeYouType, setLikeYouType] = useState<string | null>(null);
 
-  // Carousel state
-  const [carouselIndex, setCarouselIndex] = useState(0);
+  const [posterHover, setPosterHover] = useState<number | null>(null);
 
   const firstName = profile?.display_name?.split(' ')[0] || user?.email?.split('@')[0] || 'Teacher';
   const dailyMessage = DAILY_MESSAGES[new Date().getDay()];
@@ -1045,16 +1041,42 @@ export default function HubDashboard() {
     return shuffled.length > 0 ? shuffled : [];
   }, [recommendations, enrollments, featuredQuickWins, dashboardQuizResults]);
 
-  // Carousel helpers
-  const shiftLeft = useCallback(() => {
-    if (carouselCards.length === 0) return;
-    setCarouselIndex((prev) => (prev - 1 + carouselCards.length) % carouselCards.length);
-  }, [carouselCards.length]);
+  const QUICK_WIN_GRADIENTS: Record<string, string> = {
+    '#7C9CBF': 'linear-gradient(170deg, #374A60 0%, #5A7FA0 40%, #7C9CBF 70%, #B8D0E8 100%)',
+    '#D4A843': 'linear-gradient(170deg, #5C2D06 0%, #92400E 30%, #D97706 70%, #F59E0B 100%)',
+    '#6BA368': 'linear-gradient(170deg, #1B4332 0%, #2D6A4F 40%, #6BA368 70%, #95D5B2 100%)',
+    '#9B7CB8': 'linear-gradient(170deg, #3B0764 0%, #5B21B6 40%, #9B7CB8 70%, #C4B5FD 100%)',
+    '#D4789C': 'linear-gradient(170deg, #4A1942 0%, #831843 30%, #D4789C 70%, #F9A8D4 100%)',
+  };
+  const GAME_GRADIENTS = [
+    'linear-gradient(170deg, #052E16 0%, #166534 40%, #22C55E 80%, #4ADE80 100%)',
+    'linear-gradient(170deg, #0C2D48 0%, #1E5F8C 40%, #2980B9 70%, #5DADE2 100%)',
+    'linear-gradient(170deg, #4A1942 0%, #831843 30%, #DB2777 70%, #F472B6 100%)',
+  ];
+  const QUIZ_GRADIENT = 'linear-gradient(170deg, #3B0764 0%, #5B21B6 40%, #7C3AED 70%, #A78BFA 100%)';
 
-  const shiftRight = useCallback(() => {
-    if (carouselCards.length === 0) return;
-    setCarouselIndex((prev) => (prev + 1) % carouselCards.length);
-  }, [carouselCards.length]);
+  function getPosterGradient(card: CarouselCard, index: number): string {
+    if (card.type === 'course') return card.gradient || COURSE_GRADIENTS[index % COURSE_GRADIENTS.length];
+    if (card.type === 'quick_win') return QUICK_WIN_GRADIENTS[card.dot || ''] || 'linear-gradient(170deg, #374151 0%, #6B7280 50%, #9CA3AF 100%)';
+    if (card.type === 'game') return GAME_GRADIENTS[index % GAME_GRADIENTS.length];
+    return QUIZ_GRADIENT;
+  }
+
+  function getAccentColor(card: CarouselCard): string {
+    if (card.type === 'course') return '#E8B84B';
+    if (card.type === 'quiz' || card.type === 'quiz_result') return '#A78BFA';
+    if (card.type === 'quick_win') return '#7C9CBF';
+    if (card.type === 'game') return '#22C55E';
+    return '#E8B84B';
+  }
+
+  function getBadgeLabel(card: CarouselCard): string {
+    if (card.type === 'course') return 'Course';
+    if (card.type === 'quick_win') return 'Quick Win';
+    if (card.type === 'game') return 'Game';
+    if (card.type === 'quiz_result') return 'Your Result';
+    return 'Quiz';
+  }
 
   // ── Derive insight card data ──
 
@@ -1161,81 +1183,6 @@ export default function HubDashboard() {
       </div>
     );
   }
-
-  // ── Carousel card render helper ──
-  function renderCarouselCardContent(card: CarouselCard, sizeClass: 'center' | 'side' | 'far') {
-    const titleSize = sizeClass === 'center' ? '18px' : sizeClass === 'side' ? '14px' : '12px';
-    const headerH = sizeClass === 'center' ? 130 : sizeClass === 'side' ? 90 : 70;
-
-    return (
-      <>
-        {card.type === 'course' && card.gradient && (
-          <div style={{ background: card.gradient, height: headerH, padding: '14px', display: 'flex', alignItems: 'flex-end' }} />
-        )}
-        <div style={{ padding: '16px' }}>
-          {card.dot && (
-            <div style={{ width: 8, height: 8, borderRadius: '50%', background: card.dot, marginBottom: 10 }} />
-          )}
-          {card.quizIcon && (
-            <div style={{
-              width: 40, height: 40, borderRadius: '50%',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              background: card.quizIconBg || '#F3F4F6',
-              color: card.quizIconColor || '#9CA3AF',
-              fontFamily: "'Source Serif 4', serif", fontWeight: 700, fontSize: 16,
-              marginBottom: 8,
-            }}>
-              {card.quizIcon}
-            </div>
-          )}
-          {card.type === 'game' && (
-            <div style={{
-              width: 40, height: 40, borderRadius: 10,
-              background: '#F0FDF4', display: 'flex',
-              alignItems: 'center', justifyContent: 'center',
-              marginBottom: 8, fontSize: 18, color: '#166534',
-            }}>
-              &#9881;
-            </div>
-          )}
-          <span style={{
-            display: 'inline-block', fontSize: 9, fontWeight: 700,
-            letterSpacing: '1px', textTransform: 'uppercase' as const,
-            padding: '3px 8px', borderRadius: 6, marginBottom: 8,
-            ...(card.type === 'course' ? { background: '#1E2749', color: 'white' } :
-              card.type === 'quick_win' ? { background: '#FEF9EE', color: '#92400E' } :
-              card.type === 'game' ? { background: '#F0FDF4', color: '#166534' } :
-              { background: '#EDE9FE', color: '#5B21B6' }),
-          }}>
-            {card.type === 'course' ? 'Course' :
-              card.type === 'quick_win' ? 'Quick Win' :
-              card.type === 'game' ? 'Game' :
-              card.type === 'quiz_result' ? 'Your Result' : 'Quiz'}
-          </span>
-          <div style={{
-            fontFamily: "'Source Serif 4', serif", fontWeight: 600,
-            color: card.titleColor || '#1E2749',
-            lineHeight: 1.3, marginBottom: 6,
-            fontSize: titleSize,
-          }}>
-            {card.title}
-          </div>
-          <div style={{ fontSize: 12, color: '#9CA3AF', lineHeight: 1.4 }}>
-            {card.description}
-          </div>
-        </div>
-      </>
-    );
-  }
-
-  // Carousel positions (5 visible cards)
-  const carouselPositions = [
-    { offset: -2, left: '2%',  w: 180, opacity: 0.35, scale: 0.75, z: 1 },
-    { offset: -1, left: '15%', w: 220, opacity: 0.65, scale: 0.88, z: 2 },
-    { offset:  0, left: '50%', w: 300, opacity: 1,    scale: 1,    z: 3, translateX: '-50%' },
-    { offset:  1, left: '63%', w: 220, opacity: 0.65, scale: 0.88, z: 2 },
-    { offset:  2, left: '82%', w: 180, opacity: 0.35, scale: 0.75, z: 1 },
-  ];
 
   return (
     <div style={{ background: '#F5F7FA', minHeight: '100vh' }}>
@@ -1387,13 +1334,178 @@ export default function HubDashboard() {
         </div>
       </section>
 
-      {/* ============ INSIGHT CARDS (overlapping hero) ============ */}
+      {/* ============ SUGGESTIONS (poster cards) ============ */}
+      {carouselCards.length > 0 && (
+        <div style={{ padding: '32px 0 20px' }}>
+          <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 32px', marginBottom: 20 }}>
+            <span style={{ fontFamily: "'Source Serif 4', serif", fontSize: 20, fontWeight: 600, color: '#1E2749' }}>
+              Suggestions for You
+            </span>
+          </div>
+
+          <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 32px' }}>
+            <div
+              style={{
+                display: 'flex',
+                gap: 16,
+                overflowX: 'auto',
+                paddingBottom: 12,
+                scrollSnapType: 'x mandatory',
+                WebkitOverflowScrolling: 'touch',
+                msOverflowStyle: 'none',
+                scrollbarWidth: 'none',
+              }}
+            >
+              {carouselCards.map((card, i) => {
+                const isHovered = posterHover === i;
+                return (
+                  <Link
+                    key={`${card.type}-${card.slug}-${i}`}
+                    href={card.href}
+                    style={{
+                      flex: '0 0 200px',
+                      width: 200,
+                      height: 310,
+                      borderRadius: 16,
+                      overflow: 'hidden',
+                      position: 'relative',
+                      scrollSnapAlign: 'start',
+                      textDecoration: 'none',
+                      background: getPosterGradient(card, i),
+                      transform: isHovered ? 'translateY(-4px) scale(1.02)' : 'none',
+                      boxShadow: isHovered ? '0 12px 40px rgba(0,0,0,0.2)' : '0 4px 16px rgba(0,0,0,0.1)',
+                      transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+                    }}
+                    onMouseEnter={() => setPosterHover(i)}
+                    onMouseLeave={() => setPosterHover(null)}
+                  >
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        height: 4,
+                        background: getAccentColor(card),
+                        zIndex: 2,
+                      }}
+                    />
+                    <div
+                      className="pointer-events-none"
+                      style={{
+                        position: 'absolute',
+                        width: 120,
+                        height: 120,
+                        borderRadius: '50%',
+                        background: 'white',
+                        opacity: 0.12,
+                        top: -30,
+                        right: -20,
+                      }}
+                    />
+                    <div
+                      className="pointer-events-none"
+                      style={{
+                        position: 'absolute',
+                        width: 80,
+                        height: 80,
+                        borderRadius: '50%',
+                        background: '#E8B84B',
+                        opacity: 0.12,
+                        bottom: 60,
+                        left: -25,
+                      }}
+                    />
+                    <div
+                      className="pointer-events-none"
+                      style={{
+                        position: 'absolute',
+                        inset: 0,
+                        background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.1) 50%, transparent 70%)',
+                      }}
+                    />
+                    <div style={{
+                      position: 'absolute',
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      padding: '20px 16px',
+                    }}>
+                      <span style={{
+                        display: 'inline-block',
+                        fontSize: 8,
+                        fontWeight: 700,
+                        letterSpacing: '1.5px',
+                        textTransform: 'uppercase' as const,
+                        padding: '4px 10px',
+                        borderRadius: 20,
+                        border: '1px solid rgba(255,255,255,0.3)',
+                        color: 'rgba(255,255,255,0.85)',
+                        marginBottom: 10,
+                      }}>
+                        {getBadgeLabel(card)}
+                      </span>
+                      <div style={{
+                        fontFamily: "'Source Serif 4', serif",
+                        fontSize: 17,
+                        fontWeight: 700,
+                        color: 'white',
+                        lineHeight: 1.25,
+                        marginBottom: 6,
+                      }}>
+                        {card.title}
+                      </div>
+                      <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.55)' }}>
+                        {card.description}
+                      </div>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ============ BROWSE BY TOPIC ============ */}
+      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '12px 32px 48px' }}>
+        <div style={{
+          fontFamily: "'Source Serif 4', serif",
+          fontSize: 16, fontWeight: 600, color: '#1E2749',
+          marginBottom: 12,
+        }}>
+          Browse by Topic
+        </div>
+        <div style={{ display: 'flex', flexWrap: 'wrap' as const, gap: 8 }}>
+          {BROWSE_TOPICS.map(({ label, query }) => (
+            <Link
+              key={query}
+              href={`/hub/quick-wins?filter=${encodeURIComponent(query)}`}
+              style={{
+                padding: '8px 18px',
+                borderRadius: 20,
+                fontSize: 13, fontWeight: 500,
+                textDecoration: 'none',
+                border: '1.5px solid #E5E7EB',
+                color: '#4B5563',
+                background: 'white',
+                transition: 'all 0.15s',
+                fontFamily: "'DM Sans', sans-serif",
+              }}
+              onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.borderColor = '#E8B84B'; }}
+              onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.borderColor = '#E5E7EB'; }}
+            >
+              {label}
+            </Link>
+          ))}
+        </div>
+      </div>
+
+      {/* ============ INSIGHT CARDS ============ */}
       <div style={{
-        maxWidth: 1100, margin: '-20px auto 0', padding: '0 32px',
-        position: 'relative', zIndex: 2,
+        maxWidth: 1100, margin: '24px auto 0', padding: '0 32px',
         display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 14,
       }}>
-        {/* Goal card */}
         <div style={{
           background: 'white', borderRadius: 14, padding: '18px 20px',
           border: '0.5px solid rgba(0,0,0,0.06)',
@@ -1437,7 +1549,6 @@ export default function HubDashboard() {
           )}
         </div>
 
-        {/* Vibe card */}
         <div style={{
           background: 'white', borderRadius: 14, padding: '18px 20px',
           border: '0.5px solid rgba(0,0,0,0.06)',
@@ -1464,7 +1575,6 @@ export default function HubDashboard() {
           </Link>
         </div>
 
-        {/* Recent win card */}
         <div style={{
           background: 'white', borderRadius: 14, padding: '18px 20px',
           border: '0.5px solid rgba(0,0,0,0.06)',
@@ -1488,125 +1598,6 @@ export default function HubDashboard() {
               Your first win is right around the corner. Start exploring to earn it.
             </div>
           )}
-        </div>
-      </div>
-
-      {/* ============ CAROUSEL ============ */}
-      {carouselCards.length > 0 && (
-        <div style={{ padding: '32px 0 20px' }}>
-          <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 32px', marginBottom: 20 }}>
-            <span style={{ fontFamily: "'Source Serif 4', serif", fontSize: 20, fontWeight: 600, color: '#1E2749' }}>
-              Suggestions for You
-            </span>
-          </div>
-
-          <div style={{ position: 'relative', maxWidth: 1100, margin: '0 auto', padding: '0 32px' }}>
-            {/* Left arrow */}
-            <button
-              onClick={shiftLeft}
-              style={{
-                position: 'absolute', top: '50%', transform: 'translateY(-50%)',
-                left: 8, width: 40, height: 40, borderRadius: '50%',
-                background: 'white', border: '1.5px solid #E5E7EB',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                cursor: 'pointer', color: '#6B7280', fontSize: 18,
-                zIndex: 10, boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-              }}
-              aria-label="Previous"
-            >
-              <ChevronLeft size={18} />
-            </button>
-
-            {/* Right arrow */}
-            <button
-              onClick={shiftRight}
-              style={{
-                position: 'absolute', top: '50%', transform: 'translateY(-50%)',
-                right: 8, width: 40, height: 40, borderRadius: '50%',
-                background: 'white', border: '1.5px solid #E5E7EB',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                cursor: 'pointer', color: '#6B7280', fontSize: 18,
-                zIndex: 10, boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-              }}
-              aria-label="Next"
-            >
-              <ChevronRight size={18} />
-            </button>
-
-            {/* Carousel track */}
-            <div style={{ position: 'relative', minHeight: 340, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              {carouselPositions.map((pos) => {
-                if (carouselCards.length === 0) return null;
-                const idx = (carouselIndex + pos.offset + carouselCards.length) % carouselCards.length;
-                const card = carouselCards[idx];
-                const sizeClass: 'center' | 'side' | 'far' = pos.offset === 0 ? 'center' : (Math.abs(pos.offset) === 1 ? 'side' : 'far');
-
-                const handleCardClick = () => {
-                  if (pos.offset < 0) shiftLeft();
-                  else if (pos.offset > 0) shiftRight();
-                  else router.push(card.href);
-                };
-
-                return (
-                  <div
-                    key={`${pos.offset}-${idx}`}
-                    onClick={handleCardClick}
-                    style={{
-                      position: 'absolute',
-                      width: pos.w,
-                      left: pos.left,
-                      opacity: pos.opacity,
-                      transform: `${pos.translateX ? `translateX(${pos.translateX})` : ''} scale(${pos.scale})`,
-                      zIndex: pos.z,
-                      background: 'white',
-                      borderRadius: 16,
-                      overflow: 'hidden',
-                      border: '0.5px solid rgba(0,0,0,0.06)',
-                      boxShadow: pos.offset === 0 ? '0 8px 32px rgba(30,39,73,0.12)' : '0 2px 8px rgba(0,0,0,0.06)',
-                      cursor: 'pointer',
-                      transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
-                    }}
-                  >
-                    {renderCarouselCardContent(card, sizeClass)}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ============ BROWSE BY TOPIC ============ */}
-      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '12px 32px 48px' }}>
-        <div style={{
-          fontFamily: "'Source Serif 4', serif",
-          fontSize: 16, fontWeight: 600, color: '#1E2749',
-          marginBottom: 12,
-        }}>
-          Browse by Topic
-        </div>
-        <div style={{ display: 'flex', flexWrap: 'wrap' as const, gap: 8 }}>
-          {BROWSE_TOPICS.map(({ label, query }) => (
-            <Link
-              key={query}
-              href={`/hub/quick-wins?search=${encodeURIComponent(query.replace(/-/g, ' '))}`}
-              style={{
-                padding: '8px 18px',
-                borderRadius: 20,
-                fontSize: 13, fontWeight: 500,
-                textDecoration: 'none',
-                border: '1.5px solid #E5E7EB',
-                color: '#4B5563',
-                background: 'white',
-                transition: 'all 0.15s',
-                fontFamily: "'DM Sans', sans-serif",
-              }}
-              onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.borderColor = '#E8B84B'; }}
-              onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.borderColor = '#E5E7EB'; }}
-            >
-              {label}
-            </Link>
-          ))}
         </div>
       </div>
 
