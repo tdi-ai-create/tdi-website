@@ -1246,17 +1246,17 @@ export default function HubDashboard() {
               )}
               <h1 style={{
                 fontFamily: "'Source Serif 4', serif",
-                fontSize: 26, fontWeight: 700, color: 'white',
+                fontSize: 36, fontWeight: 700, color: 'white',
               }}>
                 Welcome back, {firstName}
               </h1>
               <p style={{
                 fontFamily: "'Source Serif 4', serif",
                 fontStyle: 'italic',
-                fontSize: 14,
+                fontSize: 16,
                 color: 'rgba(255,255,255,0.45)',
-                marginTop: 6,
-                maxWidth: 420,
+                marginTop: 8,
+                maxWidth: 480,
               }}>
                 &ldquo;{tip}&rdquo;
               </p>
@@ -1265,34 +1265,34 @@ export default function HubDashboard() {
             {/* Stats */}
             <div style={{ display: 'flex', gap: 24 }}>
               <div style={{ textAlign: 'center' }}>
-                <div style={{ fontFamily: "'Source Serif 4', serif", fontSize: 24, fontWeight: 700, color: 'white' }}>
+                <div style={{ fontFamily: "'Source Serif 4', serif", fontSize: 32, fontWeight: 700, color: 'white' }}>
                   {enrollments.length}
                 </div>
-                <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' as const, letterSpacing: '0.5px', marginTop: 2 }}>
+                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' as const, letterSpacing: '0.5px', marginTop: 2 }}>
                   In Progress
                 </div>
               </div>
               <div style={{ textAlign: 'center' }}>
-                <div style={{ fontFamily: "'Source Serif 4', serif", fontSize: 24, fontWeight: 700, color: 'white' }}>
+                <div style={{ fontFamily: "'Source Serif 4', serif", fontSize: 32, fontWeight: 700, color: 'white' }}>
                   {personalStats?.toolsExplored || 0}
                 </div>
-                <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' as const, letterSpacing: '0.5px', marginTop: 2 }}>
+                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' as const, letterSpacing: '0.5px', marginTop: 2 }}>
                   Tools Used
                 </div>
               </div>
               <div style={{ textAlign: 'center' }}>
-                <div style={{ fontFamily: "'Source Serif 4', serif", fontSize: 24, fontWeight: 700, color: 'white' }}>
+                <div style={{ fontFamily: "'Source Serif 4', serif", fontSize: 32, fontWeight: 700, color: 'white' }}>
                   {communityPulse?.shared || currentStreak || 0}
                 </div>
-                <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' as const, letterSpacing: '0.5px', marginTop: 2 }}>
+                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' as const, letterSpacing: '0.5px', marginTop: 2 }}>
                   Check-ins
                 </div>
               </div>
               <div style={{ textAlign: 'center' }}>
-                <div style={{ fontFamily: "'Source Serif 4', serif", fontSize: 24, fontWeight: 700, color: 'white' }}>
+                <div style={{ fontFamily: "'Source Serif 4', serif", fontSize: 32, fontWeight: 700, color: 'white' }}>
                   {certificateCount}
                 </div>
-                <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' as const, letterSpacing: '0.5px', marginTop: 2 }}>
+                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' as const, letterSpacing: '0.5px', marginTop: 2 }}>
                   {certificateCount === 1 ? 'Certificate' : 'Certificates'}
                 </div>
               </div>
@@ -1431,7 +1431,7 @@ export default function HubDashboard() {
                       background: getPosterGradient(card, idx),
                       boxShadow: isCenter ? '0 12px 40px rgba(30,39,73,0.2)' : '0 4px 16px rgba(0,0,0,0.08)',
                       cursor: 'pointer',
-                      transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
+                      transition: 'all 0.6s cubic-bezier(0.25, 0.1, 0.25, 1)',
                     }}
                   >
                     {/* Accent bar */}
