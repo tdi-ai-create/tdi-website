@@ -534,8 +534,21 @@ export default function ProfileSettingsPage() {
       .then(res => res.json())
       .then(data => {
         if (data.insight) setEducatorSnapshot(data.insight);
+        else throw new Error('No insight returned');
       })
-      .catch(() => {})
+      .catch(() => {
+        // Fallback: build snapshot from quiz data directly (no AI needed)
+        const parts = Object.entries(quizResults).map(([quizId, resultKey]) => {
+          const quiz = getQuizById(quizId);
+          if (!quiz) return null;
+          const result = quiz.results[resultKey];
+          if (!result) return null;
+          return `${quiz.shortTitle}: ${result.title}. ${result.subtitle}`;
+        }).filter(Boolean);
+        if (parts.length > 0) {
+          setEducatorSnapshot(`Here is what stands out about your journey so far. You have completed ${parts.length} self-discovery quizzes. ${parts.join('. ')}. Keep building on this momentum as you continue exploring the Hub.`);
+        }
+      })
       .finally(() => setSnapshotLoading(false));
   }, [activeTab, quizResults, educatorSnapshot, snapshotLoading]);
 
@@ -573,8 +586,21 @@ export default function ProfileSettingsPage() {
         }),
       })
         .then(r => r.json())
-        .then(r => { if (r.insight) setGrowthInsight(r.insight); })
-        .catch(() => {})
+        .then(r => {
+          if (r.insight) setGrowthInsight(r.insight);
+          else throw new Error('No insight');
+        })
+        .catch(() => {
+          // Fallback: data-driven insight without AI
+          const parts: string[] = [];
+          if (statsData.toolsExplored > 0) parts.push(`You have explored ${statsData.toolsExplored} tools this month`);
+          if (statsData.daysActive > 0) parts.push(`been active for ${statsData.daysActive} days`);
+          if (statsData.communityContributions > 0) parts.push(`contributed ${statsData.communityContributions} times to the community`);
+          if ((recognitionData?.earned.length || 0) > 0) parts.push(`earned ${recognitionData?.earned.length} recognitions`);
+          if (parts.length > 0) {
+            setGrowthInsight(`${parts.join(', ')}. Every step forward counts, and you are building something meaningful.`);
+          }
+        })
         .finally(() => setInsightsLoading(false));
     }
     if (activeTab === 'vibe_check' && !vibeInsight && checkIns.length > 0 && !insightsLoading) {
