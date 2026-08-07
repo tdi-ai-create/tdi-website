@@ -1447,7 +1447,6 @@ export default function HubDashboard() {
                       boxShadow: isCenter ? '0 12px 40px rgba(30,39,73,0.2)' : '0 4px 16px rgba(0,0,0,0.08)',
                       cursor: visible ? 'pointer' : 'default',
                       pointerEvents: visible ? 'auto' : 'none',
-                      transition: 'left 0.8s cubic-bezier(0.4, 0, 0.2, 1), width 0.8s cubic-bezier(0.4, 0, 0.2, 1), height 0.8s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), transform 0.8s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.8s cubic-bezier(0.4, 0, 0.2, 1)',
                     }}
                   >
                     {/* Accent bar */}
