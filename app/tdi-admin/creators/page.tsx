@@ -1373,6 +1373,12 @@ export default function CreatorStudioPage() {
   const [editedFeedbackContent, setEditedFeedbackContent] = useState('');
   const [feedbackActionLoading, setFeedbackActionLoading] = useState<string | null>(null);
 
+  // Draft notes queue state (Anne Marie's check-in notes for Bella)
+  const [draftNotes, setDraftNotes] = useState<any[]>([]);
+  const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
+  const [editedNoteContent, setEditedNoteContent] = useState('');
+  const [noteActionLoading, setNoteActionLoading] = useState<string | null>(null);
+
   // ── Recruitment tab state ──
   const [recruitmentStats, setRecruitmentStats] = useState<{
     critical_gaps_without_candidates: number;
@@ -1524,6 +1530,11 @@ export default function CreatorStudioPage() {
       fetch('/api/admin/creator-feedback?status=pending_review')
         .then(res => res.json())
         .then(data => setFeedbackQueue(data.feedback || []))
+        .catch(() => {});
+      // Load draft notes queue (Anne Marie check-in notes waiting for Bella)
+      fetch('/api/admin/creator-notes?status=pending_approval')
+        .then(res => res.json())
+        .then(data => setDraftNotes(data.notes || []))
         .catch(() => {});
       // Load new submissions waiting for review (before Anne Marie acts)
       fetch('/api/admin/creator-feedback?status=all')
@@ -2625,6 +2636,127 @@ export default function CreatorStudioPage() {
             </div>
           )}
 
+          {/* Draft Notes Queue (Anne Marie check-in notes for Bella) */}
+          {draftNotes.length > 0 && (
+            <div className="mb-5 bg-white rounded-2xl shadow-[0_1px_4px_rgba(0,0,0,0.04)] overflow-hidden">
+              <div className="px-5 py-3 border-b border-gray-100 flex items-center justify-between" style={{ backgroundColor: '#fafbfc' }}>
+                <div className="flex items-center gap-2">
+                  <h2 className="text-sm font-semibold tracking-wide uppercase" style={{ color: '#1e2749', fontFamily: "'DM Sans', sans-serif" }}>
+                    Check-in Notes to Review
+                  </h2>
+                  <span className="inline-flex items-center justify-center w-5 h-5 rounded-full text-xs font-bold text-white" style={{ backgroundColor: '#2563EB' }}>
+                    {draftNotes.length}
+                  </span>
+                </div>
+              </div>
+              <div className="divide-y divide-gray-100">
+                {draftNotes.map((note: any) => (
+                  <div key={note.id} className="p-4">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-sm font-semibold" style={{ color: '#1e2749' }}>{note.creator_name}</span>
+                          {note.course_title && <span className="text-xs text-gray-400">{note.course_title}</span>}
+                        </div>
+                        {note.draft_reason && (
+                          <p className="text-xs text-gray-500 mb-2">{note.draft_reason}</p>
+                        )}
+                        {editingNoteId === note.id ? (
+                          <textarea
+                            value={editedNoteContent}
+                            onChange={(e) => setEditedNoteContent(e.target.value)}
+                            className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-400 mb-2"
+                            rows={4}
+                          />
+                        ) : (
+                          <div className="px-3 py-2 bg-blue-50 rounded-lg text-xs text-gray-700 line-clamp-3">
+                            <span className="font-medium text-blue-600">Anne Marie&apos;s draft: </span>
+                            {note.content}
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex flex-col gap-1.5 flex-shrink-0">
+                        {editingNoteId === note.id ? (
+                          <>
+                            <button
+                              onClick={async () => {
+                                setNoteActionLoading(note.id);
+                                try {
+                                  await fetch('/api/admin/creator-notes', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ action: 'approve_edited', note_id: note.id, content: editedNoteContent }),
+                                  });
+                                  setDraftNotes(prev => prev.filter(n => n.id !== note.id));
+                                  setEditingNoteId(null);
+                                } catch (err) { console.error(err); }
+                                finally { setNoteActionLoading(null); }
+                              }}
+                              disabled={noteActionLoading === note.id}
+                              className="px-3 py-1.5 text-xs font-medium rounded-lg text-white transition-colors disabled:opacity-50"
+                              style={{ backgroundColor: '#16a34a' }}
+                            >
+                              {noteActionLoading === note.id ? 'Saving...' : 'Save & Approve'}
+                            </button>
+                            <button onClick={() => setEditingNoteId(null)} className="px-3 py-1.5 text-xs font-medium rounded-lg text-gray-500 bg-gray-100">
+                              Cancel
+                            </button>
+                          </>
+                        ) : (
+                          <>
+                            <button
+                              onClick={async () => {
+                                setNoteActionLoading(note.id);
+                                try {
+                                  await fetch('/api/admin/creator-notes', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ action: 'approve', note_id: note.id }),
+                                  });
+                                  setDraftNotes(prev => prev.filter(n => n.id !== note.id));
+                                } catch (err) { console.error(err); }
+                                finally { setNoteActionLoading(null); }
+                              }}
+                              disabled={noteActionLoading === note.id}
+                              className="px-3 py-1.5 text-xs font-medium rounded-lg text-white transition-colors disabled:opacity-50"
+                              style={{ backgroundColor: '#16a34a' }}
+                            >
+                              Approve
+                            </button>
+                            <button
+                              onClick={() => { setEditingNoteId(note.id); setEditedNoteContent(note.content || ''); }}
+                              className="px-3 py-1.5 text-xs font-medium rounded-lg text-blue-600 bg-blue-50 hover:bg-blue-100 transition-colors"
+                            >
+                              Edit
+                            </button>
+                            <button
+                              onClick={async () => {
+                                setNoteActionLoading(note.id);
+                                try {
+                                  await fetch('/api/admin/creator-notes', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ action: 'reject', note_id: note.id }),
+                                  });
+                                  setDraftNotes(prev => prev.filter(n => n.id !== note.id));
+                                } catch (err) { console.error(err); }
+                                finally { setNoteActionLoading(null); }
+                              }}
+                              disabled={noteActionLoading === note.id}
+                              className="px-3 py-1.5 text-xs font-medium rounded-lg text-red-600 bg-red-50 hover:bg-red-100 transition-colors disabled:opacity-50"
+                            >
+                              Reject
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Needs Your Attention */}
           {needsAttention.length > 0 && (
             <div
@@ -2846,7 +2978,7 @@ export default function CreatorStudioPage() {
           )}
 
           {/* Calm State -- shown when no submissions, feedback, or recruitment to act on. Provides context. */}
-          {newSubmissions.length === 0 && feedbackQueue.length === 0 && needsAttention.length === 0 && pendingRecruitment.length === 0 && (
+          {newSubmissions.length === 0 && feedbackQueue.length === 0 && draftNotes.length === 0 && needsAttention.length === 0 && pendingRecruitment.length === 0 && (
             <>
               {/* All caught up + quick pulse */}
               <div className="mb-5 bg-white rounded-2xl shadow-[0_1px_4px_rgba(0,0,0,0.04)] overflow-hidden">
