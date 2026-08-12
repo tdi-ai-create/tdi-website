@@ -107,11 +107,10 @@ export async function GET(request: NextRequest) {
       const pendingMilestones = approvalsByCreator.get(creator.id) || []
       const agentAlreadyActed = recentAgentActivity.has(creator.id)
 
-      // Skip if agent already acted on this creator in the past 7 days
-      if (agentAlreadyActed) continue
-
       // 1. STALLED CREATORS (14+ days, no active re-engagement or at step 5+)
-      if (daysSinceUpdate >= 14) {
+      // Skip stalled/overdue checks if agent already acted recently (7-day dedup)
+      // But NEVER skip submission reviews or approval checks -- those always surface
+      if (daysSinceUpdate >= 14 && !agentAlreadyActed) {
         // Skip if re-engagement sequence is active at steps 0-4 (drip is handling it)
         if (sequence && sequence.current_step <= 4) continue
 
