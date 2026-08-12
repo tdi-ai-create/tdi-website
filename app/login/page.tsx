@@ -41,9 +41,18 @@ export default function LoginPage() {
             <h1 className="text-2xl md:text-3xl font-bold text-[#1B2A4A] mb-2">
               Welcome Back
             </h1>
-            <p className="text-gray-500 text-base">
+            <p className="text-gray-500 text-base mb-4">
               Choose where you&apos;d like to go
             </p>
+            <div className="inline-flex items-center gap-2 text-sm text-gray-500">
+              New to Teachers Deserve It?{' '}
+              <Link
+                href="/join"
+                className="text-[#4ecdc4] font-semibold hover:underline"
+              >
+                Create your free account &rarr;
+              </Link>
+            </div>
           </div>
 
           {/* Cards Grid */}
