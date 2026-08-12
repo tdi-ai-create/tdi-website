@@ -45,6 +45,8 @@ export async function GET(request: NextRequest) {
 
     let reminders = 0;
     let escalations = 0;
+    const reminderDetails: string[] = [];
+    const escalationDetails: string[] = [];
 
     for (const inv of invoices) {
       const invoiceDate = new Date(inv.invoice_date);
@@ -90,6 +92,7 @@ export async function GET(request: NextRequest) {
       if (daysSinceInvoice >= 14 && daysSinceInvoice < 30 && daysOverdue < 0) {
         await sendReminder(inv, recipientEmail, firstName, schoolName, 'friendly', deliverable.label);
         await logEvent(supabase, inv.id, 'reminder_14d', `14-day reminder sent to ${recipientEmail}`);
+        reminderDetails.push(`${schoolName} -- $${Number(inv.amount).toLocaleString()} (14-day reminder)`);
         reminders++;
       }
 
@@ -98,6 +101,7 @@ export async function GET(request: NextRequest) {
         await supabase.from('intelligence_invoices').update({ status: 'overdue' }).eq('id', inv.id);
         await sendReminder(inv, recipientEmail, firstName, schoolName, 'due', deliverable.label);
         await logEvent(supabase, inv.id, 'reminder_due', `Due date reminder sent. Invoice marked overdue.`);
+        reminderDetails.push(`${schoolName} -- $${Number(inv.amount).toLocaleString()} (overdue, due ${inv.due_date})`);
         reminders++;
       }
 
@@ -110,6 +114,7 @@ export async function GET(request: NextRequest) {
           inv.invoice_number,
         );
         await logEvent(supabase, inv.id, 'escalation_45d', `45-day escalation sent to Omar`);
+        escalationDetails.push(`${schoolName} -- $${Number(inv.amount).toLocaleString()} (45 days, escalated to Omar)`);
         escalations++;
       }
 
@@ -122,19 +127,28 @@ export async function GET(request: NextRequest) {
           inv.invoice_number,
         );
         await logEvent(supabase, inv.id, 'escalation_60d', `60-day escalation sent to Rae`);
+        escalationDetails.push(`${schoolName} -- $${Number(inv.amount).toLocaleString()} (60+ days, escalated to Rae)`);
         escalations++;
       }
     }
 
     const backlog = await checkBacklog(supabase);
 
-    // Slack summary if anything happened
+    // Slack summary with details
     if (reminders > 0 || escalations > 0 || (backlog && backlog.uninvoiced_services > 0)) {
-      const parts = []
-      if (reminders > 0) parts.push(`${reminders} reminder${reminders > 1 ? 's' : ''} sent`)
-      if (escalations > 0) parts.push(`${escalations} escalation${escalations > 1 ? 's' : ''}`)
-      if (backlog?.uninvoiced_services > 0) parts.push(`${backlog.uninvoiced_services} delivered but not yet invoiced`)
-      slackNotify('financials', `Invoice followup: ${parts.join(', ')}. ${invoices.length} unpaid invoice${invoices.length > 1 ? 's' : ''} total.`)
+      const lines = [`*Invoice followup:* ${invoices.length} unpaid invoice${invoices.length > 1 ? 's' : ''} total.`]
+      if (reminderDetails.length > 0) {
+        lines.push(`\n*Reminders sent today (${reminderDetails.length}):*`)
+        reminderDetails.forEach(d => lines.push(`  ${d}`))
+      }
+      if (escalationDetails.length > 0) {
+        lines.push(`\n*Escalations:*`)
+        escalationDetails.forEach(d => lines.push(`  ${d}`))
+      }
+      if (backlog?.uninvoiced_services > 0) {
+        lines.push(`\n${backlog.uninvoiced_services} service${backlog.uninvoiced_services > 1 ? 's' : ''} delivered but not yet invoiced.`)
+      }
+      slackNotify('financials', lines.join('\n'))
     }
 
     return NextResponse.json({

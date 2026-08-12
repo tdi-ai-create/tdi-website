@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
-import { feedbackDraftReady, feedbackApproved } from '@/lib/creator-slack'
+import { feedbackDraftReady, feedbackApproved, noteDraftReady } from '@/lib/creator-slack'
 
 /**
  * Creator Studio Sync API -- Bridge between Paperclip agents and the Creator Portal
@@ -390,6 +390,10 @@ export async function POST(request: NextRequest) {
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
+
+    // Slack notification to #bella-actions
+    const { data: creator } = await supabase.from('creators').select('name').eq('id', creator_id).single()
+    noteDraftReady(creator?.name || 'Unknown creator', reason || 'Check-in note').catch(() => {})
 
     return NextResponse.json({ success: true, note_id: note.id })
   }

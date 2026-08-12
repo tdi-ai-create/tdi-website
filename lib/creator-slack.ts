@@ -56,6 +56,12 @@ export async function feedbackDraftReady(creatorName: string, milestoneName: str
   )
 }
 
+export async function noteDraftReady(creatorName: string, reason: string) {
+  await postToSlack(
+    `*Check-in Note Draft Ready* -- ${creatorName}\nReason: ${reason}\nReview and approve in the Creator Studio Action Center:\nhttps://www.teachersdeserveit.com/tdi-admin/creators`
+  )
+}
+
 export async function feedbackApproved(creatorName: string, milestoneName: string, approvedBy: string) {
   await postToSlack(
     `*Feedback Approved* -- ${creatorName}\nMilestone: ${milestoneName} | Approved by ${approvedBy}\nFeedback sent to creator.`
