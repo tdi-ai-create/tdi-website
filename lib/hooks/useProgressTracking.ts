@@ -196,6 +196,18 @@ export function useProgressTracking(
 
     // Auto-generate certificate when course is completed
     if (isComplete) {
+      // Log course completion to activity log
+      try {
+        await supabase.from('hub_activity_log').insert({
+          user_id: userId,
+          action: 'course_completed',
+          metadata: {
+            course_id: courseId,
+            completed_at: new Date().toISOString(),
+          },
+        });
+      } catch { /* best-effort logging */ }
+
       const result = await createCertificate(userId, courseId);
       if (result.success && result.verificationCode && result.pdHours) {
         setCertificateEarned({

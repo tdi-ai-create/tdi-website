@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, use } from 'react';
+import { useState, useEffect, useCallback, useRef, use } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useHub } from '@/components/hub/HubContext';
@@ -664,6 +664,9 @@ export default function LessonPage({ params }: LessonPageProps) {
   const [transcriptLang, setTranscriptLang] = useState<'en' | 'es'>('en');
   const [bottomSheetOpen, setBottomSheetOpen] = useState(false);
 
+  // Video auto-completion
+  const videoIframeRef = useRef<HTMLIFrameElement>(null);
+
   // Progress tracking
   const { progress, certificateEarned, clearCertificateEarned, markLessonStatus, refetch } =
     useProgressTracking(course?.id || null, user?.id || null);
@@ -793,6 +796,61 @@ export default function LessonPage({ params }: LessonPageProps) {
     if (certificateEarned) setShowCelebration(true);
   }, [certificateEarned]);
 
+  // Video auto-completion via Cloudflare Stream postMessage events
+  useEffect(() => {
+    const currentLessonId = currentLesson?.id;
+    const vid = currentLesson ? extractVideoId(currentLesson) : null;
+    if (!vid || !currentLessonId) return;
+
+    const iframe = videoIframeRef.current;
+    if (!iframe) return;
+
+    // Subscribe to Stream player events once the iframe loads
+    const subscribeToEvents = () => {
+      const cw = iframe.contentWindow;
+      if (!cw) return;
+      // Request 'ended' and 'play' events from the CF Stream player
+      cw.postMessage({ type: 'stream-subscribe', value: ['ended', 'play'] }, '*');
+    };
+
+    iframe.addEventListener('load', subscribeToEvents);
+
+    const handleMessage = (event: MessageEvent) => {
+      // CF Stream sends data as JSON with an event field
+      if (!event.data) return;
+
+      let data = event.data;
+      if (typeof data === 'string') {
+        try { data = JSON.parse(data); } catch { return; }
+      }
+
+      const eventName = data?.event || data?.type;
+
+      if (eventName === 'play' || eventName === 'playing') {
+        // Mark in_progress when video starts
+        const currentStatus = progress.lessonProgress.get(currentLessonId)?.status;
+        if (currentStatus === 'not_started') {
+          markLessonStatus(currentLessonId, 'in_progress');
+        }
+      }
+
+      if (eventName === 'ended') {
+        // Auto-complete lesson when video finishes
+        const currentStatus = progress.lessonProgress.get(currentLessonId)?.status;
+        if (currentStatus !== 'completed') {
+          markLessonStatus(currentLessonId, 'completed').then(() => refetch());
+        }
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+
+    return () => {
+      window.removeEventListener('message', handleMessage);
+      iframe.removeEventListener('load', subscribeToEvents);
+    };
+  }, [currentLesson, progress.lessonProgress, markLessonStatus, refetch]);
+
   // ---------------------------------------------------------------------------
   // Derived values
   // ---------------------------------------------------------------------------
@@ -830,6 +888,49 @@ export default function LessonPage({ params }: LessonPageProps) {
   // Handlers
   // ---------------------------------------------------------------------------
 
+  // Activity logging helper
+  const logActivity = useCallback(async (action: string, metadata: Record<string, unknown> = {}) => {
+    if (!user?.id) return;
+    const supabase = getSupabase();
+    await supabase.from('hub_activity_log').insert({
+      user_id: user.id,
+      action,
+      metadata: {
+        ...metadata,
+        course_id: course?.id,
+        course_title: course?.title,
+        lesson_id: currentLesson?.id,
+        lesson_title: currentLesson?.title,
+        timestamp: new Date().toISOString(),
+      },
+    }).catch(() => { /* best-effort logging */ });
+  }, [user?.id, course?.id, course?.title, currentLesson?.id, currentLesson?.title]);
+
+  // Log lesson viewed on page load
+  useEffect(() => {
+    if (currentLesson?.id && user?.id && !isLoading) {
+      logActivity('lesson_viewed');
+    }
+  }, [currentLesson?.id, user?.id, isLoading, logActivity]);
+
+  // Resource download handler — tracks download + auto-completes resource lessons
+  const handleResourceDownload = async (url: string, filename: string, type: string) => {
+    logActivity('resource_downloaded', { resource_url: url, filename, content_type: type });
+
+    // Auto-complete resource-type lessons when user downloads the resource
+    if (currentLesson && lessonStatus !== 'completed') {
+      await markLessonStatus(currentLesson.id, 'completed');
+      await refetch();
+    }
+
+    // Let the browser handle the actual download via the <a> tag
+  };
+
+  // Transcript download handler
+  const handleTranscriptDownload = (lang: string) => {
+    logActivity('transcript_downloaded', { language: lang });
+  };
+
   const handleMarkComplete = async () => {
     if (!currentLesson) return;
     await markLessonStatus(currentLesson.id, 'completed');
@@ -865,6 +966,7 @@ export default function LessonPage({ params }: LessonPageProps) {
     if (currentGate && currentLesson) {
       await markLessonStatus(currentLesson.id, 'completed');
       await refetch();
+      logActivity('checkin_completed', { question_id: currentGate.id, question_type: currentGate.type });
       setLocallyCleared((prev) => new Set(prev).add(currentGate.id));
 
       if (autoAdvance && nextLesson) {
@@ -1174,6 +1276,7 @@ export default function LessonPage({ params }: LessonPageProps) {
                     background: '#000', aspectRatio: '16/9',
                   }}>
                     <iframe
+                      ref={videoIframeRef}
                       src={`https://customer-4n38x6badamh5yps.cloudflarestream.com/${videoId}/iframe`}
                       style={{ width: '100%', height: '100%', border: 'none', display: 'block' }}
                       allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
@@ -1234,6 +1337,7 @@ export default function LessonPage({ params }: LessonPageProps) {
                             <a
                               href={`/api/hub/transcripts/${currentLesson.id}?lang=en`}
                               download
+                              onClick={() => handleTranscriptDownload('en')}
                               style={{
                                 fontSize: 11, color: theme.title, textDecoration: 'none',
                                 padding: '3px 10px', border: `1px solid ${theme.border}`,
@@ -1247,6 +1351,7 @@ export default function LessonPage({ params }: LessonPageProps) {
                             <a
                               href={`/api/hub/transcripts/${currentLesson.id}?lang=es`}
                               download
+                              onClick={() => handleTranscriptDownload('es')}
                               style={{
                                 fontSize: 11, color: theme.title, textDecoration: 'none',
                                 padding: '3px 10px', border: `1px solid ${theme.border}`,
@@ -1294,6 +1399,7 @@ export default function LessonPage({ params }: LessonPageProps) {
                       href={resource.url}
                       target="_blank"
                       rel="noopener noreferrer"
+                      onClick={() => handleResourceDownload(resource.url, resource.filename, resource.contentType)}
                       style={{
                         display: 'inline-flex', alignItems: 'center', gap: 8,
                         padding: '12px 28px', background: '#E8B84B', color: '#1E2749',

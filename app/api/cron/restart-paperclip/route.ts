@@ -24,6 +24,7 @@ const PAPERCLIP_URL = 'https://paperclip-production-014f.up.railway.app';
 
 // TEA company ID from .paperclip.yaml config
 const COMPANY_ID = process.env.PAPERCLIP_COMPANY_ID || '';
+const STALE_CHECKOUT_HOURS = 4; // Only release checkouts older than this
 
 async function checkPaperclipHealth(): Promise<{ healthy: boolean; latencyMs: number; detail: string }> {
   const start = Date.now();
@@ -71,10 +72,37 @@ async function sweepStaleCheckouts(): Promise<{ swept: number; errors: string[] 
     const data = await res.json();
     const issues = data?.issues || data?.data || [];
 
-    // Release each checked-out issue
+    // Release only stale checked-out issues (checked out > 4 hours ago)
+    const staleThreshold = Date.now() - STALE_CHECKOUT_HOURS * 60 * 60 * 1000;
+
     for (const issue of issues) {
       if (!issue.checkoutRunId) continue;
+
+      const checkedOutAt = issue.checkoutAt || issue.updatedAt || issue.updated_at;
+      if (checkedOutAt) {
+        const checkoutTime = new Date(checkedOutAt).getTime();
+        if (checkoutTime > staleThreshold) {
+          continue; // Recent checkout — agent may still be working
+        }
+      }
+
       try {
+        // Add audit trail comment before releasing
+        await fetch(
+          `${PAPERCLIP_URL}/api/issues/${issue.id}/comments`,
+          {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${apiToken}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              body: `[Restart Cron] Releasing stale checkout (checked out >${STALE_CHECKOUT_HOURS}h ago) before scheduled restart. Issue returned to queue — not marking as done.`,
+            }),
+            signal: AbortSignal.timeout(5000),
+          }
+        ).catch(() => { /* best-effort comment */ });
+
         const releaseRes = await fetch(
           `${PAPERCLIP_URL}/api/issues/${issue.id}/release`,
           {
@@ -88,6 +116,7 @@ async function sweepStaleCheckouts(): Promise<{ swept: number; errors: string[] 
         );
         if (releaseRes.ok) {
           swept++;
+          console.log(`[restart-paperclip] Released stale checkout on issue ${issue.id}`);
         } else {
           errors.push(`Release ${issue.id}: ${releaseRes.status}`);
         }
