@@ -88,6 +88,48 @@ function extractVideoId(lesson: Lesson): string | null {
   return null;
 }
 
+// Cloudflare Stream player SDK. The iframe embed has no documented raw
+// postMessage protocol, so player events must go through this SDK.
+const CF_STREAM_SDK_SRC = 'https://embed.cloudflarestream.com/embed/sdk.latest.js';
+
+interface CfStreamPlayer {
+  addEventListener: (event: string, handler: () => void) => void;
+  removeEventListener: (event: string, handler: () => void) => void;
+}
+
+type CfStreamWindow = Window & { Stream?: (el: HTMLIFrameElement) => CfStreamPlayer };
+
+let cfStreamSdkPromise: Promise<void> | null = null;
+
+function loadCfStreamSdk(): Promise<void> {
+  if (typeof window === 'undefined') return Promise.resolve();
+  if ((window as CfStreamWindow).Stream) return Promise.resolve();
+  if (cfStreamSdkPromise) return cfStreamSdkPromise;
+
+  cfStreamSdkPromise = new Promise<void>((resolve, reject) => {
+    const onFail = () => {
+      cfStreamSdkPromise = null;
+      reject(new Error('Cloudflare Stream SDK failed to load'));
+    };
+
+    const existing = document.querySelector<HTMLScriptElement>(`script[src="${CF_STREAM_SDK_SRC}"]`);
+    if (existing) {
+      existing.addEventListener('load', () => resolve());
+      existing.addEventListener('error', onFail);
+      return;
+    }
+
+    const script = document.createElement('script');
+    script.src = CF_STREAM_SDK_SRC;
+    script.async = true;
+    script.onload = () => resolve();
+    script.onerror = onFail;
+    document.head.appendChild(script);
+  });
+
+  return cfStreamSdkPromise;
+}
+
 function extractResource(lesson: Lesson): { url: string; filename: string; fileSize: number; contentType: string } | null {
   if (!lesson.content || typeof lesson.content !== 'object') return null;
   const c = lesson.content;
@@ -796,60 +838,60 @@ export default function LessonPage({ params }: LessonPageProps) {
     if (certificateEarned) setShowCelebration(true);
   }, [certificateEarned]);
 
-  // Video auto-completion via Cloudflare Stream postMessage events
+  // Video auto-completion via the Cloudflare Stream player SDK.
+  // Kept out of the effect deps via refs so a progress update doesn't tear down
+  // and re-attach the player listeners on every render.
+  const videoTrackingRef = useRef({ progress, markLessonStatus, refetch });
+  videoTrackingRef.current = { progress, markLessonStatus, refetch };
+
+  const currentLessonId = currentLesson?.id ?? null;
+  const currentVideoId = currentLesson ? extractVideoId(currentLesson) : null;
+
   useEffect(() => {
-    const currentLessonId = currentLesson?.id;
-    const vid = currentLesson ? extractVideoId(currentLesson) : null;
-    if (!vid || !currentLessonId) return;
+    if (!currentVideoId || !currentLessonId) return;
 
-    const iframe = videoIframeRef.current;
-    if (!iframe) return;
+    let player: CfStreamPlayer | null = null;
+    let cancelled = false;
 
-    // Subscribe to Stream player events once the iframe loads
-    const subscribeToEvents = () => {
-      const cw = iframe.contentWindow;
-      if (!cw) return;
-      // Request 'ended' and 'play' events from the CF Stream player
-      cw.postMessage({ type: 'stream-subscribe', value: ['ended', 'play'] }, '*');
-    };
+    const statusOf = () =>
+      videoTrackingRef.current.progress.lessonProgress.get(currentLessonId)?.status;
 
-    iframe.addEventListener('load', subscribeToEvents);
-
-    const handleMessage = (event: MessageEvent) => {
-      // CF Stream sends data as JSON with an event field
-      if (!event.data) return;
-
-      let data = event.data;
-      if (typeof data === 'string') {
-        try { data = JSON.parse(data); } catch { return; }
-      }
-
-      const eventName = data?.event || data?.type;
-
-      if (eventName === 'play' || eventName === 'playing') {
-        // Mark in_progress when video starts
-        const currentStatus = progress.lessonProgress.get(currentLessonId)?.status;
-        if (currentStatus === 'not_started') {
-          markLessonStatus(currentLessonId, 'in_progress');
-        }
-      }
-
-      if (eventName === 'ended') {
-        // Auto-complete lesson when video finishes
-        const currentStatus = progress.lessonProgress.get(currentLessonId)?.status;
-        if (currentStatus !== 'completed') {
-          markLessonStatus(currentLessonId, 'completed').then(() => refetch());
-        }
+    const handlePlay = () => {
+      if (statusOf() === 'not_started') {
+        videoTrackingRef.current.markLessonStatus(currentLessonId, 'in_progress');
       }
     };
 
-    window.addEventListener('message', handleMessage);
+    const handleEnded = () => {
+      if (statusOf() !== 'completed') {
+        videoTrackingRef.current
+          .markLessonStatus(currentLessonId, 'completed')
+          .then(() => videoTrackingRef.current.refetch());
+      }
+    };
+
+    loadCfStreamSdk()
+      .then(() => {
+        const iframe = videoIframeRef.current;
+        const streamFactory = (window as CfStreamWindow).Stream;
+        if (cancelled || !iframe || !streamFactory) return;
+
+        player = streamFactory(iframe);
+        player.addEventListener('play', handlePlay);
+        player.addEventListener('ended', handleEnded);
+      })
+      .catch(() => {
+        // SDK blocked or offline — the manual "Mark complete" button still works.
+      });
 
     return () => {
-      window.removeEventListener('message', handleMessage);
-      iframe.removeEventListener('load', subscribeToEvents);
+      cancelled = true;
+      if (player) {
+        player.removeEventListener('play', handlePlay);
+        player.removeEventListener('ended', handleEnded);
+      }
     };
-  }, [currentLesson, progress.lessonProgress, markLessonStatus, refetch]);
+  }, [currentLessonId, currentVideoId]);
 
   // ---------------------------------------------------------------------------
   // Derived values
@@ -891,19 +933,23 @@ export default function LessonPage({ params }: LessonPageProps) {
   // Activity logging helper
   const logActivity = useCallback(async (action: string, metadata: Record<string, unknown> = {}) => {
     if (!user?.id) return;
-    const supabase = getSupabase();
-    await supabase.from('hub_activity_log').insert({
-      user_id: user.id,
-      action,
-      metadata: {
-        ...metadata,
-        course_id: course?.id,
-        course_title: course?.title,
-        lesson_id: currentLesson?.id,
-        lesson_title: currentLesson?.title,
-        timestamp: new Date().toISOString(),
-      },
-    }).catch(() => { /* best-effort logging */ });
+    try {
+      const supabase = getSupabase();
+      await supabase.from('hub_activity_log').insert({
+        user_id: user.id,
+        action,
+        metadata: {
+          ...metadata,
+          course_id: course?.id,
+          course_title: course?.title,
+          lesson_id: currentLesson?.id,
+          lesson_title: currentLesson?.title,
+          timestamp: new Date().toISOString(),
+        },
+      });
+    } catch {
+      /* best-effort logging */
+    }
   }, [user?.id, course?.id, course?.title, currentLesson?.id, currentLesson?.title]);
 
   // Log lesson viewed on page load
@@ -966,7 +1012,7 @@ export default function LessonPage({ params }: LessonPageProps) {
     if (currentGate && currentLesson) {
       await markLessonStatus(currentLesson.id, 'completed');
       await refetch();
-      logActivity('checkin_completed', { question_id: currentGate.id, question_type: currentGate.type });
+      logActivity('checkin_completed', { question_id: currentGate.id, question_type: currentGate.question_type });
       setLocallyCleared((prev) => new Set(prev).add(currentGate.id));
 
       if (autoAdvance && nextLesson) {
