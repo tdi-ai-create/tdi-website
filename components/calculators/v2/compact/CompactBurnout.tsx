@@ -49,7 +49,7 @@ export function CompactBurnout() {
           </div>
           <div className="flex flex-wrap items-center gap-3">
             <Link
-              href={`/calculator?tab=burnout&stress=${stress}`}
+              href="/hub"
               className="inline-block bg-[#ffba06] text-[#1e2749] px-6 py-3 rounded-lg text-sm font-bold shadow-md hover:bg-[#e6a505] hover:-translate-y-0.5 transition-all"
             >
               Join the Hub

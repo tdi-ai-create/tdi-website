@@ -41,7 +41,7 @@ export default function HubLoginPage() {
   };
 
   const VALUE_PROPS = [
-    { icon: BookOpen, text: 'Ready-to-use classroom tools -- not theory, not fluff' },
+    { icon: BookOpen, text: 'Ready-to-use classroom tools. Not theory, not fluff.' },
     { icon: Award, text: 'PD certificates that count toward your hours' },
     { icon: Users, text: 'A community of 100,000+ educators who get it' },
     { icon: MessageCircle, text: 'AI coaching that knows your classroom context' },
