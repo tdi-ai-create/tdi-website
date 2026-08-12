@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef, use } from 'react';
+import { useState, useEffect, useCallback, useRef, useSyncExternalStore, use } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useHub } from '@/components/hub/HubContext';
@@ -180,48 +180,71 @@ function getGateLabel(question: QuizQuestion, allQuestions: QuizQuestion[]): str
 }
 
 // ---------------------------------------------------------------------------
-// Dark Mode hook (localStorage)
+// localStorage-backed boolean preferences
+//
+// Read through useSyncExternalStore rather than "setState inside an effect".
+// The server snapshot is always false, so SSR and hydration agree; React then
+// re-reads the real value from localStorage immediately after hydrating.
 // ---------------------------------------------------------------------------
 
+const flagListeners = new Map<string, Set<() => void>>();
+
+function readFlag(key: string): boolean {
+  try {
+    return localStorage.getItem(key) === 'true';
+  } catch {
+    return false; // storage blocked (private browsing)
+  }
+}
+
+function writeFlag(key: string, value: boolean) {
+  try {
+    localStorage.setItem(key, String(value));
+  } catch {
+    /* storage blocked — preference just won't persist */
+  }
+  // 'storage' events don't fire in the tab that made the change, so notify here.
+  flagListeners.get(key)?.forEach((listener) => listener());
+}
+
+function subscribeFlag(key: string, listener: () => void) {
+  let listeners = flagListeners.get(key);
+  if (!listeners) {
+    listeners = new Set();
+    flagListeners.set(key, listeners);
+  }
+  const set = listeners;
+  set.add(listener);
+
+  const onStorage = (e: StorageEvent) => {
+    if (e.key === key) listener();
+  };
+  window.addEventListener('storage', onStorage);
+
+  return () => {
+    set.delete(listener);
+    window.removeEventListener('storage', onStorage);
+  };
+}
+
+function useStoredFlag(key: string): { value: boolean; toggle: () => void } {
+  const subscribe = useCallback((listener: () => void) => subscribeFlag(key, listener), [key]);
+  const getSnapshot = useCallback(() => readFlag(key), [key]);
+  const getServerSnapshot = useCallback(() => false, []);
+
+  const value = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  const toggle = useCallback(() => writeFlag(key, !readFlag(key)), [key]);
+
+  return { value, toggle };
+}
+
 function useDarkMode() {
-  const [dark, setDark] = useState(false);
-
-  useEffect(() => {
-    const stored = localStorage.getItem('tdi-lesson-dark-mode');
-    if (stored === 'true') setDark(true);
-  }, []);
-
-  const toggle = useCallback(() => {
-    setDark((prev) => {
-      const next = !prev;
-      localStorage.setItem('tdi-lesson-dark-mode', String(next));
-      return next;
-    });
-  }, []);
-
+  const { value: dark, toggle } = useStoredFlag('tdi-lesson-dark-mode');
   return { dark, toggle };
 }
 
-// ---------------------------------------------------------------------------
-// Auto-advance hook (localStorage)
-// ---------------------------------------------------------------------------
-
 function useAutoAdvance() {
-  const [enabled, setEnabled] = useState(false);
-
-  useEffect(() => {
-    const stored = localStorage.getItem('tdi-lesson-auto-advance');
-    if (stored === 'true') setEnabled(true);
-  }, []);
-
-  const toggle = useCallback(() => {
-    setEnabled((prev) => {
-      const next = !prev;
-      localStorage.setItem('tdi-lesson-auto-advance', String(next));
-      return next;
-    });
-  }, []);
-
+  const { value: enabled, toggle } = useStoredFlag('tdi-lesson-auto-advance');
   return { enabled, toggle };
 }
 
