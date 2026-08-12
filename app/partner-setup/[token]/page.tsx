@@ -18,6 +18,8 @@ import {
   Lock,
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
+import { SetupLanguageProvider, useSetupLanguage } from '@/lib/partner-setup/useSetupLanguage';
+import SetupLanguageToggle from '@/components/partner-setup/SetupLanguageToggle';
 
 interface Partnership {
   id: string;
@@ -36,6 +38,7 @@ function PartnerSetupContent() {
   const router = useRouter();
   const params = useParams();
   const token = params.token as string;
+  const { language, t } = useSetupLanguage();
 
   const [pageState, setPageState] = useState<PageState>('loading');
   const [partnership, setPartnership] = useState<Partnership | null>(null);
@@ -59,6 +62,7 @@ function PartnerSetupContent() {
         body: JSON.stringify({
           user_id: userId,
           email: userEmail,
+          preferred_language: language,
         }),
       });
 
@@ -68,12 +72,12 @@ function PartnerSetupContent() {
         router.push(`/partner-setup/${token}/intake`);
       } else {
         setPageState('error');
-        setErrorMessage(data.error || 'Failed to complete setup');
+        setErrorMessage(data.error || t('Failed to complete setup', 'No se pudo completar la configuraci\u00f3n'));
       }
     } catch (error) {
       console.error('Error accepting invite:', error);
       setPageState('error');
-      setErrorMessage('Failed to complete setup. Please try again.');
+      setErrorMessage(t('Failed to complete setup. Please try again.', 'No se pudo completar la configuraci\u00f3n. Por favor, int\u00e9ntelo de nuevo.'));
     }
   };
 
@@ -98,14 +102,9 @@ function PartnerSetupContent() {
         const { data: { session } } = await supabase.auth.getSession();
 
         if (session?.user) {
-          // User is authenticated - they either:
-          // 1. Just returned from Google OAuth
-          // 2. Already have a session from before
-          // Either way, accept the invite and continue to intake
           setPageState('creating');
           await acceptInviteAndRedirect(session.user.id, session.user.email || '');
         } else {
-          // No session - show welcome screen
           setPageState('welcome');
         }
       } catch (error) {
@@ -119,13 +118,10 @@ function PartnerSetupContent() {
     }
   }, [token]);
 
-  // Listen for auth state changes (handles email/password signup or Google OAuth during page session)
+  // Listen for auth state changes
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      // Only handle SIGNED_IN events that occur AFTER initial page load
-      // (Initial session is handled in the loadPartnershipAndCheckSession effect above)
       if (event === 'SIGNED_IN' && session?.user && partnership && pageState !== 'creating') {
-        // User just signed in via Google while on this page
         setPageState('creating');
         await acceptInviteAndRedirect(session.user.id, session.user.email || '');
       }
@@ -150,7 +146,10 @@ function PartnerSetupContent() {
     });
 
     if (error) {
-      setErrorMessage('Google sign-in is not available right now. Please create an account with email and password.');
+      setErrorMessage(t(
+        'Google sign-in is not available right now. Please create an account with email and password.',
+        'El inicio de sesi\u00f3n con Google no est\u00e1 disponible en este momento. Por favor, cree una cuenta con correo electr\u00f3nico y contrase\u00f1a.'
+      ));
       setIsGoogleLoading(false);
     }
   };
@@ -168,15 +167,15 @@ function PartnerSetupContent() {
     const errors: Record<string, string> = {};
 
     if (!email) {
-      errors.email = 'Email is required';
+      errors.email = t('Email is required', 'El correo electr\u00f3nico es obligatorio');
     }
 
     if (password.length < 8) {
-      errors.password = 'Password must be at least 8 characters';
+      errors.password = t('Password must be at least 8 characters', 'La contrase\u00f1a debe tener al menos 8 caracteres');
     }
 
     if (password !== confirmPassword) {
-      errors.confirmPassword = 'Passwords do not match';
+      errors.confirmPassword = t('Passwords do not match', 'Las contrase\u00f1as no coinciden');
     }
 
     if (Object.keys(errors).length > 0) {
@@ -201,7 +200,10 @@ function PartnerSetupContent() {
       if (signUpError) {
         if (signUpError.message.includes('already registered')) {
           setFieldErrors({
-            email: 'This email already has an account. Try logging in instead.',
+            email: t(
+              'This email already has an account. Try logging in instead.',
+              'Este correo electr\u00f3nico ya tiene una cuenta. Intente iniciar sesi\u00f3n.'
+            ),
           });
           setPageState('create_account');
           return;
@@ -210,7 +212,7 @@ function PartnerSetupContent() {
       }
 
       if (!signUpData.user) {
-        throw new Error('Failed to create account');
+        throw new Error(t('Failed to create account', 'No se pudo crear la cuenta'));
       }
 
       // Sign in immediately after signup
@@ -231,6 +233,7 @@ function PartnerSetupContent() {
           user_id: signUpData.user.id,
           email,
           password,
+          preferred_language: language,
         }),
       });
 
@@ -241,12 +244,17 @@ function PartnerSetupContent() {
         router.push(`/partner-setup/${token}/intake`);
       } else {
         setPageState('error');
-        setErrorMessage(data.error || 'Failed to complete setup');
+        setErrorMessage(data.error || t('Failed to complete setup', 'No se pudo completar la configuraci\u00f3n'));
       }
     } catch (error: unknown) {
       console.error('Error creating account:', error);
       setPageState('error');
-      const errorMsg = error instanceof Error ? error.message : 'Something went wrong. Please try again or contact hello@teachersdeserveit.com';
+      const errorMsg = error instanceof Error
+        ? error.message
+        : t(
+            'Something went wrong. Please try again or contact hello@teachersdeserveit.com',
+            'Algo sali\u00f3 mal. Por favor, int\u00e9ntelo de nuevo o contacte a hello@teachersdeserveit.com'
+          );
       setErrorMessage(errorMsg);
     }
   };
@@ -257,7 +265,7 @@ function PartnerSetupContent() {
       <div className="min-h-screen bg-gradient-to-br from-[#1B2A4A] to-[#38618C] flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="w-8 h-8 animate-spin text-white mx-auto mb-4" />
-          <p className="text-white/80">Loading your invitation...</p>
+          <p className="text-white/80">{t('Loading your invitation...', 'Cargando su invitaci\u00f3n...')}</p>
         </div>
       </div>
     );
@@ -268,29 +276,40 @@ function PartnerSetupContent() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-[#1B2A4A] to-[#38618C] flex items-center justify-center px-4">
         <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full text-center">
+          <div className="absolute top-4 right-4">
+            <SetupLanguageToggle />
+          </div>
           <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <AlertCircle className="w-8 h-8 text-red-600" />
           </div>
-          <h1 className="text-2xl font-bold text-[#1e2749] mb-2">Invalid or Expired Link</h1>
+          <h1 className="text-2xl font-bold text-[#1e2749] mb-2">
+            {t('Invalid or Expired Link', 'Enlace inv\u00e1lido o expirado')}
+          </h1>
           <p className="text-gray-600 mb-4">
-            This invitation link is no longer valid. It may have already been used or has expired.
+            {t(
+              'This invitation link is no longer valid. It may have already been used or has expired.',
+              'Este enlace de invitaci\u00f3n ya no es v\u00e1lido. Es posible que ya se haya utilizado o haya expirado.'
+            )}
           </p>
           <p className="text-sm text-gray-500 mb-6">
-            If you already have an account, <Link href="/partners/login" className="text-[#80a4ed] hover:underline font-medium">log in here</Link>.
-            Otherwise, contact us to request a new invite.
+            {t('If you already have an account, ', 'Si ya tiene una cuenta, ')}
+            <Link href="/partners/login" className="text-[#80a4ed] hover:underline font-medium">
+              {t('log in here', 'inicie sesi\u00f3n aqu\u00ed')}
+            </Link>
+            {t('. Otherwise, contact us to request a new invite.', '. De lo contrario, cont\u00e1ctenos para solicitar una nueva invitaci\u00f3n.')}
           </p>
           <div className="flex flex-col gap-3">
             <Link
               href="/"
               className="inline-flex items-center justify-center gap-2 bg-[#1e2749] text-white px-6 py-3 rounded-xl hover:bg-[#2a3459] transition-colors"
             >
-              Return Home
+              {t('Return Home', 'Volver al inicio')}
             </Link>
             <a
               href="mailto:rae@teachersdeserveit.com?subject=Partnership%20Invite%20Request"
               className="inline-flex items-center justify-center gap-2 text-sm text-[#80a4ed] hover:underline"
             >
-              Request a new invite
+              {t('Request a new invite', 'Solicitar una nueva invitaci\u00f3n')}
             </a>
           </div>
         </div>
@@ -302,17 +321,22 @@ function PartnerSetupContent() {
   if (pageState === 'error') {
     return (
       <div className="min-h-screen bg-gradient-to-br from-[#1B2A4A] to-[#38618C] flex items-center justify-center px-4">
-        <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full text-center">
+        <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full text-center relative">
+          <div className="absolute top-4 right-4">
+            <SetupLanguageToggle />
+          </div>
           <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <AlertCircle className="w-8 h-8 text-red-600" />
           </div>
-          <h1 className="text-2xl font-bold text-[#1e2749] mb-2">Something Went Wrong</h1>
+          <h1 className="text-2xl font-bold text-[#1e2749] mb-2">
+            {t('Something Went Wrong', 'Algo sali\u00f3 mal')}
+          </h1>
           <p className="text-gray-600 mb-6">{errorMessage}</p>
           <button
             onClick={() => setPageState('create_account')}
             className="inline-flex items-center gap-2 bg-[#1e2749] text-white px-6 py-3 rounded-xl hover:bg-[#2a3459] transition-colors"
           >
-            Try Again
+            {t('Try Again', 'Intentar de nuevo')}
           </button>
         </div>
       </div>
@@ -325,7 +349,7 @@ function PartnerSetupContent() {
       <div className="min-h-screen bg-gradient-to-br from-[#1B2A4A] to-[#38618C] flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="w-8 h-8 animate-spin text-white mx-auto mb-4" />
-          <p className="text-white/80">Creating your account...</p>
+          <p className="text-white/80">{t('Creating your account...', 'Creando su cuenta...')}</p>
         </div>
       </div>
     );
@@ -335,7 +359,12 @@ function PartnerSetupContent() {
   if (pageState === 'welcome') {
     return (
       <div className="min-h-screen bg-gradient-to-br from-[#1B2A4A] to-[#38618C] flex items-center justify-center px-4 py-8">
-        <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden">
+        <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden relative">
+          {/* Language Toggle */}
+          <div className="absolute top-4 right-4 z-10">
+            <SetupLanguageToggle />
+          </div>
+
           {/* Logo */}
           <div className="pt-8 px-8">
             <Image
@@ -352,13 +381,18 @@ function PartnerSetupContent() {
             <div className="text-center mb-6">
               <div className="inline-flex items-center gap-2 text-[#ffba06] mb-3">
                 <Sparkles className="w-5 h-5" />
-                <span className="text-sm font-semibold uppercase tracking-wide">Partnership Invitation</span>
+                <span className="text-sm font-semibold uppercase tracking-wide">
+                  {t('Partnership Invitation', 'Invitaci\u00f3n de asociaci\u00f3n')}
+                </span>
               </div>
               <h1 className="text-2xl font-bold text-[#1e2749] mb-2">
-                Welcome to Your TDI Partnership!
+                {t('Welcome to Your TDI Partnership!', 'Bienvenido/a a su asociaci\u00f3n con TDI!')}
               </h1>
               <p className="text-gray-600">
-                You just made one of the best decisions for your team. We&apos;re excited to walk alongside you - let&apos;s get your partnership space set up so your educators can start exploring right away.
+                {t(
+                  "You just made one of the best decisions for your team. We're excited to walk alongside you \u2014 let's get your partnership space set up so your educators can start exploring right away.",
+                  'Acaba de tomar una de las mejores decisiones para su equipo. Estamos emocionados de acompa\u00f1arle. Vamos a configurar su espacio de asociaci\u00f3n para que sus educadores puedan comenzar a explorar de inmediato.'
+                )}
               </p>
             </div>
 
@@ -380,7 +414,10 @@ function PartnerSetupContent() {
                   {partnership?.contact_name}
                 </p>
                 <p className="text-sm text-gray-600 capitalize">
-                  {partnership?.partnership_type} Partnership - {partnership?.contract_phase}
+                  {partnership?.partnership_type === 'district'
+                    ? t('District', 'Distrito')
+                    : t('School', 'Escuela')
+                  } {t('Partnership', 'Asociaci\u00f3n')} - {partnership?.contract_phase}
                 </p>
               </div>
             </div>
@@ -390,7 +427,7 @@ function PartnerSetupContent() {
               onClick={() => setPageState('create_account')}
               className="w-full bg-[#1e2749] text-white py-3.5 px-6 rounded-xl font-semibold hover:bg-[#2a3459] transition-colors flex items-center justify-center gap-2"
             >
-              Let&apos;s Get Started
+              {t("Let's Get Started", 'Vamos a comenzar')}
               <ArrowRight className="w-5 h-5" />
             </button>
           </div>
@@ -402,7 +439,12 @@ function PartnerSetupContent() {
   // Create account screen
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#1B2A4A] to-[#38618C] flex items-center justify-center px-4 py-8">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden relative">
+        {/* Language Toggle */}
+        <div className="absolute top-4 right-4 z-10">
+          <SetupLanguageToggle />
+        </div>
+
         {/* Logo */}
         <div className="pt-8 px-8">
           <Image
@@ -417,7 +459,7 @@ function PartnerSetupContent() {
         {/* Progress */}
         <div className="px-8 pt-6">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm text-gray-500">Step 1 of 3</span>
+            <span className="text-sm text-gray-500">{t('Step 1 of 3', 'Paso 1 de 3')}</span>
             <span className="text-sm text-gray-500">33%</span>
           </div>
           <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
@@ -432,10 +474,13 @@ function PartnerSetupContent() {
               <Lock className="w-6 h-6 text-[#1e2749]" />
             </div>
             <h1 className="text-xl font-bold text-[#1e2749] mb-1">
-              Create Your Account
+              {t('Create Your Account', 'Crear su cuenta')}
             </h1>
             <p className="text-sm text-gray-600">
-              Set up your login credentials to access your dashboard
+              {t(
+                'Set up your login credentials to access your dashboard',
+                'Configure sus credenciales de acceso para su panel'
+              )}
             </p>
           </div>
 
@@ -456,7 +501,7 @@ function PartnerSetupContent() {
                 <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
               </svg>
             )}
-            Continue with Google
+            {t('Continue with Google', 'Continuar con Google')}
           </button>
 
           {/* Divider */}
@@ -465,7 +510,9 @@ function PartnerSetupContent() {
               <div className="w-full border-t border-gray-200" />
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-4 bg-white text-gray-500">or create with email</span>
+              <span className="px-4 bg-white text-gray-500">
+                {t('or create with email', 'o cree una cuenta con correo electr\u00f3nico')}
+              </span>
             </div>
           </div>
 
@@ -473,7 +520,7 @@ function PartnerSetupContent() {
             {/* Email */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Email
+                {t('Email', 'Correo electr\u00f3nico')}
               </label>
               <input
                 type="email"
@@ -481,13 +528,23 @@ function PartnerSetupContent() {
                 readOnly
                 className="w-full px-4 py-3 border border-gray-200 rounded-xl bg-gray-50 text-gray-600 cursor-not-allowed"
               />
-              <p className="text-xs text-gray-400 mt-1">This is the email your invitation was sent to.</p>
+              <p className="text-xs text-gray-400 mt-1">
+                {t(
+                  'This is the email your invitation was sent to.',
+                  'Este es el correo electr\u00f3nico al que se envi\u00f3 su invitaci\u00f3n.'
+                )}
+              </p>
               {fieldErrors.email && (
                 <p className="text-sm text-red-500 mt-1 flex items-center gap-1">
                   {fieldErrors.email}
                   {fieldErrors.email.includes('logging in') && (
                     <Link href="/partners/login" className="underline font-medium">
-                      Log in here
+                      {t('Log in here', 'Inicie sesi\u00f3n aqu\u00ed')}
+                    </Link>
+                  )}
+                  {fieldErrors.email.includes('iniciar sesi\u00f3n') && (
+                    <Link href="/partners/login" className="underline font-medium">
+                      {t('Log in here', 'Inicie sesi\u00f3n aqu\u00ed')}
                     </Link>
                   )}
                 </p>
@@ -497,7 +554,7 @@ function PartnerSetupContent() {
             {/* Password */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Create Password
+                {t('Create Password', 'Crear contrase\u00f1a')}
               </label>
               <div className="relative">
                 <input
@@ -529,7 +586,7 @@ function PartnerSetupContent() {
                       ? <Check className="w-4 h-4" />
                       : <X className="w-4 h-4" />
                   )}
-                  At least 8 characters
+                  {t('At least 8 characters', 'Al menos 8 caracteres')}
                 </p>
               )}
             </div>
@@ -537,7 +594,7 @@ function PartnerSetupContent() {
             {/* Confirm Password */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Confirm Password
+                {t('Confirm Password', 'Confirmar contrase\u00f1a')}
               </label>
               <div className="relative">
                 <input
@@ -563,7 +620,10 @@ function PartnerSetupContent() {
                   doPasswordsMatch ? 'text-green-600' : 'text-red-500'
                 }`}>
                   {doPasswordsMatch ? <Check className="w-4 h-4" /> : <X className="w-4 h-4" />}
-                  {doPasswordsMatch ? 'Passwords match' : 'Passwords do not match'}
+                  {doPasswordsMatch
+                    ? t('Passwords match', 'Las contrase\u00f1as coinciden')
+                    : t('Passwords do not match', 'Las contrase\u00f1as no coinciden')
+                  }
                 </p>
               )}
             </div>
@@ -571,7 +631,10 @@ function PartnerSetupContent() {
             {/* Info note */}
             <div className="bg-blue-50 border border-blue-100 rounded-xl p-4">
               <p className="text-sm text-blue-700">
-                This will be your login for your Partnership Dashboard - and eventually your Learning Hub access too.
+                {t(
+                  'This will be your login for your Partnership Dashboard \u2014 and eventually your Learning Hub access too.',
+                  'Este ser\u00e1 su inicio de sesi\u00f3n para su Panel de Asociaci\u00f3n, y eventualmente tambi\u00e9n para su acceso al Hub de Aprendizaje.'
+                )}
               </p>
             </div>
 
@@ -581,7 +644,7 @@ function PartnerSetupContent() {
               disabled={!isPasswordValid || !doPasswordsMatch}
               className="w-full bg-[#1e2749] text-white py-3.5 px-6 rounded-xl font-semibold hover:bg-[#2a3459] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Create Account
+              {t('Create Account', 'Crear cuenta')}
             </button>
           </form>
 
@@ -590,7 +653,7 @@ function PartnerSetupContent() {
             onClick={() => setPageState('welcome')}
             className="w-full text-center text-sm text-gray-500 hover:text-[#1e2749] mt-4"
           >
-            &larr; Back
+            &larr; {t('Back', 'Atr\u00e1s')}
           </button>
         </div>
       </div>
@@ -612,7 +675,9 @@ function LoadingFallback() {
 export default function PartnerSetupPage() {
   return (
     <Suspense fallback={<LoadingFallback />}>
-      <PartnerSetupContent />
+      <SetupLanguageProvider>
+        <PartnerSetupContent />
+      </SetupLanguageProvider>
     </Suspense>
   );
 }

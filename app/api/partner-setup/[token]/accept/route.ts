@@ -27,7 +27,7 @@ export async function POST(
   try {
     const { token } = await params;
     const body = await request.json();
-    const { user_id, email } = body;
+    const { user_id, email, preferred_language } = body;
 
     if (!token || !user_id || !email) {
       return NextResponse.json(
@@ -105,12 +105,26 @@ export async function POST(
       console.error('Error updating partnership:', updateError);
     }
 
+    // Save language preference to hub_profiles if provided
+    if (preferred_language && (preferred_language === 'en' || preferred_language === 'es')) {
+      const { error: profileError } = await supabase
+        .from('hub_profiles')
+        .upsert(
+          { id: user_id, preferred_language },
+          { onConflict: 'id' }
+        );
+
+      if (profileError) {
+        console.error('Error saving language preference:', profileError);
+      }
+    }
+
     // Log activity
     await supabase.from('activity_log').insert({
       partnership_id: partnership.id,
       user_id,
       action: 'account_created',
-      details: { email },
+      details: { email, preferred_language: preferred_language || 'en' },
     });
 
     return NextResponse.json({

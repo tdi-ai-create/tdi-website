@@ -22,6 +22,8 @@ import {
   Mail,
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
+import { SetupLanguageProvider, useSetupLanguage } from '@/lib/partner-setup/useSetupLanguage';
+import SetupLanguageToggle from '@/components/partner-setup/SetupLanguageToggle';
 
 // US States for dropdown
 const US_STATES = [
@@ -91,6 +93,19 @@ const ROLE_OPTIONS = [
   'Other',
 ];
 
+// Spanish role labels for display
+const ROLE_LABELS_ES: Record<string, string> = {
+  'Teacher': 'Maestro/a',
+  'Paraprofessional': 'Paraprofesional',
+  'Instructional Coach': 'Entrenador/a instruccional',
+  'Curriculum Director': 'Director/a de curr\u00edculo',
+  'Assistant Principal': 'Subdirector/a',
+  'Principal': 'Director/a',
+  'Counselor': 'Consejero/a',
+  'Specialist': 'Especialista',
+  'Other': 'Otro',
+};
+
 interface Partnership {
   id: string;
   partnership_type: 'district' | 'school';
@@ -121,6 +136,7 @@ function IntakeWizardContent() {
   const router = useRouter();
   const params = useParams();
   const token = params.token as string;
+  const { language, t } = useSetupLanguage();
 
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -150,6 +166,10 @@ function IntakeWizardContent() {
     role_title: '',
   });
 
+  // Helper for org type label
+  const orgTypeLabel = (type: 'district' | 'school') =>
+    type === 'district' ? t('District', 'Distrito') : t('School', 'Escuela');
+
   // Load partnership and check authorization
   useEffect(() => {
     const checkAuth = async () => {
@@ -178,11 +198,11 @@ function IntakeWizardContent() {
           }));
           setIsAuthorized(true);
         } else {
-          setErrorMessage(data.error || 'Unauthorized');
+          setErrorMessage(data.error || t('Unauthorized', 'No autorizado'));
         }
       } catch (error) {
         console.error('Error checking auth:', error);
-        setErrorMessage('Failed to load');
+        setErrorMessage(t('Failed to load', 'Error al cargar'));
       } finally {
         setIsLoading(false);
       }
@@ -197,7 +217,7 @@ function IntakeWizardContent() {
     setOrgData(prev => ({ ...prev, [field]: value }));
   };
 
-  // CSV upload handler - simplified columns (no building)
+  // CSV upload handler
   const [csvParseMessage, setCsvParseMessage] = useState<string | null>(null);
 
   const handleCSVUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -206,7 +226,10 @@ function IntakeWizardContent() {
 
     // File size check (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
-      setCsvParseMessage('File is too large. Please use a CSV under 5MB.');
+      setCsvParseMessage(t(
+        'File is too large. Please use a CSV under 5MB.',
+        'El archivo es demasiado grande. Use un CSV de menos de 5MB.'
+      ));
       return;
     }
 
@@ -219,28 +242,36 @@ function IntakeWizardContent() {
       const lines = text.split('\n').filter(line => line.trim());
 
       if (lines.length < 2) {
-        setCsvParseMessage('CSV appears empty. Make sure it has a header row and at least one staff member.');
+        setCsvParseMessage(t(
+          'CSV appears empty. Make sure it has a header row and at least one staff member.',
+          'El CSV parece vac\u00edo. Aseg\u00farese de que tenga una fila de encabezado y al menos un miembro del personal.'
+        ));
         return;
       }
 
       const headers = lines[0].toLowerCase().split(',').map(h => h.trim().replace(/[^a-z0-9\s]/g, ''));
 
-      // Flexible header matching -- handles common variations
+      // Flexible header matching
       const firstNameIdx = headers.findIndex(h =>
-        (h.includes('first') && h.includes('name')) || h === 'firstname' || h === 'first'
+        (h.includes('first') && h.includes('name')) || h === 'firstname' || h === 'first' ||
+        h === 'nombre'
       );
       const lastNameIdx = headers.findIndex(h =>
-        (h.includes('last') && h.includes('name')) || h === 'lastname' || h === 'last' || h === 'surname'
+        (h.includes('last') && h.includes('name')) || h === 'lastname' || h === 'last' || h === 'surname' ||
+        h === 'apellido'
       );
-      // Also check for a single "name" column (full name)
-      const fullNameIdx = firstNameIdx < 0 ? headers.findIndex(h => h === 'name' || h === 'full name' || h === 'fullname') : -1;
-      const emailIdx = headers.findIndex(h => h.includes('email') || h === 'e-mail');
+      const fullNameIdx = firstNameIdx < 0 ? headers.findIndex(h => h === 'name' || h === 'full name' || h === 'fullname' || h === 'nombre completo') : -1;
+      const emailIdx = headers.findIndex(h => h.includes('email') || h === 'e-mail' || h === 'correo' || h.includes('correo'));
       const roleIdx = headers.findIndex(h =>
-        h.includes('role') || h.includes('title') || h.includes('position') || h.includes('job')
+        h.includes('role') || h.includes('title') || h.includes('position') || h.includes('job') ||
+        h.includes('puesto') || h.includes('cargo') || h.includes('rol')
       );
 
       if (emailIdx < 0 && firstNameIdx < 0 && fullNameIdx < 0) {
-        setCsvParseMessage('Could not find name or email columns. Make sure your CSV has headers like "First Name", "Last Name", "Email".');
+        setCsvParseMessage(t(
+          'Could not find name or email columns. Make sure your CSV has headers like "First Name", "Last Name", "Email".',
+          'No se encontraron columnas de nombre o correo electr\u00f3nico. Aseg\u00farese de que su CSV tenga encabezados como "Nombre", "Apellido", "Correo electr\u00f3nico".'
+        ));
         return;
       }
 
@@ -256,7 +287,6 @@ function IntakeWizardContent() {
         let lastName = '';
 
         if (fullNameIdx >= 0 && firstNameIdx < 0) {
-          // Split full name into first/last
           const parts = (values[fullNameIdx] || '').split(/\s+/);
           firstName = parts[0] || '';
           lastName = parts.slice(1).join(' ') || '';
@@ -267,10 +297,8 @@ function IntakeWizardContent() {
 
         const email = emailIdx >= 0 ? values[emailIdx] : values[2] || '';
 
-        // Skip empty rows
         if (!firstName && !lastName && !email) continue;
 
-        // Deduplicate by email
         const emailLower = email.toLowerCase();
         if (emailLower && seenEmails.has(emailLower)) continue;
         if (emailLower) seenEmails.add(emailLower);
@@ -284,13 +312,22 @@ function IntakeWizardContent() {
       }
 
       if (staff.length === 0) {
-        setCsvParseMessage('No staff members found in the file. Check that your data starts on row 2.');
+        setCsvParseMessage(t(
+          'No staff members found in the file. Check that your data starts on row 2.',
+          'No se encontraron miembros del personal en el archivo. Verifique que sus datos comiencen en la fila 2.'
+        ));
         return;
       }
 
       const messages: string[] = [];
-      if (roleIdx < 0) messages.push('No role column detected -- you can add roles manually.');
-      if (seenEmails.size < staff.length + (lines.length - 1 - staff.length)) messages.push('Duplicate emails were removed.');
+      if (roleIdx < 0) messages.push(t(
+        'No role column detected \u2014 you can add roles manually.',
+        'No se detect\u00f3 columna de puesto. Puede agregar los puestos manualmente.'
+      ));
+      if (seenEmails.size < staff.length + (lines.length - 1 - staff.length)) messages.push(t(
+        'Duplicate emails were removed.',
+        'Se eliminaron correos electr\u00f3nicos duplicados.'
+      ));
       setCsvParseMessage(messages.length > 0 ? messages.join(' ') : null);
 
       setStaffList(staff);
@@ -323,12 +360,14 @@ function IntakeWizardContent() {
 
   // Download CSV template
   const downloadTemplate = () => {
-    const csvContent = 'First Name,Last Name,Email,Role Title\nJohn,Smith,john.smith@school.edu,Teacher\nJane,Doe,jane.doe@school.edu,Instructional Coach';
+    const csvContent = language === 'es'
+      ? 'Nombre,Apellido,Correo electr\u00f3nico,Puesto\nJuan,Garc\u00eda,juan.garcia@escuela.edu,Maestro\nMar\u00eda,L\u00f3pez,maria.lopez@escuela.edu,Entrenadora instruccional'
+      : 'First Name,Last Name,Email,Role Title\nJohn,Smith,john.smith@school.edu,Teacher\nJane,Doe,jane.doe@school.edu,Instructional Coach';
     const blob = new Blob([csvContent], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'staff-roster-template.csv';
+    a.download = t('staff-roster-template.csv', 'plantilla-lista-de-personal.csv');
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -361,18 +400,17 @@ function IntakeWizardContent() {
 
       if (data.success) {
         if (step === 2) {
-          // Show confirmation screen
           setDashboardSlug(data.slug);
           setViewState('confirmation');
         } else {
           setCurrentStep(2);
         }
       } else {
-        setErrorMessage(data.error || 'Failed to save');
+        setErrorMessage(data.error || t('Failed to save', 'Error al guardar'));
       }
     } catch (error) {
       console.error('Error saving:', error);
-      setErrorMessage('Failed to save. Please try again.');
+      setErrorMessage(t('Failed to save. Please try again.', 'Error al guardar. Por favor, int\u00e9ntelo de nuevo.'));
     } finally {
       setIsSaving(false);
     }
@@ -391,7 +429,7 @@ function IntakeWizardContent() {
       <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="w-8 h-8 animate-spin text-[#80a4ed] mx-auto mb-4" />
-          <p className="text-gray-600">Loading...</p>
+          <p className="text-gray-600">{t('Loading...', 'Cargando...')}</p>
         </div>
       </div>
     );
@@ -405,8 +443,12 @@ function IntakeWizardContent() {
           <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <AlertCircle className="w-8 h-8 text-red-600" />
           </div>
-          <h1 className="text-2xl font-bold text-[#1e2749] mb-2">Access Denied</h1>
-          <p className="text-gray-600 mb-6">{errorMessage || 'Please complete the signup process first.'}</p>
+          <h1 className="text-2xl font-bold text-[#1e2749] mb-2">
+            {t('Access Denied', 'Acceso denegado')}
+          </h1>
+          <p className="text-gray-600 mb-6">
+            {errorMessage || t('Please complete the signup process first.', 'Por favor, complete el proceso de registro primero.')}
+          </p>
         </div>
       </div>
     );
@@ -426,6 +468,7 @@ function IntakeWizardContent() {
               height={42}
               className="h-10 w-auto"
             />
+            <SetupLanguageToggle />
           </div>
         </header>
 
@@ -437,27 +480,30 @@ function IntakeWizardContent() {
             </div>
 
             <h1 className="text-3xl font-bold text-[#1e2749] mb-4">
-              You&apos;re all set!
+              {t("You're all set!", "\u00a1Todo listo!")}
             </h1>
 
             <div className="bg-white rounded-xl border border-gray-200 p-6 mb-8">
               <div className="space-y-3">
                 <div className="flex justify-between items-center">
                   <span className="text-gray-600">
-                    {partnership.partnership_type === 'district' ? 'District' : 'School'}
+                    {orgTypeLabel(partnership.partnership_type)}
                   </span>
                   <span className="font-medium text-[#1e2749]">{orgData.name}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-600">Location</span>
+                  <span className="text-gray-600">{t('Location', 'Ubicaci\u00f3n')}</span>
                   <span className="font-medium text-[#1e2749]">
                     {orgData.address_city}, {orgData.address_state}
                   </span>
                 </div>
                 <div className="flex justify-between items-center pt-3 border-t border-gray-100">
-                  <span className="text-gray-600">Staff count</span>
+                  <span className="text-gray-600">{t('Staff count', 'Personal')}</span>
                   <span className="font-medium text-[#1e2749]">
-                    {staffList.length} educator{staffList.length !== 1 ? 's' : ''} added
+                    {staffList.length} {staffList.length !== 1
+                      ? t('educators added', 'educadores agregados')
+                      : t('educator added', 'educador agregado')
+                    }
                   </span>
                 </div>
               </div>
@@ -465,19 +511,36 @@ function IntakeWizardContent() {
 
             {/* What happens next */}
             <div className="bg-[#F9FAFB] rounded-xl p-5 mb-6 text-left">
-              <p className="text-sm font-semibold text-[#1e2749] mb-3">What happens next:</p>
+              <p className="text-sm font-semibold text-[#1e2749] mb-3">
+                {t('What happens next:', '\u00bfQu\u00e9 sigue?')}
+              </p>
               <div className="space-y-2.5">
                 <div className="flex items-start gap-2.5">
                   <span className="w-5 h-5 rounded-full bg-[#4ecdc4]/20 flex items-center justify-center text-[10px] font-bold text-[#2A9D8F] flex-shrink-0 mt-0.5">1</span>
-                  <p className="text-sm text-gray-600">Your {staffList.length} educators will receive Hub access within 24 hours.</p>
+                  <p className="text-sm text-gray-600">
+                    {t(
+                      `Your ${staffList.length} educators will receive Hub access within 24 hours.`,
+                      `Sus ${staffList.length} educadores recibir\u00e1n acceso al Hub en un plazo de 24 horas.`
+                    )}
+                  </p>
                 </div>
                 <div className="flex items-start gap-2.5">
                   <span className="w-5 h-5 rounded-full bg-[#4ecdc4]/20 flex items-center justify-center text-[10px] font-bold text-[#2A9D8F] flex-shrink-0 mt-0.5">2</span>
-                  <p className="text-sm text-gray-600">Your dashboard will update in real time as your team starts exploring.</p>
+                  <p className="text-sm text-gray-600">
+                    {t(
+                      'Your dashboard will update in real time as your team starts exploring.',
+                      'Su panel se actualizar\u00e1 en tiempo real a medida que su equipo comience a explorar.'
+                    )}
+                  </p>
                 </div>
                 <div className="flex items-start gap-2.5">
                   <span className="w-5 h-5 rounded-full bg-[#4ecdc4]/20 flex items-center justify-center text-[10px] font-bold text-[#2A9D8F] flex-shrink-0 mt-0.5">3</span>
-                  <p className="text-sm text-gray-600">We&apos;ll reach out to schedule your first check-in call.</p>
+                  <p className="text-sm text-gray-600">
+                    {t(
+                      "We'll reach out to schedule your first check-in call.",
+                      'Nos comunicaremos con usted para programar su primera llamada de seguimiento.'
+                    )}
+                  </p>
                 </div>
               </div>
             </div>
@@ -486,12 +549,14 @@ function IntakeWizardContent() {
               onClick={goToDashboard}
               className="w-full bg-[#1e2749] text-white py-4 rounded-xl font-semibold text-lg hover:bg-[#2a3459] transition-colors flex items-center justify-center gap-2"
             >
-              Go to My Dashboard
+              {t('Go to My Dashboard', 'Ir a mi panel')}
               <ChevronRight className="w-5 h-5" />
             </button>
 
             <p className="text-xs text-gray-400 mt-4">
-              Questions? Email <a href="mailto:rae@teachersdeserveit.com" className="text-[#80a4ed] hover:underline">rae@teachersdeserveit.com</a> anytime.
+              {t('Questions? Email ', '\u00bfPreguntas? Env\u00ede un correo a ')}
+              <a href="mailto:rae@teachersdeserveit.com" className="text-[#80a4ed] hover:underline">rae@teachersdeserveit.com</a>
+              {t(' anytime.', ' en cualquier momento.')}
             </p>
           </div>
         </main>
@@ -511,7 +576,12 @@ function IntakeWizardContent() {
             height={42}
             className="h-10 w-auto"
           />
-          <span className="text-sm text-gray-500">Step {currentStep} of 2</span>
+          <div className="flex items-center gap-4">
+            <SetupLanguageToggle />
+            <span className="text-sm text-gray-500">
+              {t(`Step ${currentStep} of 2`, `Paso ${currentStep} de 2`)}
+            </span>
+          </div>
         </div>
       </header>
 
@@ -526,7 +596,10 @@ function IntakeWizardContent() {
                 {currentStep > 1 ? <Check className="w-4 h-4" /> : '1'}
               </div>
               <span className="text-sm font-medium hidden sm:inline">
-                Your {partnership.partnership_type === 'district' ? 'District' : 'School'}
+                {t(
+                  `Your ${partnership.partnership_type === 'district' ? 'District' : 'School'}`,
+                  `Su ${orgTypeLabel(partnership.partnership_type)}`
+                )}
               </span>
             </div>
 
@@ -538,7 +611,9 @@ function IntakeWizardContent() {
               }`}>
                 2
               </div>
-              <span className="text-sm font-medium hidden sm:inline">Staff Roster</span>
+              <span className="text-sm font-medium hidden sm:inline">
+                {t('Staff Roster', 'Lista de personal')}
+              </span>
             </div>
           </div>
 
@@ -552,7 +627,7 @@ function IntakeWizardContent() {
 
           {/* Step Content */}
           <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
-            {/* Step 1: Organization - Simplified */}
+            {/* Step 1: Organization */}
             {currentStep === 1 && (
               <div>
                 <div className="flex items-center gap-3 mb-2">
@@ -562,24 +637,36 @@ function IntakeWizardContent() {
                     <School className="w-6 h-6 text-blue-600" />
                   )}
                   <h2 className="text-xl font-semibold text-[#1e2749]">
-                    Your {partnership.partnership_type === 'district' ? 'District' : 'School'}
+                    {t(
+                      `Your ${partnership.partnership_type === 'district' ? 'District' : 'School'}`,
+                      `Su ${orgTypeLabel(partnership.partnership_type)}`
+                    )}
                   </h2>
                 </div>
                 <p className="text-gray-600 mb-6">
-                  Just a few quick details to get your dashboard set up.
+                  {t(
+                    'Just a few quick details to get your dashboard set up.',
+                    'Solo unos datos r\u00e1pidos para configurar su panel.'
+                  )}
                 </p>
 
                 <div className="space-y-5">
                   {/* Name */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      {partnership.partnership_type === 'district' ? 'District Name' : 'School Name'} *
+                      {partnership.partnership_type === 'district'
+                        ? t('District Name', 'Nombre del distrito')
+                        : t('School Name', 'Nombre de la escuela')
+                      } *
                     </label>
                     <input
                       type="text"
                       value={orgData.name}
                       onChange={(e) => handleOrgChange('name', e.target.value)}
-                      placeholder={partnership.partnership_type === 'district' ? 'e.g., Springfield Public Schools' : 'e.g., Lincoln Elementary School'}
+                      placeholder={partnership.partnership_type === 'district'
+                        ? t('e.g., Springfield Public Schools', 'ej., Escuelas P\u00fablicas de Springfield')
+                        : t('e.g., Lincoln Elementary School', 'ej., Escuela Primaria Lincoln')
+                      }
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#80a4ed] focus:border-transparent outline-none text-lg"
                       autoFocus
                     />
@@ -588,23 +675,27 @@ function IntakeWizardContent() {
                   {/* City & State side by side */}
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">City *</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        {t('City', 'Ciudad')} *
+                      </label>
                       <input
                         type="text"
                         value={orgData.address_city}
                         onChange={(e) => handleOrgChange('address_city', e.target.value)}
-                        placeholder="e.g., Springfield"
+                        placeholder={t('e.g., Springfield', 'ej., Springfield')}
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#80a4ed] focus:border-transparent outline-none"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">State *</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        {t('State', 'Estado')} *
+                      </label>
                       <select
                         value={orgData.address_state}
                         onChange={(e) => handleOrgChange('address_state', e.target.value)}
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#80a4ed] focus:border-transparent outline-none bg-white"
                       >
-                        <option value="">Select state...</option>
+                        <option value="">{t('Select state...', 'Seleccione estado...')}</option>
                         {US_STATES.map(state => (
                           <option key={state.value} value={state.value}>
                             {state.label}
@@ -622,10 +713,15 @@ function IntakeWizardContent() {
               <div>
                 <div className="flex items-center gap-3 mb-2">
                   <Users className="w-6 h-6 text-green-600" />
-                  <h2 className="text-xl font-semibold text-[#1e2749]">Staff Roster</h2>
+                  <h2 className="text-xl font-semibold text-[#1e2749]">
+                    {t('Staff Roster', 'Lista de personal')}
+                  </h2>
                 </div>
                 <p className="text-gray-600 mb-6">
-                  Upload your staff list so we can set up Hub access for everyone.
+                  {t(
+                    'Upload your staff list so we can set up Hub access for everyone.',
+                    'Suba su lista de personal para que podamos configurar el acceso al Hub para todos.'
+                  )}
                 </p>
 
                 {staffList.length === 0 && !showManualEntry ? (
@@ -633,17 +729,25 @@ function IntakeWizardContent() {
                     {/* CSV Upload */}
                     <div className="text-center py-6 border-2 border-dashed border-gray-200 rounded-xl">
                       <FileSpreadsheet className="w-10 h-10 mx-auto mb-3 text-gray-400" />
-                      <h3 className="font-medium text-[#1e2749] mb-1">Upload Staff CSV</h3>
+                      <h3 className="font-medium text-[#1e2749] mb-1">
+                        {t('Upload Staff CSV', 'Subir CSV de personal')}
+                      </h3>
                       <p className="text-sm text-gray-500 mb-1">
-                        Columns: First Name, Last Name, Email, Role Title
+                        {t(
+                          'Columns: First Name, Last Name, Email, Role Title',
+                          'Columnas: Nombre, Apellido, Correo electr\u00f3nico, Puesto'
+                        )}
                       </p>
                       <p className="text-xs text-gray-400 mb-4">
-                        Most formats work -- we&apos;ll match columns automatically. You can also use a single &quot;Name&quot; column.
+                        {t(
+                          'Most formats work \u2014 we\'ll match columns automatically. You can also use a single "Name" column.',
+                          'La mayor\u00eda de los formatos funcionan. Haremos coincidir las columnas autom\u00e1ticamente. Tambi\u00e9n puede usar una sola columna de "Nombre".'
+                        )}
                       </p>
 
                       <label className="inline-flex items-center gap-2 bg-[#1e2749] text-white px-5 py-2.5 rounded-lg hover:bg-[#2a3459] transition-colors cursor-pointer">
                         <Upload className="w-4 h-4" />
-                        Choose File
+                        {t('Choose File', 'Elegir archivo')}
                         <input
                           type="file"
                           accept=".csv"
@@ -653,7 +757,7 @@ function IntakeWizardContent() {
                       </label>
 
                       {csvParseMessage && (
-                        <p className={`text-sm mt-3 ${csvParseMessage.includes('Could not') || csvParseMessage.includes('empty') || csvParseMessage.includes('too large') ? 'text-red-500' : 'text-amber-600'}`}>
+                        <p className={`text-sm mt-3 ${csvParseMessage.includes('Could not') || csvParseMessage.includes('empty') || csvParseMessage.includes('too large') || csvParseMessage.includes('No se encontraron') || csvParseMessage.includes('vac\u00edo') || csvParseMessage.includes('demasiado grande') ? 'text-red-500' : 'text-amber-600'}`}>
                           {csvParseMessage}
                         </p>
                       )}
@@ -663,14 +767,14 @@ function IntakeWizardContent() {
                         className="flex items-center gap-1.5 text-sm text-[#80a4ed] hover:underline mx-auto mt-3"
                       >
                         <Download className="w-4 h-4" />
-                        Download template
+                        {t('Download template', 'Descargar plantilla')}
                       </button>
                     </div>
 
                     {/* Divider */}
                     <div className="flex items-center gap-4">
                       <div className="flex-1 h-px bg-gray-200" />
-                      <span className="text-sm text-gray-400">or</span>
+                      <span className="text-sm text-gray-400">{t('or', 'o')}</span>
                       <div className="flex-1 h-px bg-gray-200" />
                     </div>
 
@@ -680,18 +784,18 @@ function IntakeWizardContent() {
                       className="w-full py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
                     >
                       <Plus className="w-4 h-4" />
-                      Enter staff manually
+                      {t('Enter staff manually', 'Ingresar personal manualmente')}
                     </button>
 
                     {/* Email Fallback */}
                     <div className="text-center pt-2">
                       <p className="text-sm text-gray-500">
-                        Don&apos;t have your roster ready?{' '}
+                        {t("Don't have your roster ready? ", "\u00bfNo tiene su lista lista? ")}
                         <a
                           href="mailto:hello@teachersdeserveit.com?subject=Staff%20Roster%20for%20Partner%20Setup"
                           className="text-[#80a4ed] hover:underline"
                         >
-                          Email it to us
+                          {t('Email it to us', 'Env\u00edenosla por correo')}
                         </a>
                       </p>
                     </div>
@@ -699,18 +803,22 @@ function IntakeWizardContent() {
                 ) : showManualEntry && staffList.length === 0 ? (
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
-                      <h3 className="font-medium text-[#1e2749]">Add Staff Member</h3>
+                      <h3 className="font-medium text-[#1e2749]">
+                        {t('Add Staff Member', 'Agregar miembro del personal')}
+                      </h3>
                       <button
                         onClick={() => setShowManualEntry(false)}
                         className="text-sm text-gray-500 hover:text-gray-700"
                       >
-                        Back to upload
+                        {t('Back to upload', 'Volver a subir archivo')}
                       </button>
                     </div>
 
                     <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <label className="block text-sm text-gray-600 mb-1">First Name *</label>
+                        <label className="block text-sm text-gray-600 mb-1">
+                          {t('First Name', 'Nombre')} *
+                        </label>
                         <input
                           type="text"
                           value={manualStaff.first_name}
@@ -719,7 +827,9 @@ function IntakeWizardContent() {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm text-gray-600 mb-1">Last Name *</label>
+                        <label className="block text-sm text-gray-600 mb-1">
+                          {t('Last Name', 'Apellido')} *
+                        </label>
                         <input
                           type="text"
                           value={manualStaff.last_name}
@@ -730,7 +840,9 @@ function IntakeWizardContent() {
                     </div>
 
                     <div>
-                      <label className="block text-sm text-gray-600 mb-1">Email *</label>
+                      <label className="block text-sm text-gray-600 mb-1">
+                        {t('Email', 'Correo electr\u00f3nico')} *
+                      </label>
                       <input
                         type="email"
                         value={manualStaff.email}
@@ -740,15 +852,19 @@ function IntakeWizardContent() {
                     </div>
 
                     <div>
-                      <label className="block text-sm text-gray-600 mb-1">Role Title</label>
+                      <label className="block text-sm text-gray-600 mb-1">
+                        {t('Role Title', 'Puesto')}
+                      </label>
                       <select
                         value={manualStaff.role_title}
                         onChange={(e) => handleManualStaffChange('role_title', e.target.value)}
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#80a4ed] focus:border-transparent outline-none bg-white"
                       >
-                        <option value="">Select role...</option>
+                        <option value="">{t('Select role...', 'Seleccione puesto...')}</option>
                         {ROLE_OPTIONS.map(role => (
-                          <option key={role} value={role}>{role}</option>
+                          <option key={role} value={role}>
+                            {language === 'es' ? ROLE_LABELS_ES[role] || role : role}
+                          </option>
                         ))}
                       </select>
                     </div>
@@ -759,7 +875,7 @@ function IntakeWizardContent() {
                       className="w-full py-2.5 bg-[#1e2749] text-white rounded-lg hover:bg-[#2a3459] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                     >
                       <Plus className="w-4 h-4" />
-                      Add Staff Member
+                      {t('Add Staff Member', 'Agregar miembro del personal')}
                     </button>
                   </div>
                 ) : (
@@ -769,10 +885,15 @@ function IntakeWizardContent() {
                       <div className="flex items-center gap-2">
                         <CheckCircle className="w-5 h-5 text-green-500" />
                         <span className="font-medium text-[#1e2749]">
-                          {staffList.length} staff member{staffList.length !== 1 ? 's' : ''}
+                          {staffList.length} {staffList.length !== 1
+                            ? t('staff members', 'miembros del personal')
+                            : t('staff member', 'miembro del personal')
+                          }
                         </span>
                         {csvFileName && (
-                          <span className="text-sm text-gray-500">from {csvFileName}</span>
+                          <span className="text-sm text-gray-500">
+                            {t('from', 'de')} {csvFileName}
+                          </span>
                         )}
                       </div>
                       <button
@@ -780,7 +901,7 @@ function IntakeWizardContent() {
                         className="text-sm text-gray-500 hover:text-red-500 flex items-center gap-1"
                       >
                         <X className="w-4 h-4" />
-                        Clear
+                        {t('Clear', 'Limpiar')}
                       </button>
                     </div>
 
@@ -789,9 +910,15 @@ function IntakeWizardContent() {
                         <table className="w-full text-sm">
                           <thead className="bg-gray-50 sticky top-0">
                             <tr>
-                              <th className="text-left px-3 py-2 font-medium text-gray-600">Name</th>
-                              <th className="text-left px-3 py-2 font-medium text-gray-600">Email</th>
-                              <th className="text-left px-3 py-2 font-medium text-gray-600">Role</th>
+                              <th className="text-left px-3 py-2 font-medium text-gray-600">
+                                {t('Name', 'Nombre')}
+                              </th>
+                              <th className="text-left px-3 py-2 font-medium text-gray-600">
+                                {t('Email', 'Correo')}
+                              </th>
+                              <th className="text-left px-3 py-2 font-medium text-gray-600">
+                                {t('Role', 'Puesto')}
+                              </th>
                               <th className="w-8"></th>
                             </tr>
                           </thead>
@@ -807,6 +934,7 @@ function IntakeWizardContent() {
                                   <button
                                     onClick={() => removeStaff(idx)}
                                     className="p-1 text-gray-400 hover:text-red-500"
+                                    aria-label={t('Remove', 'Eliminar')}
                                   >
                                     <Trash2 className="w-3.5 h-3.5" />
                                   </button>
@@ -818,32 +946,34 @@ function IntakeWizardContent() {
                       </div>
                       {staffList.length > 10 && (
                         <div className="px-3 py-2 bg-gray-50 text-sm text-gray-500 text-center">
-                          + {staffList.length - 10} more staff members
+                          + {staffList.length - 10} {t('more staff members', 'm\u00e1s miembros del personal')}
                         </div>
                       )}
                     </div>
 
                     {/* Add more manually */}
                     <div className="mt-4 pt-4 border-t border-gray-100">
-                      <h4 className="text-sm font-medium text-gray-700 mb-3">Add another</h4>
+                      <h4 className="text-sm font-medium text-gray-700 mb-3">
+                        {t('Add another', 'Agregar otro')}
+                      </h4>
                       <div className="flex gap-2">
                         <input
                           type="text"
-                          placeholder="First Name"
+                          placeholder={t('First Name', 'Nombre')}
                           value={manualStaff.first_name}
                           onChange={(e) => handleManualStaffChange('first_name', e.target.value)}
                           className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#80a4ed] focus:border-transparent outline-none"
                         />
                         <input
                           type="text"
-                          placeholder="Last Name"
+                          placeholder={t('Last Name', 'Apellido')}
                           value={manualStaff.last_name}
                           onChange={(e) => handleManualStaffChange('last_name', e.target.value)}
                           className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#80a4ed] focus:border-transparent outline-none"
                         />
                         <input
                           type="email"
-                          placeholder="Email"
+                          placeholder={t('Email', 'Correo')}
                           value={manualStaff.email}
                           onChange={(e) => handleManualStaffChange('email', e.target.value)}
                           className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#80a4ed] focus:border-transparent outline-none"
@@ -870,7 +1000,7 @@ function IntakeWizardContent() {
                   className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-[#1e2749] transition-colors"
                 >
                   <ChevronLeft className="w-5 h-5" />
-                  Back
+                  {t('Back', 'Atr\u00e1s')}
                 </button>
               ) : (
                 <div />
@@ -888,16 +1018,16 @@ function IntakeWizardContent() {
                 {isSaving ? (
                   <>
                     <Loader2 className="w-5 h-5 animate-spin" />
-                    Saving...
+                    {t('Saving...', 'Guardando...')}
                   </>
                 ) : currentStep === 2 ? (
                   <>
-                    Complete Setup
+                    {t('Complete Setup', 'Completar configuraci\u00f3n')}
                     <Check className="w-5 h-5" />
                   </>
                 ) : (
                   <>
-                    Continue
+                    {t('Continue', 'Siguiente')}
                     <ChevronRight className="w-5 h-5" />
                   </>
                 )}
@@ -924,7 +1054,9 @@ function LoadingFallback() {
 export default function IntakeWizardPage() {
   return (
     <Suspense fallback={<LoadingFallback />}>
-      <IntakeWizardContent />
+      <SetupLanguageProvider>
+        <IntakeWizardContent />
+      </SetupLanguageProvider>
     </Suspense>
   );
 }

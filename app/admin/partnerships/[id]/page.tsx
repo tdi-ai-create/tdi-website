@@ -266,6 +266,10 @@ export default function PartnershipDetailPage() {
   const [showActionItemModal, setShowActionItemModal] = useState(false);
   const [showReminderModal, setShowReminderModal] = useState(false);
 
+  // Send Login Link state
+  const [isSendingLoginLink, setIsSendingLoginLink] = useState(false);
+  const [loginLinkSent, setLoginLinkSent] = useState(false);
+
   // Modal form state
   const [metricsForm, setMetricsForm] = useState({
     metric_name: 'hub_login_pct',
@@ -407,6 +411,38 @@ export default function PartnershipDetailPage() {
 
     fetchEnrichment();
   }, [partnership?.sales_deal_id, userEmail]);
+
+  // Send Login Link
+  const handleSendLoginLink = async () => {
+    if (!partnership || !userEmail) return;
+    setIsSendingLoginLink(true);
+    try {
+      const resp = await fetch('/api/admin/partnerships/send-login-link', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-user-email': userEmail,
+        },
+        body: JSON.stringify({
+          email: partnership.contact_email,
+          partnershipId: partnership.id,
+          contactName: partnership.contact_name,
+          schoolName: organization?.name || partnership.contact_name,
+        }),
+      });
+      const data = await resp.json();
+      if (data.success) {
+        setLoginLinkSent(true);
+        setTimeout(() => setLoginLinkSent(false), 5000);
+      } else {
+        alert(data.error || 'Failed to send login link');
+      }
+    } catch {
+      alert('Failed to send login link. Please try again.');
+    } finally {
+      setIsSendingLoginLink(false);
+    }
+  };
 
   // Download staff roster as CSV
   const downloadStaffCSV = () => {
@@ -815,7 +851,7 @@ export default function PartnershipDetailPage() {
         </div>
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-2 md:grid-cols-6 gap-3 mb-6">
+        <div className="grid grid-cols-2 md:grid-cols-7 gap-3 mb-6">
           <Link
             href={`/admin/partnerships/${partnershipId}/surveys`}
             className="flex items-center gap-3 bg-white rounded-xl border border-gray-200 p-4 hover:border-[#80a4ed] transition-colors"
@@ -911,6 +947,38 @@ export default function PartnershipDetailPage() {
             <div className="text-left">
               <p className="font-medium text-[#1e2749]">Send Reminder</p>
               <p className="text-xs text-gray-500">Email partner</p>
+            </div>
+          </button>
+
+          <button
+            onClick={handleSendLoginLink}
+            disabled={isSendingLoginLink}
+            className={`flex items-center gap-3 bg-white rounded-xl border p-4 transition-colors disabled:opacity-50 ${
+              loginLinkSent
+                ? 'border-green-400 bg-green-50'
+                : 'border-gray-200 hover:border-[#E8B84B]'
+            }`}
+          >
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+              loginLinkSent ? 'bg-green-100' : 'bg-amber-100'
+            }`}>
+              {isSendingLoginLink ? (
+                <Loader2 className="w-5 h-5 text-amber-600 animate-spin" />
+              ) : loginLinkSent ? (
+                <Check className="w-5 h-5 text-green-600" />
+              ) : (
+                <Mail className="w-5 h-5 text-amber-600" />
+              )}
+            </div>
+            <div className="text-left">
+              <p className="font-medium text-[#1e2749]">
+                {loginLinkSent ? 'Link Sent!' : 'Send Login Link'}
+              </p>
+              <p className="text-xs text-gray-500">
+                {loginLinkSent
+                  ? `Sent to ${partnership?.contact_email}`
+                  : 'Magic link to dashboard'}
+              </p>
             </div>
           </button>
         </div>

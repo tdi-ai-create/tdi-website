@@ -112,6 +112,8 @@ export default function AdminPartnershipsPage() {
   const [isAdding, setIsAdding] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [accessDenied, setAccessDenied] = useState(false);
+  const [sendingLoginLinkId, setSendingLoginLinkId] = useState<string | null>(null);
+  const [sentLoginLinkId, setSentLoginLinkId] = useState<string | null>(null);
 
   // Filter state
   const [filterType, setFilterType] = useState<string>('all');
@@ -270,6 +272,37 @@ export default function AdminPartnershipsPage() {
       console.error('Error creating partnership:', error);
     } finally {
       setIsAdding(false);
+    }
+  };
+
+  const handleSendLoginLink = async (partnership: Partnership) => {
+    if (!userEmail) return;
+    setSendingLoginLinkId(partnership.id);
+    try {
+      const resp = await fetch('/api/admin/partnerships/send-login-link', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-user-email': userEmail,
+        },
+        body: JSON.stringify({
+          email: partnership.contact_email,
+          partnershipId: partnership.id,
+          contactName: partnership.contact_name,
+          schoolName: partnership.org_name || partnership.contact_name,
+        }),
+      });
+      const data = await resp.json();
+      if (data.success) {
+        setSentLoginLinkId(partnership.id);
+        setTimeout(() => setSentLoginLinkId(null), 4000);
+      } else {
+        alert(data.error || 'Failed to send login link');
+      }
+    } catch {
+      alert('Failed to send login link. Please try again.');
+    } finally {
+      setSendingLoginLinkId(null);
     }
   };
 
@@ -792,6 +825,36 @@ export default function AdminPartnershipsPage() {
                               Dashboard
                             </Link>
                           )}
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleSendLoginLink(partnership);
+                            }}
+                            disabled={sendingLoginLinkId === partnership.id}
+                            className={`inline-flex items-center gap-1 text-xs px-2 py-1 rounded transition-colors disabled:opacity-50 ${
+                              sentLoginLinkId === partnership.id
+                                ? 'bg-green-100 text-green-700'
+                                : 'bg-amber-50 text-amber-700 hover:bg-amber-100'
+                            }`}
+                            title="Send login link"
+                          >
+                            {sendingLoginLinkId === partnership.id ? (
+                              <>
+                                <Loader2 className="w-3 h-3 animate-spin" />
+                                Sending...
+                              </>
+                            ) : sentLoginLinkId === partnership.id ? (
+                              <>
+                                <Check className="w-3 h-3" />
+                                Sent!
+                              </>
+                            ) : (
+                              <>
+                                <Mail className="w-3 h-3" />
+                                Login Link
+                              </>
+                            )}
+                          </button>
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
