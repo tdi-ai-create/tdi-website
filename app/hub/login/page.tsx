@@ -21,7 +21,7 @@ export default function HubLoginPage() {
   const hasRedirectedRef = useRef(false);
   const { tUI } = useTranslation();
 
-  useEffect(() => { const t = setTimeout(() => setTimerDone(true), 4500); return () => clearTimeout(t); }, []);
+  useEffect(() => { const t = setTimeout(() => setTimerDone(true), 3000); return () => clearTimeout(t); }, []);
   useEffect(() => {
     async function checkAuth() {
       const user = await getCurrentUser();

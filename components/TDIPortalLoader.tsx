@@ -98,7 +98,7 @@ function generateEntryPath(
 }
 
 // MINIMUM time the loader must be visible (animation + fade + buffer)
-const MINIMUM_MS = 4500;
+const MINIMUM_MS = 3000;
 
 export default function TDIPortalLoader({ portal, onComplete }: TDIPortalLoaderProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
