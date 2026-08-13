@@ -10,6 +10,28 @@
 /** Julie gets two attempts to get a narrative through before a person steps in. */
 export const MAX_QA_ATTEMPTS = 2
 
+/**
+ * Whether automated QA is actually running.
+ *
+ * This exists because ownership of a narrative in qa_review depends on it. If
+ * we call it agent work while no agent is configured, the narrative goes quiet
+ * and nobody is told — which is exactly the failure this pipeline was rebuilt
+ * to remove. Default off: a person owns QA until Julie is demonstrably live.
+ *
+ * Set FUNDING_QA_AGENT_ENABLED=true once her Paperclip config is in place.
+ */
+export function isQaAgentEnabled(): boolean {
+  return process.env.FUNDING_QA_AGENT_ENABLED === 'true'
+}
+
+/**
+ * How long a narrative may sit awaiting a verdict before a person is told,
+ * even when automated QA is switched on. Julie normally answers in minutes, so
+ * anything past this means she is not picking it up and silence would otherwise
+ * look like progress.
+ */
+export const QA_SILENCE_HOURS = 24
+
 export type EscalationOptionKey =
   | 'approve_anyway'
   | 'redraft_with_guidance'

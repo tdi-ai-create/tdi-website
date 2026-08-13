@@ -33,7 +33,13 @@ export function computeNextActions(
   actions: any[],
   gate: any,
   allocations: any[],
+  opts: { qaAgentEnabled?: boolean; qaSilenceHours?: number } = {},
 ): NextAction[] {
+  // Passed in rather than read from env here, so this stays a pure function and
+  // is safe to import from client components.
+  const qaAgentEnabled = opts.qaAgentEnabled ?? false
+  const qaSilenceHours = opts.qaSilenceHours ?? 24
+
   const result: NextAction[] = []
   const today = new Date()
   today.setHours(0, 0, 0, 0)
@@ -241,26 +247,51 @@ export function computeNextActions(
     }
   }
 
-  // Narrative awaiting a QA verdict. Julie files this through the sync API, so
-  // it is genuinely agent work — a person can still do it by hand on the pursuit
-  // page if she is behind. Muted, because nobody is blocked.
+  // Narrative awaiting a QA verdict.
+  //
+  // Who owns this depends on whether automated QA is actually running. Calling
+  // it agent work while no agent is configured is how five finished narratives
+  // sat silent for over a week. Two conditions hand it back to a person:
+  // automated QA being off, or it having gone quiet past QA_SILENCE_HOURS.
   for (const opp of opportunities) {
     if (opp.narrative_status !== 'qa_review' || opp.qa_passed === true) continue
     if (['awarded', 'denied', 'closed'].includes(opp.status)) continue
 
     const attempt = (opp.qa_attempt_count ?? 0) + 1
+    const since = opp.narrative_status_changed_at || opp.updated_at
+    const hoursWaiting = since
+      ? Math.floor((Date.now() - new Date(since).getTime()) / 3600000)
+      : Infinity
+    const goneQuiet = hoursWaiting >= qaSilenceHours
+
+    if (qaAgentEnabled && !goneQuiet) {
+      result.push({
+        id: `qa-wait-${opp.id}`,
+        label: `"${opp.name}" — in QA review`,
+        why: attempt > 1
+          ? `Attempt ${attempt}. One more failure and this comes to you with options.`
+          : 'Waiting on a QA pass or fail.',
+        owner: 'agent',
+        urgency: 'low',
+        actionType: 'waiting',
+        targetId: opp.id,
+        tab: 'opportunities',
+        inProgress: true,
+      })
+      continue
+    }
+
     result.push({
-      id: `qa-wait-${opp.id}`,
-      label: `"${opp.name}" — in QA review`,
-      why: attempt > 1
-        ? `Attempt ${attempt}. One more failure and this comes to you with options.`
-        : 'Waiting on a QA pass or fail.',
-      owner: 'agent',
-      urgency: 'low',
-      actionType: 'waiting',
+      id: `qa-verdict-${opp.id}`,
+      label: `Review "${opp.name}" and pass or fail it`,
+      why: qaAgentEnabled
+        ? `No QA verdict in ${hoursWaiting === Infinity ? 'a long time' : `${hoursWaiting} hours`}. Open the pursuit, read it inline, then pass or fail with notes.`
+        : 'Automated QA is not switched on yet, so this one is yours. Open the pursuit, read it inline, name the reviewer, then pass or fail with notes.',
+      owner: 'bella',
+      urgency: 'high',
+      actionType: 'qa_verdict',
       targetId: opp.id,
       tab: 'opportunities',
-      inProgress: true,
     })
   }
 

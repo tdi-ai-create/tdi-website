@@ -22,8 +22,8 @@ const cases: Case[] = [
   { label: 'requested, window unknown', opp: { ...base, narrative_status: 'requested', window_status: 'unknown' }, gate: openGate, expectOwner: ['bella', 'agent'] },
   { label: 'drafting', opp: { ...base, narrative_status: 'drafting' }, gate: openGate, expectOwner: ['agent'] },
   { label: 'review', opp: { ...base, narrative_status: 'review' }, gate: openGate, expectOwner: ['bella'] },
-  { label: 'qa_review, no verdict', opp: { ...base, narrative_status: 'qa_review', qa_passed: null }, gate: openGate, expectOwner: ['agent'] },
-  { label: 'qa_review, attempt 2', opp: { ...base, narrative_status: 'qa_review', qa_passed: null, qa_attempt_count: 1 }, gate: openGate, expectOwner: ['agent'] },
+  { label: 'qa_review, no verdict', opp: { ...base, narrative_status: 'qa_review', qa_passed: null, narrative_status_changed_at: new Date().toISOString() }, gate: openGate, expectOwner: ['agent'] },
+  { label: 'qa_review, attempt 2', opp: { ...base, narrative_status: 'qa_review', qa_passed: null, qa_attempt_count: 1, narrative_status_changed_at: new Date().toISOString() }, gate: openGate, expectOwner: ['agent'] },
   { label: 'approval (QA passed)', opp: { ...base, narrative_status: 'approval', qa_passed: true, qa_reviewer: 'julie' }, gate: openGate, expectOwner: ['bella'] },
   { label: 'legacy qa_review + passed', opp: { ...base, narrative_status: 'qa_review', qa_passed: true }, gate: openGate, expectOwner: ['bella'] },
   { label: 'escalated, needs decision', opp: { ...base, narrative_status: 'escalated', qa_escalation: { summary: 's', root_cause: 'r', recommended_option: 'reassign' } }, gate: openGate, expectOwner: ['bella'] },
@@ -35,7 +35,7 @@ const cases: Case[] = [
 let failures = 0
 
 for (const c of cases) {
-  const actions = computeNextActions(pursuit, [c.opp], [], c.gate, [])
+  const actions = computeNextActions(pursuit, [c.opp], [], c.gate, [], { qaAgentEnabled: true })
   // Ignore pursuit-level noise; we only care about items about this opportunity
   const relevant = actions.filter(a => a.targetId === c.opp.id || a.id.includes(c.opp.id))
   const owners = [...new Set(relevant.map(a => a.owner))]
@@ -54,5 +54,36 @@ for (const c of cases) {
   console.log(`${ok ? 'PASS' : 'FAIL'}  ${c.label}  →  owners=[${owners.join(',')}] expected=[${c.expectOwner.join(',')}]  "${relevant[0]?.label ?? 'NO ITEM'}"`)
 }
 
-console.log(`\n${failures === 0 ? 'All states owned and actionable.' : `${failures} state(s) produce no owner — traps.`}`)
+// ── QA ownership must follow whether automated QA is actually running ──
+//
+// This is the regression that put five finished narratives back into silence:
+// qa_review was called agent work while no QA agent was configured, so nothing
+// surfaced to a person and nothing picked it up.
+
+console.log('\n── QA ownership ──')
+
+const qaOpp = { ...base, narrative_status: 'qa_review', qa_passed: null, qa_attempt_count: 0,
+  narrative_status_changed_at: new Date().toISOString() }
+
+const agentOff = computeNextActions(pursuit, [qaOpp], [], openGate, [], { qaAgentEnabled: false })
+  .filter(a => a.owner === 'bella' && !a.inProgress)
+const offOk = agentOff.length > 0
+if (!offOk) failures++
+console.log(`${offOk ? 'PASS' : 'FAIL'}  QA agent OFF → a person owns it  (${agentOff.length} actionable)`)
+
+const agentOn = computeNextActions(pursuit, [qaOpp], [], openGate, [], { qaAgentEnabled: true })
+  .filter(a => a.owner === 'agent')
+const onOk = agentOn.length > 0
+if (!onOk) failures++
+console.log(`${onOk ? 'PASS' : 'FAIL'}  QA agent ON, fresh → agent owns it  (${agentOn.length} muted)`)
+
+// Even with the agent on, silence past the threshold must reach a person
+const staleOpp = { ...qaOpp, narrative_status_changed_at: new Date(Date.now() - 48 * 3600000).toISOString() }
+const stale = computeNextActions(pursuit, [staleOpp], [], openGate, [], { qaAgentEnabled: true, qaSilenceHours: 24 })
+  .filter(a => a.owner === 'bella' && !a.inProgress)
+const staleOk = stale.length > 0
+if (!staleOk) failures++
+console.log(`${staleOk ? 'PASS' : 'FAIL'}  QA agent ON but silent 48h → a person owns it  (${stale.length} actionable)`)
+
+console.log(`\n${failures === 0 ? 'All states owned and actionable.' : `${failures} check(s) failed — work can go silent.`}`)
 process.exit(failures === 0 ? 0 : 1)
