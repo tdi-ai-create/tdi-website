@@ -158,7 +158,8 @@ export async function POST(
           { method: 'POST', headers: { Authorization: `Bearer ${cfToken}` } }
         )
         const genData = await genRes.json()
-        const alreadyExists = genData.errors?.[0]?.message?.includes('already exists')
+        const allMessages = [...(genData.errors || []), ...(genData.messages || [])].map((m: { message?: string }) => m.message || '').join(' ').toLowerCase()
+        const alreadyExists = allMessages.includes('already exists') || allMessages.includes('existing caption')
 
         if (!genRes.ok && !alreadyExists) {
           results.push({
