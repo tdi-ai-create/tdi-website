@@ -1783,9 +1783,9 @@ export default function CreatorStudioPage() {
   const [recruitmentActionLoading, setRecruitmentActionLoading] = useState<string | null>(null);
   const [recruitmentEditingOutreach, setRecruitmentEditingOutreach] = useState<string | null>(null);
   const [recruitmentEditedDraft, setRecruitmentEditedDraft] = useState('');
-  const [recruitmentResponseForm, setRecruitmentResponseForm] = useState<{ candidateId: string; notes: string; stage: string } | null>(null);
+  const [recruitmentResponseForm, setRecruitmentResponseForm] = useState<{ candidateId: string; notes: string; stage: string; email: string } | null>(null);
   const [recruitmentNoteForm, setRecruitmentNoteForm] = useState<{ candidateId: string; content: string } | null>(null);
-  const [recruitmentConvertForm, setRecruitmentConvertForm] = useState<{ candidateId: string; contentPath: string; topic: string } | null>(null);
+  const [recruitmentConvertForm, setRecruitmentConvertForm] = useState<{ candidateId: string; contentPath: string; topic: string; email: string } | null>(null);
   const [recruitmentExpandedFit, setRecruitmentExpandedFit] = useState<Set<string>>(new Set());
   const [recruitmentExpandedDraft, setRecruitmentExpandedDraft] = useState<Set<string>>(new Set());
   const [recruitmentQuickNotes, setRecruitmentQuickNotes] = useState<Record<string, string>>({});
@@ -6662,6 +6662,13 @@ export default function CreatorStudioPage() {
                                   placeholder="Response notes..."
                                   className="w-full border border-gray-300 rounded-lg p-2 text-sm min-h-[60px] mb-2"
                                 />
+                                <input
+                                  type="email"
+                                  value={recruitmentResponseForm!.email}
+                                  onChange={e => setRecruitmentResponseForm(prev => prev ? { ...prev, email: e.target.value } : null)}
+                                  placeholder="Their email address, if they shared one"
+                                  className="w-full border border-gray-300 rounded-lg p-2 text-sm mb-2"
+                                />
                                 <div className="flex items-center gap-2">
                                   <select
                                     value={recruitmentResponseForm!.stage}
@@ -6674,7 +6681,7 @@ export default function CreatorStudioPage() {
                                     <option value="declined">Declined</option>
                                   </select>
                                   <button
-                                    onClick={() => { handleRecruitmentAction('log_response', { candidate_id: candidate.id, response_notes: recruitmentResponseForm!.notes, new_stage: recruitmentResponseForm!.stage }); }}
+                                    onClick={() => { handleRecruitmentAction('log_response', { candidate_id: candidate.id, response_notes: recruitmentResponseForm!.notes, new_stage: recruitmentResponseForm!.stage, email: recruitmentResponseForm!.email.trim() || undefined }); }}
                                     disabled={isActionLoading}
                                     className="px-3 py-1.5 text-xs font-medium text-white rounded-lg disabled:opacity-50"
                                     style={{ backgroundColor: theme.accent }}
@@ -6733,10 +6740,33 @@ export default function CreatorStudioPage() {
                                     />
                                   </div>
                                 </div>
+                                <div className="mb-2">
+                                  <label className="text-xs text-gray-500">
+                                    Email <span className="text-red-600">required</span>
+                                  </label>
+                                  <input
+                                    type="email"
+                                    value={recruitmentConvertForm!.email}
+                                    onChange={e => setRecruitmentConvertForm(prev => prev ? { ...prev, email: e.target.value } : null)}
+                                    placeholder="The address they replied from"
+                                    className="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-xs mt-0.5"
+                                  />
+                                  {!recruitmentConvertForm!.email.trim() && (
+                                    <p className="text-xs text-gray-500 mt-1">
+                                      A creator account needs an email. Onboarding messages are sent to it.
+                                    </p>
+                                  )}
+                                </div>
                                 <div className="flex gap-2">
                                   <button
-                                    onClick={() => { handleRecruitmentAction('convert_to_creator', { candidate_id: candidate.id, content_path: recruitmentConvertForm!.contentPath, topic: recruitmentConvertForm!.topic }); }}
-                                    disabled={isActionLoading}
+                                    onClick={() => {
+                                      if (!recruitmentConvertForm!.email.trim()) {
+                                        showToast('Add their email address before converting.', 'error');
+                                        return;
+                                      }
+                                      handleRecruitmentAction('convert_to_creator', { candidate_id: candidate.id, content_path: recruitmentConvertForm!.contentPath, topic: recruitmentConvertForm!.topic, email: recruitmentConvertForm!.email.trim() });
+                                    }}
+                                    disabled={isActionLoading || !recruitmentConvertForm!.email.trim()}
                                     className="px-3 py-1.5 text-xs font-medium text-white rounded-lg disabled:opacity-50 bg-green-600 hover:bg-green-700"
                                   >{isActionLoading ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Convert to Creator'}</button>
                                   <button onClick={() => setRecruitmentConvertForm(null)} className="px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-200 rounded-lg hover:bg-gray-300">Cancel</button>
@@ -6819,7 +6849,7 @@ export default function CreatorStudioPage() {
                                 {candidate.stage === 'outreach_sent' && (
                                   <>
                                     <button
-                                      onClick={() => setRecruitmentResponseForm({ candidateId: candidate.id, notes: '', stage: 'interested' })}
+                                      onClick={() => setRecruitmentResponseForm({ candidateId: candidate.id, notes: '', stage: 'interested', email: candidate.email || '' })}
                                       className="px-3 py-1.5 text-xs font-medium text-white rounded-lg"
                                       style={{ backgroundColor: theme.accent }}
                                     >Log Response</button>
@@ -6893,7 +6923,7 @@ export default function CreatorStudioPage() {
                                 {candidate.stage === 'committed' && (
                                   <>
                                     <button
-                                      onClick={() => setRecruitmentConvertForm({ candidateId: candidate.id, contentPath: candidate.content_path || 'course', topic: candidate.expertise_area || '' })}
+                                      onClick={() => setRecruitmentConvertForm({ candidateId: candidate.id, contentPath: candidate.content_path || 'course', topic: candidate.expertise_area || '', email: candidate.email || '' })}
                                       className="px-3 py-1.5 text-xs font-medium text-white rounded-lg bg-green-600 hover:bg-green-700"
                                     >Convert to Creator</button>
                                     <button
