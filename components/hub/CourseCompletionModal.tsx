@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { Award, Download, Share2, X } from 'lucide-react';
+import { Award, BookOpen, Download, Share2, X } from 'lucide-react';
 import ShareMenu from './ShareMenu';
 import { useTranslation } from '@/lib/hub/useTranslation';
 import { usePopupQueue } from '@/lib/hub/PopupQueueContext';
@@ -18,6 +18,12 @@ interface CourseCompletionModalProps {
   pdHours: number;
   verificationCode: string;
   courseSlug: string;
+  /**
+   * The implementation plan they wrote in the final check-in. Shown back to
+   * them here because this screen is read for about four seconds, and the plan
+   * is the only part that asks something of them tomorrow.
+   */
+  plan?: string | null;
 }
 
 export default function CourseCompletionModal({
@@ -27,6 +33,7 @@ export default function CourseCompletionModal({
   pdHours,
   verificationCode,
   courseSlug,
+  plan,
 }: CourseCompletionModalProps) {
   const hasConfetti = useRef(false);
   const [showShareMenu, setShowShareMenu] = useState(false);
@@ -228,11 +235,55 @@ export default function CourseCompletionModal({
             </p>
           </div>
 
+          {/* The plan they just committed to, in their own words */}
+          {plan && plan.trim().length > 0 && (
+            <div
+              className="mb-5"
+              style={{
+                background: '#FEF9EE',
+                border: '1px solid #FDE68A',
+                borderLeft: '4px solid #E8B84B',
+                borderRadius: '0 12px 12px 0',
+                padding: '18px 20px',
+                // The surrounding modal is centered; prose is not readable that way.
+                textAlign: 'left',
+              }}
+            >
+              <div
+                style={{
+                  fontSize: '10.5px',
+                  fontWeight: 700,
+                  letterSpacing: '0.13em',
+                  textTransform: 'uppercase',
+                  color: '#92400E',
+                  marginBottom: '9px',
+                  fontFamily: "'DM Sans', sans-serif",
+                }}
+              >
+                {tUI('The plan you committed to')}
+              </div>
+              <blockquote
+                style={{
+                  margin: 0,
+                  fontFamily: "'Source Serif 4', Georgia, serif",
+                  fontSize: '15px',
+                  lineHeight: 1.62,
+                  color: '#3A2E14',
+                  fontStyle: 'italic',
+                  whiteSpace: 'pre-wrap',
+                }}
+              >
+                {plan.trim()}
+              </blockquote>
+            </div>
+          )}
+
           {/* Action buttons */}
           <div className="space-y-3">
-            {/* Download Certificate */}
+            {/* Download Certificate. The code is a path segment, not a query
+                param: /api/hub/certificate?code=X matches no route and 404s. */}
             <Link
-              href={`/api/hub/certificate?code=${verificationCode}`}
+              href={`/api/hub/certificate/${verificationCode}`}
               target="_blank"
               className="flex items-center justify-center gap-2 w-full py-3 rounded-lg font-medium transition-colors"
               style={{
@@ -254,6 +305,21 @@ export default function CourseCompletionModal({
               pdHours={pdHours}
               buttonVariant="secondary"
             />
+
+            {/* Their own words, on a page they can come back to */}
+            <Link
+              href="/hub/certificates#your-notes"
+              className="flex items-center justify-center gap-2 w-full py-3 rounded-lg font-medium transition-colors"
+              style={{
+                backgroundColor: '#FFFFFF',
+                color: '#4B5563',
+                border: '1.5px solid #E5E7EB',
+                fontFamily: "'DM Sans', sans-serif",
+              }}
+            >
+              <BookOpen size={18} />
+              {tUI('See all my notes')}
+            </Link>
 
             {/* Back to Dashboard */}
             <Link
