@@ -117,3 +117,19 @@ export async function recruitmentRevisitDue(candidateName: string, reason: strin
     `*Revisit Candidate Due* -- ${candidateName}\nReason: ${reason}\nCandidate is due for re-engagement.`
   )
 }
+
+// -- Scheduled check-in notes --
+
+/** A scheduled note came due but the creator should no longer be contacted. */
+export async function scheduledNoteHeld(creatorName: string, reason: string) {
+  await postToSlack(
+    `*Scheduled Check-in Held* | ${creatorName}\nReason: ${reason}\nThe note was not sent and is back in the review queue.`
+  )
+}
+
+/** The note published but the creator was never told. Needs a human. */
+export async function scheduledNoteEmailFailed(creatorName: string, reason: string) {
+  await postToSlack(
+    `*Scheduled Check-in Email Failed* | ${creatorName}\nThe note is live in their portal but the email did not send: ${reason}\nReach out to them directly.`
+  )
+}

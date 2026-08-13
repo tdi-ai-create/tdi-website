@@ -73,6 +73,10 @@
       "schedule": "0 8 * * 1"
     },
     {
+      "path": "/api/cron/creator-scheduled-notes",
+      "schedule": "0 * * * *"
+    },
+    {
       "path": "/api/cron/creator-first-week",
       "schedule": "30 9 * * *"
     },

@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
 import { feedbackDraftReady, feedbackApproved, noteDraftReady } from '@/lib/creator-slack'
+import { notifyCreatorOfNote } from '@/lib/creator-note-notify'
 
 /**
  * Creator Studio Sync API -- Bridge between Paperclip agents and the Creator Portal
@@ -444,57 +445,20 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: error?.message || 'Draft not found or already approved' }, { status: 404 })
     }
 
-    // Get creator info for email notification
-    const { data: creator } = await supabase
-      .from('creators')
-      .select('name, email')
-      .eq('id', note.creator_id)
-      .single()
+    // Email the creator and refresh their activity stamp so an in-flight
+    // re-engagement sequence does not nudge someone we just replied to.
+    const notified = await notifyCreatorOfNote(supabase, note.creator_id, {
+      source: 'creator-studio-sync',
+      actor: approved_by,
+    })
 
-    // Send email notification to creator (same as add-note flow)
-    if (creator?.email) {
-      const resendApiKey = process.env.RESEND_API_KEY
-      if (resendApiKey) {
-        const firstName = creator.name.split(' ')[0]
-        try {
-          await fetch('https://api.resend.com/emails', {
-            method: 'POST',
-            headers: { Authorization: `Bearer ${resendApiKey}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              from: 'TDI Creator Studio <notifications@teachersdeserveit.com>',
-              to: [creator.email],
-              subject: 'Creator Studio | New note from your team!',
-              html: `
-                <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
-                  <h2 style="color: #1e2749;">Hi ${firstName}!</h2>
-                  <p style="font-size: 16px; color: #333; line-height: 1.6;">
-                    The TDI team has added a new note to your Creator Studio profile.
-                    Log in to review it and keep moving forward on your journey!
-                  </p>
-                  <div style="text-align: center; margin: 32px 0;">
-                    <a href="https://www.teachersdeserveit.com/creator-portal/dashboard"
-                       style="display: inline-block; background: #1e2749; color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: 600;">
-                      View My Creator Studio
-                    </a>
-                  </div>
-                  <p style="color: #666; font-size: 14px;">-- The TDI Team</p>
-                </div>
-              `,
-            }),
-          })
-        } catch (emailErr) {
-          console.error('[creator-studio-sync] Email error:', emailErr)
-        }
-      }
-    }
-
-    // Bump updated_at to cancel any active re-engagement sequence
-    await supabase
-      .from('creators')
-      .update({ updated_at: new Date().toISOString() })
-      .eq('id', note.creator_id)
-
-    return NextResponse.json({ success: true, note_id: note.id, approved_by })
+    return NextResponse.json({
+      success: true,
+      note_id: note.id,
+      approved_by,
+      emailed: notified.sent,
+      email_error: notified.reason ?? null,
+    })
   }
 
   // ─── reject_draft: Bella rejects an agent-drafted note ───
