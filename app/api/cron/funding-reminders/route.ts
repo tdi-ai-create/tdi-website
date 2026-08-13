@@ -25,16 +25,19 @@ export async function GET(request: NextRequest) {
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     )
 
-    // Fetch all active data
+    // Fetch all active data. Archived pursuits are excluded here and their
+    // opportunities and action items filtered out below — otherwise the daily
+    // digest reports on schools we are no longer working with.
     const [pursuitRes, oppRes, actionRes] = await Promise.all([
-      supabase.from('funding_pursuits').select('*'),
+      supabase.from('funding_pursuits').select('*').neq('archived', true),
       supabase.from('funding_opportunities').select('*').not('status', 'in', '("awarded","denied")'),
       supabase.from('funding_action_items').select('*').not('status', 'in', '("done","skipped")'),
     ])
 
     const pursuits = pursuitRes.data || []
-    const opportunities = oppRes.data || []
-    const actionItems = actionRes.data || []
+    const activeIds = new Set(pursuits.map(p => p.id))
+    const opportunities = (oppRes.data || []).filter(o => activeIds.has(o.pursuit_id))
+    const actionItems = (actionRes.data || []).filter(a => activeIds.has(a.pursuit_id))
 
     const alerts = calculateFundingAlerts({ pursuits, opportunities, actionItems })
 

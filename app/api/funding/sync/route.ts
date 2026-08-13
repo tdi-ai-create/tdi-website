@@ -122,6 +122,12 @@ export async function GET(request: NextRequest) {
     const narrativeWork = (rawNarrativeWork ?? []).filter((o: any) => gateOpenPursuitIds.has(o.pursuit_id))
 
     // 2. Research work — NOT window-gated, NOT gate-gated (finding new funders is always allowed)
+    //
+    // Deliberately dormant: research_status is 'none' on every row in the table
+    // and nothing sets it, so this branch has never returned work. Kept rather
+    // than deleted because funder discovery is planned — but it advertises a
+    // capability that does not exist today. Do not treat an empty
+    // research_funders_count as evidence that discovery ran.
     let researchQuery = supabase
       .from('funding_opportunities')
       .select(`
@@ -262,7 +268,6 @@ export async function POST(request: NextRequest) {
     const { opportunityId, ...updates } = body
     if (!opportunityId) return NextResponse.json({ error: 'opportunityId required' }, { status: 400 })
 
-    const allowed: Record<string, unknown> = { updated_at: new Date().toISOString() }
     const fields = [
       'name', 'amount', 'status', 'plan_category', 'waiting_on',
       'contact_name', 'contact_email', 'application_opens', 'application_closes',
@@ -271,10 +276,32 @@ export async function POST(request: NextRequest) {
       'decision_date', 'awarded_amount', 'denial_reason',
       'next_action', 'next_action_due',
     ]
-    fields.forEach(f => { if (updates[f] !== undefined) allowed[f] = updates[f] })
 
-    // Always update activity timestamp
-    allowed.last_activity_at = new Date().toISOString()
+    const { data: beforeRow } = await supabase
+      .from('funding_opportunities')
+      .select('*')
+      .eq('id', opportunityId)
+      .single()
+    const before = beforeRow as Record<string, unknown> | null
+
+    const allowed: Record<string, unknown> = { updated_at: new Date().toISOString() }
+    let changed = false
+    fields.forEach(f => {
+      if (updates[f] === undefined) return
+      allowed[f] = updates[f]
+      if (!before || before[f] !== updates[f]) changed = true
+    })
+
+    // Only a real change counts as activity. Stamping this on every write is how
+    // stalled narratives used to report zero days idle while sitting untouched
+    // for a week — the stall detector reads this field.
+    if (changed) allowed.last_activity_at = new Date().toISOString()
+
+    // State clock (migration 113): narrative_status transitions only
+    if (updates.narrative_status !== undefined &&
+        before?.narrative_status !== updates.narrative_status) {
+      allowed.narrative_status_changed_at = new Date().toISOString()
+    }
 
     const { error } = await supabase
       .from('funding_opportunities')
@@ -291,13 +318,29 @@ export async function POST(request: NextRequest) {
     const { opportunityId, narrativeStatus, narrativeUrl, narrativeContent, note } = body
     if (!opportunityId) return NextResponse.json({ error: 'opportunityId required' }, { status: 400 })
 
-    const updates: Record<string, unknown> = {
-      last_activity_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    }
+    const { data: prior } = await supabase
+      .from('funding_opportunities')
+      .select('narrative_status, narrative_url, narrative_content')
+      .eq('id', opportunityId)
+      .single()
+
+    const updates: Record<string, unknown> = { updated_at: new Date().toISOString() }
     if (narrativeStatus) updates.narrative_status = narrativeStatus
     if (narrativeUrl) updates.narrative_url = narrativeUrl
     if (narrativeContent !== undefined) updates.narrative_content = narrativeContent
+
+    const changed =
+      (narrativeStatus && narrativeStatus !== prior?.narrative_status) ||
+      (narrativeUrl && narrativeUrl !== prior?.narrative_url) ||
+      (narrativeContent !== undefined && narrativeContent !== prior?.narrative_content)
+
+    // See the note in update_opportunity: activity means a change, not a touch.
+    if (changed) updates.last_activity_at = new Date().toISOString()
+
+    // State clock (migration 113)
+    if (narrativeStatus && narrativeStatus !== prior?.narrative_status) {
+      updates.narrative_status_changed_at = new Date().toISOString()
+    }
 
     const { error } = await supabase
       .from('funding_opportunities')

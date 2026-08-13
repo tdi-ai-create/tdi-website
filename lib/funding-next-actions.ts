@@ -241,6 +241,25 @@ export function computeNextActions(
     }
   }
 
+  // Narrative awaiting a QA verdict.
+  // A person files this today. When Julie Lynn is wired to the sync API this
+  // flips to owner 'agent' — until then, calling it agent work strands it,
+  // because nothing automated can write qa_passed.
+  for (const opp of opportunities) {
+    if (opp.narrative_status === 'qa_review' && opp.qa_passed !== true) {
+      result.push({
+        id: `qa-verdict-${opp.id}`,
+        label: `File QA verdict for "${opp.name}"`,
+        why: 'Draft is written and waiting on a pass or fail. Open the pursuit, read it inline, name the reviewer, then pass or fail with notes.',
+        owner: 'bella',
+        urgency: 'high',
+        actionType: 'qa_verdict',
+        targetId: opp.id,
+        tab: 'opportunities',
+      })
+    }
+  }
+
   // Narrative QA passed → needs approval
   for (const opp of opportunities) {
     if (opp.narrative_status === 'qa_review' && opp.qa_passed === true) {
@@ -360,7 +379,24 @@ export function computeNextActions(
 
   for (const opp of opportunities) {
     if (opp.narrative_status === 'requested') {
-      result.push({
+      // Agents only see drafting work when the window is open AND the gate is open
+      // (see find_work in app/api/funding/sync/route.ts). If either is false the
+      // request is invisible to every agent, so saying "waiting for agent" is a lie.
+      const windowOpen = opp.window_status === 'open'
+      const blockers: string[] = []
+      if (!gate?.gate_open) blockers.push('the gate is not satisfied')
+      if (!windowOpen) blockers.push(`the window is ${opp.window_status || 'unverified'}`)
+
+      result.push(blockers.length > 0 ? {
+        id: `blocked-draft-${opp.id}`,
+        label: `"${opp.name}" — draft requested but blocked`,
+        why: `No agent can pick this up while ${blockers.join(' and ')}. Nothing will happen until that clears.`,
+        owner: 'bella',
+        urgency: 'high',
+        actionType: 'unblock_draft',
+        targetId: opp.id,
+        tab: 'overview',
+      } : {
         id: `drafting-wait-${opp.id}`,
         label: `"${opp.name}" — draft requested`,
         why: `Waiting for ${opp.assigned_agent || 'agent'} to start drafting`,
@@ -377,19 +413,6 @@ export function computeNextActions(
         id: `drafting-${opp.id}`,
         label: `"${opp.name}" — ${opp.assigned_agent || 'agent'} is drafting`,
         why: 'No action needed — agent is working',
-        owner: 'agent',
-        urgency: 'low',
-        actionType: 'waiting',
-        targetId: opp.id,
-        tab: 'opportunities',
-        inProgress: true,
-      })
-    }
-    if (opp.narrative_status === 'qa_review' && opp.qa_passed !== true) {
-      result.push({
-        id: `qa-wait-${opp.id}`,
-        label: `"${opp.name}" — in QA review`,
-        why: 'Waiting for QA pass/fail',
         owner: 'agent',
         urgency: 'low',
         actionType: 'waiting',
