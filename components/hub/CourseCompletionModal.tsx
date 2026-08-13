@@ -112,7 +112,7 @@ export default function CourseCompletionModal({
 
   if (!isOpen || !isActive(POPUP_ID)) return null;
 
-  const shareMessage = `I just completed "${courseTitle}" and earned ${pdHours} PD hours on the TDI Learning Hub! 🎓`;
+  const shareMessage = `I just completed "${courseTitle}" on the TDI Learning Hub.`;
   const shareUrl = `${typeof window !== 'undefined' ? window.location.origin : ''}/hub/verify/${verificationCode}`;
 
   return (
@@ -201,7 +201,7 @@ export default function CourseCompletionModal({
                 color: '#2B3A67',
               }}
             >
-              {tUI(`You earned ${pdHours} PD hour${pdHours !== 1 ? 's' : ''}!`)}
+              {tUI('Course complete')}
             </span>
           </div>
 

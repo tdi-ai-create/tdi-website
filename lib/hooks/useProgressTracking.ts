@@ -235,10 +235,13 @@ export function useProgressTracking(
       }
 
       const result = await createCertificate(userId, courseId);
-      if (result.success && result.verificationCode && result.pdHours) {
+      // Do not gate on pdHours. Every published course currently has pd_hours
+      // of 0, which is falsy, so requiring it here meant the certificate row
+      // was written but the learner was never told they had earned it.
+      if (result.success && result.verificationCode) {
         setCertificateEarned({
           verificationCode: result.verificationCode,
-          pdHours: result.pdHours,
+          pdHours: result.pdHours ?? 0,
         });
       }
     }
