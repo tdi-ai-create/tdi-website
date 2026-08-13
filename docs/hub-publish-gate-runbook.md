@@ -76,6 +76,30 @@ Publishing an unreviewed item must fail with "QA has not passed". Running
 `mark_reviewed` then `publish` must succeed. Test on a real draft, not a probe
 row, and confirm `is_published` actually became true rather than trusting a 200.
 
+## Course check-in coverage
+
+Separate from the QA gate flag, and already live as of 2026-08-13. The admin
+coverage view at `GET /api/tdi-admin/courses/all/bulk-checks` reports
+`meets_minimum` per course. A course passes only when both hold:
+
+- it has as many check-ins as it has room for, up to three, counted as **lessons
+  carrying questions** rather than question rows
+- every one of those check-ins ends in a reflection or an implementation plan
+
+Counting rows rather than lessons is what let a course with three check-ins
+report five for months. If you are changing this metric, count lessons.
+
+A course cannot have check-ins without transcripts, because each question is
+written from the transcript of the lesson it sits on. So the practical publish
+order is: upload videos, generate transcripts, generate check-ins, then publish.
+The Course Upload SOP and the Course Check-Ins SOP in the admin portal cover
+both steps.
+
+Known blockers as of 2026-08-13: `crack-the-co-teaching-code` and
+`escape-the-first-week` have no transcripts at all, so they have no check-ins
+and will not pass. `classroom-management-toolkit` passes, but its final check-in
+sits one lesson early because the Wrap Up transcript is too short to use.
+
 ## Rolling back
 
 One statement, takes effect immediately, no deploy required:

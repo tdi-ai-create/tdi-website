@@ -27,6 +27,8 @@ export interface QuizResponse {
   lesson_id: string;
   response: string;
   is_correct: boolean | null;
+  /** What the educator wrote after getting this question wrong. */
+  follow_up?: string | null;
   created_at: string;
 }
 
@@ -113,6 +115,38 @@ export async function saveQuizResponse(
   }
 
   return true;
+}
+
+/**
+ * Save the reflection an educator writes after answering a question wrong.
+ *
+ * It belongs to the answer that prompted it, so it updates that row rather
+ * than creating a second one. The previous version invented a question_id of
+ * "<uuid>_reflection", which is not a uuid, so every write failed and the
+ * player thanked the educator for words it had just thrown away.
+ */
+export async function saveFollowUpReflection(
+  userId: string,
+  questionId: string,
+  text: string
+): Promise<boolean> {
+  const supabase = getSupabase();
+
+  const { data, error } = await supabase
+    .from('hub_quiz_responses')
+    .update({ follow_up: text })
+    .eq('user_id', userId)
+    .eq('question_id', questionId)
+    .select('id');
+
+  if (error) {
+    console.error('Error saving follow-up reflection:', error);
+    return false;
+  }
+
+  // No row means the answer it belongs to was never recorded. Report that
+  // rather than letting the UI claim the reflection was kept.
+  return (data?.length ?? 0) > 0;
 }
 
 /**

@@ -31,6 +31,7 @@ export async function GET(
     'hub-content-creation': 'hub-content-creation.html',
     'grant-application-spec': 'grant-application-spec.html',
     'course-upload-sop': 'course-upload-sop.html',
+    'course-checkins-sop': 'course-checkins-sop.html',
     'swag-fulfillment': 'swag-fulfillment.html',
     'leadership-workflow': 'leadership-workflow.html',
   };

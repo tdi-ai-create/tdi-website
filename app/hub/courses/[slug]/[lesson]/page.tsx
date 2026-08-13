@@ -29,6 +29,7 @@ import {
   getCourseResponses,
   computeGatePositions,
   saveQuizResponse,
+  saveFollowUpReflection,
   checkMultipleChoiceAnswer,
   checkTrueFalseAnswer,
 } from '@/lib/hub/quiz';
@@ -287,6 +288,7 @@ function GateCard({ question, label, isFinalPart, userId, dark, onGateCleared }:
   const [committed, setCommitted] = useState(false);
   const [wrongReflection, setWrongReflection] = useState('');
   const [wrongReflectionSaved, setWrongReflectionSaved] = useState(false);
+  const [wrongReflectionError, setWrongReflectionError] = useState(false);
 
   const header = getGateHeader(question.question_type);
 
@@ -490,11 +492,24 @@ function GateCard({ question, label, isFinalPart, userId, dark, onGateCleared }:
                       lineHeight: 1.6, resize: 'none' as const,
                     }}
                   />
+                  {wrongReflectionError && (
+                    <div style={{
+                      marginTop: 10, fontSize: 13, lineHeight: 1.5,
+                      color: dark ? '#FCA5A5' : '#B91C1C', fontFamily: "'DM Sans', sans-serif",
+                    }}>
+                      That did not save. Check your connection and try again, and copy your
+                      words somewhere safe first so you do not lose them.
+                    </div>
+                  )}
                   <button
                     onClick={async () => {
                       if (wrongReflection.trim().length < 10) return;
-                      await saveQuizResponse(userId, question.id + '_reflection', question.lesson_id, wrongReflection, null);
-                      setWrongReflectionSaved(true);
+                      // Only move on if the reflection actually landed. Telling an
+                      // educator their words were kept when they were not is worse
+                      // than asking them to try again.
+                      const saved = await saveFollowUpReflection(userId, question.id, wrongReflection.trim());
+                      setWrongReflectionError(!saved);
+                      setWrongReflectionSaved(saved);
                     }}
                     disabled={wrongReflection.trim().length < 10}
                     style={{

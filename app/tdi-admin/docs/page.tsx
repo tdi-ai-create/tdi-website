@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useTDIAdmin } from '@/lib/tdi-admin/context';
 import { Search, Download, Printer, ExternalLink } from 'lucide-react';
 
-type DocId = 'admin-guide' | 'data-flow' | 'workflow' | 'service-invoicing' | 'funding' | 'funding-launch' | 'grant-application-spec' | 'hub-engagement' | 'engagement-workflow' | 'hub-content-standards' | 'hub-content-creation' | 'course-upload-sop' | 'creator-feedback-sop' | 'creator-recruitment-sop' | 'creator-dormancy-sop' | 'communication-map' | 'swag-fulfillment' | 'leadership-workflow';
+type DocId = 'admin-guide' | 'data-flow' | 'workflow' | 'service-invoicing' | 'funding' | 'funding-launch' | 'grant-application-spec' | 'hub-engagement' | 'engagement-workflow' | 'hub-content-standards' | 'hub-content-creation' | 'course-upload-sop' | 'course-checkins-sop' | 'creator-feedback-sop' | 'creator-recruitment-sop' | 'creator-dormancy-sop' | 'communication-map' | 'swag-fulfillment' | 'leadership-workflow';
 
 interface Doc {
   id: DocId;
@@ -150,10 +150,20 @@ const DOC_GROUPS: DocGroup[] = [
       {
         id: 'course-upload-sop',
         label: 'Course Upload SOP',
-        desc: 'How to upload videos and PDFs to courses (tus protocol, troubleshooting)',
-        tags: ['upload', 'video', 'pdf', 'course', 'cloudflare', 'stream', 'tus', 'bulk upload', 'document', 'troubleshooting'],
+        desc: 'How to upload videos and PDFs to courses, and generate the transcripts check-ins depend on',
+        tags: ['upload', 'video', 'pdf', 'course', 'cloudflare', 'stream', 'tus', 'bulk upload', 'document', 'transcript', 'captions', 'troubleshooting'],
         relatedSections: [
           { label: 'Hub Production', href: '/tdi-admin/hub/production' },
+        ],
+      },
+      {
+        id: 'course-checkins-sop',
+        label: 'Course Check-Ins SOP',
+        desc: 'What a check-in is, how many a course gets, and how to generate them',
+        tags: ['check-in', 'checkin', 'quiz', 'reflection', 'action step', 'implementation plan', 'course', 'transcript', 'generate checks', 'privacy'],
+        relatedSections: [
+          { label: 'Hub Production', href: '/tdi-admin/hub/production' },
+          { label: 'Learning Hub', href: '/hub' },
         ],
       },
       {

@@ -1,4 +1,22 @@
 -- ============================================================
+-- NOT APPLIED. This is a design, not the shape of the database.
+--
+-- Verified against the live Learning Hub project on 2026-08-13: none of these
+-- tables exist, and no application code reads or writes them. Game play is not
+-- recorded anywhere. The only game data we keep is hub_game_badges, which
+-- stores what a learner earned but not what they did to earn it.
+--
+-- Nothing is silently failing, because nothing calls it. But the file sitting
+-- in this folder reads as applied, so treat this header as the correction until
+-- someone decides one of:
+--
+--   a) build game play tracking, apply this, and wire the games to write to it
+--   b) delete this file, and accept badges as the whole record
+--
+-- Until then, do not assume a hub_game_sessions table exists.
+-- ============================================================
+
+-- ============================================================
 -- Hub Game Progress & Spaced Repetition Tables
 -- Tracks per-session game data, per-round responses,
 -- and supports spaced repetition for missed items.
