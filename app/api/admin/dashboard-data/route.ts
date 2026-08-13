@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { getCreatorActivity } from '@/lib/creator-activity';
+import { STEP_INTERVAL_DAYS, FINAL_STEP } from '@/lib/reengagement-config';
 
 export async function GET(request: NextRequest) {
   try {
@@ -52,6 +54,23 @@ export async function GET(request: NextRequest) {
     const now = new Date();
     const fourteenDaysAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
 
+    // Activity from the shared helper, so this page and the re-engagement cron
+    // answer "when did this creator last do something" the same way. The two
+    // used to disagree: this route read milestone completions, the cron read
+    // creators.updated_at.
+    const activity = await getCreatorActivity(supabase, now);
+
+    // Open re-engagement sequences, so Bella can see and filter the pipeline
+    // from the roster rather than opening creators one at a time.
+    const { data: sequences } = await supabase
+      .from('creator_reengagement_sequences')
+      .select('creator_id, current_step, status, started_at, last_email_sent_at')
+      .eq('status', 'active');
+
+    const sequenceByCreator = new Map(
+      (sequences || []).map((s) => [s.creator_id, s])
+    );
+
     // Process each creator
     const enrichedCreators = creators?.map((creator) => {
       const creatorMilestones = allMilestones?.filter((m) => m.creator_id === creator.id) || [];
@@ -79,12 +98,12 @@ export async function GET(request: NextRequest) {
       // Use core percent as main progress (creator is "done" when core is 100%)
       const progressPercentage = corePercent;
 
-      // Find most recent activity (completed_at)
-      const completedDates = creatorMilestones
-        .filter((m) => m.completed_at)
-        .map((m) => new Date(m.completed_at));
-      const lastActivityDate = completedDates.length > 0
-        ? new Date(Math.max(...completedDates.map((d) => d.getTime())))
+      // Most recent real activity: a completed milestone or a portal sign-in.
+      // Sign-ins count because most of the roster has never signed in at all,
+      // so one is a meaningful sign that somebody came back.
+      const creatorActivity = activity.get(creator.id);
+      const lastActivityDate = creatorActivity
+        ? new Date(creatorActivity.lastActivityAt)
         : new Date(creator.created_at);
 
       // Find next available milestone (lowest sort_order with status='available')
@@ -161,6 +180,35 @@ export async function GET(request: NextRequest) {
         currentMilestoneName,
         requiresTeamAction,
         waitingOn,
+        // Why this creator reads as active or stalled, so a row on the creators
+        // tab explains itself instead of being a mystery.
+        activity: creatorActivity
+          ? {
+              lastActivityAt: creatorActivity.lastActivityAt,
+              lastMilestoneAt: creatorActivity.lastMilestoneAt,
+              lastLoginAt: creatorActivity.lastLoginAt,
+              daysSinceActivity: creatorActivity.daysSinceActivity,
+              source: creatorActivity.source,
+              explanation: creatorActivity.explanation,
+            }
+          : null,
+        reengagement: (() => {
+          const seq = sequenceByCreator.get(creator.id);
+          if (!seq) return null;
+          const nextEmailDue = new Date(
+            new Date(seq.last_email_sent_at).getTime() +
+              STEP_INTERVAL_DAYS * 24 * 60 * 60 * 1000
+          );
+          return {
+            status: seq.status,
+            currentStep: seq.current_step,
+            startedAt: seq.started_at,
+            lastEmailAt: seq.last_email_sent_at,
+            nextEmailDue: nextEmailDue.toISOString(),
+            // Next send is the pause notice, which ends the account.
+            facingPause: seq.current_step >= FINAL_STEP - 1,
+          };
+        })(),
         // Core vs Bonus progress
         progress: {
           coreTotal,

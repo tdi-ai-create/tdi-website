@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { requireAdminAuth } from '@/lib/tdi-admin/auth';
 
 export async function POST(request: NextRequest) {
   try {
+    const auth = await requireAdminAuth();
+    if (auth instanceof NextResponse) return auth;
+
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
@@ -48,15 +52,25 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Add a note for audit trail
-    await supabase.from('creator_notes').insert({
+    // Add a note for audit trail.
+    //
+    // This previously set note_type, a column creator_notes does not have, so
+    // Postgres rejected every insert and the result was never checked. Archiving
+    // a creator left no record of who did it or when. Internal only, so it does
+    // not surface in the creator's own portal.
+    const { error: noteError } = await supabase.from('creator_notes').insert({
       creator_id: creatorId,
       content: action === 'archive'
         ? 'Creator archived'
         : 'Creator unarchived (restored to active)',
       author: 'System',
-      note_type: 'status_change',
+      visible_to_creator: false,
     });
+
+    if (noteError) {
+      // The status change already succeeded, so report rather than fail.
+      console.error('[archive-creator] Audit note failed:', noteError);
+    }
 
     return NextResponse.json({ success: true, creator: data });
   } catch (error) {

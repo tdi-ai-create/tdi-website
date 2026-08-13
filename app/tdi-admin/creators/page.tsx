@@ -109,16 +109,60 @@ const USMapChart = dynamic(() => import('@/components/tdi-admin/USMapChart'), {
 });
 
 // Tab types
-type TabId = 'dashboard' | 'creators' | 'analytics' | 'affiliate' | 'recruitment';
+type TabId = 'dashboard' | 'creators' | 'reengagement' | 'analytics' | 'affiliate' | 'recruitment';
 
 // Tab configuration
 const TABS: { id: TabId; label: string; icon: React.ElementType }[] = [
   { id: 'dashboard', label: 'Action Center', icon: LayoutGrid },
   { id: 'creators', label: 'Creators', icon: Users },
+  { id: 'reengagement', label: 'Re-engagement', icon: Mail },
   { id: 'analytics', label: 'Analytics', icon: TrendingUp },
   { id: 'affiliate', label: 'Affiliate', icon: DollarSign },
   { id: 'recruitment', label: 'Recruitment', icon: UserPlus },
 ];
+
+// Re-engagement filter options for the creators roster. Grouped by what Bella
+// would actually act on rather than by raw step number.
+type ReengagementFilter =
+  | 'all'
+  | 'none'
+  | 'any'
+  | 'early'
+  | 'late'
+  | 'facing_pause'
+  | 'paused';
+
+const REENGAGEMENT_FILTERS: { value: ReengagementFilter; label: string }[] = [
+  { value: 'all', label: 'All' },
+  { value: 'none', label: 'Not in sequence' },
+  { value: 'any', label: 'In sequence' },
+  { value: 'early', label: 'Early (steps 0 to 2)' },
+  { value: 'late', label: 'Late (steps 3 to 5)' },
+  { value: 'facing_pause', label: 'Facing pause' },
+  { value: 'paused', label: 'Paused' },
+];
+
+function matchesReengagementFilter(c: EnrichedCreator, filter: ReengagementFilter): boolean {
+  if (filter === 'all') return true;
+  if (filter === 'paused') return c.lifecycle_state === 'paused';
+
+  const seq = c.reengagement;
+  if (filter === 'none') return !seq;
+  if (!seq) return false;
+
+  switch (filter) {
+    case 'any':
+      return true;
+    case 'early':
+      return seq.currentStep <= 2;
+    case 'late':
+      return seq.currentStep >= 3 && seq.currentStep <= 4;
+    case 'facing_pause':
+      return seq.facingPause;
+    default:
+      return true;
+  }
+}
 
 // Types
 interface EnrichedCreator {
@@ -160,6 +204,24 @@ interface EnrichedCreator {
     bonusAvailable: number;
     isComplete: boolean;
   };
+  // Why this creator reads as active or stalled. Milestone completions and
+  // portal sign-ins, never record edits.
+  activity?: {
+    lastActivityAt: string;
+    lastMilestoneAt: string | null;
+    lastLoginAt: string | null;
+    daysSinceActivity: number;
+    source: 'milestone' | 'login' | 'never';
+    explanation: string;
+  } | null;
+  reengagement?: {
+    status: string;
+    currentStep: number;
+    startedAt: string;
+    lastEmailAt: string;
+    nextEmailDue: string;
+    facingPause: boolean;
+  } | null;
 }
 
 interface DashboardData {
@@ -686,6 +748,316 @@ function getPeriodOptions(): { value: string; label: string }[] {
     options.push({ value: val, label: formatPeriodLabel(val) });
   }
   return options;
+}
+
+// ---------------------------------------------------------------------------
+// Re-engagement tab
+//
+// The whole ladder in one screen. Built after an audit found the sequence had
+// been emailing the wrong people for a month with no way to notice from the
+// admin: the only view was a per-creator card on the detail page, so nobody
+// ever saw the shape of the pipeline.
+// ---------------------------------------------------------------------------
+
+interface PipelineCreator {
+  id: string;
+  name: string | null;
+  email: string | null;
+  startedAt?: string;
+  lastEmailAt?: string;
+  nextEmailDue?: string;
+  daysSinceActivity: number | null;
+  why: string | null;
+}
+
+interface ReengagementPipelineData {
+  config: {
+    sendsEnabled: boolean;
+    stallThresholdDays: number;
+    stepIntervalDays: number;
+    finalStep: number;
+  };
+  ladder: { step: number; label: string; creators: PipelineCreator[] }[];
+  wouldEnrol: { id: string; name: string | null; email: string | null; daysSinceActivity: number; why: string }[];
+  wouldAdvance: { id: string; name: string | null; currentStep: number; nextStep: number; wouldPause: boolean }[];
+  recentSends: {
+    creator_id: string | null;
+    creator_name: string | null;
+    subject: string;
+    step: number | null;
+    sent_at: string;
+    dry_run: boolean;
+  }[];
+  paused: { id: string; name: string | null; pausedAt: string | null; pausedBy: string | null; daysPaused: number | null }[];
+  totals: {
+    inSequence: number;
+    wouldEnrol: number;
+    wouldAdvance: number;
+    facingPause: number;
+    paused: number;
+  };
+}
+
+function shortDate(iso: string | null | undefined): string {
+  if (!iso) return '--';
+  return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+
+function ReengagementTab() {
+  const [data, setData] = useState<ReengagementPipelineData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch('/api/admin/reengagement/pipeline')
+      .then((r) => r.json())
+      .then((json) => {
+        if (json.success) setData(json);
+        else setError(json.error || 'Could not load the pipeline');
+      })
+      .catch(() => setError('Could not load the pipeline'))
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="w-6 h-6 animate-spin" style={{ color: theme.accent }} />
+      </div>
+    );
+  }
+
+  if (error || !data) {
+    return (
+      <div className="bg-white rounded-2xl border border-gray-100 p-8 text-center">
+        <p className="text-gray-500">{error || 'No pipeline data'}</p>
+      </div>
+    );
+  }
+
+  const { config, ladder, wouldEnrol, wouldAdvance, recentSends, paused, totals } = data;
+
+  return (
+    <div className="space-y-6">
+      {/* Sends paused banner. Without this the freeze becomes its own mystery. */}
+      {!config.sendsEnabled && (
+        <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5 flex gap-4">
+          <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+          <div className="space-y-1.5">
+            <p className="font-semibold text-amber-900">Re-engagement email is paused</p>
+            <p className="text-sm text-amber-800 leading-relaxed">
+              The daily scan is still running and everything below is live, but no email is
+              reaching creators and no sequence is advancing. Nobody is being auto-paused.
+              Use the queue below to check the system is picking the right people, then turn
+              sends back on in <code className="text-xs bg-amber-100 px-1 py-0.5 rounded">lib/reengagement-config.ts</code>.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Totals */}
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+        {[
+          { label: 'In a sequence', value: totals.inSequence, alarm: false },
+          { label: 'Would start today', value: totals.wouldEnrol, alarm: false },
+          { label: 'Due a next email', value: totals.wouldAdvance, alarm: false },
+          { label: 'Facing pause', value: totals.facingPause, alarm: totals.facingPause > 0 },
+          { label: 'Currently paused', value: totals.paused, alarm: false },
+        ].map((stat) => (
+          <div key={stat.label} className="bg-white rounded-2xl border border-gray-100 p-4">
+            <p className={`text-2xl font-semibold ${stat.alarm ? 'text-red-600' : 'text-slate-800'}`}>
+              {stat.value}
+            </p>
+            <p className="text-xs text-gray-500 mt-1">{stat.label}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* The ladder */}
+      <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+        <div className="px-5 py-4 border-b border-gray-100">
+          <h3 className="font-semibold text-slate-800">Where everyone sits</h3>
+          <p className="text-xs text-gray-500 mt-0.5">
+            One step every {config.stepIntervalDays} days. Step {config.finalStep} sends the pause
+            notice and pauses the account.
+          </p>
+        </div>
+        <div className="divide-y divide-gray-100">
+          {ladder.map((rung) => (
+            <div key={rung.step} className="px-5 py-3.5 flex flex-col sm:flex-row sm:items-start gap-3">
+              <div className="sm:w-44 flex-shrink-0 flex items-center gap-2">
+                <span
+                  className={`text-[10px] font-semibold px-1.5 py-0.5 rounded uppercase tracking-wide ${
+                    rung.step >= config.finalStep
+                      ? 'bg-red-50 text-red-700'
+                      : rung.step >= config.finalStep - 1
+                      ? 'bg-amber-50 text-amber-700'
+                      : 'bg-gray-100 text-gray-600'
+                  }`}
+                >
+                  Step {rung.step}
+                </span>
+                <span className="text-sm text-gray-600">{rung.label}</span>
+              </div>
+              <div className="flex-1 min-w-0">
+                {rung.creators.length === 0 ? (
+                  <p className="text-sm text-gray-300">Nobody</p>
+                ) : (
+                  <div className="flex flex-wrap gap-1.5">
+                    {rung.creators.map((c) => (
+                      <Link
+                        key={c.id}
+                        href={`/tdi-admin/creators/${c.id}`}
+                        className="text-xs bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-lg px-2 py-1 transition-colors"
+                        title={c.why || undefined}
+                      >
+                        {c.name}
+                        {c.nextEmailDue && (
+                          <span className="text-gray-400 ml-1.5">next {shortDate(c.nextEmailDue)}</span>
+                        )}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* What the next run would do */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+          <div className="px-5 py-4 border-b border-gray-100">
+            <h3 className="font-semibold text-slate-800">Would start a sequence</h3>
+            <p className="text-xs text-gray-500 mt-0.5">
+              No milestone and no sign-in for {config.stallThresholdDays}+ days.
+            </p>
+          </div>
+          {wouldEnrol.length === 0 ? (
+            <p className="px-5 py-6 text-sm text-gray-400">Nobody new.</p>
+          ) : (
+            <div className="divide-y divide-gray-100 max-h-80 overflow-y-auto">
+              {wouldEnrol.map((c) => (
+                <Link
+                  key={c.id}
+                  href={`/tdi-admin/creators/${c.id}`}
+                  className="px-5 py-3 flex items-baseline justify-between gap-3 hover:bg-gray-50 transition-colors"
+                >
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-slate-800 truncate">{c.name}</p>
+                    <p className="text-xs text-gray-400 truncate">{c.why}</p>
+                  </div>
+                  <span className="text-xs text-gray-500 flex-shrink-0 tabular-nums">
+                    {c.daysSinceActivity}d
+                  </span>
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+          <div className="px-5 py-4 border-b border-gray-100">
+            <h3 className="font-semibold text-slate-800">Due their next email</h3>
+            <p className="text-xs text-gray-500 mt-0.5">
+              Already in a sequence, {config.stepIntervalDays}+ days since the last one.
+            </p>
+          </div>
+          {wouldAdvance.length === 0 ? (
+            <p className="px-5 py-6 text-sm text-gray-400">Nobody is due.</p>
+          ) : (
+            <div className="divide-y divide-gray-100 max-h-80 overflow-y-auto">
+              {wouldAdvance.map((c) => (
+                <Link
+                  key={c.id}
+                  href={`/tdi-admin/creators/${c.id}`}
+                  className="px-5 py-3 flex items-center justify-between gap-3 hover:bg-gray-50 transition-colors"
+                >
+                  <p className="text-sm font-medium text-slate-800 truncate">{c.name}</p>
+                  <span
+                    className={`text-[10px] font-semibold px-1.5 py-0.5 rounded uppercase tracking-wide flex-shrink-0 ${
+                      c.wouldPause ? 'bg-red-50 text-red-700' : 'bg-gray-100 text-gray-600'
+                    }`}
+                  >
+                    {c.wouldPause ? 'Would pause' : `Step ${c.currentStep} to ${c.nextStep}`}
+                  </span>
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Paused creators, easy to forget entirely */}
+      <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+        <div className="px-5 py-4 border-b border-gray-100">
+          <h3 className="font-semibold text-slate-800">Paused creators</h3>
+          <p className="text-xs text-gray-500 mt-0.5">
+            They hear from Bella every 90 days. Their work is saved and their affiliate link keeps earning.
+          </p>
+        </div>
+        {paused.length === 0 ? (
+          <p className="px-5 py-6 text-sm text-gray-400">Nobody is paused.</p>
+        ) : (
+          <div className="divide-y divide-gray-100">
+            {paused.map((c) => (
+              <Link
+                key={c.id}
+                href={`/tdi-admin/creators/${c.id}`}
+                className="px-5 py-3 flex items-baseline justify-between gap-3 hover:bg-gray-50 transition-colors"
+              >
+                <div className="min-w-0">
+                  <p className="text-sm font-medium text-slate-800 truncate">{c.name}</p>
+                  <p className="text-xs text-gray-400 truncate">
+                    paused {shortDate(c.pausedAt)} by {c.pausedBy || 'unknown'}
+                  </p>
+                </div>
+                <span className="text-xs text-gray-500 flex-shrink-0 tabular-nums">
+                  {c.daysPaused !== null ? `${c.daysPaused}d` : '--'}
+                </span>
+              </Link>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Send history */}
+      <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+        <div className="px-5 py-4 border-b border-gray-100">
+          <h3 className="font-semibold text-slate-800">Recent re-engagement email</h3>
+          <p className="text-xs text-gray-500 mt-0.5">
+            Newest first. Suppressed rows were worked out by the scan but never delivered.
+          </p>
+        </div>
+        {recentSends.length === 0 ? (
+          <p className="px-5 py-6 text-sm text-gray-400">Nothing yet.</p>
+        ) : (
+          <div className="divide-y divide-gray-100 max-h-96 overflow-y-auto">
+            {recentSends.map((s, i) => (
+              <div key={`${s.creator_id}-${s.sent_at}-${i}`} className="px-5 py-3 flex items-baseline justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="text-sm text-slate-800 truncate">
+                    {s.creator_name}
+                    {s.step !== null && <span className="text-gray-400 ml-2">step {s.step}</span>}
+                  </p>
+                  <p className="text-xs text-gray-400 truncate">{s.subject}</p>
+                </div>
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  {s.dry_run && (
+                    <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded uppercase tracking-wide bg-gray-100 text-gray-500">
+                      Suppressed
+                    </span>
+                  )}
+                  <span className="text-xs text-gray-500 tabular-nums">{shortDate(s.sent_at)}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
 }
 
 function AffiliateTab() {
@@ -1280,6 +1652,7 @@ export default function CreatorStudioPage() {
   const [filterPhase, setFilterPhase] = useState<string>('all');
   const [filterWaitingOn, setFilterWaitingOn] = useState<string>('all');
   const [filterPublishStatus, setFilterPublishStatus] = useState<string>('all');
+  const [filterReengagement, setFilterReengagement] = useState<ReengagementFilter>('all');
   const [showFilters, setShowFilters] = useState(false);
   const [activeStatFilter, setActiveStatFilter] = useState<string | null>(null);
   const [showArchived, setShowArchived] = useState(false);
@@ -1797,6 +2170,11 @@ export default function CreatorStudioPage() {
       filtered = filtered.filter((c) => c.publish_status === filterPublishStatus);
     }
 
+    // Apply re-engagement filter
+    if (filterReengagement !== 'all') {
+      filtered = filtered.filter((c) => matchesReengagementFilter(c, filterReengagement));
+    }
+
     // Apply sorting
     filtered.sort((a, b) => {
       let comparison = 0;
@@ -1822,7 +2200,7 @@ export default function CreatorStudioPage() {
     }
 
     setFilteredCreators(filtered);
-  }, [searchQuery, dashboardData, filterPath, filterPhase, filterWaitingOn, filterPublishStatus, activeStatFilter, sortBy, sortOrder]);
+  }, [searchQuery, dashboardData, filterPath, filterPhase, filterWaitingOn, filterPublishStatus, filterReengagement, activeStatFilter, sortBy, sortOrder]);
 
   const handleAddCreator = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -2203,7 +2581,8 @@ export default function CreatorStudioPage() {
     (filterPath !== 'all' ? 1 : 0) +
     (filterPhase !== 'all' ? 1 : 0) +
     (filterWaitingOn !== 'all' ? 1 : 0) +
-    (filterPublishStatus !== 'all' ? 1 : 0);
+    (filterPublishStatus !== 'all' ? 1 : 0) +
+    (filterReengagement !== 'all' ? 1 : 0);
 
   // Get path badge styling
   const getPathBadge = (path: string | null) => {
@@ -3296,6 +3675,18 @@ export default function CreatorStudioPage() {
                     <option value="published">Published</option>
                   </select>
                 </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-500 mb-1.5">Re-engagement</label>
+                  <select
+                    value={filterReengagement}
+                    onChange={(e) => setFilterReengagement(e.target.value as ReengagementFilter)}
+                    className="px-3 py-2 border border-gray-200 rounded-xl text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 outline-none transition-all bg-white"
+                  >
+                    {REENGAGEMENT_FILTERS.map((f) => (
+                      <option key={f.value} value={f.value}>{f.label}</option>
+                    ))}
+                  </select>
+                </div>
                 {(activeFiltersCount > 0 || activeStatFilter) && (
                   <button
                     onClick={() => {
@@ -3303,6 +3694,7 @@ export default function CreatorStudioPage() {
                       setFilterPhase('all');
                       setFilterWaitingOn('all');
                       setFilterPublishStatus('all');
+                      setFilterReengagement('all');
                       setActiveStatFilter(null);
                     }}
                     className="self-end px-3 py-2 text-sm text-gray-500 hover:text-slate-700 transition-colors"
@@ -3477,12 +3869,36 @@ export default function CreatorStudioPage() {
                               );
                             })()}
                             <div className="min-w-0">
-                              <p className="font-medium truncate" style={{ color: '#2B3A67' }}>
-                                {creator.name}
-                              </p>
+                              <div className="flex items-center gap-2 min-w-0">
+                                <p className="font-medium truncate" style={{ color: '#2B3A67' }}>
+                                  {creator.name}
+                                </p>
+                                {creator.reengagement && (
+                                  <span
+                                    className={`flex-shrink-0 text-[10px] font-semibold px-1.5 py-0.5 rounded uppercase tracking-wide ${
+                                      creator.reengagement.facingPause
+                                        ? 'bg-red-50 text-red-700'
+                                        : 'bg-amber-50 text-amber-700'
+                                    }`}
+                                    title={`Re-engagement step ${creator.reengagement.currentStep} of 6. Next email due ${new Date(creator.reengagement.nextEmailDue).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}.`}
+                                  >
+                                    {creator.reengagement.facingPause
+                                      ? 'Facing pause'
+                                      : `Step ${creator.reengagement.currentStep}`}
+                                  </span>
+                                )}
+                              </div>
                               <p className="text-xs text-gray-500 truncate">
                                 {creator.topic || creator.course_title || creator.email}
                               </p>
+                              {/* Why this creator reads as stalled. Without it, a row in a
+                                  sequence is a mystery, which is how the wrong 19 people
+                                  went unnoticed for a month. */}
+                              {creator.isStalled && creator.activity && (
+                                <p className="text-xs text-gray-400 truncate mt-0.5">
+                                  {creator.activity.explanation}
+                                </p>
+                              )}
                             </div>
                           </div>
                         </td>
@@ -5491,6 +5907,11 @@ export default function CreatorStudioPage() {
       {/* AFFILIATE TAB */}
       {activeTab === 'affiliate' && (
         <AffiliateTab />
+      )}
+
+      {/* RE-ENGAGEMENT TAB */}
+      {activeTab === 'reengagement' && (
+        <ReengagementTab />
       )}
 
       {/* Add Creator Modal */}
