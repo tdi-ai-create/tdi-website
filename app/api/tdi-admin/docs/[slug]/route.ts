@@ -24,6 +24,7 @@ export async function GET(
     'engagement-workflow': 'engagement-workflow.html',
     'creator-feedback-sop': 'creator-feedback-sop.html',
     'creator-recruitment-sop': 'creator-recruitment-sop.html',
+    'creator-dormancy-sop': 'creator-dormancy-sop.html',
     'communication-map': 'communication-map.html',
     'data-flow': 'data-flow.html',
     'hub-content-standards': 'hub-content-standards.html',

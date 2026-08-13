@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Creator Dormancy &amp; Offboarding -- SOP</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'DM Sans', -apple-system, sans-serif; color: #1e2749; line-height: 1.6; padding: 40px 48px; max-width: 900px; }
+  h1 { font-family: 'Source Serif 4', Georgia, serif; font-size: 28px; font-weight: 700; margin-bottom: 8px; }
+  h2 { font-family: 'Source Serif 4', Georgia, serif; font-size: 20px; font-weight: 700; margin: 36px 0 12px; padding-bottom: 8px; border-bottom: 2px solid #E5E7EB; }
+  h3 { font-size: 15px; font-weight: 700; margin: 20px 0 8px; color: #2B3A67; }
+  p { font-size: 14px; margin-bottom: 12px; color: #374151; }
+  .subtitle { font-size: 14px; color: #6B7280; margin-bottom: 24px; }
+  .updated { font-size: 11px; color: #9CA3AF; margin-bottom: 32px; }
+  ul, ol { font-size: 14px; margin: 8px 0 16px 24px; color: #374151; }
+  li { margin-bottom: 6px; }
+  .role-tag { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.03em; margin-right: 6px; }
+  .role-bella { background: #FCE7F3; color: #9D174D; }
+  .role-rae { background: #DBEAFE; color: #1E40AF; }
+  .role-creator { background: #D1FAE5; color: #065F46; }
+  .role-system { background: #F3F4F6; color: #374151; }
+  table { width: 100%; border-collapse: collapse; margin: 12px 0 20px; font-size: 13px; }
+  th { text-align: left; padding: 10px 12px; background: #F9FAFB; border-bottom: 2px solid #E5E7EB; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: #6B7280; }
+  td { padding: 10px 12px; border-bottom: 1px solid #F3F4F6; vertical-align: top; }
+  .step-box { background: #F9FAFB; border: 1px solid #E5E7EB; border-radius: 10px; padding: 18px 20px; margin: 16px 0; }
+  .step-box .step-num { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; background: #1e2749; color: white; font-size: 13px; font-weight: 700; margin-right: 10px; }
+  .step-box .step-title { font-size: 15px; font-weight: 700; color: #1e2749; display: inline; }
+  .step-box .step-detail { margin-top: 10px; padding-left: 38px; }
+  .step-box .step-detail p { margin-bottom: 8px; }
+  .highlight { background: #FFFBEB; border: 1px solid #FDE68A; border-radius: 8px; padding: 14px 18px; margin: 16px 0; }
+  .highlight strong { color: #854D0E; }
+  .rule { background: #FEF2F2; border: 1px solid #FECACA; border-radius: 8px; padding: 14px 18px; margin: 16px 0; }
+  .rule strong { color: #991B1B; }
+  .success { background: #F0FDF4; border: 1px solid #BBF7D0; border-radius: 8px; padding: 14px 18px; margin: 16px 0; }
+  .success strong { color: #065F46; }
+  .open { background: #EEF2FF; border: 1px solid #C7D2FE; border-radius: 8px; padding: 14px 18px; margin: 16px 0; }
+  .open strong { color: #3730A3; }
+  .portal-path { font-family: 'SF Mono', 'Fira Code', monospace; font-size: 12px; background: #F3F4F6; padding: 2px 6px; border-radius: 4px; color: #6B7280; }
+  .button-ref { display: inline-block; font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 6px; background: #1e2749; color: white; margin: 0 2px; }
+  .button-ref.secondary { background: #F3F4F6; color: #374151; border: 1px solid #D1D5DB; }
+  .button-ref.danger { background: #FEF2F2; color: #991B1B; border: 1px solid #FECACA; }
+  .ladder { margin: 16px 0; border: 1px solid #E5E7EB; border-radius: 10px; overflow: hidden; }
+  .ladder-row { display: grid; grid-template-columns: 84px 150px 1fr; gap: 14px; padding: 11px 16px; border-bottom: 1px solid #F3F4F6; font-size: 13px; align-items: baseline; }
+  .ladder-row:last-child { border-bottom: 0; }
+  .ladder-row.final { background: #FEF2F2; }
+  .ladder-day { font-family: 'SF Mono', 'Fira Code', monospace; font-size: 12px; color: #6B7280; }
+  .ladder-name { font-weight: 600; color: #1e2749; }
+  .ladder-row.final .ladder-name { color: #991B1B; }
+  .door { border-left: 3px solid #E5E7EB; padding-left: 16px; margin: 18px 0; }
+  .door.pause { border-left-color: #065F46; }
+  .door.withdraw { border-left-color: #A16207; }
+  .door.archive { border-left-color: #6B7280; }
+  .door.delete { border-left-color: #991B1B; }
+</style>
+</head>
+<body>
+
+<h1>Creator Dormancy &amp; Offboarding</h1>
+<p class="subtitle">Standard Operating Procedure -- What happens when a creator goes quiet, and what to do if they never come back</p>
+<p class="updated">Last updated: August 13, 2026 | Written after the re-engagement audit</p>
+
+<!-- ── OVERVIEW ── -->
+
+<h2>Overview</h2>
+<p>Creators sign up with real intent and then life happens. Most of the Creator Studio roster is dormant at any given time, and that is normal rather than a failure. This SOP covers what the system does on its own, what Bella does, and how a relationship ends when it needs to.</p>
+
+<p>The guiding principle: <strong>a creator should never be surprised, and should always have a way back that takes one click.</strong></p>
+
+<div class="highlight">
+  <p><strong>Why this document exists.</strong> An audit on August 13, 2026 found the re-engagement sequence had been emailing the wrong people for a month, and nobody could tell, because there was no way to see the pipeline from the admin. The automation is now correct and visible. This SOP records the policy behind it, which until now lived only in people's heads.</p>
+</div>
+
+<!-- ── WHAT COUNTS AS DORMANT ── -->
+
+<h2>What counts as dormant</h2>
+
+<p>Dormancy means <strong>no portal activity</strong>. Specifically the field <span class="portal-path">last_portal_activity_at</span>, which is stamped in exactly one place: when a creator opens their Creator Studio dashboard.</p>
+
+<table>
+  <tr><th>Signal</th><th>Counts as activity?</th><th>Why</th></tr>
+  <tr>
+    <td><strong>Opening the portal</strong></td>
+    <td>Yes</td>
+    <td>The creator did something. This is the signal the sequence starts and stops on.</td>
+  </tr>
+  <tr>
+    <td><strong>Submitting a milestone</strong></td>
+    <td>Yes</td>
+    <td>They had to open the portal to do it, which stamps the field.</td>
+  </tr>
+  <tr>
+    <td><strong>An admin editing their record</strong></td>
+    <td>No</td>
+    <td>Bella fixing a course title is not the creator coming back.</td>
+  </tr>
+  <tr>
+    <td><strong>Replying to one of Bella's emails</strong></td>
+    <td>No, not automatically</td>
+    <td>Inbound replies are not captured anywhere yet. Use <span class="button-ref">Mark as Engaged</span> by hand.</td>
+  </tr>
+</table>
+
+<div class="rule">
+  <p><strong>Never use <span class="portal-path">updated_at</span> to judge whether a creator is active.</strong> A database trigger stamps that column on any write to the record, including bulk scripts. A bulk edit on July 19, 2026 enrolled nineteen creators into a six week email sequence in a single day, none of whom had actually changed behaviour that week. If you are writing a query or a report about creator activity, use <span class="portal-path">last_portal_activity_at</span>.</p>
+</div>
+
+<!-- ── THE LADDER ── -->
+
+<h2>The ladder</h2>
+
+<p>After 15 days with no portal activity, the system starts a sequence. One step per week, seven steps, all from Bella. Any portal activity at any point cancels the rest of it immediately.</p>
+
+<div class="ladder">
+  <div class="ladder-row">
+    <span class="ladder-day">Day 15</span>
+    <span class="ladder-name">Step 0</span>
+    <span>"Just checking in." Warm, no ask, no pressure.</span>
+  </div>
+  <div class="ladder-row">
+    <span class="ladder-day">Day 22</span>
+    <span class="ladder-name">Step 1</span>
+    <span>"Even 15 minutes can shift your momentum."</span>
+  </div>
+  <div class="ladder-row">
+    <span class="ladder-day">Day 29</span>
+    <span class="ladder-name">Step 2</span>
+    <span>"Everyone hits a pause." Invites a reply about what is in the way.</span>
+  </div>
+  <div class="ladder-row">
+    <span class="ladder-day">Day 36</span>
+    <span class="ladder-name">Step 3</span>
+    <span>"Your idea is still a great one." Offers to move the timeline.</span>
+  </div>
+  <div class="ladder-row">
+    <span class="ladder-day">Day 43</span>
+    <span class="ladder-name">Step 4</span>
+    <span>"The door is open whenever you're ready."</span>
+  </div>
+  <div class="ladder-row">
+    <span class="ladder-day">Day 50</span>
+    <span class="ladder-name">Step 5</span>
+    <span>Last weekly check-in. Warns that account next steps follow.</span>
+  </div>
+  <div class="ladder-row final">
+    <span class="ladder-day">Day 57</span>
+    <span class="ladder-name">Step 6</span>
+    <span>Pause notice, and the account is paused automatically. Carries a one-click reactivation link that works without signing in.</span>
+  </div>
+</div>
+
+<p>Once a sequence completes or is cancelled, that creator cannot be re-enrolled for 90 days. This stops someone who paused and came back from immediately restarting the ladder.</p>
+
+<div class="success">
+  <p><strong>Pausing is not an ending.</strong> The pause email says so explicitly, and it is true: work and progress are saved, the affiliate link keeps earning, and the reactivation link brings the account straight back. Roughly one in three creators who have paused did it themselves, on purpose, which is the system working as intended.</p>
+</div>
+
+<!-- ── BELLA'S PART ── -->
+
+<h2>What Bella does</h2>
+
+<p>Everything above runs without anyone touching it. Bella's job is to catch the people the machine should not be emailing, and to be a human where a human matters.</p>
+
+<div class="step-box">
+  <span class="step-num">1</span>
+  <span class="step-title">Check the Re-engagement tab weekly</span>
+  <div class="step-detail">
+    <p><span class="portal-path">Admin Portal &gt; Creator Studio &gt; Re-engagement</span></p>
+    <p>The tab shows the whole ladder at once: who sits on each step, who the next run would start a sequence for, who is due their next email, who is currently paused and for how long, and every re-engagement email that has gone out.</p>
+    <p>The one number worth watching is <strong>Facing pause</strong>. Anyone in that count is one week away from having their account paused automatically.</p>
+  </div>
+</div>
+
+<div class="step-box">
+  <span class="step-num">2</span>
+  <span class="step-title">Read the "why" before acting</span>
+  <div class="step-detail">
+    <p>On the Creators tab, every stalled row explains itself underneath the name, for example <em>"last milestone Feb 18, never signed in"</em>. Filter by <strong>Re-engagement</strong> to see just the people in a sequence.</p>
+    <p>If the reason looks wrong, that is a signal worth raising rather than ignoring. It is exactly what nobody could see before August 2026.</p>
+  </div>
+</div>
+
+<div class="step-box">
+  <span class="step-num">3</span>
+  <span class="step-title">Use Mark as Engaged when you have made real contact</span>
+  <div class="step-detail">
+    <p><span class="button-ref">Mark as Engaged</span> on the creator's detail page cancels the sequence and records the touch.</p>
+    <p>Use it when a creator replies to an email, answers a call, or tells you in person that they are coming back. The system cannot see any of that on its own, so without this they keep receiving nudges after they have already talked to you, which reads as nobody listening.</p>
+  </div>
+</div>
+
+<div class="step-box">
+  <span class="step-num">4</span>
+  <span class="step-title">Reach out personally to anyone who got close</span>
+  <div class="step-detail">
+    <p>A creator at 30 of 40 milestones who went quiet is a different situation from one who never completed anything. The ladder treats them identically. You should not.</p>
+    <p>Before someone with real progress hits step 6, send them something personal. The automated emails are warm but they are not from a person who knows what they were working on.</p>
+  </div>
+</div>
+
+<!-- ── PAUSED ── -->
+
+<h2>Creators who are paused</h2>
+
+<p>Paused creators hear from Bella every 90 days, automatically, with a one-click reactivation link. That check-in exists so that pausing is a rest rather than a disappearance.</p>
+
+<div class="rule">
+  <p><strong>Paused creators are the easiest people in the whole system to forget.</strong> Between May and August 2026, six paused creators received nothing at all, because the check-in job stamped its own "already checked in" marker without ever sending an email. Two of them were at 32 and 38 of 40 milestones. If the paused list in the Re-engagement tab shows people at 90+ days with no recent check-in, something is wrong with the job and it should be raised, not waited out.</p>
+</div>
+
+<!-- ── THE EXIT DOORS ── -->
+
+<h2>Ending a creator relationship</h2>
+
+<p>There are four ways to end a creator relationship. Only one of them tells the creator anything.</p>
+
+<div class="door pause">
+  <h3>Pause <span class="role-tag role-creator">Creator</span> <span class="role-tag role-bella">Bella</span> <span class="role-tag role-system">System</span></h3>
+  <p><strong>Use this by default.</strong> Reversible, the creator is told, their work is saved, the affiliate link keeps earning, and they get a link that brings them straight back. Can be done by the creator themselves from their dashboard, by an admin, or automatically at step 6.</p>
+</div>
+
+<div class="door withdraw">
+  <h3>Withdrawn <span class="role-tag role-bella">Bella</span> <span class="role-tag role-rae">Rae</span></h3>
+  <p>Use when a creator has actively told you they are not continuing. It records that decision and removes them from the public creators page.</p>
+  <p><strong>No email is sent.</strong> If someone withdraws, reply to them personally. They told you something; the system will not answer on your behalf.</p>
+</div>
+
+<div class="door archive">
+  <h3>Archived <span class="role-tag role-bella">Bella</span> <span class="role-tag role-rae">Rae</span></h3>
+  <p>Housekeeping only. Hides a finished or abandoned record from the working list and removes them from the public creators page. Use for records you want out of the way but not gone.</p>
+</div>
+
+<div class="door delete">
+  <h3>Delete <span class="role-tag role-rae">Rae</span></h3>
+  <p><strong>Permanent and unrecoverable.</strong> Destroys the creator and every milestone, note, project and submission attached to them. No email, no export, no undo.</p>
+  <p>Reserve this for duplicates and test accounts. It should never be how a real person's relationship with TDI ends.</p>
+</div>
+
+<div class="rule">
+  <p><strong>Never delete a real creator to tidy up the roster.</strong> Use Archived. A dormant creator who reappears in eighteen months with their work intact is a good outcome; one whose entire history was destroyed is not.</p>
+</div>
+
+<!-- ── OPEN QUESTIONS ── -->
+
+<h2>Decided and still open</h2>
+
+<p>Recorded honestly so the next person knows which parts are settled.</p>
+
+<h3>Decided (Rae, August 13, 2026)</h3>
+<ul>
+  <li>Activity means portal activity, not record edits</li>
+  <li>Auto-pause at step 6 stays automatic, now that the reactivation link works</li>
+  <li>Dormant unsigned creators are handled by the sequence rather than a manual triage pass</li>
+  <li>Paused creators get a real check-in every 90 days</li>
+</ul>
+
+<h3>Still open</h3>
+<div class="open">
+  <p><strong>Whether an unsigned creator is a creator.</strong> As of August 2026, twenty of twenty six active creators had never signed an agreement, and most had never signed into the portal. Deciding whether those records belong on the roster at all would shrink the dormancy problem more than any automation. Until that is decided, the ladder treats them the same as everyone else.</p>
+</div>
+<div class="open">
+  <p><strong>Whether a human should always make contact before an account is auto-paused.</strong> Currently a creator can go from signup to paused without any person speaking to them. Step 4 above is the manual habit that covers this, but it is a habit rather than a rule the system enforces.</p>
+</div>
+<div class="open">
+  <p><strong>Whether Withdrawn and Archived should collapse into one "Closed" state</strong>, and what a closed creator is told about their work.</p>
+</div>
+
+<!-- ── REFERENCE ── -->
+
+<h2>Where things live</h2>
+
+<table>
+  <tr><th>What</th><th>Where</th></tr>
+  <tr><td>The pipeline, ladder, paused list, send history</td><td><span class="portal-path">Admin &gt; Creator Studio &gt; Re-engagement</span></td></tr>
+  <tr><td>Per-creator sequence status and Mark as Engaged</td><td><span class="portal-path">Admin &gt; Creator Studio &gt; [Creator] </span></td></tr>
+  <tr><td>Filter the roster by sequence step</td><td><span class="portal-path">Admin &gt; Creator Studio &gt; Creators &gt; Filters</span></td></tr>
+  <tr><td>The sequence itself</td><td><span class="portal-path">cron/creator-reengagement</span>, daily 5 AM CT</td></tr>
+  <tr><td>The paused check-in</td><td><span class="portal-path">cron/pause-check-ins</span>, daily 9 AM CT</td></tr>
+  <tr><td>Thresholds and the reactivation URL</td><td><span class="portal-path">lib/reengagement-config.ts</span></td></tr>
+  <tr><td>Every creator email in one table</td><td><a href="/tdi-admin/docs?doc=communication-map">Communication Map</a></td></tr>
+</table>
+
+</body>
+</html>
