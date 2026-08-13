@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, useEffect, useCallback, use } from 'react';
+import { useState, useEffect, useCallback, useRef, useSyncExternalStore, use } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useHub } from '@/components/hub/HubContext';
 import { getHubSupabase as getSupabase } from '@/lib/supabase-hub';
-import { useProgressTracking } from '@/lib/hooks/useProgressTracking';
+import { useProgressTracking, type LessonStatus } from '@/lib/hooks/useProgressTracking';
 import CourseCompletionModal from '@/components/hub/CourseCompletionModal';
 import { useTranslation } from '@/lib/hub/useTranslation';
 import {
@@ -88,6 +88,59 @@ function extractVideoId(lesson: Lesson): string | null {
   return null;
 }
 
+// Cloudflare Stream player SDK. The iframe embed has no documented raw
+// postMessage protocol, so player events must go through this SDK.
+const CF_STREAM_SDK_SRC = 'https://embed.cloudflarestream.com/embed/sdk.latest.js';
+
+interface CfStreamPlayer {
+  addEventListener: (event: string, handler: () => void) => void;
+  removeEventListener: (event: string, handler: () => void) => void;
+}
+
+type CfStreamWindow = Window & { Stream?: (el: HTMLIFrameElement) => CfStreamPlayer };
+
+let cfStreamSdkPromise: Promise<void> | null = null;
+
+function loadCfStreamSdk(): Promise<void> {
+  if (typeof window === 'undefined') return Promise.resolve();
+  if ((window as CfStreamWindow).Stream) return Promise.resolve();
+  if (cfStreamSdkPromise) return cfStreamSdkPromise;
+
+  cfStreamSdkPromise = new Promise<void>((resolve, reject) => {
+    // Guarantees the promise always settles. Without it, a script tag that
+    // already fired 'load' without defining window.Stream would leave this
+    // pending forever and the player listeners would never attach.
+    const timeout = setTimeout(() => onFail(), 15000);
+
+    const onLoad = () => {
+      clearTimeout(timeout);
+      resolve();
+    };
+
+    function onFail() {
+      clearTimeout(timeout);
+      cfStreamSdkPromise = null;
+      reject(new Error('Cloudflare Stream SDK failed to load'));
+    }
+
+    const existing = document.querySelector<HTMLScriptElement>(`script[src="${CF_STREAM_SDK_SRC}"]`);
+    if (existing) {
+      existing.addEventListener('load', onLoad);
+      existing.addEventListener('error', onFail);
+      return;
+    }
+
+    const script = document.createElement('script');
+    script.src = CF_STREAM_SDK_SRC;
+    script.async = true;
+    script.onload = onLoad;
+    script.onerror = onFail;
+    document.head.appendChild(script);
+  });
+
+  return cfStreamSdkPromise;
+}
+
 function extractResource(lesson: Lesson): { url: string; filename: string; fileSize: number; contentType: string } | null {
   if (!lesson.content || typeof lesson.content !== 'object') return null;
   const c = lesson.content;
@@ -138,48 +191,71 @@ function getGateLabel(question: QuizQuestion, allQuestions: QuizQuestion[]): str
 }
 
 // ---------------------------------------------------------------------------
-// Dark Mode hook (localStorage)
+// localStorage-backed boolean preferences
+//
+// Read through useSyncExternalStore rather than "setState inside an effect".
+// The server snapshot is always false, so SSR and hydration agree; React then
+// re-reads the real value from localStorage immediately after hydrating.
 // ---------------------------------------------------------------------------
 
+const flagListeners = new Map<string, Set<() => void>>();
+
+function readFlag(key: string): boolean {
+  try {
+    return localStorage.getItem(key) === 'true';
+  } catch {
+    return false; // storage blocked (private browsing)
+  }
+}
+
+function writeFlag(key: string, value: boolean) {
+  try {
+    localStorage.setItem(key, String(value));
+  } catch {
+    /* storage blocked — preference just won't persist */
+  }
+  // 'storage' events don't fire in the tab that made the change, so notify here.
+  flagListeners.get(key)?.forEach((listener) => listener());
+}
+
+function subscribeFlag(key: string, listener: () => void) {
+  let listeners = flagListeners.get(key);
+  if (!listeners) {
+    listeners = new Set();
+    flagListeners.set(key, listeners);
+  }
+  const set = listeners;
+  set.add(listener);
+
+  const onStorage = (e: StorageEvent) => {
+    if (e.key === key) listener();
+  };
+  window.addEventListener('storage', onStorage);
+
+  return () => {
+    set.delete(listener);
+    window.removeEventListener('storage', onStorage);
+  };
+}
+
+function useStoredFlag(key: string): { value: boolean; toggle: () => void } {
+  const subscribe = useCallback((listener: () => void) => subscribeFlag(key, listener), [key]);
+  const getSnapshot = useCallback(() => readFlag(key), [key]);
+  const getServerSnapshot = useCallback(() => false, []);
+
+  const value = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  const toggle = useCallback(() => writeFlag(key, !readFlag(key)), [key]);
+
+  return { value, toggle };
+}
+
 function useDarkMode() {
-  const [dark, setDark] = useState(false);
-
-  useEffect(() => {
-    const stored = localStorage.getItem('tdi-lesson-dark-mode');
-    if (stored === 'true') setDark(true);
-  }, []);
-
-  const toggle = useCallback(() => {
-    setDark((prev) => {
-      const next = !prev;
-      localStorage.setItem('tdi-lesson-dark-mode', String(next));
-      return next;
-    });
-  }, []);
-
+  const { value: dark, toggle } = useStoredFlag('tdi-lesson-dark-mode');
   return { dark, toggle };
 }
 
-// ---------------------------------------------------------------------------
-// Auto-advance hook (localStorage)
-// ---------------------------------------------------------------------------
-
 function useAutoAdvance() {
-  const [enabled, setEnabled] = useState(false);
-
-  useEffect(() => {
-    const stored = localStorage.getItem('tdi-lesson-auto-advance');
-    if (stored === 'true') setEnabled(true);
-  }, []);
-
-  const toggle = useCallback(() => {
-    setEnabled((prev) => {
-      const next = !prev;
-      localStorage.setItem('tdi-lesson-auto-advance', String(next));
-      return next;
-    });
-  }, []);
-
+  const { value: enabled, toggle } = useStoredFlag('tdi-lesson-auto-advance');
   return { enabled, toggle };
 }
 
@@ -664,6 +740,9 @@ export default function LessonPage({ params }: LessonPageProps) {
   const [transcriptLang, setTranscriptLang] = useState<'en' | 'es'>('en');
   const [bottomSheetOpen, setBottomSheetOpen] = useState(false);
 
+  // Video auto-completion
+  const videoIframeRef = useRef<HTMLIFrameElement>(null);
+
   // Progress tracking
   const { progress, certificateEarned, clearCertificateEarned, markLessonStatus, refetch } =
     useProgressTracking(course?.id || null, user?.id || null);
@@ -793,6 +872,68 @@ export default function LessonPage({ params }: LessonPageProps) {
     if (certificateEarned) setShowCelebration(true);
   }, [certificateEarned]);
 
+  // Video auto-completion via the Cloudflare Stream player SDK.
+  // The latest progress and callbacks live in a ref so they stay out of the
+  // effect deps, otherwise every progress update would tear down and re-attach
+  // the player listeners. The ref is updated in an effect rather than during
+  // render, which React does not allow.
+  const videoTrackingRef = useRef({ progress, markLessonStatus, refetch });
+
+  useEffect(() => {
+    videoTrackingRef.current = { progress, markLessonStatus, refetch };
+  });
+
+  const currentLessonId = currentLesson?.id ?? null;
+  const currentVideoId = currentLesson ? extractVideoId(currentLesson) : null;
+
+  useEffect(() => {
+    if (!currentVideoId || !currentLessonId) return;
+
+    let player: CfStreamPlayer | null = null;
+    let cancelled = false;
+
+    // A lesson with no row in the progress map has not been started. That
+    // happens if the viewer hits play before progress finishes loading.
+    const statusOf = (): LessonStatus =>
+      videoTrackingRef.current.progress.lessonProgress.get(currentLessonId)?.status ?? 'not_started';
+
+    const handlePlay = () => {
+      if (statusOf() === 'not_started') {
+        videoTrackingRef.current.markLessonStatus(currentLessonId, 'in_progress');
+      }
+    };
+
+    const handleEnded = () => {
+      if (statusOf() !== 'completed') {
+        videoTrackingRef.current
+          .markLessonStatus(currentLessonId, 'completed')
+          .then(() => videoTrackingRef.current.refetch());
+      }
+    };
+
+    loadCfStreamSdk()
+      .then(() => {
+        const iframe = videoIframeRef.current;
+        const streamFactory = (window as CfStreamWindow).Stream;
+        if (cancelled || !iframe || !streamFactory) return;
+
+        player = streamFactory(iframe);
+        player.addEventListener('play', handlePlay);
+        player.addEventListener('ended', handleEnded);
+      })
+      .catch(() => {
+        // SDK blocked or offline — the manual "Mark complete" button still works.
+      });
+
+    return () => {
+      cancelled = true;
+      if (player) {
+        player.removeEventListener('play', handlePlay);
+        player.removeEventListener('ended', handleEnded);
+      }
+    };
+  }, [currentLessonId, currentVideoId]);
+
   // ---------------------------------------------------------------------------
   // Derived values
   // ---------------------------------------------------------------------------
@@ -830,6 +971,56 @@ export default function LessonPage({ params }: LessonPageProps) {
   // Handlers
   // ---------------------------------------------------------------------------
 
+  // Activity logging helper
+  const logActivity = useCallback(async (action: string, metadata: Record<string, unknown> = {}) => {
+    if (!user?.id) return;
+    try {
+      const supabase = getSupabase();
+      // Supabase reports row-level failures in `error` rather than throwing, so
+      // both paths need handling or a broken insert disappears silently.
+      const { error } = await supabase.from('hub_activity_log').insert({
+        user_id: user.id,
+        action,
+        metadata: {
+          ...metadata,
+          course_id: course?.id,
+          course_title: course?.title,
+          lesson_id: currentLesson?.id,
+          lesson_title: currentLesson?.title,
+          timestamp: new Date().toISOString(),
+        },
+      });
+      if (error) console.warn(`[hub] activity log "${action}" failed:`, error.message);
+    } catch (err) {
+      console.warn(`[hub] activity log "${action}" threw:`, err);
+    }
+  }, [user?.id, course?.id, course?.title, currentLesson?.id, currentLesson?.title]);
+
+  // Log lesson viewed on page load
+  useEffect(() => {
+    if (currentLesson?.id && user?.id && !isLoading) {
+      logActivity('lesson_viewed');
+    }
+  }, [currentLesson?.id, user?.id, isLoading, logActivity]);
+
+  // Resource download handler — tracks download + auto-completes resource lessons
+  const handleResourceDownload = async (url: string, filename: string, type: string) => {
+    logActivity('resource_downloaded', { resource_url: url, filename, content_type: type });
+
+    // Auto-complete resource-type lessons when user downloads the resource
+    if (currentLesson && lessonStatus !== 'completed') {
+      await markLessonStatus(currentLesson.id, 'completed');
+      await refetch();
+    }
+
+    // Let the browser handle the actual download via the <a> tag
+  };
+
+  // Transcript download handler
+  const handleTranscriptDownload = (lang: string) => {
+    logActivity('transcript_downloaded', { language: lang });
+  };
+
   const handleMarkComplete = async () => {
     if (!currentLesson) return;
     await markLessonStatus(currentLesson.id, 'completed');
@@ -865,6 +1056,7 @@ export default function LessonPage({ params }: LessonPageProps) {
     if (currentGate && currentLesson) {
       await markLessonStatus(currentLesson.id, 'completed');
       await refetch();
+      logActivity('checkin_completed', { question_id: currentGate.id, question_type: currentGate.question_type });
       setLocallyCleared((prev) => new Set(prev).add(currentGate.id));
 
       if (autoAdvance && nextLesson) {
@@ -1174,6 +1366,7 @@ export default function LessonPage({ params }: LessonPageProps) {
                     background: '#000', aspectRatio: '16/9',
                   }}>
                     <iframe
+                      ref={videoIframeRef}
                       src={`https://customer-4n38x6badamh5yps.cloudflarestream.com/${videoId}/iframe`}
                       style={{ width: '100%', height: '100%', border: 'none', display: 'block' }}
                       allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
@@ -1234,6 +1427,7 @@ export default function LessonPage({ params }: LessonPageProps) {
                             <a
                               href={`/api/hub/transcripts/${currentLesson.id}?lang=en`}
                               download
+                              onClick={() => handleTranscriptDownload('en')}
                               style={{
                                 fontSize: 11, color: theme.title, textDecoration: 'none',
                                 padding: '3px 10px', border: `1px solid ${theme.border}`,
@@ -1247,6 +1441,7 @@ export default function LessonPage({ params }: LessonPageProps) {
                             <a
                               href={`/api/hub/transcripts/${currentLesson.id}?lang=es`}
                               download
+                              onClick={() => handleTranscriptDownload('es')}
                               style={{
                                 fontSize: 11, color: theme.title, textDecoration: 'none',
                                 padding: '3px 10px', border: `1px solid ${theme.border}`,
@@ -1294,6 +1489,7 @@ export default function LessonPage({ params }: LessonPageProps) {
                       href={resource.url}
                       target="_blank"
                       rel="noopener noreferrer"
+                      onClick={() => handleResourceDownload(resource.url, resource.filename, resource.contentType)}
                       style={{
                         display: 'inline-flex', alignItems: 'center', gap: 8,
                         padding: '12px 28px', background: '#E8B84B', color: '#1E2749',

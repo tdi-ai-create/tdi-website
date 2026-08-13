@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { clearFlagForCompletedMilestone } from '@/lib/creator-agent-flags';
 
 export async function POST(request: Request) {
   try {
@@ -100,6 +101,9 @@ export async function POST(request: Request) {
       console.error('[approve-milestone] Update error:', updateError);
       return NextResponse.json({ success: false, error: updateError.message }, { status: 500 });
     }
+
+    // Doing the work the flag asked for should retire the flag.
+    await clearFlagForCompletedMilestone(supabase, creatorId, milestoneId);
 
     if (!updateData || updateData.length === 0) {
       console.error('[approve-milestone] No rows updated - creator_milestone record may not exist');

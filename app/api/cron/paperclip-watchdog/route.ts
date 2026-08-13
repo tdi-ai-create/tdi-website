@@ -31,6 +31,7 @@ const PAPERCLIP_URL = 'https://paperclip-railway-template-production.up.railway.
 const SLOW_THRESHOLD_MS = 5000;
 const HEALTH_TIMEOUT_MS = 8000; // longer than threshold so we measure slow vs. down
 const COOLDOWN_MINUTES = 10;
+const STALE_CHECKOUT_HOURS = 4; // Only release checkouts older than this
 
 const COMPANY_ID = process.env.PAPERCLIP_COMPANY_ID || '';
 
@@ -119,9 +120,38 @@ async function sweepStaleCheckouts(): Promise<{ swept: number; errors: string[] 
     const data = await res.json();
     const issues = data?.issues || data?.data || [];
 
+    const staleThreshold = Date.now() - STALE_CHECKOUT_HOURS * 60 * 60 * 1000;
+
     for (const issue of issues) {
       if (!issue.checkoutRunId) continue;
+
+      // Only release checkouts that are actually stale (checked out > 4 hours ago)
+      const checkedOutAt = issue.checkoutAt || issue.updatedAt || issue.updated_at;
+      if (checkedOutAt) {
+        const checkoutTime = new Date(checkedOutAt).getTime();
+        if (checkoutTime > staleThreshold) {
+          // This checkout is recent — skip it, agent may still be working
+          continue;
+        }
+      }
+
       try {
+        // Add a comment before releasing so there's an audit trail
+        await fetch(
+          `${PAPERCLIP_URL}/api/issues/${issue.id}/comments`,
+          {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${apiToken}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              body: `[Watchdog] Releasing stale checkout (checked out >${STALE_CHECKOUT_HOURS}h ago). Issue returned to queue — not marking as done. Previous assignee may need to re-check.`,
+            }),
+            signal: AbortSignal.timeout(5000),
+          }
+        ).catch(() => { /* best-effort comment */ });
+
         const releaseRes = await fetch(
           `${PAPERCLIP_URL}/api/issues/${issue.id}/release`,
           {
@@ -135,6 +165,7 @@ async function sweepStaleCheckouts(): Promise<{ swept: number; errors: string[] 
         );
         if (releaseRes.ok) {
           swept++;
+          console.log(`[watchdog] Released stale checkout on issue ${issue.id} (${issue.title || 'untitled'})`);
         } else {
           errors.push(`Release ${issue.id}: ${releaseRes.status}`);
         }
