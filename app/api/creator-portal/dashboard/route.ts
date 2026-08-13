@@ -81,6 +81,28 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Creator not found' }, { status: 404 });
     }
 
+    // Stamp real creator activity.
+    //
+    // This is the only place that records a creator actually using the portal.
+    // cron/creator-reengagement reads last_portal_activity_at to decide whether
+    // someone came back and its nudge sequence should stop. It used to read
+    // creators.updated_at, which the creators_updated_at trigger stamps on any
+    // write at all, so a bulk admin script looked identical to a creator
+    // logging in and silently cancelled everyone's sequence.
+    //
+    // Deliberately not awaited on the response path and deliberately not fatal:
+    // a creator should never see a broken dashboard because a telemetry write
+    // failed. The write does bump updated_at via the trigger, which is fine
+    // now that nothing infers creator activity from that column.
+    const { error: activityError } = await supabase
+      .from('creators')
+      .update({ last_portal_activity_at: new Date().toISOString() })
+      .eq('id', creator.id);
+
+    if (activityError) {
+      console.error('[dashboard-api] Failed to stamp last_portal_activity_at:', activityError.message);
+    }
+
     const contentPath = creator.content_path as string | null;
 
     // Get all phases

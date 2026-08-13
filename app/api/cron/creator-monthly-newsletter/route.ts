@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { logCreatorEmail } from '@/lib/creator-email-log';
+import { guardCron } from '@/lib/cron-guard';
 import Anthropic from '@anthropic-ai/sdk';
 
 // ---------------------------------------------------------------------------
@@ -72,14 +73,12 @@ const CREATOR_TIPS = [
 
 export async function GET(request: NextRequest) {
   try {
-    const authHeader = request.headers.get('authorization');
-    const cronSecret = process.env.CRON_SECRET;
-    if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
-      const isVercelCron = request.headers.get('x-vercel-cron') === '1';
-      if (!isVercelCron) {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-      }
+    const guard = guardCron(request);
+    if (!guard.ok) {
+      return NextResponse.json({ error: guard.error }, { status: guard.status });
     }
+    const { dryRun } = guard;
+    const now = new Date();
 
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -269,9 +268,51 @@ export async function GET(request: NextRequest) {
       </div>
     `;
 
-    // Send to all active creators
+    // Dedupe guard.
+    //
+    // This job had none, so every invocation mailed every active creator. The
+    // cron schedule is "0 10 1 * *", but the endpoint was also hit twice
+    // off-schedule on 2026-08-03 at 16:47 and 27 creators received the same
+    // August newsletter three times, twice within 40 seconds.
+    //
+    // One newsletter per creator per calendar month, checked against the log
+    // that already records every send.
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+
+    const { data: alreadySentThisMonth, error: sentLookupError } = await supabase
+      .from('creator_email_log')
+      .select('creator_id')
+      .eq('category', 'monthly_newsletter')
+      .gte('sent_at', monthStart.toISOString());
+
+    if (sentLookupError) {
+      // Refuse to send rather than risk mailing everyone a duplicate.
+      console.error('[monthly-newsletter] Dedupe lookup failed:', sentLookupError.message);
+      return NextResponse.json(
+        { success: false, error: `Dedupe lookup failed, refusing to send: ${sentLookupError.message}` },
+        { status: 500 }
+      );
+    }
+
+    const alreadySent = new Set((alreadySentThisMonth || []).map((r) => r.creator_id));
+    const recipients = activeCreators.filter((c) => !alreadySent.has(c.id));
+    const skipped = activeCreators.length - recipients.length;
+
+    if (dryRun) {
+      return NextResponse.json({
+        success: true,
+        dryRun: true,
+        subject,
+        audience: activeCreators.length,
+        skippedAlreadySentThisMonth: skipped,
+        wouldSend: recipients.length,
+        plan: recipients.map((c) => ({ creator: c.name, to: c.email })),
+      });
+    }
+
+    // Send to all active creators who have not already had this month's issue
     let sent = 0;
-    for (const creator of activeCreators) {
+    for (const creator of recipients) {
       try {
         const res = await fetch('https://api.resend.com/emails', {
           method: 'POST',
@@ -306,9 +347,14 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    console.log(`[monthly-newsletter] Sent to ${sent}/${activeCreators.length} creators`);
+    console.log(`[monthly-newsletter] Sent to ${sent}/${recipients.length} creators (${skipped} already had this month's issue)`);
 
-    return NextResponse.json({ success: true, sent, total: activeCreators.length });
+    return NextResponse.json({
+      success: true,
+      sent,
+      total: activeCreators.length,
+      skippedAlreadySentThisMonth: skipped,
+    });
   } catch (error) {
     console.error('[monthly-newsletter] Error:', error);
     return NextResponse.json(

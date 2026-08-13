@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { logCreatorEmail } from '@/lib/creator-email-log';
 import { CREATOR_STUDIO_BCC } from '@/lib/creator-notification-recipients';
+import { guardCron, checkedWrite } from '@/lib/cron-guard';
 
 // Reminder intervals in days before target date
 const REMINDER_INTERVALS = [
@@ -14,19 +15,11 @@ const REMINDER_INTERVALS = [
 
 export async function GET(request: NextRequest) {
   try {
-    // Verify this is called from Vercel cron or authorized source
-    const authHeader = request.headers.get('authorization');
-    const cronSecret = process.env.CRON_SECRET;
-
-    // In production, verify the cron secret if set
-    if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
-      // Allow the request if coming from localhost or vercel cron
-      const isVercelCron = request.headers.get('x-vercel-cron') === '1';
-      if (!isVercelCron) {
-        console.log('[creator-reminders] Unauthorized request');
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-      }
+    const guard = guardCron(request);
+    if (!guard.ok) {
+      return NextResponse.json({ error: guard.error }, { status: guard.status });
     }
+    const { dryRun } = guard;
 
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -43,11 +36,20 @@ export async function GET(request: NextRequest) {
       auth: { autoRefreshToken: false, persistSession: false },
     });
 
-    // Get all creators with a target_completion_date set and not yet launched
+    // Get all creators with a launch date set and not yet launched.
+    //
+    // Reads BOTH date columns. The Creator Portal dashboard writes
+    // projected_completion_date (app/api/creator-portal/set-projected-date),
+    // while this cron was only ever looking at target_completion_date. Of 21
+    // active creators with a launch date, 20 had only the projected one, so
+    // they were invisible here. set-projected-date now dual-writes, but every
+    // date set before that shipped is projected-only and was never backfilled.
+    //
+    // target wins when both are set, since it is the explicitly-committed date.
     const { data: creators, error: creatorsError } = await supabase
       .from('creators')
-      .select('id, email, name, target_completion_date, content_path, publish_status')
-      .not('target_completion_date', 'is', null)
+      .select('id, email, name, target_completion_date, projected_completion_date, content_path, publish_status')
+      .or('target_completion_date.not.is.null,projected_completion_date.not.is.null')
       .neq('publish_status', 'published')
       .eq('status', 'active')
       .or('lifecycle_state.is.null,lifecycle_state.eq.active');
@@ -63,9 +65,10 @@ export async function GET(request: NextRequest) {
     if (!creators || creators.length === 0) {
       return NextResponse.json({
         success: true,
-        message: 'No creators with target dates found',
+        message: 'No creators with launch dates found',
         remindersChecked: 0,
         remindersSent: 0,
+        dryRun,
       });
     }
 
@@ -73,34 +76,61 @@ export async function GET(request: NextRequest) {
     today.setHours(0, 0, 0, 0);
     let remindersChecked = 0;
     let remindersSent = 0;
+    const errors: string[] = [];
+    const plan: Record<string, unknown>[] = [];
     const results: { creatorId: string; creatorName: string; reminderType: string; success: boolean }[] = [];
 
     for (const creator of creators) {
-      const targetDate = new Date(creator.target_completion_date);
-      targetDate.setHours(0, 0, 0, 0);
-      const daysUntilTarget = Math.ceil((targetDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+      const launchDateStr = creator.target_completion_date || creator.projected_completion_date;
+      if (!launchDateStr) continue;
+
+      // Parse the date parts explicitly rather than `new Date(launchDateStr)`.
+      //
+      // These columns are DATE, so PostgREST returns a bare "YYYY-MM-DD", which
+      // `new Date()` parses as UTC midnight. The following setHours(0,0,0,0)
+      // then snaps to LOCAL midnight, which in any negative UTC offset lands on
+      // the previous day. Production runs in UTC so the two cancel out, but the
+      // countdown was off by one anywhere else, and the launch date printed in
+      // the email body was a day early too. Building the date from its parts
+      // makes both sides local midnight and the arithmetic exact everywhere.
+      const [ly, lm, ld] = launchDateStr.split('-').map(Number);
+      const targetDate = new Date(ly, lm - 1, ld);
+      const daysUntilTarget = Math.round((targetDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
 
       // Check each reminder interval
       for (const interval of REMINDER_INTERVALS) {
         remindersChecked++;
 
-        // Only send if we're at exactly this interval (or within 1 day to account for cron timing)
-        // Use ranges to avoid missing reminders if cron skips a day
+        // Bands rather than exact days, so a skipped cron run does not drop a
+        // reminder entirely. A creator first seen 45 days out lands in the 60
+        // band and gets one catch-up note.
         const nextInterval = REMINDER_INTERVALS[REMINDER_INTERVALS.indexOf(interval) + 1];
         const lowerBound = nextInterval ? nextInterval.days + 1 : 0;
         if (daysUntilTarget >= lowerBound && daysUntilTarget <= interval.days) {
-          // Check if this reminder was already sent for this target date
+          // Check if this reminder was already sent for this launch date.
+          //
+          // maybeSingle, not single. single() returns PGRST116 for both "no
+          // rows" and "multiple rows", so duplicate log rows would read back as
+          // "never sent" and resend on every run. The unique index added in
+          // migration 115 also prevents duplicates at the write side.
           const { data: existingReminder, error: reminderError } = await supabase
             .from('creator_reminder_log')
             .select('id')
             .eq('creator_id', creator.id)
             .eq('reminder_type', interval.type)
-            .eq('target_date', creator.target_completion_date)
-            .single();
+            .eq('target_date', launchDateStr)
+            .maybeSingle();
 
-          if (reminderError && reminderError.code !== 'PGRST116') {
-            // PGRST116 = no rows returned, which is fine
-            console.error('[creator-reminders] Error checking existing reminder:', reminderError);
+          if (reminderError) {
+            // Do not fall through to sending on a failed dedupe read. This is
+            // also the branch that silently disabled the entire cron: the
+            // creator_reminder_log table did not exist, every read failed with
+            // 42703, and the old code only forgave PGRST116 so every creator
+            // hit continue. The table now exists (migration 115) but a genuine
+            // read failure must still be loud rather than silent.
+            const msg = `dedupe read for ${creator.email} (${interval.type}): ${reminderError.message}`;
+            console.error(`[creator-reminders] ${msg}`);
+            errors.push(msg);
             continue;
           }
 
@@ -116,6 +146,26 @@ export async function GET(request: NextRequest) {
                                creator.content_path === 'blog' ? 'blog post' :
                                creator.content_path === 'download' ? 'download' : 'content';
 
+            // Say the real number of days, not the band label. Because the
+            // bands are ranges, a creator 45 days out falls in the 60 band and
+            // would have been told "60 days to launch" on a date 45 days away.
+            const daysLabel = daysUntilTarget === 1 ? '1 day' : `${daysUntilTarget} days`;
+            const subject = `Creator Studio | ${daysLabel} to launch, ${firstName}!`;
+
+            if (dryRun) {
+              plan.push({
+                creator: creator.name,
+                to: creator.email,
+                reminderType: interval.type,
+                actualDaysOut: daysUntilTarget,
+                launchDate: launchDateStr,
+                dateSource: creator.target_completion_date ? 'target' : 'projected',
+                subject,
+              });
+              remindersSent++;
+              continue;
+            }
+
             try {
               const emailResponse = await fetch('https://api.resend.com/emails', {
                 method: 'POST',
@@ -127,12 +177,12 @@ export async function GET(request: NextRequest) {
                   from: 'TDI Creator Studio <notifications@teachersdeserveit.com>',
                   to: [creator.email],
                   bcc: CREATOR_STUDIO_BCC,
-                  subject: `Creator Studio | ${interval.days} days to launch, ${firstName}!`,
+                  subject,
                   html: `
                     <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
                       <h2 style="color: #1e2749;">Hey ${firstName}!</h2>
                       <p style="color: #374151; font-size: 16px; line-height: 1.6;">
-                        Just a friendly reminder that you're <strong>${interval.days} days</strong> away from your ${contentType} launch goal!
+                        Just a friendly reminder that you're <strong>${daysLabel}</strong> away from your ${contentType} launch goal!
                       </p>
                       <p style="color: #374151; font-size: 16px; line-height: 1.6;">
                         Your target launch date is <strong>${targetDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}</strong>.
@@ -155,14 +205,20 @@ export async function GET(request: NextRequest) {
               });
 
               if (emailResponse.ok) {
-                // Log the sent reminder
-                await supabase
-                  .from('creator_reminder_log')
-                  .insert({
-                    creator_id: creator.id,
-                    reminder_type: interval.type,
-                    target_date: creator.target_completion_date,
-                  });
+                // Log the sent reminder. The unique index on
+                // (creator_id, reminder_type, target_date) is the real
+                // guarantee against a double-send if the cron is invoked twice.
+                await checkedWrite(
+                  `reminder log for ${creator.email} (${interval.type})`,
+                  supabase
+                    .from('creator_reminder_log')
+                    .insert({
+                      creator_id: creator.id,
+                      reminder_type: interval.type,
+                      target_date: launchDateStr,
+                    }),
+                  errors
+                );
 
                 await logCreatorEmail({
                   creator_id: creator.id,
@@ -170,9 +226,13 @@ export async function GET(request: NextRequest) {
                   creator_email: creator.email,
                   direction: 'to_creator',
                   category: 'countdown_reminder',
-                  subject: `You're ${interval.days} days from your launch goal`,
+                  subject: `You're ${daysLabel} from your launch goal`,
                   sent_by: 'cron:creator-reminders',
-                  metadata: { reminder_type: interval.type, days: interval.days },
+                  metadata: {
+                    reminder_type: interval.type,
+                    days: daysUntilTarget,
+                    date_source: creator.target_completion_date ? 'target' : 'projected',
+                  },
                 });
 
                 remindersSent++;
@@ -209,10 +269,12 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
+      dryRun,
       message: `Processed ${creators.length} creators`,
       remindersChecked,
       remindersSent,
-      results,
+      errors,
+      ...(dryRun ? { plan } : { results }),
     });
   } catch (error) {
     console.error('[creator-reminders] Error:', error);
