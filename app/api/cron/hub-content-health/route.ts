@@ -6,12 +6,15 @@ import { createClient } from '@supabase/supabase-js';
  * Hub Content Health Check -- runs daily at 7:30 AM CT via Vercel cron.
  *
  * Verifies critical Hub content is visible to users:
- *   1. Quick Wins: checks published count is above minimum threshold
- *   2. Courses: checks published courses are accessible
- *   3. Thumbnails: checks for content missing thumbnails
+ *   1. Quick Wins: published count is above minimum threshold
+ *   2. Courses: published courses are accessible
+ *   3. RLS: an anonymous reader can actually see published Quick Wins
+ *   4. Finished content that was never published (the expensive silent failure)
+ *   5. status / is_published divergence (admin says live, Hub says dark)
  *
  * Sends an IMMEDIATE alert email to Rae if anything is wrong.
- * This prevents content from silently disappearing.
+ * This prevents content from silently disappearing, and from silently never
+ * appearing in the first place.
  */
 
 const MIN_PUBLISHED_QUICK_WINS = 50; // Alert if below this
@@ -96,23 +99,106 @@ export async function GET() {
     issues.push(`RLS sanity check failed: ${String(err)}`);
   }
 
-  // Check 5: Alert on stale drafts (content created by agents but not uploaded/published)
-  try {
-    const { data: staleDrafts } = await supabase
-      .from('hub_quick_wins')
-      .select('id, title, created_at')
-      .eq('is_published', false)
-      .is('file_url', null)
-      .lt('created_at', new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString());
+  // Check 5: Unpublished content, split by whether it is finished or genuinely incomplete.
+  //
+  // The Hub renders on `is_published` alone. `status` is workflow metadata for the
+  // admin/QA view and is never read by an educator-facing query. The failure mode that
+  // actually costs us is finished content that nobody published: it has every field and
+  // both PDFs, it just never had is_published flipped, so it is invisible. The old
+  // version of this check only looked for a missing file_url, so it reported the rare
+  // incomplete case and was blind to the common finished-but-dark case.
+  const STALE_HOURS = 48;
+  const staleCutoff = new Date(Date.now() - STALE_HOURS * 60 * 60 * 1000).toISOString();
 
-    if (staleDrafts && staleDrafts.length > 0) {
+  try {
+    const { data: unpublished, error } = await supabase
+      .from('hub_quick_wins')
+      .select('id, title, status, quick_win_type, file_url, tool_file_url, description, lift, category, topic_tags, roles, danielson_domains')
+      .eq('is_published', false)
+      .lt('created_at', staleCutoff);
+
+    if (error) {
+      issues.push(`Unpublished content check failed: ${error.message}`);
+    } else if (unpublished && unpublished.length > 0) {
+      const nonEmpty = (a: unknown) => Array.isArray(a) && a.length > 0;
+
+      // "Ready" means publishing it would give an educator something real to use.
+      //   download -> needs both the guide PDF and the tool PDF
+      //   quiz     -> the detail page renders "Take Quiz" off file_url and falls back to
+      //               a "Quiz coming soon" placeholder without it, so file_url is required
+      //   game / activity -> interactive, rendered by their own routes, need no PDF
+      const isReady = (q: typeof unpublished[number]) => {
+        const tagged =
+          !!q.title?.trim() && !!q.description?.trim() && !!q.lift && !!q.category &&
+          nonEmpty(q.topic_tags) && nonEmpty(q.roles) && nonEmpty(q.danielson_domains);
+        if (!tagged) return false;
+        if (q.quick_win_type === 'download') return !!q.file_url && !!q.tool_file_url;
+        if (q.quick_win_type === 'quiz') return !!q.file_url;
+        return true;
+      };
+
+      const ready = unpublished.filter(isReady);
+      const incomplete = unpublished.filter(q => !isReady(q));
+
+      if (ready.length > 0) {
+        issues.push(
+          `CRITICAL: ${ready.length} Quick Win${ready.length > 1 ? 's are' : ' is'} complete and passing every publish requirement ` +
+          `but still not live, so no educator can see ${ready.length > 1 ? 'them' : 'it'}. ` +
+          `Publish via POST /api/hub/content-sync (action: publish). ` +
+          `Titles: ${ready.slice(0, 8).map(d => d.title).join(', ')}${ready.length > 8 ? `, and ${ready.length - 8} more` : ''}`
+        );
+      }
+
+      if (incomplete.length > 0) {
+        const why = (q: typeof unpublished[number]) => {
+          const missing: string[] = [];
+          if (!q.description?.trim()) missing.push('description');
+          if (!q.lift) missing.push('lift');
+          if (!q.category) missing.push('category');
+          if (!nonEmpty(q.topic_tags)) missing.push('topic_tags');
+          if (!nonEmpty(q.roles)) missing.push('roles');
+          if (!nonEmpty(q.danielson_domains)) missing.push('danielson_domains');
+          if (q.quick_win_type === 'download') {
+            if (!q.file_url) missing.push('guide PDF');
+            if (!q.tool_file_url) missing.push('tool PDF');
+          }
+          if (q.quick_win_type === 'quiz' && !q.file_url) missing.push('quiz content (file_url)');
+          return `${q.title} (${q.quick_win_type || 'no type'}: missing ${missing.join(', ')})`;
+        };
+        issues.push(
+          `${incomplete.length} Quick Win${incomplete.length > 1 ? 's' : ''} older than ${STALE_HOURS}h still incomplete. ` +
+          `${incomplete.slice(0, 5).map(why).join('; ')}${incomplete.length > 5 ? `; and ${incomplete.length - 5} more` : ''}`
+        );
+      }
+    }
+  } catch (err) {
+    issues.push(`Unpublished content check failed: ${String(err)}`);
+  }
+
+  // Check 5b: status / is_published divergence.
+  //
+  // Migration 108 normalizes this at the database level, so a hit here means something
+  // is writing around the trigger and the admin may be showing "published" for content
+  // that is actually dark.
+  try {
+    const { data: divergent, error } = await supabase
+      .from('hub_quick_wins')
+      .select('id, title')
+      .eq('status', 'published')
+      .eq('is_published', false);
+
+    if (error) {
+      issues.push(`Publish-state divergence check failed: ${error.message}`);
+    } else if (divergent && divergent.length > 0) {
       issues.push(
-        `${staleDrafts.length} draft Quick Win${staleDrafts.length > 1 ? 's' : ''} created over 48 hours ago with no PDF uploaded. ` +
-        `These may be stuck in the Paperclip pipeline. Titles: ${staleDrafts.slice(0, 5).map(d => d.title).join(', ')}${staleDrafts.length > 5 ? '...' : ''}`
+        `CRITICAL: ${divergent.length} Quick Win${divergent.length > 1 ? 's are' : ' is'} marked status='published' but is_published=false, ` +
+        `so ${divergent.length > 1 ? 'they show' : 'it shows'} as published in the admin while being invisible on the Hub. ` +
+        `Migration 108 should make this impossible, so a write path is bypassing the trigger. ` +
+        `Titles: ${divergent.slice(0, 5).map(d => d.title).join(', ')}${divergent.length > 5 ? '...' : ''}`
       );
     }
   } catch (err) {
-    issues.push(`Stale draft check failed: ${String(err)}`);
+    issues.push(`Publish-state divergence check failed: ${String(err)}`);
   }
 
   // Check 6: Clean up video staging files older than 1 hour
