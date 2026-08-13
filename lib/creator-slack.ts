@@ -16,17 +16,21 @@ function db() {
   )
 }
 
-async function getWebhook(): Promise<{ url: string | null; enabled: boolean }> {
+async function getWebhook(
+  channel: 'creator' | 'rae' = 'creator'
+): Promise<{ url: string | null; enabled: boolean }> {
   const { data } = await db()
     .from('funding_notification_settings')
-    .select('slack_enabled, creator_webhook_url')
+    .select('slack_enabled, creator_webhook_url, partner_webhook_url')
     .limit(1)
     .single()
-  return { url: data?.creator_webhook_url || null, enabled: data?.slack_enabled || false }
+  // creator_webhook_url is #bella-actions, partner_webhook_url is #rae-actions.
+  const url = channel === 'rae' ? data?.partner_webhook_url : data?.creator_webhook_url
+  return { url: url || null, enabled: data?.slack_enabled || false }
 }
 
-async function postToSlack(text: string) {
-  const { url, enabled } = await getWebhook()
+async function postToSlack(text: string, channel: 'creator' | 'rae' = 'creator') {
+  const { url, enabled } = await getWebhook(channel)
   if (!enabled || !url) {
     console.log(LOG, '[DRY RUN]', text)
     return
@@ -158,5 +162,70 @@ export async function recruitmentPipelineStalled(criticalGaps: number, activeCan
     `*Recruitment Pipeline Is Quiet* | ${criticalGaps} critical gap${criticalGaps === 1 ? '' : 's'} open\n` +
       `No new candidates in 14 days. ${activeCandidates} candidate${activeCandidates === 1 ? '' : 's'} active in the pipeline.\n` +
       `Worth a look, or nudge Anne Marie for fresh research.\n${RECRUITMENT_TAB_URL}`
+  )
+}
+
+export type DigestCandidate = {
+  name: string
+  role: string | null
+  org: string | null
+  gap: string
+  contact: string
+  why: string
+  draft: string
+}
+
+/**
+ * The weekly handoff to Bella. Everything she needs is inline so she can copy
+ * an outreach draft straight out of Slack without opening the portal first.
+ */
+export async function recruitmentWeeklyDigest(candidates: DigestCandidate[], target: number) {
+  if (candidates.length === 0) return
+
+  const header =
+    `*This Week's Creator Candidates* | ${candidates.length} of ${target}\n` +
+    `Researched by Anne Marie. Each one is ready to send once you approve it.\n`
+
+  const body = candidates
+    .map((c, i) => {
+      const who = [c.role, c.org].filter(Boolean).join(', ')
+      return (
+        `\n\n*${i + 1}. ${c.name}*` +
+        (who ? `\n${who}` : '') +
+        `\nGap: ${c.gap}` +
+        `\nContact: ${c.contact}` +
+        `\nWhy: ${c.why}` +
+        `\n\n\`\`\`${c.draft}\`\`\``
+      )
+    })
+    .join('')
+
+  const footer =
+    `\n\nApprove, edit, or dismiss each one here:\n${RECRUITMENT_TAB_URL}`
+
+  await postToSlack(header + body + footer)
+}
+
+/** Friday check for Rae: the week came up short of the recruitment target. */
+export async function recruitmentWeeklyShortfall(
+  actual: number,
+  target: number,
+  openCriticalGaps: number
+) {
+  await postToSlack(
+    `*Recruitment Came Up Short This Week* | ${actual} of ${target}\n` +
+      `${openCriticalGaps} critical gap${openCriticalGaps === 1 ? '' : 's'} still open with nobody sourced.\n` +
+      `${RECRUITMENT_TAB_URL}`,
+    'rae'
+  )
+}
+
+/** The research job itself failed. Silence is what broke this the first time. */
+export async function recruitmentResearchFailed(reason: string) {
+  await postToSlack(
+    `*Recruitment Research Failed* | no candidates were produced this run\n` +
+      `Reason: ${reason}\n` +
+      `The pipeline will be short this week unless someone nominates manually.\n${RECRUITMENT_TAB_URL}`,
+    'rae'
   )
 }
