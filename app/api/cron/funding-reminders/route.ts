@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
 import { calculateFundingAlerts } from '@/lib/tdi-admin/funding-alert-rules'
+import { syncGateActionItems } from '@/lib/funding-gate-sync'
 
 /**
  * Daily cron endpoint for funding reminders.
@@ -37,7 +38,33 @@ export async function GET(request: NextRequest) {
     const pursuits = pursuitRes.data || []
     const activeIds = new Set(pursuits.map(p => p.id))
     const opportunities = (oppRes.data || []).filter(o => activeIds.has(o.pursuit_id))
-    const actionItems = (actionRes.data || []).filter(a => activeIds.has(a.pursuit_id))
+    let actionItems = (actionRes.data || []).filter(a => activeIds.has(a.pursuit_id))
+
+    // Reconcile gate gaps into client action items before computing alerts.
+    // The gate PUT does this going forward, but a pursuit whose gate was shut
+    // and never touched again would otherwise never surface its blockers. That
+    // is exactly how St. Peter Chanel went 23 days with nothing happening.
+    let gateItemsCreated = 0
+    const { data: gates } = await supabase
+      .from('pursuit_gate')
+      .select('*')
+      .in('pursuit_id', Array.from(activeIds))
+
+    const gateByPursuit = new Map((gates || []).map(g => [g.pursuit_id, g]))
+    for (const p of pursuits) {
+      const res = await syncGateActionItems(supabase, p.id, gateByPursuit.get(p.id) ?? null)
+        .catch(() => ({ created: 0, resolved: 0 }))
+      gateItemsCreated += res.created
+    }
+
+    // Re-read action items if the reconcile added any, so the digest sees them
+    if (gateItemsCreated > 0) {
+      const { data: refreshed } = await supabase
+        .from('funding_action_items')
+        .select('*')
+        .not('status', 'in', '("done","skipped")')
+      actionItems = (refreshed || []).filter(a => activeIds.has(a.pursuit_id))
+    }
 
     const alerts = calculateFundingAlerts({ pursuits, opportunities, actionItems })
 

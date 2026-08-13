@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { requireAdminAuth } from '@/lib/tdi-admin/auth'
 import { postFundingEvent, gateEvent, contactVerifiedEvent } from '@/lib/funding-slack'
+import { syncGateActionItems } from '@/lib/funding-gate-sync'
 
 function db() {
   return createClient(
@@ -93,6 +94,11 @@ export async function PUT(
   }
 
   if (result.error) return NextResponse.json({ error: result.error.message }, { status: 500 })
+
+  // Keep the school's action items in step with what the gate is still missing.
+  // A shut gate makes drafting work invisible to every agent, so the gaps have
+  // to be visible to Bella and to the school rather than silently blocking.
+  await syncGateActionItems(supabase, pursuitId, result.data).catch(() => {})
 
   // Slack narration
   const { data: pursuit } = await supabase.from('funding_pursuits').select('pursuit_name').eq('id', pursuitId).single()

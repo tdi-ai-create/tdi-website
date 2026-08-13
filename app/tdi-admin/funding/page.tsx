@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { DraftEmailModal, introEmailDraft } from './components/panel/DraftEmailModal'
+import { DraftEmailModal, introEmailDraft, gateBlockerEmailDraft } from './components/panel/DraftEmailModal'
 
 /**
  * One next-step item, exactly as computed by lib/funding-next-actions.ts and
@@ -46,6 +46,7 @@ interface SchoolData {
   actions: {
     id: string
     title: string
+    clientLabel: string | null
     description: string | null
     dueDate: string | null
     ownerName: string | null
@@ -110,6 +111,7 @@ export default function FundingPage() {
               actions: actions.map((a: any) => ({
                 id: a.id,
                 title: a.title,
+                clientLabel: a.client_label ?? null,
                 description: a.description,
                 dueDate: a.due_date,
                 ownerName: a.owner_name,
@@ -223,6 +225,12 @@ function SchoolCard({ school, onDraftEmail, onToast }: {
   const isIntro = nextStep?.actionType === 'setup_pursuit'
   const isBlocked = nextStep?.actionType === 'unblock_draft'
 
+  // What the school still owes us, in the words they will actually read.
+  // Maintained by lib/funding-gate-sync.ts, so this stays in step automatically.
+  const gateGapLabels = school.actions
+    .filter(a => a.category === 'gate' && a.ownerType === 'client')
+    .map(a => a.clientLabel || a.title)
+
   const bannerBg = isBlocked ? '#FEF2F2' : isWaiting ? '#F0FDF4' : isIntro ? '#EFF6FF' : '#F5F3FF'
   const bannerFg = isBlocked ? '#B91C1C' : isWaiting ? '#1e2749' : isIntro ? '#1e2749' : '#6D28D9'
   const needsAttention = !!nextStep && !isWaiting
@@ -273,8 +281,26 @@ function SchoolCard({ school, onDraftEmail, onToast }: {
             </div>
           </div>
 
-          {/* Intro email is the one action this page can complete on its own */}
-          {isIntro && school.email ? (
+          {/* Blocked on the school: offer the email that names exactly what we need */}
+          {isBlocked && school.email && gateGapLabels.length > 0 ? (
+            <button
+              onClick={() => {
+                const draft = gateBlockerEmailDraft(
+                  school.contact,
+                  school.name.replace(/ - Grant Funding$/, '').replace(/ - Grant Funded Funding$/, ''),
+                  gateGapLabels,
+                )
+                onDraftEmail(school.email, school.contact, draft.subject, draft.body, school.name, school.id)
+              }}
+              style={{
+                fontSize: 12, fontWeight: 700, padding: '8px 16px', borderRadius: 8,
+                border: 'none', background: '#DC2626', color: 'white', cursor: 'pointer', flexShrink: 0,
+                whiteSpace: 'nowrap',
+              }}
+            >
+              Email {school.contact.split(' ')[0]}
+            </button>
+          ) : isIntro && school.email ? (
             <button
               onClick={() => {
                 const draft = introEmailDraft(school.contact, school.name.replace(/ - Grant Funding$/, ''))

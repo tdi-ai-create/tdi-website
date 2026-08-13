@@ -223,6 +223,37 @@ Teachers Deserve It`,
   }
 }
 
+/**
+ * Sent when the gate is holding a school's applications up. Names exactly what
+ * we need and nothing about our internal pipeline — the school should never
+ * have to decode a status to know what we want from them.
+ */
+export function gateBlockerEmailDraft(
+  contactName: string,
+  schoolName: string,
+  gapLabels: string[],
+): { subject: string; body: string } {
+  const firstName = contactName.split(' ')[0]
+  const list = gapLabels.map(l => `- ${l}`).join('\n')
+  const count = gapLabels.length
+
+  return {
+    subject: `${count} quick thing${count === 1 ? '' : 's'} to get ${schoolName}'s grant applications moving`,
+    body: `Hi ${firstName},
+
+We have grant applications lined up for ${schoolName} and we are ready to start writing them. Before we can, there ${count === 1 ? 'is one thing' : `are ${count} things`} we need from you:
+
+${list}
+
+${count === 1 ? 'It usually takes a few minutes.' : 'Most of these take a few minutes each.'} Once ${count === 1 ? 'it is' : 'they are'} done, we handle the rest. We write the applications, you review and submit, and we follow up at every deadline.
+
+If it is easier to do this on a quick call, reply and I will send you a time. Happy to walk through any of it.
+
+Bella
+Teachers Deserve It`,
+  }
+}
+
 export function schoolInfoEmailDraft(contactName: string, schoolName: string, missingFields: string[]): { subject: string; body: string } {
   const firstName = contactName.split(' ')[0]
   const fieldList = missingFields.map(f => `- ${f}`).join('\n')
