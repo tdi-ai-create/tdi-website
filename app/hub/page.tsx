@@ -232,7 +232,7 @@ interface Enrollment {
   id: string;
   course_id: string;
   status: string;
-  progress_percentage: number;
+  progress_pct: number;
   course: {
     id: string;
     slug: string;
@@ -412,7 +412,7 @@ export default function HubDashboard() {
           // 1. Enrollments
           supabase
             .from('hub_enrollments')
-            .select('id, course_id, status, progress_percentage, course:hub_courses(id, slug, title, category, estimated_minutes)')
+            .select('id, course_id, status, progress_pct, course:hub_courses(id, slug, title, category, estimated_minutes)')
             .eq('user_id', user.id)
             .eq('status', 'active')
             .order('updated_at', { ascending: false })
@@ -443,6 +443,11 @@ export default function HubDashboard() {
         ]);
 
         // Process enrollments
+        // Surface query failures: a bad column name returns 42703 and would
+        // otherwise silently empty the dashboard's Continue learning section.
+        if (enrollmentResult.error) {
+          console.error('Error loading enrollments:', enrollmentResult.error.message);
+        }
         const enrollmentData = enrollmentResult.data;
         if (enrollmentData) {
           const enrichedEnrollments = await Promise.all(
@@ -959,7 +964,7 @@ export default function HubDashboard() {
       cards.push({
         type: 'course',
         title: enrollment.course?.title || 'Course',
-        description: `${enrollment.progress_percentage || 0}% complete`,
+        description: `${enrollment.progress_pct || 0}% complete`,
         slug: enrollment.course?.slug || '',
         href: `/hub/courses/${enrollment.course?.slug}`,
         gradient: COURSE_GRADIENTS[gradientIdx++ % COURSE_GRADIENTS.length],
@@ -1125,7 +1130,7 @@ export default function HubDashboard() {
   // Recent win: most recently completed course or recent check-in
   const recentWin = useMemo(() => {
     // Check for completed enrollments first
-    const completedEnrollment = enrollments.find(e => e.progress_percentage >= 100);
+    const completedEnrollment = enrollments.find(e => e.progress_pct >= 100);
     if (completedEnrollment) {
       return {
         text: completedEnrollment.course?.title || 'a course',
@@ -1326,11 +1331,11 @@ export default function HubDashboard() {
                     <div style={{
                       height: '100%', borderRadius: 2,
                       background: '#E8B84B',
-                      width: `${continueEnrollment.progress_percentage || 0}%`,
+                      width: `${continueEnrollment.progress_pct || 0}%`,
                     }} />
                   </div>
                   <span style={{ fontSize: 11, color: '#E8B84B', fontWeight: 600 }}>
-                    {continueEnrollment.progress_percentage || 0}%
+                    {continueEnrollment.progress_pct || 0}%
                   </span>
                 </div>
               </div>
