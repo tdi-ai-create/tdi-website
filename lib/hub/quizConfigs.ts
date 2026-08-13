@@ -1653,6 +1653,422 @@ export const burnoutWarningQuiz: QuizConfig = {
     `I took TDI's Burnout Early Warning System and got "${title}" -- ${subtitle} Check yours at teachersdeserveit.com/hub`,
 }
 
+// ── 14. What's Your Classroom Management Style? ──────────────────────────
+// Converted from Classroom Management Resource 15 by Dr. Jasmine Cole. The
+// original was a static HTML handout with a tally-your-letters scoring key,
+// which maps directly onto the engine's type-tallying model.
+
+export const managementStyleQuiz: QuizConfig = {
+  id: 'management_style',
+  slug: 'management-style-quiz',
+  title: "What's Your Classroom Management Style?",
+  shortTitle: 'Management Style',
+  description: 'There is no best style. Ten questions to find the one you default to, and what it costs you.',
+  questionCount: 10,
+  durationLabel: '3 min',
+  category: 'identity',
+  accentColor: '#2A9D8F',
+  accentBg: '#E0F2F1',
+  accentGradient: 'linear-gradient(135deg, #2A9D8F 0%, #4DB6AC 100%)',
+  results: {
+    collaborator: {
+      key: 'collaborator',
+      title: 'The Collaborator',
+      subtitle: 'You build systems with students, not for them.',
+      description: 'You believe students invest in what they help create. Your strengths are real ownership and buy in, genuine critical thinking, and norms that feel fair because they were co-constructed. Watch for this: collaborative norm setting eats time, some students need firm adult led structure before they can share decisions, and consensus is too slow in a crisis. Try next: write a non negotiables list of 3 to 5 expectations that are yours to set before the collaborative process opens.',
+      color: '#059669',
+      bg: '#D1FAE5',
+      icon: 'A',
+    },
+    commander: {
+      key: 'commander',
+      title: 'The Commander',
+      subtitle: 'You treat clarity and consistency as acts of care.',
+      description: 'You build a structured environment where students know exactly what to expect. Your strengths are efficiency, maximized learning time, and a room that runs even when you are out. Watch for this: compliance can train students to behave for you rather than build internal motivation, and rigid consistency becomes inequity when circumstances differ. Try next: replace one automatic consequence with a brief private check in, and run 2x10, two minutes of personal conversation with your most challenging student for ten straight days.',
+      color: '#2563EB',
+      bg: '#DBEAFE',
+      icon: 'B',
+    },
+    connector: {
+      key: 'connector',
+      title: 'The Connector',
+      subtitle: 'You believe behavior is communication.',
+      description: 'You prioritize knowing your students deeply. Your strengths are students who feel genuinely seen, early warning signs you catch before anyone else, and culturally responsive practice. Students labeled difficult elsewhere often do well with you. Watch for this: deep emotional investment burns out, and you may delay addressing behavior to protect the connection. Try next: build three automatic procedures that run on structure rather than relational energy, and set one self care boundary you actually keep.',
+      color: '#DB2777',
+      bg: '#FCE7F3',
+      icon: 'C',
+    },
+    coach: {
+      key: 'coach',
+      title: 'The Coach',
+      subtitle: 'You treat behavior as a skill set you can teach.',
+      description: 'Your job, as you see it, is diagnosing what students cannot yet do and teaching it explicitly. Your strengths are removing shame from management, building transferable skills, and naturally differentiated practice. Watch for this: it can get clinical without relational warmth, and you may over scaffold. Try next: add a daily relationship touchpoint with no agenda, and name your non coachable moments, the ones where the right response is presence rather than instruction.',
+      color: '#D97706',
+      bg: '#FEF3C7',
+      icon: 'D',
+    },
+  },
+  questions: [
+    {
+      question: 'A student repeatedly calls out during your lesson without raising their hand.',
+      answers: [
+        { text: 'I stop and ask the class to help come up with a solution together', types: ['collaborator'] },
+        { text: 'I give a clear, firm reminder and a consequence if it continues', types: ['commander'] },
+        { text: 'I check in privately afterward to find out what is driving it', types: ['connector'] },
+        { text: 'I give them a meaningful role. "You clearly have ideas. Hold that thought."', types: ['coach'] },
+      ],
+    },
+    {
+      question: 'You are planning a new seating arrangement. Your first instinct is to...',
+      answers: [
+        { text: 'Have students propose arrangements that help everyone learn', types: ['collaborator'] },
+        { text: 'Assign seats based on behavior data and academic needs', types: ['commander'] },
+        { text: 'Think about who needs proximity to me or a supportive peer', types: ['connector'] },
+        { text: 'Design flexible groupings I can rotate based on the activity', types: ['coach'] },
+      ],
+    },
+    {
+      question: 'A parent emails to complain about your classroom. You...',
+      answers: [
+        { text: 'Invite them in to observe and co-create a plan', types: ['collaborator'] },
+        { text: 'Respond with the rationale behind the procedures and what they produce', types: ['commander'] },
+        { text: 'Call to listen and understand the family perspective first', types: ['connector'] },
+        { text: 'Share specific examples of how the approach supports their child', types: ['coach'] },
+      ],
+    },
+    {
+      question: 'It is the first week of school. You spend the most time on...',
+      answers: [
+        { text: 'Building class agreements through discussion and consensus', types: ['collaborator'] },
+        { text: 'Teaching and practicing every procedure until it is automatic', types: ['commander'] },
+        { text: 'Relationship building circles and learning student stories', types: ['connector'] },
+        { text: 'Diagnostics, so I know where each student is before setting goals', types: ['coach'] },
+      ],
+    },
+    {
+      question: 'A conflict breaks out between two students during group work. You...',
+      answers: [
+        { text: 'Pause the class and facilitate a brief problem-solving conversation', types: ['collaborator'] },
+        { text: 'Separate them immediately, apply the consequence, debrief later', types: ['commander'] },
+        { text: 'Move close, de-escalate with calm presence, talk to each privately', types: ['connector'] },
+        { text: 'Ask both what went wrong, what skill they need, how they will retry', types: ['coach'] },
+      ],
+    },
+    {
+      question: 'You realize a classroom routine is not working. Your response...',
+      answers: [
+        { text: 'Bring it to the students. "This is not working for us. What changes?"', types: ['collaborator'] },
+        { text: 'Analyze it, redesign it, reteach it, hold everyone accountable', types: ['commander'] },
+        { text: 'Consider whether students feel safe or connected enough to follow it', types: ['connector'] },
+        { text: 'Figure out which specific skill is missing and build a mini lesson', types: ['coach'] },
+      ],
+    },
+    {
+      question: 'Which statement best describes your core belief about student behavior?',
+      answers: [
+        { text: 'Students behave best when they have ownership and voice', types: ['collaborator'] },
+        { text: 'Students behave best when expectations are clear and non negotiable', types: ['commander'] },
+        { text: 'Students behave best when they feel known, valued, and safe', types: ['connector'] },
+        { text: 'Students behave best when they have the skills, practice, and feedback', types: ['coach'] },
+      ],
+    },
+    {
+      question: 'A student who has been doing well suddenly shuts down and refuses to work. You...',
+      answers: [
+        { text: 'Ask a trusted classmate to check in', types: ['collaborator'] },
+        { text: 'State the expectation and timeline, give space, follow up if needed', types: ['commander'] },
+        { text: 'Sit near quietly, let them know I notice, find a private moment to ask', types: ['connector'] },
+        { text: 'Offer a choice of two modified tasks that still hit the learning goal', types: ['coach'] },
+      ],
+    },
+    {
+      question: 'Your classroom walls primarily feature...',
+      answers: [
+        { text: 'Student-generated norms and documentation of class decisions', types: ['collaborator'] },
+        { text: 'Posted procedures, expectations, behavior tracking, learning targets', types: ['commander'] },
+        { text: 'Student photos, identity-affirming images, shout-out boards', types: ['connector'] },
+        { text: 'Goal trackers, growth data, strategy anchor charts, reflections', types: ['coach'] },
+      ],
+    },
+    {
+      question: 'A colleague asks what the secret to your classroom management is. You say...',
+      answers: [
+        { text: '"I do not manage them. We manage us. They built what you see."', types: ['collaborator'] },
+        { text: '"Consistency. I say what I mean and follow through every time."', types: ['commander'] },
+        { text: '"Relationships. If they know I care, everything else follows."', types: ['connector'] },
+        { text: '"I teach behavior like content. Instruction, practice, feedback."', types: ['coach'] },
+      ],
+    },
+  ],
+  shareMessage: (title, subtitle) =>
+    `I took TDI's classroom management style quiz and got "${title}". ${subtitle} Find yours at teachersdeserveit.com/hub`,
+}
+
+// ── 15. Arts Classroom Culture Checkup ──────────────────────────────────
+// Converted from Classroom Management Resource 19 by Dr. Jasmine Cole.
+
+export const artsCultureQuiz: QuizConfig = {
+  id: 'arts_culture',
+  slug: 'arts-classroom-culture-checkup',
+  title: 'Arts Classroom Culture Checkup',
+  shortTitle: 'Arts Culture',
+  description: 'For art, music, theater and dance teachers. Twelve questions on whether your room is safe enough for real creative risk.',
+  questionCount: 12,
+  durationLabel: '4 min',
+  category: 'needs',
+  accentColor: '#9333EA',
+  accentBg: '#F3E8FF',
+  accentGradient: 'linear-gradient(135deg, #9333EA 0%, #C084FC 100%)',
+  results: {
+    thriving: {
+      key: 'thriving',
+      title: 'The Thriving Studio',
+      subtitle: 'Creative risk, psychological safety and equitable participation are all in place.',
+      description: 'Students feel safe taking creative risks, critique is structured and kind, every student gets a meaningful public moment, and studio culture is genuinely co-owned. This is the environment that produces the deepest creative and personal growth. Where to go next: document what you do and share it, other arts educators need this. Involve students in curating influences and researching community artists. And use your culture as evidence when you advocate for the value of arts education in your building.',
+      color: '#7C3AED',
+      bg: '#F3E8FF',
+      icon: 'A',
+    },
+    developing: {
+      key: 'developing',
+      title: 'The Developing Gallery',
+      subtitle: 'You care and you have standards. What is missing is arts-specific structure.',
+      description: 'You are doing many things right. What is often absent are the taught structures that make arts classrooms distinct: a real critique protocol, a performance ladder that scaffolds vulnerability, transparent systems for who gets featured. You may be relying on personality and goodwill where explicit structure would serve students better. Where to go next: build one critique protocol, I notice, I wonder, what if, and use it consistently for two months before judging it. Build a performance ladder from partner sharing to small group to full audience. And track showcase equity in a simple spreadsheet so rotation is real rather than intended.',
+      color: '#2563EB',
+      bg: '#DBEAFE',
+      icon: 'B',
+    },
+    construction: {
+      key: 'construction',
+      title: 'The Under-Construction Workshop',
+      subtitle: 'Skill and product may be outrunning the culture that makes deep work possible.',
+      description: 'You likely have high standards and real passion for your discipline. The gap is the culture layer, the rituals that make students safe enough to take the risks your standards require. When students fear judgment they retreat to safe, uninspired work, and a thick skin expectation tends to filter out the students who most need what arts education offers. Where to go next: name vulnerability explicitly this week and set 2 or 3 non negotiables, no side talk during performances, applause every time, a private channel for discomfort. Separate skill drills from creative projects so students know which mode they are in. And revisit the thick skin narrative, since psychological safety produces braver performers, not weaker ones.',
+      color: '#D97706',
+      bg: '#FEF3C7',
+      icon: 'C',
+    },
+  },
+  questions: [
+    {
+      question: 'When a student tries something unconventional...',
+      answers: [
+        { text: 'I celebrate it and ask them to explain their thinking', types: ['thriving'] },
+        { text: 'I acknowledge it but redirect toward the assignment parameters', types: ['developing'] },
+        { text: 'I correct it. The assignment has specific requirements', types: ['construction'] },
+      ],
+    },
+    {
+      question: 'When a student produces weak work and knows it...',
+      answers: [
+        { text: 'I normalize it. I show my own failed attempts and professional drafts', types: ['thriving'] },
+        { text: 'I reassure them it is not as bad as they think and focus on what works', types: ['developing'] },
+        { text: 'I give direct, honest feedback about what is not working', types: ['construction'] },
+      ],
+    },
+    {
+      question: 'Someone walks in during an energetic session. You feel...',
+      answers: [
+        { text: 'Confident. I can articulate the learning and I have attention signals', types: ['thriving'] },
+        { text: 'Self-conscious. I sometimes tighten structure more than necessary', types: ['developing'] },
+        { text: 'Honestly, sometimes it is out of control and I struggle with balance', types: ['construction'] },
+      ],
+    },
+    {
+      question: 'A talented student freezes during performances...',
+      answers: [
+        { text: 'I have built low-stakes performance rungs and offer alternative formats', types: ['thriving'] },
+        { text: 'I excuse them from performance situations to avoid distress', types: ['developing'] },
+        { text: 'I push them. Overcoming the fear is part of the learning', types: ['construction'] },
+      ],
+    },
+    {
+      question: 'How you prepare students for emotionally vulnerable work...',
+      answers: [
+        { text: 'I name vulnerability explicitly, have rituals, and intervene when trust breaks', types: ['thriving'] },
+        { text: 'I keep a supportive tone but have no explicit structures for it', types: ['developing'] },
+        { text: 'I expect a thick skin. The arts are demanding', types: ['construction'] },
+      ],
+    },
+    {
+      question: 'When students give feedback on each other’s work...',
+      answers: [
+        { text: 'I taught a critique protocol and I facilitate every session', types: ['thriving'] },
+        { text: 'I ask them to be nice, and comments end up vague', types: ['developing'] },
+        { text: 'It is unpredictable. Sometimes it goes well, sometimes feelings get hurt', types: ['construction'] },
+      ],
+    },
+    {
+      question: 'On perceived talent hierarchies in your class...',
+      answers: [
+        { text: 'I work against it. Success is growth and creative thinking, not innate talent', types: ['thriving'] },
+        { text: 'I do not create it intentionally, but I know it exists', types: ['developing'] },
+        { text: 'The hierarchy reflects reality. Some students have genuine aptitude', types: ['construction'] },
+      ],
+    },
+    {
+      question: 'Who gets the solo, the lead role, or the most wall space...',
+      answers: [
+        { text: 'A transparent rotating process I track. Everyone gets a public moment', types: ['thriving'] },
+        { text: 'The strongest performers. I want the program to look its best', types: ['developing'] },
+        { text: 'I try to be fair but default to the same reliable, eager students', types: ['construction'] },
+      ],
+    },
+    {
+      question: 'The artists, musicians and composers you teach are...',
+      answers: [
+        { text: 'Intentionally diverse. Students see themselves and meet the unfamiliar', types: ['thriving'] },
+        { text: 'Somewhat diverse, but I lean heavily on the Western canon', types: ['developing'] },
+        { text: 'What I know. I focus on technique and am unsure how identity connects', types: ['construction'] },
+      ],
+    },
+    {
+      question: 'Your program’s visibility in the wider school...',
+      answers: [
+        { text: 'I collaborate with other teachers. Student work is visible building-wide', types: ['thriving'] },
+        { text: 'I keep to my space but contribute to school events when asked', types: ['developing'] },
+        { text: 'I feel isolated. My program is treated as an elective', types: ['construction'] },
+      ],
+    },
+    {
+      question: 'Expectations around shared equipment and space are...',
+      answers: [
+        { text: 'Co-created, explicitly taught, with real time built in for setup and cleanup', types: ['thriving'] },
+        { text: 'Posted and reviewed in September. I remind. Cleanup is often rushed', types: ['developing'] },
+        { text: 'Informal and assumed. I address problems as they come and often clean up myself', types: ['construction'] },
+      ],
+    },
+    {
+      question: 'On meaningful artistic choices in your class...',
+      answers: [
+        { text: 'Students regularly choose subjects, materials and projects, and I honor it', types: ['thriving'] },
+        { text: 'I offer some choice inside assignments, but I set direction and standards', types: ['developing'] },
+        { text: 'I mostly direct the work. Students replicate what I model', types: ['construction'] },
+      ],
+    },
+  ],
+  shareMessage: (title, subtitle) =>
+    `I took TDI's Arts Classroom Culture Checkup and got "${title}". ${subtitle} Check yours at teachersdeserveit.com/hub`,
+}
+
+// ── 16. SEL Strategy Selector ───────────────────────────────────────────
+// Converted from Classroom Management Resource 17 by Dr. Jasmine Cole.
+// Answer one specific student in mind. Results map to a named strategy.
+
+export const selStrategyQuiz: QuizConfig = {
+  id: 'sel_strategy',
+  slug: 'sel-strategy-selector',
+  title: 'SEL Strategy Selector',
+  shortTitle: 'SEL Selector',
+  description: 'Hold one student in mind. Five questions to match the behavior you are seeing to the strategy that actually fits it.',
+  questionCount: 5,
+  durationLabel: '2 min',
+  category: 'needs',
+  accentColor: '#0891B2',
+  accentBg: '#CFFAFE',
+  accentGradient: 'linear-gradient(135deg, #0891B2 0%, #22D3EE 100%)',
+  results: {
+    regulation: {
+      key: 'regulation',
+      title: 'Regulation Toolkit',
+      subtitle: 'For explosive or dysregulated behavior.',
+      description: 'Pre-taught calming strategies, plus the environmental structures that give students permission to use them. Teach 3 or 4 explicitly: box breathing, progressive muscle relaxation, a drawing reset, a movement break. Post a regulation menu so the options are visible. Set up a non-verbal signal so a student can request a break without an audience. Practice while the student is calm, never during a meltdown. Be patient, regulation skills take 6 to 8 weeks of consistent practice before they run automatically.',
+      color: '#0891B2',
+      bg: '#CFFAFE',
+      icon: '1',
+    },
+    structure: {
+      key: 'structure',
+      title: 'Structured Choice and Self-Monitoring',
+      subtitle: 'For persistent, low-level disruption.',
+      description: 'Bounded choices at predictable decision points, paired with the student tracking their own behavior. Offer 2 or 3 structured choices at transitions: seat, task order, format. Teach them to check their own on-task behavior every 10 to 15 minutes on a simple form. Set daily goals together and celebrate honest self-assessment over perfect scores. Replace verbal reminders with a gesture or a card on the desk. Start with one class period before expanding.',
+      color: '#2563EB',
+      bg: '#DBEAFE',
+      icon: '2',
+    },
+    community: {
+      key: 'community',
+      title: 'Community-Building Circles',
+      subtitle: 'For social conflict and peer dynamics. Also the right starting point when your answers were mixed.',
+      description: 'Structured peer dialogue, 10 to 15 minutes twice a week, that builds trust across the whole class. Use a talking piece so only one person speaks. Rotate three prompt types: connection, skill-building, problem-solving. Set circle norms together in the first session. Participate as an equal member rather than a facilitator steering the outcome. Stay with low-risk prompts for the first 3 or 4 weeks before going deeper. If your answers were evenly split, run this as the whole-class foundation and layer the individual strategy for your most challenging student on top.',
+      color: '#059669',
+      bg: '#D1FAE5',
+      icon: '3',
+    },
+    identity: {
+      key: 'identity',
+      title: 'Identity-Affirming Engagement',
+      subtitle: 'For avoidance and disengagement.',
+      description: 'Reconnect a disengaged student by making the work relevant to who they actually are. Run an interest and identity inventory and keep their own words. Redesign the entry point to the learning using those answers as context. Assign competence publicly, create visible moments where this student is the expert. Build a classroom role that carries real status. Expect resistance at first and persist, and pair it with weekly one-on-one check-ins.',
+      color: '#D97706',
+      bg: '#FEF3C7',
+      icon: '4',
+    },
+    collaborative: {
+      key: 'collaborative',
+      title: 'Collaborative Problem-Solving',
+      subtitle: 'For defiance and power struggles.',
+      description: 'A structured conversation adapted from Dr. Ross Greene, and it only works when both of you are calm. Step one, empathy: gather their perspective without judgment and listen fully before you respond. Step two, define the problem: share your concern with "I notice" language, two concerns side by side rather than one over the other. Step three, invitation: "I wonder if we can find a solution that works for both of us," then brainstorm together. Write the plan down and set a specific check-in date. If it fails, return to step one with genuine curiosity rather than frustration.',
+      color: '#DC2626',
+      bg: '#FEE2E2',
+      icon: '5',
+    },
+  },
+  questions: [
+    {
+      question: 'The nature of the disruption is mostly...',
+      answers: [
+        { text: 'Explosive. Sudden outbursts or shutdowns with little warning', types: ['regulation'] },
+        { text: 'Persistent and low-level. Talking, fidgeting, boundary-pushing', types: ['structure'] },
+        { text: 'Social. Gossip, exclusion, cliques, peer conflict', types: ['community'] },
+        { text: 'Avoidant. Refusal to participate, head down, "I do not care"', types: ['identity'] },
+        { text: 'Defiant. Direct challenges, arguing, refusing directions', types: ['collaborative'] },
+      ],
+    },
+    {
+      question: 'It tends to happen...',
+      answers: [
+        { text: 'During transitions, unstructured time, or changes to routine', types: ['regulation'] },
+        { text: 'During independent work, or difficult and boring tasks', types: ['structure'] },
+        { text: 'During group work, partner activities, or social settings', types: ['community'] },
+        { text: 'At the start of class, after weekends or breaks', types: ['identity'] },
+        { text: 'When given a direct instruction or correction in front of peers', types: ['collaborative'] },
+      ],
+    },
+    {
+      question: 'What you have already tried...',
+      answers: [
+        { text: 'Consequences are not working, or are making it worse', types: ['regulation'] },
+        { text: 'Private talks produce compliance that does not last', types: ['structure'] },
+        { text: 'Addressing the peer group does not stick. Dynamics keep shifting', types: ['community'] },
+        { text: 'Incentives and choices are not reaching this student', types: ['identity'] },
+        { text: 'Flexibility and rapport get read as weakness', types: ['collaborative'] },
+      ],
+    },
+    {
+      question: 'Your own emotional response is closest to...',
+      answers: [
+        { text: 'Worry. I am concerned about their safety or wellbeing', types: ['regulation'] },
+        { text: 'Exhaustion. I am tired of repeating myself every day', types: ['structure'] },
+        { text: 'Frustration with the group. All my energy goes to social dynamics', types: ['community'] },
+        { text: 'Helplessness. Nothing I try reaches this student', types: ['identity'] },
+        { text: 'Anger or defensiveness. It feels personal', types: ['collaborative'] },
+      ],
+    },
+    {
+      question: 'What the student actually seems to need is...',
+      answers: [
+        { text: 'Regulation. They cannot manage their emotional or physical state', types: ['regulation'] },
+        { text: 'Structure. Clearer expectations and more predictable routines', types: ['structure'] },
+        { text: 'Belonging. Social connection, acceptance, relationship skills', types: ['community'] },
+        { text: 'Purpose. Meaning, relevance, or belief in their own capability', types: ['identity'] },
+        { text: 'Power. Agency and autonomy in the environment', types: ['collaborative'] },
+      ],
+    },
+  ],
+  shareMessage: (title, subtitle) =>
+    `TDI's SEL Strategy Selector pointed me to "${title}". ${subtitle} Find your match at teachersdeserveit.com/hub`,
+}
+
 // ── All Quizzes Registry ──────────────────────────────────────────────
 
 export const ALL_QUIZZES: QuizConfig[] = [
@@ -1669,6 +2085,9 @@ export const ALL_QUIZZES: QuizConfig[] = [
   coachingStanceQuiz,
   paraPartnershipQuiz,
   burnoutWarningQuiz,
+  managementStyleQuiz,
+  artsCultureQuiz,
+  selStrategyQuiz,
 ]
 
 export function getQuizById(id: string): QuizConfig | undefined {
