@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { logCreatorEmail } from '@/lib/creator-email-log';
 import { creatorEmailTemplate } from '@/lib/creator-email-template';
+import { guardCron } from '@/lib/cron-guard';
 
 // ---------------------------------------------------------------------------
 // First-Week Momentum Email
@@ -15,14 +16,11 @@ import { creatorEmailTemplate } from '@/lib/creator-email-template';
 
 export async function GET(request: NextRequest) {
   try {
-    const authHeader = request.headers.get('authorization');
-    const cronSecret = process.env.CRON_SECRET;
-    if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
-      const isVercelCron = request.headers.get('x-vercel-cron') === '1';
-      if (!isVercelCron) {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-      }
+    const guard = guardCron(request);
+    if (!guard.ok) {
+      return NextResponse.json({ error: guard.error }, { status: guard.status });
     }
+    const { dryRun } = guard;
 
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -36,27 +34,43 @@ export async function GET(request: NextRequest) {
       auth: { autoRefreshToken: false, persistSession: false },
     });
 
-    // Find creators added 3 days ago (window: 3-4 days to account for cron timing)
-    const threeDaysAgo = new Date();
-    threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
-    threeDaysAgo.setHours(0, 0, 0, 0);
+    // Find creators who are at least 3 days old but not yet 10 days old.
+    //
+    // This used to be a fixed 24 hour slice between the 4-days-ago and
+    // 3-days-ago midnights, which had two problems. It actually selected
+    // creators added 4 days ago rather than 3, and because it was exactly one
+    // day wide with the cron running daily, a single missed or failed run meant
+    // those creators fell out of the window permanently and never got the
+    // email at all.
+    //
+    // A 7 day range is safe to widen to because the already-sent check below
+    // is what does the deduping, not the narrowness of the window.
+    const windowStart = new Date();
+    windowStart.setDate(windowStart.getDate() - 10);
 
-    const fourDaysAgo = new Date();
-    fourDaysAgo.setDate(fourDaysAgo.getDate() - 4);
-    fourDaysAgo.setHours(0, 0, 0, 0);
+    const windowEnd = new Date();
+    windowEnd.setDate(windowEnd.getDate() - 3);
 
-    const { data: newCreators } = await supabase
+    const { data: newCreators, error: newCreatorsError } = await supabase
       .from('creators')
-      .select('id, email, name, content_path, current_phase')
+      .select('id, email, name, content_path, current_phase, created_at')
       .eq('status', 'active')
-      .gte('created_at', fourDaysAgo.toISOString())
-      .lte('created_at', threeDaysAgo.toISOString());
+      .gte('created_at', windowStart.toISOString())
+      .lte('created_at', windowEnd.toISOString());
+
+    if (newCreatorsError) {
+      return NextResponse.json(
+        { success: false, error: `Failed to read new creators: ${newCreatorsError.message}` },
+        { status: 500 }
+      );
+    }
 
     if (!newCreators || newCreators.length === 0) {
-      return NextResponse.json({ success: true, message: 'No new creators in the 3-day window', sent: 0 });
+      return NextResponse.json({ success: true, message: 'No new creators in the 3 to 10 day window', sent: 0, dryRun });
     }
 
     let sent = 0;
+    const plan: Record<string, unknown>[] = [];
 
     for (const creator of newCreators) {
       // Check if they've completed any milestone
@@ -115,6 +129,18 @@ export async function GET(request: NextRequest) {
         showMission: true,
       });
 
+      if (dryRun) {
+        plan.push({
+          creator: creator.name,
+          to: creator.email,
+          createdAt: creator.created_at,
+          oneThing,
+          subject,
+        });
+        sent++;
+        continue;
+      }
+
       try {
         const res = await fetch('https://api.resend.com/emails', {
           method: 'POST',
@@ -150,7 +176,13 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    return NextResponse.json({ success: true, checked: newCreators.length, sent });
+    return NextResponse.json({
+      success: true,
+      dryRun,
+      checked: newCreators.length,
+      sent,
+      ...(dryRun ? { plan } : {}),
+    });
   } catch (error) {
     console.error('[first-week] Error:', error);
     return NextResponse.json(

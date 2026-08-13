@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { logCreatorEmail } from '@/lib/creator-email-log';
 import { creatorEmailTemplate } from '@/lib/creator-email-template';
+import { guardCron, checkedWrite } from '@/lib/cron-guard';
 
 // ---------------------------------------------------------------------------
 // Creator Re-engagement Cron
@@ -149,15 +150,11 @@ function getEmailContent(step: number, firstName: string): { subject: string; ht
 
 export async function GET(request: NextRequest) {
   try {
-    // Auth check
-    const authHeader = request.headers.get('authorization');
-    const cronSecret = process.env.CRON_SECRET;
-    if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
-      const isVercelCron = request.headers.get('x-vercel-cron') === '1';
-      if (!isVercelCron) {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-      }
+    const guard = guardCron(request);
+    if (!guard.ok) {
+      return NextResponse.json({ error: guard.error }, { status: guard.status });
     }
+    const { dryRun } = guard;
 
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -176,63 +173,117 @@ export async function GET(request: NextRequest) {
 
     const now = new Date();
     const results = {
+      dryRun,
       sequencesStarted: 0,
       sequencesCancelled: 0,
       emailsSent: 0,
       accountsPaused: 0,
       errors: [] as string[],
+      plan: [] as Record<string, unknown>[],
     };
 
     // ----- PHASE 1: Cancel sequences where creator became active -----
-    const { data: activeSequences } = await supabase
+    const { data: activeSequences, error: activeSeqError } = await supabase
       .from('creator_reengagement_sequences')
       .select('id, creator_id, started_at')
       .eq('status', 'active');
 
+    if (activeSeqError) {
+      results.errors.push(`read active sequences: ${activeSeqError.message}`);
+    }
+
     if (activeSequences && activeSequences.length > 0) {
       for (const seq of activeSequences) {
-        // Check if creator's updated_at is newer than the sequence start
-        const { data: creator } = await supabase
+        const { data: creator, error: creatorError } = await supabase
           .from('creators')
-          .select('updated_at, name, lifecycle_state')
+          .select('last_portal_activity_at, name, lifecycle_state')
           .eq('id', seq.creator_id)
           .single();
 
+        if (creatorError) {
+          results.errors.push(`read creator ${seq.creator_id}: ${creatorError.message}`);
+          continue;
+        }
         if (!creator) continue;
 
-        const creatorUpdated = new Date(creator.updated_at);
+        // Cancel only on real creator-initiated portal activity.
+        //
+        // This used to compare creators.updated_at, which the creators_updated_at
+        // trigger stamps on ANY write. A bulk admin write on 2026-07-19 touched
+        // 21 rows at once and cancelled the whole July cohort at step 1, which is
+        // why steps 2 through 6 had never fired. last_portal_activity_at is only
+        // written by the Creator Portal itself.
+        //
+        // The 60 second grace window matters: Phase 3 creates the sequence and
+        // then writes to the creator row moments later. Comparing raw timestamps
+        // would let a sequence cancel itself on the next run.
+        const activityAt = creator.last_portal_activity_at
+          ? new Date(creator.last_portal_activity_at)
+          : null;
         const seqStarted = new Date(seq.started_at);
+        const graceCutoff = new Date(seqStarted.getTime() + 60_000);
 
-        // Also cancel if creator is already paused/withdrawn
-        const shouldCancel =
-          creatorUpdated > seqStarted ||
-          creator.lifecycle_state === 'paused';
+        const cameBack = activityAt !== null && activityAt > graceCutoff;
+        const isPaused = creator.lifecycle_state === 'paused';
+        const shouldCancel = cameBack || isPaused;
 
         if (shouldCancel) {
-          await supabase
-            .from('creator_reengagement_sequences')
-            .update({
-              status: 'cancelled',
-              cancelled_at: now.toISOString(),
-              cancelled_reason: creatorUpdated > seqStarted ? 'creator_active' : 'already_paused',
-              updated_at: now.toISOString(),
-            })
-            .eq('id', seq.id);
+          const reason = cameBack ? 'creator_active' : 'already_paused';
+
+          if (dryRun) {
+            results.plan.push({
+              phase: 'cancel',
+              creator: creator.name,
+              sequenceId: seq.id,
+              reason,
+              startedAt: seq.started_at,
+              lastPortalActivityAt: creator.last_portal_activity_at,
+            });
+          } else {
+            await checkedWrite(
+              `cancel sequence ${seq.id}`,
+              supabase
+                .from('creator_reengagement_sequences')
+                .update({
+                  status: 'cancelled',
+                  cancelled_at: now.toISOString(),
+                  cancelled_reason: reason,
+                  updated_at: now.toISOString(),
+                })
+                .eq('id', seq.id),
+              results.errors
+            );
+            console.log(`[reengagement] Cancelled sequence for creator ${seq.creator_id} — ${reason}`);
+          }
 
           results.sequencesCancelled++;
-          console.log(`[reengagement] Cancelled sequence for creator ${seq.creator_id} — creator became active`);
         }
       }
     }
 
     // ----- PHASE 2: Advance active sequences (send next email) -----
-    const { data: sequencesToAdvance } = await supabase
+    // In a live run Phase 1 has already flipped cancelled rows, so this re-query
+    // skips them. A dry run writes nothing, so the ids are filtered out here to
+    // keep the reported plan faithful to what a live run would do.
+    const cancelledIds = new Set(
+      dryRun
+        ? results.plan.filter((p) => p.phase === 'cancel').map((p) => p.sequenceId as string)
+        : []
+    );
+
+    const { data: sequencesToAdvance, error: advanceError } = await supabase
       .from('creator_reengagement_sequences')
       .select('id, creator_id, current_step, last_email_sent_at')
       .eq('status', 'active');
 
+    if (advanceError) {
+      results.errors.push(`read sequences to advance: ${advanceError.message}`);
+    }
+
     if (sequencesToAdvance && sequencesToAdvance.length > 0) {
       for (const seq of sequencesToAdvance) {
+        if (cancelledIds.has(seq.id)) continue;
+
         const lastSent = new Date(seq.last_email_sent_at);
         const daysSinceLastEmail = Math.floor(
           (now.getTime() - lastSent.getTime()) / (1000 * 60 * 60 * 24)
@@ -254,8 +305,23 @@ export async function GET(request: NextRequest) {
         const firstName = creator.name?.split(' ')[0] || 'there';
 
         if (nextStep <= 6) {
-          // Send the next email
           const { subject, html } = getEmailContent(nextStep, firstName);
+
+          if (dryRun) {
+            results.plan.push({
+              phase: 'advance',
+              creator: creator.name,
+              to: creator.email,
+              step: nextStep,
+              subject,
+              daysSinceLastEmail,
+              wouldPauseAccount: nextStep === 6,
+            });
+            results.emailsSent++;
+            if (nextStep === 6) results.accountsPaused++;
+            continue;
+          }
+
           const sent = await sendEmail(resendApiKey, creator.email, subject, html);
 
           if (sent) {
@@ -263,33 +329,41 @@ export async function GET(request: NextRequest) {
 
             if (nextStep === 6) {
               // Step 6 sent — mark sequence completed and auto-pause
-              await supabase
-                .from('creator_reengagement_sequences')
-                .update({
-                  current_step: nextStep,
-                  last_email_sent_at: now.toISOString(),
-                  status: 'completed',
-                  completed_at: now.toISOString(),
-                  updated_at: now.toISOString(),
-                })
-                .eq('id', seq.id);
+              await checkedWrite(
+                `complete sequence ${seq.id}`,
+                supabase
+                  .from('creator_reengagement_sequences')
+                  .update({
+                    current_step: nextStep,
+                    last_email_sent_at: now.toISOString(),
+                    status: 'completed',
+                    completed_at: now.toISOString(),
+                    updated_at: now.toISOString(),
+                  })
+                  .eq('id', seq.id),
+                results.errors
+              );
 
               // Auto-pause the creator account
-              const paused = await pauseCreatorAccount(supabase, seq.creator_id);
+              const paused = await pauseCreatorAccount(supabase, seq.creator_id, results.errors);
               if (paused) {
                 results.accountsPaused++;
                 console.log(`[reengagement] Auto-paused creator ${seq.creator_id} after step 6`);
               }
             } else {
               // Advance to next step
-              await supabase
-                .from('creator_reengagement_sequences')
-                .update({
-                  current_step: nextStep,
-                  last_email_sent_at: now.toISOString(),
-                  updated_at: now.toISOString(),
-                })
-                .eq('id', seq.id);
+              await checkedWrite(
+                `advance sequence ${seq.id} to step ${nextStep}`,
+                supabase
+                  .from('creator_reengagement_sequences')
+                  .update({
+                    current_step: nextStep,
+                    last_email_sent_at: now.toISOString(),
+                    updated_at: now.toISOString(),
+                  })
+                  .eq('id', seq.id),
+                results.errors
+              );
             }
 
             await logCreatorEmail({
@@ -314,25 +388,41 @@ export async function GET(request: NextRequest) {
     const stallCutoff = new Date(now);
     stallCutoff.setDate(stallCutoff.getDate() - STALL_THRESHOLD_DAYS);
 
-    // Find active creators who haven't been updated in 15+ days
-    // and don't already have an active sequence
-    const { data: stalledCreators } = await supabase
+    // Find active creators with no real portal activity in 15+ days who don't
+    // already have an active sequence. Filters on last_portal_activity_at for
+    // the same reason Phase 1 does: updated_at moves on admin writes and would
+    // mask a genuinely stalled creator as active.
+    const { data: stalledCreators, error: stalledError } = await supabase
       .from('creators')
-      .select('id, email, name')
+      .select('id, email, name, last_portal_activity_at')
       .eq('status', 'active')
       .or('lifecycle_state.is.null,lifecycle_state.eq.active')
-      .lt('updated_at', stallCutoff.toISOString())
+      .lt('last_portal_activity_at', stallCutoff.toISOString())
       .neq('publish_status', 'published');
+
+    if (stalledError) {
+      results.errors.push(`read stalled creators: ${stalledError.message}`);
+    }
 
     if (stalledCreators && stalledCreators.length > 0) {
       for (const creator of stalledCreators) {
-        // Check if there's already an active sequence
-        const { data: existingSeq } = await supabase
+        // Check if there's already an active sequence.
+        //
+        // maybeSingle, not single. single() returns PGRST116 for both "no rows"
+        // and "multiple rows", so a creator who somehow ended up with two active
+        // sequences would read back as having none and get a third started.
+        const { data: existingSeq, error: existingSeqError } = await supabase
           .from('creator_reengagement_sequences')
           .select('id')
           .eq('creator_id', creator.id)
           .eq('status', 'active')
-          .single();
+          .maybeSingle();
+
+        if (existingSeqError) {
+          // Do not fall through to sending on a failed dedupe read.
+          results.errors.push(`dedupe check for ${creator.email}: ${existingSeqError.message}`);
+          continue;
+        }
 
         if (existingSeq) continue; // Already has an active sequence
 
@@ -353,27 +443,57 @@ export async function GET(request: NextRequest) {
 
         const firstName = creator.name?.split(' ')[0] || 'there';
         const { subject, html } = getEmailContent(0, firstName);
+
+        if (dryRun) {
+          results.plan.push({
+            phase: 'start',
+            creator: creator.name,
+            to: creator.email,
+            step: 0,
+            subject,
+            lastPortalActivityAt: creator.last_portal_activity_at,
+          });
+          results.sequencesStarted++;
+          results.emailsSent++;
+          continue;
+        }
+
         const sent = await sendEmail(resendApiKey, creator.email, subject, html);
 
         if (sent) {
           // Create the sequence record
-          await supabase
-            .from('creator_reengagement_sequences')
-            .insert({
-              creator_id: creator.id,
-              current_step: 0,
-              last_email_sent_at: now.toISOString(),
-              status: 'active',
-            });
+          await checkedWrite(
+            `insert sequence for ${creator.email}`,
+            supabase
+              .from('creator_reengagement_sequences')
+              .insert({
+                creator_id: creator.id,
+                current_step: 0,
+                last_email_sent_at: now.toISOString(),
+                status: 'active',
+              }),
+            results.errors
+          );
 
-          // Update creator status to followed_up
-          await supabase
-            .from('creators')
-            .update({
-              last_followed_up_at: now.toISOString(),
-              followed_up_by: 'system:reengagement',
-            })
-            .eq('id', creator.id);
+          // Stamp the follow-up timestamp.
+          //
+          // This previously also wrote followed_up_by, which does not exist on
+          // creators. PostgREST rejects the entire statement on an unknown
+          // column (42703), so last_followed_up_at was never actually written
+          // and the failure was invisible because the result went unchecked.
+          //
+          // Note this write bumps creators.updated_at via the creators_updated_at
+          // trigger. That is now harmless: Phase 1 reads last_portal_activity_at,
+          // which admin and system writes never touch. Before that change this
+          // line would have cancelled the sequence it just created.
+          await checkedWrite(
+            `stamp last_followed_up_at for ${creator.email}`,
+            supabase
+              .from('creators')
+              .update({ last_followed_up_at: now.toISOString() })
+              .eq('id', creator.id),
+            results.errors
+          );
 
           await logCreatorEmail({
             creator_id: creator.id,
@@ -451,13 +571,14 @@ async function sendEmail(
 
 async function pauseCreatorAccount(
   supabase: any,
-  creatorId: string
+  creatorId: string,
+  errors: string[]
 ): Promise<boolean> {
   try {
     const { randomBytes } = await import('crypto');
     const unpauseToken = randomBytes(24).toString('hex');
 
-    await (supabase.from('creators') as any).update({
+    const { error: pauseError } = await (supabase.from('creators') as any).update({
       lifecycle_state: 'paused',
       paused_at: new Date().toISOString(),
       paused_by: 'system:reengagement',
@@ -467,7 +588,13 @@ async function pauseCreatorAccount(
       updated_at: new Date().toISOString(),
     }).eq('id', creatorId);
 
-    await (supabase.from('creator_pause_history') as any).insert({
+    if (pauseError) {
+      errors.push(`pause creator ${creatorId}: ${pauseError.message}`);
+      console.error('[reengagement] Pause failed:', pauseError.message);
+      return false;
+    }
+
+    const { error: historyError } = await (supabase.from('creator_pause_history') as any).insert({
       creator_id: creatorId,
       event_type: 'paused',
       triggered_by: 'system:reengagement',
@@ -475,8 +602,16 @@ async function pauseCreatorAccount(
       reason: 'Auto-paused after 6-week re-engagement sequence with no response',
     });
 
+    if (historyError) {
+      // The pause itself landed, so this is not a failure of the operation,
+      // but the audit trail is incomplete and should be visible.
+      errors.push(`pause history for ${creatorId}: ${historyError.message}`);
+    }
+
     return true;
   } catch (e) {
+    const msg = e instanceof Error ? e.message : 'Unknown error';
+    errors.push(`pause creator ${creatorId}: ${msg}`);
     console.error('[reengagement] Pause error:', e);
     return false;
   }
