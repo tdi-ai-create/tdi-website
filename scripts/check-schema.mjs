@@ -101,10 +101,14 @@ for (const project of PROJECTS) {
 }
 
 if (schemas.length === 0) {
-  console.error('No Supabase credentials available; cannot check schema drift.');
-  console.error('Set NEXT_PUBLIC_LEARNING_HUB_SUPABASE_URL + LEARNING_HUB_SUPABASE_SERVICE_KEY');
-  console.error('and/or NEXT_PUBLIC_SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY.');
-  process.exit(1);
+  // Skip rather than fail. A missing secret must never block every PR; the
+  // check is here to catch bugs, not to become one.
+  console.log('Skipping schema check: no Supabase credentials available.');
+  console.log('To enable, set these repo secrets:');
+  console.log('  NEXT_PUBLIC_LEARNING_HUB_SUPABASE_URL + LEARNING_HUB_SUPABASE_SERVICE_KEY');
+  console.log('  NEXT_PUBLIC_SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY');
+  console.log('The schema endpoint needs a service key; the anon key gets 401 there.');
+  process.exit(0);
 }
 
 const knownTables = new Set();
