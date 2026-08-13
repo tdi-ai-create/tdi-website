@@ -17,6 +17,7 @@ export interface QuizQuestion {
   explanation: string | null;
   sort_order: number;
   content_position: number | null;
+  is_active?: boolean;
 }
 
 export interface QuizResponse {
@@ -39,6 +40,7 @@ export async function getLessonQuestions(lessonId: string): Promise<QuizQuestion
     .from('hub_quiz_questions')
     .select('*')
     .eq('lesson_id', lessonId)
+    .eq('is_active', true)
     .order('sort_order', { ascending: true });
 
   if (error) {
@@ -125,6 +127,7 @@ export async function getCourseQuestions(lessonIds: string[]): Promise<QuizQuest
     .from('hub_quiz_questions')
     .select('*')
     .in('lesson_id', lessonIds)
+    .eq('is_active', true)
     .order('sort_order', { ascending: true });
 
   if (error) {
@@ -167,55 +170,124 @@ export async function getCourseResponses(
 /**
  * Compute which lesson index each check-in appears on.
  *
- * Each question has a `lesson_id` that ties it to a specific lesson. We place
- * the check-in on that lesson so it renders after the content the learner just
- * watched. This works naturally for any course length: a 3-lesson course might
- * have 1-2 check-ins, a 10-lesson course might have 5. The content creator
- * controls placement, not an algorithm.
+ * A check-in is the whole set of questions attached to one lesson, not a single
+ * question. A well-formed check-in confirms the educator understood the lesson
+ * (a comprehension question) and then asks them to reflect on it or plan how
+ * they will use it. Those parts belong together, on the lesson they came from,
+ * so the learner answers them right after watching that content.
  *
- * If multiple questions share the same lesson_id, only the first (by
- * sort_order) becomes the gate. The rest are skipped to keep one gate per
- * lesson.
+ * Placement comes from each question's `lesson_id`, never from an algorithm
+ * spreading questions across percentage positions. A 4-lesson course might have
+ * 2 check-ins and a 20-lesson course 3. Whoever builds the content decides.
+ *
+ * Returns lesson index -> that lesson's questions in sort_order. Every question
+ * is returned; nothing is silently dropped.
  */
 export function computeGatePositions(
   questions: QuizQuestion[],
   totalLessons: number,
   lessonIds?: string[]
-): Map<number, QuizQuestion> {
-  const gates = new Map<number, QuizQuestion>();
+): Map<number, QuizQuestion[]> {
+  const gates = new Map<number, QuizQuestion[]>();
   if (questions.length === 0 || totalLessons === 0) return gates;
 
-  // If we have the ordered lesson IDs, place each question on its own lesson
-  if (lessonIds && lessonIds.length > 0) {
-    const lessonIndexMap = new Map<string, number>();
-    lessonIds.forEach((id, idx) => lessonIndexMap.set(id, idx));
+  const sorted = [...questions].sort((a, b) => a.sort_order - b.sort_order);
 
-    // Sort by sort_order so first question per lesson wins the gate slot
-    const sorted = [...questions].sort((a, b) => a.sort_order - b.sort_order);
+  // Without the ordered lesson IDs we cannot know where a question belongs, and
+  // guessing is what put check-ins on the wrong lessons in the first place.
+  if (!lessonIds || lessonIds.length === 0) return gates;
 
-    for (const q of sorted) {
-      const idx = lessonIndexMap.get(q.lesson_id);
-      if (idx !== undefined && !gates.has(idx)) {
-        gates.set(idx, q);
-      }
-    }
-    return gates;
+  const lessonIndexMap = new Map<string, number>();
+  lessonIds.forEach((id, idx) => lessonIndexMap.set(id, idx));
+
+  for (const q of sorted) {
+    const idx = lessonIndexMap.get(q.lesson_id);
+    if (idx === undefined) continue;
+    const existing = gates.get(idx);
+    if (existing) existing.push(q);
+    else gates.set(idx, [q]);
   }
 
-  // Fallback for callers that don't pass lessonIds: distribute by sort_order
-  // across the course length evenly. This path should not normally be hit.
-  const sorted = [...questions].sort((a, b) => a.sort_order - b.sort_order);
-  const step = totalLessons / (sorted.length + 1);
-  sorted.forEach((q, i) => {
-    const idx = Math.min(Math.floor(step * (i + 1)), totalLessons - 1);
-    let finalIdx = idx;
-    while (gates.has(finalIdx) && finalIdx < totalLessons - 1) {
-      finalIdx++;
-    }
-    gates.set(finalIdx, q);
-  });
-
   return gates;
+}
+
+/**
+ * How many check-ins a course actually has: one per lesson that carries
+ * questions, not one per question. This is the number the course page promises
+ * and the number the lesson player counts through.
+ */
+export function countCheckIns(
+  questions: QuizQuestion[],
+  lessonIds: string[]
+): number {
+  const lessonSet = new Set(lessonIds);
+  const lessonsWithQuestions = new Set(
+    questions.filter((q) => lessonSet.has(q.lesson_id)).map((q) => q.lesson_id)
+  );
+  return lessonsWithQuestions.size;
+}
+
+/**
+ * Plain-language description of what a check-in asks of the educator, built
+ * from the parts it actually contains. Used on the course outline so the
+ * promise on the overview matches the experience in the player.
+ */
+export function describeCheckIn(questions: QuizQuestion[]): string {
+  const types = new Set(questions.map((q) => q.question_type));
+  const parts: string[] = [];
+
+  if (types.has('multiple_choice') || types.has('true_false')) {
+    parts.push('a quick check on what you just learned');
+  }
+  if (types.has('reflection')) parts.push('a reflection');
+  if (types.has('action_step')) parts.push('a plan for using it');
+  if (types.has('checkpoint')) parts.push('the big ideas so far');
+
+  if (parts.length === 0) return 'Check-in';
+  if (parts.length === 1) return `Check-in: ${parts[0]}`;
+  return `Check-in: ${parts.slice(0, -1).join(', ')} and ${parts[parts.length - 1]}`;
+}
+
+/**
+ * What a course's check-ins ask of an educator overall, for the course page's
+ * summary copy. Derived from the questions the course actually has, so a course
+ * whose only applied prompt is a plan does not promise a reflection too.
+ */
+export function summarizeCheckIns(questions: QuizQuestion[]): {
+  /** Trailing phrase for "3 check-ins ___" */
+  feature: string;
+  /** Sentence for the "How This Course Works" step */
+  detail: string;
+} {
+  const types = new Set(questions.map((q) => q.question_type));
+  const reflects = types.has('reflection');
+  const plans = types.has('action_step');
+
+  if (reflects && plans) {
+    return {
+      feature: 'with a reflection and a plan',
+      detail:
+        'Each one confirms the ideas landed, then asks you to think through what they mean for your own room and what you will try.',
+    };
+  }
+  if (plans) {
+    return {
+      feature: 'with a plan for what you will try',
+      detail:
+        'Each one confirms the ideas landed, then asks you to write down what you will try and when.',
+    };
+  }
+  if (reflects) {
+    return {
+      feature: 'with a reflection',
+      detail:
+        'Each one confirms the ideas landed, then asks you to think through what they mean for your own room.',
+    };
+  }
+  return {
+    feature: '',
+    detail: 'Each one confirms the ideas landed before you move on.',
+  };
 }
 
 /**

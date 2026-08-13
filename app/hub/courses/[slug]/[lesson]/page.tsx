@@ -177,7 +177,7 @@ function getGateHeader(questionType: string): string {
     case 'reflection':
       return 'Your turn to think on this';
     case 'action_step':
-      return 'Something to try this week';
+      return 'Now put it to work';
     case 'checkpoint':
       return 'Before you go, the big ideas';
     default:
@@ -185,9 +185,14 @@ function getGateHeader(questionType: string): string {
   }
 }
 
-function getGateLabel(question: QuizQuestion, allQuestions: QuizQuestion[]): string {
-  const idx = allQuestions.findIndex((q) => q.id === question.id);
-  return `Check-in ${idx + 1} of ${allQuestions.length}`;
+/**
+ * "Check-in 2 of 3" counts check-ins across the course, and the second line
+ * counts the parts inside this one. Counting raw questions here is what made
+ * the player promise five check-ins in a course that has three.
+ */
+function getGateLabel(gateNumber: number, totalGates: number, partIndex: number, totalParts: number): string {
+  const base = `Check-in ${gateNumber} of ${totalGates}`;
+  return totalParts > 1 ? `${base} · Part ${partIndex + 1} of ${totalParts}` : base;
 }
 
 // ---------------------------------------------------------------------------
@@ -265,13 +270,14 @@ function useAutoAdvance() {
 
 interface GateCardProps {
   question: QuizQuestion;
-  allQuestions: QuizQuestion[];
+  label: string;
+  isFinalPart: boolean;
   userId: string;
   dark: boolean;
   onGateCleared: () => void;
 }
 
-function GateCard({ question, allQuestions, userId, dark, onGateCleared }: GateCardProps) {
+function GateCard({ question, label, isFinalPart, userId, dark, onGateCleared }: GateCardProps) {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [answered, setAnswered] = useState(false);
   const [wasCorrect, setWasCorrect] = useState(false);
@@ -283,7 +289,9 @@ function GateCard({ question, allQuestions, userId, dark, onGateCleared }: GateC
   const [wrongReflectionSaved, setWrongReflectionSaved] = useState(false);
 
   const header = getGateHeader(question.question_type);
-  const label = getGateLabel(question, allQuestions);
+
+  // A check-in can have more than one part. The button says where it leads.
+  const advanceLabel = isFinalPart ? 'Keep going' : 'Next part';
 
   const handleMultipleChoiceSelect = async (idx: number) => {
     if (answered) return;
@@ -318,8 +326,9 @@ function GateCard({ question, allQuestions, userId, dark, onGateCleared }: GateC
   };
 
   const handleActionCommit = async () => {
+    if (reflectionText.trim().length < 30) return;
     setSaving(true);
-    await saveQuizResponse(userId, question.id, question.lesson_id, 'Committed to try', null);
+    await saveQuizResponse(userId, question.id, question.lesson_id, reflectionText.trim(), null);
     setSaving(false);
     setCommitted(true);
     setAnswered(true);
@@ -447,7 +456,7 @@ function GateCard({ question, allQuestions, userId, dark, onGateCleared }: GateC
 
           {answered && !gateCleared && wasCorrect && (
             <button onClick={handleContinue} style={continueButtonStyle}>
-              You got it. Keep going.
+              You got it. {advanceLabel}.
               <ArrowRight size={16} />
             </button>
           )}
@@ -502,7 +511,7 @@ function GateCard({ question, allQuestions, userId, dark, onGateCleared }: GateC
                 </>
               ) : (
                 <button onClick={handleContinue} style={continueButtonStyle}>
-                  Nice reflection. Keep going.
+                  Nice reflection. {advanceLabel}.
                   <ArrowRight size={16} />
                 </button>
               )}
@@ -562,7 +571,7 @@ function GateCard({ question, allQuestions, userId, dark, onGateCleared }: GateC
             </>
           ) : !gateCleared ? (
             <button onClick={handleContinue} style={continueButtonStyle}>
-              Nice. On to the next one.
+              Nice. {advanceLabel}.
               <ArrowRight size={16} />
             </button>
           ) : null}
@@ -591,21 +600,61 @@ function GateCard({ question, allQuestions, userId, dark, onGateCleared }: GateC
           </div>
 
           {!committed ? (
-            <button
-              onClick={handleActionCommit}
-              disabled={saving}
-              style={{
-                padding: '14px 32px', background: dark ? 'rgba(255,255,255,0.05)' : 'white',
-                border: '2px solid #E8B84B', borderRadius: 12,
-                color: dark ? '#E8B84B' : '#92400E', fontSize: 15, fontWeight: 600,
-                cursor: 'pointer', fontFamily: "'DM Sans', sans-serif",
-              }}
-            >
-              {saving ? 'Saving...' : 'I will try this'}
-            </button>
+            <>
+              <p style={{
+                fontSize: 15, fontWeight: 600, color: dark ? '#F3F4F6' : '#1E2749',
+                fontFamily: "'Source Serif 4', Georgia, serif", marginBottom: 8,
+              }}>
+                Your plan
+              </p>
+              <p style={{
+                fontSize: 14, color: dark ? '#D1D5DB' : '#4B5563',
+                fontFamily: "'DM Sans', sans-serif", marginBottom: 14, lineHeight: 1.6,
+              }}>
+                What will you try, and when? Naming the day and the class period is what turns
+                a good idea into something that actually happens.
+              </p>
+              <textarea
+                value={reflectionText}
+                onChange={(e) => setReflectionText(e.target.value)}
+                placeholder="On Tuesday during my third period class, I will..."
+                style={{
+                  width: '100%', padding: 16, minHeight: 100,
+                  background: dark ? 'rgba(255,255,255,0.05)' : '#FFFFFF',
+                  border: `1.5px solid ${dark ? 'rgba(255,255,255,0.15)' : '#E5E7EB'}`,
+                  borderRadius: 12, color: dark ? '#E5E7EB' : '#1E2749',
+                  fontSize: 14, fontFamily: "'DM Sans', sans-serif",
+                  lineHeight: 1.6, resize: 'none' as const, outline: 'none',
+                }}
+                onFocus={(e) => { e.target.style.borderColor = '#E8B84B'; }}
+                onBlur={(e) => { e.target.style.borderColor = dark ? 'rgba(255,255,255,0.15)' : '#E5E7EB'; }}
+              />
+              <div style={{
+                fontSize: 12, color: reflectionText.trim().length >= 30 ? '#16A34A' : '#9CA3AF',
+                marginTop: 6, fontFamily: "'DM Sans', sans-serif",
+              }}>
+                {reflectionText.trim().length}/30 characters minimum. This is yours. We will never share it.
+              </div>
+              <button
+                onClick={handleActionCommit}
+                disabled={reflectionText.trim().length < 30 || saving}
+                style={{
+                  marginTop: 14, padding: '14px 32px',
+                  background: dark ? 'rgba(255,255,255,0.05)' : 'white',
+                  border: `2px solid ${reflectionText.trim().length >= 30 ? '#E8B84B' : (dark ? 'rgba(255,255,255,0.12)' : '#E5E7EB')}`,
+                  borderRadius: 12,
+                  color: reflectionText.trim().length >= 30 ? (dark ? '#E8B84B' : '#92400E') : '#9CA3AF',
+                  fontSize: 15, fontWeight: 600,
+                  cursor: reflectionText.trim().length >= 30 ? 'pointer' : 'not-allowed',
+                  fontFamily: "'DM Sans', sans-serif",
+                }}
+              >
+                {saving ? 'Saving...' : 'Lock in my plan'}
+              </button>
+            </>
           ) : !gateCleared ? (
             <button onClick={handleContinue} style={continueButtonStyle}>
-              On to the next one.
+              Plan saved. {advanceLabel}.
               <ArrowRight size={16} />
             </button>
           ) : null}
@@ -654,7 +703,7 @@ function GateCard({ question, allQuestions, userId, dark, onGateCleared }: GateC
               disabled={saving}
               style={continueButtonStyle}
             >
-              {saving ? 'Saving...' : 'Ready to continue'}
+              {saving ? 'Saving...' : isFinalPart ? 'Ready to continue' : 'Next part'}
               <ArrowRight size={16} />
             </button>
           )}
@@ -664,6 +713,77 @@ function GateCard({ question, allQuestions, userId, dark, onGateCleared }: GateC
   }
 
   return null;
+}
+
+// ---------------------------------------------------------------------------
+// Check-in sequence
+//
+// One check-in can hold more than one part: a comprehension question to confirm
+// the lesson landed, then a reflection or an implementation plan. The parts are
+// shown one at a time, in sort_order, and the check-in is not cleared until the
+// educator has worked through all of them. Parts they answered on an earlier
+// visit are skipped.
+// ---------------------------------------------------------------------------
+
+interface GateSequenceProps {
+  questions: QuizQuestion[];
+  gateNumber: number;
+  totalGates: number;
+  answeredIds: Set<string>;
+  userId: string;
+  dark: boolean;
+  onGateCleared: () => void;
+}
+
+function GateSequence({
+  questions,
+  gateNumber,
+  totalGates,
+  answeredIds,
+  userId,
+  dark,
+  onGateCleared,
+}: GateSequenceProps) {
+  const [clearedInSession, setClearedInSession] = useState<Set<string>>(new Set());
+
+  // Reset when the learner moves to a different check-in.
+  const gateKey = questions.map((q) => q.id).join('|');
+  const lastGateKeyRef = useRef(gateKey);
+  useEffect(() => {
+    if (lastGateKeyRef.current !== gateKey) {
+      lastGateKeyRef.current = gateKey;
+      setClearedInSession(new Set());
+    }
+  }, [gateKey]);
+
+  const isDone = (q: QuizQuestion) => answeredIds.has(q.id) || clearedInSession.has(q.id);
+  const currentPartIndex = questions.findIndex((q) => !isDone(q));
+
+  useEffect(() => {
+    if (questions.length > 0 && currentPartIndex === -1) onGateCleared();
+    // onGateCleared is stable enough for this purpose; re-running on every
+    // render would fire the completion handler repeatedly.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentPartIndex, questions.length]);
+
+  if (currentPartIndex === -1) return null;
+
+  const question = questions[currentPartIndex];
+  const isFinalPart = currentPartIndex === questions.length - 1;
+
+  return (
+    <GateCard
+      key={question.id}
+      question={question}
+      label={getGateLabel(gateNumber, totalGates, currentPartIndex, questions.length)}
+      isFinalPart={isFinalPart}
+      userId={userId}
+      dark={dark}
+      onGateCleared={() => {
+        setClearedInSession((prev) => new Set(prev).add(question.id));
+      }}
+    />
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -694,7 +814,7 @@ export default function LessonPage({ params }: LessonPageProps) {
   // Gate state
   const [courseQuestions, setCourseQuestions] = useState<QuizQuestion[]>([]);
   const [courseResponses, setCourseResponses] = useState<Record<string, QuizResponse>>({});
-  const [gates, setGates] = useState<Map<number, QuizQuestion>>(new Map());
+  const [gates, setGates] = useState<Map<number, QuizQuestion[]>>(new Map());
   const [locallyCleared, setLocallyCleared] = useState<Set<string>>(new Set());
 
   // UI state
@@ -909,23 +1029,28 @@ export default function LessonPage({ params }: LessonPageProps) {
     : 'not_started';
   const isComplete = lessonStatus === 'completed';
 
-  // Gate logic
-  const currentGate = gates.get(currentIndex) || null;
-  const isGateActive = currentGate !== null && !courseResponses[currentGate.id] && !locallyCleared.has(currentGate.id);
+  // Gate logic. A check-in is cleared only once every one of its parts is done,
+  // so a two-part check-in cannot be escaped by answering the first question.
+  const gateIndices = Array.from(gates.keys()).sort((a, b) => a - b);
+  const isQuestionAnswered = (q: QuizQuestion) =>
+    !!courseResponses[q.id] || locallyCleared.has(q.id);
+  const isGateCleared = (questions: QuizQuestion[]) => questions.every(isQuestionAnswered);
+
+  const currentGateQuestions = gates.get(currentIndex) || null;
+  const isGateActive = currentGateQuestions !== null && !isGateCleared(currentGateQuestions);
+  const currentGateNumber = currentGateQuestions ? gateIndices.indexOf(currentIndex) + 1 : 0;
+  const answeredQuestionIds = new Set(
+    courseQuestions.filter(isQuestionAnswered).map((q) => q.id)
+  );
 
   // Locked lesson indices (lessons after first uncleared gate)
   const lockedLessonIndices = new Set<number>();
-  if (gates.size > 0) {
-    const gateIndices = Array.from(gates.keys()).sort((a, b) => a - b);
-    for (const gateIdx of gateIndices) {
-      const gateQ = gates.get(gateIdx)!;
-      const isCleared = !!courseResponses[gateQ.id] || locallyCleared.has(gateQ.id);
-      if (!isCleared) {
-        for (let i = gateIdx + 1; i < allLessons.length; i++) {
-          lockedLessonIndices.add(i);
-        }
-        break;
+  for (const gateIdx of gateIndices) {
+    if (!isGateCleared(gates.get(gateIdx)!)) {
+      for (let i = gateIdx + 1; i < allLessons.length; i++) {
+        lockedLessonIndices.add(i);
       }
+      break;
     }
   }
 
@@ -1015,17 +1140,25 @@ export default function LessonPage({ params }: LessonPageProps) {
   };
 
   const handleGateCleared = async () => {
-    if (currentGate && currentLesson) {
-      await markLessonStatus(currentLesson.id, 'completed');
-      await refetch();
-      logActivity('checkin_completed', { question_id: currentGate.id, question_type: currentGate.question_type });
-      setLocallyCleared((prev) => new Set(prev).add(currentGate.id));
+    if (!currentGateQuestions || !currentLesson) return;
 
-      if (autoAdvance && nextLesson) {
-        setTimeout(() => {
-          router.push(`/hub/courses/${slug}/${nextLesson.slug || nextLesson.id}`);
-        }, 800);
-      }
+    await markLessonStatus(currentLesson.id, 'completed');
+    await refetch();
+    logActivity('checkin_completed', {
+      lesson_id: currentLesson.id,
+      question_ids: currentGateQuestions.map((q) => q.id),
+      question_types: currentGateQuestions.map((q) => q.question_type),
+    });
+    setLocallyCleared((prev) => {
+      const next = new Set(prev);
+      currentGateQuestions.forEach((q) => next.add(q.id));
+      return next;
+    });
+
+    if (autoAdvance && nextLesson) {
+      setTimeout(() => {
+        router.push(`/hub/courses/${slug}/${nextLesson.slug || nextLesson.id}`);
+      }, 800);
     }
   };
 
@@ -1159,9 +1292,8 @@ export default function LessonPage({ params }: LessonPageProps) {
                 const lessonGlobalIdx = flatLessonIndex.get(l.id) ?? -1;
                 const isLocked = lockedLessonIndices.has(lessonGlobalIdx);
                 const gateOnThisLesson = gates.get(lessonGlobalIdx);
-                const gateIsCleared = gateOnThisLesson
-                  ? !!courseResponses[gateOnThisLesson.id] || locallyCleared.has(gateOnThisLesson.id)
-                  : false;
+                const gateIsCleared = gateOnThisLesson ? isGateCleared(gateOnThisLesson) : false;
+                const gateNumberHere = gateOnThisLesson ? gateIndices.indexOf(lessonGlobalIdx) + 1 : 0;
                 const lessonDuration = l.duration_seconds ? formatDuration(l.duration_seconds) : '';
 
                 return (
@@ -1222,7 +1354,9 @@ export default function LessonPage({ params }: LessonPageProps) {
                           width: 6, height: 6, borderRadius: '50%',
                           background: gateIsCleared ? '#22C55E' : '#E8B84B',
                         }} />
-                        {gateIsCleared ? 'Quick check (done)' : 'Quick check'}
+                        {gateIsCleared
+                          ? `Check-in ${gateNumberHere} (done)`
+                          : `Check-in ${gateNumberHere} of ${gateIndices.length}`}
                       </div>
                     )}
                   </div>
@@ -1625,11 +1759,13 @@ export default function LessonPage({ params }: LessonPageProps) {
               </div>
 
               {/* Check-in: renders BELOW the lesson content, not replacing it */}
-              {isGateActive && currentGate && user && (
+              {isGateActive && currentGateQuestions && user && (
                 <div style={{ marginTop: 24 }}>
-                  <GateCard
-                    question={currentGate}
-                    allQuestions={courseQuestions}
+                  <GateSequence
+                    questions={currentGateQuestions}
+                    gateNumber={currentGateNumber}
+                    totalGates={gateIndices.length}
+                    answeredIds={answeredQuestionIds}
                     userId={user.id}
                     dark={dark}
                     onGateCleared={handleGateCleared}

@@ -39,3 +39,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Check-in rebuild snapshots (local safety net, not source)
+/scripts/checkin-backups/

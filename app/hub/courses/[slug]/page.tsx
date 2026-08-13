@@ -21,7 +21,7 @@ import CourseCard from '@/components/hub/CourseCard';
 import CommunityTabs from '@/components/hub/CommunityTabs';
 import AchievementInsights from '@/components/hub/AchievementInsights';
 import CapacityFeedbackPrompt, { shouldShowCapacityFeedback } from '@/components/hub/CapacityFeedbackPrompt';
-import { computeGatePositions } from '@/lib/hub/quiz';
+import { computeGatePositions, countCheckIns, describeCheckIn, summarizeCheckIns } from '@/lib/hub/quiz';
 import type { QuizQuestion, QuizOption, QuizResponse } from '@/lib/hub/quiz';
 
 // Category colors
@@ -70,38 +70,15 @@ function formatDuration(seconds: number | null | undefined): string | null {
   return `${mins}:${secs.toString().padStart(2, '0')}`;
 }
 
-// Gate type display text
-function getGateLabel(type: string): string {
-  switch (type) {
-    case 'multiple_choice':
-    case 'true_false':
-      return "Quick check: Let's make sure this clicked";
-    case 'reflection':
-      return 'Reflection: Your turn to think on this';
-    case 'action_step':
-      return 'Action step: Something to try this week';
-    case 'checkpoint':
-      return 'Checkpoint: Before you go, the big ideas';
-    default:
-      return "Quick check: Let's make sure this clicked";
-  }
-}
-
-// Gate type icon character
-function getGateIcon(type: string): string {
-  switch (type) {
-    case 'multiple_choice':
-    case 'true_false':
-      return '?';
-    case 'reflection':
-      return '\u270E'; // pencil
-    case 'action_step':
-      return '\u2713'; // checkmark
-    case 'checkpoint':
-      return '\u2605'; // star
-    default:
-      return '?';
-  }
+// Icon for a check-in, chosen from the most involved thing it asks for. A
+// check-in that ends in an implementation plan is a checkmark, not a question
+// mark, because planning is the part that matters most.
+function getGateIcon(questions: QuizQuestion[]): string {
+  const types = new Set(questions.map((q) => q.question_type));
+  if (types.has('action_step')) return '\u2713'; // checkmark
+  if (types.has('reflection')) return '\u270E'; // pencil
+  if (types.has('checkpoint')) return '\u2605'; // star
+  return '?';
 }
 
 interface Lesson {
@@ -298,6 +275,7 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
             .from('hub_quiz_questions')
             .select('*')
             .in('lesson_id', allLessonIds)
+            .eq('is_active', true)
             .order('sort_order', { ascending: true });
 
           if (questionsData && questionsData.length > 0) {
@@ -481,9 +459,18 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
     return modules.reduce((acc, mod) => acc + mod.lessons.length, 0);
   };
 
-  // Flatten all lessons for gate computation
+  // Flatten all lessons for gate computation. The lesson IDs have to go in, or
+  // the outline shows check-ins on different lessons than the player does.
   const allLessonsFlat = modules.flatMap(mod => mod.lessons);
-  const gatePositions = computeGatePositions(checkInQuestions, allLessonsFlat.length);
+  const allLessonIdsFlat = allLessonsFlat.map(l => l.id);
+  const gatePositions = computeGatePositions(checkInQuestions, allLessonsFlat.length, allLessonIdsFlat);
+  // What the course promises is the number of check-ins, not the number of
+  // questions inside them. A check-in with a question and a reflection is one
+  // check-in, and counting its parts is what made a 3 check-in course claim 5.
+  const checkInCount = countCheckIns(checkInQuestions, allLessonIdsFlat);
+  // The summary copy describes the parts the course actually has, so a course
+  // whose only applied prompt is a plan does not also promise a reflection.
+  const checkInSummary = summarizeCheckIns(checkInQuestions);
 
   // Loading skeleton
   if (isLoading) {
@@ -727,7 +714,7 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
                   <strong className="text-white">{totalLessons}</strong> {totalLessons === 1 ? 'lesson' : 'lessons'}
                 </span>
               )}
-              {checkInQuestions.length > 0 && (
+              {checkInCount > 0 && (
                 <span
                   className="rounded-full px-4 py-1.5 text-sm font-medium"
                   style={{
@@ -736,7 +723,7 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
                     color: 'rgba(255,255,255,0.7)',
                   }}
                 >
-                  <strong className="text-white">{checkInQuestions.length}</strong> check-in{checkInQuestions.length !== 1 ? 's' : ''}
+                  <strong className="text-white">{checkInCount}</strong> check-in{checkInCount !== 1 ? 's' : ''}
                 </span>
               )}
             </div>
@@ -811,7 +798,9 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
                 <div>
                   {[
                     'Watch short video lessons',
-                    'Answer quick check-ins',
+                    checkInCount > 0
+                      ? `${checkInCount} check-in${checkInCount !== 1 ? 's' : ''} ${checkInSummary.feature}`.trim()
+                      : 'Reflect as you go',
                     'Download resource packet',
                     'Earn certificate',
                   ].map((feature) => (
@@ -902,8 +891,14 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {[
                   { num: 1, title: tUI('Watch'), desc: 'Short video lessons you can fit into a prep period or planning block.' },
-                  { num: 2, title: tUI('Check In'), desc: 'Answer a quick question between sections to make sure the ideas are clicking.' },
-                  { num: 3, title: tUI('Apply'), desc: 'Walk away with strategies you can use in your classroom tomorrow.' },
+                  {
+                    num: 2,
+                    title: tUI('Check In'),
+                    desc: checkInCount > 0
+                      ? `${checkInCount} check-in${checkInCount !== 1 ? 's' : ''} along the way. ${checkInSummary.detail}`
+                      : 'Space to pause and think through what the ideas mean for your own room.',
+                  },
+                  { num: 3, title: tUI('Apply'), desc: 'Leave with a written plan for what you will try, and when.' },
                 ].map((step) => (
                   <div key={step.num} className="text-center">
                     <div
@@ -942,7 +937,7 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
                   </span>
                   <span className="text-sm" style={{ color: '#9CA3AF' }}>
                     {totalLessons} {totalLessons === 1 ? 'lesson' : 'lessons'}
-                    {checkInQuestions.length > 0 && ` + ${checkInQuestions.length} check-in${checkInQuestions.length !== 1 ? 's' : ''}`}
+                    {checkInCount > 0 && ` + ${checkInCount} check-in${checkInCount !== 1 ? 's' : ''}`}
                   </span>
                 </div>
 
@@ -1057,8 +1052,8 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
                               )}
                             </div>
 
-                            {/* Gate indicator after this lesson */}
-                            {gate && (
+                            {/* Check-in after this lesson, described by what it actually asks */}
+                            {gate && gate.length > 0 && (
                               <div
                                 className="flex items-center gap-2.5 text-sm font-medium"
                                 style={{
@@ -1072,9 +1067,9 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
                                   className="flex-shrink-0 flex items-center justify-center rounded-full text-white text-xs font-bold"
                                   style={{ width: '20px', height: '20px', background: '#E8B84B' }}
                                 >
-                                  {getGateIcon(gate.question_type)}
+                                  {getGateIcon(gate)}
                                 </span>
-                                {getGateLabel(gate.question_type)}
+                                {describeCheckIn(gate)}
                               </div>
                             )}
                           </div>

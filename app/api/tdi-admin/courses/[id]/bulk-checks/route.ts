@@ -12,10 +12,19 @@ function getHubServiceSupabase() {
 }
 
 /**
+ * Every course should carry three check-ins, each on a content lesson, and each
+ * made of a comprehension question plus a reflection or an implementation plan.
+ * Coverage is counted in check-ins, not questions: counting questions is what
+ * let a course with three check-ins report five.
+ */
+const TARGET_CHECK_INS = 3
+
+/**
  * GET /api/tdi-admin/courses/[id]/bulk-checks
  *
- * Returns engagement check coverage at the COURSE level.
- * Each course should have 5 check-ins total (not per lesson).
+ * Returns check-in coverage at the COURSE level: how many lessons carry a
+ * check-in, and whether those check-ins ask educators to apply what they
+ * learned rather than only recall it.
  * If id is "all", returns coverage across all courses.
  */
 export async function GET(
@@ -45,11 +54,12 @@ export async function GET(
       .select('id, title, content, transcript, module_id, hub_modules!inner(course_id)')
       .in('hub_modules.course_id', courseIds.length > 0 ? courseIds : ['none'])
 
-    // Get all quiz questions for these lessons
+    // Get all active quiz questions for these lessons
     const lessonIds = (lessons || []).map((l) => l.id)
     const { data: questions } = await supabase
       .from('hub_quiz_questions')
       .select('lesson_id, question_type')
+      .eq('is_active', true)
       .in('lesson_id', lessonIds.length > 0 ? lessonIds : ['none'])
 
     // Count checks per course
@@ -59,13 +69,24 @@ export async function GET(
       if (courseId) lessonToCourse.set(l.id, courseId)
     })
 
-    const courseCheckCounts = new Map<string, number>()
+    // A check-in is a lesson that carries questions, so a lesson with a
+    // comprehension question and a reflection counts once.
+    const courseCheckInLessons = new Map<string, Set<string>>()
+    const courseAppliedCounts = new Map<string, number>()
     questions?.forEach((q) => {
       const courseId = lessonToCourse.get(q.lesson_id)
-      if (courseId) {
-        courseCheckCounts.set(courseId, (courseCheckCounts.get(courseId) || 0) + 1)
+      if (!courseId) return
+      const lessonSet = courseCheckInLessons.get(courseId) || new Set<string>()
+      lessonSet.add(q.lesson_id)
+      courseCheckInLessons.set(courseId, lessonSet)
+      if (q.question_type === 'reflection' || q.question_type === 'action_step') {
+        courseAppliedCounts.set(courseId, (courseAppliedCounts.get(courseId) || 0) + 1)
       }
     })
+
+    const courseCheckCounts = new Map<string, number>(
+      Array.from(courseCheckInLessons, ([courseId, set]) => [courseId, set.size])
+    )
 
     // Check which courses have content (at least one lesson with content)
     const courseHasContent = new Map<string, boolean>()
@@ -86,6 +107,7 @@ export async function GET(
 
     const results = (courses || []).map((c) => {
       const checkCount = courseCheckCounts.get(c.id) || 0
+      const appliedCount = courseAppliedCounts.get(c.id) || 0
       const hasContent = courseHasContent.get(c.id) || false
       const lessonCount = courseLessonCount.get(c.id) || 0
       return {
@@ -94,7 +116,10 @@ export async function GET(
         lesson_count: lessonCount,
         has_content: hasContent,
         check_count: checkCount,
-        meets_minimum: checkCount >= 5,
+        applied_count: appliedCount,
+        // A course clears the gate only when it has enough check-ins and every
+        // one of them ends in a reflection or a plan.
+        meets_minimum: checkCount >= Math.min(TARGET_CHECK_INS, lessonCount) && appliedCount >= checkCount,
       }
     })
 
@@ -115,12 +140,209 @@ export async function GET(
   }
 }
 
+
+// ---------------------------------------------------------------------------
+// Generation
+// ---------------------------------------------------------------------------
+
+// Lessons that introduce the course rather than teach it. A check-in here asks
+// educators to reflect on a welcome video.
+const INTRO_TITLE = /^(welcome|getting started|intro|introduction|your guide|meet |start here|who is |about (this|the) (course|creator))/i
+const RESOURCE_TITLE = /(download|packet|workbook|resource|handout|slides|worksheet)/i
+const TRANSCRIPT_CHARS = 12000
+
+interface LessonRow {
+  id: string
+  title: string
+  type: string | null
+  sort_order: number
+  module_id: string | null
+  transcript: string | null
+}
+
+const isContentLesson = (l: LessonRow) =>
+  l.type !== 'resource' && l.type !== 'download' && !RESOURCE_TITLE.test(l.title)
+
+const hasTranscript = (l: LessonRow) => (l.transcript || '').trim().length > 400
+
+/**
+ * Which lessons carry a check-in.
+ *
+ * Candidates are content lessons with enough transcript to write a real
+ * question from, minus the intro lessons. The last candidate always gets one,
+ * so the implementation plan is written after the final lesson; the rest are
+ * spread evenly across what comes before.
+ */
+function pickCheckInLessons(lessons: LessonRow[]): LessonRow[] {
+  const teaching = lessons.filter((l) => isContentLesson(l) && hasTranscript(l))
+  const candidates = teaching.filter((l) => !INTRO_TITLE.test(l.title))
+  const pool = candidates.length > 0 ? candidates : teaching
+  if (pool.length === 0) return []
+
+  const count = Math.min(TARGET_CHECK_INS, pool.length)
+  const picked: LessonRow[] = []
+  for (let i = 1; i <= count; i++) {
+    // i/count lands the last one exactly on the final lesson.
+    const idx = Math.min(pool.length - 1, Math.ceil((pool.length * i) / count) - 1)
+    const lesson = pool[idx]
+    if (!picked.some((p) => p.id === lesson.id)) picked.push(lesson)
+  }
+  return picked
+}
+
+const CHECK_IN_SCHEMA = {
+  type: 'object',
+  additionalProperties: false,
+  required: ['comprehension', 'applied'],
+  properties: {
+    comprehension: {
+      type: 'object',
+      additionalProperties: false,
+      required: ['question_text', 'options', 'explanation'],
+      properties: {
+        question_text: { type: 'string' },
+        options: {
+          type: 'array',
+          items: {
+            type: 'object',
+            additionalProperties: false,
+            required: ['text', 'is_correct'],
+            properties: { text: { type: 'string' }, is_correct: { type: 'boolean' } },
+          },
+        },
+        explanation: { type: 'string' },
+      },
+    },
+    applied: {
+      type: 'object',
+      additionalProperties: false,
+      required: ['question_text'],
+      properties: { question_text: { type: 'string' } },
+    },
+  },
+}
+
+const STYLE_RULES = `Style rules, all required:
+- Never use an em dash, an en dash, or a double hyphen. Use a period, a comma, or restructure the sentence.
+- No emojis.
+- Write to an educator as a respected colleague. Warm, direct, never condescending.
+- Do not reference "the video", "the lesson", or "this module". Ask about the idea itself, so the question reads the same in a transcript or a printed packet.`
+
+// The style rule is absolute, so strip anything that slipped through rather
+// than shipping a dash into a course.
+function cleanText(s: unknown): string {
+  return String(s || '')
+    .replace(/[–—]|--/g, ', ')
+    .replace(/\s+,/g, ',')
+    .replace(/,\s*,/g, ',')
+    .replace(/\s{2,}/g, ' ')
+    .trim()
+}
+
+interface GeneratedQuestion {
+  question_text: string
+  question_type: string
+  options: Array<{ text: string; is_correct?: boolean }> | null
+  correct_answer: string | null
+  explanation: string | null
+  sort_order: number
+}
+
+async function generateCheckIn(
+  client: Anthropic,
+  course: { title: string; description: string | null; category: string | null },
+  lesson: LessonRow,
+  position: number,
+  total: number,
+  priorTitles: string[]
+): Promise<GeneratedQuestion[]> {
+  const isFinal = position === total
+
+  const appliedSpec = isFinal
+    ? `2. An implementation plan prompt (question_type "action_step"). This is the last check-in in the course, so it asks the educator to commit to something specific from what they have learned: what they will try, with which students or colleagues, and when. Name a concrete strategy from this course so the prompt cannot be answered generically. Two to four sentences.`
+    : `2. A reflection prompt (question_type "reflection"). It asks the educator to connect this specific idea to their own room, their own students, or a situation they have actually been in. Ground it in the content of this lesson, not the course in general. Two to four sentences.`
+
+  const prompt = `You write formative check-ins for Teachers Deserve It, a professional learning hub for educators.
+
+COURSE: ${course.title}
+COURSE DESCRIPTION: ${course.description || 'Not provided'}
+CATEGORY: ${course.category || 'General'}
+
+This is check-in ${position} of ${total} in the course, placed at the end of the lesson below. The educator has just finished watching it.${
+    priorTitles.length ? `\nLessons they have already watched: ${priorTitles.join('; ')}` : ''
+  }
+
+LESSON: ${lesson.title}
+
+TRANSCRIPT OF THIS LESSON:
+${(lesson.transcript || '').trim().slice(0, TRANSCRIPT_CHARS)}
+
+---
+
+Write exactly two parts.
+
+1. A multiple choice comprehension question with four options, exactly one correct. It must be answerable only by someone who understood THIS lesson: build it from a specific idea, distinction, number, or step that appears in the transcript above. No general education trivia, and nothing answerable by common sense alone. The three wrong options must be plausible to someone who half followed the lesson, not obviously wrong. The explanation teaches why the correct answer is correct in two or three sentences, so an educator who missed it still learns the idea.
+
+${appliedSpec}
+
+${STYLE_RULES}`
+
+  const response = await client.messages.create({
+    model: 'claude-opus-5',
+    max_tokens: 4000,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    output_config: { effort: 'medium', format: { type: 'json_schema', schema: CHECK_IN_SCHEMA } },
+    messages: [{ role: 'user', content: prompt }],
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } as any)
+
+  if (response.stop_reason === 'refusal') throw new Error('Model declined the request')
+
+  const text = response.content
+    .filter((b): b is Anthropic.TextBlock => b.type === 'text')
+    .map((b) => b.text)
+    .join('')
+  const parsed = JSON.parse(text)
+
+  const options = parsed.comprehension.options.map((o: { text: string; is_correct: boolean }) => ({
+    text: cleanText(o.text),
+    is_correct: !!o.is_correct,
+  }))
+  if (options.filter((o: { is_correct: boolean }) => o.is_correct).length !== 1) {
+    throw new Error('Comprehension question did not come back with exactly one correct option')
+  }
+
+  return [
+    {
+      question_text: cleanText(parsed.comprehension.question_text),
+      question_type: 'multiple_choice',
+      options,
+      correct_answer: null,
+      explanation: cleanText(parsed.comprehension.explanation),
+      sort_order: 0,
+    },
+    {
+      question_text: cleanText(parsed.applied.question_text),
+      question_type: isFinal ? 'action_step' : 'reflection',
+      options: null,
+      correct_answer: null,
+      explanation: null,
+      sort_order: 1,
+    },
+  ]
+}
+
 /**
  * POST /api/tdi-admin/courses/[id]/bulk-checks
  *
- * Generates 5 AI engagement checks per COURSE (not per lesson).
- * Synthesizes content across all lessons to create course-level checks.
- * Assigns checks to the first lesson with content for DB storage.
+ * Rebuilds a course's check-ins from the transcripts of the lessons they sit
+ * on, so each one confirms the educator understood that lesson and then asks
+ * them to reflect on it or plan how they will use it. The final check-in lands
+ * on the last content lesson and always asks for the plan.
+ *
+ * Existing questions are retired (is_active = false) rather than deleted:
+ * educators have already answered some of them, and hub_quiz_responses
+ * references question_id.
  */
 export async function POST(
   request: NextRequest,
@@ -135,7 +357,6 @@ export async function POST(
       return NextResponse.json({ error: 'Anthropic API key not configured' }, { status: 500 })
     }
 
-    // Get courses
     let coursesQuery = supabase
       .from('hub_courses')
       .select('id, title, category, description')
@@ -147,236 +368,155 @@ export async function POST(
     const { data: courses, error: coursesError } = await coursesQuery
     if (coursesError) return NextResponse.json({ error: coursesError.message }, { status: 500 })
 
-    // Get all lessons for these courses
     const courseIds = (courses || []).map((c) => c.id)
-    const { data: allLessons, error: lessonsError } = await supabase
-      .from('hub_lessons')
-      .select('id, title, type, content, transcript, module_id, hub_modules!inner(course_id)')
-      .in('hub_modules.course_id', courseIds.length > 0 ? courseIds : ['none'])
+    if (courseIds.length === 0) {
+      return NextResponse.json({ error: 'Course not found' }, { status: 404 })
+    }
+
+    // Modules are the reliable path to a course's lessons: hub_lessons.course_id
+    // is often null.
+    const { data: modules } = await supabase
+      .from('hub_modules')
+      .select('id, course_id, sort_order')
+      .in('course_id', courseIds)
       .order('sort_order', { ascending: true })
+
+    const moduleIds = (modules || []).map((m) => m.id)
+    const { data: allLessons, error: lessonsError } = moduleIds.length > 0
+      ? await supabase
+          .from('hub_lessons')
+          .select('id, title, type, sort_order, module_id, transcript')
+          .in('module_id', moduleIds)
+          .order('sort_order', { ascending: true })
+      : { data: [] as LessonRow[], error: null }
 
     if (lessonsError) return NextResponse.json({ error: lessonsError.message }, { status: 500 })
 
-    // Group lessons by course
-    const lessonsByCourse = new Map<string, typeof allLessons>()
-    allLessons?.forEach((l) => {
-      const courseId = (l as any).hub_modules?.course_id
+    const moduleOrder = new Map((modules || []).map((m, i) => [m.id, i]))
+    const moduleCourse = new Map((modules || []).map((m) => [m.id, m.course_id]))
+
+    const lessonsByCourse = new Map<string, LessonRow[]>()
+    ;((allLessons || []) as LessonRow[]).forEach((l) => {
+      const courseId = l.module_id ? moduleCourse.get(l.module_id) : undefined
       if (!courseId) return
       const arr = lessonsByCourse.get(courseId) || []
       arr.push(l)
       lessonsByCourse.set(courseId, arr)
     })
-
-    // Get existing check counts per course
-    const allLessonIds = (allLessons || []).map((l) => l.id)
-    const { data: existingQuestions } = await supabase
-      .from('hub_quiz_questions')
-      .select('lesson_id, sort_order')
-      .in('lesson_id', allLessonIds.length > 0 ? allLessonIds : ['none'])
-
-    const lessonToCourse = new Map<string, string>()
-    allLessons?.forEach((l) => {
-      const courseId = (l as any).hub_modules?.course_id
-      if (courseId) lessonToCourse.set(l.id, courseId)
-    })
-
-    const courseCheckCounts = new Map<string, number>()
-    existingQuestions?.forEach((q) => {
-      const courseId = lessonToCourse.get(q.lesson_id)
-      if (courseId) {
-        courseCheckCounts.set(courseId, (courseCheckCounts.get(courseId) || 0) + 1)
-      }
-    })
-
-    // Filter to courses that need checks (< 5 total) and have content
-    const needsChecks = (courses || []).filter((c) => {
-      const lessons = lessonsByCourse.get(c.id) || []
-      const hasContent = lessons.some((l) => {
-        const content = l.content as Record<string, unknown> | null
-        return !!(
-          (content?.body_html && (content.body_html as string).length > 50) ||
-          (content?.text && (content.text as string).length > 50) ||
-          (content?.markdown && (content.markdown as string).length > 50) ||
-          (content?.video_id) ||
-          (l.transcript && (l.transcript as string).length > 50)
-        )
+    lessonsByCourse.forEach((arr) =>
+      arr.sort((a, b) => {
+        const mod = (moduleOrder.get(a.module_id!) ?? 0) - (moduleOrder.get(b.module_id!) ?? 0)
+        return mod !== 0 ? mod : a.sort_order - b.sort_order
       })
-      return hasContent && (courseCheckCounts.get(c.id) || 0) < 5
-    })
-
-    if (needsChecks.length === 0) {
-      return NextResponse.json({
-        success: true,
-        message: 'All courses already have check-ins.',
-        processed: 0,
-        results: [],
-      })
-    }
+    )
 
     const client = new Anthropic({ apiKey })
 
     const results: Array<{
       course_id: string
       course_title: string
-      status: 'generated' | 'failed' | 'skipped'
-      checks_created: number
+      status: 'rebuilt' | 'failed' | 'skipped'
+      check_ins: number
+      questions_created: number
+      retired: number
       error?: string
     }> = []
 
-    for (const course of needsChecks) {
+    for (const course of courses || []) {
       const lessons = lessonsByCourse.get(course.id) || []
+      const gateLessons = pickCheckInLessons(lessons)
 
-      // Build a summary of the course content from all lessons
-      const lessonSummaries: string[] = []
-      let firstLessonWithContent: string | null = null
-
-      for (const lesson of lessons) {
-        const content = lesson.content as Record<string, unknown> | null
-        const bodyHtml = (content?.body_html as string) || ''
-        const bodyText = (content?.text as string) || ''
-        const markdown = (content?.markdown as string) || ''
-        const transcript = (lesson.transcript as string) || ''
-        const lessonContent = bodyHtml || bodyText || markdown || transcript
-
-        if (lessonContent && lessonContent.trim().length > 50) {
-          if (!firstLessonWithContent) firstLessonWithContent = lesson.id
-          // Take first 1500 chars of each lesson to stay within token limits
-          lessonSummaries.push(`LESSON: ${lesson.title}\n${lessonContent.substring(0, 1500)}`)
-        }
-      }
-
-      if (lessonSummaries.length === 0 || !firstLessonWithContent) {
+      if (gateLessons.length === 0) {
         results.push({
           course_id: course.id,
           course_title: course.title,
           status: 'skipped',
-          checks_created: 0,
+          check_ins: 0,
+          questions_created: 0,
+          retired: 0,
+          error: 'No lesson with a usable transcript',
         })
         continue
       }
 
-      // Cap total content to ~12K chars
-      let combinedContent = ''
-      for (const summary of lessonSummaries) {
-        if (combinedContent.length + summary.length > 12000) break
-        combinedContent += summary + '\n\n---\n\n'
-      }
-
       try {
-        const prompt = `You are an instructional designer for Teachers Deserve It, an educator professional development platform. Generate 5 formative check-ins for this ENTIRE COURSE, not individual lessons. The check-ins should assess the course's key themes and big ideas.
-
-COURSE TITLE: ${course.title}
-COURSE CATEGORY: ${course.category || 'General'}
-COURSE DESCRIPTION: ${course.description || 'N/A'}
-TOTAL LESSONS: ${lessons.length}
-
-CONTENT FROM ACROSS THE COURSE:
-${combinedContent}
-
----
-
-Generate exactly 5 check-ins for the whole course:
-- 2 multiple choice comprehension checks (3-4 options, 1 correct) covering the course's core concepts
-- 1 reflection prompt that connects the course themes to the educator's own practice
-- 1 action step: a specific, practical thing they can try in their classroom this week based on what they learned
-- 1 checkpoint: 3-4 key takeaways from the entire course
-
-Rules:
-- These should cover the WHOLE COURSE, not just one lesson
-- Test real understanding of the course's big ideas, not surface recall
-- Reflection should be personal: "Think about..." or "Consider a time when..."
-- Action step must be specific enough to do tomorrow
-- Tone: warm, professional, no emojis, no dashes
-- Explanations should teach WHY, not just confirm
-
-Return ONLY a JSON array. Each object:
-{"question_text":"...","question_type":"multiple_choice"|"reflection"|"action_step"|"checkpoint","options":[...]|null,"correct_answer":"..."|null,"explanation":"..."|null,"sort_order":number}
-
-For multiple_choice: options = [{"text":"...","is_correct":boolean}]
-For checkpoint: options = [{"text":"..."}] (takeaways)
-For reflection/action_step: options = null
-
-JSON array only, no markdown fences.`
-
-        const response = await client.messages.create({
-          model: 'claude-sonnet-4-6',
-          max_tokens: 4000,
-          messages: [{ role: 'user', content: prompt }],
-        })
-
-        const responseText = response.content
-          .filter((block): block is Anthropic.TextBlock => block.type === 'text')
-          .map((block) => block.text)
-          .join('')
-
-        const cleaned = responseText.replace(/^```json?\s*\n?/i, '').replace(/\n?```\s*$/i, '').trim()
-        const questions = JSON.parse(cleaned)
-
-        if (!Array.isArray(questions) || questions.length === 0) {
-          results.push({
-            course_id: course.id,
-            course_title: course.title,
-            status: 'failed',
-            checks_created: 0,
-            error: 'AI returned no questions',
-          })
-          continue
+        // Generate everything before touching the database, so a failure
+        // halfway through never leaves a course with no check-ins at all.
+        const generated: GeneratedQuestion[][] = []
+        for (let i = 0; i < gateLessons.length; i++) {
+          const lesson = gateLessons[i]
+          const idx = lessons.findIndex((l) => l.id === lesson.id)
+          const priorTitles = lessons
+            .slice(0, idx)
+            .filter(isContentLesson)
+            .map((l) => l.title)
+            .slice(-6)
+          generated.push(
+            await generateCheckIn(client, course, lesson, i + 1, gateLessons.length, priorTitles)
+          )
         }
 
-        // Store all 5 checks on the first lesson with content
-        const insertRows = questions.map((q: Record<string, unknown>, i: number) => ({
-          lesson_id: firstLessonWithContent,
-          question_text: q.question_text || '',
-          question_type: q.question_type || 'multiple_choice',
-          options: q.options || null,
-          correct_answer: q.correct_answer || null,
-          explanation: q.explanation || null,
-          sort_order: i,
-          content_position: null,
-        }))
+        const lessonIds = lessons.map((l) => l.id)
+        const { data: existing } = await supabase
+          .from('hub_quiz_questions')
+          .select('id')
+          .eq('is_active', true)
+          .in('lesson_id', lessonIds)
+
+        if (existing && existing.length > 0) {
+          await supabase
+            .from('hub_quiz_questions')
+            .update({ is_active: false })
+            .in('id', existing.map((q) => q.id))
+        }
+
+        const rows = gateLessons.flatMap((lesson, i) =>
+          generated[i].map((q) => ({
+            ...q,
+            lesson_id: lesson.id,
+            content_position: null,
+            is_active: true,
+          }))
+        )
 
         const { data: created, error: insertError } = await supabase
           .from('hub_quiz_questions')
-          .insert(insertRows)
+          .insert(rows)
           .select()
 
-        if (insertError) {
-          results.push({
-            course_id: course.id,
-            course_title: course.title,
-            status: 'failed',
-            checks_created: 0,
-            error: insertError.message,
-          })
-        } else {
-          results.push({
-            course_id: course.id,
-            course_title: course.title,
-            status: 'generated',
-            checks_created: created?.length || 0,
-          })
-        }
+        if (insertError) throw new Error(insertError.message)
+
+        results.push({
+          course_id: course.id,
+          course_title: course.title,
+          status: 'rebuilt',
+          check_ins: gateLessons.length,
+          questions_created: created?.length || 0,
+          retired: existing?.length || 0,
+        })
       } catch (err: unknown) {
         results.push({
           course_id: course.id,
           course_title: course.title,
           status: 'failed',
-          checks_created: 0,
+          check_ins: 0,
+          questions_created: 0,
+          retired: 0,
           error: err instanceof Error ? err.message : 'Unknown error',
         })
       }
     }
 
-    const generated = results.filter((r) => r.status === 'generated').length
-    const totalChecks = results.reduce((sum, r) => sum + r.checks_created, 0)
+    const rebuilt = results.filter((r) => r.status === 'rebuilt').length
+    const totalCheckIns = results.reduce((sum, r) => sum + r.check_ins, 0)
     const failed = results.filter((r) => r.status === 'failed').length
 
     return NextResponse.json({
       success: true,
-      message: `Generated ${totalChecks} check-ins across ${generated} courses. ${failed > 0 ? `${failed} failed.` : ''}`,
+      message: `Rebuilt ${totalCheckIns} check-ins across ${rebuilt} course${rebuilt === 1 ? '' : 's'}. ${failed > 0 ? `${failed} failed.` : ''}`.trim(),
       processed: results.length,
-      generated,
-      total_checks: totalChecks,
+      rebuilt,
+      total_check_ins: totalCheckIns,
       failed,
       results,
     })
