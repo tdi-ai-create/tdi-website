@@ -18,11 +18,16 @@ export async function GET() {
   try {
     const supabase = getSupabaseAdmin();
 
-    // Fetch only creators marked for website display
+    // Fetch only creators marked for website display.
+    //
+    // The status check matters: archiving or withdrawing a creator sets status
+    // but never touched display_on_website, so people who had left were still
+    // being listed publicly. Anyone who is not active comes off the site.
     const { data: creators, error } = await supabase
       .from('creators')
       .select('id, name, website_display_name, website_title, website_bio, headshot_url, display_order, content_path, topic')
       .eq('display_on_website', true)
+      .eq('status', 'active')
       .order('display_order', { ascending: true });
 
     if (error) {

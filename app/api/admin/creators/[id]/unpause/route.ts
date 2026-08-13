@@ -1,11 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { requireAdminAuth } from '@/lib/tdi-admin/auth'
 
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const auth = await requireAdminAuth();
+    if (auth instanceof NextResponse) return auth;
+
     const { id } = await params
     const { adminEmail } = await request.json()
 

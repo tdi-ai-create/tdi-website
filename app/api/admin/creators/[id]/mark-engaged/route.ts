@@ -42,20 +42,29 @@ export async function POST(
         .eq('id', activeSeq.id);
     }
 
-    // Bump updated_at so the creator doesn't immediately re-trigger
-    await supabase
+    // Record the touch. This previously also wrote followed_up_by, a column
+    // that does not exist on creators, so Postgres rejected the entire update
+    // and nothing was written from 17 May 2026 onward. The admin dashboard has
+    // a "Followed Up" card and creator list that read last_followed_up_at, and
+    // both sat permanently empty because of it.
+    const { error: touchError } = await supabase
       .from('creators')
       .update({
         updated_at: now,
         last_followed_up_at: now,
-        followed_up_by: adminEmail,
       })
       .eq('id', id);
+
+    if (touchError) {
+      console.error('[mark-engaged] Follow-up stamp failed:', touchError);
+      return NextResponse.json({ error: touchError.message }, { status: 500 });
+    }
 
     return NextResponse.json({
       success: true,
       sequenceCancelled: !!activeSeq,
       step: activeSeq?.current_step ?? null,
+      followedUpAt: now,
     });
   } catch (e: any) {
     console.error('[mark-engaged] Error:', e);

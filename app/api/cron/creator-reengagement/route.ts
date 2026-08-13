@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { logCreatorEmail } from '@/lib/creator-email-log';
 import { creatorEmailTemplate } from '@/lib/creator-email-template';
+import { randomBytes } from 'crypto';
+import { unpauseUrl } from '@/lib/reengagement-config';
 import { guardCron, checkedWrite } from '@/lib/cron-guard';
 
 // ---------------------------------------------------------------------------
@@ -24,7 +26,17 @@ const REPLY_TO = 'bella@teachersdeserveit.com';
 // Email templates — warm, short, from Bella
 // ---------------------------------------------------------------------------
 
-function getEmailContent(step: number, firstName: string): { subject: string; html: string } {
+function getEmailContent(
+  step: number,
+  firstName: string,
+  /**
+   * One-click reactivation URL, required for the final step. The account is
+   * being paused there and the creator needs a way back that does not involve
+   * signing in: 25 of 35 creators have never signed in at all, so the default
+   * dashboard CTA was a login wall for most of the people receiving it.
+   */
+  reactivateUrl?: string
+): { subject: string; html: string } {
   switch (step) {
     case 0:
       return {
@@ -136,6 +148,7 @@ function getEmailContent(step: number, firstName: string): { subject: string; ht
             <p>Wishing you the best,<br/>Bella</p>
           `,
           ctaLabel: 'Reactivate My Account',
+          ctaUrl: reactivateUrl,
         }),
       };
 
@@ -305,7 +318,16 @@ export async function GET(request: NextRequest) {
         const firstName = creator.name?.split(' ')[0] || 'there';
 
         if (nextStep <= 6) {
-          const { subject, html } = getEmailContent(nextStep, firstName);
+          // Mint the reactivation token before composing, so the link in the
+          // creator's inbox is the same one the pause actually stores. It used
+          // to be minted inside pauseCreatorAccount and never emailed anywhere,
+          // which left the one-click path dead.
+          const unpauseToken = nextStep === 6 ? randomBytes(24).toString('hex') : undefined;
+          const { subject, html } = getEmailContent(
+            nextStep,
+            firstName,
+            unpauseToken ? unpauseUrl(unpauseToken) : undefined
+          );
 
           if (dryRun) {
             results.plan.push({
@@ -345,7 +367,7 @@ export async function GET(request: NextRequest) {
               );
 
               // Auto-pause the creator account
-              const paused = await pauseCreatorAccount(supabase, seq.creator_id, results.errors);
+              const paused = await pauseCreatorAccount(supabase, seq.creator_id, unpauseToken!, results.errors);
               if (paused) {
                 results.accountsPaused++;
                 console.log(`[reengagement] Auto-paused creator ${seq.creator_id} after step 6`);
@@ -572,11 +594,11 @@ async function sendEmail(
 async function pauseCreatorAccount(
   supabase: any,
   creatorId: string,
+  /** The token already emailed to the creator, so their link resolves. */
+  unpauseToken: string,
   errors: string[]
 ): Promise<boolean> {
   try {
-    const { randomBytes } = await import('crypto');
-    const unpauseToken = randomBytes(24).toString('hex');
 
     const { error: pauseError } = await (supabase.from('creators') as any).update({
       lifecycle_state: 'paused',

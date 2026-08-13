@@ -1,12 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { requireAdminAuth } from '@/lib/tdi-admin/auth';
 
 /**
  * API endpoint to permanently delete a creator and all associated data.
  * POST with { creatorId }
+ *
+ * This destroys a person's record and every milestone, note, project and
+ * submission attached to it, with no export and no undo. It ran unauthenticated
+ * until Aug 2026: the middleware refreshes session cookies for /api routes but
+ * deliberately blocks nothing, so the gate has to live here.
  */
 export async function POST(request: NextRequest) {
   try {
+    const auth = await requireAdminAuth();
+    if (auth instanceof NextResponse) return auth;
+
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 

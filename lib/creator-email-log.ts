@@ -14,6 +14,12 @@ export interface EmailLogEntry {
   step?: number;
   sent_by?: string;
   metadata?: Record<string, unknown>;
+  /**
+   * True when the send was suppressed by a config flag and only recorded.
+   * Nothing reached the creator. Powers the "would have sent" queue in the
+   * admin Re-engagement tab.
+   */
+  dry_run?: boolean;
 }
 
 export async function logCreatorEmail(entry: EmailLogEntry): Promise<void> {
@@ -36,6 +42,7 @@ export async function logCreatorEmail(entry: EmailLogEntry): Promise<void> {
       step: entry.step ?? null,
       sent_by: entry.sent_by || 'system',
       metadata: entry.metadata || null,
+      dry_run: entry.dry_run ?? false,
     });
   } catch (e) {
     // Non-blocking — never fail the parent operation over logging
