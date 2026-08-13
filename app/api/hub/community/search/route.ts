@@ -49,11 +49,11 @@ export async function GET(request: NextRequest) {
         const qaUserIds = [...new Set(qaPosts.map(p => p.user_id))]
         const { data: qaProfiles } = await supabase
           .from('hub_profiles')
-          .select('user_id, display_name, role')
-          .in('user_id', qaUserIds)
+          .select('id, display_name, role')
+          .in('id', qaUserIds)
 
         const profileMap = new Map(
-          (qaProfiles || []).map(p => [p.user_id, { name: p.display_name, role: p.role }])
+          (qaProfiles || []).map(p => [p.id, { name: p.display_name, role: p.role }])
         )
 
         for (const post of qaPosts) {
@@ -95,11 +95,11 @@ export async function GET(request: NextRequest) {
         const convUserIds = [...new Set(convPosts.map(p => p.user_id))]
         const { data: convProfiles } = await supabase
           .from('hub_profiles')
-          .select('user_id, display_name, role')
-          .in('user_id', convUserIds)
+          .select('id, display_name, role')
+          .in('id', convUserIds)
 
         const profileMap = new Map(
-          (convProfiles || []).map(p => [p.user_id, { name: p.display_name, role: p.role }])
+          (convProfiles || []).map(p => [p.id, { name: p.display_name, role: p.role }])
         )
 
         for (const post of convPosts) {

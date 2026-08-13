@@ -197,15 +197,50 @@ export async function GET(
       }
 
       case 'courses': {
+        // hub_enrollments stores neither the educator email nor the course
+        // title. Selecting them failed with 42703, so this report was always
+        // empty. The course title comes from the hub_courses foreign key; the
+        // email needs a separate lookup because the user FK points at
+        // auth.users rather than hub_profiles.
         let courseData = null;
         if (hubSupabase) {
           try {
-            const { data } = await hubSupabase
+            const { data: enrollments, error: enrollErr } = await hubSupabase
               .from('hub_enrollments')
-              .select('user_email, course_title, status, completed_at, enrolled_at')
+              .select('user_id, status, completed_at, enrolled_at, course:hub_courses(title)')
               .limit(2000);
-            courseData = data;
-          } catch {}
+
+            if (enrollErr) {
+              console.error('Course report enrollment query failed:', enrollErr.message);
+            }
+
+            if (enrollments && enrollments.length > 0) {
+              const userIds = [...new Set(enrollments.map((e) => e.user_id).filter(Boolean))];
+              const { data: profiles } = await hubSupabase
+                .from('hub_profiles')
+                .select('id, email')
+                .in('id', userIds);
+
+              const emailById = new Map((profiles || []).map((p) => [p.id, p.email]));
+
+              courseData = enrollments.map((e) => ({
+                user_email: emailById.get(e.user_id) || null,
+                course_title:
+                  (e.course as { title?: string } | { title?: string }[] | null) === null
+                    ? null
+                    : Array.isArray(e.course)
+                      ? e.course[0]?.title ?? null
+                      : (e.course as { title?: string }).title ?? null,
+                status: e.status,
+                completed_at: e.completed_at,
+                enrolled_at: e.enrolled_at,
+              }));
+            } else {
+              courseData = [];
+            }
+          } catch (err) {
+            console.error('Course report failed:', err);
+          }
         }
 
         const hasData = courseData && courseData.length > 0;
