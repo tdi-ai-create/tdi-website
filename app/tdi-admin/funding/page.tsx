@@ -2,7 +2,24 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { DraftEmailModal, introEmailDraft } from './components/panel/DraftEmailModal'
+import { DraftEmailModal, introEmailDraft, gateBlockerEmailDraft } from './components/panel/DraftEmailModal'
+
+/**
+ * One next-step item, exactly as computed by lib/funding-next-actions.ts and
+ * served by /api/funding/queue. This page does NOT compute its own — that is
+ * how it used to end up telling Bella to approve things it had no button for.
+ */
+interface QueueItem {
+  id: string
+  label: string
+  why: string
+  owner: 'bella' | 'rae' | 'agent' | 'school' | 'auto'
+  urgency: 'critical' | 'high' | 'normal' | 'low'
+  actionType: string
+  targetId?: string | null
+  inProgress?: boolean
+  pursuitId: string
+}
 
 interface SchoolData {
   id: string
@@ -11,6 +28,7 @@ interface SchoolData {
   email: string
   pipeline: number
   introSent: boolean
+  nextSteps: QueueItem[]
   grants: {
     name: string
     id: string
@@ -22,11 +40,13 @@ interface SchoolData {
     hasDraft: boolean
     narrativeStatus: string
     narrativeUrl: string | null
+    qaPassed: boolean | null
     forwardingStatus: string | null
   }[]
   actions: {
     id: string
     title: string
+    clientLabel: string | null
     description: string | null
     dueDate: string | null
     ownerName: string | null
@@ -42,10 +62,22 @@ export default function FundingPage() {
   const [toast, setToast] = useState<string | null>(null)
 
   useEffect(() => {
-    fetch('/api/funding/dashboard')
-      .then(r => r.json())
-      .then(d => {
+    Promise.all([
+      fetch('/api/funding/dashboard').then(r => r.json()),
+      fetch('/api/funding/queue').then(r => r.json()).catch(() => ({ items: [] })),
+    ])
+      .then(([d, q]) => {
         const pursuits = (d.pursuits || []).filter((p: any) => !p.archived)
+
+        // Group the engine's next-step items by pursuit. Already sorted
+        // critical → high → normal → low by the queue API.
+        const stepsByPursuit = new Map<string, QueueItem[]>()
+        for (const item of (q.items || []) as QueueItem[]) {
+          const list = stepsByPursuit.get(item.pursuitId) ?? []
+          list.push(item)
+          stepsByPursuit.set(item.pursuitId, list)
+        }
+
         // Fetch opportunities for each pursuit
         Promise.all(pursuits.map((p: any) =>
           Promise.all([
@@ -61,6 +93,7 @@ export default function FundingPage() {
               email: p.client_contact_email || '',
               pipeline: p.total_amount || 0,
               introSent: !!p.intro_sent_at,
+              nextSteps: stepsByPursuit.get(p.id) ?? [],
               grants: (od.opportunities || []).map((o: any) => ({
                 name: o.name,
                 id: o.id,
@@ -72,11 +105,13 @@ export default function FundingPage() {
                 hasDraft: !!o.narrative_content,
                 narrativeStatus: o.narrative_status,
                 narrativeUrl: o.narrative_url,
+                qaPassed: o.qa_passed ?? null,
                 forwardingStatus: o.forwarding_email_status,
               })),
               actions: actions.map((a: any) => ({
                 id: a.id,
                 title: a.title,
+                clientLabel: a.client_label ?? null,
                 description: a.description,
                 dueDate: a.due_date,
                 ownerName: a.owner_name,
@@ -85,12 +120,12 @@ export default function FundingPage() {
               })),
             }})
         )).then(data => {
-          // Sort: schools with drafts ready first, then by pipeline value
+          // Sort by whether anything actually needs a person, then pipeline value
           data.sort((a: SchoolData, b: SchoolData) => {
-            const aReady = a.grants.filter(g => ['review', 'qa_review'].includes(g.narrativeStatus)).length
-            const bReady = b.grants.filter(g => ['review', 'qa_review'].includes(g.narrativeStatus)).length
-            if (aReady > 0 && bReady === 0) return -1
-            if (bReady > 0 && aReady === 0) return 1
+            const aOpen = a.nextSteps.filter(s => !s.inProgress).length
+            const bOpen = b.nextSteps.filter(s => !s.inProgress).length
+            if (aOpen > 0 && bOpen === 0) return -1
+            if (bOpen > 0 && aOpen === 0) return 1
             return b.pipeline - a.pipeline
           })
           setSchools(data)
@@ -110,7 +145,7 @@ export default function FundingPage() {
 
   const totalPipeline = schools.reduce((s, sc) => s + sc.pipeline, 0)
   const totalGrants = schools.reduce((s, sc) => s + sc.grants.length, 0)
-  const readyToReview = schools.reduce((s, sc) => s + sc.grants.filter(g => ['review', 'qa_review'].includes(g.narrativeStatus)).length, 0)
+  const needsYou = schools.reduce((s, sc) => s + sc.nextSteps.filter(i => !i.inProgress && (i.owner === 'bella' || i.owner === 'rae')).length, 0)
 
   return (
     <div style={{ padding: '32px 48px', fontFamily: "'DM Sans', sans-serif", maxWidth: 1000 }}>
@@ -152,7 +187,7 @@ export default function FundingPage() {
         </div>
       </div>
       <p style={{ fontSize: 14, color: '#6B7280', marginBottom: 24 }}>
-        {schools.length} schools | ${(totalPipeline / 1000).toFixed(0)}K pipeline | {totalGrants} grants tracked{readyToReview > 0 ? ` | ${readyToReview} ready to review` : ''}
+        {schools.length} schools | ${(totalPipeline / 1000).toFixed(0)}K pipeline | {totalGrants} grants tracked{needsYou > 0 ? ` | ${needsYou} waiting on you` : ''}
       </p>
 
       {/* School cards */}
@@ -181,45 +216,29 @@ function SchoolCard({ school, onDraftEmail, onToast }: {
   const completedGrants = school.grants.filter(g => g.status !== 'denied' && g.forwardingStatus === 'sent' && g.narrativeStatus === 'ready')
   const activeGrants = school.grants.filter(g => g.status !== 'denied' && !(g.forwardingStatus === 'sent' && g.narrativeStatus === 'ready'))
   const deniedGrants = school.grants.filter(g => g.status === 'denied')
-  const openWindowGrants = activeGrants.filter(g => g.windowOpen)
-  const draftsReady = activeGrants.filter(g => ['review', 'qa_review'].includes(g.narrativeStatus))
-  const draftsInProgress = activeGrants.filter(g => g.narrativeStatus === 'drafting' || g.narrativeStatus === 'requested')
-  const needsDraft = openWindowGrants.filter(g => g.narrativeStatus === 'not_started')
 
-  // Determine next action
-  let nextAction = ''
-  let nextActionType: 'email' | 'review' | 'draft' | 'info' | 'waiting' | 'none' = 'none'
+  // The next step comes from the shared engine, never from logic local to this
+  // page. Prefer the top item a person can act on; fall back to the top
+  // in-progress item so a waiting pursuit still says what it is waiting for.
+  const nextStep = school.nextSteps.find(i => !i.inProgress) ?? school.nextSteps[0] ?? null
+  const isWaiting = !!nextStep?.inProgress
+  const isIntro = nextStep?.actionType === 'setup_pursuit'
+  const isBlocked = nextStep?.actionType === 'unblock_draft'
 
-  const sentGrants = activeGrants.filter(g => g.forwardingStatus === 'sent')
-  const approvedNotSent = activeGrants.filter(g => g.narrativeStatus === 'ready' && g.forwardingStatus !== 'sent')
+  // What the school still owes us, in the words they will actually read.
+  // Maintained by lib/funding-gate-sync.ts, so this stays in step automatically.
+  const gateGapLabels = school.actions
+    .filter(a => a.category === 'gate' && a.ownerType === 'client')
+    .map(a => a.clientLabel || a.title)
 
-  if (!school.introSent && school.email) {
-    nextAction = `Send intro email to ${school.contact.split(' ')[0]}`
-    nextActionType = 'email'
-  } else if (draftsReady.length > 0) {
-    nextAction = `Review ${draftsReady.length} narrative${draftsReady.length > 1 ? 's' : ''} and approve`
-    nextActionType = 'review'
-  } else if (approvedNotSent.length > 0) {
-    nextAction = `Send ${approvedNotSent.length} approved application${approvedNotSent.length > 1 ? 's' : ''} to ${school.contact.split(' ')[0]}`
-    nextActionType = 'review'
-  } else if (sentGrants.length > 0) {
-    nextAction = `Application${sentGrants.length > 1 ? 's' : ''} sent to ${school.contact.split(' ')[0]}. Waiting on Deed setup and submission.`
-    nextActionType = 'waiting'
-  } else if (needsDraft.length > 0) {
-    nextAction = `Request narrative drafts for ${needsDraft.length} open-window grant${needsDraft.length > 1 ? 's' : ''}`
-    nextActionType = 'draft'
-  } else if (openWindowGrants.length === 0 && activeGrants.length > 0) {
-    nextAction = 'Verify which grant windows are open'
-    nextActionType = 'info'
-  } else if (draftsInProgress.length > 0) {
-    nextAction = `${draftsInProgress.length} draft${draftsInProgress.length > 1 ? 's' : ''} in progress with agents`
-    nextActionType = 'none'
-  }
+  const bannerBg = isBlocked ? '#FEF2F2' : isWaiting ? '#F0FDF4' : isIntro ? '#EFF6FF' : '#F5F3FF'
+  const bannerFg = isBlocked ? '#B91C1C' : isWaiting ? '#1e2749' : isIntro ? '#1e2749' : '#6D28D9'
+  const needsAttention = !!nextStep && !isWaiting
 
   return (
     <div style={{
       background: 'white', border: '1px solid #E5E7EB', borderRadius: 14,
-      borderLeft: draftsReady.length > 0 ? '4px solid #8B5CF6' : nextActionType === 'email' ? '4px solid #3B82F6' : '4px solid #E5E7EB',
+      borderLeft: isBlocked ? '4px solid #DC2626' : needsAttention ? '4px solid #8B5CF6' : '4px solid #E5E7EB',
       overflow: 'hidden',
     }}>
       {/* Header */}
@@ -242,23 +261,46 @@ function SchoolCard({ school, onDraftEmail, onToast }: {
         </div>
       </div>
 
-      {/* Next action banner */}
-      {nextAction && (
+      {/* Next action banner — label, reason, and a control that always works */}
+      {nextStep && (
         <div style={{
           padding: '12px 22px',
-          background: nextActionType === 'review' ? '#F5F3FF' : nextActionType === 'email' ? '#EFF6FF' : nextActionType === 'waiting' ? '#F0FDF4' : '#F9FAFB',
+          background: bannerBg,
           borderBottom: '1px solid #F3F4F6',
-          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+          display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16,
         }}>
-          <div>
+          <div style={{ minWidth: 0 }}>
             <div style={{ fontSize: 11, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 2 }}>
-              Next Step
+              {isBlocked ? 'Blocked' : isWaiting ? 'Waiting' : 'Next Step'}
             </div>
-            <div style={{ fontSize: 14, fontWeight: 600, color: nextActionType === 'review' ? '#6D28D9' : '#1e2749' }}>
-              {nextAction}
+            <div style={{ fontSize: 14, fontWeight: 600, color: bannerFg }}>
+              {nextStep.label}
+            </div>
+            <div style={{ fontSize: 12, color: '#6B7280', marginTop: 3, lineHeight: 1.45 }}>
+              {nextStep.why}
             </div>
           </div>
-          {nextActionType === 'email' && school.email && (
+
+          {/* Blocked on the school: offer the email that names exactly what we need */}
+          {isBlocked && school.email && gateGapLabels.length > 0 ? (
+            <button
+              onClick={() => {
+                const draft = gateBlockerEmailDraft(
+                  school.contact,
+                  school.name.replace(/ - Grant Funding$/, '').replace(/ - Grant Funded Funding$/, ''),
+                  gateGapLabels,
+                )
+                onDraftEmail(school.email, school.contact, draft.subject, draft.body, school.name, school.id)
+              }}
+              style={{
+                fontSize: 12, fontWeight: 700, padding: '8px 16px', borderRadius: 8,
+                border: 'none', background: '#DC2626', color: 'white', cursor: 'pointer', flexShrink: 0,
+                whiteSpace: 'nowrap',
+              }}
+            >
+              Email {school.contact.split(' ')[0]}
+            </button>
+          ) : isIntro && school.email ? (
             <button
               onClick={() => {
                 const draft = introEmailDraft(school.contact, school.name.replace(/ - Grant Funding$/, ''))
@@ -266,43 +308,23 @@ function SchoolCard({ school, onDraftEmail, onToast }: {
               }}
               style={{
                 fontSize: 12, fontWeight: 700, padding: '8px 16px', borderRadius: 8,
-                border: 'none', background: '#3B82F6', color: 'white', cursor: 'pointer',
+                border: 'none', background: '#3B82F6', color: 'white', cursor: 'pointer', flexShrink: 0,
               }}
             >
               Draft Email
             </button>
-          )}
-          {nextActionType === 'review' && (
-            <div style={{ display: 'flex', gap: 6 }}>
-              {draftsReady.map(g => (
-                g.narrativeUrl ? (
-                  <a
-                    key={g.id}
-                    href={g.narrativeUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{
-                      fontSize: 12, fontWeight: 700, padding: '8px 16px', borderRadius: 8,
-                      border: 'none', background: '#8B5CF6', color: 'white', textDecoration: 'none',
-                    }}
-                  >
-                    Open {g.name.split(' ')[0]} Doc
-                  </a>
-                ) : null
-              ))}
-            </div>
-          )}
-          {nextActionType === 'draft' && (
+          ) : !isWaiting ? (
             <Link
               href={`/tdi-admin/funding/${school.id}`}
               style={{
                 fontSize: 12, fontWeight: 700, padding: '8px 16px', borderRadius: 8,
-                border: 'none', background: '#10B981', color: 'white', textDecoration: 'none',
+                border: 'none', background: isBlocked ? '#DC2626' : '#8B5CF6', color: 'white',
+                textDecoration: 'none', flexShrink: 0, whiteSpace: 'nowrap',
               }}
             >
-              Request Drafts
+              {isBlocked ? 'Fix This' : 'Open Pursuit'}
             </Link>
-          )}
+          ) : null}
         </div>
       )}
 
@@ -482,9 +504,14 @@ function GrantRow({ grant, school, onDraftEmail, onToast, onRefresh }: {
     )
   }
 
-  const isReviewable = ['review', 'qa_review'].includes(grant.narrativeStatus) && !approved
-  const isApproved = approved || grant.narrativeStatus === 'ready'
-  const isDrafting = grant.narrativeStatus === 'drafting' || grant.narrativeStatus === 'requested'
+  const ns = grant.narrativeStatus
+  // QA passed, waiting on Bella. Legacy rows sit in qa_review + qa_passed
+  // rather than the 'approval' state, so both count.
+  const awaitingApproval = !approved && (ns === 'approval' || (ns === 'qa_review' && grant.qaPassed === true))
+  const inQa = ns === 'qa_review' && grant.qaPassed !== true
+  const isEscalated = ns === 'escalated'
+  const isApproved = approved || ns === 'ready'
+  const isDrafting = ns === 'drafting' || ns === 'requested'
 
   return (
     <div style={{
@@ -514,17 +541,35 @@ function GrantRow({ grant, school, onDraftEmail, onToast, onRefresh }: {
             </span>
           )}
 
-          {isReviewable && grant.narrativeUrl && (
-            <>
-              <a href={grant.narrativeUrl} target="_blank" rel="noopener noreferrer"
-                style={{ fontSize: 12, fontWeight: 700, padding: '6px 14px', borderRadius: 8, background: '#8B5CF6', color: 'white', textDecoration: 'none' }}>
-                Open Doc
-              </a>
-              <button onClick={handleApprove} disabled={approving}
-                style={{ fontSize: 12, fontWeight: 700, padding: '6px 14px', borderRadius: 8, border: 'none', background: approving ? '#9CA3AF' : '#10B981', color: 'white', cursor: 'pointer' }}>
-                {approving ? '...' : 'Approve'}
-              </button>
-            </>
+          {/* An external doc link when one exists — but never a precondition for acting */}
+          {(awaitingApproval || inQa) && grant.narrativeUrl && (
+            <a href={grant.narrativeUrl} target="_blank" rel="noopener noreferrer"
+              style={{ fontSize: 11, fontWeight: 600, padding: '4px 10px', borderRadius: 6, border: '1px solid #E5E7EB', background: 'white', color: '#6B7280', textDecoration: 'none' }}>
+              Open Doc
+            </a>
+          )}
+
+          {/* With QA running, nobody is waiting on a person here */}
+          {inQa && (
+            <span style={{ fontSize: 11, fontWeight: 600, padding: '4px 10px', borderRadius: 6, background: '#EDE9FE', color: '#6D28D9' }}>
+              In QA review
+            </span>
+          )}
+
+          {/* QA failed twice. The options live on the pursuit page. */}
+          {isEscalated && (
+            <Link href={`/tdi-admin/funding/${school.id}`}
+              style={{ fontSize: 12, fontWeight: 700, padding: '6px 14px', borderRadius: 8, background: '#DC2626', color: 'white', textDecoration: 'none' }}>
+              Needs your decision
+            </Link>
+          )}
+
+          {/* QA passed — approving is one click, with or without a doc URL */}
+          {awaitingApproval && (
+            <button onClick={handleApprove} disabled={approving}
+              style={{ fontSize: 12, fontWeight: 700, padding: '6px 14px', borderRadius: 8, border: 'none', background: approving ? '#9CA3AF' : '#10B981', color: 'white', cursor: 'pointer' }}>
+              {approving ? '...' : 'Approve'}
+            </button>
           )}
 
           {isApproved && !sent && (
@@ -556,13 +601,13 @@ function GrantRow({ grant, school, onDraftEmail, onToast, onRefresh }: {
             </>
           )}
 
-          {!isDrafting && !isReviewable && !isApproved && grant.windowOpen && (
+          {!isDrafting && !inQa && !isEscalated && !awaitingApproval && !isApproved && grant.windowOpen && (
             <span style={{ fontSize: 11, fontWeight: 600, padding: '4px 10px', borderRadius: 6, background: '#D1FAE5', color: '#065F46' }}>
               Window open
             </span>
           )}
 
-          {!isDrafting && !isReviewable && !isApproved && !grant.windowOpen && (
+          {!isDrafting && !inQa && !isEscalated && !awaitingApproval && !isApproved && !grant.windowOpen && (
             <span style={{ fontSize: 11, fontWeight: 600, padding: '4px 10px', borderRadius: 6, background: '#F3F4F6', color: '#6B7280' }}>
               Not started
             </span>

@@ -114,6 +114,12 @@ export async function PATCH(request: NextRequest) {
   ];
   fields.forEach(f => { if (body[f] !== undefined) updates[f] = body[f]; });
 
+  // State clock: stamped only when narrative_status genuinely changes, so
+  // "how long has this been in this state" stays answerable. See migration 113.
+  if (body.narrative_status !== undefined && body.narrative_status !== before?.narrative_status) {
+    updates.narrative_status_changed_at = new Date().toISOString();
+  }
+
   // When client_submitted flips to true, set timestamp and update activity
   if (body.client_submitted === true && !before?.client_submitted) {
     updates.client_submitted_at = new Date().toISOString();

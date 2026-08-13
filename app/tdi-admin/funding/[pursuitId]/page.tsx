@@ -98,6 +98,9 @@ export default function PursuitDetailPage() {
   const schoolActionItems = (data.actionItems || []).filter((a: any) =>
     !(a.owner_email === 'rae@teachersdeserveit.com' && !a.opportunity_id)
   )
+  // No opts: this is a client component and cannot read the QA agent flag, so
+  // it defaults to treating QA as a person's job. That errs toward showing work
+  // rather than hiding it, and the QA panel is on this page anyway.
   const nextActions = computeNextActions(
     p,
     data.opportunities || [],

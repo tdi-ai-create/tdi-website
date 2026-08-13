@@ -33,7 +33,13 @@ export function computeNextActions(
   actions: any[],
   gate: any,
   allocations: any[],
+  opts: { qaAgentEnabled?: boolean; qaSilenceHours?: number } = {},
 ): NextAction[] {
+  // Passed in rather than read from env here, so this stays a pure function and
+  // is safe to import from client components.
+  const qaAgentEnabled = opts.qaAgentEnabled ?? false
+  const qaSilenceHours = opts.qaSilenceHours ?? 24
+
   const result: NextAction[] = []
   const today = new Date()
   today.setHours(0, 0, 0, 0)
@@ -160,7 +166,7 @@ export function computeNextActions(
 
   // Deadline within 7 days with submission not ready
   for (const opp of opportunities) {
-    if (['awarded', 'denied'].includes(opp.status)) continue
+    if (['awarded', 'denied', 'closed'].includes(opp.status)) continue
     const deadline = opp.internal_deadline || opp.application_closes
     if (!deadline) continue
     const due = new Date(deadline + 'T00:00:00')
@@ -210,7 +216,7 @@ export function computeNextActions(
   // Federal formula funds (Title II-A, IDEA/CEIS) should auto-mark as open on creation.
   // Remaining unknown windows are agent research tasks.
   const unverifiedWindows = opportunities.filter(
-    (o: any) => !['awarded', 'denied'].includes(o.status) && (o.window_status || 'unknown') === 'unknown'
+    (o: any) => !['awarded', 'denied', 'closed'].includes(o.status) && (o.window_status || 'unknown') === 'unknown'
   )
   for (const opp of unverifiedWindows) {
     result.push({
@@ -241,9 +247,116 @@ export function computeNextActions(
     }
   }
 
-  // Narrative QA passed → needs approval
+  // Narrative awaiting a QA verdict.
+  //
+  // Who owns this depends on whether automated QA is actually running. Calling
+  // it agent work while no agent is configured is how five finished narratives
+  // sat silent for over a week. Two conditions hand it back to a person:
+  // automated QA being off, or it having gone quiet past QA_SILENCE_HOURS.
   for (const opp of opportunities) {
-    if (opp.narrative_status === 'qa_review' && opp.qa_passed === true) {
+    if (opp.narrative_status !== 'qa_review' || opp.qa_passed === true) continue
+    if (['awarded', 'denied', 'closed'].includes(opp.status)) continue
+
+    const attempt = (opp.qa_attempt_count ?? 0) + 1
+    const since = opp.narrative_status_changed_at || opp.updated_at
+    const hoursWaiting = since
+      ? Math.floor((Date.now() - new Date(since).getTime()) / 3600000)
+      : Infinity
+    const goneQuiet = hoursWaiting >= qaSilenceHours
+
+    if (qaAgentEnabled && !goneQuiet) {
+      result.push({
+        id: `qa-wait-${opp.id}`,
+        label: `"${opp.name}" — in QA review`,
+        why: attempt > 1
+          ? `Attempt ${attempt}. One more failure and this comes to you with options.`
+          : 'Waiting on a QA pass or fail.',
+        owner: 'agent',
+        urgency: 'low',
+        actionType: 'waiting',
+        targetId: opp.id,
+        tab: 'opportunities',
+        inProgress: true,
+      })
+      continue
+    }
+
+    result.push({
+      id: `qa-verdict-${opp.id}`,
+      label: `Review "${opp.name}" and pass or fail it`,
+      why: qaAgentEnabled
+        ? `No QA verdict in ${hoursWaiting === Infinity ? 'a long time' : `${hoursWaiting} hours`}. Open the pursuit, read it inline, then pass or fail with notes.`
+        : 'Automated QA is not switched on yet, so this one is yours. Open the pursuit, read it inline, name the reviewer, then pass or fail with notes.',
+      owner: 'bella',
+      urgency: 'high',
+      actionType: 'qa_verdict',
+      targetId: opp.id,
+      tab: 'opportunities',
+    })
+  }
+
+  // Escalated: QA failed twice, so a person chooses a path. Always arrives with
+  // a diagnosis and a recommended option — never as an open problem.
+  // See lib/funding-qa.ts.
+  for (const opp of opportunities) {
+    if (opp.narrative_status !== 'escalated') continue
+    if (['awarded', 'denied', 'closed'].includes(opp.status)) continue
+    const esc = opp.qa_escalation || {}
+
+    if (esc.awaiting_client) {
+      result.push({
+        id: `escalation-waiting-${opp.id}`,
+        label: `"${opp.name}" — waiting on information from the school`,
+        why: esc.client_ask ? `We asked for: ${esc.client_ask}` : 'Information requested from the school.',
+        owner: 'school',
+        urgency: 'normal',
+        actionType: 'resume_drafting',
+        targetId: opp.id,
+        tab: 'opportunities',
+        inProgress: true,
+      })
+      continue
+    }
+
+    result.push({
+      id: `escalation-${opp.id}`,
+      label: `Decide what to do with "${opp.name}"`,
+      why: esc.summary
+        ? `${esc.summary}${esc.recommended_option ? ` Recommended: ${String(esc.recommended_option).replace(/_/g, ' ')}.` : ''}`
+        : 'QA could not get this one through. Open the pursuit to see your options.',
+      owner: 'bella',
+      urgency: 'high',
+      actionType: 'resolve_escalation',
+      targetId: opp.id,
+      tab: 'opportunities',
+    })
+  }
+
+  // Approved but not yet sent to the school.
+  // Without this nothing tells anyone to send a finished application until a
+  // deadline is within 7 days, which is far too late to be the first prompt.
+  for (const opp of opportunities) {
+    if (opp.narrative_status !== 'ready') continue
+    if (['awarded', 'denied', 'closed'].includes(opp.status)) continue
+    if (opp.forwarding_email_status === 'sent') continue
+
+    const contact = pursuit.client_contact_name?.split(' ')[0] || 'the school'
+    result.push({
+      id: `send-${opp.id}`,
+      label: `Send "${opp.name}" to ${contact}`,
+      why: 'Approved and ready. It does nothing for the school until it reaches them.',
+      owner: 'bella',
+      urgency: 'high',
+      actionType: 'send_to_client',
+      targetId: opp.id,
+      tab: 'opportunities',
+    })
+  }
+
+  // QA passed → Bella approves. Nothing reaches a school without this step.
+  for (const opp of opportunities) {
+    if (opp.narrative_status === 'approval' ||
+        (opp.narrative_status === 'qa_review' && opp.qa_passed === true)) {
       result.push({
         id: `approve-${opp.id}`,
         label: `Approve "${opp.name}" narrative`,
@@ -340,7 +453,7 @@ export function computeNextActions(
   // Opportunities with open window + gate open but narrative not started
   if (gate?.gate_open) {
     for (const opp of opportunities) {
-      if (['awarded', 'denied'].includes(opp.status)) continue
+      if (['awarded', 'denied', 'closed'].includes(opp.status)) continue
       if (opp.window_status !== 'open') continue
       if (opp.narrative_status && opp.narrative_status !== 'not_started') continue
       result.push({
@@ -360,7 +473,24 @@ export function computeNextActions(
 
   for (const opp of opportunities) {
     if (opp.narrative_status === 'requested') {
-      result.push({
+      // Agents only see drafting work when the window is open AND the gate is open
+      // (see find_work in app/api/funding/sync/route.ts). If either is false the
+      // request is invisible to every agent, so saying "waiting for agent" is a lie.
+      const windowOpen = opp.window_status === 'open'
+      const blockers: string[] = []
+      if (!gate?.gate_open) blockers.push('the gate is not satisfied')
+      if (!windowOpen) blockers.push(`the window is ${opp.window_status || 'unverified'}`)
+
+      result.push(blockers.length > 0 ? {
+        id: `blocked-draft-${opp.id}`,
+        label: `"${opp.name}" — draft requested but blocked`,
+        why: `No agent can pick this up while ${blockers.join(' and ')}. Nothing will happen until that clears.`,
+        owner: 'bella',
+        urgency: 'high',
+        actionType: 'unblock_draft',
+        targetId: opp.id,
+        tab: 'overview',
+      } : {
         id: `drafting-wait-${opp.id}`,
         label: `"${opp.name}" — draft requested`,
         why: `Waiting for ${opp.assigned_agent || 'agent'} to start drafting`,
@@ -377,19 +507,6 @@ export function computeNextActions(
         id: `drafting-${opp.id}`,
         label: `"${opp.name}" — ${opp.assigned_agent || 'agent'} is drafting`,
         why: 'No action needed — agent is working',
-        owner: 'agent',
-        urgency: 'low',
-        actionType: 'waiting',
-        targetId: opp.id,
-        tab: 'opportunities',
-        inProgress: true,
-      })
-    }
-    if (opp.narrative_status === 'qa_review' && opp.qa_passed !== true) {
-      result.push({
-        id: `qa-wait-${opp.id}`,
-        label: `"${opp.name}" — in QA review`,
-        why: 'Waiting for QA pass/fail',
         owner: 'agent',
         urgency: 'low',
         actionType: 'waiting',

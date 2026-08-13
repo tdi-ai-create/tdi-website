@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { computeNextActions } from '@/lib/funding-next-actions'
+import { isQaAgentEnabled, QA_SILENCE_HOURS } from '@/lib/funding-qa'
 import { requireAdminAuth } from '@/lib/tdi-admin/auth'
 
 export const dynamic = 'force-dynamic'
@@ -71,6 +72,7 @@ export async function GET() {
         actionsByPursuit.get(p.id) ?? [],
         gateByPursuit.get(p.id) ?? null,
         allocsByPursuit.get(p.id) ?? [],
+        { qaAgentEnabled: isQaAgentEnabled(), qaSilenceHours: QA_SILENCE_HOURS },
       )
       for (const action of nextActions) {
         allItems.push({
