@@ -26,6 +26,12 @@ export interface QuizResult {
 
 export interface QuizConfig {
   id: string
+  /**
+   * Learning Hub slug. Present when this quiz has a hub_quick_wins row, which is
+   * what makes it reachable at /hub/quiz/[slug]. Omit for quizzes that only run
+   * inside onboarding or the profile page.
+   */
+  slug?: string
   title: string
   shortTitle: string           // for cards and tabs
   description: string          // shown before starting
@@ -929,6 +935,7 @@ export const creatorQuiz: QuizConfig = {
 
 export const communicationStyleQuiz: QuizConfig = {
   id: 'communication_style',
+  slug: 'communication-style-quiz',
   title: "What's Your Communication Style?",
   shortTitle: 'Communication Style',
   description: 'How do you handle the tough conversations? 10 questions to find your default mode.',
@@ -1076,6 +1083,7 @@ export const communicationStyleQuiz: QuizConfig = {
 
 export const btsReadinessQuiz: QuizConfig = {
   id: 'bts_readiness',
+  slug: 'back-to-school-readiness',
   title: 'Back to School Readiness Check',
   shortTitle: 'BTS Readiness',
   description: 'A quick self-assessment across the domains that matter most for day one.',
@@ -1223,6 +1231,7 @@ export const btsReadinessQuiz: QuizConfig = {
 
 export const coachingStanceQuiz: QuizConfig = {
   id: 'coaching_stance',
+  slug: 'coaching-stance-quiz',
   title: "What's Your Coaching Stance?",
   shortTitle: 'Coaching Stance',
   description: 'How do you show up when you are supporting another educator? 8 questions to find out.',
@@ -1352,6 +1361,7 @@ export const coachingStanceQuiz: QuizConfig = {
 
 export const paraPartnershipQuiz: QuizConfig = {
   id: 'para_partnership',
+  slug: 'para-partnership-pulse',
   title: 'Para Partnership Pulse Check',
   shortTitle: 'Partnership Pulse',
   description: 'A quick check on the health of your teacher-para partnership. Both roles can take this.',
@@ -1499,6 +1509,7 @@ export const paraPartnershipQuiz: QuizConfig = {
 
 export const burnoutWarningQuiz: QuizConfig = {
   id: 'burnout_warning',
+  slug: 'burnout-early-warning',
   title: 'Burnout Early Warning System',
   shortTitle: 'Burnout Check',
   description: 'An honest check-in on where you are right now. No judgment. Just information.',
@@ -1662,4 +1673,14 @@ export const ALL_QUIZZES: QuizConfig[] = [
 
 export function getQuizById(id: string): QuizConfig | undefined {
   return ALL_QUIZZES.find(q => q.id === id)
+}
+
+/** Resolve a quiz from its Learning Hub slug. Used by /hub/quiz/[slug]. */
+export function getQuizBySlug(slug: string): QuizConfig | undefined {
+  return ALL_QUIZZES.find(q => q.slug === slug)
+}
+
+/** Every quiz reachable at its own Hub URL. */
+export function getRoutableQuizzes(): QuizConfig[] {
+  return ALL_QUIZZES.filter(q => !!q.slug)
 }

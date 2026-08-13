@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
+import { getQuizBySlug } from '@/lib/hub/quizConfigs'
 
 // PDF upload via base64 can be slow
 export const maxDuration = 60
@@ -28,6 +29,7 @@ const VALID_LIFT = ['LOW', 'MED', 'HIGH'] as const
 const VALID_DOMAINS = ['1-planning', '2-environment', '3-instruction', '4-professional'] as const
 
 export type QuickWinRow = {
+  slug: string | null
   title: string | null
   description: string | null
   category: string | null
@@ -88,8 +90,14 @@ export function qaBlockers(qw: QuickWinRow): string[] {
   if (qw.quick_win_type === 'download') {
     if (!qw.file_url) out.push('download type requires a guide PDF (file_url)')
     if (!qw.tool_file_url) out.push('download type requires a tool PDF (tool_file_url), run generate_tool')
-  } else if (qw.quick_win_type === 'quiz' && !qw.file_url) {
-    out.push('quiz type requires file_url, otherwise the page shows "Quiz coming soon"')
+  } else if (qw.quick_win_type === 'quiz') {
+    // A quiz is playable either because a config exists (renders in-app at
+    // /hub/quiz/[slug]) or because a file backs it. With neither, the detail
+    // page can only show "Quiz coming soon".
+    const interactive = !!qw.slug && !!getQuizBySlug(qw.slug)
+    if (!interactive && !qw.file_url) {
+      out.push('quiz type needs either a config in lib/hub/quizConfigs (preferred, renders in-app) or a file_url')
+    }
   }
 
   return out

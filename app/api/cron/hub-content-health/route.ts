@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import { createClient } from '@supabase/supabase-js';
+import { getQuizBySlug } from '@/lib/hub/quizConfigs';
 
 /**
  * Hub Content Health Check -- runs daily at 7:30 AM CT via Vercel cron.
@@ -113,7 +114,7 @@ export async function GET() {
   try {
     const { data: unpublished, error } = await supabase
       .from('hub_quick_wins')
-      .select('id, title, status, quick_win_type, file_url, tool_file_url, description, lift, category, topic_tags, roles, danielson_domains')
+      .select('id, slug, title, status, quick_win_type, file_url, tool_file_url, tool_type, description, lift, category, topic_tags, roles, danielson_domains')
       .eq('is_published', false)
       .lt('created_at', staleCutoff);
 
@@ -132,8 +133,10 @@ export async function GET() {
           !!q.title?.trim() && !!q.description?.trim() && !!q.lift && !!q.category &&
           nonEmpty(q.topic_tags) && nonEmpty(q.roles) && nonEmpty(q.danielson_domains);
         if (!tagged) return false;
-        if (q.quick_win_type === 'download') return !!q.file_url && !!q.tool_file_url;
-        if (q.quick_win_type === 'quiz') return !!q.file_url;
+        if (q.quick_win_type === 'download') {
+          return !!q.file_url && (!!q.tool_file_url || q.tool_type === 'self_contained');
+        }
+        if (q.quick_win_type === 'quiz') return !!q.slug && !!getQuizBySlug(q.slug);
         return true;
       };
 
@@ -160,9 +163,11 @@ export async function GET() {
           if (!nonEmpty(q.danielson_domains)) missing.push('danielson_domains');
           if (q.quick_win_type === 'download') {
             if (!q.file_url) missing.push('guide PDF');
-            if (!q.tool_file_url) missing.push('tool PDF');
+            if (!q.tool_file_url && q.tool_type !== 'self_contained') missing.push('tool PDF');
           }
-          if (q.quick_win_type === 'quiz' && !q.file_url) missing.push('quiz content (file_url)');
+          if (q.quick_win_type === 'quiz' && !(q.slug && getQuizBySlug(q.slug))) {
+            missing.push('quiz config in lib/hub/quizConfigs');
+          }
           return `${q.title} (${q.quick_win_type || 'no type'}: missing ${missing.join(', ')})`;
         };
         issues.push(

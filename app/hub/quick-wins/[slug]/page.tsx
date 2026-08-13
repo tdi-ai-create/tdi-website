@@ -2,6 +2,7 @@
 
 import { useState, useEffect, use } from 'react';
 import Link from 'next/link';
+import { getQuizBySlug } from '@/lib/hub/quizConfigs';
 import { useRouter } from 'next/navigation';
 import { useHub } from '@/components/hub/HubContext';
 import { getHubSupabase as getSupabase } from '@/lib/supabase-hub';
@@ -424,6 +425,12 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
   const { user } = useHub();
   const { language, t } = useLanguage();
   const lang = language === 'es' ? 'es' : 'en';
+
+  // ─── Interactive Quiz Route ──────────────────────────────────────────────
+  // A quiz is playable in-app only when a config exists for this slug. Without
+  // one there is nothing to render, so the page falls back to "coming soon"
+  // rather than linking at a raw file the educator would have to download.
+  const hasInteractiveQuiz = !!getQuizBySlug(slug);
 
   // ─── Practice Game Route ─────────────────────────────────────────────────
   const gameConfig = PRACTICE_GAME_MAP[slug];
@@ -1231,18 +1238,20 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
 
             {/* Right: action card inside hero */}
             <div className="md:w-[280px] flex-shrink-0 p-6 md:p-8 flex flex-col justify-center gap-3">
-              {/* Download / Quiz button */}
-              {quickWin.content_type === 'quiz' && quickWin.download_url ? (
-                <a
-                  href={quickWin.download_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
+              {/* Download / Quiz button.
+                  An interactive quiz is one with a config in lib/hub/quizConfigs,
+                  which renders in-app at /hub/quiz/[slug]. Linking to file_url
+                  instead would hand the educator a raw file to download, which is
+                  what used to happen. */}
+              {quickWin.content_type === 'quiz' && hasInteractiveQuiz ? (
+                <Link
+                  href={`/hub/quiz/${slug}`}
                   className="flex items-center justify-center gap-2 py-3 px-4 font-semibold text-sm rounded-xl transition-opacity hover:opacity-90"
                   style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
                 >
                   <Play size={16} />
                   {tUI('Take Quiz')}
-                </a>
+                </Link>
               ) : quickWin.tool_file_url ? (
                 <>
                   <a
@@ -1343,17 +1352,15 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
               {/* Quiz type */}
               {quickWin.content_type === 'quiz' && (
                 <div className="mb-6">
-                  {quickWin.download_url ? (
-                    <a
-                      href={quickWin.download_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                  {hasInteractiveQuiz ? (
+                    <Link
+                      href={`/hub/quiz/${slug}`}
                       className="flex items-center justify-center gap-3 w-full py-4 font-semibold text-lg transition-opacity hover:opacity-90"
                       style={{ backgroundColor: '#ffba06', color: '#1e2749', borderRadius: '12px' }}
                     >
                       <Play size={22} />
                       {tUI('Take Quiz')}
-                    </a>
+                    </Link>
                   ) : (
                     <div
                       className="flex items-center justify-center gap-3 w-full py-4 font-semibold text-lg"
