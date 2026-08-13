@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { getCreatorActivity } from '@/lib/creator-activity';
+import { classifyRoster } from '@/lib/agreement-gate';
+import { AGREEMENT_GRACE_DAYS } from '@/lib/reengagement-config';
 import {
   PAUSE_CHECK_IN_SENDS_ENABLED,
   STALL_THRESHOLD_DAYS,
@@ -54,6 +56,16 @@ export async function GET() {
     }
 
     const byId = new Map((creators as CreatorRow[]).map((c) => [c.id, c]));
+
+    // The agreement gate, from the same classifier the cron uses, so what Bella
+    // reads here is exactly what will happen.
+    const gate = await classifyRoster(supabase, now);
+    const unsignedWorking = gate
+      .filter((v) => v.outcome === 'unsigned_working')
+      .map((v) => ({ id: v.creatorId, name: v.name, reason: v.reason }));
+    const closingSoon = gate
+      .filter((v) => v.outcome === 'close')
+      .map((v) => ({ id: v.creatorId, name: v.name, reason: v.reason }));
     const activity = await getCreatorActivity(supabase, now);
 
     // ---- The ladder: who sits at each step right now ----
@@ -183,10 +195,13 @@ export async function GET() {
         sendsEnabled: true,
         pauseCheckInSendsEnabled: PAUSE_CHECK_IN_SENDS_ENABLED,
         stallThresholdDays: STALL_THRESHOLD_DAYS,
+        agreementGraceDays: AGREEMENT_GRACE_DAYS,
         stepIntervalDays: STEP_INTERVAL_DAYS,
         finalStep: FINAL_STEP,
       },
       ladder,
+      unsignedWorking,
+      closingSoon,
       wouldEnrol,
       wouldAdvance,
       recentSends: recentSends || [],
@@ -197,6 +212,8 @@ export async function GET() {
         wouldAdvance: wouldAdvance.length,
         facingPause: wouldAdvance.filter((w) => w.wouldPause).length,
         paused: paused.length,
+        unsignedWorking: unsignedWorking.length,
+        closingSoon: closingSoon.length,
       },
     });
   } catch (error) {

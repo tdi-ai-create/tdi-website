@@ -106,6 +106,38 @@
 
 <!-- ── THE LADDER ── -->
 
+<h2>The agreement gate</h2>
+
+<p>Before the nudge ladder ever applies, there is a simpler question: did this person sign an agreement? A signed agreement is what makes someone a creator rather than someone who filled in a form.</p>
+
+<table>
+  <tr><th>Situation</th><th>What happens</th></tr>
+  <tr>
+    <td><strong>Signed</strong></td>
+    <td>Normal creator. Goes through the nudge ladder below if they go quiet.</td>
+  </tr>
+  <tr>
+    <td><strong>Unsigned, joined less than 60 days ago</strong></td>
+    <td>Nothing. They are still inside the window.</td>
+  </tr>
+  <tr>
+    <td><strong>Unsigned, past 60 days, but doing real work</strong></td>
+    <td>Never closed automatically. Appears under <strong>Working without an agreement</strong> in the Re-engagement tab, for Bella to get an agreement in front of them.</td>
+  </tr>
+  <tr>
+    <td><strong>Unsigned, past 60 days, nothing behind it</strong></td>
+    <td>The account closes on its own, with a warm note from Bella saying they can restart any time by replying. Nothing is deleted.</td>
+  </tr>
+</table>
+
+<div class="success">
+  <p><strong>The closing note is not a rejection.</strong> It says the timing did not work out, that this is not a no, and that replying is enough to get set back up. No forms, no starting over. A creator who comes back this way keeps everything they had.</p>
+</div>
+
+<div class="rule">
+  <p><strong>"Real work" deliberately excludes onboarding.</strong> Most dormant accounts show three to six completed milestones, all finished on the same day, because those are the automatic onboarding steps. That is not work. The gate looks for a milestone completed in the last 90 days, or a sign-in in the last 30.</p>
+</div>
+
 <h2>The ladder</h2>
 
 <p>After 15 days with no portal activity, the system starts a sequence. One step per week, seven steps, all from Bella. Any portal activity at any point cancels the rest of it immediately.</p>
@@ -211,7 +243,7 @@
 
 <h2>Ending a creator relationship</h2>
 
-<p>There are four ways to end a creator relationship. Only one of them tells the creator anything.</p>
+<p>There is one real ending, and two housekeeping states. Use Pause while there is still a relationship, and Withdrawn when there is not.</p>
 
 <div class="door pause">
   <h3>Pause <span class="role-tag role-creator">Creator</span> <span class="role-tag role-bella">Bella</span> <span class="role-tag role-system">System</span></h3>
@@ -220,13 +252,13 @@
 
 <div class="door withdraw">
   <h3>Withdrawn <span class="role-tag role-bella">Bella</span> <span class="role-tag role-rae">Rae</span></h3>
-  <p>Use when a creator has actively told you they are not continuing. It records that decision and removes them from the public creators page.</p>
+  <p>The one ending. Use when a creator tells you they are not continuing, and it is what the agreement gate sets automatically. Records the decision and removes them from the public creators page. Reversible: setting them back to active restores everything.</p>
   <p><strong>No email is sent.</strong> If someone withdraws, reply to them personally. They told you something; the system will not answer on your behalf.</p>
 </div>
 
 <div class="door archive">
   <h3>Archived <span class="role-tag role-bella">Bella</span> <span class="role-tag role-rae">Rae</span></h3>
-  <p>Housekeeping only. Hides a finished or abandoned record from the working list and removes them from the public creators page. Use for records you want out of the way but not gone.</p>
+  <p>Housekeeping only, not an ending. Hides a finished record from the working list. If you are ending a relationship, use Withdrawn instead, so there is one answer to "did this person leave" rather than two.</p>
 </div>
 
 <div class="door delete">
@@ -241,30 +273,37 @@
 
 <!-- ── OPEN QUESTIONS ── -->
 
-<h2>Decided and still open</h2>
+<h2>The rules, settled</h2>
 
-<p>Recorded honestly so the next person knows which parts are settled.</p>
+<p>Nothing in this document is an open question. If a situation is not covered here, it is a gap worth raising, not a judgement call to make alone.</p>
 
-<h3>Decided (Rae, August 13, 2026)</h3>
-<ul>
-  <li>Activity means portal activity, not record edits</li>
-  <li>Auto-pause at step 6 stays automatic, now that the reactivation link works</li>
-  <li>Dormant unsigned creators are handled by the sequence rather than a manual triage pass</li>
-  <li>Paused creators get a real check-in every 90 days</li>
-</ul>
-
-<h3>Still open</h3>
-<div class="open">
-  <p><strong>Whether an unsigned creator is a creator.</strong> As of August 2026, twenty of twenty six active creators had never signed an agreement, and most had never signed into the portal. Deciding whether those records belong on the roster at all would shrink the dormancy problem more than any automation. Until that is decided, the ladder treats them the same as everyone else.</p>
-</div>
-<div class="open">
-  <p><strong>Whether a human should always make contact before an account is auto-paused.</strong> Currently a creator can go from signup to paused without any person speaking to them. Step 4 above is the manual habit that covers this, but it is a habit rather than a rule the system enforces.</p>
-</div>
-<div class="open">
-  <p><strong>Whether Withdrawn and Archived should collapse into one "Closed" state</strong>, and what a closed creator is told about their work.</p>
-</div>
-
-<!-- ── REFERENCE ── -->
+<table>
+  <tr><th>Rule</th><th>What it means</th></tr>
+  <tr>
+    <td><strong>An agreement is the gate</strong></td>
+    <td>A signed agreement is what makes someone a creator. Unsigned accounts past 60 days with no work behind them close automatically.</td>
+  </tr>
+  <tr>
+    <td><strong>Activity means portal activity</strong></td>
+    <td>Opening the Creator Studio counts. An admin editing the record does not.</td>
+  </tr>
+  <tr>
+    <td><strong>Nobody working is ever closed by a machine</strong></td>
+    <td>An unsigned creator who is doing real work is surfaced to Bella, never auto-closed. That is a conversation.</td>
+  </tr>
+  <tr>
+    <td><strong>Auto-pause stays automatic</strong></td>
+    <td>Step 6 pauses without a human approving it, because the reactivation link works and the pause is reversible.</td>
+  </tr>
+  <tr>
+    <td><strong>There is one ending, not four</strong></td>
+    <td>Closed means <span class="portal-path">withdrawn</span>. Archived is housekeeping only. Delete is for duplicates and test accounts.</td>
+  </tr>
+  <tr>
+    <td><strong>Paused creators hear from us every 90 days</strong></td>
+    <td>Pausing is a rest, not a disappearance.</td>
+  </tr>
+</table>
 
 <h2>Where things live</h2>
 
@@ -274,6 +313,7 @@
   <tr><td>Per-creator sequence status and Mark as Engaged</td><td><span class="portal-path">Admin &gt; Creator Studio &gt; [Creator] </span></td></tr>
   <tr><td>Filter the roster by sequence step</td><td><span class="portal-path">Admin &gt; Creator Studio &gt; Creators &gt; Filters</span></td></tr>
   <tr><td>The sequence itself</td><td><span class="portal-path">cron/creator-reengagement</span>, daily 5 AM CT</td></tr>
+  <tr><td>The agreement gate</td><td><span class="portal-path">cron/creator-agreement-gate</span>, daily 11 AM CT</td></tr>
   <tr><td>The paused check-in</td><td><span class="portal-path">cron/pause-check-ins</span>, daily 9 AM CT</td></tr>
   <tr><td>Thresholds and the reactivation URL</td><td><span class="portal-path">lib/reengagement-config.ts</span></td></tr>
   <tr><td>Every creator email in one table</td><td><a href="/tdi-admin/docs?doc=communication-map">Communication Map</a></td></tr>

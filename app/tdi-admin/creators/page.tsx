@@ -774,10 +774,13 @@ interface ReengagementPipelineData {
   config: {
     sendsEnabled: boolean;
     stallThresholdDays: number;
+    agreementGraceDays: number;
     stepIntervalDays: number;
     finalStep: number;
   };
   ladder: { step: number; label: string; creators: PipelineCreator[] }[];
+  unsignedWorking: { id: string; name: string | null; reason: string }[];
+  closingSoon: { id: string; name: string | null; reason: string }[];
   wouldEnrol: { id: string; name: string | null; email: string | null; daysSinceActivity: number; why: string }[];
   wouldAdvance: { id: string; name: string | null; currentStep: number; nextStep: number; wouldPause: boolean }[];
   recentSends: {
@@ -795,6 +798,8 @@ interface ReengagementPipelineData {
     wouldAdvance: number;
     facingPause: number;
     paused: number;
+    unsignedWorking: number;
+    closingSoon: number;
   };
 }
 
@@ -835,7 +840,7 @@ function ReengagementTab() {
     );
   }
 
-  const { config, ladder, wouldEnrol, wouldAdvance, recentSends, paused, totals } = data;
+  const { config, ladder, wouldEnrol, wouldAdvance, recentSends, paused, totals, unsignedWorking, closingSoon } = data;
 
   return (
     <div className="space-y-6">
@@ -863,6 +868,7 @@ function ReengagementTab() {
           { label: 'Due a next email', value: totals.wouldAdvance, alarm: false },
           { label: 'Facing pause', value: totals.facingPause, alarm: totals.facingPause > 0 },
           { label: 'Currently paused', value: totals.paused, alarm: false },
+          { label: 'Need an agreement', value: totals.unsignedWorking, alarm: totals.unsignedWorking > 0 },
         ].map((stat) => (
           <div key={stat.label} className="bg-white rounded-2xl border border-gray-100 p-4">
             <p className={`text-2xl font-semibold ${stat.alarm ? 'text-red-600' : 'text-slate-800'}`}>
@@ -987,6 +993,58 @@ function ReengagementTab() {
             </div>
           )}
         </div>
+      </div>
+
+      {/* The only thing on this page that asks Bella to act */}
+      {unsignedWorking.length > 0 && (
+        <div className="bg-white rounded-2xl border border-amber-200 overflow-hidden">
+          <div className="px-5 py-4 border-b border-amber-100 bg-amber-50/60">
+            <h3 className="font-semibold text-slate-800">Working without an agreement</h3>
+            <p className="text-xs text-amber-800 mt-0.5">
+              Building content for us with nothing signed. They are never closed automatically.
+              Get an agreement in front of them.
+            </p>
+          </div>
+          <div className="divide-y divide-gray-100">
+            {unsignedWorking.map((c) => (
+              <Link
+                key={c.id}
+                href={`/tdi-admin/creators/${c.id}`}
+                className="px-5 py-3 flex items-baseline justify-between gap-3 hover:bg-gray-50 transition-colors"
+              >
+                <p className="text-sm font-medium text-slate-800 truncate">{c.name}</p>
+                <span className="text-xs text-gray-400 truncate flex-shrink-0">{c.reason}</span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Closing automatically. Shown so it is never a surprise. */}
+      <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+        <div className="px-5 py-4 border-b border-gray-100">
+          <h3 className="font-semibold text-slate-800">Closing on the next run</h3>
+          <p className="text-xs text-gray-500 mt-0.5">
+            No agreement after {config.agreementGraceDays} days and no work behind it.
+            Each gets a warm note from Bella saying they can restart any time by replying.
+          </p>
+        </div>
+        {closingSoon.length === 0 ? (
+          <p className="px-5 py-6 text-sm text-gray-400">Nobody is closing.</p>
+        ) : (
+          <div className="divide-y divide-gray-100 max-h-80 overflow-y-auto">
+            {closingSoon.map((c) => (
+              <Link
+                key={c.id}
+                href={`/tdi-admin/creators/${c.id}`}
+                className="px-5 py-3 flex items-baseline justify-between gap-3 hover:bg-gray-50 transition-colors"
+              >
+                <p className="text-sm font-medium text-slate-800 truncate">{c.name}</p>
+                <span className="text-xs text-gray-400 truncate flex-shrink-0">{c.reason}</span>
+              </Link>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Paused creators, easy to forget entirely */}
