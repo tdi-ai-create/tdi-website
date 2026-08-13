@@ -539,12 +539,31 @@ function QueueRow({ item, muted, loading, onVerifyContact, onApproveDraft, onSen
           </div>
         )
 
+      // QA failed twice. The options live on the pursuit page, where there is
+      // room to show the diagnosis alongside them.
+      case 'resolve_escalation':
+        return (
+          <Link
+            href={`/tdi-admin/funding/${item.pursuitId}`}
+            style={{
+              fontSize: 12, fontWeight: 700, padding: '8px 12px', borderRadius: 8,
+              border: 'none', background: '#DC2626', color: 'white',
+              textDecoration: 'none', whiteSpace: 'nowrap',
+            }}
+          >
+            See options
+          </Link>
+        )
+
       case 'verify_window':
       case 'complete_gate':
       case 'allocate_award':
       case 'complete_profile':
       case 'prepare_submission':
       case 'request_research':
+      case 'unblock_draft':
+      case 'resume_drafting':
+      case 'send_to_client':
         return (
           <Link
             href={`/tdi-admin/funding/${item.pursuitId}`}
@@ -558,8 +577,21 @@ function QueueRow({ item, muted, loading, onVerifyContact, onApproveDraft, onSen
           </Link>
         )
 
+      // Never render an item with no way to act on it. If a new actionType
+      // arrives without a case here, it still gets a route to the pursuit.
       default:
-        return null
+        return item.inProgress ? null : (
+          <Link
+            href={`/tdi-admin/funding/${item.pursuitId}`}
+            style={{
+              fontSize: 10, fontWeight: 600, padding: '3px 10px', borderRadius: 4,
+              border: '1px solid #E5E7EB', background: 'white', color: '#8B5CF6',
+              textDecoration: 'none', whiteSpace: 'nowrap',
+            }}
+          >
+            Open pursuit
+          </Link>
+        )
     }
   }
 

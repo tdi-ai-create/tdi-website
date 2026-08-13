@@ -1,5 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
+import { MAX_QA_ATTEMPTS, ESCALATION_OPTIONS, validateEscalation } from '@/lib/funding-qa'
+import { postFundingEvent, narrativeEvent } from '@/lib/funding-slack'
 
 /**
  * Funding Sync API -- Bridge between Paperclip and the Admin Funding Portal
@@ -41,6 +43,7 @@ type SyncAction =
   | 'add_timeline_event'
   | 'draft_email'
   | 'update_narrative'
+  | 'submit_qa_verdict'
   | 'get_status'
 
 // GET -- Paperclip can look up pursuits and status
@@ -144,6 +147,26 @@ export async function GET(request: NextRequest) {
 
     const { data: researchWork } = await researchQuery
 
+    // 3. QA work — narratives waiting on a verdict.
+    //
+    // Deliberately NOT window-gated and NOT gate-gated, unlike drafting. The
+    // narrative already exists; reviewing it costs nothing if the window later
+    // closes, and holding a finished draft behind a gate the school has not
+    // cleared just recreates the stall this pipeline had before.
+    const { data: rawQaWork } = await supabase
+      .from('funding_opportunities')
+      .select(`
+        id, pursuit_id, name, plan_category, amount,
+        narrative_status, narrative_url, narrative_content, qa_passed,
+        qa_attempt_count, redraft_guidance, assigned_agent,
+        window_status, application_closes,
+        pursuit:funding_pursuits!pursuit_id(id, pursuit_name, district_name)
+      `)
+      .eq('narrative_status', 'qa_review')
+
+    // qa_passed = false means it already bounced back and is being redrafted
+    const qaWork = (rawQaWork ?? []).filter((o: any) => o.qa_passed == null)
+
     // Tag each item with its request type
     const work = [
       ...narrativeWork.map((item: any) => ({
@@ -152,6 +175,12 @@ export async function GET(request: NextRequest) {
       })),
       ...(researchWork ?? []).map((item: any) => ({
         request_type: 'research_funders' as const,
+        ...item,
+      })),
+      ...qaWork.map((item: any) => ({
+        request_type: 'qa_narrative' as const,
+        attempt: (item.qa_attempt_count ?? 0) + 1,
+        escalates_if_failed: (item.qa_attempt_count ?? 0) + 1 > MAX_QA_ATTEMPTS,
         ...item,
       })),
     ]
@@ -163,6 +192,7 @@ export async function GET(request: NextRequest) {
         agent: agent || 'all',
         draft_narrative_count: narrativeWork.length,
         research_funders_count: (researchWork ?? []).length,
+        qa_narrative_count: qaWork.length,
       },
     })
   }
@@ -373,6 +403,121 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({ success: true })
+  }
+
+  // ---- SUBMIT QA VERDICT ----
+  // The only way a QA decision enters the system. Deliberately not part of
+  // update_opportunity: the verdict carries rules (notes required on a fail,
+  // the attempt bound, a usable escalation) that a generic field write would
+  // not enforce.
+  if (action === 'submit_qa_verdict') {
+    const { opportunityId, passed, reviewer, score, summary, issues, escalation } = body
+
+    if (!opportunityId) return NextResponse.json({ error: 'opportunityId required' }, { status: 400 })
+    if (typeof passed !== 'boolean') return NextResponse.json({ error: 'passed (boolean) required' }, { status: 400 })
+    if (!reviewer) return NextResponse.json({ error: 'reviewer required' }, { status: 400 })
+
+    const { data: opp } = await supabase
+      .from('funding_opportunities')
+      .select('id, pursuit_id, name, narrative_status, qa_attempt_count, assigned_agent')
+      .eq('id', opportunityId)
+      .single()
+
+    if (!opp) return NextResponse.json({ error: 'Opportunity not found' }, { status: 404 })
+    if (opp.narrative_status !== 'qa_review') {
+      return NextResponse.json({
+        error: `Narrative is '${opp.narrative_status}', not 'qa_review'. Nothing to review.`,
+      }, { status: 409 })
+    }
+
+    // A fail with no explanation is useless to whoever picks it up next
+    if (!passed && (!summary || String(summary).trim().length < 15)) {
+      return NextResponse.json({
+        error: 'summary required on a fail — the writer needs to know what to change',
+      }, { status: 400 })
+    }
+
+    const attempt = (opp.qa_attempt_count ?? 0) + 1
+    const now = new Date().toISOString()
+
+    await supabase.from('funding_narrative_qa_reviews').insert({
+      opportunity_id: opportunityId,
+      attempt,
+      passed,
+      reviewer,
+      score: typeof score === 'number' ? score : null,
+      summary: summary || null,
+      issues: issues ?? null,
+    })
+
+    const updates: Record<string, unknown> = {
+      qa_passed: passed,
+      qa_reviewer: reviewer,
+      qa_notes: summary || null,
+      qa_attempt_count: attempt,
+      updated_at: now,
+      last_activity_at: now,
+      narrative_status_changed_at: now,
+    }
+
+    let outcome: string
+
+    if (passed) {
+      // Julie's pass never reaches a school. It reaches Bella.
+      updates.narrative_status = 'approval'
+      updates.redraft_guidance = null
+      outcome = 'approval'
+    } else if (attempt > MAX_QA_ATTEMPTS) {
+      // Escalating to someone who is not a grant expert, so it has to arrive as
+      // a diagnosis with a recommended path, never as an open problem.
+      const check = validateEscalation(escalation)
+      if (!check.ok) {
+        return NextResponse.json({
+          error: `Attempt ${attempt} exceeds the ${MAX_QA_ATTEMPTS}-attempt limit, so this escalates to a person. ${check.error}`,
+          escalation_required: true,
+          options: ESCALATION_OPTIONS.map(o => ({ key: o.key, label: o.label, useWhen: o.useWhen })),
+        }, { status: 400 })
+      }
+      updates.narrative_status = 'escalated'
+      updates.qa_escalation = check.value
+      outcome = 'escalated'
+    } else {
+      // Back to the writer for another attempt
+      updates.narrative_status = 'requested'
+      updates.redraft_guidance = summary
+      outcome = 'requested'
+    }
+
+    const { error } = await supabase
+      .from('funding_opportunities')
+      .update(updates)
+      .eq('id', opportunityId)
+
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+    const labels: Record<string, string> = {
+      approval: `QA passed (${reviewer}) — ready for Bella's approval`,
+      requested: `QA failed attempt ${attempt} — returned to writer`,
+      escalated: `QA failed ${attempt} times — escalated to Bella with a recommendation`,
+    }
+    await supabase.from('funding_pursuit_timeline').insert({
+      pursuit_id: opp.pursuit_id,
+      event_date: now.split('T')[0],
+      event_title: `${labels[outcome]}: ${opp.name}`,
+      event_detail: summary || '',
+      status: outcome === 'approval' ? 'complete' : 'active',
+    })
+
+    postFundingEvent(
+      narrativeEvent(opp.pursuit_id, '', opp.name, 'qa_review', outcome, reviewer)
+    ).catch(() => {})
+
+    return NextResponse.json({
+      success: true,
+      outcome,
+      attempt,
+      attempts_remaining: Math.max(0, MAX_QA_ATTEMPTS - attempt),
+    })
   }
 
   // ---- CREATE ACTION ITEM ----

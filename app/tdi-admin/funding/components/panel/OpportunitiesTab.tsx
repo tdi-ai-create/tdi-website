@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { ESCALATION_OPTIONS } from '@/lib/funding-qa'
 
 const PLAN_COLORS: Record<string, string> = { A: '#0F766E', B: '#1B365D', C: '#7C3AED', D: '#B45309' }
 const PLAN_LABELS: Record<string, string> = {
@@ -9,7 +10,7 @@ const PLAN_LABELS: Record<string, string> = {
   C: 'Association / competitive',
   D: 'Corporate / foundation / local (fast, small)',
 }
-const STATUS_OPTIONS = ['not_started', 'researching', 'applied', 'waiting', 'awarded', 'denied', 'stalled', 'backup']
+const STATUS_OPTIONS = ['not_started', 'researching', 'applied', 'waiting', 'awarded', 'denied', 'stalled', 'backup', 'closed']
 
 const WINDOW_STATUS_OPTIONS = [
   { value: 'unknown', label: 'Unknown' },
@@ -634,14 +635,22 @@ function NarrativeControl({ opp, gateOpen, onRequestDraft, onApprove, onPatch }:
   const windowOpen = opp.window_status === 'open'
   const hasContent = !!opp.narrative_content
   const hasUrl = !!opp.narrative_url
-  const showReader = ['review', 'qa_review', 'ready'].includes(ns) && hasContent
+  const showReader = ['review', 'qa_review', 'approval', 'escalated', 'ready'].includes(ns) && hasContent
 
+  // Manual QA, for when a person reviews instead of Julie. Lands in the same
+  // states the automated path uses, so the two never diverge.
   const handleQaPass = () => {
-    onPatch({ narrative_status: 'qa_review', qa_passed: true, qa_reviewer: qaReviewer, qa_notes: qaNotes })
+    onPatch({ narrative_status: 'approval', qa_passed: true, qa_reviewer: qaReviewer, qa_notes: qaNotes })
   }
 
   const handleQaFail = () => {
-    onPatch({ narrative_status: 'drafting', qa_passed: false, qa_reviewer: qaReviewer, qa_notes: qaNotes })
+    onPatch({
+      narrative_status: 'requested',
+      qa_passed: null,
+      qa_reviewer: qaReviewer,
+      qa_notes: qaNotes,
+      redraft_guidance: qaNotes,
+    })
   }
 
   return (
@@ -742,11 +751,47 @@ function NarrativeControl({ opp, gateOpen, onRequestDraft, onApprove, onPatch }:
           </>
         )}
 
+        {/* ── approval: QA passed, Bella decides ── */}
+        {ns === 'approval' && (
+          <>
+            <span style={{ fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 4, background: '#D1FAE5', color: '#065F46' }}>
+              QA passed{opp.qa_reviewer ? ` by ${opp.qa_reviewer}` : ''} — your approval
+            </span>
+            {hasUrl && (
+              <a href={opp.narrative_url} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} style={{ fontSize: 10, color: '#8B5CF6', textDecoration: 'underline' }}>
+                Open external
+              </a>
+            )}
+            {hasContent && (
+              <button onClick={() => setShowContent(!showContent)} style={{ fontSize: 9, padding: '1px 6px', borderRadius: 3, border: '1px solid #E5E7EB', background: 'white', color: '#6B7280', cursor: 'pointer' }}>
+                {showContent ? 'Hide' : 'Read inline'}
+              </button>
+            )}
+            <button onClick={onApprove} style={{ fontSize: 10, fontWeight: 600, padding: '3px 10px', borderRadius: 4, border: 'none', background: '#10B981', color: 'white', cursor: 'pointer' }}>
+              Approve
+            </button>
+          </>
+        )}
+
+        {/* ── escalated: QA could not get it through ── */}
+        {ns === 'escalated' && (
+          <>
+            <span style={{ fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 4, background: '#FEE2E2', color: '#B91C1C' }}>
+              {opp.qa_escalation?.awaiting_client ? 'Waiting on the school' : 'Needs your decision'}
+            </span>
+            {hasContent && (
+              <button onClick={() => setShowContent(!showContent)} style={{ fontSize: 9, padding: '1px 6px', borderRadius: 3, border: '1px solid #E5E7EB', background: 'white', color: '#6B7280', cursor: 'pointer' }}>
+                {showContent ? 'Hide' : 'Read the draft'}
+              </button>
+            )}
+          </>
+        )}
+
         {/* ── qa_review: QA pass/fail ── */}
         {ns === 'qa_review' && (
           <>
             <span style={{ fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 4, background: '#EDE9FE', color: '#6D28D9' }}>
-              In QA review
+              In QA review{(opp.qa_attempt_count ?? 0) > 0 ? ` — attempt ${(opp.qa_attempt_count ?? 0) + 1}` : ''}
             </span>
             {hasUrl && (
               <a href={opp.narrative_url} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} style={{ fontSize: 10, color: '#8B5CF6', textDecoration: 'underline' }}>
@@ -830,12 +875,171 @@ function NarrativeControl({ opp, gateOpen, onRequestDraft, onApprove, onPatch }:
         </div>
       )}
 
+      {/* Escalation: the report and the choices */}
+      {ns === 'escalated' && <EscalationPanel opp={opp} />}
+
       {/* QA passed confirmation */}
-      {ns === 'qa_review' && opp.qa_passed === true && (
+      {(ns === 'approval' || (ns === 'qa_review' && opp.qa_passed === true)) && (
         <div style={{ fontSize: 11, color: '#065F46', background: '#D1FAE5', padding: '6px 10px', borderRadius: 6 }}>
           QA passed{opp.qa_reviewer ? ` by ${opp.qa_reviewer}` : ''}{opp.qa_notes ? ` — ${opp.qa_notes}` : ''}. Ready for final approval.
         </div>
       )}
+    </div>
+  )
+}
+
+// ── Escalation panel ──
+//
+// Shown when QA has failed a narrative twice. Bella is not a grant expert, so
+// this never presents an open problem: it opens with what went wrong in plain
+// language, why it keeps happening, and a recommended path, then lists the
+// alternatives with what each one actually does.
+
+function EscalationPanel({ opp }: { opp: any }) {
+  const esc = opp.qa_escalation || {}
+  const [choice, setChoice] = useState<string | null>(esc.recommended_option ?? null)
+  const [detail, setDetail] = useState<string>(esc.detail ?? '')
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [done, setDone] = useState<string | null>(null)
+
+  const selected = ESCALATION_OPTIONS.find(o => o.key === choice)
+  const needsDetail = !!selected?.requires && detail.trim().length < 3
+  const blocked = busy || !choice || needsDetail
+
+  const submit = async (optionKey: string, detailText: string) => {
+    setBusy(true)
+    setError(null)
+    const res = await fetch('/api/funding/escalation', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ opportunityId: opp.id, option: optionKey, detail: detailText }),
+    }).then(r => r.json()).catch(() => ({ error: 'Request failed' }))
+    setBusy(false)
+    if (res.error) { setError(res.error); return }
+    setDone(res.message || 'Done.')
+    setTimeout(() => window.location.reload(), 1400)
+  }
+
+  if (done) {
+    return (
+      <div style={{ fontSize: 12, color: '#065F46', background: '#D1FAE5', padding: '10px 14px', borderRadius: 8, lineHeight: 1.5 }}>
+        {done}
+      </div>
+    )
+  }
+
+  // Parked waiting on the school. Still has an owner and a way forward.
+  if (esc.awaiting_client) {
+    return (
+      <div style={{ padding: '12px 14px', background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 8, display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <div style={{ fontSize: 10, fontWeight: 700, color: '#92400E', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+          Waiting on the school
+        </div>
+        <div style={{ fontSize: 12, color: '#1e2749', lineHeight: 1.55 }}>
+          We asked for: <strong>{esc.client_ask}</strong>
+        </div>
+        <button
+          onClick={() => submit('resume_drafting', detail)}
+          disabled={busy}
+          style={{
+            alignSelf: 'flex-start', fontSize: 11, fontWeight: 600, padding: '6px 14px',
+            borderRadius: 6, border: 'none', background: busy ? '#9CA3AF' : '#8B5CF6',
+            color: 'white', cursor: busy ? 'default' : 'pointer',
+          }}
+        >
+          {busy ? 'Working...' : 'The school replied — resume drafting'}
+        </button>
+        {error && <div style={{ fontSize: 11, color: '#B91C1C' }}>{error}</div>}
+      </div>
+    )
+  }
+
+  return (
+    <div style={{ padding: '14px 16px', background: '#FEF2F2', border: '1px solid #FECACA', borderRadius: 8, display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <div style={{ fontSize: 10, fontWeight: 700, color: '#B91C1C', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+        QA could not get this through after {opp.qa_attempt_count ?? 2} attempts
+      </div>
+
+      {/* The report */}
+      {esc.summary && (
+        <div style={{ fontSize: 12.5, color: '#1e2749', lineHeight: 1.6 }}>{esc.summary}</div>
+      )}
+      {esc.root_cause && (
+        <div style={{ fontSize: 12, color: '#4B5563', lineHeight: 1.6, paddingLeft: 12, borderLeft: '2px solid #FECACA' }}>
+          <strong style={{ color: '#1e2749' }}>Why it keeps failing:</strong> {esc.root_cause}
+        </div>
+      )}
+      {esc.recommendation_reason && (
+        <div style={{ fontSize: 12, color: '#065F46', background: '#D1FAE5', padding: '8px 12px', borderRadius: 6, lineHeight: 1.55 }}>
+          <strong>Recommended: {ESCALATION_OPTIONS.find(o => o.key === esc.recommended_option)?.label}.</strong> {esc.recommendation_reason}
+        </div>
+      )}
+
+      {/* The choices */}
+      <div style={{ fontSize: 10, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: 0.5, marginTop: 2 }}>
+        What would you like to do
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+        {ESCALATION_OPTIONS.map(o => {
+          const isPicked = choice === o.key
+          const isRecommended = esc.recommended_option === o.key
+          return (
+            <button
+              key={o.key}
+              onClick={() => { setChoice(o.key); setDetail(isRecommended ? (esc.detail ?? '') : '') }}
+              style={{
+                textAlign: 'left', padding: '10px 12px', borderRadius: 6, cursor: 'pointer',
+                border: isPicked ? '2px solid #8B5CF6' : '1px solid #E5E7EB',
+                background: isPicked ? '#F5F3FF' : 'white',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 3 }}>
+                <span style={{ fontSize: 12.5, fontWeight: 650, color: '#1e2749' }}>{o.label}</span>
+                {isRecommended && (
+                  <span style={{ fontSize: 9, fontWeight: 700, padding: '1px 6px', borderRadius: 3, background: '#D1FAE5', color: '#065F46', textTransform: 'uppercase', letterSpacing: 0.4 }}>
+                    Recommended
+                  </span>
+                )}
+              </div>
+              <div style={{ fontSize: 11, color: '#6B7280', lineHeight: 1.5 }}>{o.whatHappens}</div>
+              <div style={{ fontSize: 10.5, color: '#9CA3AF', lineHeight: 1.5, marginTop: 3, fontStyle: 'italic' }}>
+                Use when: {o.useWhen}
+              </div>
+            </button>
+          )
+        })}
+      </div>
+
+      {/* Whatever the chosen option needs from her */}
+      {selected?.requires && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+          <label style={{ fontSize: 11, fontWeight: 600, color: '#374151' }}>{selected.requires.label}</label>
+          <textarea
+            value={detail}
+            onChange={e => setDetail(e.target.value)}
+            placeholder={selected.requires.placeholder}
+            rows={3}
+            style={{ fontSize: 12, padding: '8px 10px', border: '1px solid #E5E7EB', borderRadius: 6, resize: 'vertical', fontFamily: 'inherit' }}
+          />
+        </div>
+      )}
+
+      {error && (
+        <div style={{ fontSize: 11, color: '#B91C1C', background: 'white', padding: '8px 10px', borderRadius: 6 }}>{error}</div>
+      )}
+
+      <button
+        onClick={() => choice && submit(choice, detail)}
+        disabled={blocked}
+        style={{
+          alignSelf: 'flex-start', fontSize: 12, fontWeight: 650, padding: '8px 18px', borderRadius: 6,
+          border: 'none', background: blocked ? '#D1D5DB' : '#8B5CF6', color: 'white',
+          cursor: blocked ? 'default' : 'pointer',
+        }}
+      >
+        {busy ? 'Working...' : selected ? selected.label : 'Choose an option'}
+      </button>
     </div>
   )
 }

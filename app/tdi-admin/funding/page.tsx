@@ -504,10 +504,14 @@ function GrantRow({ grant, school, onDraftEmail, onToast, onRefresh }: {
     )
   }
 
-  const isReviewable = ['review', 'qa_review'].includes(grant.narrativeStatus) && !approved
-  const qaPassed = grant.qaPassed === true
-  const isApproved = approved || grant.narrativeStatus === 'ready'
-  const isDrafting = grant.narrativeStatus === 'drafting' || grant.narrativeStatus === 'requested'
+  const ns = grant.narrativeStatus
+  // QA passed, waiting on Bella. Legacy rows sit in qa_review + qa_passed
+  // rather than the 'approval' state, so both count.
+  const awaitingApproval = !approved && (ns === 'approval' || (ns === 'qa_review' && grant.qaPassed === true))
+  const inQa = ns === 'qa_review' && grant.qaPassed !== true
+  const isEscalated = ns === 'escalated'
+  const isApproved = approved || ns === 'ready'
+  const isDrafting = ns === 'drafting' || ns === 'requested'
 
   return (
     <div style={{
@@ -538,24 +542,30 @@ function GrantRow({ grant, school, onDraftEmail, onToast, onRefresh }: {
           )}
 
           {/* An external doc link when one exists — but never a precondition for acting */}
-          {isReviewable && grant.narrativeUrl && (
+          {(awaitingApproval || inQa) && grant.narrativeUrl && (
             <a href={grant.narrativeUrl} target="_blank" rel="noopener noreferrer"
               style={{ fontSize: 11, fontWeight: 600, padding: '4px 10px', borderRadius: 6, border: '1px solid #E5E7EB', background: 'white', color: '#6B7280', textDecoration: 'none' }}>
               Open Doc
             </a>
           )}
 
-          {/* Awaiting a QA verdict. The panel that files it lives on the pursuit
-              page, so send Bella there rather than showing a dead Approve. */}
-          {isReviewable && !qaPassed && (
+          {/* With QA running, nobody is waiting on a person here */}
+          {inQa && (
+            <span style={{ fontSize: 11, fontWeight: 600, padding: '4px 10px', borderRadius: 6, background: '#EDE9FE', color: '#6D28D9' }}>
+              In QA review
+            </span>
+          )}
+
+          {/* QA failed twice. The options live on the pursuit page. */}
+          {isEscalated && (
             <Link href={`/tdi-admin/funding/${school.id}`}
-              style={{ fontSize: 12, fontWeight: 700, padding: '6px 14px', borderRadius: 8, background: '#8B5CF6', color: 'white', textDecoration: 'none' }}>
-              Review and file QA
+              style={{ fontSize: 12, fontWeight: 700, padding: '6px 14px', borderRadius: 8, background: '#DC2626', color: 'white', textDecoration: 'none' }}>
+              Needs your decision
             </Link>
           )}
 
-          {/* QA passed — approving is a one-click call, with or without a doc URL */}
-          {isReviewable && qaPassed && (
+          {/* QA passed — approving is one click, with or without a doc URL */}
+          {awaitingApproval && (
             <button onClick={handleApprove} disabled={approving}
               style={{ fontSize: 12, fontWeight: 700, padding: '6px 14px', borderRadius: 8, border: 'none', background: approving ? '#9CA3AF' : '#10B981', color: 'white', cursor: 'pointer' }}>
               {approving ? '...' : 'Approve'}
@@ -591,13 +601,13 @@ function GrantRow({ grant, school, onDraftEmail, onToast, onRefresh }: {
             </>
           )}
 
-          {!isDrafting && !isReviewable && !isApproved && grant.windowOpen && (
+          {!isDrafting && !inQa && !isEscalated && !awaitingApproval && !isApproved && grant.windowOpen && (
             <span style={{ fontSize: 11, fontWeight: 600, padding: '4px 10px', borderRadius: 6, background: '#D1FAE5', color: '#065F46' }}>
               Window open
             </span>
           )}
 
-          {!isDrafting && !isReviewable && !isApproved && !grant.windowOpen && (
+          {!isDrafting && !inQa && !isEscalated && !awaitingApproval && !isApproved && !grant.windowOpen && (
             <span style={{ fontSize: 11, fontWeight: 600, padding: '4px 10px', borderRadius: 6, background: '#F3F4F6', color: '#6B7280' }}>
               Not started
             </span>
