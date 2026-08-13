@@ -34,7 +34,7 @@
 
 <h1>TDI Communication Map</h1>
 <p class="subtitle">Every automated email the system sends -- who gets it, when, and why</p>
-<p class="updated">Last updated: July 19, 2026 | Covers all cron jobs + triggered emails</p>
+<p class="updated">Last updated: August 13, 2026 | Covers all cron jobs + triggered emails</p>
 
 <div class="section-note">
   <strong>How to read this:</strong> Partner = principal/contact. Educator = teacher/para. Internal = Rae/team. Creator = course creator. All times are Central Time (CT). All emails send via Resend from @teachersdeserveit.com.
@@ -227,7 +227,7 @@
     <td><strong>Creator Re-engagement</strong><br><span class="badge b-creator">Creator</span></td>
     <td><span class="schedule">Daily 5 AM CT</span></td>
     <td class="from">Bella from TDI Creator Studio<br>creatorstudio@<br>reply-to bella@</td>
-    <td>7 notes over 6 weeks for creators with no portal activity in 15+ days. Cancels the moment they return. Note 7 pauses the account.</td>
+    <td>7 notes over 6 weeks for creators with no portal activity in 15+ days. Cancels the moment they return. Note 7 pauses the account and carries a one-click reactivation link.</td>
     <td><code>cron/creator-reengagement</code></td>
   </tr>
   <tr>
@@ -236,6 +236,13 @@
     <td class="from">TDI Creator Studio<br>notifications@</td>
     <td>Launch date countdown at 60, 30, 14, 7 and 3 days out. Nothing to do with milestones. Reads target_completion_date, falling back to projected_completion_date.</td>
     <td><code>cron/creator-reminders</code></td>
+  </tr>
+  <tr>
+    <td><strong>Paused Creator Check-in</strong><br><span class="badge b-creator">Creator</span></td>
+    <td><span class="schedule">Daily 9 AM CT</span></td>
+    <td class="from">Bella from TDI Creator Studio<br>creatorstudio@</td>
+    <td>Every 90 days while paused, so pausing is a rest rather than a disappearance. Carries a one-click reactivation link that works without signing in.</td>
+    <td><code>cron/pause-check-ins</code></td>
   </tr>
 </table>
 

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useTDIAdmin } from '@/lib/tdi-admin/context';
 import { Search, Download, Printer, ExternalLink } from 'lucide-react';
 
-type DocId = 'admin-guide' | 'data-flow' | 'workflow' | 'service-invoicing' | 'funding' | 'funding-launch' | 'grant-application-spec' | 'hub-engagement' | 'engagement-workflow' | 'hub-content-standards' | 'hub-content-creation' | 'course-upload-sop' | 'creator-feedback-sop' | 'creator-recruitment-sop' | 'communication-map' | 'swag-fulfillment' | 'leadership-workflow';
+type DocId = 'admin-guide' | 'data-flow' | 'workflow' | 'service-invoicing' | 'funding' | 'funding-launch' | 'grant-application-spec' | 'hub-engagement' | 'engagement-workflow' | 'hub-content-standards' | 'hub-content-creation' | 'course-upload-sop' | 'creator-feedback-sop' | 'creator-recruitment-sop' | 'creator-dormancy-sop' | 'communication-map' | 'swag-fulfillment' | 'leadership-workflow';
 
 interface Doc {
   id: DocId;
@@ -187,6 +187,16 @@ const DOC_GROUPS: DocGroup[] = [
         desc: 'Submit > review > approve > feedback loop',
         tags: ['creator', 'feedback', 'SOP', 'submit', 'review', 'approve', 'bella', 'anne marie', 'milestone'],
         relatedSections: [
+          { label: 'Creator Studio', href: '/tdi-admin/creators' },
+        ],
+      },
+      {
+        id: 'creator-dormancy-sop',
+        label: 'Creator Dormancy & Offboarding',
+        desc: 'Goes quiet > nudge ladder > pause > how a relationship ends',
+        tags: ['creator', 'dormant', 'inactive', 'stalled', 'quiet', 're-engagement', 'reengagement', 'nudge', 'pause', 'paused', 'offboarding', 'withdraw', 'archive', 'delete', 'remove', 'dismiss', 'bella', 'SOP'],
+        relatedSections: [
+          { label: 'Re-engagement', href: '/tdi-admin/creators' },
           { label: 'Creator Studio', href: '/tdi-admin/creators' },
         ],
       },

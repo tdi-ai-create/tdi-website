@@ -48,7 +48,7 @@
 
 <h1>Creator Studio Feedback Portal</h1>
 <p class="subtitle">Standard Operating Procedure -- How feedback flows from creator submission to approved response</p>
-<p class="updated">Last updated: July 18, 2026 | TEA-33</p>
+<p class="updated">Last updated: August 13, 2026 | TEA-33</p>
 
 <!-- ── OVERVIEW ── -->
 
@@ -187,9 +187,13 @@
       <li>The milestone status changes to <strong>waiting_approval</strong></li>
       <li>The milestone review_status changes to <strong>submitted</strong></li>
       <li>Submission version auto-increments (1, 2, 3...)</li>
-      <li>Creator's <span class="portal-path">updated_at</span> timestamp bumps (cancels any active re-engagement drip)</li>
+      <li>Opening the portal to submit stamps <span class="portal-path">last_portal_activity_at</span>, which cancels any active re-engagement drip</li>
     </ul>
     <p>The milestone now appears under "Under Review" in their portal with the message: <em>"Submitted -- your team is reviewing this."</em></p>
+
+    <div class="highlight">
+      <p><strong>Why the activity field matters.</strong> Cancellation used to read <span class="portal-path">updated_at</span>, which a database trigger stamps on <em>any</em> write to the creator record. That meant an admin correcting a course title looked identical to a creator coming back, and a bulk edit on July 19 cancelled an entire cohort at once. Only the creator portal writes <span class="portal-path">last_portal_activity_at</span>, so it means what it says. Editing a creator from the admin no longer stops their emails.</p>
+    </div>
   </div>
 </div>
 
