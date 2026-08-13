@@ -201,6 +201,36 @@ export async function GET() {
     issues.push(`Publish-state divergence check failed: ${String(err)}`);
   }
 
+  // Check 5c: QA bypasses in the last 24h.
+  //
+  // Publishing without a QA pass is allowed (an agent outage should never fully
+  // block shipping) but it is never silent. Every override carries a written
+  // reason and gets reported here the next morning.
+  try {
+    const dayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+    const { data: bypassed, error } = await supabase
+      .from('hub_quick_wins')
+      .select('title, qa_override_reason, published_by, updated_at')
+      .eq('is_published', true)
+      .not('qa_override_reason', 'is', null)
+      .gte('updated_at', dayAgo);
+
+    if (error) {
+      issues.push(`QA bypass check failed: ${error.message}`);
+    } else if (bypassed && bypassed.length > 0) {
+      const recent = bypassed.filter(b => !b.qa_override_reason?.startsWith('grandfathered:'));
+      if (recent.length > 0) {
+        issues.push(
+          `${recent.length} Quick Win${recent.length > 1 ? 's were' : ' was'} published in the last 24h without a QA pass. ` +
+          recent.slice(0, 5).map(b => `"${b.title}" by ${b.published_by || 'unknown'} (${b.qa_override_reason})`).join('; ') +
+          `${recent.length > 5 ? `; and ${recent.length - 5} more` : ''}`
+        );
+      }
+    }
+  } catch (err) {
+    issues.push(`QA bypass check failed: ${String(err)}`);
+  }
+
   // Check 6: Clean up video staging files older than 1 hour
   let stagingCleaned = 0;
   try {
