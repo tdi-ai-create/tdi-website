@@ -40,6 +40,7 @@ export type QuickWinRow = {
   danielson_domains: string[] | null
   file_url: string | null
   tool_file_url: string | null
+  tool_type: string | null
 }
 
 /**
@@ -89,7 +90,12 @@ export function qaBlockers(qw: QuickWinRow): string[] {
   // Games and activities are interactive and need neither.
   if (qw.quick_win_type === 'download') {
     if (!qw.file_url) out.push('download type requires a guide PDF (file_url)')
-    if (!qw.tool_file_url) out.push('download type requires a tool PDF (tool_file_url), run generate_tool')
+    // Some downloads are a single printable that already IS the tool: a lab card,
+    // a quick card, a walkthrough form. Those declare tool_type self_contained
+    // and need no second file. Mirrors the database trigger in migration 112.
+    if (!qw.tool_file_url && qw.tool_type !== 'self_contained') {
+      out.push('download type requires a tool PDF (tool_file_url), run generate_tool, or set tool_type to self_contained if the guide is itself the printable tool')
+    }
   } else if (qw.quick_win_type === 'quiz') {
     // A quiz is playable either because a config exists (renders in-app at
     // /hub/quiz/[slug]) or because a file backs it. With neither, the detail
