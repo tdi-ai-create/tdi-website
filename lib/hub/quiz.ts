@@ -165,51 +165,54 @@ export async function getCourseResponses(
 }
 
 /**
- * Compute which lesson index each check-in gates.
- * Distributes 5 checks across N lessons:
- * - Comprehension 1 at ~20%
- * - Comprehension 2 at ~40%
- * - Reflection at ~60%
- * - Action step at ~80%
- * - Checkpoint at final lesson
+ * Compute which lesson index each check-in appears on.
+ *
+ * Each question has a `lesson_id` that ties it to a specific lesson. We place
+ * the check-in on that lesson so it renders after the content the learner just
+ * watched. This works naturally for any course length: a 3-lesson course might
+ * have 1-2 check-ins, a 10-lesson course might have 5. The content creator
+ * controls placement, not an algorithm.
+ *
+ * If multiple questions share the same lesson_id, only the first (by
+ * sort_order) becomes the gate. The rest are skipped to keep one gate per
+ * lesson.
  */
 export function computeGatePositions(
   questions: QuizQuestion[],
-  totalLessons: number
+  totalLessons: number,
+  lessonIds?: string[]
 ): Map<number, QuizQuestion> {
   const gates = new Map<number, QuizQuestion>();
   if (questions.length === 0 || totalLessons === 0) return gates;
 
-  // Sort by type priority for proper distribution
-  const typeOrder: Record<string, number> = {
-    multiple_choice: 0,
-    true_false: 0,
-    reflection: 1,
-    action_step: 2,
-    checkpoint: 3,
-  };
+  // If we have the ordered lesson IDs, place each question on its own lesson
+  if (lessonIds && lessonIds.length > 0) {
+    const lessonIndexMap = new Map<string, number>();
+    lessonIds.forEach((id, idx) => lessonIndexMap.set(id, idx));
 
-  const sorted = [...questions].sort((a, b) => {
-    const aOrder = typeOrder[a.question_type] ?? 0;
-    const bOrder = typeOrder[b.question_type] ?? 0;
-    if (aOrder !== bOrder) return aOrder - bOrder;
-    return a.sort_order - b.sort_order;
-  });
+    // Sort by sort_order so first question per lesson wins the gate slot
+    const sorted = [...questions].sort((a, b) => a.sort_order - b.sort_order);
 
-  // Distribute across lessons
-  const positions = [0.2, 0.4, 0.6, 0.8, 1.0];
-  sorted.forEach((q, i) => {
-    if (i >= positions.length) return;
-    const lessonIndex = Math.min(
-      Math.floor(positions[i] * totalLessons) - 1,
-      totalLessons - 1
-    );
-    // Ensure no two gates on the same lesson
-    let finalIndex = Math.max(0, lessonIndex);
-    while (gates.has(finalIndex) && finalIndex < totalLessons - 1) {
-      finalIndex++;
+    for (const q of sorted) {
+      const idx = lessonIndexMap.get(q.lesson_id);
+      if (idx !== undefined && !gates.has(idx)) {
+        gates.set(idx, q);
+      }
     }
-    gates.set(finalIndex, q);
+    return gates;
+  }
+
+  // Fallback for callers that don't pass lessonIds: distribute by sort_order
+  // across the course length evenly. This path should not normally be hit.
+  const sorted = [...questions].sort((a, b) => a.sort_order - b.sort_order);
+  const step = totalLessons / (sorted.length + 1);
+  sorted.forEach((q, i) => {
+    const idx = Math.min(Math.floor(step * (i + 1)), totalLessons - 1);
+    let finalIdx = idx;
+    while (gates.has(finalIdx) && finalIdx < totalLessons - 1) {
+      finalIdx++;
+    }
+    gates.set(finalIdx, q);
   });
 
   return gates;

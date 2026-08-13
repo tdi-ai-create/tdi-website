@@ -269,11 +269,9 @@ interface GateCardProps {
   userId: string;
   dark: boolean;
   onGateCleared: () => void;
-  courseName: string;
-  courseSlug: string;
 }
 
-function GateCard({ question, allQuestions, userId, dark, onGateCleared, courseName, courseSlug }: GateCardProps) {
+function GateCard({ question, allQuestions, userId, dark, onGateCleared }: GateCardProps) {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [answered, setAnswered] = useState(false);
   const [wasCorrect, setWasCorrect] = useState(false);
@@ -389,15 +387,6 @@ function GateCard({ question, allQuestions, userId, dark, onGateCleared, courseN
 
     return (
       <div style={{ width: '100%', maxWidth: 780, display: 'flex', flexDirection: 'column' }}>
-        <div style={{ marginBottom: 10 }}>
-          <Link
-            href={`/hub/courses/${courseSlug}`}
-            style={{ color: '#9CA3AF', textDecoration: 'none', fontSize: 12, display: 'flex', alignItems: 'center', gap: 5 }}
-          >
-            <ArrowLeft size={12} />
-            {courseName}
-          </Link>
-        </div>
         <div style={gateInnerStyle}>
           <div style={labelStyle}>{label}</div>
           <h2 style={headerStyle}>{header}</h2>
@@ -528,15 +517,6 @@ function GateCard({ question, allQuestions, userId, dark, onGateCleared, courseN
   if (question.question_type === 'reflection') {
     return (
       <div style={{ width: '100%', maxWidth: 780, display: 'flex', flexDirection: 'column' }}>
-        <div style={{ marginBottom: 10 }}>
-          <Link
-            href={`/hub/courses/${courseSlug}`}
-            style={{ color: '#9CA3AF', textDecoration: 'none', fontSize: 12, display: 'flex', alignItems: 'center', gap: 5 }}
-          >
-            <ArrowLeft size={12} />
-            {courseName}
-          </Link>
-        </div>
         <div style={gateInnerStyle}>
           <div style={labelStyle}>{label}</div>
           <h2 style={headerStyle}>{header}</h2>
@@ -595,15 +575,6 @@ function GateCard({ question, allQuestions, userId, dark, onGateCleared, courseN
   if (question.question_type === 'action_step') {
     return (
       <div style={{ width: '100%', maxWidth: 780, display: 'flex', flexDirection: 'column' }}>
-        <div style={{ marginBottom: 10 }}>
-          <Link
-            href={`/hub/courses/${courseSlug}`}
-            style={{ color: '#9CA3AF', textDecoration: 'none', fontSize: 12, display: 'flex', alignItems: 'center', gap: 5 }}
-          >
-            <ArrowLeft size={12} />
-            {courseName}
-          </Link>
-        </div>
         <div style={gateInnerStyle}>
           <div style={labelStyle}>{label}</div>
           <h2 style={headerStyle}>{header}</h2>
@@ -657,15 +628,6 @@ function GateCard({ question, allQuestions, userId, dark, onGateCleared, courseN
 
     return (
       <div style={{ width: '100%', maxWidth: 780, display: 'flex', flexDirection: 'column' }}>
-        <div style={{ marginBottom: 10 }}>
-          <Link
-            href={`/hub/courses/${courseSlug}`}
-            style={{ color: '#9CA3AF', textDecoration: 'none', fontSize: 12, display: 'flex', alignItems: 'center', gap: 5 }}
-          >
-            <ArrowLeft size={12} />
-            {courseName}
-          </Link>
-        </div>
         <div style={gateInnerStyle}>
           <div style={labelStyle}>{label}</div>
           <h2 style={headerStyle}>{header}</h2>
@@ -854,7 +816,7 @@ export default function LessonPage({ params }: LessonPageProps) {
         const responseMap = await getCourseResponses(user.id, questionIds);
         setCourseResponses(responseMap);
 
-        const gateMap = computeGatePositions(allQuestions, ordered.length);
+        const gateMap = computeGatePositions(allQuestions, ordered.length, allLessonIds);
         setGates(gateMap);
 
         setLocallyCleared(new Set());
@@ -1308,9 +1270,8 @@ export default function LessonPage({ params }: LessonPageProps) {
           overflow: 'auto',
         }}>
 
-          {/* VIDEO/RESOURCE STATE */}
-          {!isGateActive && (
-            <div style={{ width: '100%', maxWidth: 780, display: 'flex', flexDirection: 'column' }}>
+          {/* VIDEO/RESOURCE + INLINE CHECK-IN */}
+          <div style={{ width: '100%', maxWidth: 780, display: 'flex', flexDirection: 'column' }}>
 
               {/* Back row */}
               <div style={{ marginBottom: 10 }}>
@@ -1605,15 +1566,18 @@ export default function LessonPage({ params }: LessonPageProps) {
                     <ArrowLeft size={16} />
                   </button>
 
-                  {/* Next button */}
+                  {/* Next button (disabled when a check-in gate needs completing) */}
                   {isLastLesson && progress.isComplete ? (
                     <button
                       onClick={handleCompleteCourse}
+                      disabled={isGateActive}
                       style={{
-                        background: '#E8B84B', border: '1.5px solid #E8B84B', borderRadius: 10,
+                        background: isGateActive ? '#9CA3AF' : '#E8B84B',
+                        border: `1.5px solid ${isGateActive ? '#9CA3AF' : '#E8B84B'}`, borderRadius: 10,
                         padding: '9px 22px', color: '#1E2749', fontSize: 14, fontWeight: 600,
-                        cursor: 'pointer', fontFamily: "'DM Sans', sans-serif",
+                        cursor: isGateActive ? 'not-allowed' : 'pointer', fontFamily: "'DM Sans', sans-serif",
                         display: 'flex', alignItems: 'center', gap: 6,
+                        opacity: isGateActive ? 0.5 : 1,
                       }}
                     >
                       {tUI('Complete Course')}
@@ -1621,13 +1585,17 @@ export default function LessonPage({ params }: LessonPageProps) {
                     </button>
                   ) : nextLesson ? (
                     <button
-                      onClick={() => router.push(`/hub/courses/${slug}/${nextLesson.slug || nextLesson.id}`)}
+                      onClick={() => !isGateActive && router.push(`/hub/courses/${slug}/${nextLesson.slug || nextLesson.id}`)}
+                      disabled={isGateActive}
                       style={{
-                        background: '#1E2749', border: '1.5px solid #1E2749', borderRadius: 10,
+                        background: isGateActive ? '#9CA3AF' : '#1E2749',
+                        border: `1.5px solid ${isGateActive ? '#9CA3AF' : '#1E2749'}`, borderRadius: 10,
                         padding: '9px 22px', color: 'white', fontSize: 14, fontWeight: 600,
-                        cursor: 'pointer', fontFamily: "'DM Sans', sans-serif",
+                        cursor: isGateActive ? 'not-allowed' : 'pointer', fontFamily: "'DM Sans', sans-serif",
                         display: 'flex', alignItems: 'center', gap: 6,
+                        opacity: isGateActive ? 0.5 : 1,
                       }}
+                      title={isGateActive ? 'Complete the check-in below to continue' : ''}
                     >
                       <span style={{ maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
                         {nextLesson.title}
@@ -1655,21 +1623,20 @@ export default function LessonPage({ params }: LessonPageProps) {
                   {tUI('Course Outline')}
                 </button>
               </div>
-            </div>
-          )}
 
-          {/* GATE STATE (replaces the lesson card) */}
-          {isGateActive && currentGate && user && (
-            <GateCard
-              question={currentGate}
-              allQuestions={courseQuestions}
-              userId={user.id}
-              dark={dark}
-              onGateCleared={handleGateCleared}
-              courseName={course.title}
-              courseSlug={slug}
-            />
-          )}
+              {/* Check-in: renders BELOW the lesson content, not replacing it */}
+              {isGateActive && currentGate && user && (
+                <div style={{ marginTop: 24 }}>
+                  <GateCard
+                    question={currentGate}
+                    allQuestions={courseQuestions}
+                    userId={user.id}
+                    dark={dark}
+                    onGateCleared={handleGateCleared}
+                  />
+                </div>
+              )}
+            </div>
 
         </div>
 
