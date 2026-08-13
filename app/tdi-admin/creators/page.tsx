@@ -73,6 +73,12 @@ import { PORTAL_THEMES } from '@/lib/tdi-admin/theme';
 import { copyToClipboard, formatEmailsForCopy } from '@/lib/tdi-admin/clipboard';
 import { Toast, useToast } from '@/components/tdi-admin/Toast';
 import {
+  DraftNoteCard,
+  type DraftNote,
+  type DraftNoteAction,
+  type DraftNoteActionPayload,
+} from '@/components/tdi-admin/DraftNoteCard';
+import {
   BarChart,
   Bar,
   XAxis,
@@ -1375,8 +1381,6 @@ export default function CreatorStudioPage() {
 
   // Draft notes queue state (Anne Marie's check-in notes for Bella)
   const [draftNotes, setDraftNotes] = useState<any[]>([]);
-  const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
-  const [editedNoteContent, setEditedNoteContent] = useState('');
   const [noteActionLoading, setNoteActionLoading] = useState<string | null>(null);
 
   // ── Recruitment tab state ──
@@ -1880,6 +1884,105 @@ export default function CreatorStudioPage() {
 
   // Copy button states for "Copied!" feedback
   const [copiedSection, setCopiedSection] = useState<string | null>(null);
+
+  /**
+   * Approve, edit-and-approve, or reject one of Anne Marie's draft notes.
+   *
+   * Approving publishes the note and emails the creator. Only drop the note
+   * from the queue when the server confirms it, and say plainly whether the
+   * email went out, since a published note nobody was told about is the exact
+   * failure this queue is meant to prevent.
+   */
+  const handleDraftNoteAction = async (
+    note: DraftNote,
+    action: DraftNoteAction,
+    payload?: DraftNoteActionPayload
+  ) => {
+    setNoteActionLoading(note.id);
+    try {
+      const res = await fetch('/api/admin/creator-notes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action,
+          note_id: note.id,
+          approved_by: adminEmail || 'admin',
+          rejected_by: adminEmail || 'admin',
+          ...(payload || {}),
+        }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        showToast(data.error || 'Could not update this note', 'error');
+        return;
+      }
+
+      setDraftNotes(prev => prev.filter(n => n.id !== note.id));
+
+      const who = note.creator_name || 'the creator';
+      if (action === 'reject') {
+        showToast('Draft rejected and the reason recorded');
+      } else if (data.scheduled_send_at) {
+        showToast(
+          `Approved. It sends to ${who} on ${new Date(data.scheduled_send_at).toLocaleString()}`
+        );
+      } else if (data.emailed) {
+        showToast(`Note published and ${who} was emailed`);
+      } else {
+        showToast(
+          `Note published, but the email to ${who} did not send: ${data.email_error || 'unknown error'}. Reach out directly.`,
+          'error'
+        );
+      }
+    } catch (err) {
+      console.error(err);
+      showToast('Network error', 'error');
+    } finally {
+      setNoteActionLoading(null);
+    }
+  };
+
+  /**
+   * Save internal documentation against the creator, not the draft, so it is
+   * still there after the draft is approved or rejected.
+   */
+  const handleSaveInternalNote = async (
+    note: DraftNote,
+    content: string,
+    reminderAt: string | null
+  ): Promise<boolean> => {
+    try {
+      const res = await fetch('/api/admin/creator-internal-notes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'save',
+          creator_id: note.creator_id,
+          content,
+          reminder_at: reminderAt,
+          author: adminEmail || 'TDI Admin',
+        }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        showToast(data.error || 'Could not save the internal note', 'error');
+        return false;
+      }
+
+      // Reflect it on the card without a refetch.
+      setDraftNotes(prev =>
+        prev.map(n => (n.creator_id === note.creator_id ? { ...n, internal_note: data.note } : n))
+      );
+      showToast(reminderAt ? 'Internal note saved with a reminder' : 'Internal note saved');
+      return true;
+    } catch (err) {
+      console.error(err);
+      showToast('Network error', 'error');
+      return false;
+    }
+  };
 
   // Copy emails to clipboard helper
   const handleCopyEmails = async (emails: string[], sectionId: string) => {
@@ -2721,107 +2824,13 @@ export default function CreatorStudioPage() {
               </div>
               <div className="divide-y divide-gray-100">
                 {draftNotes.map((note: any) => (
-                  <div key={note.id} className="p-4">
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="text-sm font-semibold" style={{ color: '#1e2749' }}>{note.creator_name}</span>
-                          {note.course_title && <span className="text-xs text-gray-400">{note.course_title}</span>}
-                        </div>
-                        {note.draft_reason && (
-                          <p className="text-xs text-gray-500 mb-2">{note.draft_reason}</p>
-                        )}
-                        {editingNoteId === note.id ? (
-                          <textarea
-                            value={editedNoteContent}
-                            onChange={(e) => setEditedNoteContent(e.target.value)}
-                            className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-400 mb-2"
-                            rows={4}
-                          />
-                        ) : (
-                          <div className="px-3 py-2 bg-blue-50 rounded-lg text-xs text-gray-700 line-clamp-3">
-                            <span className="font-medium text-blue-600">Anne Marie&apos;s draft: </span>
-                            {note.content}
-                          </div>
-                        )}
-                      </div>
-                      <div className="flex flex-col gap-1.5 flex-shrink-0">
-                        {editingNoteId === note.id ? (
-                          <>
-                            <button
-                              onClick={async () => {
-                                setNoteActionLoading(note.id);
-                                try {
-                                  await fetch('/api/admin/creator-notes', {
-                                    method: 'POST',
-                                    headers: { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify({ action: 'approve_edited', note_id: note.id, content: editedNoteContent }),
-                                  });
-                                  setDraftNotes(prev => prev.filter(n => n.id !== note.id));
-                                  setEditingNoteId(null);
-                                } catch (err) { console.error(err); }
-                                finally { setNoteActionLoading(null); }
-                              }}
-                              disabled={noteActionLoading === note.id}
-                              className="px-3 py-1.5 text-xs font-medium rounded-lg text-white transition-colors disabled:opacity-50"
-                              style={{ backgroundColor: '#16a34a' }}
-                            >
-                              {noteActionLoading === note.id ? 'Saving...' : 'Save & Approve'}
-                            </button>
-                            <button onClick={() => setEditingNoteId(null)} className="px-3 py-1.5 text-xs font-medium rounded-lg text-gray-500 bg-gray-100">
-                              Cancel
-                            </button>
-                          </>
-                        ) : (
-                          <>
-                            <button
-                              onClick={async () => {
-                                setNoteActionLoading(note.id);
-                                try {
-                                  await fetch('/api/admin/creator-notes', {
-                                    method: 'POST',
-                                    headers: { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify({ action: 'approve', note_id: note.id }),
-                                  });
-                                  setDraftNotes(prev => prev.filter(n => n.id !== note.id));
-                                } catch (err) { console.error(err); }
-                                finally { setNoteActionLoading(null); }
-                              }}
-                              disabled={noteActionLoading === note.id}
-                              className="px-3 py-1.5 text-xs font-medium rounded-lg text-white transition-colors disabled:opacity-50"
-                              style={{ backgroundColor: '#16a34a' }}
-                            >
-                              Approve
-                            </button>
-                            <button
-                              onClick={() => { setEditingNoteId(note.id); setEditedNoteContent(note.content || ''); }}
-                              className="px-3 py-1.5 text-xs font-medium rounded-lg text-blue-600 bg-blue-50 hover:bg-blue-100 transition-colors"
-                            >
-                              Edit
-                            </button>
-                            <button
-                              onClick={async () => {
-                                setNoteActionLoading(note.id);
-                                try {
-                                  await fetch('/api/admin/creator-notes', {
-                                    method: 'POST',
-                                    headers: { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify({ action: 'reject', note_id: note.id }),
-                                  });
-                                  setDraftNotes(prev => prev.filter(n => n.id !== note.id));
-                                } catch (err) { console.error(err); }
-                                finally { setNoteActionLoading(null); }
-                              }}
-                              disabled={noteActionLoading === note.id}
-                              className="px-3 py-1.5 text-xs font-medium rounded-lg text-red-600 bg-red-50 hover:bg-red-100 transition-colors disabled:opacity-50"
-                            >
-                              Reject
-                            </button>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  </div>
+                  <DraftNoteCard
+                    key={note.id}
+                    note={note}
+                    loading={noteActionLoading === note.id}
+                    onAction={handleDraftNoteAction}
+                    onSaveInternalNote={handleSaveInternalNote}
+                  />
                 ))}
               </div>
             </div>

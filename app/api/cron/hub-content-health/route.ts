@@ -6,12 +6,15 @@ import { createClient } from '@supabase/supabase-js';
  * Hub Content Health Check -- runs daily at 7:30 AM CT via Vercel cron.
  *
  * Verifies critical Hub content is visible to users:
- *   1. Quick Wins: checks published count is above minimum threshold
- *   2. Courses: checks published courses are accessible
- *   3. Thumbnails: checks for content missing thumbnails
+ *   1. Quick Wins: published count is above minimum threshold
+ *   2. Courses: published courses are accessible
+ *   3. RLS: an anonymous reader can actually see published Quick Wins
+ *   4. Finished content that was never published (the expensive silent failure)
+ *   5. status / is_published divergence (admin says live, Hub says dark)
  *
  * Sends an IMMEDIATE alert email to Rae if anything is wrong.
- * This prevents content from silently disappearing.
+ * This prevents content from silently disappearing, and from silently never
+ * appearing in the first place.
  */
 
 const MIN_PUBLISHED_QUICK_WINS = 50; // Alert if below this
@@ -96,23 +99,189 @@ export async function GET() {
     issues.push(`RLS sanity check failed: ${String(err)}`);
   }
 
-  // Check 5: Alert on stale drafts (content created by agents but not uploaded/published)
-  try {
-    const { data: staleDrafts } = await supabase
-      .from('hub_quick_wins')
-      .select('id, title, created_at')
-      .eq('is_published', false)
-      .is('file_url', null)
-      .lt('created_at', new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString());
+  // Check 5: Unpublished content, split by whether it is finished or genuinely incomplete.
+  //
+  // The Hub renders on `is_published` alone. `status` is workflow metadata for the
+  // admin/QA view and is never read by an educator-facing query. The failure mode that
+  // actually costs us is finished content that nobody published: it has every field and
+  // both PDFs, it just never had is_published flipped, so it is invisible. The old
+  // version of this check only looked for a missing file_url, so it reported the rare
+  // incomplete case and was blind to the common finished-but-dark case.
+  const STALE_HOURS = 48;
+  const staleCutoff = new Date(Date.now() - STALE_HOURS * 60 * 60 * 1000).toISOString();
 
-    if (staleDrafts && staleDrafts.length > 0) {
+  try {
+    const { data: unpublished, error } = await supabase
+      .from('hub_quick_wins')
+      .select('id, title, status, quick_win_type, file_url, tool_file_url, description, lift, category, topic_tags, roles, danielson_domains')
+      .eq('is_published', false)
+      .lt('created_at', staleCutoff);
+
+    if (error) {
+      issues.push(`Unpublished content check failed: ${error.message}`);
+    } else if (unpublished && unpublished.length > 0) {
+      const nonEmpty = (a: unknown) => Array.isArray(a) && a.length > 0;
+
+      // "Ready" means publishing it would give an educator something real to use.
+      //   download -> needs both the guide PDF and the tool PDF
+      //   quiz     -> the detail page renders "Take Quiz" off file_url and falls back to
+      //               a "Quiz coming soon" placeholder without it, so file_url is required
+      //   game / activity -> interactive, rendered by their own routes, need no PDF
+      const isReady = (q: typeof unpublished[number]) => {
+        const tagged =
+          !!q.title?.trim() && !!q.description?.trim() && !!q.lift && !!q.category &&
+          nonEmpty(q.topic_tags) && nonEmpty(q.roles) && nonEmpty(q.danielson_domains);
+        if (!tagged) return false;
+        if (q.quick_win_type === 'download') return !!q.file_url && !!q.tool_file_url;
+        if (q.quick_win_type === 'quiz') return !!q.file_url;
+        return true;
+      };
+
+      const ready = unpublished.filter(isReady);
+      const incomplete = unpublished.filter(q => !isReady(q));
+
+      if (ready.length > 0) {
+        issues.push(
+          `CRITICAL: ${ready.length} Quick Win${ready.length > 1 ? 's are' : ' is'} complete and passing every publish requirement ` +
+          `but still not live, so no educator can see ${ready.length > 1 ? 'them' : 'it'}. ` +
+          `Publish via POST /api/hub/content-sync (action: publish). ` +
+          `Titles: ${ready.slice(0, 8).map(d => d.title).join(', ')}${ready.length > 8 ? `, and ${ready.length - 8} more` : ''}`
+        );
+      }
+
+      if (incomplete.length > 0) {
+        const why = (q: typeof unpublished[number]) => {
+          const missing: string[] = [];
+          if (!q.description?.trim()) missing.push('description');
+          if (!q.lift) missing.push('lift');
+          if (!q.category) missing.push('category');
+          if (!nonEmpty(q.topic_tags)) missing.push('topic_tags');
+          if (!nonEmpty(q.roles)) missing.push('roles');
+          if (!nonEmpty(q.danielson_domains)) missing.push('danielson_domains');
+          if (q.quick_win_type === 'download') {
+            if (!q.file_url) missing.push('guide PDF');
+            if (!q.tool_file_url) missing.push('tool PDF');
+          }
+          if (q.quick_win_type === 'quiz' && !q.file_url) missing.push('quiz content (file_url)');
+          return `${q.title} (${q.quick_win_type || 'no type'}: missing ${missing.join(', ')})`;
+        };
+        issues.push(
+          `${incomplete.length} Quick Win${incomplete.length > 1 ? 's' : ''} older than ${STALE_HOURS}h still incomplete. ` +
+          `${incomplete.slice(0, 5).map(why).join('; ')}${incomplete.length > 5 ? `; and ${incomplete.length - 5} more` : ''}`
+        );
+      }
+    }
+  } catch (err) {
+    issues.push(`Unpublished content check failed: ${String(err)}`);
+  }
+
+  // Check 5b: status / is_published divergence.
+  //
+  // Migration 108 normalizes this at the database level, so a hit here means something
+  // is writing around the trigger and the admin may be showing "published" for content
+  // that is actually dark.
+  try {
+    const { data: divergent, error } = await supabase
+      .from('hub_quick_wins')
+      .select('id, title')
+      .eq('status', 'published')
+      .eq('is_published', false);
+
+    if (error) {
+      issues.push(`Publish-state divergence check failed: ${error.message}`);
+    } else if (divergent && divergent.length > 0) {
       issues.push(
-        `${staleDrafts.length} draft Quick Win${staleDrafts.length > 1 ? 's' : ''} created over 48 hours ago with no PDF uploaded. ` +
-        `These may be stuck in the Paperclip pipeline. Titles: ${staleDrafts.slice(0, 5).map(d => d.title).join(', ')}${staleDrafts.length > 5 ? '...' : ''}`
+        `CRITICAL: ${divergent.length} Quick Win${divergent.length > 1 ? 's are' : ' is'} marked status='published' but is_published=false, ` +
+        `so ${divergent.length > 1 ? 'they show' : 'it shows'} as published in the admin while being invisible on the Hub. ` +
+        `Migration 108 should make this impossible, so a write path is bypassing the trigger. ` +
+        `Titles: ${divergent.slice(0, 5).map(d => d.title).join(', ')}${divergent.length > 5 ? '...' : ''}`
       );
     }
   } catch (err) {
-    issues.push(`Stale draft check failed: ${String(err)}`);
+    issues.push(`Publish-state divergence check failed: ${String(err)}`);
+  }
+
+  // Check 5c: QA bypasses in the last 24h.
+  //
+  // Publishing without a QA pass is allowed (an agent outage should never fully
+  // block shipping) but it is never silent. Every override carries a written
+  // reason and gets reported here the next morning.
+  try {
+    const dayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+    const { data: bypassed, error } = await supabase
+      .from('hub_quick_wins')
+      .select('title, qa_override_reason, published_by, updated_at')
+      .eq('is_published', true)
+      .not('qa_override_reason', 'is', null)
+      .gte('updated_at', dayAgo);
+
+    if (error) {
+      issues.push(`QA bypass check failed: ${error.message}`);
+    } else if (bypassed && bypassed.length > 0) {
+      const recent = bypassed.filter(b => !b.qa_override_reason?.startsWith('grandfathered:'));
+      if (recent.length > 0) {
+        issues.push(
+          `${recent.length} Quick Win${recent.length > 1 ? 's were' : ' was'} published in the last 24h without a QA pass. ` +
+          recent.slice(0, 5).map(b => `"${b.title}" by ${b.published_by || 'unknown'} (${b.qa_override_reason})`).join('; ') +
+          `${recent.length > 5 ? `; and ${recent.length - 5} more` : ''}`
+        );
+      }
+    }
+  } catch (err) {
+    issues.push(`QA bypass check failed: ${String(err)}`);
+  }
+
+  // Check 5d: pipeline heartbeat.
+  //
+  // The hardest failure to notice is absence of output. Nothing was created
+  // between Aug 5 and Aug 13 and nothing was published in that window either,
+  // and not one alert said so, because every check here asked "is what exists
+  // broken" and none asked "is anything still arriving". Fifteen finished Quick
+  // Wins sat invisible for eight days inside that blind spot.
+  //
+  // Silence is a failure signal. Treat it as one.
+  const CREATE_SILENCE_DAYS = 7;
+  const PUBLISH_SILENCE_DAYS = 10;
+
+  try {
+    const { data: latest, error } = await supabase
+      .from('hub_quick_wins')
+      .select('created_at')
+      .order('created_at', { ascending: false })
+      .limit(1);
+
+    const { data: lastPub, error: pubErr } = await supabase
+      .from('hub_quick_wins')
+      .select('updated_at')
+      .eq('is_published', true)
+      .order('updated_at', { ascending: false })
+      .limit(1);
+
+    if (error || pubErr) {
+      issues.push(`Pipeline heartbeat check failed: ${error?.message || pubErr?.message}`);
+    } else {
+      const daysSince = (iso?: string) =>
+        iso ? Math.floor((Date.now() - new Date(iso).getTime()) / 86_400_000) : null;
+
+      const sinceCreate = daysSince(latest?.[0]?.created_at);
+      const sincePublish = daysSince(lastPub?.[0]?.updated_at);
+
+      if (sinceCreate !== null && sinceCreate >= CREATE_SILENCE_DAYS) {
+        issues.push(
+          `CRITICAL: No new Quick Win has been created in ${sinceCreate} days. ` +
+          `The content pipeline has stopped producing. Check that Jasmine is running and that ` +
+          `Paperclip is not degraded.`
+        );
+      }
+      if (sincePublish !== null && sincePublish >= PUBLISH_SILENCE_DAYS) {
+        issues.push(
+          `CRITICAL: Nothing has been published to the Hub in ${sincePublish} days. ` +
+          `Either nothing is being produced, or finished content is not making it through QA.`
+        );
+      }
+    }
+  } catch (err) {
+    issues.push(`Pipeline heartbeat check failed: ${String(err)}`);
   }
 
   // Check 6: Clean up video staging files older than 1 hour
@@ -142,12 +311,75 @@ export async function GET() {
     console.error('[hub-content-health] Staging cleanup error:', err);
   }
 
-  // If no issues, all good
+  // If no issues, all good. Clear any open alert state so a problem that comes
+  // back later is correctly reported as new rather than resuming an old streak.
   if (issues.length === 0) {
+    await supabase.from('hub_alert_state').delete().eq('source', 'hub-content-health');
     return NextResponse.json({
       status: 'healthy',
       message: 'All Hub content checks passed',
       stagingCleaned,
+      timestamp,
+    });
+  }
+
+  // Escalation state.
+  //
+  // The previous version mailed the same text every morning for seven days.
+  // Identical daily mail reads as noise and gets ignored, which is exactly what
+  // happened. Same problem now escalates and backs off instead of repeating:
+  // days 1, 2 and 3, then every third day, with the subject carrying the age.
+  const fingerprint = issues
+    .map(i => i.replace(/\d+/g, '#').slice(0, 200))
+    .sort()
+    .join('||');
+
+  let daysOpen = 0;
+  let shouldSend = true;
+
+  try {
+    const { data: prior } = await supabase
+      .from('hub_alert_state')
+      .select('first_seen, send_count')
+      .eq('fingerprint', fingerprint)
+      .maybeSingle();
+
+    if (prior) {
+      daysOpen = Math.floor((Date.now() - new Date(prior.first_seen).getTime()) / 86_400_000);
+      // Days 0,1,2 always send. After that, every third day.
+      shouldSend = daysOpen < 3 || daysOpen % 3 === 0;
+
+      await supabase
+        .from('hub_alert_state')
+        .update({
+          last_seen: timestamp,
+          ...(shouldSend ? { last_sent: timestamp, send_count: prior.send_count + 1 } : {}),
+        })
+        .eq('fingerprint', fingerprint);
+    } else {
+      // New problem. Retire any previous fingerprint for this source so the
+      // changed alert does not inherit a stale age.
+      await supabase.from('hub_alert_state').delete().eq('source', 'hub-content-health');
+      await supabase.from('hub_alert_state').insert({
+        fingerprint,
+        source: 'hub-content-health',
+        first_seen: timestamp,
+        last_seen: timestamp,
+        last_sent: timestamp,
+        send_count: 1,
+        sample: issues[0]?.slice(0, 500) || null,
+      });
+    }
+  } catch (err) {
+    console.error('[hub-content-health] Alert state error, sending anyway:', err);
+  }
+
+  if (!shouldSend) {
+    return NextResponse.json({
+      status: 'unhealthy',
+      suppressed: true,
+      reason: `Same issues as ${daysOpen} days ago. Next send on day ${daysOpen + (3 - (daysOpen % 3))}.`,
+      issues,
       timestamp,
     });
   }
@@ -157,14 +389,21 @@ export async function GET() {
   if (resendKey) {
     const resend = new Resend(resendKey);
     const hasCritical = issues.some(i => i.includes('CRITICAL'));
+    const age = daysOpen > 0 ? ` (UNRESOLVED ${daysOpen} DAYS)` : '';
 
     await resend.emails.send({
       from: 'TDI Admin <noreply@teachersdeserveit.com>',
       to: ['Rae@teachersdeserveit.com'],
-      subject: `${hasCritical ? 'CRITICAL' : 'WARNING'}: Hub Content Health Check Failed`,
+      subject: `${hasCritical ? 'CRITICAL' : 'WARNING'}${age}: Hub Content Health Check Failed`,
       html: `
         <h2>Hub Content Health Check ${hasCritical ? 'CRITICAL' : 'WARNING'}</h2>
         <p><strong>Time:</strong> ${timestamp}</p>
+        ${daysOpen > 0 ? `
+        <p style="background:#fef2f2;border-left:4px solid #dc2626;padding:10px 14px;margin:12px 0;">
+          <strong>This has been unresolved for ${daysOpen} day${daysOpen === 1 ? '' : 's'}.</strong>
+          It was first detected on ${new Date(Date.now() - daysOpen * 86_400_000).toISOString().slice(0, 10)}
+          and has not cleared since.
+        </p>` : ''}
         <h3>Issues Found:</h3>
         <ul>
           ${issues.map(i => `<li style="color: ${i.includes('CRITICAL') ? '#dc2626' : '#d97706'}; margin-bottom: 8px;">${i}</li>`).join('')}
@@ -173,6 +412,7 @@ export async function GET() {
         <p style="color:#71717a;font-size:12px;">
           From hub-content-health cron. Check the Learning Hub Supabase project
           and RLS policies if content has disappeared.
+          ${daysOpen >= 3 ? 'This alert now sends every third day while it stays unresolved, so it does not become background noise.' : ''}
         </p>
       `,
     }).catch(err => console.error('[hub-content-health] Failed to send alert:', err));
@@ -180,6 +420,7 @@ export async function GET() {
 
   return NextResponse.json({
     status: 'unhealthy',
+    daysOpen,
     issues,
     timestamp,
   });

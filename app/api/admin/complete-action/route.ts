@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { clearFlagForCompletedMilestone } from '@/lib/creator-agent-flags';
 
 /**
  * API endpoint for admins to complete creator actions on their behalf.
@@ -183,6 +184,9 @@ export async function POST(request: Request) {
       console.error('[admin/complete-action] Error updating milestone:', updateError);
       return NextResponse.json({ success: false, error: updateError.message }, { status: 500 });
     }
+
+    // Doing the work the flag asked for should retire the flag.
+    await clearFlagForCompletedMilestone(supabase, creatorId, milestoneId);
 
     // Record in creator_submissions for full audit trail
     await supabase
