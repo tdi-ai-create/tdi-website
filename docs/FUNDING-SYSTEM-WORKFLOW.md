@@ -25,7 +25,7 @@ Every pursuit moves through these phases in order:
 | **Research** | Find matching grant opportunities for this school. | Agents (Amara) |
 | **Strategy** | Map funding paths, set A/B/C/D priorities, timeline. | Bella |
 | **Writing** | Draft grant narratives and application materials. | Agents (Vanessa) |
-| **Review** | QA check + Bella approval on all narratives. | Bella + Julie (QA) |
+| **Review** | Julie scores each narrative, then Bella approves it. | Julie (QA) + Bella |
 | **Delivered** | Materials sent to school contact for submission. | Bella |
 | **Submitted** | Application submitted by school, waiting on funder. | School |
 | **Awaiting** | Funder reviewing. Monitor for decision. | Auto (follow-up engine) |
@@ -58,8 +58,8 @@ Each item has an action button:
 |--------|-------------|
 | **Verify employed** | Confirms the school contact still works there (required before sending anything) |
 | **Request draft** | Assigns a narrative to Vanessa or Amara to write |
-| **Send to QA** | Sends a completed draft to Julie for quality check |
-| **Approve** | Marks a reviewed draft as ready for the school |
+| **See options** | Opens an escalated narrative so you can choose how to proceed |
+| **Approve** | Marks a QA-passed draft as ready for the school |
 | **Done** | Marks an action item complete |
 | **Send nudge** | Sends a follow-up email to the school contact |
 | **Open pursuit** | Opens the full pursuit detail page |
@@ -84,14 +84,29 @@ When Bella clicks "Request draft" on an opportunity:
 2. On her next heartbeat, Vanessa calls `find_work` and picks up the assignment
 3. Vanessa drafts the narrative using the grants-catalog knowledge for that funder
 4. Vanessa creates a Google Doc in the "TDI Grant Narratives" Drive folder
-5. Vanessa pushes the Doc URL + plain text back to the portal
-6. The portal shows the draft in the opportunity's narrative panel
-7. Bella reviews, sends to QA, then approves
+5. Vanessa pushes the Doc URL + plain text back to the portal and sets `qa_review`
+6. Julie picks it up from `find_work` and files a verdict
+7. A pass moves it to `approval`, where Bella reads and approves it
+8. Bella sends the approved application to the school
+
+**If QA fails a narrative**, it goes back to the writer with Julie's notes. That
+happens twice. A third failure moves it to `escalated` and Bella gets Julie's
+diagnosis plus five options to choose from: approve as written, send back with
+her direction, try a different writer, ask the school for missing information,
+or stop pursuing the grant.
 
 **Important rules:**
 - Agents never mark a narrative as "ready" -- that is always Bella's approval
+- A QA pass is not a send. It goes to Bella, never to the school.
 - Agents never send anything to a school -- all client sends are human-gated
 - Agents only draft for opportunities where the funding window is verified open
+- A shut gate makes drafting invisible to every agent. The portal shows those
+  as **Blocked** with the specific things the school still owes us.
+
+**Automated QA is switched on by `FUNDING_QA_AGENT_ENABLED=true`.** While it is
+off, QA verdicts are Bella's job and the portal says so. Even when it is on, a
+narrative sitting more than 24 hours without a verdict surfaces to Bella, so
+silence never reads as progress.
 
 ---
 

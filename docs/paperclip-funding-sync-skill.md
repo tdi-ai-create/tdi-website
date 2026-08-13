@@ -161,6 +161,16 @@ curl -s -X GET \
 |---|---|---|---|
 | `draft_narrative` | `narrative_status = 'requested'` | YES — `window_status = 'open'` AND `gate_open = true` | Draft or update the grant narrative for this opportunity |
 | `research_funders` | `research_status = 'requested'` | NO — research finds new paths | Research available funding sources for this pursuit |
+| `qa_narrative` | `narrative_status = 'qa_review'` AND `qa_passed IS NULL` | NO — the draft already exists | Score the narrative against the quality gate and file a verdict with `submit_qa_verdict` |
+
+`qa_narrative` items carry two extra fields the QA reviewer needs:
+
+| Field | Meaning |
+|---|---|
+| `attempt` | Which attempt this is. 1 on a first review, higher after a fail sent it back. |
+| `escalates_if_failed` | `true` when failing this attempt sends it to a person instead of back to the writer. When this is true, a failing verdict MUST include an `escalation` object or the API rejects it. |
+
+**Why QA work is not gated:** the narrative already exists, so reviewing it costs nothing if the window later closes. Holding a finished draft behind a gate the school has not cleared just recreates a stall.
 
 **Window gate rule:** `draft_narrative` work is only returned when `window_status = 'open'`. Agents should not draft narratives for paths whose funding window is unknown or closed — that work would be wasted. Research work (`research_funders`) is exempt because research is how we discover and verify open paths.
 
@@ -188,7 +198,7 @@ Adds a new grant opportunity to a pursuit.
 | `applicationOpens` | no | ISO date string |
 | `applicationCloses` | no | ISO date string |
 | `waitingOn` | no | What/who the opportunity is waiting on |
-| `narrativeStatus` | no | One of: `drafting`, `review`, `ready` |
+| `narrativeStatus` | no | Normally omitted. Defaults to `not_started`. |
 | `notes` | no | Free-text notes |
 
 ```bash
@@ -238,12 +248,36 @@ Shortcut for updating narrative-specific fields on an opportunity. Agents can no
 | Field | Required | Description |
 |---|---|---|
 | `opportunityId` | YES | UUID of the opportunity |
-| `narrativeStatus` | no | One of: `drafting`, `review`, `qa_review`, `ready` |
+| `narrativeStatus` | no | One of: `drafting`, `qa_review` |
 | `narrativeUrl` | no | URL to the narrative document (external link) |
 | `narrativeContent` | no | Full narrative text for inline portal reading |
 | `note` | no | Note about the narrative update (logged to timeline) |
 
-**Narrative lifecycle:** `not_started` → `requested` → `drafting` → `review` → `qa_review` → `ready`. Agents set status up to `review`. QA reviewers pass/fail during `qa_review`. Only humans approve to `ready`. Agents must NEVER set `qa_review` or `ready`.
+**Narrative lifecycle**
+
+```
+not_started -> requested -> drafting -> qa_review -> approval -> ready
+                  ^                         |
+                  |                         +-> escalated   (failed twice)
+                  +---- failed QA, back to the writer with notes
+```
+
+Every state has exactly one owner and one exit:
+
+| State | Owner | What happens next |
+|---|---|---|
+| `not_started` | Bella | She requests a draft |
+| `requested` | writing agent | Agent drafts, then sets `qa_review` |
+| `qa_review` | QA agent | Files a verdict with `submit_qa_verdict` |
+| `approval` | Bella | She reads and approves, which sets `ready` |
+| `escalated` | Bella | She chooses from a set of options in the portal |
+| `ready` | Bella | She sends it to the school |
+
+**What a writing agent may set:** `drafting` and `qa_review`, nothing else.
+
+**What a writing agent must NEVER set:** `approval`, `escalated`, or `ready`. Those are set by `submit_qa_verdict` or by a person. Writing to them directly puts a narrative in front of a school without anyone having approved it.
+
+`review` is a legacy state kept only for old rows. Do not set it.
 
 ```bash
 curl -s -X POST \
@@ -260,7 +294,101 @@ curl -s -X POST \
   }'
 ```
 
-### 4. Create Action Item
+### 4. Submit QA Verdict
+
+The only way a QA decision enters the system. Deliberately separate from
+`update_opportunity`, which cannot write `qa_passed` at all: the verdict carries
+rules a generic field write would not enforce.
+
+Only valid when `narrative_status = 'qa_review'`. Anything else returns 409.
+
+| Field | Required | Description |
+|---|---|---|
+| `opportunityId` | YES | UUID of the opportunity |
+| `passed` | YES | Boolean. `true` sends it to Bella for approval. |
+| `reviewer` | YES | Who reviewed it, e.g. `julie` |
+| `summary` | on a fail | What is wrong. Minimum 15 characters. The writer reads this. |
+| `score` | no | Numeric score against the quality gate |
+| `issues` | no | Array of `{ criterion, problem, fix, severity }` |
+| `escalation` | on the final fail | Required when `escalates_if_failed` is true. See below. |
+
+**What each verdict does**
+
+| Verdict | Result |
+|---|---|
+| `passed: true` | Moves to `approval`. **Does not reach the school.** Bella reads and approves. |
+| `passed: false`, attempts remaining | Back to `requested` with your summary as `redraft_guidance` |
+| `passed: false`, no attempts left | Moves to `escalated` with your diagnosis attached |
+
+Two failed attempts are allowed before escalation. A third failure goes to a
+person.
+
+**The escalation object**
+
+Required on the final fail. This goes to Bella, who is not a grant expert, so it
+must arrive as a diagnosis with a recommended path, never as an open problem. An
+escalation without a usable recommendation is rejected and the verdict is not
+saved.
+
+| Field | Required | Description |
+|---|---|---|
+| `summary` | YES | What is wrong, in plain language. Minimum 20 characters. |
+| `root_cause` | YES | Why it keeps failing, not what failed this time. Minimum 20 characters. |
+| `recommended_option` | YES | One of the five options below |
+| `recommendation_reason` | YES | Why that is the right call. Minimum 15 characters. |
+| `detail` | no | Pre-filled text for the recommended option's input, so Bella can accept it as-is |
+
+**The five options.** You recommend one; Bella can pick any.
+
+| Key | What it does |
+|---|---|
+| `approve_anyway` | Sends to Bella's approval step, objections recorded and overridden |
+| `redraft_with_guidance` | Back to the writer with her notes, attempt count reset |
+| `reassign` | Back to drafting with a different agent, attempt count reset |
+| `request_info` | Creates a client action item and drafts an email; narrative waits |
+| `stop_pursuing` | Closes the opportunity and removes it from both queues |
+
+```bash
+curl -s -X POST \
+  "https://www.teachersdeserveit.com/api/funding/sync" \
+  -H "Authorization: Bearer ${PAPERCLIP_SYNC_KEY}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "action": "submit_qa_verdict",
+    "opportunityId": "opp-789-xyz",
+    "passed": false,
+    "reviewer": "julie",
+    "score": 61,
+    "summary": "The need statement still has no enrollment or demographic figures, so the reviewer cannot size the problem.",
+    "issues": [
+      {
+        "criterion": "Need statement",
+        "problem": "No enrollment, FRL percentage, or demographic data",
+        "fix": "Add figures from the school profile",
+        "severity": "blocking"
+      }
+    ],
+    "escalation": {
+      "summary": "Both drafts describe the need in general terms because we do not have the school'\''s enrollment or free and reduced lunch numbers on file.",
+      "root_cause": "The school profile was never completed, so the writer has no figures to use and is filling the gap with generic language each time.",
+      "recommended_option": "request_info",
+      "recommendation_reason": "No amount of rewriting fixes a missing number. One short email to the school unblocks every remaining grant, not just this one.",
+      "detail": "Current enrollment and the percentage of students on free or reduced lunch."
+    }
+  }'
+```
+
+**Response**
+
+```json
+{ "success": true, "outcome": "escalated", "attempt": 3, "attempts_remaining": 0 }
+```
+
+`outcome` is one of `approval`, `requested`, or `escalated`.
+
+---
+
+### 5. Create Action Item
 
 Creates a task assigned to TDI staff or a client contact.
 
@@ -297,7 +425,7 @@ curl -s -X POST \
   }'
 ```
 
-### 5. Update Action Item
+### 6. Update Action Item
 
 Updates the status or details of an existing action item.
 
@@ -322,7 +450,7 @@ curl -s -X POST \
   }'
 ```
 
-### 6. Add Timeline Event
+### 7. Add Timeline Event
 
 Logs a milestone or notable event to the pursuit timeline.
 
@@ -347,7 +475,7 @@ curl -s -X POST \
   }'
 ```
 
-### 7. Draft Email
+### 8. Draft Email
 
 Creates an email draft for human review. Agents MUST NOT send emails directly -- this creates a draft that Rae or Bella will review and send.
 
@@ -389,8 +517,10 @@ Follow these rules strictly when using this API:
 2. **Check before creating.** Before `create_opportunity`, call `get_pursuit` and verify no opportunity with the same name exists. The API returns `409` on duplicates, but checking first avoids unnecessary errors.
 
 3. **Narrative status permissions.**
-   - Agents may set `narrativeStatus` to `drafting` (when starting work) or `review` (when draft is complete).
-   - Only humans (Rae or Bella) may set `narrativeStatus` to `ready`. Never set this value as an agent.
+   - Writing agents may set `narrativeStatus` to `drafting` (when starting) or `qa_review` (when the draft is complete). Nothing else.
+   - Writing agents must NEVER set `approval`, `escalated`, or `ready`. Those are reached through `submit_qa_verdict` or by a person. Setting them directly puts work in front of a school that nobody approved.
+   - QA agents do not set `narrativeStatus` at all. They call `submit_qa_verdict` and the API moves the state.
+   - Only a person sets `ready`, by approving in the portal.
 
 4. **Default TDI action owner.** When creating action items with `ownerType: "tdi"` and no specific owner, default to:
    - `ownerName`: `"Bella"`
@@ -400,7 +530,13 @@ Follow these rules strictly when using this API:
 
 6. **Draft emails only.** Use `draft_email` to create emails for human review. Agents must NEVER send emails directly to external contacts. All outbound communication goes through Rae or Bella.
 
+   Passing QA is not sending. A passed narrative goes to Bella for approval, never to the school.
+
 7. **Error handling.** If any API call returns an error, log the error details and do not retry more than once. Report the failure to the task context so a human can investigate.
+
+8. **A failing QA verdict must be usable.** `summary` tells the writer what to change and is required on every fail. On a final fail the `escalation` object is required, and it is rejected unless it explains the problem, why it keeps happening, and which of the five options you recommend. Bella is not a grant expert. Never hand her an open problem.
+
+9. **If work is not appearing, do not assume it is done.** `find_work` returns nothing for a pursuit whose gate is shut or whose window is unverified. That is a blocked pursuit, not a finished one. Check `get_pursuit` before concluding there is nothing to do.
 
 ---
 
@@ -420,12 +556,32 @@ A typical agent workflow for a new grant discovery:
 A typical workflow for completing a narrative:
 
 ```
-1. find_pursuit(school="Lincoln Elementary")       -> get pursuitId
-2. get_pursuit(pursuitId)                          -> get opportunityId
-3. update_narrative(opportunityId, narrativeStatus="drafting")
-4. [... agent drafts the narrative ...]
-5. update_narrative(opportunityId, narrativeStatus="review", narrativeUrl="...")
-6. add_timeline_event(pursuitId, "Narrative drafted for [grant name]")
-7. create_action(pursuitId, title="Review narrative draft", ownerType="tdi")
-8. draft_email(pursuitId, subject="Narrative ready for review", ...)
+1. find_work(agent="vanessa")                      -> pick a draft_narrative item
+2. update_narrative(opportunityId, narrativeStatus="drafting")
+3. [... agent drafts the narrative ...]
+4. update_narrative(opportunityId, narrativeStatus="qa_review",
+                    narrativeContent="...", narrativeUrl="...")
+5. add_timeline_event(pursuitId, "Narrative drafted for [grant name]")
+```
+
+Stop there. Do not create a review action item and do not draft a
+"ready for review" email. The portal raises QA work on its own, and duplicating
+it as an action item is how the queue fills with things nobody owns.
+
+A typical QA workflow:
+
+```
+1. find_work(agent="julie")                        -> pick a qa_narrative item
+2. [... score narrative_content against the quality gate ...]
+3a. submit_qa_verdict(opportunityId, passed=true,  reviewer="julie", score=88)
+    -> moves to approval, Bella reads and approves
+
+3b. submit_qa_verdict(opportunityId, passed=false, reviewer="julie",
+                      summary="...", issues=[...])
+    -> back to the writer with your summary as guidance
+
+3c. submit_qa_verdict(opportunityId, passed=false, reviewer="julie",
+                      summary="...", escalation={...})
+    -> only when escalates_if_failed is true. Goes to Bella with your
+       diagnosis and recommendation.
 ```
