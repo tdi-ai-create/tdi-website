@@ -1058,6 +1058,16 @@ export default function LessonPage({ params }: LessonPageProps) {
     courseQuestions.filter(isQuestionAnswered).map((q) => q.id)
   );
 
+  // The plan they wrote in the final check-in, to hand back to them on the
+  // completion screen. Reading it from state they already have avoids another
+  // round trip at the exact moment the confetti is firing.
+  const completedPlan =
+    courseQuestions
+      .filter((q) => q.question_type === 'action_step')
+      .map((q) => courseResponses[q.id]?.response)
+      .filter((r): r is string => !!r && r.trim().length > 0)
+      .pop() ?? null;
+
   // Locked lesson indices (lessons after first uncleared gate)
   const lockedLessonIndices = new Set<number>();
   for (const gateIdx of gateIndices) {
@@ -1860,6 +1870,7 @@ export default function LessonPage({ params }: LessonPageProps) {
           pdHours={course.pd_hours}
           verificationCode={certificateEarned.verificationCode}
           courseSlug={slug}
+          plan={completedPlan}
         />
       )}
     </div>

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useHub } from '@/components/hub/HubContext';
 import { useTranslation } from '@/lib/hub/useTranslation';
 import { getHubSupabase as getSupabase } from '@/lib/supabase-hub';
+import CourseNotes from '@/components/hub/CourseNotes';
 import {
   Award,
   Download,
@@ -1539,6 +1540,9 @@ ${displayName}</div>
           </div>
         </section>
       )}
+
+      {/* ========== Your Notes ========== */}
+      {user?.id && <CourseNotes userId={user.id} />}
 
       {/* ========== Certificates Section ========== */}
       {certificates.length > 0 && (
