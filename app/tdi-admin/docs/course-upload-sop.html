@@ -35,7 +35,7 @@
 <div class="page">
 <h1>Course Video & PDF Upload SOP</h1>
 <p class="subtitle">How to upload videos and documents to Learning Hub courses</p>
-<p class="updated">Last updated: July 30, 2026</p>
+<p class="updated">Last updated: August 13, 2026</p>
 
 <div class="card card-navy">
   <p style="font-weight:600;color:white;margin-bottom:8px;">How It Works</p>
@@ -110,6 +110,34 @@
   <p><strong>Max file size:</strong> 25MB per document</p>
   <p><strong>Storage:</strong> Supabase Storage (lesson-resources bucket)</p>
 </div>
+
+<h2>Generating Transcripts</h2>
+
+<div class="card card-amber">
+  <p style="margin-bottom:0;"><strong>Uploading the video is not the last step.</strong> A lesson without a transcript cannot carry a check-in, and a course whose lessons have no transcripts cannot be published. Generate transcripts as soon as the videos are in.</p>
+</div>
+
+<ol>
+  <li>Go to <strong>Learning Hub &gt; Production &gt; Courses</strong></li>
+  <li>Find the course in the list</li>
+  <li>Click <strong>Generate transcripts</strong></li>
+  <li>Cloudflare produces captions for each video. Allow a few minutes for a long course.</li>
+</ol>
+
+<p><strong>Why it matters:</strong> transcripts do three jobs. They make lessons accessible to educators who need captions, they let learners download and reread the lesson, and they are the source material the check-in generator reads to write a question about that specific lesson.</p>
+
+<h3>What to check</h3>
+<ul>
+  <li>Every teaching lesson has a transcript, not just most of them.</li>
+  <li>The final lesson of the course has one. If the last lesson is a short outro with almost no speech, the course's final check-in gets pushed to an earlier lesson.</li>
+  <li>A transcript of only a sentence or two counts as missing. It is not enough to write a real question from.</li>
+</ul>
+
+<div class="card card-red">
+  <p style="margin-bottom:0;"><span class="dot dot-red"></span> <strong>Known blockers as of August 2026:</strong> <code>crack-the-co-teaching-code</code> and <code>escape-the-first-week</code> have no transcripts at all and cannot be published. <code>classroom-management-toolkit</code> has a Wrap Up lesson with a transcript too short to use.</p>
+</div>
+
+<p>Once transcripts exist, see the <strong>Course Check-Ins SOP</strong> for creating the check-ins themselves.</p>
 
 <h2>Understanding the Status Dots</h2>
 <table>
