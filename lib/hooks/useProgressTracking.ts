@@ -178,6 +178,23 @@ export function useProgressTracking(
 
     const supabase = getSupabase();
 
+    // This runs after every lesson update, so it fires again on any later
+    // interaction with an already-finished course. Only the first transition
+    // into completed should stamp completed_at and write the activity row.
+    // Re-stamping would re-count an old completion in the weekly briefing and
+    // inflate time-to-complete; a second activity row would inflate the
+    // course-completions KPI, which counts rows without deduping.
+    let alreadyComplete = false;
+    if (isComplete) {
+      const { data: existing } = await supabase
+        .from('hub_enrollments')
+        .select('status, completed_at')
+        .eq('course_id', courseId)
+        .eq('user_id', userId)
+        .maybeSingle();
+      alreadyComplete = existing?.status === 'completed' && !!existing?.completed_at;
+    }
+
     const updateData: Record<string, unknown> = {
       progress_pct: newProgressPct,
       updated_at: new Date().toISOString(),
@@ -185,7 +202,9 @@ export function useProgressTracking(
 
     if (isComplete) {
       updateData.status = 'completed';
-      updateData.completed_at = new Date().toISOString();
+      if (!alreadyComplete) {
+        updateData.completed_at = new Date().toISOString();
+      }
     }
 
     await supabase
@@ -199,18 +218,20 @@ export function useProgressTracking(
       // Log course completion to activity log. Supabase reports row-level
       // failures in `error` rather than throwing, so both paths need handling
       // or a broken insert disappears silently.
-      try {
-        const { error: logError } = await supabase.from('hub_activity_log').insert({
-          user_id: userId,
-          action: 'course_completed',
-          metadata: {
-            course_id: courseId,
-            completed_at: new Date().toISOString(),
-          },
-        });
-        if (logError) console.warn('[hub] course_completed log failed:', logError.message);
-      } catch (err) {
-        console.warn('[hub] course_completed log threw:', err);
+      if (!alreadyComplete) {
+        try {
+          const { error: logError } = await supabase.from('hub_activity_log').insert({
+            user_id: userId,
+            action: 'course_completed',
+            metadata: {
+              course_id: courseId,
+              completed_at: new Date().toISOString(),
+            },
+          });
+          if (logError) console.warn('[hub] course_completed log failed:', logError.message);
+        } catch (err) {
+          console.warn('[hub] course_completed log threw:', err);
+        }
       }
 
       const result = await createCertificate(userId, courseId);
