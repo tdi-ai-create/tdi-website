@@ -42,6 +42,38 @@ export async function GET(request: NextRequest) {
 
     if (!partnerships) return NextResponse.json({ success: true, sent: 0 });
 
+    // A partner is "onboarded" when they have actually uploaded a roster, not
+    // when invite_accepted_at happens to be set. That field has proven
+    // unreliable: it was set on partnerships whose leader account was never
+    // created (suppressing every reminder to a school that could not log in),
+    // and left unset on partnerships whose leader logs in regularly (nagging
+    // people who are already doing the work). Roster rows are the first thing
+    // onboarding actually produces, so they are the honest signal.
+    //
+    // Existence alone is too loose: an abandoned upload can leave a single row
+    // behind and would read as finished. Require the roster to cover most of
+    // the expected headcount, falling back to a small floor when no headcount
+    // was ever recorded.
+    const ROSTER_COVERAGE = 0.8;
+    const ROSTER_FLOOR = 3;
+
+    const { data: rosterRows } = await supabase
+      .from('staff_members')
+      .select('partnership_id');
+
+    const rosterCount = new Map<string, number>();
+    for (const r of rosterRows || []) {
+      rosterCount.set(r.partnership_id, (rosterCount.get(r.partnership_id) || 0) + 1);
+    }
+
+    const rosterComplete = (partnershipId: string, expected: number | null) => {
+      const loaded = rosterCount.get(partnershipId) || 0;
+      if (loaded === 0) return false;
+      return expected && expected > 0
+        ? loaded >= Math.ceil(expected * ROSTER_COVERAGE)
+        : loaded >= ROSTER_FLOOR;
+    };
+
     for (const p of partnerships) {
       if (!p.contact_email) continue;
 
@@ -50,7 +82,7 @@ export async function GET(request: NextRequest) {
       const dashboardUrl = `https://www.teachersdeserveit.com/partners/${p.slug}`;
 
       // === LOGIN REMINDERS ===
-      if (p.invite_sent_at && !p.invite_accepted_at) {
+      if (p.invite_sent_at && !rosterComplete(p.id, p.staff_enrolled)) {
         const inviteSent = new Date(p.invite_sent_at);
         const daysSinceInvite = Math.floor((now.getTime() - inviteSent.getTime()) / (1000 * 60 * 60 * 24));
 
@@ -63,7 +95,11 @@ export async function GET(request: NextRequest) {
           .eq('action', reminderKey)
           .limit(1);
 
-        if (existingLog && existingLog.length > 0) continue;
+        // Previously `continue`, which abandoned the whole partner and skipped
+        // their session-date and engagement reminders further down. Now that
+        // more partners reach this block, that would have silently suppressed
+        // unrelated mail, so only the login nudge is skipped.
+        const alreadySent = Boolean(existingLog && existingLog.length > 0);
 
         let reminderEmail: { subject: string; body: string } | null = null;
 
@@ -174,7 +210,7 @@ The TDI Team`
           };
         }
 
-        if (reminderEmail) {
+        if (reminderEmail && !alreadySent) {
           const resp = await fetch('https://api.resend.com/emails', {
             method: 'POST',
             headers: { 'Authorization': `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' },
