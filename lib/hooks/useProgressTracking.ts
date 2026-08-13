@@ -196,9 +196,11 @@ export function useProgressTracking(
 
     // Auto-generate certificate when course is completed
     if (isComplete) {
-      // Log course completion to activity log
+      // Log course completion to activity log. Supabase reports row-level
+      // failures in `error` rather than throwing, so both paths need handling
+      // or a broken insert disappears silently.
       try {
-        await supabase.from('hub_activity_log').insert({
+        const { error: logError } = await supabase.from('hub_activity_log').insert({
           user_id: userId,
           action: 'course_completed',
           metadata: {
@@ -206,7 +208,10 @@ export function useProgressTracking(
             completed_at: new Date().toISOString(),
           },
         });
-      } catch { /* best-effort logging */ }
+        if (logError) console.warn('[hub] course_completed log failed:', logError.message);
+      } catch (err) {
+        console.warn('[hub] course_completed log threw:', err);
+      }
 
       const result = await createCertificate(userId, courseId);
       if (result.success && result.verificationCode && result.pdHours) {

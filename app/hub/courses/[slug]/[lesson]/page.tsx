@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useHub } from '@/components/hub/HubContext';
 import { getHubSupabase as getSupabase } from '@/lib/supabase-hub';
-import { useProgressTracking } from '@/lib/hooks/useProgressTracking';
+import { useProgressTracking, type LessonStatus } from '@/lib/hooks/useProgressTracking';
 import CourseCompletionModal from '@/components/hub/CourseCompletionModal';
 import { useTranslation } from '@/lib/hub/useTranslation';
 import {
@@ -107,14 +107,25 @@ function loadCfStreamSdk(): Promise<void> {
   if (cfStreamSdkPromise) return cfStreamSdkPromise;
 
   cfStreamSdkPromise = new Promise<void>((resolve, reject) => {
-    const onFail = () => {
+    // Guarantees the promise always settles. Without it, a script tag that
+    // already fired 'load' without defining window.Stream would leave this
+    // pending forever and the player listeners would never attach.
+    const timeout = setTimeout(() => onFail(), 15000);
+
+    const onLoad = () => {
+      clearTimeout(timeout);
+      resolve();
+    };
+
+    function onFail() {
+      clearTimeout(timeout);
       cfStreamSdkPromise = null;
       reject(new Error('Cloudflare Stream SDK failed to load'));
-    };
+    }
 
     const existing = document.querySelector<HTMLScriptElement>(`script[src="${CF_STREAM_SDK_SRC}"]`);
     if (existing) {
-      existing.addEventListener('load', () => resolve());
+      existing.addEventListener('load', onLoad);
       existing.addEventListener('error', onFail);
       return;
     }
@@ -122,7 +133,7 @@ function loadCfStreamSdk(): Promise<void> {
     const script = document.createElement('script');
     script.src = CF_STREAM_SDK_SRC;
     script.async = true;
-    script.onload = () => resolve();
+    script.onload = onLoad;
     script.onerror = onFail;
     document.head.appendChild(script);
   });
@@ -862,10 +873,15 @@ export default function LessonPage({ params }: LessonPageProps) {
   }, [certificateEarned]);
 
   // Video auto-completion via the Cloudflare Stream player SDK.
-  // Kept out of the effect deps via refs so a progress update doesn't tear down
-  // and re-attach the player listeners on every render.
+  // The latest progress and callbacks live in a ref so they stay out of the
+  // effect deps, otherwise every progress update would tear down and re-attach
+  // the player listeners. The ref is updated in an effect rather than during
+  // render, which React does not allow.
   const videoTrackingRef = useRef({ progress, markLessonStatus, refetch });
-  videoTrackingRef.current = { progress, markLessonStatus, refetch };
+
+  useEffect(() => {
+    videoTrackingRef.current = { progress, markLessonStatus, refetch };
+  });
 
   const currentLessonId = currentLesson?.id ?? null;
   const currentVideoId = currentLesson ? extractVideoId(currentLesson) : null;
@@ -876,8 +892,10 @@ export default function LessonPage({ params }: LessonPageProps) {
     let player: CfStreamPlayer | null = null;
     let cancelled = false;
 
-    const statusOf = () =>
-      videoTrackingRef.current.progress.lessonProgress.get(currentLessonId)?.status;
+    // A lesson with no row in the progress map has not been started. That
+    // happens if the viewer hits play before progress finishes loading.
+    const statusOf = (): LessonStatus =>
+      videoTrackingRef.current.progress.lessonProgress.get(currentLessonId)?.status ?? 'not_started';
 
     const handlePlay = () => {
       if (statusOf() === 'not_started') {
@@ -958,7 +976,9 @@ export default function LessonPage({ params }: LessonPageProps) {
     if (!user?.id) return;
     try {
       const supabase = getSupabase();
-      await supabase.from('hub_activity_log').insert({
+      // Supabase reports row-level failures in `error` rather than throwing, so
+      // both paths need handling or a broken insert disappears silently.
+      const { error } = await supabase.from('hub_activity_log').insert({
         user_id: user.id,
         action,
         metadata: {
@@ -970,8 +990,9 @@ export default function LessonPage({ params }: LessonPageProps) {
           timestamp: new Date().toISOString(),
         },
       });
-    } catch {
-      /* best-effort logging */
+      if (error) console.warn(`[hub] activity log "${action}" failed:`, error.message);
+    } catch (err) {
+      console.warn(`[hub] activity log "${action}" threw:`, err);
     }
   }, [user?.id, course?.id, course?.title, currentLesson?.id, currentLesson?.title]);
 
