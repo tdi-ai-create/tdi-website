@@ -4,7 +4,12 @@ import {
   recruitmentOutreachApproved,
   recruitmentCandidateResponded,
   recruitmentCandidateConverted,
+  recruitmentNeedsApproval,
 } from '@/lib/creator-slack'
+
+const GAP_PRIORITIES = ['critical', 'high', 'medium', 'low']
+const GAP_STATUSES = ['active', 'filled', 'monitoring']
+const CONTENT_PATHS = ['course', 'download', 'blog']
 
 /**
  * Admin Creator Recruitment API -- Used by the TDI Admin Portal UI
@@ -29,10 +34,16 @@ export async function GET(request: NextRequest) {
 
   // ─── gaps: all active content gaps with candidate counts ───
   if (action === 'gaps') {
-    const { data: gaps, error } = await supabase
-      .from('creator_content_gaps')
-      .select('*')
-      .order('priority', { ascending: true })
+    // Default to the working set. The scan marks well covered categories
+    // 'filled', and those should not clutter the board unless asked for.
+    const status = url.searchParams.get('status') || 'active'
+
+    let gapQuery = supabase.from('creator_content_gaps').select('*')
+    if (status !== 'all') {
+      gapQuery = gapQuery.eq('status', status)
+    }
+
+    const { data: gaps, error } = await gapQuery.order('priority', { ascending: true })
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 })
@@ -457,18 +468,116 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true, creator_id: creator.id })
   }
 
+  // ─── create_gap: a human adds a content gap ───
+  if (action === 'create_gap') {
+    const { category, priority, demand_signal, recommended_content_path, notes: gapNotes } = body
+    if (!category || !String(category).trim()) {
+      return NextResponse.json({ error: 'category required' }, { status: 400 })
+    }
+    if (!GAP_PRIORITIES.includes(priority)) {
+      return NextResponse.json({ error: `priority must be one of: ${GAP_PRIORITIES.join(', ')}` }, { status: 400 })
+    }
+    if (recommended_content_path && !CONTENT_PATHS.includes(recommended_content_path)) {
+      return NextResponse.json({ error: `recommended_content_path must be one of: ${CONTENT_PATHS.join(', ')}` }, { status: 400 })
+    }
+
+    const trimmed = String(category).trim()
+
+    // One active gap per category. Surface the existing one instead of
+    // creating a second board entry for the same problem.
+    const { data: existing } = await supabase
+      .from('creator_content_gaps')
+      .select('id, priority')
+      .ilike('category', trimmed)
+      .eq('status', 'active')
+      .maybeSingle()
+
+    if (existing) {
+      return NextResponse.json({
+        success: false,
+        error: 'An active gap already exists for this category',
+        existing_id: existing.id,
+      }, { status: 409 })
+    }
+
+    const { data: gap, error } = await supabase
+      .from('creator_content_gaps')
+      .insert({
+        category: trimmed,
+        priority,
+        demand_signal: demand_signal || null,
+        recommended_content_path: recommended_content_path || null,
+        notes: gapNotes || null,
+        status: 'active',
+        identified_by: 'admin',
+      })
+      .select()
+      .single()
+
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+    return NextResponse.json({ success: true, gap_id: gap.id })
+  }
+
+  // ─── update_gap ───
+  if (action === 'update_gap') {
+    const { gap_id, priority, demand_signal, recommended_content_path, notes: gapNotes, status } = body
+    if (!gap_id) {
+      return NextResponse.json({ error: 'gap_id required' }, { status: 400 })
+    }
+    if (priority !== undefined && !GAP_PRIORITIES.includes(priority)) {
+      return NextResponse.json({ error: `priority must be one of: ${GAP_PRIORITIES.join(', ')}` }, { status: 400 })
+    }
+    if (status !== undefined && !GAP_STATUSES.includes(status)) {
+      return NextResponse.json({ error: `status must be one of: ${GAP_STATUSES.join(', ')}` }, { status: 400 })
+    }
+    if (recommended_content_path && !CONTENT_PATHS.includes(recommended_content_path)) {
+      return NextResponse.json({ error: `recommended_content_path must be one of: ${CONTENT_PATHS.join(', ')}` }, { status: 400 })
+    }
+
+    const payload: Record<string, unknown> = {}
+    if (priority !== undefined) payload.priority = priority
+    if (demand_signal !== undefined) payload.demand_signal = demand_signal || null
+    if (recommended_content_path !== undefined) payload.recommended_content_path = recommended_content_path || null
+    if (gapNotes !== undefined) payload.notes = gapNotes || null
+    if (status !== undefined) payload.status = status
+
+    if (Object.keys(payload).length === 0) {
+      return NextResponse.json({ error: 'nothing to update' }, { status: 400 })
+    }
+
+    // A human touching a gap takes ownership of it, so the weekly scan stops
+    // overwriting the priority they set.
+    payload.identified_by = 'admin'
+
+    const { error } = await supabase
+      .from('creator_content_gaps')
+      .update(payload)
+      .eq('id', gap_id)
+
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+    return NextResponse.json({ success: true })
+  }
+
   // ─── nominate ───
   if (action === 'nominate') {
-    const { name, email, school_org, role, expertise_area, source, nominated_by, nominated_from, notes: nominationNotes } = body
-    if (!name) {
+    const {
+      name, email, school_org, role, expertise_area, source,
+      nominated_by, nominated_from, notes: nominationNotes,
+      gap_id, content_path, why_good_fit, social_url, outreach_draft,
+    } = body
+    if (!name || !String(name).trim()) {
       return NextResponse.json({ error: 'name required' }, { status: 400 })
+    }
+    if (content_path && !CONTENT_PATHS.includes(content_path)) {
+      return NextResponse.json({ error: `content_path must be one of: ${CONTENT_PATHS.join(', ')}` }, { status: 400 })
     }
 
     if (email) {
+      // Case insensitive so a retyped address does not slip past the guard.
       const { data: existing } = await supabase
         .from('creator_recruitment_candidates')
         .select('id, stage')
-        .eq('email', email)
+        .ilike('email', email)
         .maybeSingle()
 
       if (existing) {
@@ -484,11 +593,16 @@ export async function POST(request: NextRequest) {
     const { data: candidate, error } = await supabase
       .from('creator_recruitment_candidates')
       .insert({
-        name,
-        email: email || null,
+        name: String(name).trim(),
+        email: email ? String(email).trim() : null,
         school_org: school_org || null,
         role: role || null,
         expertise_area: expertise_area || null,
+        gap_id: gap_id || null,
+        content_path: content_path || null,
+        why_good_fit: why_good_fit || null,
+        social_url: social_url || null,
+        outreach_draft: outreach_draft || null,
         source: source || 'sales_nomination',
         nominated_by: nominated_by || null,
         nominated_from: nominated_from || null,
@@ -507,6 +621,21 @@ export async function POST(request: NextRequest) {
         note_type: 'note',
       })
     }
+
+    // Route it to Bella. A nomination that nobody hears about is the failure
+    // mode this whole pipeline already lived through once.
+    try {
+      let gapCategory = ''
+      if (gap_id) {
+        const { data: gap } = await supabase
+          .from('creator_content_gaps')
+          .select('category')
+          .eq('id', gap_id)
+          .single()
+        gapCategory = gap?.category || ''
+      }
+      recruitmentNeedsApproval(candidate.name, gapCategory, Boolean(outreach_draft)).catch(() => {})
+    } catch {}
 
     return NextResponse.json({ success: true, candidate_id: candidate.id })
   }
@@ -536,7 +665,7 @@ export async function POST(request: NextRequest) {
   }
 
   return NextResponse.json(
-    { error: 'Unknown action. Use: approve_outreach, mark_sent, log_response, update_stage, add_note, convert_to_creator, nominate, dismiss' },
+    { error: 'Unknown action. Use: approve_outreach, mark_sent, log_response, update_stage, add_note, convert_to_creator, nominate, dismiss, create_gap, update_gap' },
     { status: 400 }
   )
 }
