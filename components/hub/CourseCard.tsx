@@ -44,7 +44,7 @@ interface CourseCardProps {
   };
   enrollment?: {
     status: 'active' | 'completed';
-    progress_percentage: number;
+    progress_pct: number;
   } | null;
   onEnroll?: (courseId: string) => void;
   isEnrolling?: boolean;
@@ -76,7 +76,7 @@ export default function CourseCard({
   };
   const isCompleted = enrollment?.status === 'completed';
   const isEnrolled = !!enrollment;
-  const progress = enrollment?.progress_percentage || 0;
+  const progress = enrollment?.progress_pct || 0;
 
   // Check access using membership hook
   const { canAccess } = useMembership();

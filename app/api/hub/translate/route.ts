@@ -89,31 +89,33 @@ export async function POST(request: NextRequest) {
 
     // ── QUICK WIN TRANSLATION ────────────────────────────────────────────
     if (contentType === 'quick_win') {
-      const { data: qw } = await supabase
+      // hub_quick_wins has no content/content_es column. Selecting them made
+      // this query fail with 42703, so `qw` came back null and every quick win
+      // translation returned "Quick win not found". Quick Wins are downloadable
+      // PDFs, so title and description are the translatable fields.
+      const { data: qw, error: qwError } = await supabase
         .from('hub_quick_wins')
-        .select('id, title, description, content, title_es, description_es, content_es')
+        .select('id, title, description, title_es, description_es')
         .eq('id', contentId)
         .single()
 
+      if (qwError) console.error('Quick win translation lookup failed:', qwError.message)
       if (!qw) return NextResponse.json({ error: 'Quick win not found' }, { status: 404 })
 
       const needsTitleEs = !qw.title_es && qw.title
       const needsDescEs = !qw.description_es && qw.description
-      const needsContentEs = !qw.content_es && qw.content
 
-      if (!needsTitleEs && !needsDescEs && !needsContentEs) {
+      if (!needsTitleEs && !needsDescEs) {
         return NextResponse.json({
           title_es: qw.title_es,
           description_es: qw.description_es,
-          content_es: qw.content_es,
           cached: true,
         })
       }
 
-      const [titleEs, descEs, contentEs] = await Promise.all([
+      const [titleEs, descEs] = await Promise.all([
         needsTitleEs ? translateText(qw.title, lang) : Promise.resolve(qw.title_es),
         needsDescEs ? translateText(qw.description || '', lang) : Promise.resolve(qw.description_es),
-        needsContentEs ? translateText(qw.content || '', lang) : Promise.resolve(qw.content_es),
       ])
 
       await supabase
@@ -121,14 +123,12 @@ export async function POST(request: NextRequest) {
         .update({
           ...(needsTitleEs && { title_es: titleEs }),
           ...(needsDescEs && { description_es: descEs }),
-          ...(needsContentEs && { content_es: contentEs }),
         })
         .eq('id', contentId)
 
       return NextResponse.json({
         title_es: titleEs,
         description_es: descEs,
-        content_es: contentEs,
         cached: false,
       })
     }

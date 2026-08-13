@@ -67,7 +67,7 @@ interface Course {
 interface Enrollment {
   course_id: string;
   status: 'active' | 'completed';
-  progress_percentage: number;
+  progress_pct: number;
 }
 
 export default function CourseCatalogPage() {
@@ -114,10 +114,16 @@ export default function CourseCatalogPage() {
 
       // Fetch user's enrollments if logged in
       if (user?.id) {
-        const { data: enrollmentData } = await supabase
+        const { data: enrollmentData, error: enrollmentError } = await supabase
           .from('hub_enrollments')
-          .select('course_id, status, progress_percentage')
+          .select('course_id, status, progress_pct')
           .eq('user_id', user.id);
+
+        // Without this the query can fail (a bad column name returns 42703) and
+        // leave every course looking un-enrolled, with nothing in the console.
+        if (enrollmentError) {
+          console.error('Error loading enrollments:', enrollmentError.message);
+        }
 
         if (enrollmentData) {
           const enrollmentMap: Record<string, Enrollment> = {};
@@ -197,7 +203,7 @@ export default function CourseCatalogPage() {
           [courseId]: {
             course_id: courseId,
             status: 'active',
-            progress_percentage: 0,
+            progress_pct: 0,
           },
         }));
 
@@ -242,7 +248,7 @@ export default function CourseCatalogPage() {
   // Get in-progress courses (enrolled but not completed)
   const inProgressCourses = courses.filter((course) => {
     const enrollment = enrollments[course.id];
-    return enrollment && enrollment.status === 'active' && enrollment.progress_percentage > 0;
+    return enrollment && enrollment.status === 'active' && enrollment.progress_pct > 0;
   });
 
   // Loading skeleton
