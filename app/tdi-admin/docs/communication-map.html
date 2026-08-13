@@ -203,17 +203,17 @@
 <table>
   <tr><th>Email</th><th>When</th><th>From</th><th>What It Does</th><th>Code</th></tr>
   <tr>
-    <td><strong>Creator Weekly Digest</strong><br><span class="badge b-creator">Creator</span></td>
+    <td><strong>Creator Email Digest</strong><br><span class="badge b-internal">Internal</span></td>
     <td><span class="schedule">Mon 3 AM CT</span></td>
-    <td class="from">TDI Creator Studio<br>notifications@</td>
-    <td>Weekly progress digest for active creators</td>
+    <td class="from">TDI Creator Studio<br>notifications@<br>to Bella, cc team</td>
+    <td>Goes to Bella, not to creators. Summarizes every creator email sent in the past week, both directions.</td>
     <td><code>cron/creator-email-digest</code></td>
   </tr>
   <tr>
     <td><strong>Creator First Week</strong><br><span class="badge b-creator">Creator</span></td>
     <td><span class="schedule">Daily 4:30 AM CT</span></td>
     <td class="from">Bella from TDI<br>creatorstudio@</td>
-    <td>Day 1-7 onboarding drip for new creators</td>
+    <td>One email, sent once, 3 to 10 days after a creator joins. Skipped if they have already completed a milestone.</td>
     <td><code>cron/creator-first-week</code></td>
   </tr>
   <tr>
@@ -226,15 +226,15 @@
   <tr>
     <td><strong>Creator Re-engagement</strong><br><span class="badge b-creator">Creator</span></td>
     <td><span class="schedule">Daily 5 AM CT</span></td>
-    <td class="from">TDI Creator Studio<br>notifications@</td>
-    <td>7-step sequence for stalled/inactive creators</td>
+    <td class="from">Bella from TDI Creator Studio<br>creatorstudio@<br>reply-to bella@</td>
+    <td>7 notes over 6 weeks for creators with no portal activity in 15+ days. Cancels the moment they return. Note 7 pauses the account.</td>
     <td><code>cron/creator-reengagement</code></td>
   </tr>
   <tr>
     <td><strong>Creator Reminders</strong><br><span class="badge b-creator">Creator</span></td>
     <td><span class="schedule">Daily 4 AM CT</span></td>
     <td class="from">TDI Creator Studio<br>notifications@</td>
-    <td>Milestone deadline reminders for active creators</td>
+    <td>Launch date countdown at 60, 30, 14, 7 and 3 days out. Nothing to do with milestones. Reads target_completion_date, falling back to projected_completion_date.</td>
     <td><code>cron/creator-reminders</code></td>
   </tr>
 </table>
