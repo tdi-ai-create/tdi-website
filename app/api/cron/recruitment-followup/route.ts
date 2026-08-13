@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
-import { recruitmentRevisitDue } from '@/lib/creator-slack'
+import { recruitmentRevisitDue, recruitmentFollowUpDigest, type FollowUpItem } from '@/lib/creator-slack'
 
 /**
  * Recruitment Follow-up Cron -- runs daily via Vercel cron.
@@ -41,6 +41,11 @@ export async function GET(request: NextRequest) {
       revisits_resurfaced: 0,
     }
 
+    // Collected so Bella gets one digest instead of silence.
+    const dueNow: FollowUpItem[] = []
+    const revisitItems: FollowUpItem[] = []
+    const closedOut: FollowUpItem[] = []
+
     // ─── Follow-ups for outreach_sent candidates ───
     const { data: outreachCandidates } = await supabase
       .from('creator_recruitment_candidates')
@@ -66,6 +71,11 @@ export async function GET(request: NextRequest) {
           note_type: 'stage_change',
         })
 
+        closedOut.push({
+          name: candidate.name,
+          days: daysSinceSend,
+          note: `moved to no response after ${daysSinceSend} days`,
+        })
         results.auto_archived++
         continue
       }
@@ -84,6 +94,11 @@ export async function GET(request: NextRequest) {
           note_type: 'follow_up',
         })
 
+        dueNow.push({
+          name: candidate.name,
+          days: daysSinceSend,
+          note: `second follow up, ${daysSinceSend} days and no reply, try another angle`,
+        })
         results.follow_up_2++
         continue
       }
@@ -102,6 +117,11 @@ export async function GET(request: NextRequest) {
           note_type: 'follow_up',
         })
 
+        dueNow.push({
+          name: candidate.name,
+          days: daysSinceSend,
+          note: `first follow up, ${daysSinceSend} days since outreach`,
+        })
         results.follow_up_1++
       }
     }
@@ -135,7 +155,15 @@ export async function GET(request: NextRequest) {
         recruitmentRevisitDue(candidate.name, reason).catch(() => {})
       } catch {}
 
+      revisitItems.push({ name: candidate.name, days: 0, note: reason })
       results.revisits_resurfaced++
+    }
+
+    // One consolidated message. Nothing due means nothing sent.
+    try {
+      await recruitmentFollowUpDigest(dueNow, revisitItems, closedOut)
+    } catch (err) {
+      console.error('[recruitment-followup] Digest failed:', err)
     }
 
     console.log('[recruitment-followup] Results:', results)
