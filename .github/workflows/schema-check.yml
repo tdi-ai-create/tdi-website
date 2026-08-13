@@ -1,0 +1,35 @@
+name: Schema Check
+
+# Catches queries that name a table or column which does not exist. Those fail
+# at runtime with PostgREST 42703/404, and because the calling code usually
+# discards `error`, the feature just renders nothing. That class of bug shipped
+# repeatedly and went unnoticed for a long time, including a course-completion
+# flow that never once recorded a completed lesson.
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  schema-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Check for schema drift
+        env:
+          NEXT_PUBLIC_LEARNING_HUB_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_LEARNING_HUB_SUPABASE_URL }}
+          LEARNING_HUB_SUPABASE_SERVICE_KEY: ${{ secrets.LEARNING_HUB_SUPABASE_SERVICE_KEY }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: node scripts/check-schema.mjs
