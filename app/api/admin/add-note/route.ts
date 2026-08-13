@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { notifyCreatorOfNote } from '@/lib/creator-note-notify';
 
 export async function POST(request: NextRequest) {
   try {
@@ -62,77 +63,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Send email notification if note is visible to creator
+    // Notify the creator only when the note is actually visible to them.
+    let emailed = false;
+    let emailError: string | null = null;
     if (visibleToCreator !== false) {
-      const resendApiKey = process.env.RESEND_API_KEY;
-
-      if (resendApiKey && creator.email) {
-        // Get creator's first name
-        const firstName = creator.name.split(' ')[0];
-
-        try {
-          const emailResponse = await fetch('https://api.resend.com/emails', {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${resendApiKey}`,
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              from: 'TDI Creator Studio <notifications@teachersdeserveit.com>',
-              to: [creator.email],
-              cc: ['creatorstudio@teachersdeserveit.com', 'bella@teachersdeserveit.com'],
-              subject: 'Creator Studio | New note from your team!',
-              html: `
-                <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
-                  <h2 style="color: #1e2749;">Hi ${firstName}! 👋</h2>
-
-                  <p style="font-size: 16px; color: #333; line-height: 1.6;">
-                    The TDI team has added a new note to your Creator Studio profile.
-                    Log in to review it and keep moving forward on your journey!
-                  </p>
-
-                  <div style="text-align: center; margin: 32px 0;">
-                    <a href="https://www.teachersdeserveit.com/creator-portal/dashboard"
-                       style="display: inline-block; background: #1e2749; color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: 600;">
-                      View My Creator Studio →
-                    </a>
-                  </div>
-
-                  <p style="color: #666; font-size: 14px; line-height: 1.6;">
-                    Questions? Simply reply to this email and we'll get back to you.
-                  </p>
-
-                  <p style="color: #666; font-size: 14px; margin-top: 24px;">
-                    — The TDI Team
-                  </p>
-                </div>
-              `,
-            }),
-          });
-
-          if (emailResponse.ok) {
-            console.log('[add-note] Email notification sent to', creator.email);
-          } else {
-            const emailError = await emailResponse.json();
-            console.error('[add-note] Email send failed:', emailError);
-          }
-        } catch (emailErr) {
-          console.error('[add-note] Email error:', emailErr);
-        }
-
-        // Log to admin_notifications for audit trail
-        await supabase
-          .from('admin_notifications')
-          .insert({
-            creator_id: creatorId,
-            type: 'note_added',
-            message: `Note added by ${createdBy} (creator notified via email)`,
-            link: `/admin/creators/${creatorId}`,
-          });
-      }
+      const notified = await notifyCreatorOfNote(supabase, creatorId, {
+        source: 'add-note',
+        actor: createdBy,
+      });
+      emailed = notified.sent;
+      emailError = notified.reason ?? null;
     }
 
-    return NextResponse.json({ success: true, note: newNote });
+    return NextResponse.json({ success: true, note: newNote, emailed, email_error: emailError });
   } catch (error) {
     console.error('[add-note] Unexpected error:', error);
     return NextResponse.json(

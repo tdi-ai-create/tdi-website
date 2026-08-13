@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServiceSupabase } from '@/lib/supabase'
+import { notifyCreatorOfNote } from '@/lib/creator-note-notify'
 
 /**
  * Admin API for managing creator draft notes (Anne Marie's check-in notes)
  *
  * GET ?status=pending_approval -- list notes waiting for Bella's review
- * POST { action: 'approve', note_id: '...' } -- approve and make visible to creator
+ * POST { action: 'approve', note_id: '...' } -- approve, publish, and email the creator
  * POST { action: 'reject', note_id: '...' } -- reject the draft
- * POST { action: 'approve_edited', note_id: '...', content: '...' } -- edit and approve
+ * POST { action: 'approve_edited', note_id: '...', content: '...' } -- edit, publish, and email
  */
 
 export async function GET(request: NextRequest) {
@@ -46,39 +47,51 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   const body = await request.json()
-  const { action, note_id } = body
+  const { action, note_id, approved_by } = body
   const supabase = getServiceSupabase()
 
   if (!note_id) return NextResponse.json({ error: 'note_id required' }, { status: 400 })
 
-  if (action === 'approve') {
-    const { error } = await supabase
-      .from('creator_notes')
-      .update({
-        draft_status: 'approved',
-        visible_to_creator: true,
-      })
-      .eq('id', note_id)
-
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-    return NextResponse.json({ success: true })
-  }
-
-  if (action === 'approve_edited') {
+  if (action === 'approve' || action === 'approve_edited') {
     const { content } = body
-    if (!content) return NextResponse.json({ error: 'content required for edited approval' }, { status: 400 })
+    if (action === 'approve_edited' && !content) {
+      return NextResponse.json({ error: 'content required for edited approval' }, { status: 400 })
+    }
 
-    const { error } = await supabase
+    // Scope the update to notes still awaiting approval so a double click cannot
+    // publish twice and email the creator twice.
+    const { data: note, error } = await supabase
       .from('creator_notes')
       .update({
-        content,
-        draft_status: 'approved',
+        ...(action === 'approve_edited' ? { content } : {}),
+        draft_status: 'published',
         visible_to_creator: true,
       })
       .eq('id', note_id)
+      .eq('draft_status', 'pending_approval')
+      .select('id, creator_id')
+      .single()
 
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-    return NextResponse.json({ success: true })
+    if (error || !note) {
+      return NextResponse.json(
+        { error: error?.message || 'Draft not found or already approved' },
+        { status: 404 }
+      )
+    }
+
+    const notified = await notifyCreatorOfNote(supabase, note.creator_id, {
+      source: 'creator-notes-approve',
+      actor: approved_by,
+    })
+
+    // The note is published either way. Report the email outcome so the admin
+    // knows to follow up by hand rather than assuming it went out.
+    return NextResponse.json({
+      success: true,
+      note_id: note.id,
+      emailed: notified.sent,
+      email_error: notified.reason ?? null,
+    })
   }
 
   if (action === 'reject') {

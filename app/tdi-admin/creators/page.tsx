@@ -1811,6 +1811,60 @@ export default function CreatorStudioPage() {
   // Copy button states for "Copied!" feedback
   const [copiedSection, setCopiedSection] = useState<string | null>(null);
 
+  /**
+   * Approve, edit-and-approve, or reject one of Anne Marie's draft notes.
+   *
+   * Approving publishes the note and emails the creator. Only drop the note
+   * from the queue when the server confirms it, and say plainly whether the
+   * email went out, since a published note nobody was told about is the exact
+   * failure this queue is meant to prevent.
+   */
+  const handleDraftNoteAction = async (
+    note: { id: string; creator_name?: string },
+    action: 'approve' | 'approve_edited' | 'reject',
+    content?: string
+  ) => {
+    setNoteActionLoading(note.id);
+    try {
+      const res = await fetch('/api/admin/creator-notes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action,
+          note_id: note.id,
+          approved_by: adminEmail || 'admin',
+          ...(content !== undefined ? { content } : {}),
+        }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        showToast(data.error || 'Could not update this note', 'error');
+        return;
+      }
+
+      setDraftNotes(prev => prev.filter(n => n.id !== note.id));
+      setEditingNoteId(null);
+
+      const who = note.creator_name || 'the creator';
+      if (action === 'reject') {
+        showToast('Draft rejected');
+      } else if (data.emailed) {
+        showToast(`Note published and ${who} was emailed`);
+      } else {
+        showToast(
+          `Note published, but the email to ${who} did not send: ${data.email_error || 'unknown error'}. Reach out directly.`,
+          'error'
+        );
+      }
+    } catch (err) {
+      console.error(err);
+      showToast('Network error', 'error');
+    } finally {
+      setNoteActionLoading(null);
+    }
+  };
+
   // Copy emails to clipboard helper
   const handleCopyEmails = async (emails: string[], sectionId: string) => {
     if (emails.length === 0) return;
@@ -2679,19 +2733,7 @@ export default function CreatorStudioPage() {
                         {editingNoteId === note.id ? (
                           <>
                             <button
-                              onClick={async () => {
-                                setNoteActionLoading(note.id);
-                                try {
-                                  await fetch('/api/admin/creator-notes', {
-                                    method: 'POST',
-                                    headers: { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify({ action: 'approve_edited', note_id: note.id, content: editedNoteContent }),
-                                  });
-                                  setDraftNotes(prev => prev.filter(n => n.id !== note.id));
-                                  setEditingNoteId(null);
-                                } catch (err) { console.error(err); }
-                                finally { setNoteActionLoading(null); }
-                              }}
+                              onClick={() => handleDraftNoteAction(note, 'approve_edited', editedNoteContent)}
                               disabled={noteActionLoading === note.id}
                               className="px-3 py-1.5 text-xs font-medium rounded-lg text-white transition-colors disabled:opacity-50"
                               style={{ backgroundColor: '#16a34a' }}
@@ -2705,23 +2747,12 @@ export default function CreatorStudioPage() {
                         ) : (
                           <>
                             <button
-                              onClick={async () => {
-                                setNoteActionLoading(note.id);
-                                try {
-                                  await fetch('/api/admin/creator-notes', {
-                                    method: 'POST',
-                                    headers: { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify({ action: 'approve', note_id: note.id }),
-                                  });
-                                  setDraftNotes(prev => prev.filter(n => n.id !== note.id));
-                                } catch (err) { console.error(err); }
-                                finally { setNoteActionLoading(null); }
-                              }}
+                              onClick={() => handleDraftNoteAction(note, 'approve')}
                               disabled={noteActionLoading === note.id}
                               className="px-3 py-1.5 text-xs font-medium rounded-lg text-white transition-colors disabled:opacity-50"
                               style={{ backgroundColor: '#16a34a' }}
                             >
-                              Approve
+                              {noteActionLoading === note.id ? 'Sending...' : 'Approve & Send'}
                             </button>
                             <button
                               onClick={() => { setEditingNoteId(note.id); setEditedNoteContent(note.content || ''); }}
@@ -2730,18 +2761,7 @@ export default function CreatorStudioPage() {
                               Edit
                             </button>
                             <button
-                              onClick={async () => {
-                                setNoteActionLoading(note.id);
-                                try {
-                                  await fetch('/api/admin/creator-notes', {
-                                    method: 'POST',
-                                    headers: { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify({ action: 'reject', note_id: note.id }),
-                                  });
-                                  setDraftNotes(prev => prev.filter(n => n.id !== note.id));
-                                } catch (err) { console.error(err); }
-                                finally { setNoteActionLoading(null); }
-                              }}
+                              onClick={() => handleDraftNoteAction(note, 'reject')}
                               disabled={noteActionLoading === note.id}
                               className="px-3 py-1.5 text-xs font-medium rounded-lg text-red-600 bg-red-50 hover:bg-red-100 transition-colors disabled:opacity-50"
                             >
