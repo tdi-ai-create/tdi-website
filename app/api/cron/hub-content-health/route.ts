@@ -231,6 +231,59 @@ export async function GET() {
     issues.push(`QA bypass check failed: ${String(err)}`);
   }
 
+  // Check 5d: pipeline heartbeat.
+  //
+  // The hardest failure to notice is absence of output. Nothing was created
+  // between Aug 5 and Aug 13 and nothing was published in that window either,
+  // and not one alert said so, because every check here asked "is what exists
+  // broken" and none asked "is anything still arriving". Fifteen finished Quick
+  // Wins sat invisible for eight days inside that blind spot.
+  //
+  // Silence is a failure signal. Treat it as one.
+  const CREATE_SILENCE_DAYS = 7;
+  const PUBLISH_SILENCE_DAYS = 10;
+
+  try {
+    const { data: latest, error } = await supabase
+      .from('hub_quick_wins')
+      .select('created_at')
+      .order('created_at', { ascending: false })
+      .limit(1);
+
+    const { data: lastPub, error: pubErr } = await supabase
+      .from('hub_quick_wins')
+      .select('updated_at')
+      .eq('is_published', true)
+      .order('updated_at', { ascending: false })
+      .limit(1);
+
+    if (error || pubErr) {
+      issues.push(`Pipeline heartbeat check failed: ${error?.message || pubErr?.message}`);
+    } else {
+      const daysSince = (iso?: string) =>
+        iso ? Math.floor((Date.now() - new Date(iso).getTime()) / 86_400_000) : null;
+
+      const sinceCreate = daysSince(latest?.[0]?.created_at);
+      const sincePublish = daysSince(lastPub?.[0]?.updated_at);
+
+      if (sinceCreate !== null && sinceCreate >= CREATE_SILENCE_DAYS) {
+        issues.push(
+          `CRITICAL: No new Quick Win has been created in ${sinceCreate} days. ` +
+          `The content pipeline has stopped producing. Check that Jasmine is running and that ` +
+          `Paperclip is not degraded.`
+        );
+      }
+      if (sincePublish !== null && sincePublish >= PUBLISH_SILENCE_DAYS) {
+        issues.push(
+          `CRITICAL: Nothing has been published to the Hub in ${sincePublish} days. ` +
+          `Either nothing is being produced, or finished content is not making it through QA.`
+        );
+      }
+    }
+  } catch (err) {
+    issues.push(`Pipeline heartbeat check failed: ${String(err)}`);
+  }
+
   // Check 6: Clean up video staging files older than 1 hour
   let stagingCleaned = 0;
   try {
@@ -258,12 +311,75 @@ export async function GET() {
     console.error('[hub-content-health] Staging cleanup error:', err);
   }
 
-  // If no issues, all good
+  // If no issues, all good. Clear any open alert state so a problem that comes
+  // back later is correctly reported as new rather than resuming an old streak.
   if (issues.length === 0) {
+    await supabase.from('hub_alert_state').delete().eq('source', 'hub-content-health');
     return NextResponse.json({
       status: 'healthy',
       message: 'All Hub content checks passed',
       stagingCleaned,
+      timestamp,
+    });
+  }
+
+  // Escalation state.
+  //
+  // The previous version mailed the same text every morning for seven days.
+  // Identical daily mail reads as noise and gets ignored, which is exactly what
+  // happened. Same problem now escalates and backs off instead of repeating:
+  // days 1, 2 and 3, then every third day, with the subject carrying the age.
+  const fingerprint = issues
+    .map(i => i.replace(/\d+/g, '#').slice(0, 200))
+    .sort()
+    .join('||');
+
+  let daysOpen = 0;
+  let shouldSend = true;
+
+  try {
+    const { data: prior } = await supabase
+      .from('hub_alert_state')
+      .select('first_seen, send_count')
+      .eq('fingerprint', fingerprint)
+      .maybeSingle();
+
+    if (prior) {
+      daysOpen = Math.floor((Date.now() - new Date(prior.first_seen).getTime()) / 86_400_000);
+      // Days 0,1,2 always send. After that, every third day.
+      shouldSend = daysOpen < 3 || daysOpen % 3 === 0;
+
+      await supabase
+        .from('hub_alert_state')
+        .update({
+          last_seen: timestamp,
+          ...(shouldSend ? { last_sent: timestamp, send_count: prior.send_count + 1 } : {}),
+        })
+        .eq('fingerprint', fingerprint);
+    } else {
+      // New problem. Retire any previous fingerprint for this source so the
+      // changed alert does not inherit a stale age.
+      await supabase.from('hub_alert_state').delete().eq('source', 'hub-content-health');
+      await supabase.from('hub_alert_state').insert({
+        fingerprint,
+        source: 'hub-content-health',
+        first_seen: timestamp,
+        last_seen: timestamp,
+        last_sent: timestamp,
+        send_count: 1,
+        sample: issues[0]?.slice(0, 500) || null,
+      });
+    }
+  } catch (err) {
+    console.error('[hub-content-health] Alert state error, sending anyway:', err);
+  }
+
+  if (!shouldSend) {
+    return NextResponse.json({
+      status: 'unhealthy',
+      suppressed: true,
+      reason: `Same issues as ${daysOpen} days ago. Next send on day ${daysOpen + (3 - (daysOpen % 3))}.`,
+      issues,
       timestamp,
     });
   }
@@ -273,14 +389,21 @@ export async function GET() {
   if (resendKey) {
     const resend = new Resend(resendKey);
     const hasCritical = issues.some(i => i.includes('CRITICAL'));
+    const age = daysOpen > 0 ? ` (UNRESOLVED ${daysOpen} DAYS)` : '';
 
     await resend.emails.send({
       from: 'TDI Admin <noreply@teachersdeserveit.com>',
       to: ['Rae@teachersdeserveit.com'],
-      subject: `${hasCritical ? 'CRITICAL' : 'WARNING'}: Hub Content Health Check Failed`,
+      subject: `${hasCritical ? 'CRITICAL' : 'WARNING'}${age}: Hub Content Health Check Failed`,
       html: `
         <h2>Hub Content Health Check ${hasCritical ? 'CRITICAL' : 'WARNING'}</h2>
         <p><strong>Time:</strong> ${timestamp}</p>
+        ${daysOpen > 0 ? `
+        <p style="background:#fef2f2;border-left:4px solid #dc2626;padding:10px 14px;margin:12px 0;">
+          <strong>This has been unresolved for ${daysOpen} day${daysOpen === 1 ? '' : 's'}.</strong>
+          It was first detected on ${new Date(Date.now() - daysOpen * 86_400_000).toISOString().slice(0, 10)}
+          and has not cleared since.
+        </p>` : ''}
         <h3>Issues Found:</h3>
         <ul>
           ${issues.map(i => `<li style="color: ${i.includes('CRITICAL') ? '#dc2626' : '#d97706'}; margin-bottom: 8px;">${i}</li>`).join('')}
@@ -289,6 +412,7 @@ export async function GET() {
         <p style="color:#71717a;font-size:12px;">
           From hub-content-health cron. Check the Learning Hub Supabase project
           and RLS policies if content has disappeared.
+          ${daysOpen >= 3 ? 'This alert now sends every third day while it stays unresolved, so it does not become background noise.' : ''}
         </p>
       `,
     }).catch(err => console.error('[hub-content-health] Failed to send alert:', err));
@@ -296,6 +420,7 @@ export async function GET() {
 
   return NextResponse.json({
     status: 'unhealthy',
+    daysOpen,
     issues,
     timestamp,
   });
