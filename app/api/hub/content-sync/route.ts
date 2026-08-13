@@ -14,10 +14,86 @@ export const maxDuration = 60
  * - Update an existing draft (update_draft)
  * - Upload a PDF resource (upload_pdf)
  * - Upload a thumbnail image (upload_thumbnail)
+ * - Record that QA passed (mark_reviewed)  <- required before publish
  * - Publish a Quick Win (publish)
  *
  * Auth: Bearer token via PAPERCLIP_SYNC_KEY env var
  */
+
+// Canonical vocabularies. The Hub matches both case-sensitively:
+// lift drives the capacity badge (quick-wins/page.tsx), domains drive filtering.
+// A value outside these sets does not error, it just silently renders nothing,
+// which is how 21 Quick Wins shipped with a blank lift badge.
+const VALID_LIFT = ['LOW', 'MED', 'HIGH'] as const
+const VALID_DOMAINS = ['1-planning', '2-environment', '3-instruction', '4-professional'] as const
+
+export type QuickWinRow = {
+  title: string | null
+  description: string | null
+  category: string | null
+  lift: string | null
+  quick_win_type: string | null
+  topic_tags: string[] | null
+  roles: string[] | null
+  danielson_domains: string[] | null
+  file_url: string | null
+  tool_file_url: string | null
+}
+
+/**
+ * Julie Lynn's mechanical QA checklist, in code.
+ *
+ * These mirror the database trigger in migration 109 exactly. Enforcing them here
+ * too means QA sees the whole list in one response instead of hitting exceptions
+ * one at a time. The trigger remains the real backstop for direct writes.
+ *
+ * The judgment half of QA (is the content any good, is the tool actually usable)
+ * stays with Julie Lynn. This only covers what a machine can verify.
+ */
+export function qaBlockers(qw: QuickWinRow): string[] {
+  const out: string[] = []
+  const nonEmpty = (a: unknown): a is string[] => Array.isArray(a) && a.length > 0
+
+  if (!qw.title?.trim()) out.push('title is required')
+  if (!qw.description?.trim()) out.push('description is required')
+  if (!qw.category) out.push('category is required')
+  if (!qw.quick_win_type) out.push('quick_win_type is required')
+  if (!nonEmpty(qw.roles)) out.push('at least one role is required')
+
+  if (!nonEmpty(qw.topic_tags)) {
+    out.push('at least 2 topic_tags are required')
+  } else {
+    if (qw.topic_tags.length < 2) out.push(`at least 2 topic_tags are required (has ${qw.topic_tags.length})`)
+    if (qw.topic_tags.includes('general')) out.push('topic_tag "general" is not allowed, it breaks Browse by Topic')
+  }
+
+  if (!qw.lift) {
+    out.push('lift is required')
+  } else if (!VALID_LIFT.includes(qw.lift as typeof VALID_LIFT[number])) {
+    out.push(`lift must be exactly one of ${VALID_LIFT.join(', ')} (got "${qw.lift}"). The badge renders blank otherwise.`)
+  }
+
+  if (!nonEmpty(qw.danielson_domains)) {
+    out.push('at least one danielson_domain is required')
+  } else {
+    const bad = qw.danielson_domains.filter(d => !VALID_DOMAINS.includes(d as typeof VALID_DOMAINS[number]))
+    if (bad.length > 0) {
+      out.push(`danielson_domains must use ${VALID_DOMAINS.join(', ')} (got ${bad.join(', ')})`)
+    }
+  }
+
+  // Downloads ship two PDFs: the guide explains, the tool is what gets printed.
+  // Quizzes render "Take Quiz" off file_url and fall back to a placeholder without it.
+  // Games and activities are interactive and need neither.
+  if (qw.quick_win_type === 'download') {
+    if (!qw.file_url) out.push('download type requires a guide PDF (file_url)')
+    if (!qw.tool_file_url) out.push('download type requires a tool PDF (tool_file_url), run generate_tool')
+  } else if (qw.quick_win_type === 'quiz' && !qw.file_url) {
+    out.push('quiz type requires file_url, otherwise the page shows "Quiz coming soon"')
+  }
+
+  return out
+}
 
 function db() {
   const url = process.env.LEARNING_HUB_SUPABASE_URL || process.env.NEXT_PUBLIC_LEARNING_HUB_SUPABASE_URL
@@ -313,9 +389,56 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: true, thumbnail_url: thumbnailUrl })
     }
 
+    // ── mark_reviewed: record that QA passed. Required before publish. ──
+    if (action === 'mark_reviewed') {
+      const { id, reviewed_by, notes } = body
+
+      if (!id) return NextResponse.json({ error: 'id is required' }, { status: 400 })
+      if (!reviewed_by?.trim()) {
+        return NextResponse.json({ error: 'reviewed_by is required (who ran QA)' }, { status: 400 })
+      }
+
+      const { data: qw, error: fetchErr } = await supabase
+        .from('hub_quick_wins')
+        .select('*')
+        .eq('id', id)
+        .single()
+
+      if (fetchErr || !qw) return NextResponse.json({ error: 'Quick Win not found' }, { status: 404 })
+      if (qw.is_published) {
+        return NextResponse.json({ error: 'Quick Win is already published' }, { status: 400 })
+      }
+
+      // Run the same mechanical checks the publish gate enforces, so QA gets the
+      // full list up front instead of discovering them one exception at a time.
+      const blockers = qaBlockers(qw as QuickWinRow)
+      if (blockers.length > 0) {
+        return NextResponse.json({ success: false, blockers }, { status: 400 })
+      }
+
+      const { error: reviewErr } = await supabase
+        .from('hub_quick_wins')
+        .update({
+          status: 'reviewed',
+          reviewed_by: reviewed_by.trim(),
+          reviewed_at: new Date().toISOString(),
+          qa_notes: notes?.trim() || null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', id)
+
+      if (reviewErr) return NextResponse.json({ error: reviewErr.message }, { status: 500 })
+
+      return NextResponse.json({ success: true, id, slug: qw.slug, status: 'reviewed' })
+    }
+
     // ── publish: validate and publish a Quick Win ──
+    //
+    // QA is a precondition. The item must have passed mark_reviewed first, or the
+    // caller must supply an explicit override reason. Overrides are stored on the
+    // row and reported by the daily health check so a bypass is never silent.
     if (action === 'publish') {
-      const { id } = body
+      const { id, force, reason, published_by } = body
 
       if (!id) return NextResponse.json({ error: 'id is required' }, { status: 400 })
 
@@ -331,16 +454,24 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: 'Quick Win is already published' }, { status: 400 })
       }
 
-      // Validate all required fields before publishing
-      const missing: string[] = []
-      if (!qw.title?.trim()) missing.push('title')
-      if (!qw.description?.trim()) missing.push('description')
-      if (!Array.isArray(qw.topic_tags) || qw.topic_tags.length === 0) missing.push('topic_tags')
-      if (!Array.isArray(qw.roles) || qw.roles.length === 0) missing.push('roles')
-      if (!qw.file_url) missing.push('file_url')
+      if (force && !reason?.trim()) {
+        return NextResponse.json(
+          { error: 'Publishing without QA requires a written reason. Pass { force: true, reason: "..." }' },
+          { status: 400 }
+        )
+      }
 
-      if (missing.length > 0) {
-        return NextResponse.json({ success: false, missing }, { status: 400 })
+      if (!force && qw.status !== 'reviewed') {
+        return NextResponse.json({
+          success: false,
+          error: `QA has not passed. Status is "${qw.status}", expected "reviewed". ` +
+                 `Call action mark_reviewed first, or pass { force: true, reason: "..." } to publish anyway.`,
+        }, { status: 400 })
+      }
+
+      const blockers = qaBlockers(qw as QuickWinRow)
+      if (blockers.length > 0) {
+        return NextResponse.json({ success: false, blockers }, { status: 400 })
       }
 
       const { error: publishErr } = await supabase
@@ -348,6 +479,8 @@ export async function POST(request: NextRequest) {
         .update({
           is_published: true,
           status: 'published',
+          published_by: published_by?.trim() || (force ? 'override' : qw.reviewed_by) || null,
+          qa_override_reason: force ? reason.trim() : null,
           updated_at: new Date().toISOString(),
         })
         .eq('id', id)
@@ -357,7 +490,7 @@ export async function POST(request: NextRequest) {
       // The database trigger auto_seed_community (migration 104) will
       // automatically create 5 role-aware community posts
 
-      return NextResponse.json({ success: true, id, slug: qw.slug })
+      return NextResponse.json({ success: true, id, slug: qw.slug, qa_bypassed: !!force })
     }
 
     return NextResponse.json({ error: `Unknown action: ${action}` }, { status: 400 })
