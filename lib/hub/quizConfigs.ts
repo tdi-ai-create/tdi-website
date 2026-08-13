@@ -73,7 +73,7 @@ export const educatorTypeQuiz: QuizConfig = {
       key: 'connector',
       title: 'The Connector',
       subtitle: 'Relationships first, always.',
-      description: 'You know every kid by name, their dog by name, and what they had for breakfast. You build trust before you build lessons. Students remember you long after they forget the content -- and that is the point.',
+      description: 'You know every kid by name, their dog by name, and what they had for breakfast. You build trust before you build lessons. Students remember you long after they forget the content, and that is the point.',
       color: '#2A9D8F',
       bg: '#D1FAE5',
       icon: 'C',
@@ -100,7 +100,7 @@ export const educatorTypeQuiz: QuizConfig = {
       key: 'spark',
       title: 'The Spark',
       subtitle: 'Energy. You bring it every day.',
-      description: 'Your students do not know how you do it and honestly neither do you. You make hard things feel possible and boring things feel interesting. The room changes when you walk in -- and everyone knows it.',
+      description: 'Your students do not know how you do it and honestly neither do you. You make hard things feel possible and boring things feel interesting. The room changes when you walk in, and everyone knows it.',
       color: '#D97706',
       bg: '#FEF3C7',
       icon: 'S',
@@ -130,7 +130,7 @@ export const educatorTypeQuiz: QuizConfig = {
       answers: [
         { text: 'Build a system to integrate it into what I already do', types: ['architect', 'strategist'] },
         { text: 'Think about how it will affect my students and talk to them about it', types: ['connector', 'anchor'] },
-        { text: 'Get excited -- this could be interesting if I put my spin on it', types: ['innovator', 'spark'] },
+        { text: 'Get excited. This could be interesting if I put my spin on it', types: ['innovator', 'spark'] },
         { text: 'Figure out the real goal behind it and find the most efficient path', types: ['strategist', 'architect'] },
       ],
     },
@@ -139,8 +139,8 @@ export const educatorTypeQuiz: QuizConfig = {
       answers: [
         { text: 'Create a structured plan with checkpoints to get them back on track', types: ['architect'] },
         { text: 'Sit with them and ask what is going on outside of school', types: ['connector'] },
-        { text: 'Try a completely different approach -- maybe what worked before is not working now', types: ['innovator'] },
-        { text: 'Be the calm in their storm -- show up consistently so they know someone is in their corner', types: ['anchor'] },
+        { text: 'Try a completely different approach, maybe what worked before is not working now', types: ['innovator'] },
+        { text: 'Be the calm in their storm. Show up consistently so they know someone is in their corner', types: ['anchor'] },
       ],
     },
     {
@@ -163,7 +163,7 @@ export const educatorTypeQuiz: QuizConfig = {
     },
   ],
   shareMessage: (title, subtitle) =>
-    `I just took the TDI Educator Quiz and I am "${title}" -- ${subtitle} What kind of educator are you? Find out at teachersdeserveit.com/hub`,
+    `I just took the TDI Educator Quiz and I am "${title}". ${subtitle} What kind of educator are you? Find out at teachersdeserveit.com/hub`,
 }
 
 // ── 2. What's Your Classroom Superpower? ──────────────────────────────
@@ -184,7 +184,7 @@ export const superpowerQuiz: QuizConfig = {
       key: 'calm_force',
       title: 'The Calm Force',
       subtitle: 'You de-escalate without even trying.',
-      description: 'When things get chaotic, something about your presence brings the temperature down. Students feel it. Colleagues feel it. You do not raise your voice -- you do not have to. Your calm is the most powerful tool in the room.',
+      description: 'When things get chaotic, something about your presence brings the temperature down. Students feel it. Colleagues feel it. You do not raise your voice. You do not have to. Your calm is the most powerful tool in the room.',
       color: '#2563EB',
       bg: '#DBEAFE',
       icon: 'C',
@@ -202,7 +202,7 @@ export const superpowerQuiz: QuizConfig = {
       key: 'translator',
       title: 'The Translator',
       subtitle: 'You make hard things make sense.',
-      description: 'Complex ideas, confusing instructions, abstract concepts -- you break them down so every kid gets it. You find the analogy, the visual, the story that clicks. Understanding is your superpower.',
+      description: 'Complex ideas, confusing instructions, abstract concepts. You break them down so every kid gets it. You find the analogy, the visual, the story that clicks. Understanding is your superpower.',
       color: '#059669',
       bg: '#D1FAE5',
       icon: 'T',
@@ -211,7 +211,7 @@ export const superpowerQuiz: QuizConfig = {
       key: 'safe_place',
       title: 'The Safe Place',
       subtitle: 'Kids tell you things they do not tell anyone.',
-      description: 'Your classroom is the room where kids exhale. They trust you because you have earned it -- not with grand gestures but with a thousand small ones. You are the adult they will remember.',
+      description: 'Your classroom is the room where kids exhale. They trust you because you have earned it, not with grand gestures but with a thousand small ones. You are the adult they will remember.',
       color: '#7C3AED',
       bg: '#F3E8FF',
       icon: 'S',
@@ -220,7 +220,7 @@ export const superpowerQuiz: QuizConfig = {
       key: 'improviser',
       title: 'The Improviser',
       subtitle: 'Plan B is always better than Plan A.',
-      description: 'The projector breaks, a fire drill interrupts, half the class is absent -- and you pivot without missing a beat. You think on your feet and somehow the unplanned moments become the best ones.',
+      description: 'The projector breaks, a fire drill interrupts, half the class is absent, and you pivot without missing a beat. You think on your feet and somehow the unplanned moments become the best ones.',
       color: '#D97706',
       bg: '#FEF3C7',
       icon: 'I',
@@ -232,25 +232,25 @@ export const superpowerQuiz: QuizConfig = {
       answers: [
         { text: 'Calmly reset the room and pick up right where we left off', types: ['calm_force'] },
         { text: 'Turn it into a joke and use the energy to launch something fun', types: ['hype_machine'] },
-        { text: 'Use it as a teachable moment -- connect it to whatever we were learning', types: ['translator'] },
+        { text: 'Use it as a teachable moment. Connect it to whatever we were learning', types: ['translator'] },
         { text: 'Check in on the kids who look rattled before doing anything else', types: ['safe_place'] },
       ],
     },
     {
       question: 'A kid says "I don\'t get it" for the third time. You...',
       answers: [
-        { text: 'Stay patient -- lower my voice, slow down, try again', types: ['calm_force'] },
-        { text: 'Get dramatic -- act it out, draw it, make it ridiculous until it clicks', types: ['hype_machine'] },
-        { text: 'Find a totally different way to explain it -- maybe a story or a real-world example', types: ['translator'] },
+        { text: 'Stay patient. Lower my voice, slow down, try again', types: ['calm_force'] },
+        { text: 'Get dramatic. Act it out, draw it, make it ridiculous until it clicks', types: ['hype_machine'] },
+        { text: 'Find a totally different way to explain it, maybe a story or a real-world example', types: ['translator'] },
         { text: 'Pull them aside later and figure out what is really going on', types: ['safe_place'] },
       ],
     },
     {
       question: 'Your tech completely fails five minutes into class. You...',
       answers: [
-        { text: 'No stress -- pivot to whiteboard or discussion without skipping a beat', types: ['calm_force', 'improviser'] },
+        { text: 'No stress. Pivot to whiteboard or discussion without skipping a beat', types: ['calm_force', 'improviser'] },
         { text: 'Make it a competition: "Who can solve this without any tech?"', types: ['hype_machine'] },
-        { text: 'Grab a marker and explain it old-school -- honestly sometimes that is better anyway', types: ['translator'] },
+        { text: 'Grab a marker and explain it old-school. Honestly sometimes that is better anyway', types: ['translator'] },
         { text: 'Use the downtime to have a real conversation with the class', types: ['safe_place'] },
       ],
     },
@@ -274,7 +274,7 @@ export const superpowerQuiz: QuizConfig = {
     },
   ],
   shareMessage: (title, subtitle) =>
-    `My classroom superpower is "${title}" -- ${subtitle} What is yours? Find out at teachersdeserveit.com/hub`,
+    `My classroom superpower is "${title}". ${subtitle} What is yours? Find out at teachersdeserveit.com/hub`,
 }
 
 // ── 3. What's Your Professional Growth Style? ─────────────────────────
@@ -313,7 +313,7 @@ export const growthStyleQuiz: QuizConfig = {
       key: 'collaborator',
       title: 'The Collaborator',
       subtitle: 'You grow best with others.',
-      description: 'A book study, a coaching conversation, a team planning session -- that is where you light up. You process by talking, learn by sharing, and your best ideas come from building on someone else\'s. The group is always smarter with you in it.',
+      description: 'A book study, a coaching conversation, a team planning session. That is where you light up. You process by talking, learn by sharing, and your best ideas come from building on someone else\'s. The group is always smarter with you in it.',
       color: '#DB2777',
       bg: '#FCE7F3',
       icon: 'C',
@@ -322,7 +322,7 @@ export const growthStyleQuiz: QuizConfig = {
       key: 'reflector',
       title: 'The Reflector',
       subtitle: 'You learn by looking back.',
-      description: 'You do not just do the thing -- you think about the thing after. Journaling, debriefing, quiet drives home replaying the lesson. You extract more learning from one experience than most people get from five. Your growth is quiet but deep.',
+      description: 'You do not just do the thing. You think about the thing after. Journaling, debriefing, quiet drives home replaying the lesson. You extract more learning from one experience than most people get from five. Your growth is quiet but deep.',
       color: '#7C3AED',
       bg: '#F3E8FF',
       icon: 'R',
@@ -331,7 +331,7 @@ export const growthStyleQuiz: QuizConfig = {
       key: 'self_starter',
       title: 'The Self-Starter',
       subtitle: 'You do not wait for PD day.',
-      description: 'You have a bookmark folder full of articles, a list of things to try, and resources saved for later. You do not need anyone to assign you growth -- you seek it out on your own terms, on your own schedule. You are your own best PD provider.',
+      description: 'You have a bookmark folder full of articles, a list of things to try, and resources saved for later. You do not need anyone to assign you growth. You seek it out on your own terms, on your own schedule. You are your own best PD provider.',
       color: '#D97706',
       bg: '#FEF3C7',
       icon: 'S',
@@ -341,7 +341,7 @@ export const growthStyleQuiz: QuizConfig = {
     {
       question: 'You just heard about a new teaching strategy. What do you do first?',
       answers: [
-        { text: 'Research it -- find the study, read the book, understand the theory', types: ['deep_diver'] },
+        { text: 'Research it. Find the study, read the book, understand the theory', types: ['deep_diver'] },
         { text: 'Try it tomorrow and see what happens', types: ['dabbler'] },
         { text: 'Text a colleague: "Have you heard about this?"', types: ['collaborator'] },
         { text: 'Think about whether it fits with what I already know works', types: ['reflector'] },
@@ -362,13 +362,13 @@ export const growthStyleQuiz: QuizConfig = {
         { text: 'Read or listen to something I have been meaning to get to', types: ['deep_diver', 'self_starter'] },
         { text: 'Browse Pinterest, TikTok, or Instagram for classroom ideas', types: ['dabbler'] },
         { text: 'Meet up with teacher friends to swap stories and ideas', types: ['collaborator'] },
-        { text: 'Journal or just think -- process the week and plan for the next one', types: ['reflector'] },
+        { text: 'Journal or just think. Process the week and plan for the next one', types: ['reflector'] },
       ],
     },
     {
       question: 'A lesson totally flopped. Your next move?',
       answers: [
-        { text: 'Figure out exactly why -- was it the content, the delivery, the timing?', types: ['deep_diver', 'reflector'] },
+        { text: 'Figure out exactly why. Was it the content, the delivery, the timing?', types: ['deep_diver', 'reflector'] },
         { text: 'Scrap it and try something completely different', types: ['dabbler'] },
         { text: 'Talk to a colleague: "Has this happened to you? What did you do?"', types: ['collaborator'] },
         { text: 'Sit with it for a day, then come back with a revised plan', types: ['reflector'] },
@@ -377,15 +377,15 @@ export const growthStyleQuiz: QuizConfig = {
     {
       question: 'When you find a resource you love, you...',
       answers: [
-        { text: 'Go down the rabbit hole -- read everything by that author or creator', types: ['deep_diver'] },
-        { text: 'Save it and move on -- I have 47 other tabs open', types: ['dabbler', 'self_starter'] },
+        { text: 'Go down the rabbit hole. Read everything by that author or creator', types: ['deep_diver'] },
+        { text: 'Save it and move on. I have 47 other tabs open', types: ['dabbler', 'self_starter'] },
         { text: 'Share it immediately with my team or PLC', types: ['collaborator'] },
         { text: 'Come back to it later when I can really sit with it', types: ['reflector'] },
       ],
     },
   ],
   shareMessage: (title, subtitle) =>
-    `My professional growth style is "${title}" -- ${subtitle} What is yours? Find out at teachersdeserveit.com/hub`,
+    `My professional growth style is "${title}". ${subtitle} What is yours? Find out at teachersdeserveit.com/hub`,
 }
 
 // ── 4. What's Your Tech Comfort Zone? ─────────────────────────────────
@@ -406,7 +406,7 @@ export const techComfortQuiz: QuizConfig = {
       key: 'analog_heart',
       title: 'Analog at Heart',
       subtitle: 'Paper, pencils, and real conversations.',
-      description: 'Tech is fine but it is not your thing -- and that is completely okay. Your strength is in the human connection, the handwritten note, the face-to-face moment. Some of the best teaching happens without a screen.',
+      description: 'Tech is fine but it is not your thing, and that is completely okay. Your strength is in the human connection, the handwritten note, the face-to-face moment. Some of the best teaching happens without a screen.',
       color: '#92400E',
       bg: '#FEF3C7',
       icon: 'A',
@@ -415,7 +415,7 @@ export const techComfortQuiz: QuizConfig = {
       key: 'cautious_curious',
       title: 'Cautiously Curious',
       subtitle: 'Show me it works and I am in.',
-      description: 'You are not anti-tech -- you just want proof before you invest the time. You have been burned by the "next big thing" before. Once you see something work, though, you commit fully and use it well.',
+      description: 'You are not anti-tech. You just want proof before you invest the time. You have been burned by the "next big thing" before. Once you see something work, though, you commit fully and use it well.',
       color: '#2563EB',
       bg: '#DBEAFE',
       icon: 'C',
@@ -424,7 +424,7 @@ export const techComfortQuiz: QuizConfig = {
       key: 'steady_user',
       title: 'The Steady User',
       subtitle: 'You have your tools and they work.',
-      description: 'Google Slides, your LMS, maybe a few favorites -- you know what works and you use it consistently. You are not chasing every new app but you are far from a beginner. Reliability is your tech superpower.',
+      description: 'Google Slides, your LMS, maybe a few favorites. You know what works and you use it consistently. You are not chasing every new app but you are far from a beginner. Reliability is your tech superpower.',
       color: '#059669',
       bg: '#D1FAE5',
       icon: 'S',
@@ -443,27 +443,27 @@ export const techComfortQuiz: QuizConfig = {
     {
       question: 'A colleague mentions a new app for the classroom. Your first thought?',
       answers: [
-        { text: 'I will stick with what I know -- too many apps, not enough time', types: ['analog_heart'] },
+        { text: 'I will stick with what I know, too many apps, not enough time', types: ['analog_heart'] },
         { text: 'Interesting... but does it actually work? Show me first', types: ['cautious_curious'] },
-        { text: 'I will look into it when I have a minute -- maybe it replaces something I already use', types: ['steady_user'] },
-        { text: 'Already downloaded it -- want me to show you?', types: ['tech_adventurer'] },
+        { text: 'I will look into it when I have a minute, maybe it replaces something I already use', types: ['steady_user'] },
+        { text: 'Already downloaded it. Want me to show you?', types: ['tech_adventurer'] },
       ],
     },
     {
       question: 'Your school gets a new platform. How do you feel?',
       answers: [
         { text: 'Honestly? A little stressed. Another thing to learn', types: ['analog_heart'] },
-        { text: 'Cautiously optimistic -- I will wait and see how others like it first', types: ['cautious_curious'] },
-        { text: 'Fine -- I will figure it out and add it to my workflow', types: ['steady_user'] },
-        { text: 'Excited -- I love exploring new tools', types: ['tech_adventurer'] },
+        { text: 'Cautiously optimistic. I will wait and see how others like it first', types: ['cautious_curious'] },
+        { text: 'Fine. I will figure it out and add it to my workflow', types: ['steady_user'] },
+        { text: 'Excited. I love exploring new tools', types: ['tech_adventurer'] },
       ],
     },
     {
       question: 'How do you feel about AI in education?',
       answers: [
-        { text: 'Honestly not sure what to think yet -- it feels overwhelming', types: ['analog_heart'] },
-        { text: 'Curious but cautious -- I want to see real examples before I try it', types: ['cautious_curious'] },
-        { text: 'I have tried a few things -- some useful, some not', types: ['steady_user'] },
+        { text: 'Honestly not sure what to think yet. It feels overwhelming', types: ['analog_heart'] },
+        { text: 'Curious but cautious. I want to see real examples before I try it', types: ['cautious_curious'] },
+        { text: 'I have tried a few things. Some useful, some not', types: ['steady_user'] },
         { text: 'I am already using it for lesson planning, feedback, and more', types: ['tech_adventurer'] },
       ],
     },
@@ -471,15 +471,15 @@ export const techComfortQuiz: QuizConfig = {
       question: 'Your go-to way to share something with students is...',
       answers: [
         { text: 'Printed handouts or writing it on the board', types: ['analog_heart'] },
-        { text: 'Whatever the school already uses -- I keep it simple', types: ['cautious_curious', 'steady_user'] },
+        { text: 'Whatever the school already uses. I keep it simple', types: ['cautious_curious', 'steady_user'] },
         { text: 'A shared doc or slide deck I have used all year', types: ['steady_user'] },
-        { text: 'It depends -- I like mixing it up with different tools', types: ['tech_adventurer'] },
+        { text: 'It depends. I like mixing it up with different tools', types: ['tech_adventurer'] },
       ],
     },
     {
       question: 'When tech breaks in class, you...',
       answers: [
-        { text: 'Secretly relieved -- back to basics', types: ['analog_heart'] },
+        { text: 'Secretly relieved. Back to basics', types: ['analog_heart'] },
         { text: 'A little flustered but I have a backup plan', types: ['cautious_curious'] },
         { text: 'Troubleshoot for a minute, then pivot', types: ['steady_user'] },
         { text: 'Fix it on the fly and keep going', types: ['tech_adventurer'] },
@@ -487,7 +487,7 @@ export const techComfortQuiz: QuizConfig = {
     },
   ],
   shareMessage: (title, subtitle) =>
-    `My ed-tech personality is "${title}" -- ${subtitle} What is yours? Find out at teachersdeserveit.com/hub`,
+    `My ed-tech personality is "${title}". ${subtitle} What is yours? Find out at teachersdeserveit.com/hub`,
 }
 
 // ── 5. What Does Your Classroom Need Right Now? ───────────────────────
@@ -508,7 +508,7 @@ export const classroomNeedsQuiz: QuizConfig = {
       key: 'engagement_boost',
       title: 'Engagement Boost',
       subtitle: 'Your kids need a spark.',
-      description: 'The energy has dipped and you can feel it. Students are going through the motions but the fire is not there. You need strategies that wake things up -- not gimmicks, but real ways to reignite curiosity and participation.',
+      description: 'The energy has dipped and you can feel it. Students are going through the motions but the fire is not there. You need strategies that wake things up, not gimmicks, but real ways to reignite curiosity and participation.',
       color: '#D97706',
       bg: '#FEF3C7',
       icon: 'E',
@@ -517,7 +517,7 @@ export const classroomNeedsQuiz: QuizConfig = {
       key: 'calm_and_structure',
       title: 'Calm and Structure',
       subtitle: 'Things need to settle down.',
-      description: 'Behaviors are escalating, transitions are messy, and the vibe is off. You need routines, resets, and strategies that bring the calm back. Not punishment -- just structure that helps everyone breathe.',
+      description: 'Behaviors are escalating, transitions are messy, and the vibe is off. You need routines, resets, and strategies that bring the calm back. Not punishment. Just structure that helps everyone breathe.',
       color: '#2563EB',
       bg: '#DBEAFE',
       icon: 'C',
@@ -526,7 +526,7 @@ export const classroomNeedsQuiz: QuizConfig = {
       key: 'connection_repair',
       title: 'Connection Repair',
       subtitle: 'The relationships need attention.',
-      description: 'Something feels disconnected -- between you and students, between the students themselves, or between your classroom and families. Right now the most important thing is rebuilding trust and strengthening bonds.',
+      description: 'Something feels disconnected. Between you and students, between the students themselves, or between your classroom and families. Right now the most important thing is rebuilding trust and strengthening bonds.',
       color: '#DC2626',
       bg: '#FEE2E2',
       icon: 'R',
@@ -535,7 +535,7 @@ export const classroomNeedsQuiz: QuizConfig = {
       key: 'teacher_survival',
       title: 'Teacher Survival Mode',
       subtitle: 'You need to take care of YOU.',
-      description: 'The classroom might actually be fine -- it is you who is running on empty. Before you can give more to your students, you need tools that help you recover, reset boundaries, and remember why you do this.',
+      description: 'The classroom might actually be fine. It is you who is running on empty. Before you can give more to your students, you need tools that help you recover, reset boundaries, and remember why you do this.',
       color: '#7C3AED',
       bg: '#F3E8FF',
       icon: 'S',
@@ -544,7 +544,7 @@ export const classroomNeedsQuiz: QuizConfig = {
       key: 'fresh_start',
       title: 'Fresh Start Energy',
       subtitle: 'Time to shake things up.',
-      description: 'Nothing is broken, but nothing is exciting either. You are in a rut and you know it. You need fresh ideas, a new routine, a different angle -- something to make tomorrow feel different from today.',
+      description: 'Nothing is broken, but nothing is exciting either. You are in a rut and you know it. You need fresh ideas, a new routine, a different angle. Something to make tomorrow feel different from today.',
       color: '#059669',
       bg: '#D1FAE5',
       icon: 'F',
@@ -554,19 +554,19 @@ export const classroomNeedsQuiz: QuizConfig = {
     {
       question: 'When you picture your classroom right now, the first word that comes to mind is...',
       answers: [
-        { text: 'Flat -- the energy just is not there', types: ['engagement_boost'] },
-        { text: 'Chaotic -- too many fires to put out', types: ['calm_and_structure'] },
-        { text: 'Disconnected -- something feels off between us', types: ['connection_repair'] },
-        { text: 'Exhausting -- I am the one struggling most', types: ['teacher_survival'] },
+        { text: 'Flat. The energy just is not there', types: ['engagement_boost'] },
+        { text: 'Chaotic, too many fires to put out', types: ['calm_and_structure'] },
+        { text: 'Disconnected. Something feels off between us', types: ['connection_repair'] },
+        { text: 'Exhausting. I am the one struggling most', types: ['teacher_survival'] },
       ],
     },
     {
       question: 'If you could wave a magic wand, you would change...',
       answers: [
-        { text: 'Student motivation -- I want them to actually care', types: ['engagement_boost'] },
-        { text: 'Transitions and behavior -- I need things to run smoother', types: ['calm_and_structure'] },
+        { text: 'Student motivation. I want them to actually care', types: ['engagement_boost'] },
+        { text: 'Transitions and behavior. I need things to run smoother', types: ['calm_and_structure'] },
         { text: 'How students treat each other', types: ['connection_repair'] },
-        { text: 'My own energy level -- I am running on fumes', types: ['teacher_survival'] },
+        { text: 'My own energy level. I am running on fumes', types: ['teacher_survival'] },
       ],
     },
     {
@@ -584,7 +584,7 @@ export const classroomNeedsQuiz: QuizConfig = {
         { text: 'Getting kids to participate or care about the work', types: ['engagement_boost'] },
         { text: 'Managing behaviors and keeping things on track', types: ['calm_and_structure'] },
         { text: 'Dealing with conflicts or students shutting down', types: ['connection_repair'] },
-        { text: 'Just getting through it -- I am counting the hours', types: ['teacher_survival'] },
+        { text: 'Just getting through it. I am counting the hours', types: ['teacher_survival'] },
       ],
     },
     {
@@ -598,7 +598,7 @@ export const classroomNeedsQuiz: QuizConfig = {
     },
   ],
   shareMessage: (title, subtitle) =>
-    `I just checked in on my classroom needs and got "${title}" -- ${subtitle} Check yours at teachersdeserveit.com/hub`,
+    `I just checked in on my classroom needs and got "${title}". ${subtitle} Check yours at teachersdeserveit.com/hub`,
 }
 
 // ── 6. What Season Are You In? ────────────────────────────────────────
@@ -617,7 +617,7 @@ export const careerSeasonQuiz: QuizConfig = {
   results: {
     spring: {
       key: 'spring',
-      title: 'Spring -- New Growth',
+      title: 'Spring: New Growth',
       subtitle: 'Everything is new and that is both exciting and terrifying.',
       description: 'You are in the early years or a brand new role. Every day teaches you something. You are building your identity as an educator and figuring out what kind of teacher you want to be. The learning curve is steep but so is the potential.',
       color: '#059669',
@@ -626,27 +626,27 @@ export const careerSeasonQuiz: QuizConfig = {
     },
     summer: {
       key: 'summer',
-      title: 'Summer -- Full Bloom',
+      title: 'Summer: Full Bloom',
       subtitle: 'You are in your groove and it shows.',
-      description: 'You have found your rhythm. You know what works, you have your systems, and your confidence is solid. This is the season of mastery -- you are not just surviving, you are thriving. Enjoy this. You earned it.',
+      description: 'You have found your rhythm. You know what works, you have your systems, and your confidence is solid. This is the season of mastery. You are not just surviving, you are thriving. Enjoy this. You earned it.',
       color: '#D97706',
       bg: '#FEF3C7',
       icon: 'S',
     },
     autumn: {
       key: 'autumn',
-      title: 'Autumn -- Shifting',
+      title: 'Autumn: Shifting',
       subtitle: 'Something is changing and you feel it.',
-      description: 'Maybe you are eyeing leadership. Maybe you are questioning whether this is still the right fit. Maybe you want to mentor others or try something new. Autumn is not decline -- it is transition. Something beautiful is coming if you let it.',
+      description: 'Maybe you are eyeing leadership. Maybe you are questioning whether this is still the right fit. Maybe you want to mentor others or try something new. Autumn is not decline. It is transition. Something beautiful is coming if you let it.',
       color: '#DC2626',
       bg: '#FEE2E2',
       icon: 'A',
     },
     winter: {
       key: 'winter',
-      title: 'Winter -- Rest and Renewal',
+      title: 'Winter: Rest and Renewal',
       subtitle: 'You need to recharge before the next chapter.',
-      description: 'You have given a lot. Maybe too much. This season is about restoration -- not quitting, not giving up, but being honest about what you need. The best growth often follows the deepest rest. Take the time.',
+      description: 'You have given a lot. Maybe too much. This season is about restoration, not quitting, not giving up, but being honest about what you need. The best growth often follows the deepest rest. Take the time.',
       color: '#2563EB',
       bg: '#DBEAFE',
       icon: 'W',
@@ -656,8 +656,8 @@ export const careerSeasonQuiz: QuizConfig = {
     {
       question: 'When someone asks "How is teaching going?" your honest answer is...',
       answers: [
-        { text: 'Overwhelming but exciting -- I am learning so much', types: ['spring'] },
-        { text: 'Really good actually -- I feel like I know what I am doing', types: ['summer'] },
+        { text: 'Overwhelming but exciting. I am learning so much', types: ['spring'] },
+        { text: 'Really good actually. I feel like I know what I am doing', types: ['summer'] },
         { text: 'Fine... but I have been thinking about what is next', types: ['autumn'] },
         { text: 'Honestly? I am tired. I need something to change', types: ['winter'] },
       ],
@@ -665,16 +665,16 @@ export const careerSeasonQuiz: QuizConfig = {
     {
       question: 'On Sunday night, you feel...',
       answers: [
-        { text: 'Nervous but motivated -- I want to do well', types: ['spring'] },
-        { text: 'Ready -- I know what the week looks like and I am prepared', types: ['summer'] },
-        { text: 'Restless -- like I should be doing something different', types: ['autumn'] },
-        { text: 'Dread -- I need a longer break than a weekend', types: ['winter'] },
+        { text: 'Nervous but motivated. I want to do well', types: ['spring'] },
+        { text: 'Ready. I know what the week looks like and I am prepared', types: ['summer'] },
+        { text: 'Restless, like I should be doing something different', types: ['autumn'] },
+        { text: 'Dread. I need a longer break than a weekend', types: ['winter'] },
       ],
     },
     {
       question: 'Right now you are most focused on...',
       answers: [
-        { text: 'Figuring out the basics -- management, planning, surviving', types: ['spring'] },
+        { text: 'Figuring out the basics. Management, planning, surviving', types: ['spring'] },
         { text: 'Refining what I do and mentoring others', types: ['summer'] },
         { text: 'Exploring new roles, certifications, or paths', types: ['autumn'] },
         { text: 'Getting through the day and finding space to breathe', types: ['winter'] },
@@ -683,9 +683,9 @@ export const careerSeasonQuiz: QuizConfig = {
     {
       question: 'Your relationship with your job right now feels like...',
       answers: [
-        { text: 'A first date -- exciting, awkward, full of potential', types: ['spring'] },
-        { text: 'A strong partnership -- we know each other well', types: ['summer'] },
-        { text: 'A crossroads -- I love it but I am curious about other paths', types: ['autumn'] },
+        { text: 'A first date. Exciting, awkward, full of potential', types: ['spring'] },
+        { text: 'A strong partnership. We know each other well', types: ['summer'] },
+        { text: 'A crossroads. I love it but I am curious about other paths', types: ['autumn'] },
         { text: 'A long-term relationship that needs some space', types: ['winter'] },
       ],
     },
@@ -700,7 +700,7 @@ export const careerSeasonQuiz: QuizConfig = {
     },
   ],
   shareMessage: (title, subtitle) =>
-    `I took TDI's Career Season quiz and I am in "${title}" -- ${subtitle} What season are you in? Find out at teachersdeserveit.com/hub`,
+    `I took TDI's Career Season quiz and I am in "${title}". ${subtitle} What season are you in? Find out at teachersdeserveit.com/hub`,
 }
 
 // ── 7. What's Draining Your Energy? ───────────────────────────────────
@@ -721,7 +721,7 @@ export const energyDrainQuiz: QuizConfig = {
       key: 'overcommitted',
       title: 'The Overcommitter',
       subtitle: 'You said yes to everything. Again.',
-      description: 'You care deeply and it shows -- in the 47 commitments you are juggling. Committees, extra duties, helping colleagues, staying late. Your heart is huge but your calendar is unsustainable. The bravest thing you can do right now is say no to one thing.',
+      description: 'You care deeply and it shows, in the 47 commitments you are juggling. Committees, extra duties, helping colleagues, staying late. Your heart is huge but your calendar is unsustainable. The bravest thing you can do right now is say no to one thing.',
       color: '#DC2626',
       bg: '#FEE2E2',
       icon: 'O',
@@ -730,7 +730,7 @@ export const energyDrainQuiz: QuizConfig = {
       key: 'invisible_labor',
       title: 'Invisible Labor',
       subtitle: 'You are doing work nobody sees.',
-      description: 'The emotional labor, the behind-the-scenes planning, the holding it together for everyone else -- it is exhausting and nobody is counting it. You are not just teaching content; you are carrying people. That work deserves to be seen.',
+      description: 'The emotional labor, the behind-the-scenes planning, the holding it together for everyone else. It is exhausting and nobody is counting it. You are not just teaching content; you are carrying people. That work deserves to be seen.',
       color: '#7C3AED',
       bg: '#F3E8FF',
       icon: 'I',
@@ -748,7 +748,7 @@ export const energyDrainQuiz: QuizConfig = {
       key: 'isolation',
       title: 'Running Solo',
       subtitle: 'You are doing this alone and it shows.',
-      description: 'Whether you are the only one in your role, on an island in your building, or just feeling unsupported -- isolation is draining you. Teaching was never meant to be a solo act. You need your people.',
+      description: 'Whether you are the only one in your role, on an island in your building, or just feeling unsupported. Isolation is draining you. Teaching was never meant to be a solo act. You need your people.',
       color: '#059669',
       bg: '#D1FAE5',
       icon: 'R',
@@ -757,7 +757,7 @@ export const energyDrainQuiz: QuizConfig = {
       key: 'purpose_drift',
       title: 'Purpose Drift',
       subtitle: 'You forgot why you started.',
-      description: 'Somewhere between the paperwork, the mandates, and the meetings, the thing that made you love this job got buried. It is still there -- you just cannot feel it right now. You do not need a new career. You need to reconnect with the reason you chose this one.',
+      description: 'Somewhere between the paperwork, the mandates, and the meetings, the thing that made you love this job got buried. It is still there. You just cannot feel it right now. You do not need a new career. You need to reconnect with the reason you chose this one.',
       color: '#D97706',
       bg: '#FEF3C7',
       icon: 'P',
@@ -768,7 +768,7 @@ export const energyDrainQuiz: QuizConfig = {
       question: 'It is 4 PM and you are still at school. Why?',
       answers: [
         { text: 'I said I would help with three different things and now I am stuck', types: ['overcommitted'] },
-        { text: 'Doing the stuff nobody else thinks about -- organizing, prepping, cleaning up', types: ['invisible_labor'] },
+        { text: 'Doing the stuff nobody else thinks about. Organizing, prepping, cleaning up', types: ['invisible_labor'] },
         { text: 'I cannot figure out what to prioritize so I just... stayed', types: ['decision_fatigue'] },
         { text: 'Nobody else was going to do it, so here I am', types: ['isolation'] },
       ],
@@ -787,7 +787,7 @@ export const energyDrainQuiz: QuizConfig = {
       answers: [
         { text: 'Immediately start on the work I brought home', types: ['overcommitted'] },
         { text: 'Vent to someone about how much I did that nobody saw', types: ['invisible_labor'] },
-        { text: 'Stare at nothing -- my brain is absolutely fried', types: ['decision_fatigue'] },
+        { text: 'Stare at nothing. My brain is absolutely fried', types: ['decision_fatigue'] },
         { text: 'Feel lonely even if I am not alone', types: ['isolation', 'purpose_drift'] },
       ],
     },
@@ -811,7 +811,7 @@ export const energyDrainQuiz: QuizConfig = {
     },
   ],
   shareMessage: (title, subtitle) =>
-    `I just did TDI's energy check-in and discovered "${title}" -- ${subtitle} Check yours at teachersdeserveit.com/hub`,
+    `I just did TDI's energy check-in and discovered "${title}". ${subtitle} Check yours at teachersdeserveit.com/hub`,
 }
 
 // ── 8. Should I Become a TDI Creator? ─────────────────────────────────
@@ -832,7 +832,7 @@ export const creatorQuiz: QuizConfig = {
       key: 'born_creator',
       title: 'Born Creator',
       subtitle: 'You were made for this.',
-      description: 'You have the expertise, the passion, and the voice. You are already the person your colleagues come to for ideas and resources. The only thing missing is a platform -- and TDI has one waiting for you. Seriously. Apply.',
+      description: 'You have the expertise, the passion, and the voice. You are already the person your colleagues come to for ideas and resources. The only thing missing is a platform, and TDI has one waiting for you. Seriously. Apply.',
       color: '#D97706',
       bg: '#FEF3C7',
       icon: 'B',
@@ -843,7 +843,7 @@ export const creatorQuiz: QuizConfig = {
       key: 'hidden_expert',
       title: 'The Hidden Expert',
       subtitle: 'You know more than you think.',
-      description: 'You probably do not think of yourself as a "content creator" -- but you have been creating things for years. Lesson plans, systems, strategies that work. The stuff in your Google Drive could genuinely help thousands of teachers. You just need someone to say: it is time.',
+      description: 'You probably do not think of yourself as a "content creator", but you have been creating things for years. Lesson plans, systems, strategies that work. The stuff in your Google Drive could genuinely help thousands of teachers. You just need someone to say: it is time.',
       color: '#7C3AED',
       bg: '#F3E8FF',
       icon: 'H',
@@ -854,7 +854,7 @@ export const creatorQuiz: QuizConfig = {
       key: 'collaborator_creator',
       title: 'The Collaborator',
       subtitle: 'You create best with others.',
-      description: 'Solo content creation is not your thing -- and that is totally fine. You shine when you are co-building, brainstorming, or supporting someone else\'s vision. TDI has collaborative creator opportunities too. If you have a partner in mind, even better.',
+      description: 'Solo content creation is not your thing, and that is totally fine. You shine when you are co-building, brainstorming, or supporting someone else\'s vision. TDI has collaborative creator opportunities too. If you have a partner in mind, even better.',
       color: '#DB2777',
       bg: '#FCE7F3',
       icon: 'C',
@@ -864,8 +864,8 @@ export const creatorQuiz: QuizConfig = {
     future_creator: {
       key: 'future_creator',
       title: 'Future Creator',
-      subtitle: 'Not yet -- but soon.',
-      description: 'You are still building your toolkit and that is a great place to be. Keep exploring, keep learning, keep collecting ideas. When you are ready to share what you know, TDI will be here. In the meantime, keep taking courses and trying tools -- your future content is being shaped right now.',
+      subtitle: 'Not yet, but soon.',
+      description: 'You are still building your toolkit and that is a great place to be. Keep exploring, keep learning, keep collecting ideas. When you are ready to share what you know, TDI will be here. In the meantime, keep taking courses and trying tools. Your future content is being shaped right now.',
       color: '#059669',
       bg: '#D1FAE5',
       icon: 'F',
@@ -874,7 +874,7 @@ export const creatorQuiz: QuizConfig = {
       key: 'cheerleader',
       title: 'The Biggest Fan',
       subtitle: 'You lift up other creators.',
-      description: 'Creating is not calling your name right now -- but sharing, recommending, and championing great content absolutely is. You are the person who tells every teacher you know about the thing that changed your practice. That role matters more than you know. Keep sharing.',
+      description: 'Creating is not calling your name right now, but sharing, recommending, and championing great content absolutely is. You are the person who tells every teacher you know about the thing that changed your practice. That role matters more than you know. Keep sharing.',
       color: '#2563EB',
       bg: '#DBEAFE',
       icon: 'F',
@@ -896,15 +896,15 @@ export const creatorQuiz: QuizConfig = {
         { text: 'Folders full of templates, lesson plans, and systems I built myself', types: ['born_creator', 'hidden_expert'] },
         { text: 'Shared docs from projects I have built with teammates', types: ['collaborator_creator'] },
         { text: 'A bookmarks folder of amazing things other people made', types: ['cheerleader'] },
-        { text: 'Honestly kind of a mess -- I am still figuring out my workflow', types: ['future_creator'] },
+        { text: 'Honestly kind of a mess. I am still figuring out my workflow', types: ['future_creator'] },
       ],
     },
     {
       question: 'Someone says "You should make a course about that." You think...',
       answers: [
-        { text: 'I have actually thought about that -- I even have an outline started', types: ['born_creator'] },
+        { text: 'I have actually thought about that. I even have an outline started', types: ['born_creator'] },
         { text: 'Maybe? I have never thought of myself as a "course creator" but I do know this stuff', types: ['hidden_expert'] },
-        { text: 'Only if I could do it with someone -- I would not want to do it alone', types: ['collaborator_creator'] },
+        { text: 'Only if I could do it with someone. I would not want to do it alone', types: ['collaborator_creator'] },
         { text: 'That is really nice but I do not think I am there yet', types: ['future_creator'] },
       ],
     },
@@ -928,7 +928,7 @@ export const creatorQuiz: QuizConfig = {
     },
   ],
   shareMessage: (title, subtitle) =>
-    `I took TDI's Creator Quiz and got "${title}" -- ${subtitle} Should you become a TDI creator? Find out at teachersdeserveit.com/hub`,
+    `I took TDI's Creator Quiz and got "${title}". ${subtitle} Should you become a TDI creator? Find out at teachersdeserveit.com/hub`,
 }
 
 // ── 9. What's Your Communication Style? ─────────────────────────────
@@ -1076,7 +1076,7 @@ export const communicationStyleQuiz: QuizConfig = {
     },
   ],
   shareMessage: (title, subtitle) =>
-    `My communication style is "${title}" -- ${subtitle} What is yours? Find out at teachersdeserveit.com/hub`,
+    `My communication style is "${title}". ${subtitle} What is yours? Find out at teachersdeserveit.com/hub`,
 }
 
 // ── 10. Back to School Readiness Check ──────────────────────────────
@@ -1224,7 +1224,7 @@ export const btsReadinessQuiz: QuizConfig = {
     },
   ],
   shareMessage: (title, subtitle) =>
-    `I took TDI's Back to School Readiness Check and got "${title}" -- ${subtitle} How ready are you? Find out at teachersdeserveit.com/hub`,
+    `I took TDI's Back to School Readiness Check and got "${title}". ${subtitle} How ready are you? Find out at teachersdeserveit.com/hub`,
 }
 
 // ── 11. What's Your Coaching Stance? ────────────────────────────────
@@ -1354,7 +1354,7 @@ export const coachingStanceQuiz: QuizConfig = {
     },
   ],
   shareMessage: (title, subtitle) =>
-    `My coaching stance is "${title}" -- ${subtitle} What is yours? Find out at teachersdeserveit.com/hub`,
+    `My coaching stance is "${title}". ${subtitle} What is yours? Find out at teachersdeserveit.com/hub`,
 }
 
 // ── 12. Para Partnership Pulse Check ────────────────────────────────
@@ -1502,7 +1502,7 @@ export const paraPartnershipQuiz: QuizConfig = {
     },
   ],
   shareMessage: (title, subtitle) =>
-    `I took TDI's Para Partnership Pulse Check and got "${title}" -- ${subtitle} Check yours at teachersdeserveit.com/hub`,
+    `I took TDI's Para Partnership Pulse Check and got "${title}". ${subtitle} Check yours at teachersdeserveit.com/hub`,
 }
 
 // ── 13. Burnout Early Warning System ────────────────────────────────
@@ -1650,7 +1650,7 @@ export const burnoutWarningQuiz: QuizConfig = {
     },
   ],
   shareMessage: (title, subtitle) =>
-    `I took TDI's Burnout Early Warning System and got "${title}" -- ${subtitle} Check yours at teachersdeserveit.com/hub`,
+    `I took TDI's Burnout Early Warning System and got "${title}". ${subtitle} Check yours at teachersdeserveit.com/hub`,
 }
 
 // ── 14. What's Your Classroom Management Style? ──────────────────────────
