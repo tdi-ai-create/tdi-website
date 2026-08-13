@@ -1,10 +1,10 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
 import {
-  recruitmentCandidateSuggested,
   recruitmentOutreachApproved,
   recruitmentCandidateResponded,
   recruitmentCandidateConverted,
+  recruitmentNeedsApproval,
 } from '@/lib/creator-slack'
 
 /**
@@ -360,9 +360,19 @@ export async function POST(request: NextRequest) {
 
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-    // Slack notification (non-blocking)
+    // Hand the work to Bella. She approves outreach, the agent never sends it,
+    // so this notification is the actual handoff and not a nice to have.
     try {
-      recruitmentCandidateSuggested(name, expertise_area || 'unspecified', source || 'agent').catch(() => {})
+      let gapCategory = expertise_area || ''
+      if (gap_id) {
+        const { data: gap } = await supabase
+          .from('creator_content_gaps')
+          .select('category')
+          .eq('id', gap_id)
+          .single()
+        if (gap?.category) gapCategory = gap.category
+      }
+      recruitmentNeedsApproval(name, gapCategory, Boolean(outreach_draft)).catch(() => {})
     } catch {}
 
     return NextResponse.json({ success: true, candidate_id: candidate.id })

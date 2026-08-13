@@ -1402,9 +1402,16 @@ export default function CreatorStudioPage() {
   const [recruitmentQuickNotes, setRecruitmentQuickNotes] = useState<Record<string, string>>({});
   const [recruitmentSourceData, setRecruitmentSourceData] = useState<any>(null);
   const [nominateForm, setNominateForm] = useState({
-    name: '', email: '', school_org: '', expertise_area: '', source: 'sales_nomination', notes: ''
+    name: '', email: '', school_org: '', expertise_area: '', source: 'sales_nomination', notes: '',
+    gap_id: '', content_path: '', outreach_draft: ''
   });
   const [nominateLoading, setNominateLoading] = useState(false);
+  // ── Gap editor state ──
+  const [gapForm, setGapForm] = useState<{
+    id: string | null; category: string; priority: string;
+    demand_signal: string; recommended_content_path: string; notes: string;
+  } | null>(null);
+  const [gapSaving, setGapSaving] = useState(false);
 
   const canEdit = isOwner || hasPermission(permissions, 'creator_studio', 'edit');
 
@@ -1496,8 +1503,11 @@ export default function CreatorStudioPage() {
       });
       const data = await res.json();
       if (data.success) {
-        showToast('Candidate nominated!', 'success');
-        setNominateForm({ name: '', email: '', school_org: '', expertise_area: '', source: 'sales_nomination', notes: '' });
+        showToast('Candidate nominated. Sent to Bella for outreach approval.', 'success');
+        setNominateForm({
+          name: '', email: '', school_org: '', expertise_area: '', source: 'sales_nomination', notes: '',
+          gap_id: '', content_path: '', outreach_draft: ''
+        });
         await loadRecruitmentData();
       } else {
         showToast(data.error || 'Nomination failed', 'error');
@@ -1506,6 +1516,66 @@ export default function CreatorStudioPage() {
       showToast('Network error', 'error');
     } finally {
       setNominateLoading(false);
+    }
+  };
+
+  const handleSaveGap = async () => {
+    if (!gapForm) return;
+    if (!gapForm.category.trim()) { showToast('Category is required', 'error'); return; }
+    setGapSaving(true);
+    try {
+      const isEdit = Boolean(gapForm.id);
+      const res = await fetch('/api/admin/creator-recruitment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(isEdit
+          ? {
+              action: 'update_gap', gap_id: gapForm.id, priority: gapForm.priority,
+              demand_signal: gapForm.demand_signal,
+              recommended_content_path: gapForm.recommended_content_path || null,
+              notes: gapForm.notes,
+            }
+          : {
+              action: 'create_gap', category: gapForm.category, priority: gapForm.priority,
+              demand_signal: gapForm.demand_signal,
+              recommended_content_path: gapForm.recommended_content_path || null,
+              notes: gapForm.notes,
+            }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast(isEdit ? 'Gap updated' : 'Gap added', 'success');
+        setGapForm(null);
+        await loadRecruitmentData();
+      } else {
+        showToast(data.error || 'Could not save gap', 'error');
+      }
+    } catch {
+      showToast('Network error', 'error');
+    } finally {
+      setGapSaving(false);
+    }
+  };
+
+  const handleResolveGap = async (gapId: string) => {
+    setGapSaving(true);
+    try {
+      const res = await fetch('/api/admin/creator-recruitment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'update_gap', gap_id: gapId, status: 'filled' }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast('Gap marked as filled', 'success');
+        await loadRecruitmentData();
+      } else {
+        showToast(data.error || 'Could not update gap', 'error');
+      }
+    } catch {
+      showToast('Network error', 'error');
+    } finally {
+      setGapSaving(false);
     }
   };
 
@@ -5725,8 +5795,78 @@ export default function CreatorStudioPage() {
                 </button>
                 {recruitmentGapsExpanded && (
                   <div className="px-4 pb-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <p className="text-xs text-gray-400">
+                        Refreshed weekly from the Hub catalog. Add your own for demand the catalog cannot see.
+                      </p>
+                      {!gapForm && (
+                        <button
+                          onClick={() => setGapForm({ id: null, category: '', priority: 'high', demand_signal: '', recommended_content_path: '', notes: '' })}
+                          className="px-3 py-1.5 text-xs font-medium text-white rounded-lg shrink-0"
+                          style={{ backgroundColor: theme.accent }}
+                        >Add Gap</button>
+                      )}
+                    </div>
+
+                    {gapForm && (
+                      <div className="mb-3 border border-gray-200 rounded-lg p-3 bg-gray-50">
+                        <p className="text-xs font-medium text-gray-500 mb-2">
+                          {gapForm.id ? 'Edit Gap' : 'New Content Gap'}
+                        </p>
+                        <div className="grid gap-2 sm:grid-cols-2">
+                          <input
+                            value={gapForm.category}
+                            onChange={e => setGapForm(prev => prev ? { ...prev, category: e.target.value } : null)}
+                            placeholder="Category (e.g. SPED/Inclusion)"
+                            disabled={Boolean(gapForm.id)}
+                            className="border border-gray-300 rounded-lg px-2 py-1.5 text-sm disabled:bg-gray-100 disabled:text-gray-500"
+                          />
+                          <select
+                            value={gapForm.priority}
+                            onChange={e => setGapForm(prev => prev ? { ...prev, priority: e.target.value } : null)}
+                            className="border border-gray-300 rounded-lg px-2 py-1.5 text-sm"
+                          >
+                            <option value="critical">Critical</option>
+                            <option value="high">High</option>
+                            <option value="medium">Medium</option>
+                            <option value="low">Low</option>
+                          </select>
+                          <select
+                            value={gapForm.recommended_content_path}
+                            onChange={e => setGapForm(prev => prev ? { ...prev, recommended_content_path: e.target.value } : null)}
+                            className="border border-gray-300 rounded-lg px-2 py-1.5 text-sm"
+                          >
+                            <option value="">Recommended path (optional)</option>
+                            <option value="course">Course</option>
+                            <option value="download">Download</option>
+                            <option value="blog">Blog</option>
+                          </select>
+                          <input
+                            value={gapForm.demand_signal}
+                            onChange={e => setGapForm(prev => prev ? { ...prev, demand_signal: e.target.value } : null)}
+                            placeholder="Demand signal (what you are seeing)"
+                            className="border border-gray-300 rounded-lg px-2 py-1.5 text-sm"
+                          />
+                        </div>
+                        <div className="flex gap-2 mt-2">
+                          <button
+                            onClick={handleSaveGap}
+                            disabled={gapSaving}
+                            className="px-3 py-1.5 text-xs font-medium text-white rounded-lg disabled:opacity-50"
+                            style={{ backgroundColor: theme.accent }}
+                          >{gapSaving ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Save Gap'}</button>
+                          <button
+                            onClick={() => setGapForm(null)}
+                            className="px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-200 rounded-lg hover:bg-gray-300"
+                          >Cancel</button>
+                        </div>
+                      </div>
+                    )}
+
                     {recruitmentGaps.length === 0 ? (
-                      <p className="text-sm text-gray-500 py-4">No content gaps identified yet. Anne Marie will analyze Hub content and sales data to identify priority areas.</p>
+                      <p className="text-sm text-gray-500 py-4">
+                        No active content gaps. The weekly Hub scan runs Monday, or add one now with the button above.
+                      </p>
                     ) : (
                       <div className="grid gap-3">
                         {recruitmentGaps.map((gap: any) => (
@@ -5753,15 +5893,36 @@ export default function CreatorStudioPage() {
                                   <p className="text-xs text-gray-500 mt-1">{gap.demand_signal}</p>
                                 )}
                                 <div className="flex items-center gap-3 mt-1.5 text-xs text-gray-400">
-                                  {gap.existing_course_count > 0 && <span>{gap.existing_course_count} course{gap.existing_course_count > 1 ? 's' : ''}</span>}
-                                  {gap.existing_quick_win_count > 0 && <span>{gap.existing_quick_win_count} quick win{gap.existing_quick_win_count > 1 ? 's' : ''}</span>}
+                                  <span>{gap.hub_course_count || 0} course{(gap.hub_course_count || 0) === 1 ? '' : 's'}</span>
+                                  <span>{gap.hub_quick_win_count || 0} quick win{(gap.hub_quick_win_count || 0) === 1 ? '' : 's'}</span>
                                   {gap.active_creator_count > 0 && <span>{gap.active_creator_count} active creator{gap.active_creator_count > 1 ? 's' : ''}</span>}
-                                  {gap.sales_mention_count > 0 && <span>{gap.sales_mention_count} sales mention{gap.sales_mention_count > 1 ? 's' : ''}</span>}
+                                  {gap.sales_mentions > 0 && <span>{gap.sales_mentions} sales mention{gap.sales_mentions > 1 ? 's' : ''}</span>}
+                                  {gap.identified_by === 'system' && <span className="text-gray-400">auto detected</span>}
                                 </div>
                               </div>
-                              <div className="flex items-center gap-1.5 text-xs text-gray-500 shrink-0">
-                                <Users className="w-3.5 h-3.5" />
-                                <span>{gap.candidate_count} candidate{gap.candidate_count !== 1 ? 's' : ''}</span>
+                              <div className="flex flex-col items-end gap-1.5 shrink-0">
+                                <div className="flex items-center gap-1.5 text-xs text-gray-500">
+                                  <Users className="w-3.5 h-3.5" />
+                                  <span>{gap.candidate_count} candidate{gap.candidate_count !== 1 ? 's' : ''}</span>
+                                </div>
+                                <div className="flex items-center gap-1">
+                                  <button
+                                    onClick={() => setGapForm({
+                                      id: gap.id,
+                                      category: gap.category,
+                                      priority: gap.priority || 'high',
+                                      demand_signal: gap.demand_signal || '',
+                                      recommended_content_path: gap.recommended_content_path || '',
+                                      notes: gap.notes || '',
+                                    })}
+                                    className="px-2 py-1 text-xs font-medium text-gray-600 bg-gray-100 rounded hover:bg-gray-200"
+                                  >Edit</button>
+                                  <button
+                                    onClick={() => handleResolveGap(gap.id)}
+                                    disabled={gapSaving}
+                                    className="px-2 py-1 text-xs font-medium text-green-700 bg-green-50 rounded hover:bg-green-100 disabled:opacity-50"
+                                  >Filled</button>
+                                </div>
                               </div>
                             </div>
                           </div>
@@ -5946,8 +6107,14 @@ export default function CreatorStudioPage() {
                                 />
                                 <div className="flex gap-2 mt-2">
                                   <button
-                                    onClick={() => { handleRecruitmentAction('approve_outreach', { candidate_id: candidate.id, approved_by: 'admin', edited_outreach: recruitmentEditedDraft }); }}
-                                    disabled={isActionLoading}
+                                    onClick={() => {
+                                      if (!recruitmentEditedDraft.trim()) {
+                                        showToast('Outreach cannot be empty.', 'error');
+                                        return;
+                                      }
+                                      handleRecruitmentAction('approve_outreach', { candidate_id: candidate.id, approved_by: 'admin', edited_outreach: recruitmentEditedDraft });
+                                    }}
+                                    disabled={isActionLoading || !recruitmentEditedDraft.trim()}
                                     className="px-3 py-1.5 text-xs font-medium text-white rounded-lg disabled:opacity-50"
                                     style={{ backgroundColor: theme.accent }}
                                   >
@@ -6075,9 +6242,15 @@ export default function CreatorStudioPage() {
                                   <>
                                     <button
                                       onClick={async () => {
-                                        if (candidate.outreach_draft) {
-                                          navigator.clipboard.writeText(candidate.outreach_draft);
+                                        // Approving with no draft would open a blank email.
+                                        // Send them to the editor instead.
+                                        if (!candidate.outreach_draft) {
+                                          setRecruitmentEditingOutreach(candidate.id);
+                                          setRecruitmentEditedDraft('');
+                                          showToast('Write the outreach before approving.', 'error');
+                                          return;
                                         }
+                                        navigator.clipboard.writeText(candidate.outreach_draft);
                                         await handleRecruitmentAction('approve_outreach', { candidate_id: candidate.id, approved_by: 'admin' });
                                         if (candidate.email) {
                                           const mailtoUrl = `mailto:${candidate.email}?subject=Quick question about creating with TDI&body=${encodeURIComponent(candidate.outreach_draft || '')}`;
@@ -6328,6 +6501,43 @@ export default function CreatorStudioPage() {
                       className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm mt-0.5 focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400"
                     />
                   </div>
+                  <div>
+                    <label className="text-xs font-medium text-gray-600">Content Gap</label>
+                    <select
+                      value={nominateForm.gap_id}
+                      onChange={e => setNominateForm(prev => ({ ...prev, gap_id: e.target.value }))}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm mt-0.5 focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400"
+                    >
+                      <option value="">Not linked to a gap</option>
+                      {recruitmentGaps.map(gap => (
+                        <option key={gap.id} value={gap.id}>
+                          {gap.category} ({gap.priority})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="text-xs font-medium text-gray-600">Content Path</label>
+                    <select
+                      value={nominateForm.content_path}
+                      onChange={e => setNominateForm(prev => ({ ...prev, content_path: e.target.value }))}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm mt-0.5 focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400"
+                    >
+                      <option value="">Undecided</option>
+                      <option value="download">Download</option>
+                      <option value="blog">Blog</option>
+                      <option value="course">Course</option>
+                    </select>
+                  </div>
+                </div>
+                <div className="mt-3">
+                  <label className="text-xs font-medium text-gray-600">Outreach Draft (optional)</label>
+                  <textarea
+                    value={nominateForm.outreach_draft}
+                    onChange={e => setNominateForm(prev => ({ ...prev, outreach_draft: e.target.value }))}
+                    placeholder="Write the outreach now, or leave blank and draft it when you approve."
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm mt-0.5 min-h-[80px] focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400"
+                  />
                 </div>
                 <div className="mt-3 flex justify-end">
                   <button
