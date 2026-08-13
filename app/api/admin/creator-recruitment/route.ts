@@ -7,6 +7,7 @@ import {
   recruitmentNeedsApproval,
 } from '@/lib/creator-slack'
 import { buildActionQueue, summarizeGoals, QUEUE_LABELS } from '@/lib/recruitment-goals'
+import { normalizeEmail, conversionBlockedMessage } from '@/lib/recruitment-contact'
 
 const GAP_PRIORITIES = ['critical', 'high', 'medium', 'low']
 const GAP_STATUSES = ['active', 'filled', 'monitoring']
@@ -343,18 +344,28 @@ export async function POST(request: NextRequest) {
 
   // ─── log_response ───
   if (action === 'log_response') {
-    const { candidate_id, response_notes, new_stage } = body
+    const { candidate_id, response_notes, new_stage, email } = body
     if (!candidate_id || !new_stage) {
       return NextResponse.json({ error: 'candidate_id and new_stage required' }, { status: 400 })
     }
 
+    const updatePayload: Record<string, unknown> = {
+      stage: new_stage,
+      response_received_at: new Date().toISOString(),
+      response_notes: response_notes || null,
+    }
+
+    // The reply is usually where the address first appears. Capture it now, or
+    // conversion later fails on a NOT NULL column with nowhere to fix it.
+    if (email) {
+      const checked = normalizeEmail(email)
+      if (!checked.ok) return NextResponse.json({ error: checked.error }, { status: 400 })
+      updatePayload.email = checked.email
+    }
+
     const { error } = await supabase
       .from('creator_recruitment_candidates')
-      .update({
-        stage: new_stage,
-        response_received_at: new Date().toISOString(),
-        response_notes: response_notes || null,
-      })
+      .update(updatePayload)
       .eq('id', candidate_id)
 
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
@@ -425,9 +436,64 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true, note_id: note.id })
   }
 
+  // ─── update_contact: record an address whenever Bella learns it ───
+  if (action === 'update_contact') {
+    const { candidate_id, email, social_url } = body
+    if (!candidate_id) {
+      return NextResponse.json({ error: 'candidate_id required' }, { status: 400 })
+    }
+
+    const payload: Record<string, unknown> = {}
+
+    if (email !== undefined) {
+      const checked = normalizeEmail(email)
+      if (!checked.ok) return NextResponse.json({ error: checked.error }, { status: 400 })
+
+      // The unique index would reject this anyway; say so in words first.
+      const { data: clash } = await supabase
+        .from('creator_recruitment_candidates')
+        .select('id, name')
+        .ilike('email', checked.email)
+        .neq('id', candidate_id)
+        .maybeSingle()
+
+      if (clash) {
+        return NextResponse.json(
+          { error: `That email is already on another candidate (${clash.name}).` },
+          { status: 409 }
+        )
+      }
+      payload.email = checked.email
+    }
+
+    if (social_url !== undefined) payload.social_url = social_url || null
+
+    if (Object.keys(payload).length === 0) {
+      return NextResponse.json({ error: 'nothing to update' }, { status: 400 })
+    }
+
+    const { error } = await supabase
+      .from('creator_recruitment_candidates')
+      .update(payload)
+      .eq('id', candidate_id)
+
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+    if (payload.email) {
+      await supabase.from('creator_recruitment_notes').insert({
+        candidate_id,
+        content: `Email recorded: ${payload.email}`,
+        author: 'admin',
+        note_type: 'note',
+      })
+    }
+
+    return NextResponse.json({ success: true })
+  }
+
   // ─── convert_to_creator ───
   if (action === 'convert_to_creator') {
-    const { candidate_id, content_path, topic } = body
+    const { candidate_id, content_path, topic, email: providedEmail } = body
     if (!candidate_id) {
       return NextResponse.json({ error: 'candidate_id required' }, { status: 400 })
     }
@@ -442,12 +508,51 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Candidate not found' }, { status: 404 })
     }
 
+    // creators.email is NOT NULL and UNIQUE. Candidates routinely arrive with
+    // no email on purpose, so check both here rather than letting Postgres
+    // answer with something Bella cannot act on.
+    const checked = normalizeEmail(providedEmail ?? candidate.email)
+    if (!checked.ok) {
+      return NextResponse.json(
+        {
+          error: conversionBlockedMessage('no_email', candidate.name),
+          needs_email: true,
+        },
+        { status: 400 }
+      )
+    }
+
+    const { data: existingCreator } = await supabase
+      .from('creators')
+      .select('id, name')
+      .ilike('email', checked.email)
+      .maybeSingle()
+
+    if (existingCreator) {
+      return NextResponse.json(
+        {
+          error: conversionBlockedMessage('already_creator', candidate.name),
+          existing_creator_id: existingCreator.id,
+        },
+        { status: 409 }
+      )
+    }
+
+    // Keep the candidate row in step, so the address is not lost if the
+    // creator insert fails for some other reason.
+    if (checked.email !== candidate.email) {
+      await supabase
+        .from('creator_recruitment_candidates')
+        .update({ email: checked.email })
+        .eq('id', candidate_id)
+    }
+
     const finalContentPath = content_path || candidate.content_path || 'course'
     const { data: creator, error: creatorErr } = await supabase
       .from('creators')
       .insert({
         name: candidate.name,
-        email: candidate.email,
+        email: checked.email,
         content_path: finalContentPath,
         topic: topic || candidate.expertise_area || null,
         status: 'active',
@@ -695,7 +800,7 @@ export async function POST(request: NextRequest) {
   }
 
   return NextResponse.json(
-    { error: 'Unknown action. Use: approve_outreach, mark_sent, log_response, update_stage, add_note, convert_to_creator, nominate, dismiss, create_gap, update_gap' },
+    { error: 'Unknown action. Use: approve_outreach, mark_sent, log_response, update_stage, add_note, convert_to_creator, nominate, dismiss, create_gap, update_gap, update_contact' },
     { status: 400 }
   )
 }
