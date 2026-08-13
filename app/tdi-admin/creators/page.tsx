@@ -1389,6 +1389,18 @@ export default function CreatorStudioPage() {
     total_candidates_by_stage: Record<string, number>;
     avg_days_in_pipeline: number;
     conversions_this_month: number;
+    goals?: {
+      sourced_this_week: number;
+      sourcing_target: number;
+      converted_this_month: number;
+      conversion_target: number;
+      active_pipeline: number;
+      needs_action: number;
+    };
+  } | null>(null);
+  const [recruitmentQueue, setRecruitmentQueue] = useState<{
+    queue: { id: string; name: string; stage: string; reason: string; days: number; detail: string }[];
+    labels: Record<string, string>;
   } | null>(null);
   const [recruitmentGaps, setRecruitmentGaps] = useState<any[]>([]);
   const [recruitmentCandidates, setRecruitmentCandidates] = useState<any[]>([]);
@@ -1443,17 +1455,19 @@ export default function CreatorStudioPage() {
   const loadRecruitmentData = useCallback(async () => {
     setRecruitmentLoading(true);
     try {
-      const [statsRes, gapsRes, pipelineRes] = await Promise.all([
+      const [statsRes, gapsRes, pipelineRes, queueRes] = await Promise.all([
         fetch('/api/admin/creator-recruitment?action=stats'),
         fetch('/api/admin/creator-recruitment?action=gaps'),
         fetch(`/api/admin/creator-recruitment?action=pipeline&stage=${recruitmentStageFilter}`),
+        fetch('/api/admin/creator-recruitment?action=action_queue'),
       ]);
-      const [statsData, gapsData, pipelineData] = await Promise.all([
-        statsRes.json(), gapsRes.json(), pipelineRes.json(),
+      const [statsData, gapsData, pipelineData, queueData] = await Promise.all([
+        statsRes.json(), gapsRes.json(), pipelineRes.json(), queueRes.json(),
       ]);
       if (statsData.stats) setRecruitmentStats(statsData.stats);
       if (gapsData.gaps) setRecruitmentGaps(gapsData.gaps);
       if (pipelineData.candidates) setRecruitmentCandidates(pipelineData.candidates);
+      if (queueData.queue) setRecruitmentQueue({ queue: queueData.queue, labels: queueData.labels });
     } catch (error) {
       console.error('Failed to load recruitment data:', error);
     } finally {
@@ -5752,6 +5766,86 @@ export default function CreatorStudioPage() {
             </div>
           ) : (
             <>
+              {/* Section 0: Needs You, and progress against the weekly goal */}
+              <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                <div className="p-4 border-b border-gray-100 flex items-center justify-between gap-3 flex-wrap">
+                  <div>
+                    <h3 style={TYPE_SECTION_HEADER}>Needs You</h3>
+                    <p className="text-xs text-gray-400 mt-0.5">
+                      {recruitmentQueue?.queue.length
+                        ? `${recruitmentQueue.queue.length} candidate${recruitmentQueue.queue.length === 1 ? '' : 's'} waiting on a decision from you`
+                        : 'Nothing waiting. Everything in the pipeline is moving.'}
+                    </p>
+                  </div>
+                  {recruitmentStats?.goals && (
+                    <div className="flex items-center gap-5 text-sm">
+                      <div>
+                        <div className="text-xs text-gray-400">Sourced this week</div>
+                        <div className="font-semibold text-gray-900">
+                          {recruitmentStats.goals.sourced_this_week}
+                          <span className="text-gray-400 font-normal"> of {recruitmentStats.goals.sourcing_target}</span>
+                        </div>
+                      </div>
+                      <div>
+                        <div className="text-xs text-gray-400">Converted this month</div>
+                        <div className="font-semibold text-gray-900">
+                          {recruitmentStats.goals.converted_this_month}
+                          <span className="text-gray-400 font-normal"> of {recruitmentStats.goals.conversion_target}</span>
+                        </div>
+                      </div>
+                      <div>
+                        <div className="text-xs text-gray-400">Active pipeline</div>
+                        <div className="font-semibold text-gray-900">{recruitmentStats.goals.active_pipeline}</div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {recruitmentStats?.goals && (
+                  <div className="h-1.5 bg-gray-100">
+                    <div
+                      className="h-full transition-all"
+                      style={{
+                        width: `${Math.min(100, Math.round((recruitmentStats.goals.sourced_this_week / Math.max(1, recruitmentStats.goals.sourcing_target)) * 100))}%`,
+                        backgroundColor:
+                          recruitmentStats.goals.sourced_this_week >= recruitmentStats.goals.sourcing_target
+                            ? '#059669'
+                            : theme.accent,
+                      }}
+                    />
+                  </div>
+                )}
+
+                {recruitmentQueue && recruitmentQueue.queue.length > 0 && (
+                  <div className="divide-y divide-gray-100">
+                    {recruitmentQueue.queue.slice(0, 8).map(item => (
+                      <div key={`${item.id}-${item.reason}`} className="px-4 py-2.5 flex items-center justify-between gap-3">
+                        <div className="min-w-0">
+                          <span className="text-sm font-medium text-gray-900">{item.name}</span>
+                          <span className="text-xs text-gray-500 ml-2">{item.detail}</span>
+                        </div>
+                        <span
+                          className={`px-2 py-0.5 rounded-full text-xs font-medium shrink-0 ${
+                            item.reason === 'send_outreach' || item.reason === 'follow_up_2'
+                              ? 'bg-amber-100 text-amber-700'
+                              : item.reason === 'decide_no_response' || item.reason === 'stalled'
+                              ? 'bg-red-50 text-red-700'
+                              : 'bg-gray-100 text-gray-600'
+                          }`}
+                        >
+                          {recruitmentQueue.labels[item.reason] || item.reason}
+                        </span>
+                      </div>
+                    ))}
+                    {recruitmentQueue.queue.length > 8 && (
+                      <div className="px-4 py-2 text-xs text-gray-400">
+                        and {recruitmentQueue.queue.length - 8} more below
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
               {/* Section 1: Pipeline Health Bar */}
               <div className="bg-white rounded-xl border border-gray-200 p-4">
                 <div className="flex items-center justify-between flex-wrap gap-3">

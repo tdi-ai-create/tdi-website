@@ -220,6 +220,43 @@ export async function recruitmentWeeklyShortfall(
   )
 }
 
+export type FollowUpItem = { name: string; days: number; note: string }
+
+/**
+ * Daily "here is what you owe someone" note to Bella.
+ *
+ * The follow-up cron used to mark a candidate as due, write a note into a table
+ * nobody reads, and stop. That is how outreach quietly died on the vine. One
+ * consolidated message per day rather than one per candidate, so it stays
+ * readable on a busy week.
+ */
+export async function recruitmentFollowUpDigest(
+  dueNow: FollowUpItem[],
+  revisits: FollowUpItem[],
+  closedOut: FollowUpItem[]
+) {
+  if (dueNow.length === 0 && revisits.length === 0 && closedOut.length === 0) return
+
+  const section = (title: string, items: FollowUpItem[]) =>
+    items.length
+      ? `\n\n*${title}*\n` + items.map(i => `• ${i.name} | ${i.note}`).join('\n')
+      : ''
+
+  const total = dueNow.length + revisits.length
+  const header =
+    total > 0
+      ? `*Recruitment Follow Ups* | ${total} need${total === 1 ? 's' : ''} you today`
+      : `*Recruitment Follow Ups* | nothing owed, ${closedOut.length} closed out`
+
+  await postToSlack(
+    header +
+      section('Send a follow up', dueNow) +
+      section('Revisit is due', revisits) +
+      section('Closed out after no reply', closedOut) +
+      `\n\n${RECRUITMENT_TAB_URL}`
+  )
+}
+
 /** The research job itself failed. Silence is what broke this the first time. */
 export async function recruitmentResearchFailed(reason: string) {
   await postToSlack(

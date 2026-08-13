@@ -6,6 +6,7 @@ import {
   recruitmentCandidateConverted,
   recruitmentNeedsApproval,
 } from '@/lib/creator-slack'
+import { buildActionQueue, summarizeGoals, QUEUE_LABELS } from '@/lib/recruitment-goals'
 
 const GAP_PRIORITIES = ['critical', 'high', 'medium', 'low']
 const GAP_STATUSES = ['active', 'filled', 'monitoring']
@@ -224,18 +225,47 @@ export async function GET(request: NextRequest) {
       .not('converted_creator_id', 'is', null)
       .gte('updated_at', startOfMonth)
 
+    // Goal progress and the action queue share one read of the pipeline.
+    const { data: queueRows } = await supabase
+      .from('creator_recruitment_candidates')
+      .select('id, name, stage, created_at, updated_at, outreach_sent_at, outreach_follow_up_1_at, outreach_follow_up_2_at, revisit_date')
+
+    const queue = buildActionQueue(queueRows || [])
+    const goals = summarizeGoals(queueRows || [], conversionsThisMonth || 0, queue)
+
     return NextResponse.json({
       stats: {
         critical_gaps_without_candidates: criticalGapsWithoutCandidates,
         total_candidates_by_stage: totalByStage,
         avg_days_in_pipeline: activeCount > 0 ? Math.round(totalDaysInPipeline / activeCount) : 0,
         conversions_this_month: conversionsThisMonth || 0,
+        goals,
       },
     })
   }
 
+  // ─── action_queue: what Bella has to do, derived rather than asked of her ───
+  if (action === 'action_queue') {
+    const { data: rows, error } = await supabase
+      .from('creator_recruitment_candidates')
+      .select('id, name, stage, created_at, updated_at, outreach_sent_at, outreach_follow_up_1_at, outreach_follow_up_2_at, revisit_date')
+
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 })
+    }
+
+    const queue = buildActionQueue(rows || [])
+    const grouped: Record<string, typeof queue> = {}
+    for (const item of queue) {
+      grouped[item.reason] = grouped[item.reason] || []
+      grouped[item.reason].push(item)
+    }
+
+    return NextResponse.json({ queue, grouped, labels: QUEUE_LABELS, count: queue.length })
+  }
+
   return NextResponse.json(
-    { error: 'Unknown action. Use: gaps, pipeline, candidate, stats' },
+    { error: 'Unknown action. Use: gaps, pipeline, candidate, stats, action_queue' },
     { status: 400 }
   )
 }
