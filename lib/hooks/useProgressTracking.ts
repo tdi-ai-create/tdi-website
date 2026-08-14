@@ -127,22 +127,37 @@ export function useProgressTracking(
         }
       });
 
-      // Get check-in completion (quiz questions + responses for this course)
-      const { data: courseQuestions } = await supabase
+      // Get check-in completion (quiz questions + responses for this course).
+      //
+      // is_active must match what the lesson player shows. getCourseQuestions
+      // filters on it, so a deactivated question is never presented to the
+      // learner. Counting it here anyway put questions in the denominator that
+      // could never be answered, which capped every course below 100% and made
+      // certificates unreachable. 176 of 411 questions are currently inactive
+      // and all 31 published courses were affected.
+      const { data: courseQuestions, error: questionsError } = await supabase
         .from('hub_quiz_questions')
         .select('id')
+        .eq('is_active', true)
         .in('lesson_id', lessonIds.length > 0 ? lessonIds : ['__none__']);
+
+      if (questionsError) {
+        console.error('Error fetching course questions:', questionsError.message);
+      }
 
       const totalChecks = courseQuestions?.length || 0;
       let completedChecks = 0;
 
       if (totalChecks > 0) {
         const questionIds = courseQuestions!.map((q) => q.id);
-        const { data: responses } = await supabase
+        const { data: responses, error: responsesError } = await supabase
           .from('hub_quiz_responses')
           .select('question_id')
           .eq('user_id', userId)
           .in('question_id', questionIds);
+        if (responsesError) {
+          console.error('Error fetching quiz responses:', responsesError.message);
+        }
         completedChecks = responses?.length || 0;
       }
 
