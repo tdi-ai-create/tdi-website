@@ -95,10 +95,16 @@ order is: upload videos, generate transcripts, generate check-ins, then publish.
 The Course Upload SOP and the Course Check-Ins SOP in the admin portal cover
 both steps.
 
-Known blockers as of 2026-08-13: `crack-the-co-teaching-code` and
-`escape-the-first-week` have no transcripts at all, so they have no check-ins
-and will not pass. `classroom-management-toolkit` passes, but its final check-in
-sits one lesson early because the Wrap Up transcript is too short to use.
+Blocked as of 2026-08-16: `crack-the-co-teaching-code` and
+`escape-the-first-week` still have no transcripts on any lesson, so they have no
+check-ins and will not pass. `classroom-management-toolkit` passes, but its final
+check-in still sits one lesson early because the Wrap Up transcript is too short
+to use.
+
+Also note the 55 active questions on quick win and branching scenario lessons.
+Those lessons belong to no course, nothing renders their questions to a learner,
+and they still carry the old five question shape. They are not counted by
+anything a learner sees and are not covered by the standard above.
 
 ## Rolling back
 
