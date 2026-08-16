@@ -24,10 +24,13 @@ import { Resend } from 'resend';
  *   PAPERCLIP_COMPANY_ID     — TEA company ID for checkout sweep (optional)
  */
 
-const RAILWAY_API_URL = 'https://backboard.railway.com/graphql/v2';
-const PAPERCLIP_SERVICE_ID = 'a1b621b2-1abc-43b9-84fb-1d9ba8297aa8';
-const ENVIRONMENT_ID = '45885bca-d925-412f-b7e6-8ec663cdc248';
-const PAPERCLIP_URL = 'https://paperclip-railway-template-production.up.railway.app';
+import {
+  RAILWAY_API_URL,
+  PAPERCLIP_SERVICE_ID,
+  PAPERCLIP_ENVIRONMENT_ID as ENVIRONMENT_ID,
+  PAPERCLIP_URL,
+} from '@/lib/paperclip';
+
 const SLOW_THRESHOLD_MS = 5000;
 const HEALTH_TIMEOUT_MS = 8000; // longer than threshold so we measure slow vs. down
 const COOLDOWN_MINUTES = 10;

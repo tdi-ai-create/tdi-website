@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { buildHtmlEmail } from '@/lib/olivia-email-template';
+import { checkPaperclipHealth, type PaperclipHealth } from '@/lib/paperclip';
 
 /**
  * GET /api/cron/olivia-daily-briefing
@@ -16,7 +17,6 @@ import { buildHtmlEmail } from '@/lib/olivia-email-template';
  * with proper TDI branding and What/So What/Now What callout formatting.
  */
 
-const PAPERCLIP_URL = 'https://paperclip-production-014f.up.railway.app';
 
 export async function GET(request: NextRequest) {
   const timestamp = new Date().toISOString();
@@ -447,27 +447,6 @@ async function gatherSocialData(): Promise<SocialData> {
   }
 }
 
-interface PaperclipHealth {
-  status: 'healthy' | 'degraded' | 'down';
-  latencyMs: number;
-  detail: string;
-}
-
-async function checkPaperclipHealth(): Promise<PaperclipHealth> {
-  try {
-    const start = Date.now();
-    const res = await fetch(`${PAPERCLIP_URL}/api/health`, {
-      signal: AbortSignal.timeout(5000),
-    });
-    const latencyMs = Date.now() - start;
-    if (res.ok && latencyMs < 5000) {
-      return { status: 'healthy', latencyMs, detail: `${latencyMs}ms` };
-    }
-    return { status: 'degraded', latencyMs, detail: `${res.status} (${latencyMs}ms)` };
-  } catch (err) {
-    return { status: 'down', latencyMs: 0, detail: String(err) };
-  }
-}
 
 // ============================================================
 // Report Builder
