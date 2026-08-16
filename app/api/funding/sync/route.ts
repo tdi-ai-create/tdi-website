@@ -164,8 +164,11 @@ export async function GET(request: NextRequest) {
       `)
       .eq('narrative_status', 'qa_review')
 
-    // qa_passed = false means it already bounced back and is being redrafted
-    const qaWork = (rawQaWork ?? []).filter((o: any) => o.qa_passed == null)
+    // Being in qa_review IS the signal that a verdict is needed. Do not filter
+    // on qa_passed here: after a fail it stays false, so a redrafted narrative
+    // returning to qa_review would be invisible to QA forever. That is exactly
+    // what happened to five Saunemin narratives for two days.
+    const qaWork = rawQaWork ?? []
 
     // Tag each item with its request type
     const work = [
@@ -367,9 +370,16 @@ export async function POST(request: NextRequest) {
     // See the note in update_opportunity: activity means a change, not a touch.
     if (changed) updates.last_activity_at = new Date().toISOString()
 
-    // State clock (migration 113)
+    // State clock (migration 116)
     if (narrativeStatus && narrativeStatus !== prior?.narrative_status) {
       updates.narrative_status_changed_at = new Date().toISOString()
+    }
+
+    // A new draft invalidates the verdict on the old one. Without this,
+    // qa_passed keeps the stale 'false' from the previous attempt and the
+    // record claims a narrative failed a review it has never had.
+    if (narrativeStatus === 'qa_review' && prior?.narrative_status !== 'qa_review') {
+      updates.qa_passed = null
     }
 
     const { error } = await supabase

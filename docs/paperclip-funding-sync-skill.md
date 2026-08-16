@@ -161,7 +161,7 @@ curl -s -X GET \
 |---|---|---|---|
 | `draft_narrative` | `narrative_status = 'requested'` | YES — `window_status = 'open'` AND `gate_open = true` | Draft or update the grant narrative for this opportunity |
 | `research_funders` | `research_status = 'requested'` | NO — research finds new paths | Research available funding sources for this pursuit |
-| `qa_narrative` | `narrative_status = 'qa_review'` AND `qa_passed IS NULL` | NO — the draft already exists | Score the narrative against the quality gate and file a verdict with `submit_qa_verdict` |
+| `qa_narrative` | `narrative_status = 'qa_review'` | NO — the draft already exists | Score the narrative against the quality gate and file a verdict with `submit_qa_verdict` |
 
 `qa_narrative` items carry two extra fields the QA reviewer needs:
 
@@ -169,6 +169,8 @@ curl -s -X GET \
 |---|---|
 | `attempt` | Which attempt this is. 1 on a first review, higher after a fail sent it back. |
 | `escalates_if_failed` | `true` when failing this attempt sends it to a person instead of back to the writer. When this is true, a failing verdict MUST include an `escalation` object or the API rejects it. |
+
+**Re-review after a redraft.** Being in `qa_review` is the only condition. A narrative that failed, was redrafted, and came back gets reviewed again, and `qa_passed` is cleared on re-entry so it never carries a stale verdict from a draft that no longer exists.
 
 **Why QA work is not gated:** the narrative already exists, so reviewing it costs nothing if the window later closes. Holding a finished draft behind a gate the school has not cleared just recreates a stall.
 

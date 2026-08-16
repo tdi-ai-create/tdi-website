@@ -115,9 +115,15 @@ export async function PATCH(request: NextRequest) {
   fields.forEach(f => { if (body[f] !== undefined) updates[f] = body[f]; });
 
   // State clock: stamped only when narrative_status genuinely changes, so
-  // "how long has this been in this state" stays answerable. See migration 113.
+  // "how long has this been in this state" stays answerable. See migration 116.
   if (body.narrative_status !== undefined && body.narrative_status !== before?.narrative_status) {
     updates.narrative_status_changed_at = new Date().toISOString();
+
+    // A new draft invalidates the verdict on the old one, unless this same
+    // write is setting one.
+    if (body.narrative_status === 'qa_review' && body.qa_passed === undefined) {
+      updates.qa_passed = null;
+    }
   }
 
   // When client_submitted flips to true, set timestamp and update activity

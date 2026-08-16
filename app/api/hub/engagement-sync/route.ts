@@ -15,6 +15,10 @@ export const maxDuration = 60
  * - Get lesson content for review (get_lesson)
  *
  * Auth: Bearer token via PAPERCLIP_SYNC_KEY env var
+ *
+ * Every read here filters on is_active. A retired question is never shown to a
+ * learner, so counting one tells an agent a lesson already has its check-ins
+ * when the lesson is actually bare, and find_work skips it forever.
  */
 
 function db() {
@@ -64,6 +68,7 @@ export async function GET(request: NextRequest) {
     const { data: questionCounts } = await supabase
       .from('hub_quiz_questions')
       .select('lesson_id')
+      .eq('is_active', true)
 
     const lessonQuestionCounts = new Map<string, number>()
     questionCounts?.forEach((q) => {
@@ -129,6 +134,7 @@ export async function GET(request: NextRequest) {
       .from('hub_quiz_questions')
       .select('*')
       .eq('lesson_id', lessonId)
+      .eq('is_active', true)
       .order('sort_order', { ascending: true })
 
     return NextResponse.json({ lesson, questions: questions || [] })
@@ -143,6 +149,7 @@ export async function GET(request: NextRequest) {
       .from('hub_quiz_questions')
       .select('question_type')
       .eq('lesson_id', lessonId)
+      .eq('is_active', true)
 
     const types = questions?.map((q) => q.question_type) || []
     const comprehensionCount = types.filter((t) => t === 'multiple_choice' || t === 'true_false').length
@@ -174,6 +181,7 @@ export async function GET(request: NextRequest) {
     const { data: questions } = await supabase
       .from('hub_quiz_questions')
       .select('lesson_id, question_type')
+      .eq('is_active', true)
 
     const lessonQuestionCounts = new Map<string, number>()
     questions?.forEach((q) => {
@@ -311,6 +319,7 @@ JSON array only, no markdown fences.`
       .from('hub_quiz_questions')
       .select('sort_order')
       .eq('lesson_id', lesson_id)
+      .eq('is_active', true)
       .order('sort_order', { ascending: false })
       .limit(1)
 
