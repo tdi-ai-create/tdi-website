@@ -1147,9 +1147,15 @@ export default function LessonPage({ params }: LessonPageProps) {
 
   const handleCompleteCourse = async () => {
     if (!currentLesson) return;
-    if (!isComplete) {
-      await markLessonStatus(currentLesson.id, 'completed');
-    }
+    // Always run this, even when the lesson is already complete. Enrollment
+    // rollup and certificate generation both hang off markLessonStatus, so
+    // skipping it here made the button a no-op in the normal case: the learner
+    // finishes the last lesson, then clears the final check-in, then clicks
+    // Complete Course and nothing happens. The upsert writes the same values,
+    // and both the activity log and the certificate are already guarded
+    // against running twice.
+    await markLessonStatus(currentLesson.id, 'completed');
+    await refetch();
   };
 
   const toggleModule = (moduleId: string) => {
