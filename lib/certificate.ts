@@ -1,3 +1,4 @@
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { getHubSupabase as getSupabase } from '@/lib/supabase-hub';
 import { notifyCertificateReady } from '@/lib/hub/notifications';
 
@@ -20,9 +21,10 @@ export function generateVerificationCode(): string {
  */
 export async function certificateExists(
   userId: string,
-  courseId: string
+  courseId: string,
+  client?: SupabaseClient
 ): Promise<boolean> {
-  const supabase = getSupabase();
+  const supabase = client ?? getSupabase();
 
   const { data } = await supabase
     .from('hub_certificates')
@@ -39,13 +41,16 @@ export async function certificateExists(
  */
 export async function createCertificate(
   userId: string,
-  courseId: string
+  courseId: string,
+  client?: SupabaseClient
 ): Promise<{ success: boolean; verificationCode?: string; pdHours?: number; error?: string }> {
-  const supabase = getSupabase();
+  // Callers on the server (the backfill route) must pass a service-role client.
+  // getHubSupabase is the anon client, which RLS blocks outside a user session.
+  const supabase = client ?? getSupabase();
 
   try {
     // Check if certificate already exists
-    const exists = await certificateExists(userId, courseId);
+    const exists = await certificateExists(userId, courseId, supabase);
     if (exists) {
       return { success: true, error: 'Certificate already exists' };
     }
