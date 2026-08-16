@@ -22,10 +22,14 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'lesson_id is required' }, { status: 400 });
     }
 
+    // Retired questions are kept so educator responses still resolve, but they
+    // are not editable content: nothing an editor changes on one will ever
+    // reach a learner. Showing them here only invites wasted edits.
     const { data, error } = await supabase
       .from('hub_quiz_questions')
       .select('*')
       .eq('lesson_id', lessonId)
+      .eq('is_active', true)
       .order('sort_order', { ascending: true });
 
     if (error) {
@@ -75,6 +79,7 @@ export async function POST(request: Request) {
         .from('hub_quiz_questions')
         .select('sort_order')
         .eq('lesson_id', lesson_id)
+        .eq('is_active', true)
         .order('sort_order', { ascending: false })
         .limit(1);
 
