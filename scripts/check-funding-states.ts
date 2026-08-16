@@ -85,5 +85,28 @@ const staleOk = stale.length > 0
 if (!staleOk) failures++
 console.log(`${staleOk ? 'PASS' : 'FAIL'}  QA agent ON but silent 48h → a person owns it  (${stale.length} actionable)`)
 
+// ── A redrafted narrative must be reviewable again ──
+//
+// qa_passed keeps the 'false' from the previous attempt unless it is cleared on
+// re-entry. find_work used to filter on qa_passed IS NULL, which made every
+// redrafted narrative permanently invisible to QA. Five sat that way for days.
+
+console.log('\n── Re-review after a redraft ──')
+
+const redrafted = { ...base, narrative_status: 'qa_review', qa_passed: false, qa_attempt_count: 1,
+  narrative_status_changed_at: new Date().toISOString() }
+
+const reviewable = computeNextActions(pursuit, [redrafted], [], openGate, [], { qaAgentEnabled: true })
+  .filter(a => a.targetId === redrafted.id)
+const reviewOk = reviewable.length > 0
+if (!reviewOk) failures++
+console.log(`${reviewOk ? 'PASS' : 'FAIL'}  redrafted narrative (qa_passed=false) still surfaces  (${reviewable.length} items)`)
+
+// It must never read as approved just because a stale verdict is sitting on it
+const wronglyApproved = reviewable.filter(a => a.actionType === 'approve_draft')
+const notApproved = wronglyApproved.length === 0
+if (!notApproved) failures++
+console.log(`${notApproved ? 'PASS' : 'FAIL'}  and is not treated as approved`)
+
 console.log(`\n${failures === 0 ? 'All states owned and actionable.' : `${failures} check(s) failed — work can go silent.`}`)
 process.exit(failures === 0 ? 0 : 1)
