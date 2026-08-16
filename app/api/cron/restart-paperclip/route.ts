@@ -17,10 +17,17 @@ import { Resend } from 'resend';
  *   PAPERCLIP_API_TOKEN    — Paperclip session token for checkout sweep (optional)
  */
 
-const RAILWAY_API_URL = 'https://backboard.railway.com/graphql/v2';
-const PAPERCLIP_SERVICE_ID = '29ec2529-3d91-472b-82db-3049c1027cc4';
-const ENVIRONMENT_ID = '97a6200a-0263-437a-855b-183af689992d';
-const PAPERCLIP_URL = 'https://paperclip-production-014f.up.railway.app';
+import {
+  RAILWAY_API_URL,
+  PAPERCLIP_SERVICE_ID,
+  PAPERCLIP_ENVIRONMENT_ID as ENVIRONMENT_ID,
+  PAPERCLIP_URL,
+} from '@/lib/paperclip';
+
+// NOTE: this route is not on a schedule in vercel.json. The 30-minute
+// paperclip-watchdog supersedes it and is the mechanism that actually runs.
+// Its constants pointed at the retired instance until 2026-08-16, so invoking
+// it by hand would have restarted a Railway service that no longer exists.
 
 // TEA company ID from .paperclip.yaml config
 const COMPANY_ID = process.env.PAPERCLIP_COMPANY_ID || '';
