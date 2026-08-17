@@ -94,6 +94,8 @@ interface Partnership {
   virtual_sessions_completed: number;
   executive_sessions_total: number;
   executive_sessions_completed?: number;
+  /** Real contracted figure. Null for memberships-only partnerships with no services contract. */
+  cost_per_educator?: number | null;
   staff_enrolled?: number;
   status: string;
   org_name?: string | null;
@@ -1469,6 +1471,10 @@ export default function PartnerDashboard() {
       wellnessScore: hubStats?.mood_avg_7d ?? null,
       totalDeliverables: totalDel,
       completedDeliverables: completedDel,
+      // Only ever the real contracted figure. Null means we do not know what they paid,
+      // and a report must not put a number in front of a school board that we invented.
+      costPerEducator: partnership.cost_per_educator ?? null,
+      observationDays: partnership.observation_days_total || 0,
       kpis: partnershipKpis.map(k => ({ label: k.kpi_label, current: k.current_value, target: k.target_value, unit: k.target_unit })),
       quotes: teacherQuotes.slice(0, 5).map(q => ({ text: q.quote_text, role: q.teacher_role })),
       actionItemsCompleted: actionItems.filter(i => i.status === 'completed').length,
@@ -1494,11 +1500,11 @@ export default function PartnerDashboard() {
           }),
           data: {
             prompt: reportType === 'board'
-              ? `Write a professional board presentation report for ${schoolName}'s TDI partnership. Include: executive summary, key metrics, educator testimonials, ROI analysis, and recommendations. Data: ${JSON.stringify(dataContext)}. Format with clear sections. No emojis. Professional tone.`
+              ? `Write a professional board presentation report for ${schoolName}'s TDI partnership. Include: executive summary, key metrics, educator testimonials, and recommendations. Data: ${JSON.stringify(dataContext)}. Format with clear sections. No emojis. Professional tone.${dataContext.costPerEducator === null ? ' CRITICAL: no contract value is on file for this partnership. Do not state, estimate, or imply any dollar amount, cost per educator, or ROI figure. Do not reference services the data does not show, such as observation days when observationDays is 0.' : ''}`
               : reportType === 'engagement'
               ? `Write a detailed staff engagement analysis for ${schoolName}. Cover: Hub adoption rates, most-used tools, engagement trends, educator feedback, and specific recommendations to increase participation. Data: ${JSON.stringify(dataContext)}. Be specific and actionable.`
               : reportType === 'impact'
-              ? `Write an impact and ROI report for ${schoolName}'s TDI partnership investment. Include: investment summary, measurable outcomes, educator wellness changes, professional development hours, before/after comparisons, and projected year-end outcomes. Data: ${JSON.stringify(dataContext)}. Make it compelling for budget justification.`
+              ? `Write an impact report for ${schoolName}'s TDI partnership. Include: measurable outcomes, educator wellness changes, before/after comparisons, and projected year-end outcomes. Data: ${JSON.stringify(dataContext)}. Make it compelling for budget justification.${dataContext.costPerEducator === null ? ' CRITICAL: no contract value is on file for this partnership. Do not state, estimate, or imply any dollar amount, cost per educator, or ROI figure. Focus entirely on non-financial outcomes.' : ''}`
               : reportType === 'quarterly'
               ? `Write a quarterly progress report for ${schoolName}'s TDI partnership. Include: this quarter's highlights, metrics vs targets, challenges and solutions, upcoming milestones, and a forward-looking summary. Data: ${JSON.stringify(dataContext)}. Keep it concise but thorough.`
               : reportType === 'teacher'
@@ -1548,7 +1554,18 @@ export default function PartnerDashboard() {
   const generateFallbackReport = (type: string, data: any) => {
     const s = data.schoolName;
     const hasEngagement = data.hubLoginPct > 0;
-    const costPerEducator = data.staffTotal > 0 ? Math.round(18000 / data.staffTotal) : 0; // Approximate based on typical contract
+    // Never derive a price. Memberships-only partnerships have no services contract behind
+    // them, so an assumed contract value would invent a figure the school never paid.
+    const costPerEducator: number | null = data.costPerEducator ?? null;
+    const hasCost = typeof costPerEducator === 'number' && costPerEducator > 0;
+    // Describe only what this partnership actually includes.
+    const includedItems = [
+      'Learning Hub access (100+ hours of content)',
+      data.totalDeliverables > 0 ? `${data.totalDeliverables} in-person and virtual sessions` : null,
+      data.observationDays > 0 ? 'personalized observation feedback (Love Notes)' : null,
+      'leadership dashboard with real-time data',
+      'ongoing support',
+    ].filter(Boolean).join(', ');
     const quotesBlock = data.quotes.length > 0 ? '\n\nWHAT EDUCATORS ARE SAYING\n\n' + data.quotes.map((q: {text:string;role:string}) => `"${q.text}"\n-- ${q.role}`).join('\n\n') : '';
     const kpiBlock = data.kpis.length > 0 ? '\n\nPARTNERSHIP GOALS\n\n' + data.kpis.map((k: {label:string;current:number;target:number;unit:string}) => `${k.label}: ${k.current}${k.unit} of ${k.target}${k.unit} target`).join('\n') : '';
 
@@ -1556,7 +1573,7 @@ export default function PartnerDashboard() {
       case 'board':
         return `THE 30-SECOND VERSION
 
-${s} has ${data.staffTotal} educators with TDI Learning Hub access. ${hasEngagement ? `${data.hubLoginPct}% are actively engaged, ${data.toolsExplored} tools explored, ${data.completedDeliverables} of ${data.totalDeliverables} contracted sessions delivered.` : `The team is onboarding now. Contracted sessions and Hub engagement tracking begin this school year.`} TDI's implementation rate is 74%, compared to 10% for traditional PD. Investment: approximately $${costPerEducator} per educator for the full school year.
+${s} has ${data.staffTotal} educators with TDI Learning Hub access. ${hasEngagement ? `${data.hubLoginPct}% are actively engaged, ${data.toolsExplored} tools explored, ${data.completedDeliverables} of ${data.totalDeliverables} contracted sessions delivered.` : `The team is onboarding now. Contracted sessions and Hub engagement tracking begin this school year.`} TDI's implementation rate is 74%, compared to 10% for traditional PD.${hasCost ? ` Investment: approximately $${costPerEducator} per educator for the full school year.` : ''}
 
 EXECUTIVE SUMMARY
 
@@ -1573,10 +1590,9 @@ Course Completions: ${data.courseCompletions}
 Deliverables Completed: ${data.completedDeliverables} of ${data.totalDeliverables}${data.wellnessScore ? `\nEducator Wellness Score: ${data.wellnessScore}/5` : ''}
 ${kpiBlock}
 
-INVESTMENT ANALYSIS
+WHAT THE PARTNERSHIP INCLUDES
 
-Cost per educator: approximately $${costPerEducator}/year
-This includes: Learning Hub access (100+ hours of content), ${data.totalDeliverables} in-person and virtual sessions, personalized observation feedback (Love Notes), leadership dashboard with real-time data, and ongoing support.
+${hasCost ? `Cost per educator: approximately $${costPerEducator}/year\n` : ''}This includes: ${includedItems}.
 
 For comparison, a single-day PD conference costs $500-2,000 per teacher with no follow-up and no implementation tracking. TDI provides year-round support at a fraction of that cost with measurable outcomes.
 
@@ -1695,15 +1711,12 @@ INVESTMENT SUMMARY
 ${s} has invested in a TDI ${data.phase} partnership providing ${data.staffTotal} educators with year-round professional development support. This is not a one-day workshop. It is a sustained, multi-channel approach to building teaching capacity.
 
 Your partnership includes:
-- Learning Hub access for ${data.staffTotal} educators (100+ hours of content)
-- ${data.totalDeliverables} contracted deliverables (observation days, virtual sessions, executive sessions)
-- Personalized observation feedback (Love Notes) for every observed teacher
+- Learning Hub access for ${data.staffTotal} educators (100+ hours of content)${data.totalDeliverables > 0 ? `\n- ${data.totalDeliverables} contracted deliverables (observation days, virtual sessions, executive sessions)` : ''}${data.observationDays > 0 ? '\n- Personalized observation feedback (Love Notes) for every observed teacher' : ''}
 - Real-time leadership dashboard with engagement data
 - AI-generated reports for board presentations and grant reporting
 
 COST COMPARISON
-
-TDI Partnership: approximately $${costPerEducator} per educator per year
+${hasCost ? `\nTDI Partnership: approximately $${costPerEducator} per educator per year` : ''}
 Traditional PD Conference: $500-2,000 per teacher per day (no follow-up)
 External Coaching: $150-300 per hour per teacher
 
