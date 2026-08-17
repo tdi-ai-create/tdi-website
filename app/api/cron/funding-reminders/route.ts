@@ -130,6 +130,83 @@ export async function GET(request: NextRequest) {
       draftCount++
     }
 
+    // ── Signed contracts that were never linked to a gate ──
+    //
+    // This is the failure that cost the most and was hardest to see. St. Peter
+    // Chanel signed on 11 June and 8 July. Nobody linked either quote to her
+    // gate, so contract1_signed and contract2_signed stayed false, the gate
+    // stayed shut, and find_work hid every drafting task from every agent for
+    // eighteen days. Nothing reconciled it, nothing alerted on it, and the one
+    // alert that did fire told Bella to chase Paula for signatures she had
+    // already given.
+    //
+    // Deliberately detects rather than links. There is no reliable join from a
+    // pursuit to its quotes: funding_pursuits keys on partnership_id, quotes key
+    // on district_id, and partnerships carry no district_id at all. The only
+    // available match is the organisation name, and auto-linking a contract on a
+    // fuzzy name match is exactly the kind of inference that produced the wrong
+    // records this whole cleanup has been unpicking.
+    //
+    // So it names the candidate quote and asks a person to confirm. One click
+    // for them, no chance of binding the wrong contract to the wrong school.
+    let unlinkedContracts = 0
+    const unlinkedLines: string[] = []
+    for (const p of pursuits) {
+      const gate = gateByPursuit.get(p.id)
+      if (!gate) continue
+      const needsC1 = !gate.contract1_quote_id
+      const needsC2 = !gate.contract2_quote_id
+      if (!needsC1 && !needsC2) continue
+
+      // Strip the bookkeeping the pursuit name carries so it can match a quote's
+      // organisation field.
+      const school = (p.district_name || p.pursuit_name || '')
+        .replace(/^\(RENEWAL\)\s*/i, '')
+        .replace(/\s*[-–]\s*Grant Fund(ing|ed)$/i, '')
+        .trim()
+      if (school.length < 4) continue
+
+      const { data: candidates } = await supabase
+        .from('quotes')
+        .select('id, quote_number, contract_type, signed_at, contact_organization')
+        .eq('status', 'signed')
+        .ilike('contact_organization', `%${school}%`)
+
+      for (const q of candidates || []) {
+        const wantedType = needsC1 && q.contract_type === 'minimum'
+          ? 'first agreement'
+          : needsC2 && q.contract_type === 'grant_funded'
+            ? 'second agreement'
+            : null
+        if (!wantedType) continue
+        unlinkedContracts++
+        unlinkedLines.push(
+          `  • ${school}: ${q.quote_number} (${q.contract_type}) signed ` +
+            `${(q.signed_at || '').split('T')[0]} is not linked as the ${wantedType}`,
+        )
+      }
+    }
+
+    if (unlinkedContracts > 0) {
+      const settings = await loadSettings()
+      if (settings.slack_enabled && settings.slack_webhook_url) {
+        const mention = settings.bella_slack_handle ? ` <@${settings.bella_slack_handle}>` : ''
+        await fetch(settings.slack_webhook_url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            text:
+              `*${unlinkedContracts} signed contract${unlinkedContracts === 1 ? '' : 's'} may not be linked to a gate*${mention}\n` +
+              `${unlinkedLines.join('\n')}\n` +
+              `A shut gate stops all drafting silently. Please confirm the match and link it, ` +
+              `or ignore if the name is a coincidence.`,
+          }),
+        }).catch(err => console.error('[funding-reminders] Unlinked-contract post failed:', err))
+      } else {
+        console.log('[funding-reminders] Slack disabled — would have reported', unlinkedContracts, 'unlinked contract(s)')
+      }
+    }
+
     // ── One daily message to Bella: what is waiting for her to send ──
     //
     // The follow-up cron no longer emails schools. It writes a draft and stops,
@@ -208,6 +285,7 @@ export async function GET(request: NextRequest) {
       warning_count: warnings.length,
       drafts_created: draftCount,
       drafts_waiting: draftsWaiting,
+      unlinked_contracts: unlinkedContracts,
       digest_sent: alerts.length > 0,
     })
   } catch (e: unknown) {
