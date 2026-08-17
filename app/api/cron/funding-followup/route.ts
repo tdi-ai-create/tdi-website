@@ -58,6 +58,15 @@ const LEAD_WINDOWS: Record<string, number> = {
   heavy: 5,
 }
 
+// ── Nudge cadence ──
+//
+// How long an overdue item waits between reminders. Weekly, not daily: a
+// principal reminded about the same item every morning stops reading any of
+// them. Escalation is unaffected and still advances on its own window, so a
+// genuinely stuck item still climbs the ladder at the same speed.
+const NUDGE_INTERVAL_DAYS = 7
+const MS_PER_DAY = 24 * 60 * 60 * 1000
+
 // ── Escalation ladder ──
 
 const RUNG_ORDER = ['none', 'submitter', 'backup', 'admin_sponsor', 'rae'] as const
@@ -753,15 +762,34 @@ export async function GET(request: NextRequest) {
           updates.reminder_count = (item.reminder_count ?? 0) + 1
         }
 
-        // Nudge: at most once per calendar day
+        // Nudge: at most once every NUDGE_INTERVAL_DAYS.
+        //
+        // This was once per calendar day, which reads as nagging to a principal
+        // who is being reminded about the same thing every morning. There is
+        // also no upper bound on nudge_count anywhere in this file, so a daily
+        // cadence on an item nobody closes never stops: two overdue items sent
+        // one contact 27 emails, and a second contact got three a night for
+        // four consecutive nights.
+        //
+        // Weekly does not fix the missing ceiling, it reduces the blast radius
+        // while that is designed properly. Modelled against the actual incident:
+        // those 41 emails would have been 13, and the worst single item drops
+        // from 18 to 3. The ratio is well short of 7x because these items only
+        // ran 9 to 19 days past due; it approaches 7x the longer one sits open,
+        // which is exactly the case a ceiling still needs to handle.
         const lastNudge = item.last_nudge_sent_at
           ? new Date(item.last_nudge_sent_at)
           : null
-        const nudgedToday =
-          lastNudge !== null &&
-          lastNudge.toDateString() === today.toDateString()
+        const daysSinceNudge =
+          lastNudge === null
+            ? Infinity
+            : Math.floor(
+                (today.getTime() - new Date(lastNudge).setHours(0, 0, 0, 0)) /
+                  MS_PER_DAY,
+              )
+        const nudgedRecently = daysSinceNudge < NUDGE_INTERVAL_DAYS
 
-        if (!nudgedToday) {
+        if (!nudgedRecently) {
           updates.nudge_count = (item.nudge_count ?? 0) + 1
           updates.last_nudge_sent_at = now.toISOString()
           summary.nudges_fired++
