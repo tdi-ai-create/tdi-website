@@ -100,6 +100,10 @@ export async function POST(request: NextRequest) {
         status: 'pending',
         category: 'follow_up',
         action_size: 'light',
+        // Each of these is a question: did they set it up, did they submit.
+        // Closing one without recording what we found is how a school ends up
+        // chased about something already done, or assumed done when it is not.
+        requires_answer: true,
       })
 
       milestones.push({
@@ -128,6 +132,10 @@ export async function POST(request: NextRequest) {
         status: 'pending',
         category: 'follow_up',
         action_size: 'light',
+        // Each of these is a question: did they set it up, did they submit.
+        // Closing one without recording what we found is how a school ends up
+        // chased about something already done, or assumed done when it is not.
+        requires_answer: true,
       })
     }
   }

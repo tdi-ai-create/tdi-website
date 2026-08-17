@@ -149,6 +149,10 @@ export async function POST(request: NextRequest) {
         category: 'documentation',
         action_size: 'light',
         prepared_materials: preparedEmail,
+        // A question, not a task. It cannot be closed by doing something; it
+        // closes when the school tells us the answer, and the answer decides
+        // whether this path continues.
+        requires_answer: true,
       })
 
       emailDraft = { ask: askText, contactName: opp.contact_name ?? null }

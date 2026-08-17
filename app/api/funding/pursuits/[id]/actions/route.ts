@@ -81,6 +81,16 @@ export async function POST(
   return NextResponse.json({ success: true, action: data })
 }
 
+/**
+ * What an answer means for the work. Fixed set, because "what happens next" is
+ * a decision with consequences and free text would let it be dodged.
+ *
+ *   proceed        the path continues
+ *   stop_path      this path is not viable, close it
+ *   still_blocked  answered, but it does not unblock us yet
+ */
+const VALID_OUTCOMES = ['proceed', 'stop_path', 'still_blocked']
+
 // PATCH -- update an action item
 export async function PATCH(
   request: NextRequest,
@@ -101,6 +111,8 @@ export async function PATCH(
     'title', 'description', 'status', 'due_date', 'owner_type', 'owner_email',
     'owner_name', 'prepared_materials', 'prepared_document_url', 'sort_order', 'category',
     'client_label', 'cancel_reason', 'action_size', 'notes', 'link',
+    // Decision record. See the completion guard below for why these exist.
+    'requires_answer', 'answer', 'answered_by', 'answered_at', 'outcome',
   ]
   fields.forEach(f => {
     const camelKey = f.replace(/_([a-z])/g, (_, c) => c.toUpperCase())
@@ -110,6 +122,55 @@ export async function PATCH(
 
   // Handle completion
   if (body.status === 'done' || body.markDone) {
+    // A question cannot close without an answer.
+    //
+    // "Ask Paula Poche if the school has an NEA member teacher" was created on
+    // 21 July and marked done on 27 July, with one note reading "Nudge sent to
+    // bella@teachersdeserveit.com". No answer was ever recorded, so the record
+    // read resolved while the question was still open. Nobody noticed for three
+    // weeks, and by then the same unanswered question had stalled a second
+    // school.
+    //
+    // Marking done meant "somebody clicked done", never "we learned something".
+    // A green tick and an unanswered question looked identical.
+    //
+    // Only items flagged requires_answer are held to this. A contract signature
+    // is a task, where doing it is the whole story. A question is different:
+    // doing it tells you nothing, the reply does.
+    const { data: existing } = await supabase
+      .from('funding_action_items')
+      .select('requires_answer, answer, outcome, title')
+      .eq('id', body.actionId)
+      .single()
+
+    if (existing?.requires_answer) {
+      const answer = (updates.answer ?? existing.answer) as string | null
+      const outcome = (updates.outcome ?? existing.outcome) as string | null
+
+      if (!answer || !String(answer).trim()) {
+        return NextResponse.json({
+          error: `"${existing.title}" is a question. Record what you were told before closing it.`,
+          requires: { field: 'answer', label: 'What did they say?' },
+        }, { status: 400 })
+      }
+      if (!outcome || !VALID_OUTCOMES.includes(String(outcome))) {
+        return NextResponse.json({
+          error: `"${existing.title}" needs to say what the answer means before closing.`,
+          requires: {
+            field: 'outcome',
+            label: 'What does this mean for the work?',
+            options: VALID_OUTCOMES,
+          },
+        }, { status: 400 })
+      }
+
+      // Stamp who answered, if the caller supplied an answer without saying.
+      if (updates.answer !== undefined && !updates.answered_by) {
+        updates.answered_by = actorEmail
+        updates.answered_at = new Date().toISOString()
+      }
+    }
+
     updates.status = 'done'
     updates.completed_at = new Date().toISOString()
     updates.completed_by = actorEmail
