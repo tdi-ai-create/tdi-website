@@ -132,13 +132,33 @@ export function narrativeEvent(pursuitId: string, pursuitName: string, oppName: 
     'requested→drafting': `${agent || 'Agent'} started drafting ${oppName} narrative`,
     'drafting→review': `${oppName} narrative drafted by ${agent || 'agent'} → now needs QA`,
     'review→qa_review': `${oppName} narrative sent to QA`,
+    'qa_review→approval': `${oppName} passed QA${agent ? ` (${agent})` : ''} → needs your approval before it can go to the school`,
+    'qa_review→escalated': `${oppName} failed QA twice${agent ? ` (${agent})` : ''} → needs a decision from you, with a recommendation attached`,
     'qa_review→ready': `${oppName} narrative approved → ready for submission`,
   }
   const key = `${fromStatus}→${toStatus}`
   const message = labels[key] || `${oppName} narrative: ${fromStatus} → ${toStatus}`
 
-  const isHandoff = ['drafting→review', 'review→qa_review', 'qa_review→ready'].includes(key)
-  const owner = toStatus === 'qa_review' ? null : toStatus === 'ready' ? null : isHandoff ? 'bella' : null
+  // Which transitions hand work to a named person, and to whom.
+  //
+  // Being in this map at all makes the event a handoff rather than chatter, so
+  // it survives a verbosity setting of 'handoffs'. The value is who gets an
+  // @mention. null means the transition is a real handoff but there is nobody
+  // waiting on it.
+  //
+  // The two that matter most were missing entirely. A narrative that passes QA
+  // and one that exhausts its QA attempts both stop dead until Bella acts, and
+  // both were posting as untagged chatter, so nothing told her. Two finished
+  // applications sat unapproved for a day because of it.
+  const HANDOFF_OWNER: Record<string, 'bella' | null> = {
+    'drafting→review': 'bella',     // a draft exists and needs moving to QA
+    'review→qa_review': null,       // now Julie's; nobody to chase
+    'qa_review→approval': 'bella',  // passed, waiting on her approval
+    'qa_review→escalated': 'bella', // QA is out of attempts, she decides
+    'qa_review→ready': null,        // already approved; nothing owed
+  }
+  const isHandoff = key in HANDOFF_OWNER
+  const owner = HANDOFF_OWNER[key] ?? null
 
   return {
     pursuitId, pursuitName, message,
