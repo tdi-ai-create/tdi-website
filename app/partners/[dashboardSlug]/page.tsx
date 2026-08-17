@@ -1468,7 +1468,10 @@ export default function PartnerDashboard() {
       schoolName,
       phase: partnership.contract_phase || 'IGNITE',
       staffTotal: staffStats.total,
-      staffLoggedIn: staffStats.hubLoggedIn,
+      // staff_members.hub_login_date has no writer, so staffStats.hubLoggedIn is always 0.
+      // Reports read this in nine places, which produced lines like
+      // "0 of 16 educators actively using the Learning Hub (25%)". Use the real Hub count.
+      staffLoggedIn: hubStats?.logins_this_month ?? staffStats.hubLoggedIn,
       hubLoginPct: hubPctVal,
       toolsExplored: hubStats?.quick_wins_completed ?? 0,
       courseCompletions: hubStats?.course_completions ?? 0,
