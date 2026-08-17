@@ -1088,18 +1088,68 @@ export async function GET(request: NextRequest) {
     // ── Agent timeout check (Layer 3) ──
     // If a narrative was requested > 72 hours ago and never completed, alert Rae
     // Only send ONE alert per opportunity per day (check if we already alerted today)
-    const todayDate = new Date().toISOString().split('T')[0]
+    // This must match what find_work actually hands to an agent, or it reports
+    // people as unresponsive for work they were never offered.
+    //
+    // It previously matched on 'requested' plus 72 hours and nothing else,
+    // while find_work also requires an open window and an open gate. The result
+    // was a daily email to Rae naming vanessa and amara as overdue on drafts
+    // the system was deliberately hiding from them. Five of the seven it listed
+    // on 17 Aug belonged to a school that had declined grant work in August and
+    // been archived; they had been "overdue" for 431 hours and would have gone
+    // on forever.
+    //
+    // Archived is checked here too. find_work does not check it and excludes
+    // archived pursuits only incidentally, because a declined school's gate is
+    // usually shut. That is luck rather than logic, so it is closed properly in
+    // the sync route as part of this change.
     const { data: staleAgentWork } = await supabase
       .from('funding_opportunities')
       .select('id, name, pursuit_id, narrative_status, assigned_agent, updated_at')
       .eq('narrative_status', 'requested')
+      .eq('window_status', 'open')
       .lt('updated_at', new Date(Date.now() - 72 * 60 * 60 * 1000).toISOString())
 
-    if (staleAgentWork && staleAgentWork.length > 0) {
+    // Keep only work an agent can genuinely see: gate open, pursuit not archived.
+    let agentVisible: typeof staleAgentWork = []
+    const stalePursuitIds = [
+      ...new Set((staleAgentWork ?? []).map(o => o.pursuit_id).filter(Boolean)),
+    ]
+    if (stalePursuitIds.length > 0) {
+      const [gateRes, pursuitRes] = await Promise.all([
+        supabase
+          .from('pursuit_gate')
+          .select('pursuit_id')
+          .in('pursuit_id', stalePursuitIds)
+          .eq('gate_open', true),
+        supabase
+          .from('funding_pursuits')
+          .select('id, archived')
+          .in('id', stalePursuitIds),
+      ])
+      const gateOpen = new Set((gateRes.data ?? []).map(g => g.pursuit_id))
+      const live = new Set(
+        (pursuitRes.data ?? []).filter(p => !p.archived).map(p => p.id),
+      )
+      agentVisible = (staleAgentWork ?? []).filter(
+        o => gateOpen.has(o.pursuit_id) && live.has(o.pursuit_id),
+      )
+    }
+
+    const hiddenFromAgents = (staleAgentWork ?? []).length - agentVisible.length
+    if (hiddenFromAgents > 0) {
+      console.log(
+        LOG,
+        `[AGENT OVERDUE] ${hiddenFromAgents} stale narrative(s) suppressed: ` +
+          `not visible to any agent (gate shut, or pursuit archived)`,
+      )
+    }
+
+    if (agentVisible.length > 0) {
       // Collect all overdue items into a single daily digest instead of individual emails
       const overdueItems: { name: string; schoolName: string; agentName: string; hoursAgo: number }[] = []
 
-      for (const opp of staleAgentWork) {
+      for (const opp of agentVisible) {
         const { data: pursuit } = await supabase
           .from('funding_pursuits')
           .select('district_name')

@@ -112,17 +112,36 @@ export async function GET(request: NextRequest) {
     const { data: rawNarrativeWork } = await narrativeQuery
 
     // Gate enforcement: only include draft work for pursuits whose gate_open = true
+    // AND which are still live.
+    //
+    // The archive check is new. Without it, a school that has declined grant
+    // work can still have narratives handed to an agent, because nothing else
+    // here looks at the archive flag. Archived pursuits were excluded only
+    // incidentally, since a declined school's gate is usually shut, and that is
+    // luck rather than logic. Glen Ellyn sat archived with five narratives
+    // stuck at 'requested' for 431 hours; the only reason no agent picked them
+    // up is that their gate happened to be closed.
     const narrativePursuitIds = [...new Set((rawNarrativeWork ?? []).map((o: any) => o.pursuit_id))]
-    let gateOpenPursuitIds: Set<string> = new Set()
+    let servablePursuitIds: Set<string> = new Set()
     if (narrativePursuitIds.length > 0) {
-      const { data: openGates } = await supabase
-        .from('pursuit_gate')
-        .select('pursuit_id')
-        .in('pursuit_id', narrativePursuitIds)
-        .eq('gate_open', true)
-      gateOpenPursuitIds = new Set((openGates ?? []).map(g => g.pursuit_id))
+      const [gateRes, pursuitRes] = await Promise.all([
+        supabase
+          .from('pursuit_gate')
+          .select('pursuit_id')
+          .in('pursuit_id', narrativePursuitIds)
+          .eq('gate_open', true),
+        supabase
+          .from('funding_pursuits')
+          .select('id, archived')
+          .in('id', narrativePursuitIds),
+      ])
+      const gateOpen = new Set((gateRes.data ?? []).map(g => g.pursuit_id))
+      const live = new Set((pursuitRes.data ?? []).filter(p => !p.archived).map(p => p.id))
+      servablePursuitIds = new Set(
+        narrativePursuitIds.filter((id: string) => gateOpen.has(id) && live.has(id)),
+      )
     }
-    const narrativeWork = (rawNarrativeWork ?? []).filter((o: any) => gateOpenPursuitIds.has(o.pursuit_id))
+    const narrativeWork = (rawNarrativeWork ?? []).filter((o: any) => servablePursuitIds.has(o.pursuit_id))
 
     // 2. Research work — NOT window-gated, NOT gate-gated (finding new funders is always allowed)
     //
