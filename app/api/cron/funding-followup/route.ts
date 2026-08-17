@@ -107,10 +107,32 @@ type LadderStep = { rung: Rung; email: string }
  * Build the effective escalation ladder for an item, collapsing out
  * null emails and deduplicating so the same person is never notified
  * at two different rungs.
+ *
+ * The ladder depends on WHO OWNS THE ITEM, which it previously did not.
+ *
+ * Every ladder was assembled from the pursuit gate, meaning the school's
+ * submitter, backup and administrator. That is correct for work the school owes
+ * us. It is wrong for our own internal work: a task assigned to Bella would,
+ * on non-response, escalate into a principal's inbox carrying a title written
+ * about them rather than to them.
+ *
+ * This is not hypothetical. Five TDI-owned items had already climbed to the
+ * submitter rung and one reached backup. Only the send allowlist stopped those
+ * from landing, and an allowlist is a config file somebody can edit without
+ * knowing what it is holding back.
+ *
+ * So: client-owned work climbs the school ladder. TDI-owned work climbs from
+ * the TDI owner straight to Rae and never touches a school contact.
+ *
+ * Rung names are deliberately unchanged. They are persisted on every item and
+ * RUNG_ORDER compares against them, so renaming would invalidate stored state.
+ * For a TDI-owned item, read the 'submitter' rung as "the TDI person who owns
+ * this", which is what item.owner_email already holds.
  */
 function buildEffectiveLadder(
   gate: Gate | undefined,
   ownerEmail: string | null,
+  ownerType: string | null | undefined,
 ): LadderStep[] {
   const steps: LadderStep[] = []
   const seen = new Set<string>()
@@ -123,9 +145,15 @@ function buildEffectiveLadder(
     steps.push({ rung, email })
   }
 
-  tryAdd('submitter', gate?.submitter_email ?? ownerEmail)
-  tryAdd('backup', gate?.backup_email)
-  tryAdd('admin_sponsor', gate?.admin_sponsor_email)
+  if (ownerType === 'client') {
+    tryAdd('submitter', gate?.submitter_email ?? ownerEmail)
+    tryAdd('backup', gate?.backup_email)
+    tryAdd('admin_sponsor', gate?.admin_sponsor_email)
+  } else {
+    // TDI-owned work. The school is not in this ladder at all.
+    tryAdd('submitter', ownerEmail)
+  }
+
   tryAdd('rae', 'rae@teachersdeserveit.com')
 
   return steps
@@ -194,12 +222,25 @@ function escalationWindow(runwayCalDays: number): number {
   return 1
 }
 
-// ── Tone routing: client (submitter/backup) vs internal (rae) ──
+// ── Tone routing ──
+//
+// Decided by who is actually receiving the email, not by which rung of the
+// ladder it came from.
+//
+// Rung-based routing assumed rung implied audience: everything below 'rae' was
+// treated as client-facing. That assumption broke the moment an internal item
+// climbed the ladder, and it is the same class of mistake as the ladder itself.
+// A recipient's address is the fact; the rung is an inference about it.
+//
+// Practically: anyone at teachersdeserveit.com gets internal phrasing, everyone
+// else gets client phrasing, whatever rung they occupy.
 
 type EmailTone = 'client' | 'internal'
 
-function toneForRung(rung: string): EmailTone {
-  return rung === 'rae' ? 'internal' : 'client'
+function toneForRecipient(email: string): EmailTone {
+  return email.toLowerCase().endsWith('@teachersdeserveit.com')
+    ? 'internal'
+    : 'client'
 }
 
 // ── Client-facing task label ──
@@ -680,7 +721,7 @@ export async function GET(request: NextRequest) {
       const ownerFirstName = (item.owner_name ?? '').split(' ')[0] || 'there'
 
       const gate = gateByPursuit.get(item.pursuit_id)
-      const effectiveLadder = buildEffectiveLadder(gate, ownerEmail)
+      const effectiveLadder = buildEffectiveLadder(gate, ownerEmail, item.owner_type)
 
       // ── COLOR STATE ──
 
@@ -930,7 +971,7 @@ export async function GET(request: NextRequest) {
                 bizDaysOverdue,
                 rungLabel: nextStep.rung,
                 type: 'escalation',
-                tone: toneForRung(nextStep.rung),
+                tone: toneForRecipient(nextStep.email),
                 contactName: resolveContactName(nextStep, gate, item, ownerFirstName),
                 schoolName,
                 clientLabel: item.client_label,
@@ -1000,7 +1041,7 @@ export async function GET(request: NextRequest) {
                     bizDaysOverdue,
                     rungLabel: nextStep.rung,
                     type: 'escalation',
-                    tone: toneForRung(nextStep.rung),
+                    tone: toneForRecipient(nextStep.email),
                     contactName: resolveContactName(nextStep, gate, item, ownerFirstName),
                     schoolName,
                     clientLabel: item.client_label,
