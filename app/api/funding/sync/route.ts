@@ -145,11 +145,13 @@ export async function GET(request: NextRequest) {
 
     // 2. Research work — NOT window-gated, NOT gate-gated (finding new funders is always allowed)
     //
-    // Deliberately dormant: research_status is 'none' on every row in the table
-    // and nothing sets it, so this branch has never returned work. Kept rather
-    // than deleted because funder discovery is planned — but it advertises a
-    // capability that does not exist today. Do not treat an empty
-    // research_funders_count as evidence that discovery ran.
+    // No longer dormant. This branch returned nothing for the whole life of the
+    // system, because research_status read 'none' on every row and the only
+    // thing that set it was a button on an opportunity that already existed.
+    //
+    // The daily reminders cron now creates a "Local funder discovery"
+    // placeholder for any pursuit with no local source, already marked
+    // requested, so this branch has real work to hand out.
     let researchQuery = supabase
       .from('funding_opportunities')
       .select(`
