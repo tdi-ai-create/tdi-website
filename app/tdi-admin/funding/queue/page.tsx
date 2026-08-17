@@ -562,6 +562,7 @@ function QueueRow({ item, muted, loading, onVerifyContact, onApproveDraft, onSen
       case 'prepare_submission':
       case 'request_research':
       case 'unblock_draft':
+      case 'unblock_qa':
       case 'resume_drafting':
       case 'send_to_client':
         return (

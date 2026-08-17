@@ -104,7 +104,13 @@ export async function PATCH(request: NextRequest) {
     // New fields from migration 093
     'application_opens', 'application_closes', 'plan_category',
     'waiting_on', 'narrative_status', 'narrative_url', 'narrative_content',
-    'qa_reviewer', 'qa_notes', 'qa_passed', 'forwarding_email_status',
+    // qa_reviewer / qa_notes / qa_passed are deliberately NOT patchable here.
+    // QA verdicts are Julie's alone and arrive through the sync route's
+    // submit_qa_verdict action, which enforces the attempt bound, writes the
+    // funding_narrative_qa_reviews history row and requires a usable escalation
+    // once she runs out of attempts. Letting the admin PATCH set them let a
+    // person record a verdict with none of that, and under Julie's name.
+    'forwarding_email_status',
     'client_submitted', 'client_submitted_proof',
     'routed_through_district', 'district_routing_confirmed',
     'decision_date', 'awarded_amount', 'denial_reason',
@@ -119,9 +125,11 @@ export async function PATCH(request: NextRequest) {
   if (body.narrative_status !== undefined && body.narrative_status !== before?.narrative_status) {
     updates.narrative_status_changed_at = new Date().toISOString();
 
-    // A new draft invalidates the verdict on the old one, unless this same
-    // write is setting one.
-    if (body.narrative_status === 'qa_review' && body.qa_passed === undefined) {
+    // A new draft invalidates the verdict on the old one. This is now
+    // unconditional: qa_passed is no longer patchable here, so this write can
+    // never also be recording a verdict. Without the reset, a redraft returning
+    // to QA would carry the previous attempt's stale pass or fail.
+    if (body.narrative_status === 'qa_review') {
       updates.qa_passed = null;
     }
   }
