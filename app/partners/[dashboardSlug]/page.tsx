@@ -1419,6 +1419,7 @@ export default function PartnerDashboard() {
 
   // Reporting state
   const [reportGenerating, setReportGenerating] = useState<string | null>(null);
+  const [reportBlocked, setReportBlocked] = useState(false);
   const [generatedReport, setGeneratedReport] = useState<{ type: string; content: string; title: string } | null>(null);
 
   // Reports that describe real engagement need real engagement behind them.
@@ -1436,6 +1437,15 @@ export default function PartnerDashboard() {
   const generateAIReport = async (reportType: string) => {
     if (!partnership) return;
     if (ENGAGEMENT_BACKED_REPORTS.includes(reportType) && !reportDataReady) return;
+
+    // Must happen synchronously inside the click. generateAIReport awaits a stats
+    // fetch further down, and any await before window.open drops user activation,
+    // so Chrome blocks the tab and printReport used to bail without saying anything.
+    const reportWindow = window.open('', '_blank');
+    if (!reportWindow) { setReportBlocked(true); return; }
+    setReportBlocked(false);
+    reportWindow.document.write('<!DOCTYPE html><html><head><title>Generating report</title></head><body style="font-family:Helvetica,Arial,sans-serif;color:#1e2749;padding:48px;font-size:15px">Generating your report, one moment.</body></html>');
+
     setReportGenerating(reportType);
     setGeneratedReport(null);
 
@@ -1512,7 +1522,7 @@ export default function PartnerDashboard() {
     // usable copy. The deterministic templates already produce exactly what is wanted,
     // so skip the model entirely and render them directly.
     if (reportType === 'newsletter' || reportType === 'certificates') {
-      printReport(REPORT_TITLES[reportType], generateFallbackReport(reportType, dataContext));
+      printReport(REPORT_TITLES[reportType], generateFallbackReport(reportType, dataContext), reportWindow);
       setReportGenerating(null);
       return;
     }
@@ -1550,12 +1560,12 @@ export default function PartnerDashboard() {
       if (response.ok) {
         const data = await response.json();
         const content = data.insight || data.text || data.content || generateFallbackReport(reportType, dataContext);
-        printReport(title, content);
+        printReport(title, content, reportWindow);
       } else {
-        printReport(title, generateFallbackReport(reportType, dataContext));
+        printReport(title, generateFallbackReport(reportType, dataContext), reportWindow);
       }
     } catch {
-      printReport(REPORT_TITLES[reportType] || 'Report', generateFallbackReport(reportType, dataContext));
+      printReport(REPORT_TITLES[reportType] || 'Report', generateFallbackReport(reportType, dataContext), reportWindow);
     } finally {
       setReportGenerating(null);
     }
@@ -2007,7 +2017,7 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
     }
   };
 
-  const printReport = (title: string, content: string) => {
+  const printReport = (title: string, content: string, existingWindow?: Window | null) => {
     const schoolName = partnership?.org_name || partnership?.contact_name || 'School';
     const date = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
     const hubPctVal = hubStats?.hub_login_pct ?? (staffStats.total > 0 ? Math.round((staffStats.hubLoggedIn / staffStats.total) * 100) : 0);
@@ -2017,8 +2027,11 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
     const tools = hubStats?.quick_wins_completed ?? 0;
     const courses = hubStats?.course_completions ?? 0;
 
-    const w = window.open('', '_blank');
-    if (!w) return;
+    // Reuse the window opened during the click when we have one. Opening here after
+    // an await has already cost us user activation, which is what Chrome blocks.
+    const w = existingWindow ?? window.open('', '_blank');
+    if (!w) { setReportBlocked(true); return; }
+    w.document.open();
     w.document.write(`<!DOCTYPE html><html><head><title>${title} - ${schoolName}</title>
       <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -6124,6 +6137,25 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                 </div>
               </div>
             </div>
+
+            {/* Popup blocked: reports open in a new tab, so say so instead of doing nothing */}
+            {reportBlocked && (
+              <div className="bg-white rounded-2xl p-5 shadow-sm border border-red-200">
+                <div className="flex items-start gap-3">
+                  <div className="w-9 h-9 rounded-lg flex items-center justify-center bg-red-50 shrink-0">
+                    <AlertCircle className="w-4.5 h-4.5 text-red-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold text-[#1e2749]">Your browser blocked the report</h3>
+                    <p className="text-xs text-gray-600 leading-relaxed mt-1">
+                      Reports open in a new tab so you can print or save them. Your browser stopped that tab from
+                      opening. Look for a &quot;pop-up blocked&quot; icon in the address bar, allow pop-ups for
+                      teachersdeserveit.com, then click the button again.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Not enough engagement data yet: explain why, then give something useful */}
             {!reportDataReady && (

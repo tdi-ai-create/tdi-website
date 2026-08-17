@@ -87,6 +87,39 @@ const nextConfig: NextConfig = {
         destination: '/',
         permanent: true,
       },
+      // Retired hand-coded client dashboards. Every partnership now lives at
+      // /partners/<slug>, which is the only surface with the Reports tab. These
+      // pages showed older data from a separate source and are gone.
+      {
+        source: '/Allenwood-Dashboard',
+        destination: '/',
+        permanent: true,
+      },
+      {
+        source: '/Allenwood-Dashboard/:path*',
+        destination: '/',
+        permanent: true,
+      },
+      {
+        source: '/D41-dashboard',
+        destination: '/',
+        permanent: true,
+      },
+      {
+        source: '/D41-dashboard/:path*',
+        destination: '/',
+        permanent: true,
+      },
+      {
+        source: '/saunemin-dashboard',
+        destination: '/',
+        permanent: true,
+      },
+      {
+        source: '/saunemin-dashboard/:path*',
+        destination: '/',
+        permanent: true,
+      },
       {
         source: '/dashboard-creation-team-use',
         destination: '/',
