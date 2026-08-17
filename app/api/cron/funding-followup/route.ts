@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServiceSupabase } from '@/lib/supabase'
+import { postFundingEvent } from '@/lib/funding-slack'
 
 // ══════════════════════════════════════════════════════════════
 // DRY_RUN — flip to false ONLY after verifying logic against
@@ -58,7 +59,7 @@ const LEAD_WINDOWS: Record<string, number> = {
   heavy: 5,
 }
 
-// ── Nudge cadence ──
+// ── Nudge cadence and ceiling ──
 //
 // How long an overdue item waits between reminders. Weekly, not daily: a
 // principal reminded about the same item every morning stops reading any of
@@ -66,6 +67,19 @@ const LEAD_WINDOWS: Record<string, number> = {
 // genuinely stuck item still climbs the ladder at the same speed.
 const NUDGE_INTERVAL_DAYS = 7
 const MS_PER_DAY = 24 * 60 * 60 * 1000
+
+// How many automated reminders an item gets before the machine stops and a
+// person takes over.
+//
+// There was no ceiling at all. nudge_count was incremented on every send and
+// compared against nothing, so an item nobody closed emailed its owner forever.
+// Two principals received 41 between them and one item alone sent 18.
+//
+// Three weekly reminders is three weeks of asking. If that has not worked, more
+// of the same will not work either, and continuing to send is actively harmful:
+// it trains the recipient to ignore us, and it replaces a conversation somebody
+// should be having with a robot that cannot have one.
+const MAX_NUDGES = 3
 
 // ── Escalation ladder ──
 
@@ -789,7 +803,50 @@ export async function GET(request: NextRequest) {
               )
         const nudgedRecently = daysSinceNudge < NUDGE_INTERVAL_DAYS
 
-        if (!nudgedRecently) {
+        const nudgesSoFar = item.nudge_count ?? 0
+        const atCeiling = nudgesSoFar >= MAX_NUDGES
+
+        // ── CEILING REACHED — hand to a person, exactly once ──
+        //
+        // Stopping silently would swap one failure for another: the item goes
+        // quiet and is forgotten, which is the thing this pipeline exists to
+        // prevent. So the last automated act is to tell a human it is now
+        // theirs. nudge_ceiling_notified_at guarantees that fires once rather
+        // than every hour, since this cron runs hourly.
+        if (atCeiling && !item.nudge_ceiling_notified_at) {
+          updates.nudge_ceiling_notified_at = now.toISOString()
+
+          const handTo = item.owner_type === 'client' ? 'bella' : 'rae'
+          const who = item.client_label || item.title
+
+          postFundingEvent({
+            pursuitId: item.pursuit_id,
+            pursuitName: schoolName,
+            message:
+              `Automated reminders have stopped for "${who}". ` +
+              `${nudgesSoFar} sent, no response, still open. This needs a person now.`,
+            level: 'critical',
+            owner: handTo,
+            timelineTitle: `Automated reminders stopped: ${item.title}`,
+            timelineDetail:
+              `${nudgesSoFar} reminders sent to ${ownerEmail ?? 'unknown'} with no resolution. ` +
+              `Ceiling is ${MAX_NUDGES}. Handed to ${handTo}. ` +
+              `The item stays open and keeps its due date; only the automated sending stops.`,
+          }).catch(() => {})
+
+          summary.details.push({
+            item_id: item.id,
+            pursuit_id: item.pursuit_id,
+            title: item.title,
+            owner_email: ownerEmail,
+            color,
+            action: 'nudge_ceiling_reached',
+            target_email: ownerEmail ?? undefined,
+            biz_days_overdue: bizDaysOverdue,
+          })
+        }
+
+        if (!nudgedRecently && !atCeiling) {
           updates.nudge_count = (item.nudge_count ?? 0) + 1
           updates.last_nudge_sent_at = now.toISOString()
           summary.nudges_fired++
