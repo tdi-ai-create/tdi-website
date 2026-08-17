@@ -1426,7 +1426,11 @@ export default function PartnerDashboard() {
   // so we hold it back and point the leader at general Hub guidance instead.
   const REPORT_MIN_ACTIVE_STAFF = 3;
   const ENGAGEMENT_BACKED_REPORTS = ['board', 'engagement', 'impact', 'quarterly', 'teacher', 'community'];
-  const reportActiveStaff = staffStats.hubLoggedIn;
+  // Deliberately NOT staffStats.hubLoggedIn. That reads staff_members.hub_login_date,
+  // which nothing in the codebase ever writes, so it is 0 for every partnership and
+  // would keep reports permanently locked. Real engagement comes from the Hub itself.
+  const reportActiveStaff = hubStats?.logins_this_month ?? 0;
+  const reportSeatCount = hubStats?.member_count ?? staffStats.total;
   const reportDataReady = reportActiveStaff >= REPORT_MIN_ACTIVE_STAFF;
 
   const generateAIReport = async (reportType: string) => {
@@ -6125,8 +6129,8 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                     <h3 className="text-sm font-bold text-[#1e2749]">Reports aren&apos;t ready yet</h3>
                     <p className="text-xs text-gray-500">
                       {reportActiveStaff === 0
-                        ? 'No staff have logged into the Hub yet.'
-                        : `${reportActiveStaff} of ${staffStats.total} staff have logged in so far.`}
+                        ? 'No staff have logged into the Hub this month.'
+                        : `${reportActiveStaff} of ${reportSeatCount} staff have logged in this month.`}
                     </p>
                   </div>
                 </div>
