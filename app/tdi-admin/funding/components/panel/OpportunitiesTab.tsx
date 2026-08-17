@@ -627,8 +627,15 @@ function NarrativeControl({ opp, gateOpen, onRequestDraft, onApprove, onPatch }:
 }) {
   const [agentPick, setAgentPick] = useState(defaultAgent(opp.plan_category))
   const [showContent, setShowContent] = useState(false)
-  const [qaReviewer, setQaReviewer] = useState(opp.qa_reviewer || '')
-  const [qaNotes, setQaNotes] = useState(opp.qa_notes || '')
+  // Deliberately NOT seeded from opp.qa_reviewer / opp.qa_notes. Seeding them
+  // opened this panel with Julie's last verdict sitting in the reviewer's own
+  // input boxes, which read as if the person had written it and had to
+  // re-adjudicate a call already on the record. Worse, the reviewer field
+  // arrived pre-filled with 'julie', so a human pass/fail would have been
+  // filed under her name. Julie's prior verdict is shown read-only below
+  // instead; these boxes are for what this reviewer is deciding now.
+  const [qaReviewer, setQaReviewer] = useState('')
+  const [qaNotes, setQaNotes] = useState('')
 
   const ns = opp.narrative_status || 'not_started'
   const agent = opp.assigned_agent || ''
@@ -831,8 +838,24 @@ function NarrativeControl({ opp, gateOpen, onRequestDraft, onApprove, onPatch }:
           borderRadius: 8, display: 'flex', flexDirection: 'column', gap: 8,
         }}>
           <div style={{ fontSize: 10, fontWeight: 700, color: '#6D28D9', textTransform: 'uppercase', letterSpacing: 0.5 }}>
-            QA Review
+            QA Review {opp.qa_reviewer ? '(manual override)' : ''}
           </div>
+
+          {/* Julie's last word, read-only. Context for the reviewer, not their
+              draft to edit. Without this the panel looks like the first review
+              of an unreviewed narrative when it is usually the opposite. */}
+          {opp.qa_reviewer && opp.qa_notes && (
+            <div style={{ padding: '8px 10px', background: 'white', border: '1px solid #DDD6FE', borderRadius: 6 }}>
+              <div style={{ fontSize: 9, fontWeight: 700, color: '#6D28D9', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 4 }}>
+                {opp.qa_reviewer} already reviewed this{(opp.qa_attempt_count ?? 0) > 0 ? ` (attempt ${opp.qa_attempt_count})` : ''}
+              </div>
+              <div style={{ fontSize: 11, color: '#4B5563', lineHeight: 1.45 }}>{opp.qa_notes}</div>
+              <div style={{ fontSize: 9, color: '#9CA3AF', fontStyle: 'italic', marginTop: 5 }}>
+                You only need to pass or fail below if you are overriding this.
+              </div>
+            </div>
+          )}
+
           <input
             value={qaReviewer}
             onChange={e => setQaReviewer(e.target.value)}
