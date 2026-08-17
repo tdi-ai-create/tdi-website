@@ -2,6 +2,7 @@ import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
 import { calculateFundingAlerts } from '@/lib/tdi-admin/funding-alert-rules'
 import { syncGateActionItems } from '@/lib/funding-gate-sync'
+import { loadSettings } from '@/lib/funding-slack'
 
 /**
  * Daily cron endpoint for funding reminders.
@@ -129,12 +130,84 @@ export async function GET(request: NextRequest) {
       draftCount++
     }
 
+    // ── One daily message to Bella: what is waiting for her to send ──
+    //
+    // The follow-up cron no longer emails schools. It writes a draft and stops,
+    // which makes her queue the place work waits. Nothing told her it was there.
+    //
+    // That gap is not theoretical. funding_email_log held 56 rows and every one
+    // was 'sent', meaning no draft had ever existed before the drafting rule
+    // shipped, and the queue had never been somewhere anyone needed to look.
+    // Two finished Saunemin applications also sat unapproved for a day because
+    // nothing announced them.
+    //
+    // Deliberately one message per day rather than one per draft. The last
+    // notification problem in this system was volume, and a per-draft ping on a
+    // busy afternoon rebuilds it in a new place.
+    //
+    // This cron runs once daily on its own schedule, so no hour guard is needed
+    // here, unlike the agent-overdue digest which fakes "daily" with an hour
+    // equality inside an hourly job.
+    let draftsWaiting = 0
+    const { data: pendingDrafts } = await supabase
+      .from('funding_email_log')
+      .select('id, subject, to_name, to_email, pursuit_id, created_at')
+      .eq('status', 'draft')
+      .order('created_at', { ascending: true })
+
+    if (pendingDrafts && pendingDrafts.length > 0) {
+      draftsWaiting = pendingDrafts.length
+
+      // Pursuit names carry internal bookkeeping: "(RENEWAL) Allenwood
+      // Elementary - Grant Funded". Bella reads this message every morning, so
+      // it should say the school's name and nothing else.
+      const tidySchool = (raw: string | null | undefined) =>
+        (raw || '')
+          .replace(/^\(RENEWAL\)\s*/i, '')
+          .replace(/\s*[-–]\s*Grant Fund(ing|ed)$/i, '')
+          .trim() || 'unknown school'
+
+      const nameFor = new Map(
+        pursuits.map(p => [p.id, tidySchool(p.district_name || p.pursuit_name)]),
+      )
+      const lines = pendingDrafts.slice(0, 10).map(d => {
+        const who = d.to_name || d.to_email || 'unknown recipient'
+        const school = nameFor.get(d.pursuit_id) || 'unknown school'
+        return `  • ${who}, ${school}: ${d.subject}`
+      })
+      if (pendingDrafts.length > 10) {
+        lines.push(`  • and ${pendingDrafts.length - 10} more`)
+      }
+
+      const settings = await loadSettings()
+      if (settings.slack_enabled && settings.slack_webhook_url) {
+        const mention = settings.bella_slack_handle ? ` <@${settings.bella_slack_handle}>` : ''
+        const portalUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.teachersdeserveit.com'
+        const noun = draftsWaiting === 1 ? 'draft is' : 'drafts are'
+        await fetch(settings.slack_webhook_url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            text:
+              `*${draftsWaiting} ${noun} waiting to send*${mention}\n` +
+              `${lines.join('\n')}\n` +
+              `<${portalUrl}/tdi-admin/funding|Open the funding portal>`,
+          }),
+          // Loud on failure. A swallowed error here means she is never told and
+          // the drafts sit unseen, which is the failure this exists to prevent.
+        }).catch(err => console.error('[funding-reminders] Draft digest post failed:', err))
+      } else {
+        console.log('[funding-reminders] Slack disabled — would have reported', draftsWaiting, 'waiting draft(s)')
+      }
+    }
+
     return NextResponse.json({
       success: true,
       alerts_count: alerts.length,
       critical_count: critical.length,
       warning_count: warnings.length,
       drafts_created: draftCount,
+      drafts_waiting: draftsWaiting,
       digest_sent: alerts.length > 0,
     })
   } catch (e: unknown) {
