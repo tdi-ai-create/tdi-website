@@ -14,6 +14,7 @@ import {
   Star,
   Heart,
   AlertCircle,
+  Info,
   Eye,
   Phone,
   Mail,
@@ -93,6 +94,8 @@ interface Partnership {
   virtual_sessions_completed: number;
   executive_sessions_total: number;
   executive_sessions_completed?: number;
+  /** Real contracted figure. Null for memberships-only partnerships with no services contract. */
+  cost_per_educator?: number | null;
   staff_enrolled?: number;
   status: string;
   org_name?: string | null;
@@ -1418,8 +1421,21 @@ export default function PartnerDashboard() {
   const [reportGenerating, setReportGenerating] = useState<string | null>(null);
   const [generatedReport, setGeneratedReport] = useState<{ type: string; content: string; title: string } | null>(null);
 
+  // Reports that describe real engagement need real engagement behind them.
+  // Below this bar a report would read as authoritative while saying almost nothing,
+  // so we hold it back and point the leader at general Hub guidance instead.
+  const REPORT_MIN_ACTIVE_STAFF = 3;
+  const ENGAGEMENT_BACKED_REPORTS = ['board', 'engagement', 'impact', 'quarterly', 'teacher', 'community'];
+  // Deliberately NOT staffStats.hubLoggedIn. That reads staff_members.hub_login_date,
+  // which nothing in the codebase ever writes, so it is 0 for every partnership and
+  // would keep reports permanently locked. Real engagement comes from the Hub itself.
+  const reportActiveStaff = hubStats?.logins_this_month ?? 0;
+  const reportSeatCount = hubStats?.member_count ?? staffStats.total;
+  const reportDataReady = reportActiveStaff >= REPORT_MIN_ACTIVE_STAFF;
+
   const generateAIReport = async (reportType: string) => {
     if (!partnership) return;
+    if (ENGAGEMENT_BACKED_REPORTS.includes(reportType) && !reportDataReady) return;
     setReportGenerating(reportType);
     setGeneratedReport(null);
 
@@ -1452,13 +1468,20 @@ export default function PartnerDashboard() {
       schoolName,
       phase: partnership.contract_phase || 'IGNITE',
       staffTotal: staffStats.total,
-      staffLoggedIn: staffStats.hubLoggedIn,
+      // staff_members.hub_login_date has no writer, so staffStats.hubLoggedIn is always 0.
+      // Reports read this in nine places, which produced lines like
+      // "0 of 16 educators actively using the Learning Hub (25%)". Use the real Hub count.
+      staffLoggedIn: hubStats?.logins_this_month ?? staffStats.hubLoggedIn,
       hubLoginPct: hubPctVal,
       toolsExplored: hubStats?.quick_wins_completed ?? 0,
       courseCompletions: hubStats?.course_completions ?? 0,
       wellnessScore: hubStats?.mood_avg_7d ?? null,
       totalDeliverables: totalDel,
       completedDeliverables: completedDel,
+      // Only ever the real contracted figure. Null means we do not know what they paid,
+      // and a report must not put a number in front of a school board that we invented.
+      costPerEducator: partnership.cost_per_educator ?? null,
+      observationDays: partnership.observation_days_total || 0,
       kpis: partnershipKpis.map(k => ({ label: k.kpi_label, current: k.current_value, target: k.target_value, unit: k.target_unit })),
       quotes: teacherQuotes.slice(0, 5).map(q => ({ text: q.quote_text, role: q.teacher_role })),
       actionItemsCompleted: actionItems.filter(i => i.status === 'completed').length,
@@ -1484,11 +1507,11 @@ export default function PartnerDashboard() {
           }),
           data: {
             prompt: reportType === 'board'
-              ? `Write a professional board presentation report for ${schoolName}'s TDI partnership. Include: executive summary, key metrics, educator testimonials, ROI analysis, and recommendations. Data: ${JSON.stringify(dataContext)}. Format with clear sections. No emojis. Professional tone.`
+              ? `Write a professional board presentation report for ${schoolName}'s TDI partnership. Include: executive summary, key metrics, educator testimonials, and recommendations. Data: ${JSON.stringify(dataContext)}. Format with clear sections. No emojis. Professional tone.${dataContext.costPerEducator === null ? ' CRITICAL: no contract value is on file for this partnership. Do not state, estimate, or imply any dollar amount, cost per educator, or ROI figure. Do not reference services the data does not show, such as observation days when observationDays is 0.' : ''}`
               : reportType === 'engagement'
               ? `Write a detailed staff engagement analysis for ${schoolName}. Cover: Hub adoption rates, most-used tools, engagement trends, educator feedback, and specific recommendations to increase participation. Data: ${JSON.stringify(dataContext)}. Be specific and actionable.`
               : reportType === 'impact'
-              ? `Write an impact and ROI report for ${schoolName}'s TDI partnership investment. Include: investment summary, measurable outcomes, educator wellness changes, professional development hours, before/after comparisons, and projected year-end outcomes. Data: ${JSON.stringify(dataContext)}. Make it compelling for budget justification.`
+              ? `Write an impact report for ${schoolName}'s TDI partnership. Include: measurable outcomes, educator wellness changes, before/after comparisons, and projected year-end outcomes. Data: ${JSON.stringify(dataContext)}. Make it compelling for budget justification.${dataContext.costPerEducator === null ? ' CRITICAL: no contract value is on file for this partnership. Do not state, estimate, or imply any dollar amount, cost per educator, or ROI figure. Focus entirely on non-financial outcomes.' : ''}`
               : reportType === 'quarterly'
               ? `Write a quarterly progress report for ${schoolName}'s TDI partnership. Include: this quarter's highlights, metrics vs targets, challenges and solutions, upcoming milestones, and a forward-looking summary. Data: ${JSON.stringify(dataContext)}. Keep it concise but thorough.`
               : reportType === 'teacher'
@@ -1538,7 +1561,30 @@ export default function PartnerDashboard() {
   const generateFallbackReport = (type: string, data: any) => {
     const s = data.schoolName;
     const hasEngagement = data.hubLoginPct > 0;
-    const costPerEducator = data.staffTotal > 0 ? Math.round(18000 / data.staffTotal) : 0; // Approximate based on typical contract
+    // Never derive a price. Memberships-only partnerships have no services contract behind
+    // them, so an assumed contract value would invent a figure the school never paid.
+    const costPerEducator: number | null = data.costPerEducator ?? null;
+    const hasCost = typeof costPerEducator === 'number' && costPerEducator > 0;
+    // Memberships-only partnerships have no observation days or sessions behind them.
+    // Every services claim below is gated on this so a Hub-only school is never told
+    // it has deliverables to schedule or observation feedback coming.
+    const hasServices = data.totalDeliverables > 0 || data.observationDays > 0;
+    // Describe only what this partnership actually includes.
+    const includedItems = [
+      'Learning Hub access (100+ hours of content)',
+      data.totalDeliverables > 0 ? `${data.totalDeliverables} in-person and virtual sessions` : null,
+      data.observationDays > 0 ? 'personalized observation feedback (Love Notes)' : null,
+      'leadership dashboard with real-time data',
+      'ongoing support',
+    ].filter(Boolean).join(', ');
+    // Only show peer examples this school could actually replicate. The services-based
+    // ones are withheld from Hub-only partnerships, which also stops a NJ school of ~19
+    // reading the NJ example as its own numbers.
+    const caseStudies = [
+      { requiresServices: true, text: 'A K-8 school in New Jersey with 19 educators saw 68% Hub engagement in their first quarter, with teachers independently exploring stress management tools between observation visits. Their principal reported that "teachers are talking about TDI at lunch, which never happens with PD."' },
+      { requiresServices: true, text: 'A district in Illinois with 45 educators across multiple buildings achieved 82% login rates after their principal started each staff meeting with a 5-minute Quick Win from the Hub. Their observation day feedback showed measurable shifts in classroom management strategies within 6 weeks.' },
+      { requiresServices: false, text: "An elementary school in Pennsylvania used TDI's wellness tools to address mid-year burnout. Their educator wellness scores improved from 2.8 to 4.1 out of 5 over one semester. The principal credited the daily check-in feature with helping her identify struggling teachers before they reached crisis." },
+    ].filter(c => hasServices || !c.requiresServices).map(c => c.text).join('\n\n');
     const quotesBlock = data.quotes.length > 0 ? '\n\nWHAT EDUCATORS ARE SAYING\n\n' + data.quotes.map((q: {text:string;role:string}) => `"${q.text}"\n-- ${q.role}`).join('\n\n') : '';
     const kpiBlock = data.kpis.length > 0 ? '\n\nPARTNERSHIP GOALS\n\n' + data.kpis.map((k: {label:string;current:number;target:number;unit:string}) => `${k.label}: ${k.current}${k.unit} of ${k.target}${k.unit} target`).join('\n') : '';
 
@@ -1546,7 +1592,7 @@ export default function PartnerDashboard() {
       case 'board':
         return `THE 30-SECOND VERSION
 
-${s} has ${data.staffTotal} educators with TDI Learning Hub access. ${hasEngagement ? `${data.hubLoginPct}% are actively engaged, ${data.toolsExplored} tools explored, ${data.completedDeliverables} of ${data.totalDeliverables} contracted sessions delivered.` : `The team is onboarding now. Contracted sessions and Hub engagement tracking begin this school year.`} TDI's implementation rate is 74%, compared to 10% for traditional PD. Investment: approximately $${costPerEducator} per educator for the full school year.
+${s} has ${data.staffTotal} educators with TDI Learning Hub access. ${hasEngagement ? `${data.hubLoginPct}% are actively engaged, ${data.toolsExplored} tools explored.${hasServices ? ` ${data.completedDeliverables} of ${data.totalDeliverables} contracted sessions delivered.` : ''}` : hasServices ? `The team is onboarding now. Contracted sessions and Hub engagement tracking begin this school year.` : `The team is onboarding now. Hub engagement tracking begins as staff start logging in.`} TDI's implementation rate is 74%, compared to 10% for traditional PD.${hasCost ? ` Investment: approximately $${costPerEducator} per educator for the full school year.` : ''}
 
 EXECUTIVE SUMMARY
 
@@ -1560,19 +1606,18 @@ Hub Engagement: ${data.hubLoginPct}% of staff active
 Educators Enrolled: ${data.staffTotal}
 Tools and Strategies Explored: ${data.toolsExplored}
 Course Completions: ${data.courseCompletions}
-Deliverables Completed: ${data.completedDeliverables} of ${data.totalDeliverables}${data.wellnessScore ? `\nEducator Wellness Score: ${data.wellnessScore}/5` : ''}
+${hasServices ? `Deliverables Completed: ${data.completedDeliverables} of ${data.totalDeliverables}\n` : ''}${data.wellnessScore ? `\nEducator Wellness Score: ${data.wellnessScore}/5` : ''}
 ${kpiBlock}
 
-INVESTMENT ANALYSIS
+WHAT THE PARTNERSHIP INCLUDES
 
-Cost per educator: approximately $${costPerEducator}/year
-This includes: Learning Hub access (100+ hours of content), ${data.totalDeliverables} in-person and virtual sessions, personalized observation feedback (Love Notes), leadership dashboard with real-time data, and ongoing support.
+${hasCost ? `Cost per educator: approximately $${costPerEducator}/year\n` : ''}This includes: ${includedItems}.
 
 For comparison, a single-day PD conference costs $500-2,000 per teacher with no follow-up and no implementation tracking. TDI provides year-round support at a fraction of that cost with measurable outcomes.
 
 HOW TDI IS DIFFERENT
 
-Most PD is consumed and forgotten. TDI measures what teachers DO, not what they watch. Every course includes classroom action steps. Every observation day produces personalized feedback. Every data point on this dashboard is evidence of real change happening in real classrooms.
+Most PD is consumed and forgotten. TDI measures what teachers DO, not what they watch. Every course includes classroom action steps.${hasServices ? ' Every observation day produces personalized feedback.' : ''} Every data point on this dashboard is evidence of real change happening in real classrooms.
 
 National PD implementation rate: 10%
 TDI partner implementation rate: 74%
@@ -1584,23 +1629,19 @@ ${data.staffLoggedIn > 0 ? `${data.staffLoggedIn} educator${data.staffLoggedIn >
 
 PARTNERSHIP CALENDAR
 
-${data.upcomingEvents && data.upcomingEvents.length > 0 ? `Upcoming this school year:\n${data.upcomingEvents.map((e: {title:string;date:string;status:string}) => `- ${e.title}${e.date ? ' (' + new Date(e.date).toLocaleDateString('en-US', {month: 'short', day: 'numeric'}) + ')' : ''} ${e.status === 'in_progress' ? '[In Progress]' : ''}`).join('\n')}` : `Your contracted deliverables for this school year include ${data.totalDeliverables} sessions. Dates will appear here as they are confirmed. Check the "Your Plan" tab on your dashboard to schedule.`}
+${data.upcomingEvents && data.upcomingEvents.length > 0 ? `Upcoming this school year:\n${data.upcomingEvents.map((e: {title:string;date:string;status:string}) => `- ${e.title}${e.date ? ' (' + new Date(e.date).toLocaleDateString('en-US', {month: 'short', day: 'numeric'}) + ')' : ''} ${e.status === 'in_progress' ? '[In Progress]' : ''}`).join('\n')}` : hasServices ? `Your contracted deliverables for this school year include ${data.totalDeliverables} sessions. Dates will appear here as they are confirmed. Check the "Your Plan" tab on your dashboard to schedule.` : `This is a Learning Hub membership partnership, so there are no scheduled sessions to track. Your calendar is driven by how your team uses the Hub. Consider setting a recurring staff-meeting slot to share one Quick Win each week.`}
 
 ${data.completedEvents && data.completedEvents.length > 0 ? `\nCompleted:\n${data.completedEvents.map((e: {title:string;date:string}) => `- ${e.title}${e.date ? ' (' + new Date(e.date).toLocaleDateString('en-US', {month: 'short', day: 'numeric'}) + ')' : ''}`).join('\n')}` : ''}
 
 WHAT OTHER TDI SCHOOLS ARE SEEING
 
-A K-8 school in New Jersey with 19 educators saw 68% Hub engagement in their first quarter, with teachers independently exploring stress management tools between observation visits. Their principal reported that "teachers are talking about TDI at lunch, which never happens with PD."
+${caseStudies}
 
-A district in Illinois with 45 educators across multiple buildings achieved 82% login rates after their principal started each staff meeting with a 5-minute Quick Win from the Hub. Their observation day feedback showed measurable shifts in classroom management strategies within 6 weeks.
-
-An elementary school in Pennsylvania used TDI's wellness tools to address mid-year burnout. Their educator wellness scores improved from 2.8 to 4.1 out of 5 over one semester. The principal credited the daily check-in feature with helping her identify struggling teachers before they reached crisis.
-
-These are real TDI partner outcomes. Every school's journey is different, but the pattern is consistent: when educators get practical tools with follow-up support, they use them.
+These are outcomes from other TDI partner schools, not from ${s}. Every school's journey is different, but the pattern is consistent: when educators get practical tools with follow-up support, they use them.
 
 TDI RECOMMENDATION
 
-${hasEngagement ? `${s} is showing strong early signals of engagement. ${data.hubLoginPct >= 50 ? 'With over half the staff actively using the Hub, this partnership is well-positioned to deepen classroom impact in the coming months.' : 'Continue building momentum by encouraging staff to explore Hub tools during PLCs and team meetings.'}` : `${s} is in the onboarding phase. The foundation is set with ${data.staffTotal} educators enrolled. As the team begins exploring the Hub and observation days take place, this report will show measurable impact on teaching practice, staff wellness, and classroom implementation.`}
+${hasEngagement ? `${s} is showing strong early signals of engagement. ${data.hubLoginPct >= 50 ? 'With over half the staff actively using the Hub, this partnership is well-positioned to deepen classroom impact in the coming months.' : 'Continue building momentum by encouraging staff to explore Hub tools during PLCs and team meetings.'}` : `${s} is in the onboarding phase. The foundation is set with ${data.staffTotal} educators enrolled. As the team begins exploring the Hub${hasServices ? ' and observation days take place' : ''}, this report will show measurable impact on teaching practice, staff wellness, and classroom implementation.`}
 
 ${data.phase === 'IGNITE' ? 'When your team is ready, Phase 2 (ACCELERATE) expands from a pilot group to full staff. Schools that make this move typically see 3x the implementation depth. Phase progression is based on your school\'s growth milestones, not a calendar.' : ''}
 
@@ -1685,15 +1726,12 @@ INVESTMENT SUMMARY
 ${s} has invested in a TDI ${data.phase} partnership providing ${data.staffTotal} educators with year-round professional development support. This is not a one-day workshop. It is a sustained, multi-channel approach to building teaching capacity.
 
 Your partnership includes:
-- Learning Hub access for ${data.staffTotal} educators (100+ hours of content)
-- ${data.totalDeliverables} contracted deliverables (observation days, virtual sessions, executive sessions)
-- Personalized observation feedback (Love Notes) for every observed teacher
+- Learning Hub access for ${data.staffTotal} educators (100+ hours of content)${data.totalDeliverables > 0 ? `\n- ${data.totalDeliverables} contracted deliverables (observation days, virtual sessions, executive sessions)` : ''}${data.observationDays > 0 ? '\n- Personalized observation feedback (Love Notes) for every observed teacher' : ''}
 - Real-time leadership dashboard with engagement data
 - AI-generated reports for board presentations and grant reporting
 
 COST COMPARISON
-
-TDI Partnership: approximately $${costPerEducator} per educator per year
+${hasCost ? `\nTDI Partnership: approximately $${costPerEducator} per educator per year` : ''}
 Traditional PD Conference: $500-2,000 per teacher per day (no follow-up)
 External Coaching: $150-300 per hour per teacher
 
@@ -1704,8 +1742,7 @@ MEASURABLE OUTCOMES
 Hub Engagement: ${data.hubLoginPct}% of staff active
 Tools and Strategies Explored: ${data.toolsExplored}
 Courses Completed: ${data.courseCompletions}
-Deliverables Completed: ${data.completedDeliverables} of ${data.totalDeliverables}
-${data.wellnessScore ? `Educator Wellness Score: ${data.wellnessScore}/5` : ''}
+${hasServices ? `Deliverables Completed: ${data.completedDeliverables} of ${data.totalDeliverables}\n` : ''}${data.wellnessScore ? `Educator Wellness Score: ${data.wellnessScore}/5` : ''}
 ${kpiBlock}
 
 WHY THIS MATTERS
@@ -1724,15 +1761,14 @@ ${quotesBlock}
 
 GRANT-READY LANGUAGE
 
-"${s} has partnered with Teachers Deserve It (TDI) to provide ${data.staffTotal} educators with sustained, evidence-based professional development. The TDI model combines on-demand digital learning, in-person classroom observations with personalized feedback, and data-driven leadership support. TDI partners report a 74% classroom implementation rate, compared to the national average of 10% for traditional professional development."
+"${s} has partnered with Teachers Deserve It (TDI) to provide ${data.staffTotal} educators with sustained, evidence-based professional development. The TDI model combines on-demand digital learning${hasServices ? ', in-person classroom observations with personalized feedback,' : ''} and data-driven leadership support. TDI partners report a 74% classroom implementation rate, compared to the national average of 10% for traditional professional development."
 
 PROJECTED OUTCOMES
 
 ${data.phase === 'IGNITE' ? `As a Phase 1 (IGNITE) partnership, ${s} is building the foundation for school-wide change. Based on data from similar TDI partnerships, projected outcomes by end of this school year include:
 - 60-80% Hub engagement rate
 - 15-20% reduction in reported teacher stress
-- 50%+ course completion rate among active users
-- Observable changes in classroom practice during observation days
+- 50%+ course completion rate among active users${hasServices ? '\n- Observable changes in classroom practice during observation days' : ''}
 
 Phase progression is milestone-based. When your team demonstrates consistent engagement and classroom implementation, the conversation about Phase 2 (ACCELERATE) happens naturally. There is no pressure to move on a timeline that does not fit your school.` : `${s} is seeing deepening impact as the partnership matures. Schools in this phase typically see 3x the implementation depth compared to their first year. The growth is compounding.`}`;
 
@@ -1741,7 +1777,7 @@ Phase progression is milestone-based. When your team demonstrates consistent eng
 
 QUARTER HIGHLIGHTS
 
-${hasEngagement ? `${s} has ${data.staffLoggedIn} of ${data.staffTotal} educators actively using the Learning Hub (${data.hubLoginPct}%). ${data.toolsExplored > 0 ? `The team has explored ${data.toolsExplored} classroom tools and strategies.` : ''} ${data.completedDeliverables > 0 ? `${data.completedDeliverables} of ${data.totalDeliverables} contracted deliverables are complete.` : 'Deliverables are scheduled and upcoming.'}` : `${s} launched its TDI partnership this quarter with ${data.staffTotal} educators enrolled. The team is in the onboarding phase with Hub access being activated.`}
+${hasEngagement ? `${s} has ${data.staffLoggedIn} of ${data.staffTotal} educators actively using the Learning Hub (${data.hubLoginPct}%). ${data.toolsExplored > 0 ? `The team has explored ${data.toolsExplored} classroom tools and strategies.` : ''} ${!hasServices ? '' : data.completedDeliverables > 0 ? `${data.completedDeliverables} of ${data.totalDeliverables} contracted deliverables are complete.` : 'Deliverables are scheduled and upcoming.'}` : `${s} launched its TDI partnership this quarter with ${data.staffTotal} educators enrolled. The team is in the onboarding phase with Hub access being activated.`}
 ${kpiBlock}
 
 METRICS VS TARGETS
@@ -1749,14 +1785,13 @@ METRICS VS TARGETS
 Hub Engagement: ${data.hubLoginPct}% (TDI benchmark: 60-80%)
 Tools Explored: ${data.toolsExplored}
 Courses Completed: ${data.courseCompletions}
-Deliverables: ${data.completedDeliverables}/${data.totalDeliverables}
-Action Items: ${data.actionItemsCompleted} completed, ${data.actionItemsPending} pending
+${hasServices ? `Deliverables: ${data.completedDeliverables}/${data.totalDeliverables}\n` : ''}Action Items: ${data.actionItemsCompleted} completed, ${data.actionItemsPending} pending
 ${data.wellnessScore ? `Wellness Score: ${data.wellnessScore}/5` : ''}
 ${quotesBlock}
 
 WHAT TDI IS DELIVERING NEXT
 
-${data.completedDeliverables < data.totalDeliverables ? `Your partnership still has ${data.totalDeliverables - data.completedDeliverables} deliverables remaining this school year. These may include observation days, virtual strategy sessions, or executive impact sessions. Check your dashboard's "Your Plan" tab for details on what each session includes and how to prepare.` : 'All contracted deliverables have been completed for this school year.'}
+${!hasServices ? 'This is a Learning Hub membership partnership, so there are no sessions scheduled to deliver. What comes next is driven by your team: the more staff who log in and try a Quick Win, the more this report can tell you.' : data.completedDeliverables < data.totalDeliverables ? `Your partnership still has ${data.totalDeliverables - data.completedDeliverables} deliverables remaining this school year. These may include observation days, virtual strategy sessions, or executive impact sessions. Check your dashboard's "Your Plan" tab for details on what each session includes and how to prepare.` : 'All contracted deliverables have been completed for this school year.'}
 
 ${data.upcomingEvents && data.upcomingEvents.length > 0 ? `Coming up:\n${data.upcomingEvents.map((e: {title:string;date:string;status:string}) => `- ${e.title}${e.date ? ' (' + new Date(e.date).toLocaleDateString('en-US', {month: 'short', day: 'numeric'}) + ')' : ' (date TBD)'}`).join('\n')}` : ''}
 
@@ -1764,9 +1799,7 @@ The Learning Hub continues to add new content regularly, including seasonal tool
 
 HOW OTHER SCHOOLS ARE USING THIS QUARTER
 
-A middle school in the Midwest used their second observation day as a catalyst. After receiving Love Notes, 8 teachers independently started a "strategy swap" channel where they shared Hub tools with each other. Their Hub engagement jumped from 45% to 78% in two weeks.
-
-An elementary principal in the Southeast started reading one educator quote from the Hub aloud at each staff meeting. Within a month, teachers were asking to be the one quoted next. It became a quiet competition to try new strategies.
+${hasServices ? 'A middle school in the Midwest used their second observation day as a catalyst. After receiving Love Notes, 8 teachers independently started a "strategy swap" channel where they shared Hub tools with each other. Their Hub engagement jumped from 45% to 78% in two weeks.\n\n' : ''}An elementary principal in the Southeast started reading one educator quote from the Hub aloud at each staff meeting. Within a month, teachers were asking to be the one quoted next. It became a quiet competition to try new strategies.
 
 LOOKING AHEAD
 
@@ -6088,6 +6121,68 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
               </div>
             </div>
 
+            {/* Not enough engagement data yet: explain why, then give something useful */}
+            {!reportDataReady && (
+              <div className="bg-white rounded-2xl p-6 shadow-sm border border-[#E8B84B]/40">
+                <div className="flex items-start gap-3 mb-3">
+                  <div className="w-9 h-9 rounded-lg flex items-center justify-center bg-[#E8B84B]/15 shrink-0">
+                    <Info className="w-4.5 h-4.5 text-[#B8860B]" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold text-[#1e2749]">Reports aren&apos;t ready yet</h3>
+                    <p className="text-xs text-gray-500">
+                      {reportActiveStaff === 0
+                        ? 'No staff have logged into the Hub this month.'
+                        : `${reportActiveStaff} of ${reportSeatCount} staff have logged in this month.`}
+                    </p>
+                  </div>
+                </div>
+                <p className="text-xs text-gray-600 leading-relaxed mb-4">
+                  Partnership reports are generated from active staff engagement in the Learning Hub. Things like which
+                  tools your team opens, courses they finish, and how participation moves over time. There isn&apos;t
+                  enough activity collected yet to produce a report that would tell you anything real, so we&apos;re
+                  holding these back rather than handing you a document built on empty numbers. Once at least{' '}
+                  {REPORT_MIN_ACTIVE_STAFF} staff members are using the Hub, these unlock automatically.
+                </p>
+
+                <div className="rounded-xl bg-[#F8FAFC] p-4">
+                  <p className="text-[11px] font-bold uppercase tracking-wide text-gray-400 mb-3">In the meantime</p>
+                  <ul className="space-y-2.5">
+                    <li className="flex items-start gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#2A9D8F] mt-1.5 shrink-0" />
+                      <span className="text-xs text-gray-600 leading-relaxed">
+                        <strong className="text-[#1e2749]">Newsletter Ready content</strong> is available below right
+                        now. It gives you four weeks of copy-paste tips and conversation starters for your staff email,
+                        and it doesn&apos;t depend on engagement data.
+                      </span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#E8B84B] mt-1.5 shrink-0" />
+                      <span className="text-xs text-gray-600 leading-relaxed">
+                        <strong className="text-[#1e2749]">Back to school tools</strong> in the Hub are the fastest way
+                        to get your team started. Share one Quick Win at your next staff meeting and ask everyone to try
+                        it that week.
+                      </span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#38618C] mt-1.5 shrink-0" />
+                      <span className="text-xs text-gray-600 leading-relaxed">
+                        <strong className="text-[#1e2749]">Staff Celebrations</strong> below let you print award
+                        certificates for your team today. No data required.
+                      </span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#9333EA] mt-1.5 shrink-0" />
+                      <span className="text-xs text-gray-600 leading-relaxed">
+                        <strong className="text-[#1e2749]">Check the Team tab</strong> to confirm everyone on your
+                        roster received their Hub welcome email, and resend to anyone who hasn&apos;t logged in.
+                      </span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            )}
+
             {/* Report Cards Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
@@ -6105,10 +6200,10 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                 <p className="text-xs text-gray-600 mb-4 leading-relaxed">Executive summary with key metrics, ROI analysis, educator testimonials, and renewal recommendations. Formatted for board meeting presentations.</p>
                 <button
                   onClick={() => generateAIReport('board')}
-                  disabled={reportGenerating !== null}
+                  disabled={reportGenerating !== null || !reportDataReady}
                   className="w-full py-2.5 rounded-lg text-sm font-semibold bg-[#1e2749] text-white hover:bg-[#2a3459] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
                 >
-                  {reportGenerating === 'board' ? <><Loader2 className="w-4 h-4 animate-spin" /> Generating...</> : <><Sparkles className="w-4 h-4" /> Generate Report</>}
+                  {reportGenerating === 'board' ? <><Loader2 className="w-4 h-4 animate-spin" /> Generating...</> : !reportDataReady ? <>Not enough data yet</> : <><Sparkles className="w-4 h-4" /> Generate Report</>}
                 </button>
               </div>
 
@@ -6126,10 +6221,10 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                 <p className="text-xs text-gray-600 mb-4 leading-relaxed">Hub adoption rates, most-used tools, engagement trends, and actionable recommendations to share at your next PLC or staff meeting.</p>
                 <button
                   onClick={() => generateAIReport('engagement')}
-                  disabled={reportGenerating !== null}
+                  disabled={reportGenerating !== null || !reportDataReady}
                   className="w-full py-2.5 rounded-lg text-sm font-semibold bg-[#1e2749] text-white hover:bg-[#2a3459] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
                 >
-                  {reportGenerating === 'engagement' ? <><Loader2 className="w-4 h-4 animate-spin" /> Generating...</> : <><Sparkles className="w-4 h-4" /> Generate Report</>}
+                  {reportGenerating === 'engagement' ? <><Loader2 className="w-4 h-4 animate-spin" /> Generating...</> : !reportDataReady ? <>Not enough data yet</> : <><Sparkles className="w-4 h-4" /> Generate Report</>}
                 </button>
               </div>
 
@@ -6147,10 +6242,10 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                 <p className="text-xs text-gray-600 mb-4 leading-relaxed">Investment analysis, measurable outcomes, wellness improvements, PD hours earned, and projected outcomes. Perfect for budget season and grant applications.</p>
                 <button
                   onClick={() => generateAIReport('impact')}
-                  disabled={reportGenerating !== null}
+                  disabled={reportGenerating !== null || !reportDataReady}
                   className="w-full py-2.5 rounded-lg text-sm font-semibold bg-[#1e2749] text-white hover:bg-[#2a3459] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
                 >
-                  {reportGenerating === 'impact' ? <><Loader2 className="w-4 h-4 animate-spin" /> Generating...</> : <><Sparkles className="w-4 h-4" /> Generate Report</>}
+                  {reportGenerating === 'impact' ? <><Loader2 className="w-4 h-4 animate-spin" /> Generating...</> : !reportDataReady ? <>Not enough data yet</> : <><Sparkles className="w-4 h-4" /> Generate Report</>}
                 </button>
               </div>
 
@@ -6168,10 +6263,10 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                 <p className="text-xs text-gray-600 mb-4 leading-relaxed">This quarter&apos;s highlights, metrics vs targets, milestones reached, challenges addressed, and what&apos;s ahead. Share with leadership or use for your own planning.</p>
                 <button
                   onClick={() => generateAIReport('quarterly')}
-                  disabled={reportGenerating !== null}
+                  disabled={reportGenerating !== null || !reportDataReady}
                   className="w-full py-2.5 rounded-lg text-sm font-semibold bg-[#1e2749] text-white hover:bg-[#2a3459] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
                 >
-                  {reportGenerating === 'quarterly' ? <><Loader2 className="w-4 h-4 animate-spin" /> Generating...</> : <><Sparkles className="w-4 h-4" /> Generate Report</>}
+                  {reportGenerating === 'quarterly' ? <><Loader2 className="w-4 h-4 animate-spin" /> Generating...</> : !reportDataReady ? <>Not enough data yet</> : <><Sparkles className="w-4 h-4" /> Generate Report</>}
                 </button>
               </div>
 
@@ -6189,10 +6284,10 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                 <p className="text-xs text-gray-600 mb-4 leading-relaxed">Popular tools your team loves, educator quotes, completion milestones, and celebration-worthy moments. Great for staff newsletters or morning announcements.</p>
                 <button
                   onClick={() => generateAIReport('teacher')}
-                  disabled={reportGenerating !== null}
+                  disabled={reportGenerating !== null || !reportDataReady}
                   className="w-full py-2.5 rounded-lg text-sm font-semibold bg-[#1e2749] text-white hover:bg-[#2a3459] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
                 >
-                  {reportGenerating === 'teacher' ? <><Loader2 className="w-4 h-4 animate-spin" /> Generating...</> : <><Sparkles className="w-4 h-4" /> Generate Report</>}
+                  {reportGenerating === 'teacher' ? <><Loader2 className="w-4 h-4 animate-spin" /> Generating...</> : !reportDataReady ? <>Not enough data yet</> : <><Sparkles className="w-4 h-4" /> Generate Report</>}
                 </button>
               </div>
 
@@ -6210,10 +6305,10 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                 <p className="text-xs text-gray-600 mb-4 leading-relaxed">A parent-friendly summary of your school&apos;s PD investment: what teachers are learning, how it helps students, and why it matters. Ready for newsletters or your school website.</p>
                 <button
                   onClick={() => generateAIReport('community')}
-                  disabled={reportGenerating !== null}
+                  disabled={reportGenerating !== null || !reportDataReady}
                   className="w-full py-2.5 rounded-lg text-sm font-semibold bg-[#1e2749] text-white hover:bg-[#2a3459] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
                 >
-                  {reportGenerating === 'community' ? <><Loader2 className="w-4 h-4 animate-spin" /> Generating...</> : <><Sparkles className="w-4 h-4" /> Generate Report</>}
+                  {reportGenerating === 'community' ? <><Loader2 className="w-4 h-4 animate-spin" /> Generating...</> : !reportDataReady ? <>Not enough data yet</> : <><Sparkles className="w-4 h-4" /> Generate Report</>}
                 </button>
               </div>
             </div>
