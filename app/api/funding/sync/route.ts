@@ -378,6 +378,36 @@ export async function POST(request: NextRequest) {
       .eq('id', opportunityId)
       .single()
 
+    // A narrative cannot re-enter QA unchanged.
+    //
+    // Julie gets two attempts before a narrative escalates to a person. Nothing
+    // checked that a resubmission differed from the draft she had already
+    // reviewed, so a writer could send the identical text back and burn an
+    // attempt without editing a word.
+    //
+    // It happened repeatedly. Five of the fifteen reviews on Saunemin say some
+    // version of "no changes were made since the last review" — a third of all
+    // QA effort spent re-reading text Julie had already read, and on two
+    // narratives it consumed the attempt budget and forced an escalation that
+    // need never have happened.
+    //
+    // Refused rather than silently ignored, so the writer is told why and can
+    // act, instead of believing the work was submitted.
+    if (
+      narrativeStatus === 'qa_review' &&
+      prior?.narrative_status === 'requested' &&
+      narrativeContent !== undefined &&
+      narrativeContent === prior?.narrative_content
+    ) {
+      return NextResponse.json({
+        error:
+          'This narrative is identical to the version QA already reviewed. ' +
+          'Address the redraft guidance and resubmit, or escalate it if the ' +
+          'blocker cannot be fixed by rewriting.',
+        unchanged: true,
+      }, { status: 409 })
+    }
+
     const updates: Record<string, unknown> = { updated_at: new Date().toISOString() }
     if (narrativeStatus) updates.narrative_status = narrativeStatus
     if (narrativeUrl) updates.narrative_url = narrativeUrl
