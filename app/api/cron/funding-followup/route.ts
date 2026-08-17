@@ -241,20 +241,49 @@ function toneForRecipient(email: string): EmailTone {
 }
 
 // ── Client-facing task label ──
-// Strips internal verb prefixes so clients see natural language.
-// If a client_label field exists on the item, use that instead.
+//
+// What a school is told an item is about. If client_label is set, that is the
+// wording a person chose and it is used verbatim.
+//
+// Without one, this used to strip four known internal prefixes off the raw
+// title and send whatever remained. A denylist of four patterns is the wrong
+// shape for this: it passes everything it does not recognise, and the titles
+// that caused real damage matched none of them. "Check if Paula set up her Deed
+// account" and "Remind Paula: window is open" both sailed straight through and
+// were mailed to Paula, written about her in the third person.
+//
+// Inverted to a safelist. A title is only shown to a school if it reads like
+// something addressed to them. Anything phrased as an internal instruction
+// falls back to neutral wording, and logs, because an item reaching a school
+// without a client_label is a gap someone should close rather than something to
+// paper over silently.
+
+const INTERNAL_TITLE_SHAPES = [
+  /^(check|confirm|verify)\b/i,   // "Check if X set up their account"
+  /^(remind|nudge|chase)\b/i,     // "Remind X: window is open"
+  /^(ask|email|call|contact)\b/i, // "Ask X if the school has..."
+  /^(track|follow\s+up|get)\b/i,  // "Track X", "Get X to send Y"
+  /^(gate|internal|todo)\b/i,     // machine-generated prefixes
+  /\b(bella|rae|julie|vanessa|amara)\b/i, // names of ours have no business here
+]
 
 function clientTaskLabel(rawTitle: string, clientLabel?: string | null): string {
-  if (clientLabel) return clientLabel
-  // Strip leading internal verbs: "Get X to send ...", "Confirm: ...", "Follow up on ...", "Track ..."
-  const stripped = rawTitle
-    .replace(/^(Get\s+\S+\s+to\s+)/i, '')
-    .replace(/^(Confirm:\s*)/i, '')
-    .replace(/^(Follow\s+up\s+(on|with)\s+\S+[:/]?\s*)/i, '')
-    .replace(/^(Track\s+)/i, '')
-    .trim()
-  // If stripping left something meaningful, use it; otherwise fall back gracefully
-  return stripped.length > 5 ? stripped : 'this funding step'
+  if (clientLabel && clientLabel.trim()) return clientLabel.trim()
+
+  const title = (rawTitle || '').trim()
+  const looksInternal =
+    !title || INTERNAL_TITLE_SHAPES.some(shape => shape.test(title))
+
+  if (looksInternal) {
+    console.warn(
+      LOG,
+      `[LABEL] "${title}" has no client_label and reads as internal — ` +
+        `using neutral wording. Set a client_label on this item.`,
+    )
+    return 'this funding step'
+  }
+
+  return title
 }
 
 // Capitalize a rung label for display
@@ -1023,10 +1052,15 @@ export async function GET(request: NextRequest) {
           // Item just became overdue — escalate to first rung in effective ladder
           const nextStep = effectiveLadder[0]
           if (nextStep) {
-            updates.escalation_rung = nextStep.rung
-            updates.last_escalated_at = now.toISOString()
-
-            summary.escalations_advanced++
+            // Advance the rung only once the escalation has actually reached
+            // someone, either as a sent email or a draft queued for Bella.
+            //
+            // It used to advance before the send was attempted. So a failed
+            // send, or an allowlist skip, silently consumed a rung: the ladder
+            // moved on while nobody had been contacted, and the person at that
+            // rung went on record as having been asked and not answered. The
+            // next cycle then escalated past them.
+            let reached = false
 
             const nextNextStep = effectiveLadder[1] ?? null
             if (DRY_RUN) {
@@ -1056,9 +1090,15 @@ export async function GET(request: NextRequest) {
                 pursuitId: item.pursuit_id,
                 opportunityId: item.opportunity_id,
               })
-              if (outcome === 'sent') summary.sent++
-              else if (outcome === 'drafted') summary.drafted_for_bella++
+              if (outcome === 'sent') { summary.sent++; reached = true }
+              else if (outcome === 'drafted') { summary.drafted_for_bella++; reached = true }
               else summary.send_failed++
+            }
+
+            if (reached) {
+              updates.escalation_rung = nextStep.rung
+              updates.last_escalated_at = now.toISOString()
+              summary.escalations_advanced++
             }
 
             summary.details.push({
@@ -1094,10 +1134,9 @@ export async function GET(request: NextRequest) {
               const nextStep = findNextStep(effectiveLadder, currentRung)
 
               if (nextStep) {
-                updates.escalation_rung = nextStep.rung
-                updates.last_escalated_at = now.toISOString()
-
-                summary.escalations_advanced++
+                // Same rule as the first rung: advance only once the escalation
+                // has actually reached someone. See the comment there.
+                let reached = false
 
                 const advNextStep = findNextStep(effectiveLadder, nextStep.rung)
                 if (DRY_RUN) {
@@ -1128,9 +1167,15 @@ export async function GET(request: NextRequest) {
                     pursuitId: item.pursuit_id,
                     opportunityId: item.opportunity_id,
                   })
-                  if (outcome === 'sent') summary.sent++
-                  else if (outcome === 'drafted') summary.drafted_for_bella++
+                  if (outcome === 'sent') { summary.sent++; reached = true }
+                  else if (outcome === 'drafted') { summary.drafted_for_bella++; reached = true }
                   else summary.send_failed++
+                }
+
+                if (reached) {
+                  updates.escalation_rung = nextStep.rung
+                  updates.last_escalated_at = now.toISOString()
+                  summary.escalations_advanced++
                 }
 
                 summary.details.push({
