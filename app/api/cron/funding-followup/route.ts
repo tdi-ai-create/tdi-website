@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServiceSupabase } from '@/lib/supabase'
 import { postFundingEvent } from '@/lib/funding-slack'
+import { isGateOpen } from '@/lib/funding-gate-gaps'
 
 // ══════════════════════════════════════════════════════════════
 // DRY_RUN — flip to false ONLY after verifying logic against
@@ -11,38 +12,27 @@ import { postFundingEvent } from '@/lib/funding-slack'
 const DRY_RUN = false
 
 // ══════════════════════════════════════════════════════════════
-// SEND_ALLOWLIST — go-live safety rail (independent of DRY_RUN).
+// SEND_ALLOWLIST — which TDI addresses this cron may email.
 //
-// Bella is onboarded. TDI staff can receive emails now.
-// Client addresses still excluded until go-live (Day 3 of launch plan).
+// It only governs internal recipients now. A school address never reaches the
+// allowlist at all: sendFollowUpEmail queues a draft for Bella instead of
+// sending, so the decision is made before this list is consulted.
 //
-// To arm school contacts (go-live step):
-//   'teri.gordonhernandez@pgcps.org',   // Allenwood
-//   'sharonh.porter@pgcps.org',          // Allenwood backup
-//   'ppoche@stpchanel.org',              // St. Peter Chanel
-//   'jsuarez@d94.org',                   // WeGo
-//   'zwemke@ogschool.com',               // Oak Grove
-//   'dneukirch@d41.org',                 // Glen Ellyn
-//   'mandy.johnson@gcafbcd.org',         // Go Christian
-//   'doughang@saunemin.org',             // Saunemin
+// The previous comment claimed client addresses were "still excluded until
+// go-live" while the list immediately below it contained every one of them.
+// Anyone reading this file to answer "can we accidentally email a school" got
+// the wrong answer. They were removed with the drafting rule, not before it:
+// removing them while the allowlist still gated the client path would have made
+// those sends vanish silently instead of becoming drafts, which is worse.
 //
-// Order of checks: DRY_RUN → WINDOW GATE → ALLOWLIST → send.
+// Order of checks: DRY_RUN → WINDOW GATE → TDI? → ALLOWLIST → send.
+//                                            └→ not TDI: draft for Bella.
 // ══════════════════════════════════════════════════════════════
 const ALLOWLIST_ENABLED = true
 const SEND_ALLOWLIST: string[] = [
-  // TDI staff
   'rae@teachersdeserveit.com',
   'hello@teachersdeserveit.com',
   'bella@teachersdeserveit.com',
-  // School contacts (go-live July 15, 2026)
-  'teri.gordonhernandez@pgcps.org',   // Allenwood
-  'sharonh.porter@pgcps.org',          // Allenwood backup
-  'ppoche@stpchanel.org',              // St. Peter Chanel
-  'jsuarez@d94.org',                   // WeGo
-  'zwemke@ogschool.com',               // Oak Grove
-  'dneukirch@d41.org',                 // Glen Ellyn
-  'mandy.johnson@gcafbcd.org',         // Go Christian
-  'doughang@saunemin.org',             // Saunemin
 ]
 
 function isOnAllowlist(email: string): boolean {
@@ -99,6 +89,11 @@ type Gate = {
   backup_name: string | null
   admin_sponsor_email: string | null
   admin_sponsor_name: string | null
+  // Fetched so isGateOpen can apply the same five conditions the gate route
+  // does. Without these the check silently degrades to "three contacts named",
+  // which is how a school with unsigned contracts got treated as ready.
+  contract1_signed: boolean | null
+  contract2_signed: boolean | null
 }
 
 type LadderStep = { rung: Rung; email: string }
@@ -237,10 +232,12 @@ function escalationWindow(runwayCalDays: number): number {
 
 type EmailTone = 'client' | 'internal'
 
-function toneForRecipient(email: string): EmailTone {
+function isTdiAddress(email: string): boolean {
   return email.toLowerCase().endsWith('@teachersdeserveit.com')
-    ? 'internal'
-    : 'client'
+}
+
+function toneForRecipient(email: string): EmailTone {
+  return isTdiAddress(email) ? 'internal' : 'client'
 }
 
 // ── Client-facing task label ──
@@ -311,11 +308,11 @@ async function sendFollowUpEmail(params: {
   // For email log tracking
   pursuitId?: string
   opportunityId?: string | null
-}): Promise<boolean> {
+}): Promise<'sent' | 'drafted' | 'failed'> {
   const resendKey = process.env.RESEND_API_KEY
   if (!resendKey) {
     console.warn(LOG, 'RESEND_API_KEY not set — skipping send')
-    return false
+    return 'failed'
   }
 
   const {
@@ -453,6 +450,64 @@ async function sendFollowUpEmail(params: {
     ? 'hello@teachersdeserveit.com'
     : undefined
 
+  // ── Automation never emails a school. It drafts, and Bella sends. ──
+  //
+  // This is the rule, and this is the only place it needs to hold, because
+  // every automated send in this file passes through here. The manual "Send
+  // nudge" button uses lib/funding-followup-email.ts and is unaffected: that is
+  // a person choosing to send, which is exactly what we want to stay possible.
+  //
+  // Why the rule exists. Every serious failure this system has had came from a
+  // machine deciding to contact a principal: 41 emails to two of them, internal
+  // wording sent in the third person, and a school chased about submitting an
+  // application nobody was writing. Capping and relabelling reduce that. Only
+  // this removes it.
+  //
+  // The cost is real and worth naming: nothing reaches a school while Bella is
+  // away. That is a deliberate trade, and the drafts wait rather than vanish.
+  if (!isTdiAddress(to)) {
+    const supabase = getServiceSupabase()
+
+    // One draft per item per day, not one per hourly run.
+    const since = new Date()
+    since.setHours(0, 0, 0, 0)
+    const { data: alreadyDrafted } = await supabase
+      .from('funding_email_log')
+      .select('id')
+      .eq('to_email', to)
+      .eq('subject', subject)
+      .eq('status', 'draft')
+      .gte('created_at', since.toISOString())
+      .limit(1)
+
+    if (alreadyDrafted && alreadyDrafted.length > 0) {
+      console.log(LOG, `[DRAFT] Already queued today for ${to}: "${subject}"`)
+      return 'drafted'
+    }
+
+    const { error: draftError } = await supabase.from('funding_email_log').insert({
+      pursuit_id: params.pursuitId || null,
+      opportunity_id: params.opportunityId || null,
+      subject,
+      body: html,
+      to_email: to,
+      to_name: params.contactName || null,
+      from_email: 'noreply@teachersdeserveit.com',
+      status: 'draft',
+      sent_by: 'system (queued for Bella)',
+      email_type: type === 'nudge' || type === 'escalation' ? 'nudge' : 'deadline_reminder',
+    })
+    if (draftError) {
+      // Loud on purpose. A swallowed failure here means the school is never
+      // contacted and nobody knows, which is worse than the email problem.
+      console.error(LOG, `Failed to queue draft for ${to}:`, draftError)
+      return 'failed'
+    }
+
+    console.log(LOG, `[DRAFT] Queued for Bella instead of sending to ${to}: "${subject}"`)
+    return 'drafted'
+  }
+
   const payload: Record<string, unknown> = {
     from: `${fromName} <noreply@teachersdeserveit.com>`,
     to: [to],
@@ -474,7 +529,7 @@ async function sendFollowUpEmail(params: {
   if (!res.ok) {
     const err = await res.json().catch(() => ({}))
     console.error(LOG, `Resend error sending to ${to}:`, err)
-    return false
+    return 'failed'
   }
 
   // Log to funding_email_log for the Emails tab
@@ -498,7 +553,7 @@ async function sendFollowUpEmail(params: {
     if (logError) console.error(LOG, 'Failed to log email:', logError)
   }
 
-  return true
+  return 'sent'
 }
 
 // ── Route handler ──
@@ -524,6 +579,8 @@ export async function GET(request: NextRequest) {
       nudges_fired: 0,
       escalations_advanced: 0,
       sent: 0,
+      drafted_for_bella: 0,
+      send_failed: 0,
       dry_run_skipped: 0,
       window_skipped: 0,
       allowlist_skipped: 0,
@@ -570,7 +627,7 @@ export async function GET(request: NextRequest) {
     const { data: gates } = pursuitIds.length > 0
       ? await supabase
           .from('pursuit_gate')
-          .select('pursuit_id, submitter_email, submitter_name, backup_email, backup_name, admin_sponsor_email, admin_sponsor_name')
+          .select('pursuit_id, submitter_email, submitter_name, backup_email, backup_name, admin_sponsor_email, admin_sponsor_name, contract1_signed, contract2_signed')
           .in('pursuit_id', pursuitIds)
       : { data: [] as Gate[] }
 
@@ -688,8 +745,23 @@ export async function GET(request: NextRequest) {
       // (gate must be satisfied before any school outreach)
       if (item.owner_type === 'client') {
         const gate = gateByPursuit.get(item.pursuit_id)
-        const gateOpen = gate && gate.submitter_email && gate.backup_email && gate.admin_sponsor_email
-        if (!gateOpen) continue
+        // One definition of an open gate, shared with the gate route and the
+        // gap sync, rather than a private approximation of it.
+        //
+        // This used to check three email addresses and stop there, ignoring
+        // both signed contracts and gate_open entirely. So a school whose gate
+        // was shut, for whom no agent could draft a single word, was still
+        // treated as ready and chased about submitting.
+        //
+        // That is the St. Peter Chanel episode in one line. Her gate sat shut
+        // for eighteen days because two signed contracts were never linked to
+        // it, nothing was drafted the whole time, and she was emailed fourteen
+        // times about submitting an application nobody was writing.
+        //
+        // isGateOpen recomputes from the fields rather than trusting the stored
+        // gate_open flag, which is what a record disagreeing with reality looks
+        // like and is the most common bug in this codebase.
+        if (!isGateOpen(gate)) continue
       }
 
       // Don't send reminders for actions in phases ahead of the pursuit's current phase
@@ -774,11 +846,11 @@ export async function GET(request: NextRequest) {
         if (DRY_RUN) {
           console.log(LOG, `[DRY RUN] Would send reminder to ${targetEmail} for "${item.title}" (due ${dueDateStr})`)
           summary.dry_run_skipped++
-        } else if (targetEmail && ALLOWLIST_ENABLED && !isOnAllowlist(targetEmail)) {
+        } else if (targetEmail && ALLOWLIST_ENABLED && isTdiAddress(targetEmail) && !isOnAllowlist(targetEmail)) {
           console.log(LOG, `[ALLOWLIST] Skipped ${targetEmail} — not on allowlist`)
           summary.allowlist_skipped++
         } else if (targetEmail) {
-          await sendFollowUpEmail({
+          const outcome = await sendFollowUpEmail({
             to: targetEmail,
             itemTitle: item.title,
             dueDate: dueDateStr,
@@ -792,7 +864,9 @@ export async function GET(request: NextRequest) {
             pursuitId: item.pursuit_id,
             opportunityId: item.opportunity_id,
           })
-          summary.sent++
+          if (outcome === 'sent') summary.sent++
+          else if (outcome === 'drafted') summary.drafted_for_bella++
+          else summary.send_failed++
         }
 
         summary.details.push({
@@ -897,11 +971,11 @@ export async function GET(request: NextRequest) {
           if (DRY_RUN) {
             console.log(LOG, `[DRY RUN] Would send nudge to ${targetEmail} for overdue "${item.title}"`)
             summary.dry_run_skipped++
-          } else if (targetEmail && ALLOWLIST_ENABLED && !isOnAllowlist(targetEmail)) {
+          } else if (targetEmail && ALLOWLIST_ENABLED && isTdiAddress(targetEmail) && !isOnAllowlist(targetEmail)) {
             console.log(LOG, `[ALLOWLIST] Skipped ${targetEmail} — not on allowlist`)
             summary.allowlist_skipped++
           } else if (targetEmail) {
-            await sendFollowUpEmail({
+            const outcome = await sendFollowUpEmail({
               to: targetEmail,
               itemTitle: item.title,
               dueDate: item.due_date,
@@ -915,7 +989,9 @@ export async function GET(request: NextRequest) {
               pursuitId: item.pursuit_id,
               opportunityId: item.opportunity_id,
             })
-            summary.sent++
+            if (outcome === 'sent') summary.sent++
+            else if (outcome === 'drafted') summary.drafted_for_bella++
+            else summary.send_failed++
           }
 
           summary.details.push({
@@ -960,11 +1036,11 @@ export async function GET(request: NextRequest) {
                   `${bizDaysOverdue} biz days overdue, window=${windowSize}`,
               )
               summary.dry_run_skipped++
-            } else if (ALLOWLIST_ENABLED && !isOnAllowlist(nextStep.email)) {
+            } else if (ALLOWLIST_ENABLED && isTdiAddress(nextStep.email) && !isOnAllowlist(nextStep.email)) {
               console.log(LOG, `[ALLOWLIST] Skipped ${nextStep.email} — not on allowlist`)
               summary.allowlist_skipped++
             } else {
-              await sendFollowUpEmail({
+              const outcome = await sendFollowUpEmail({
                 to: nextStep.email,
                 itemTitle: item.title,
                 dueDate: item.due_date,
@@ -980,7 +1056,9 @@ export async function GET(request: NextRequest) {
                 pursuitId: item.pursuit_id,
                 opportunityId: item.opportunity_id,
               })
-              summary.sent++
+              if (outcome === 'sent') summary.sent++
+              else if (outcome === 'drafted') summary.drafted_for_bella++
+              else summary.send_failed++
             }
 
             summary.details.push({
@@ -1030,11 +1108,11 @@ export async function GET(request: NextRequest) {
                       `window=${windowSize}`,
                   )
                   summary.dry_run_skipped++
-                } else if (ALLOWLIST_ENABLED && !isOnAllowlist(nextStep.email)) {
+                } else if (ALLOWLIST_ENABLED && isTdiAddress(nextStep.email) && !isOnAllowlist(nextStep.email)) {
                   console.log(LOG, `[ALLOWLIST] Skipped ${nextStep.email} — not on allowlist`)
                   summary.allowlist_skipped++
                 } else {
-                  await sendFollowUpEmail({
+                  const outcome = await sendFollowUpEmail({
                     to: nextStep.email,
                     itemTitle: item.title,
                     dueDate: item.due_date,
@@ -1050,7 +1128,9 @@ export async function GET(request: NextRequest) {
                     pursuitId: item.pursuit_id,
                     opportunityId: item.opportunity_id,
                   })
-                  summary.sent++
+                  if (outcome === 'sent') summary.sent++
+                  else if (outcome === 'drafted') summary.drafted_for_bella++
+                  else summary.send_failed++
                 }
 
                 summary.details.push({
