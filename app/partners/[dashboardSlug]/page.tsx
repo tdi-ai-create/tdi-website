@@ -1495,6 +1495,28 @@ export default function PartnerDashboard() {
       sessionCount: sessionRecords.length,
     };
 
+    const REPORT_TITLES: Record<string, string> = {
+      board: 'Board Presentation Report',
+      engagement: 'Staff Engagement Analysis',
+      impact: 'Impact & ROI Report',
+      quarterly: 'Quarterly Progress Report',
+      teacher: 'Teacher Highlights',
+      community: 'Community Update',
+      newsletter: 'Newsletter Ready Content',
+      certificates: 'Staff Celebration Certificates',
+    };
+
+    // Newsletter and certificates are copy-paste material a leader sends out, not
+    // narrative reports. Neither had a prompt branch below, so both fell through to
+    // "write a comprehensive partnership summary" and produced a report instead of
+    // usable copy. The deterministic templates already produce exactly what is wanted,
+    // so skip the model entirely and render them directly.
+    if (reportType === 'newsletter' || reportType === 'certificates') {
+      printReport(REPORT_TITLES[reportType], generateFallbackReport(reportType, dataContext));
+      setReportGenerating(null);
+      return;
+    }
+
     try {
       const response = await fetch('/api/hub/insights', {
         method: 'POST',
@@ -1523,17 +1545,7 @@ export default function PartnerDashboard() {
         }),
       });
 
-      const reportTitles: Record<string, string> = {
-        board: 'Board Presentation Report',
-        engagement: 'Staff Engagement Analysis',
-        impact: 'Impact & ROI Report',
-        quarterly: 'Quarterly Progress Report',
-        teacher: 'Teacher Highlights',
-        community: 'Community Update',
-        newsletter: 'Newsletter Ready Content',
-        certificates: 'Staff Celebration Certificates',
-      };
-      const title = reportTitles[reportType] || 'Partnership Report';
+      const title = REPORT_TITLES[reportType] || 'Partnership Report';
 
       if (response.ok) {
         const data = await response.json();
@@ -1543,15 +1555,7 @@ export default function PartnerDashboard() {
         printReport(title, generateFallbackReport(reportType, dataContext));
       }
     } catch {
-      const reportTitles: Record<string, string> = {
-        board: 'Board Presentation Report',
-        engagement: 'Staff Engagement Analysis',
-        impact: 'Impact & ROI Report',
-        quarterly: 'Quarterly Progress Report',
-        teacher: 'Teacher Highlights',
-        community: 'Community Update',
-      };
-      printReport(reportTitles[reportType] || 'Report', generateFallbackReport(reportType, dataContext));
+      printReport(REPORT_TITLES[reportType] || 'Report', generateFallbackReport(reportType, dataContext));
     } finally {
       setReportGenerating(null);
     }
