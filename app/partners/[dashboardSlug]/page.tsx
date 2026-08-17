@@ -14,6 +14,7 @@ import {
   Star,
   Heart,
   AlertCircle,
+  Info,
   Eye,
   Phone,
   Mail,
@@ -1418,8 +1419,17 @@ export default function PartnerDashboard() {
   const [reportGenerating, setReportGenerating] = useState<string | null>(null);
   const [generatedReport, setGeneratedReport] = useState<{ type: string; content: string; title: string } | null>(null);
 
+  // Reports that describe real engagement need real engagement behind them.
+  // Below this bar a report would read as authoritative while saying almost nothing,
+  // so we hold it back and point the leader at general Hub guidance instead.
+  const REPORT_MIN_ACTIVE_STAFF = 3;
+  const ENGAGEMENT_BACKED_REPORTS = ['board', 'engagement', 'impact', 'quarterly', 'teacher', 'community'];
+  const reportActiveStaff = staffStats.hubLoggedIn;
+  const reportDataReady = reportActiveStaff >= REPORT_MIN_ACTIVE_STAFF;
+
   const generateAIReport = async (reportType: string) => {
     if (!partnership) return;
+    if (ENGAGEMENT_BACKED_REPORTS.includes(reportType) && !reportDataReady) return;
     setReportGenerating(reportType);
     setGeneratedReport(null);
 
@@ -6088,6 +6098,68 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
               </div>
             </div>
 
+            {/* Not enough engagement data yet: explain why, then give something useful */}
+            {!reportDataReady && (
+              <div className="bg-white rounded-2xl p-6 shadow-sm border border-[#E8B84B]/40">
+                <div className="flex items-start gap-3 mb-3">
+                  <div className="w-9 h-9 rounded-lg flex items-center justify-center bg-[#E8B84B]/15 shrink-0">
+                    <Info className="w-4.5 h-4.5 text-[#B8860B]" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold text-[#1e2749]">Reports aren&apos;t ready yet</h3>
+                    <p className="text-xs text-gray-500">
+                      {reportActiveStaff === 0
+                        ? 'No staff have logged into the Hub yet.'
+                        : `${reportActiveStaff} of ${staffStats.total} staff have logged in so far.`}
+                    </p>
+                  </div>
+                </div>
+                <p className="text-xs text-gray-600 leading-relaxed mb-4">
+                  Partnership reports are generated from active staff engagement in the Learning Hub. Things like which
+                  tools your team opens, courses they finish, and how participation moves over time. There isn&apos;t
+                  enough activity collected yet to produce a report that would tell you anything real, so we&apos;re
+                  holding these back rather than handing you a document built on empty numbers. Once at least{' '}
+                  {REPORT_MIN_ACTIVE_STAFF} staff members are using the Hub, these unlock automatically.
+                </p>
+
+                <div className="rounded-xl bg-[#F8FAFC] p-4">
+                  <p className="text-[11px] font-bold uppercase tracking-wide text-gray-400 mb-3">In the meantime</p>
+                  <ul className="space-y-2.5">
+                    <li className="flex items-start gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#2A9D8F] mt-1.5 shrink-0" />
+                      <span className="text-xs text-gray-600 leading-relaxed">
+                        <strong className="text-[#1e2749]">Newsletter Ready content</strong> is available below right
+                        now. It gives you four weeks of copy-paste tips and conversation starters for your staff email,
+                        and it doesn&apos;t depend on engagement data.
+                      </span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#E8B84B] mt-1.5 shrink-0" />
+                      <span className="text-xs text-gray-600 leading-relaxed">
+                        <strong className="text-[#1e2749]">Back to school tools</strong> in the Hub are the fastest way
+                        to get your team started. Share one Quick Win at your next staff meeting and ask everyone to try
+                        it that week.
+                      </span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#38618C] mt-1.5 shrink-0" />
+                      <span className="text-xs text-gray-600 leading-relaxed">
+                        <strong className="text-[#1e2749]">Staff Celebrations</strong> below let you print award
+                        certificates for your team today. No data required.
+                      </span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#9333EA] mt-1.5 shrink-0" />
+                      <span className="text-xs text-gray-600 leading-relaxed">
+                        <strong className="text-[#1e2749]">Check the Team tab</strong> to confirm everyone on your
+                        roster received their Hub welcome email, and resend to anyone who hasn&apos;t logged in.
+                      </span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            )}
+
             {/* Report Cards Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
@@ -6105,10 +6177,10 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                 <p className="text-xs text-gray-600 mb-4 leading-relaxed">Executive summary with key metrics, ROI analysis, educator testimonials, and renewal recommendations. Formatted for board meeting presentations.</p>
                 <button
                   onClick={() => generateAIReport('board')}
-                  disabled={reportGenerating !== null}
+                  disabled={reportGenerating !== null || !reportDataReady}
                   className="w-full py-2.5 rounded-lg text-sm font-semibold bg-[#1e2749] text-white hover:bg-[#2a3459] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
                 >
-                  {reportGenerating === 'board' ? <><Loader2 className="w-4 h-4 animate-spin" /> Generating...</> : <><Sparkles className="w-4 h-4" /> Generate Report</>}
+                  {reportGenerating === 'board' ? <><Loader2 className="w-4 h-4 animate-spin" /> Generating...</> : !reportDataReady ? <>Not enough data yet</> : <><Sparkles className="w-4 h-4" /> Generate Report</>}
                 </button>
               </div>
 
@@ -6126,10 +6198,10 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                 <p className="text-xs text-gray-600 mb-4 leading-relaxed">Hub adoption rates, most-used tools, engagement trends, and actionable recommendations to share at your next PLC or staff meeting.</p>
                 <button
                   onClick={() => generateAIReport('engagement')}
-                  disabled={reportGenerating !== null}
+                  disabled={reportGenerating !== null || !reportDataReady}
                   className="w-full py-2.5 rounded-lg text-sm font-semibold bg-[#1e2749] text-white hover:bg-[#2a3459] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
                 >
-                  {reportGenerating === 'engagement' ? <><Loader2 className="w-4 h-4 animate-spin" /> Generating...</> : <><Sparkles className="w-4 h-4" /> Generate Report</>}
+                  {reportGenerating === 'engagement' ? <><Loader2 className="w-4 h-4 animate-spin" /> Generating...</> : !reportDataReady ? <>Not enough data yet</> : <><Sparkles className="w-4 h-4" /> Generate Report</>}
                 </button>
               </div>
 
@@ -6147,10 +6219,10 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                 <p className="text-xs text-gray-600 mb-4 leading-relaxed">Investment analysis, measurable outcomes, wellness improvements, PD hours earned, and projected outcomes. Perfect for budget season and grant applications.</p>
                 <button
                   onClick={() => generateAIReport('impact')}
-                  disabled={reportGenerating !== null}
+                  disabled={reportGenerating !== null || !reportDataReady}
                   className="w-full py-2.5 rounded-lg text-sm font-semibold bg-[#1e2749] text-white hover:bg-[#2a3459] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
                 >
-                  {reportGenerating === 'impact' ? <><Loader2 className="w-4 h-4 animate-spin" /> Generating...</> : <><Sparkles className="w-4 h-4" /> Generate Report</>}
+                  {reportGenerating === 'impact' ? <><Loader2 className="w-4 h-4 animate-spin" /> Generating...</> : !reportDataReady ? <>Not enough data yet</> : <><Sparkles className="w-4 h-4" /> Generate Report</>}
                 </button>
               </div>
 
@@ -6168,10 +6240,10 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                 <p className="text-xs text-gray-600 mb-4 leading-relaxed">This quarter&apos;s highlights, metrics vs targets, milestones reached, challenges addressed, and what&apos;s ahead. Share with leadership or use for your own planning.</p>
                 <button
                   onClick={() => generateAIReport('quarterly')}
-                  disabled={reportGenerating !== null}
+                  disabled={reportGenerating !== null || !reportDataReady}
                   className="w-full py-2.5 rounded-lg text-sm font-semibold bg-[#1e2749] text-white hover:bg-[#2a3459] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
                 >
-                  {reportGenerating === 'quarterly' ? <><Loader2 className="w-4 h-4 animate-spin" /> Generating...</> : <><Sparkles className="w-4 h-4" /> Generate Report</>}
+                  {reportGenerating === 'quarterly' ? <><Loader2 className="w-4 h-4 animate-spin" /> Generating...</> : !reportDataReady ? <>Not enough data yet</> : <><Sparkles className="w-4 h-4" /> Generate Report</>}
                 </button>
               </div>
 
@@ -6189,10 +6261,10 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                 <p className="text-xs text-gray-600 mb-4 leading-relaxed">Popular tools your team loves, educator quotes, completion milestones, and celebration-worthy moments. Great for staff newsletters or morning announcements.</p>
                 <button
                   onClick={() => generateAIReport('teacher')}
-                  disabled={reportGenerating !== null}
+                  disabled={reportGenerating !== null || !reportDataReady}
                   className="w-full py-2.5 rounded-lg text-sm font-semibold bg-[#1e2749] text-white hover:bg-[#2a3459] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
                 >
-                  {reportGenerating === 'teacher' ? <><Loader2 className="w-4 h-4 animate-spin" /> Generating...</> : <><Sparkles className="w-4 h-4" /> Generate Report</>}
+                  {reportGenerating === 'teacher' ? <><Loader2 className="w-4 h-4 animate-spin" /> Generating...</> : !reportDataReady ? <>Not enough data yet</> : <><Sparkles className="w-4 h-4" /> Generate Report</>}
                 </button>
               </div>
 
@@ -6210,10 +6282,10 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                 <p className="text-xs text-gray-600 mb-4 leading-relaxed">A parent-friendly summary of your school&apos;s PD investment: what teachers are learning, how it helps students, and why it matters. Ready for newsletters or your school website.</p>
                 <button
                   onClick={() => generateAIReport('community')}
-                  disabled={reportGenerating !== null}
+                  disabled={reportGenerating !== null || !reportDataReady}
                   className="w-full py-2.5 rounded-lg text-sm font-semibold bg-[#1e2749] text-white hover:bg-[#2a3459] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
                 >
-                  {reportGenerating === 'community' ? <><Loader2 className="w-4 h-4 animate-spin" /> Generating...</> : <><Sparkles className="w-4 h-4" /> Generate Report</>}
+                  {reportGenerating === 'community' ? <><Loader2 className="w-4 h-4 animate-spin" /> Generating...</> : !reportDataReady ? <>Not enough data yet</> : <><Sparkles className="w-4 h-4" /> Generate Report</>}
                 </button>
               </div>
             </div>
