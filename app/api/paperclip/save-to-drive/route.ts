@@ -9,7 +9,9 @@ import { NextRequest, NextResponse } from 'next/server';
  * Folder defaults to "Paperclip Outputs" (auto-created if missing).
  * Format defaults to "doc" (Google Doc). Also supports "text" (plain text file).
  *
- * Auth: Bearer token via PAPERCLIP_REPORT_SECRET (same as send-report).
+ * Auth: Bearer PAPERCLIP_REPORT_SECRET, PAPERCLIP_SYNC_KEY or CRON_SECRET.
+ * Matches send-report deliberately: agents carry one bearer token and should not
+ * have to know which sibling route accepts which secret.
  * Drive access: Uses Olivia's Google OAuth refresh token stored in Supabase.
  */
 
@@ -95,11 +97,22 @@ async function findOrCreateFolder(accessToken: string, folderName: string): Prom
 
 export async function POST(request: NextRequest) {
   try {
-    // Auth check
+    // Auth: same token set as send-report.
+    //
+    // This route used to accept PAPERCLIP_REPORT_SECRET alone. Railway has that
+    // variable set to the same string as PAPERCLIP_SYNC_KEY, which the website
+    // does not, so every agent call authenticated fine against the sync API and
+    // was rejected here. Grant narratives went weeks with no Google Doc because
+    // of it, and the agents reported a credential fault nobody could reproduce.
     const authHeader = request.headers.get('authorization');
-    const expectedSecret = process.env.PAPERCLIP_REPORT_SECRET;
+    const token = authHeader?.replace('Bearer ', '');
+    const validTokens = [
+      process.env.PAPERCLIP_REPORT_SECRET,
+      process.env.PAPERCLIP_SYNC_KEY,
+      process.env.CRON_SECRET,
+    ].filter(Boolean);
 
-    if (!expectedSecret || authHeader !== `Bearer ${expectedSecret}`) {
+    if (validTokens.length === 0 || !token || !validTokens.includes(token)) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
