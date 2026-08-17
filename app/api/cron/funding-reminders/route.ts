@@ -265,26 +265,6 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    if (unlinkedContracts > 0) {
-      const settings = await loadSettings()
-      if (settings.slack_enabled && settings.slack_webhook_url) {
-        const mention = settings.bella_slack_handle ? ` <@${settings.bella_slack_handle}>` : ''
-        await fetch(settings.slack_webhook_url, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            text:
-              `*${unlinkedContracts} signed contract${unlinkedContracts === 1 ? '' : 's'} may not be linked to a gate*${mention}\n` +
-              `${unlinkedLines.join('\n')}\n` +
-              `A shut gate stops all drafting silently. Please confirm the match and link it, ` +
-              `or ignore if the name is a coincidence.`,
-          }),
-        }).catch(err => console.error('[funding-reminders] Unlinked-contract post failed:', err))
-      } else {
-        console.log('[funding-reminders] Slack disabled — would have reported', unlinkedContracts, 'unlinked contract(s)')
-      }
-    }
-
     // ── One daily message to Bella: what is waiting for her to send ──
     //
     // The follow-up cron no longer emails schools. It writes a draft and stops,
@@ -303,56 +283,116 @@ export async function GET(request: NextRequest) {
     // This cron runs once daily on its own schedule, so no hour guard is needed
     // here, unlike the agent-overdue digest which fakes "daily" with an hour
     // equality inside an hourly job.
-    let draftsWaiting = 0
+    // ── Shared helper: schools, not bookkeeping ──
+    // "(RENEWAL) Allenwood Elementary - Grant Funded" is internal. Bella reads
+    // this every morning, so it should say the school's name and nothing else.
+    const tidySchool = (raw: string | null | undefined) =>
+      (raw || '')
+        .replace(/^\(RENEWAL\)\s*/i, '')
+        .replace(/\s*[-–]\s*Grant Fund(ing|ed)$/i, '')
+        .trim() || 'unknown school'
+    const nameFor = new Map(
+      pursuits.map(p => [p.id, tidySchool(p.district_name || p.pursuit_name)]),
+    )
+
     const { data: pendingDrafts } = await supabase
       .from('funding_email_log')
       .select('id, subject, to_name, to_email, pursuit_id, created_at')
       .eq('status', 'draft')
       .order('created_at', { ascending: true })
+    const draftsWaiting = pendingDrafts?.length ?? 0
 
-    if (pendingDrafts && pendingDrafts.length > 0) {
-      draftsWaiting = pendingDrafts.length
+    const { data: openQuestions } = await supabase
+      .from('funding_action_items')
+      .select('id, title, client_label, pursuit_id, due_date')
+      .eq('requires_answer', true)
+      .is('answer', null)
+      .in('status', ['pending', 'in_progress'])
 
-      // Pursuit names carry internal bookkeeping: "(RENEWAL) Allenwood
-      // Elementary - Grant Funded". Bella reads this message every morning, so
-      // it should say the school's name and nothing else.
-      const tidySchool = (raw: string | null | undefined) =>
-        (raw || '')
-          .replace(/^\(RENEWAL\)\s*/i, '')
-          .replace(/\s*[-–]\s*Grant Fund(ing|ed)$/i, '')
-          .trim() || 'unknown school'
+    // ── ONE message to Bella, ordered by what it costs to ignore ──
+    //
+    // This replaces three separate Slack posts, and it exists because the
+    // alerting we already had failed in exactly the way more posts would.
+    //
+    // Stall detection works. It fired every single day for four weeks on a
+    // school that had completely stopped moving, and nothing happened. Three
+    // reasons, none of them detection: the digest is addressed to Rae rather
+    // than to Bella who owns the work, it arrives carrying twenty-odd items,
+    // and a school frozen for a month is weighted the same as a window that
+    // needs confirming.
+    //
+    // So: one message, to the person who owns it, sections ordered by cost,
+    // and everything routine collapsed into a count rather than a list. If she
+    // reads only the first section, she has done the most valuable thing
+    // available to her that day.
+    const sections: string[] = []
+    const cap = (arr: string[], n: number) =>
+      arr.length > n ? [...arr.slice(0, n), `  • and ${arr.length - n} more`] : arr
 
-      const nameFor = new Map(
-        pursuits.map(p => [p.id, tidySchool(p.district_name || p.pursuit_name)]),
-      )
-      const lines = pendingDrafts.slice(0, 10).map(d => {
-        const who = d.to_name || d.to_email || 'unknown recipient'
-        const school = nameFor.get(d.pursuit_id) || 'unknown school'
-        return `  • ${who}, ${school}: ${d.subject}`
-      })
-      if (pendingDrafts.length > 10) {
-        lines.push(`  • and ${pendingDrafts.length - 10} more`)
-      }
+    const decisions = opportunities
+      .filter(o => o.narrative_status === 'escalated')
+      .map(o => `  • ${nameFor.get(o.pursuit_id) ?? 'unknown'}: ${o.name} needs a decision`)
+    if (decisions.length) sections.push(`*Needs a decision from you (${decisions.length})*\n${cap(decisions, 6).join('\n')}`)
 
+    const approvals = opportunities
+      .filter(o => o.narrative_status === 'approval')
+      .map(o => `  • ${nameFor.get(o.pursuit_id) ?? 'unknown'}: ${o.name} passed QA and is waiting`)
+    if (approvals.length) sections.push(`*Finished, waiting on your approval (${approvals.length})*\n${cap(approvals, 6).join('\n')}`)
+
+    const draftLines = (pendingDrafts ?? []).map(d =>
+      `  • ${d.to_name || d.to_email || 'unknown'}, ${nameFor.get(d.pursuit_id) ?? 'unknown'}: ${d.subject}`)
+    if (draftLines.length) sections.push(`*Written and waiting for you to send (${draftLines.length})*\n${cap(draftLines, 6).join('\n')}`)
+
+    if (unlinkedContracts > 0) {
+      sections.push(
+        `*Signed contracts that may not be linked (${unlinkedContracts})*\n` +
+        `${cap(unlinkedLines, 6).join('\n')}\n` +
+        `  _a shut gate stops all drafting silently_`)
+    }
+
+    const questionLines = (openQuestions ?? []).map(q =>
+      `  • ${nameFor.get(q.pursuit_id) ?? 'unknown'}: ${q.client_label || q.title}`)
+    if (questionLines.length) sections.push(`*Asked and not answered (${questionLines.length})*\n${cap(questionLines, 6).join('\n')}`)
+
+    const stalled = alerts.filter(a => a.category === 'stalled')
+    if (stalled.length) {
+      const byPursuit = new Map<string, number>()
+      for (const a of stalled) byPursuit.set(a.pursuit_name, (byPursuit.get(a.pursuit_name) ?? 0) + 1)
+      const stallLines = [...byPursuit.entries()].map(([name, n]) =>
+        `  • ${tidySchool(name)}: ${n} path${n === 1 ? '' : 's'} with no movement`)
+      sections.push(`*Not moving (${stalled.length})*\n${cap(stallLines, 6).join('\n')}`)
+    }
+
+    // Everything else becomes a number, not a list. This is the part that stops
+    // the message turning back into wallpaper.
+    const accountedFor = decisions.length + approvals.length + stalled.length
+    const remaining = Math.max(0, alerts.length - accountedFor)
+
+    let digestPosted = false
+    if (sections.length > 0) {
       const settings = await loadSettings()
       if (settings.slack_enabled && settings.slack_webhook_url) {
         const mention = settings.bella_slack_handle ? ` <@${settings.bella_slack_handle}>` : ''
         const portalUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.teachersdeserveit.com'
-        const noun = draftsWaiting === 1 ? 'draft is' : 'drafts are'
+        const tail = remaining > 0
+          ? `\n_${remaining} other open alert${remaining === 1 ? '' : 's'} in the portal, none urgent._`
+          : ''
         await fetch(settings.slack_webhook_url, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             text:
-              `*${draftsWaiting} ${noun} waiting to send*${mention}\n` +
-              `${lines.join('\n')}\n` +
+              `*Grant work for today*${mention}\n\n` +
+              `${sections.join('\n\n')}\n` +
+              `${tail}\n` +
               `<${portalUrl}/tdi-admin/funding|Open the funding portal>`,
           }),
-          // Loud on failure. A swallowed error here means she is never told and
-          // the drafts sit unseen, which is the failure this exists to prevent.
-        }).catch(err => console.error('[funding-reminders] Draft digest post failed:', err))
+          // Loud on failure. Silence here means she is never told and the work
+          // sits unseen, which is the failure this exists to prevent.
+        }).catch(err => console.error('[funding-reminders] Daily digest post failed:', err))
+        digestPosted = true
       } else {
-        console.log('[funding-reminders] Slack disabled — would have reported', draftsWaiting, 'waiting draft(s)')
+        console.log('[funding-reminders] Slack disabled — would have posted', sections.length, 'section(s)')
       }
     }
 
@@ -363,6 +403,8 @@ export async function GET(request: NextRequest) {
       warning_count: warnings.length,
       drafts_created: draftCount,
       drafts_waiting: draftsWaiting,
+      digest_posted: digestPosted,
+      digest_sections: sections.length,
       unlinked_contracts: unlinkedContracts,
       discovery_requested: discoveryCreated,
       digest_sent: alerts.length > 0,
