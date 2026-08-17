@@ -106,19 +106,52 @@ export async function POST(request: NextRequest) {
       updates.waiting_on = 'client'
       updates.qa_escalation = { ...escalation, awaiting_client: true, client_ask: detail, requested_by: actor, requested_at: now }
 
+      // Two things were missing here, and together they meant the loop never
+      // closed.
+      //
+      // The item had no due date, and the follow-up engine skips anything
+      // without one, so the school was never reminded about a question that is
+      // blocking their own application. Two of these were created for Saunemin
+      // and both were silent.
+      //
+      // And the drafted email below was built, returned in the API response,
+      // and then discarded, because no screen reads it. Bella had to write the
+      // message herself every time, from a question the system had already
+      // phrased for her. prepared_materials exists on this table for exactly
+      // this and was left empty.
+      const askText = String(detail).trim()
+      const greeting = opp.contact_name ? `Hi ${String(opp.contact_name).split(' ')[0]},` : 'Hi,'
+      const preparedEmail = [
+        greeting,
+        '',
+        `We are finishing the ${opp.name} application for you and there is one thing we need from your side before we can complete it:`,
+        '',
+        askText,
+        '',
+        'As soon as we have that we will pick it straight back up. Happy to jump on a quick call if that is easier than writing it out.',
+        '',
+        'Thank you,',
+        'Bella',
+      ].join('\n')
+
+      const infoDue = new Date()
+      infoDue.setDate(infoDue.getDate() + 7)
+
       await supabase.from('funding_action_items').insert({
         pursuit_id: opp.pursuit_id,
         opportunity_id: opp.id,
         owner_type: 'client',
         title: `Information needed for ${opp.name}`,
-        client_label: String(detail).trim(),
+        client_label: askText,
         description: `We need this to finish the ${opp.name} application.`,
         status: 'pending',
+        due_date: infoDue.toISOString().split('T')[0],
         category: 'documentation',
         action_size: 'light',
+        prepared_materials: preparedEmail,
       })
 
-      emailDraft = { ask: String(detail).trim(), contactName: opp.contact_name ?? null }
+      emailDraft = { ask: askText, contactName: opp.contact_name ?? null }
       message = 'Action item created for the school. Review and send the email, and the narrative resumes when they reply.'
       break
     }
