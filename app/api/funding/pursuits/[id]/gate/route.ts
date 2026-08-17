@@ -98,17 +98,17 @@ export async function PUT(
   // Keep the school's action items in step with what the gate is still missing.
   // A shut gate makes drafting work invisible to every agent, so the gaps have
   // to be visible to Bella and to the school rather than silently blocking.
-  await syncGateActionItems(supabase, pursuitId, result.data).catch(() => {})
+  await syncGateActionItems(supabase, pursuitId, result.data).catch(err => console.error('[gate] non-blocking side effect failed:', err))
 
   // Slack narration
   const { data: pursuit } = await supabase.from('funding_pursuits').select('pursuit_name').eq('id', pursuitId).single()
   const pName = pursuit?.pursuit_name || 'Unknown'
 
   if (nowOpen && !wasOpen) {
-    postFundingEvent(gateEvent(pursuitId, pName)).catch(() => {})
+    postFundingEvent(gateEvent(pursuitId, pName)).catch(err => console.error('[gate] non-blocking side effect failed:', err))
   }
   if (body.submitter_employment_verified_at && !existing?.submitter_employment_verified_at) {
-    postFundingEvent(contactVerifiedEvent(pursuitId, pName, result.data?.submitter_name || 'Contact')).catch(() => {})
+    postFundingEvent(contactVerifiedEvent(pursuitId, pName, result.data?.submitter_name || 'Contact')).catch(err => console.error('[gate] non-blocking side effect failed:', err))
   }
 
   return NextResponse.json({ success: true, gate: result.data })

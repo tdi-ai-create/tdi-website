@@ -260,7 +260,7 @@ export async function POST(
     .eq('id', actionId)
 
   // Slack narration
-  postFundingEvent(nudgeSentEvent(item.pursuit_id, schoolName, item.title, recipientEmail)).catch(() => {})
+  postFundingEvent(nudgeSentEvent(item.pursuit_id, schoolName, item.title, recipientEmail)).catch(err => console.error('[send-nudge] non-blocking side effect failed:', err))
 
   return NextResponse.json({
     sent: true,

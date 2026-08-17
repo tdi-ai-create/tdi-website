@@ -101,7 +101,7 @@ export async function POST(request: NextRequest) {
 
   // Slack notification
   if (flippedCount > 0) {
-    grantUnlockedServices(pursuit.pursuit_name, flippedCount).catch(() => {})
+    grantUnlockedServices(pursuit.pursuit_name, flippedCount).catch(err => console.error('[confirm-award] non-blocking side effect failed:', err))
   }
 
   return NextResponse.json({
