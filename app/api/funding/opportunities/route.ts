@@ -142,6 +142,22 @@ export async function PATCH(request: NextRequest) {
       } catch { return {} as Record<string, unknown>; }
     })();
 
+    // Everything this school has already been turned down for. Six denials sit
+    // on one pursuit with written reasons and nothing has ever read them.
+    const { data: denials } = oppNow?.pursuit_id
+      ? await supabase
+          .from('funding_opportunities')
+          .select('name, denial_reason')
+          .eq('pursuit_id', oppNow.pursuit_id)
+          .eq('status', 'denied')
+      : { data: [] };
+
+    const priorDenials = (denials ?? []).map(d => ({
+      pathName: d.name as string,
+      reason: (d.denial_reason as string) ?? null,
+      sameSchool: true,
+    }));
+
     const result = screenPath(
       {
         name: oppNow?.name ?? '',
@@ -155,6 +171,7 @@ export async function PATCH(request: NextRequest) {
         titleIStatus: (profile.title_i_status as string) ?? null,
         designation: (profile.designation as string) ?? null,
       },
+      priorDenials,
     );
 
     await supabase.from('funding_opportunities').update({

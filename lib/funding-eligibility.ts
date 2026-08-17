@@ -54,6 +54,14 @@ export interface PathContext {
   namedApplicant?: string | null   // e.g. the NEA member, where one is required
 }
 
+/** A funder that already turned us down, and why. */
+export interface PriorDenial {
+  pathName: string
+  reason: string | null
+  /** Whether it was this same school or a comparable one. */
+  sameSchool: boolean
+}
+
 /** A private or independent school is not in the state accountability system. */
 function isOutsideStateAccountability(sector?: string | null): boolean {
   const s = (sector || '').toLowerCase()
@@ -73,7 +81,51 @@ const NEEDS_TDI_AUTHORIZATION = /(Title I Section 1003)/i
  * Run every rule against one path. First rule to object wins, and a stop
  * outranks an ask.
  */
-export function screenPath(path: PathContext, school: SchoolContext): EligibilityResult {
+export function screenPath(
+  path: PathContext,
+  school: SchoolContext,
+  priorDenials: PriorDenial[] = [],
+): EligibilityResult {
+  // ── What we already lost on ──
+  //
+  // Runs first, because a funder that has already said no to this exact school
+  // is the cheapest fact available and the one we have been ignoring hardest.
+  // Allenwood holds six denials, each with a written reason, and nothing has
+  // ever read them. A path that failed can be recommended again unchanged.
+  //
+  // Deliberately an ask rather than a stop. A denial is evidence, not a law:
+  // cycles reopen, criteria change, and a school's circumstances move. It
+  // should make a person look, not close the door.
+  // Guard against bulk-applied reasons. All six denials on one pursuit carry the
+  // identical string, copy-pasted across unrelated funders, so quoting one back
+  // would tell someone the Greater Washington Community Foundation declined
+  // because a district officer said Title II-A offers no grants. That is not
+  // evidence, it is a paste. Where the same reason appears on several paths,
+  // flag the denial without quoting a reason nobody actually wrote for it.
+  const reasonCounts = new Map<string, number>()
+  for (const d of priorDenials) {
+    const key = (d.reason || '').trim()
+    if (key) reasonCounts.set(key, (reasonCounts.get(key) ?? 0) + 1)
+  }
+
+  const sameSchoolDenial = priorDenials.find(
+    d => d.sameSchool && d.pathName.toLowerCase() === path.name.toLowerCase(),
+  )
+  if (sameSchoolDenial) {
+    return {
+      verdict: 'ask_first',
+      rule: 'prior_denial',
+      reason:
+        `This school already applied to ${path.name} and was turned down` +
+        (sameSchoolDenial.reason && (reasonCounts.get(sameSchoolDenial.reason.trim()) ?? 0) === 1
+          ? `: ${sameSchoolDenial.reason}`
+          : '. No reason specific to this funder was recorded.') +
+        ` Applying again unchanged is unlikely to land differently.`,
+      unblockedBy:
+        'Confirm what has changed since — a new cycle, different criteria, or a materially different ask.',
+    }
+  }
+
   // ── Sector ──
   // The strongest rule we have, and it needs no numbers. A school outside the
   // state accountability system cannot carry a CSI, TSI or ATSI identification
