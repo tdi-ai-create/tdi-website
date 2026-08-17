@@ -47,6 +47,7 @@ export async function GET(request: NextRequest) {
     let escalations = 0;
     const reminderDetails: string[] = [];
     const escalationDetails: string[] = [];
+    const logFailures: string[] = [];
 
     for (const inv of invoices) {
       const invoiceDate = new Date(inv.invoice_date);
@@ -74,68 +75,90 @@ export async function GET(request: NextRequest) {
 
       if (!partnership) continue;
 
-      // Check if we already sent a reminder at this stage today
-      const { data: existingEvents } = await supabase
+      // Which automated stages has this invoice already been through? Scoped to
+      // the life of the invoice, not to today. A same-day check only stops a
+      // double send within one run; it lets the same email go out again
+      // tomorrow, which is exactly how these schools ended up on a daily blast.
+      const { data: priorStages, error: priorStagesError } = await supabase
         .from('payment_events')
-        .select('id')
+        .select('reminder_stage')
         .eq('invoice_id', inv.id)
-        .eq('event_date', today)
-        .limit(1);
+        .not('reminder_stage', 'is', null);
 
-      if (existingEvents && existingEvents.length > 0) continue;
+      if (priorStagesError) {
+        // We cannot tell what has already been sent, so send nothing. Failing
+        // closed costs one day of followup; failing open costs a client
+        // relationship.
+        console.error('[invoice-followup] Could not read reminder history for', inv.invoice_number, priorStagesError);
+        logFailures.push(`${inv.invoice_number}: could not read reminder history, skipped`);
+        continue;
+      }
+
+      const sentStages = new Set((priorStages || []).map(e => e.reminder_stage));
 
       const recipientEmail = partnership.primary_contact_email || partnership.contact_email;
+
+      if (!recipientEmail) {
+        logFailures.push(`${inv.invoice_number}: no contact email on partnership, skipped`);
+        continue;
+      }
       const firstName = (partnership.contact_name || '').split(' ')[0] || 'there';
       const schoolName = partnership.org_name || partnership.contact_name || 'your school';
 
       // Day 14: Friendly reminder
-      if (daysSinceInvoice >= 14 && daysSinceInvoice < 30 && daysOverdue < 0) {
-        await sendReminder(inv, recipientEmail, firstName, schoolName, 'friendly', deliverable.label);
-        await logEvent(supabase, inv.id, 'reminder_14d', `14-day reminder sent to ${recipientEmail}`);
-        reminderDetails.push(`${schoolName} -- $${Number(inv.amount).toLocaleString()} (14-day reminder)`);
-        reminders++;
+      if (daysSinceInvoice >= 14 && daysSinceInvoice < 30 && daysOverdue < 0 && !sentStages.has('reminder_14d')) {
+        if (await claimStage(supabase, inv.id, 'reminder_14d', 'email_sent', `14-day reminder sent to ${recipientEmail}`, logFailures, inv.invoice_number)) {
+          await sendReminder(inv, recipientEmail, firstName, schoolName, 'friendly', deliverable.label);
+          reminderDetails.push(`${schoolName} -- $${Number(inv.amount).toLocaleString()} (14-day reminder)`);
+          reminders++;
+        }
       }
 
       // Day 30 (due date): Firmer reminder + mark overdue
-      if (daysOverdue >= 0 && daysOverdue < 15) {
-        await supabase.from('intelligence_invoices').update({ status: 'overdue' }).eq('id', inv.id);
-        await sendReminder(inv, recipientEmail, firstName, schoolName, 'due', deliverable.label);
-        await logEvent(supabase, inv.id, 'reminder_due', `Due date reminder sent. Invoice marked overdue.`);
-        reminderDetails.push(`${schoolName} -- $${Number(inv.amount).toLocaleString()} (overdue, due ${inv.due_date})`);
-        reminders++;
+      if (daysOverdue >= 0 && daysOverdue < 15 && !sentStages.has('reminder_due')) {
+        if (await claimStage(supabase, inv.id, 'reminder_due', 'email_sent', `Due date reminder sent to ${recipientEmail}. Invoice marked overdue.`, logFailures, inv.invoice_number)) {
+          await supabase.from('intelligence_invoices').update({ status: 'overdue' }).eq('id', inv.id);
+          await sendReminder(inv, recipientEmail, firstName, schoolName, 'due', deliverable.label);
+          reminderDetails.push(`${schoolName} -- $${Number(inv.amount).toLocaleString()} (overdue, due ${inv.due_date})`);
+          reminders++;
+        }
       }
 
       // Day 45: Escalate to Omar
-      if (daysOverdue >= 15 && daysOverdue < 30) {
-        await sendInternalAlert(
-          'omar@secureplusfinancial.com',
-          `Invoice ${inv.invoice_number} is 45 days old`,
-          `${schoolName} has not paid invoice ${inv.invoice_number} ($${Number(inv.amount).toLocaleString()}) for "${deliverable.label}". It was due ${inv.due_date}. This may need a direct call to their AP department.`,
-          inv.invoice_number,
-        );
-        await logEvent(supabase, inv.id, 'escalation_45d', `45-day escalation sent to Omar`);
-        escalationDetails.push(`${schoolName} -- $${Number(inv.amount).toLocaleString()} (45 days, escalated to Omar)`);
-        escalations++;
+      if (daysOverdue >= 15 && daysOverdue < 30 && !sentStages.has('escalation_45d')) {
+        if (await claimStage(supabase, inv.id, 'escalation_45d', 'escalated', '45-day escalation sent to Omar', logFailures, inv.invoice_number)) {
+          await sendInternalAlert(
+            'omar@secureplusfinancial.com',
+            `Invoice ${inv.invoice_number} is 45 days old`,
+            `${schoolName} has not paid invoice ${inv.invoice_number} ($${Number(inv.amount).toLocaleString()}) for "${deliverable.label}". It was due ${inv.due_date}. This may need a direct call to their AP department.`,
+            inv.invoice_number,
+          );
+          escalationDetails.push(`${schoolName} -- $${Number(inv.amount).toLocaleString()} (45 days, escalated to Omar)`);
+          escalations++;
+        }
       }
 
       // Day 60: Escalate to Rae
-      if (daysOverdue >= 30) {
-        await sendInternalAlert(
-          'Rae@TeachersDeserveIt.com',
-          `Invoice ${inv.invoice_number} is 60+ days overdue`,
-          `${schoolName} still has not paid invoice ${inv.invoice_number} ($${Number(inv.amount).toLocaleString()}) for "${deliverable.label}". Due date was ${inv.due_date}. Omar was notified at Day 45. This may need your direct outreach to the principal.`,
-          inv.invoice_number,
-        );
-        await logEvent(supabase, inv.id, 'escalation_60d', `60-day escalation sent to Rae`);
-        escalationDetails.push(`${schoolName} -- $${Number(inv.amount).toLocaleString()} (60+ days, escalated to Rae)`);
-        escalations++;
+      if (daysOverdue >= 30 && !sentStages.has('escalation_60d')) {
+        if (await claimStage(supabase, inv.id, 'escalation_60d', 'escalated', '60-day escalation sent to Rae', logFailures, inv.invoice_number)) {
+          await sendInternalAlert(
+            'Rae@TeachersDeserveIt.com',
+            `Invoice ${inv.invoice_number} is 60+ days overdue`,
+            `${schoolName} still has not paid invoice ${inv.invoice_number} ($${Number(inv.amount).toLocaleString()}) for "${deliverable.label}". Due date was ${inv.due_date}. Omar was notified at Day 45. This may need your direct outreach to the principal.`,
+            inv.invoice_number,
+          );
+          escalationDetails.push(`${schoolName} -- $${Number(inv.amount).toLocaleString()} (60+ days, escalated to Rae)`);
+          escalations++;
+        }
       }
     }
 
     const backlog = await checkBacklog(supabase);
 
-    // Slack summary with details
-    if (reminders > 0 || escalations > 0 || (backlog && backlog.uninvoiced_services > 0)) {
+    // Slack summary with details. Failures post even on an otherwise quiet day:
+    // a reminder that silently stopped logging is how this went unnoticed for
+    // two weeks.
+    if (reminders > 0 || escalations > 0 || logFailures.length > 0 || (backlog && backlog.uninvoiced_services > 0)) {
       const lines = [`*Invoice followup:* ${invoices.length} unpaid invoice${invoices.length > 1 ? 's' : ''} total.`]
       if (reminderDetails.length > 0) {
         lines.push(`\n*Reminders sent today (${reminderDetails.length}):*`)
@@ -148,6 +171,10 @@ export async function GET(request: NextRequest) {
       if (backlog?.uninvoiced_services > 0) {
         lines.push(`\n${backlog.uninvoiced_services} service${backlog.uninvoiced_services > 1 ? 's' : ''} delivered but not yet invoiced.`)
       }
+      if (logFailures.length > 0) {
+        lines.push(`\n*Needs attention (${logFailures.length}):* nothing was emailed for these.`)
+        logFailures.forEach(f => lines.push(`  ${f}`))
+      }
       slackNotify('financials', lines.join('\n'))
     }
 
@@ -156,6 +183,7 @@ export async function GET(request: NextRequest) {
       unpaid_invoices: invoices.length,
       reminders_sent: reminders,
       escalations_sent: escalations,
+      log_failures: logFailures,
       backlog,
     });
   } catch (error) {
@@ -237,13 +265,40 @@ async function sendInternalAlert(to: string, subject: string, body: string, invo
   });
 }
 
-async function logEvent(supabase: ReturnType<typeof getServiceSupabase>, invoiceId: string, eventType: string, summary: string) {
-  await supabase.from('payment_events').insert({
+/**
+ * Records that an automated stage is about to fire, and reports whether the
+ * caller may send.
+ *
+ * The write happens BEFORE the email goes out, and a unique index on
+ * (invoice_id, reminder_stage) means a second attempt loses. If the row cannot
+ * be written we return false and nothing is sent. An unlogged send is what put
+ * three schools on a daily email for two weeks, so a send we cannot record is
+ * treated as a send we are not allowed to make.
+ */
+async function claimStage(
+  supabase: ReturnType<typeof getServiceSupabase>,
+  invoiceId: string,
+  stage: string,
+  eventType: 'email_sent' | 'escalated',
+  summary: string,
+  failures: string[],
+  invoiceNumber: string,
+): Promise<boolean> {
+  const { error } = await supabase.from('payment_events').insert({
     invoice_id: invoiceId,
     event_type: eventType,
     event_date: new Date().toISOString().split('T')[0],
     summary,
+    reminder_stage: stage,
   });
+
+  if (error) {
+    console.error('[invoice-followup] Could not claim stage', stage, 'for', invoiceNumber, error);
+    failures.push(`${invoiceNumber}: could not log ${stage}, nothing sent (${error.message})`);
+    return false;
+  }
+
+  return true;
 }
 
 async function checkBacklog(supabase: ReturnType<typeof getServiceSupabase>) {
