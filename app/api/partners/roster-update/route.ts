@@ -200,7 +200,10 @@ export async function POST(request: NextRequest) {
               body: JSON.stringify({
                 email: s.email,
                 firstName: s.firstName || s.email.split('@')[0],
-                schoolName: partnership.contact_name || 'your school',
+                // org_name, not contact_name. The welcome email renders this as
+                // "Your school, X, has partnered with TDI", so contact_name produced
+                // "Your school, Jack Lipari, has partnered with TDI".
+                schoolName: partnership.org_name || 'your school',
                 roleTitle: s.roleTitle || null,
               }),
             }).catch(() => {});
