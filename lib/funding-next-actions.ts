@@ -439,19 +439,49 @@ export function computeNextActions(
     })
   }
 
-  // No fast funding source (diversification)
+  // ── No local funding source ──
+  //
+  // This is the only trigger in the system that can ask for funder research,
+  // and as written it could never fire for anyone.
+  //
+  // It required a pursuit to hold a Plan A or B path and NO Plan C or D path.
+  // But the seeding template gives every new pursuit NEA as a C and Walmart
+  // Spark as a D, so "has no C or D" was false from the moment a pursuit was
+  // created. Verified against all live pursuits: every one holds both.
+  //
+  // The consequence is the whole reason every school gets the same six national
+  // programmes. research_status reads 'none' on every opportunity ever created,
+  // the agent research branch has never returned work, and neither of the
+  // playbook's local-funder steps has been completed for any school.
+  //
+  // The condition now counts sources that are actually LOCAL rather than any
+  // C or D. Seeding two national programmes no longer satisfies it, because
+  // two national programmes are not diversification.
   const tiers: Record<string, number> = { A: 0, B: 0, C: 0, D: 0 }
   for (const opp of opportunities) {
     const cat = (opp.plan_category || '').toUpperCase()
     if (tiers[cat] !== undefined) tiers[cat]++
   }
+
+  // The two the template seeds into every pursuit. Present everywhere, local
+  // nowhere, so they cannot count towards having found a local source.
+  const SEEDED_NATIONAL = /(NEA Learning|Walmart Spark)/i
+  const localSources = opportunities.filter((o: { plan_category?: string | null; name?: string | null }) => {
+    const cat = (o.plan_category || '').toUpperCase()
+    if (cat !== 'C' && cat !== 'D') return false
+    return !SEEDED_NATIONAL.test(o.name || '')
+  })
+
   const hasSlow = tiers.A > 0 || tiers.B > 0
-  const hasFast = tiers.C > 0 || tiers.D > 0
-  if (opportunities.length > 0 && hasSlow && !hasFast) {
+  if (opportunities.length > 0 && hasSlow && localSources.length === 0) {
     result.push({
       id: 'diversify',
-      label: 'No fast funding sources (Plan C/D)',
-      why: 'Agents should research a local/foundation source to hedge the timeline',
+      label: 'No local funding sources found yet',
+      why:
+        'Every path on this pursuit is a national programme. Local money — service clubs, ' +
+        'county foundations, the employer base, utility and farm bureau funds, diocesan ' +
+        'offices — is where the fast, renewable, low-competition grants are, and none has ' +
+        'been researched for this school.',
       owner: 'agent',
       urgency: 'normal',
       actionType: 'request_research',

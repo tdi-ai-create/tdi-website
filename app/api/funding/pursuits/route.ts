@@ -57,14 +57,21 @@ export async function POST(request: NextRequest) {
         current_phase: 'intake',
         implementation_date: implementationDate || null,
         school_profile: schoolProfile ? JSON.stringify(schoolProfile) : '{}',
-        funding_paths: fundingPaths ? JSON.stringify(fundingPaths) : JSON.stringify([
-          { plan: 'A', label: 'Title II-A', amount: 0, status: 'not_started', deadline: null, contact: '', notes: '' },
-          { plan: 'A', label: 'IDEA / CEIS', amount: 0, status: 'not_started', deadline: null, contact: '', notes: '' },
-          { plan: 'A', label: 'Title I Part A', amount: 0, status: 'not_started', deadline: null, contact: '', notes: '' },
-          { plan: 'B', label: 'State formula', amount: 0, status: 'not_started', deadline: null, contact: '', notes: '' },
-          { plan: 'C', label: 'Foundation/corporate', amount: 0, status: 'not_started', deadline: null, contact: '', notes: '' },
-          { plan: 'D', label: 'Crowdfunding/direct', amount: 0, status: 'not_started', deadline: null, contact: '', notes: '' },
-        ]),
+        // funding_paths is a legacy display field and this default was a second
+        // hardcoded list of funding paths, separate from STANDARD_OPPORTUNITIES
+        // and maintained by nobody. It seeded six generic labels that drifted
+        // from the six real opportunities created immediately below, so a
+        // pursuit began life with two disagreeing accounts of its own plan.
+        //
+        // Nothing reads it. It is declared in one leadership page's type and
+        // never rendered, and two of the three live pursuits already have it
+        // empty. Seeding a stale second list is worse than seeding nothing, so
+        // it now stays empty unless a caller explicitly supplies paths.
+        //
+        // The column is left in place rather than dropped: removing it is a
+        // migration with no benefit, and an empty array is already what most
+        // rows hold.
+        funding_paths: fundingPaths ? JSON.stringify(fundingPaths) : JSON.stringify([]),
         next_action_label: 'Build school profile (Phase 1)',
         next_action_urgency: 'info',
         client_contact_name: clientContactName || null,
@@ -80,7 +87,18 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    // Auto-generate standard funding opportunities
+    // Auto-generate standard funding opportunities.
+    //
+    // This used to copy six fields and drop the rest. The template also defines
+    // window_status_default, window_verifier, default_agent and notes for every
+    // opportunity, all of which were read and thrown away.
+    //
+    // The cost showed up much later and looked like something else. Every new
+    // opportunity arrived with no assigned agent and no window status, so
+    // find_work — which requires window_status 'open' — could not release it,
+    // and somebody had to notice and set both by hand. Nothing surfaced that
+    // they were missing, so what it looked like was drafting quietly not
+    // happening.
     const oppInserts = STANDARD_OPPORTUNITIES.map(opp => ({
       pursuit_id: data.id,
       name: opp.name,
@@ -89,6 +107,10 @@ export async function POST(request: NextRequest) {
       plan_category: opp.plan_category,
       waiting_on: opp.waiting_on,
       narrative_status: opp.narrative_status,
+      // Previously discarded:
+      window_status: opp.window_status_default,
+      assigned_agent: opp.default_agent,
+      notes: opp.notes,
     }));
 
     await supabase.from('funding_opportunities').insert(oppInserts);
