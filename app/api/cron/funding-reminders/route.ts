@@ -130,6 +130,84 @@ export async function GET(request: NextRequest) {
       draftCount++
     }
 
+    // ── Local funder discovery: give the agents something to actually research ──
+    //
+    // Every school receives the same six national programmes and no local money
+    // has ever been researched for anyone. The reason is structural, not a
+    // dormant switch.
+    //
+    // find_work's research branch is keyed on an existing opportunity with
+    // research_status 'requested'. So the only research the system can express
+    // is "look into this funder we already know about". There is no shape for
+    // "go find funders for this school", which is the thing we actually need,
+    // and the one button that sets research_status can only be clicked on a row
+    // that already exists. research_status reads 'none' on every opportunity
+    // ever created.
+    //
+    // This creates the missing shape: one placeholder opportunity per pursuit
+    // that has no local source yet, already marked as research requested, so
+    // find_work hands it to an agent on the next sync. The agent researches the
+    // families named in the description and creates real opportunities from
+    // what it finds.
+    //
+    // Created once per pursuit and never duplicated. It is visible in the
+    // opportunities list on purpose: a placeholder somebody can see and close is
+    // better than a silent gap, which is what we have had.
+    let discoveryCreated = 0
+    const SEEDED_NATIONAL = /(NEA Learning|Walmart Spark)/i
+    const DISCOVERY_NAME = 'Local funder discovery'
+
+    for (const p of pursuits) {
+      const oppsHere = opportunities.filter(o => o.pursuit_id === p.id)
+      if (oppsHere.length === 0) continue
+
+      // Already has one, or already has a genuinely local source: nothing to do.
+      if (oppsHere.some(o => (o.name || '') === DISCOVERY_NAME)) continue
+      const hasLocal = oppsHere.some(o => {
+        const cat = (o.plan_category || '').toUpperCase()
+        return (cat === 'C' || cat === 'D') && !SEEDED_NATIONAL.test(o.name || '')
+      })
+      if (hasLocal) continue
+
+      const school = (p.district_name || p.pursuit_name || '')
+        .replace(/^\(RENEWAL\)\s*/i, '')
+        .replace(/\s*[-–]\s*Grant Fund(ing|ed)$/i, '')
+        .trim()
+
+      const { error: discErr } = await supabase.from('funding_opportunities').insert({
+        pursuit_id: p.id,
+        name: DISCOVERY_NAME,
+        plan_category: 'C',
+        status: 'not_started',
+        waiting_on: 'tdi',
+        narrative_status: 'not_started',
+        window_status: 'open',
+        research_status: 'requested',
+        assigned_agent: 'amara',
+        notes:
+          `Find local funding sources for ${school}. Work through: service clubs ` +
+          `(Rotary, Lions, Kiwanis, Elks, Knights of Columbus); veteran posts ` +
+          `(American Legion, VFW); the local employer base including plants and ` +
+          `regional headquarters inside the county; county and regional community ` +
+          `foundations; utility and rural electric cooperative funds; county farm ` +
+          `bureaus; diocesan or denominational education offices where the school ` +
+          `is faith-based; state and local union affiliates distinct from national ` +
+          `NEA; pro sports team foundations near the county; and store-level retail ` +
+          `or grocery community programmes. ` +
+          `For each candidate confirm it is real and currently open before adding ` +
+          `it: name, what it funds, typical award size, deadline or cycle, and how ` +
+          `to apply. An unverified list is worse than no list. Create a real ` +
+          `opportunity for each verified candidate, then close this placeholder.`,
+      })
+
+      if (discErr) {
+        console.error('[funding-reminders] Failed to create discovery opportunity:', discErr)
+      } else {
+        discoveryCreated++
+        console.log('[funding-reminders] Requested local funder discovery for', school)
+      }
+    }
+
     // ── Signed contracts that were never linked to a gate ──
     //
     // This is the failure that cost the most and was hardest to see. St. Peter
@@ -286,6 +364,7 @@ export async function GET(request: NextRequest) {
       drafts_created: draftCount,
       drafts_waiting: draftsWaiting,
       unlinked_contracts: unlinkedContracts,
+      discovery_requested: discoveryCreated,
       digest_sent: alerts.length > 0,
     })
   } catch (e: unknown) {
