@@ -174,6 +174,17 @@ export async function GET(request: NextRequest) {
         .replace(/\s*[-–]\s*Grant Fund(ing|ed)$/i, '')
         .trim()
 
+      // Place and sector are what make this searchable at all. Without them the
+      // brief reduces to "find local funders", which is why the ten families
+      // below have never produced a single candidate.
+      const place = [p.city, p.county, p.state_code].filter(Boolean).join(', ')
+      const context = [
+        place && `Location: ${place}.`,
+        p.sector && `Sector: ${p.sector}.`,
+        p.authorizer && `Governing body: ${p.authorizer}.`,
+        p.employer_base && `Employers in or near the county: ${p.employer_base}.`,
+      ].filter(Boolean).join(' ')
+
       const { error: discErr } = await supabase.from('funding_opportunities').insert({
         pursuit_id: p.id,
         name: DISCOVERY_NAME,
@@ -185,7 +196,9 @@ export async function GET(request: NextRequest) {
         research_status: 'requested',
         assigned_agent: 'amara',
         notes:
-          `Find local funding sources for ${school}. Work through: service clubs ` +
+          `Find local funding sources for ${school}. ` +
+          (context ? `${context} ` : `No structured location on file — establish city, county and sector first, or this search cannot be done properly. `) +
+          `Work through: service clubs ` +
           `(Rotary, Lions, Kiwanis, Elks, Knights of Columbus); veteran posts ` +
           `(American Legion, VFW); the local employer base including plants and ` +
           `regional headquarters inside the county; county and regional community ` +
