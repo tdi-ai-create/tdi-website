@@ -16,19 +16,19 @@ const base = { id: 'o1', name: 'Test Grant', status: 'not_started', window_statu
 type Case = { label: string; opp: any; gate: any; expectOwner: string[] }
 
 const cases: Case[] = [
-  { label: 'not_started, window open, gate open', opp: { ...base, narrative_status: 'not_started' }, gate: openGate, expectOwner: ['bella'] },
+  { label: 'not_started, window open, gate open', opp: { ...base, narrative_status: 'not_started' }, gate: openGate, expectOwner: ['team'] },
   { label: 'requested, gate open', opp: { ...base, narrative_status: 'requested' }, gate: openGate, expectOwner: ['agent'] },
-  { label: 'requested, GATE SHUT', opp: { ...base, narrative_status: 'requested' }, gate: shutGate, expectOwner: ['bella'] },
-  { label: 'requested, window unknown', opp: { ...base, narrative_status: 'requested', window_status: 'unknown' }, gate: openGate, expectOwner: ['bella', 'agent'] },
+  { label: 'requested, GATE SHUT', opp: { ...base, narrative_status: 'requested' }, gate: shutGate, expectOwner: ['team'] },
+  { label: 'requested, window unknown', opp: { ...base, narrative_status: 'requested', window_status: 'unknown' }, gate: openGate, expectOwner: ['team', 'agent'] },
   { label: 'drafting', opp: { ...base, narrative_status: 'drafting' }, gate: openGate, expectOwner: ['agent'] },
-  { label: 'review', opp: { ...base, narrative_status: 'review' }, gate: openGate, expectOwner: ['bella'] },
+  { label: 'review', opp: { ...base, narrative_status: 'review' }, gate: openGate, expectOwner: ['team'] },
   { label: 'qa_review, no verdict', opp: { ...base, narrative_status: 'qa_review', qa_passed: null, narrative_status_changed_at: new Date().toISOString() }, gate: openGate, expectOwner: ['agent'] },
   { label: 'qa_review, attempt 2', opp: { ...base, narrative_status: 'qa_review', qa_passed: null, qa_attempt_count: 1, narrative_status_changed_at: new Date().toISOString() }, gate: openGate, expectOwner: ['agent'] },
-  { label: 'approval (QA passed)', opp: { ...base, narrative_status: 'approval', qa_passed: true, qa_reviewer: 'julie' }, gate: openGate, expectOwner: ['bella'] },
-  { label: 'legacy qa_review + passed', opp: { ...base, narrative_status: 'qa_review', qa_passed: true }, gate: openGate, expectOwner: ['bella'] },
-  { label: 'escalated, needs decision', opp: { ...base, narrative_status: 'escalated', qa_escalation: { summary: 's', root_cause: 'r', recommended_option: 'reassign' } }, gate: openGate, expectOwner: ['bella'] },
+  { label: 'approval (QA passed)', opp: { ...base, narrative_status: 'approval', qa_passed: true, qa_reviewer: 'julie' }, gate: openGate, expectOwner: ['team'] },
+  { label: 'legacy qa_review + passed', opp: { ...base, narrative_status: 'qa_review', qa_passed: true }, gate: openGate, expectOwner: ['team'] },
+  { label: 'escalated, needs decision', opp: { ...base, narrative_status: 'escalated', qa_escalation: { summary: 's', root_cause: 'r', recommended_option: 'reassign' } }, gate: openGate, expectOwner: ['team'] },
   { label: 'escalated, awaiting client', opp: { ...base, narrative_status: 'escalated', qa_escalation: { awaiting_client: true, client_ask: 'enrollment' } }, gate: openGate, expectOwner: ['school'] },
-  { label: 'ready', opp: { ...base, narrative_status: 'ready' }, gate: openGate, expectOwner: ['bella'] },
+  { label: 'ready', opp: { ...base, narrative_status: 'ready' }, gate: openGate, expectOwner: ['team'] },
   { label: 'closed (stopped pursuing)', opp: { ...base, narrative_status: 'escalated', status: 'closed' }, gate: openGate, expectOwner: ['NONE'] },
 ]
 
@@ -66,7 +66,7 @@ const qaOpp = { ...base, narrative_status: 'qa_review', qa_passed: null, qa_atte
   narrative_status_changed_at: new Date().toISOString() }
 
 const agentOff = computeNextActions(pursuit, [qaOpp], [], openGate, [], { qaAgentEnabled: false })
-  .filter(a => a.owner === 'bella' && !a.inProgress)
+  .filter(a => a.owner === 'team' && !a.inProgress)
 const offOk = agentOff.length > 0
 if (!offOk) failures++
 console.log(`${offOk ? 'PASS' : 'FAIL'}  QA agent OFF → a person owns it  (${agentOff.length} actionable)`)
@@ -80,7 +80,7 @@ console.log(`${onOk ? 'PASS' : 'FAIL'}  QA agent ON, fresh → agent owns it  ($
 // Even with the agent on, silence past the threshold must reach a person
 const staleOpp = { ...qaOpp, narrative_status_changed_at: new Date(Date.now() - 48 * 3600000).toISOString() }
 const stale = computeNextActions(pursuit, [staleOpp], [], openGate, [], { qaAgentEnabled: true, qaSilenceHours: 24 })
-  .filter(a => a.owner === 'bella' && !a.inProgress)
+  .filter(a => a.owner === 'team' && !a.inProgress)
 const staleOk = stale.length > 0
 if (!staleOk) failures++
 console.log(`${staleOk ? 'PASS' : 'FAIL'}  QA agent ON but silent 48h → a person owns it  (${stale.length} actionable)`)

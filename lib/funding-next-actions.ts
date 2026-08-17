@@ -10,7 +10,19 @@
  *   auto   — engine handles it (reminders, escalations)
  */
 
-export type ActionOwner = 'bella' | 'rae' | 'agent' | 'school' | 'auto'
+/**
+ * Who does the work, not which person does it.
+ *
+ * This used to distinguish 'team' from 'team', which produced two separate
+ * queues for one team. That is not how TDI works: if Bella does not know how to
+ * do something she asks Rae, and the work belongs to both of them either way.
+ * Splitting it made a person choose whose list a task belonged on before they
+ * could act, and made every count answer the wrong question.
+ *
+ * Three owners, because there are three genuinely different kinds of work:
+ * ours, the agents', and the school's.
+ */
+export type ActionOwner = 'team' | 'agent' | 'school' | 'auto'
 export type ActionUrgency = 'critical' | 'high' | 'normal' | 'low'
 
 export interface NextAction {
@@ -54,7 +66,7 @@ export function computeNextActions(
       id: `intro-${pursuit.id}`,
       label: `Send intro email to ${contactName}`,
       why: `Introduce yourself as their TDI funding contact${contactEmail ? ` (${contactEmail})` : ''}. Let them know you'll be identifying grant opportunities for ${schoolName}.`,
-      owner: 'bella',
+      owner: 'team',
       urgency: 'normal',
       actionType: 'setup_pursuit',
       tab: 'overview',
@@ -84,7 +96,7 @@ export function computeNextActions(
       id: `overdue-${a.id}`,
       label: a.client_label || a.title,
       why: `${daysOverdue} day${daysOverdue !== 1 ? 's' : ''} overdue${isClientOwned && alreadyNudged ? ' — nudged, waiting on school' : ''}`,
-      owner: isClientOwned && alreadyNudged ? 'school' : isClientOwned ? 'bella' : (a.owner_email === 'rae@teachersdeserveit.com' ? 'rae' : 'bella'),
+      owner: isClientOwned && alreadyNudged ? 'school' : isClientOwned ? 'team' : ('team'),
       urgency: 'critical',
       dueDate: a.due_date,
       actionType: isClientOwned && !alreadyNudged ? 'send_nudge' : 'complete_action',
@@ -108,7 +120,7 @@ export function computeNextActions(
       id: `upcoming-${a.id}`,
       label: a.client_label || a.title,
       why: a.description || `Due in ${daysUntil} day${daysUntil !== 1 ? 's' : ''}`,
-      owner: isClientOwned ? 'school' : isRaeOwned ? 'rae' : 'bella',
+      owner: isClientOwned ? 'school' : isRaeOwned ? 'team' : 'team',
       urgency: daysUntil <= 3 ? 'high' : 'normal',
       dueDate: a.due_date,
       actionType: 'complete_action',
@@ -128,7 +140,7 @@ export function computeNextActions(
       id: `action-${a.id}`,
       label: a.client_label || a.title,
       why: a.description || 'No due date set',
-      owner: isClientOwned ? 'school' : isRaeOwned ? 'rae' : 'bella',
+      owner: isClientOwned ? 'school' : isRaeOwned ? 'team' : 'team',
       urgency: 'low',
       actionType: 'complete_action',
       targetId: a.id,
@@ -143,7 +155,7 @@ export function computeNextActions(
       id: 'verify-contact',
       label: `Verify ${gate.submitter_name} is still employed`,
       why: 'The gate depends on it — unverified contacts are how pursuits stall',
-      owner: 'bella',
+      owner: 'team',
       urgency: 'critical',
       actionType: 'verify_contact',
       tab: 'overview',
@@ -156,7 +168,7 @@ export function computeNextActions(
         id: 'reverify-contact',
         label: `Re-verify ${gate.submitter_name} (${daysSince}d since last check)`,
         why: 'Verification is stale — confirm the contact hasn\'t changed',
-        owner: 'bella',
+        owner: 'team',
         urgency: 'critical',
         actionType: 'verify_contact',
         tab: 'overview',
@@ -178,7 +190,7 @@ export function computeNextActions(
       id: `deadline-${opp.id}`,
       label: `${opp.name} deadline in ${daysLeft} day${daysLeft !== 1 ? 's' : ''}`,
       why: `Submission not ready — ${opp.narrative_status !== 'ready' ? 'narrative not approved' : opp.forwarding_email_status !== 'sent' ? 'forwarding email not sent' : 'not yet submitted'}`,
-      owner: 'bella',
+      owner: 'team',
       urgency: 'critical',
       dueDate: deadline,
       actionType: 'prepare_submission',
@@ -222,10 +234,10 @@ export function computeNextActions(
         id: 'gate-incomplete',
         label: `Gate not satisfied — ${missing.length} condition${missing.length !== 1 ? 's' : ''} remaining`,
         why,
-        // Both branches of the previous conditional returned 'bella', so the
+        // Both branches of the previous conditional returned 'team', so the
         // routing decision it implied was never finished. Collapsed rather than
         // guessed at: Bella owns gate completion either way.
-        owner: 'bella',
+        owner: 'team',
         urgency: 'high',
         actionType: 'complete_gate',
         tab: 'overview',
@@ -262,7 +274,7 @@ export function computeNextActions(
         // draft, which is Julie's job.
         label: `Send "${opp.name}" narrative to Julie for QA`,
         why: 'Agent finished the draft. Glance at it if you like, then click "Send to QA". Julie does the reviewing. You approve it after she passes it.',
-        owner: 'bella',
+        owner: 'team',
         urgency: 'high',
         actionType: 'send_to_qa',
         targetId: opp.id,
@@ -319,7 +331,7 @@ export function computeNextActions(
           ? 'Check whether Julie is running and unblock her.'
           : 'FUNDING_QA_AGENT_ENABLED is not set, so nothing is picking QA up.'
       } Do not grade the narrative in her place.`,
-      owner: 'rae',
+      owner: 'team',
       urgency: 'high',
       actionType: 'unblock_qa',
       targetId: opp.id,
@@ -356,7 +368,7 @@ export function computeNextActions(
       why: esc.summary
         ? `${esc.summary}${esc.recommended_option ? ` Recommended: ${String(esc.recommended_option).replace(/_/g, ' ')}.` : ''}`
         : 'QA could not get this one through. Open the pursuit to see your options.',
-      owner: 'bella',
+      owner: 'team',
       urgency: 'high',
       actionType: 'resolve_escalation',
       targetId: opp.id,
@@ -377,7 +389,7 @@ export function computeNextActions(
       id: `send-${opp.id}`,
       label: `Send "${opp.name}" to ${contact}`,
       why: 'Approved and ready. It does nothing for the school until it reaches them.',
-      owner: 'bella',
+      owner: 'team',
       urgency: 'high',
       actionType: 'send_to_client',
       targetId: opp.id,
@@ -393,7 +405,7 @@ export function computeNextActions(
         id: `approve-${opp.id}`,
         label: `Approve "${opp.name}" narrative`,
         why: `QA passed${opp.qa_reviewer ? ` (${opp.qa_reviewer})` : ''}. Click Approve to mark it ready for the school.`,
-        owner: 'bella',
+        owner: 'team',
         urgency: 'high',
         actionType: 'approve_draft',
         targetId: opp.id,
@@ -413,7 +425,7 @@ export function computeNextActions(
         id: `allocate-${opp.id}`,
         label: `Allocate $${(awardedAmt - allocatedTotal).toLocaleString()} from "${opp.name}"`,
         why: 'Money decision with the client — map award to line items',
-        owner: 'rae',
+        owner: 'team',
         urgency: 'high',
         actionType: 'allocate_award',
         targetId: opp.id,
@@ -432,7 +444,7 @@ export function computeNextActions(
       id: 'review-strategy',
       label: `Review Bella's funding selections and approve strategy`,
       why: `${customizedOpps.length} opportunities have been researched. Review the selections and plan categories.`,
-      owner: 'rae',
+      owner: 'team',
       urgency: 'normal',
       actionType: 'complete_action',
       tab: 'opportunities',
@@ -522,7 +534,7 @@ export function computeNextActions(
         id: `start-draft-${opp.id}`,
         label: `Request draft for "${opp.name}"`,
         why: 'Window is open and gate is satisfied — ready to draft',
-        owner: 'bella',
+        owner: 'team',
         urgency: 'normal',
         actionType: 'request_draft',
         targetId: opp.id,
@@ -547,7 +559,7 @@ export function computeNextActions(
         id: `blocked-draft-${opp.id}`,
         label: `"${opp.name}" — draft requested but blocked`,
         why: `No agent can pick this up while ${blockers.join(' and ')}. Nothing will happen until that clears.`,
-        owner: 'bella',
+        owner: 'team',
         urgency: 'high',
         actionType: 'unblock_draft',
         targetId: opp.id,
