@@ -571,7 +571,7 @@ export async function POST(request: NextRequest) {
 
     postFundingEvent(
       narrativeEvent(opp.pursuit_id, '', opp.name, 'qa_review', outcome, reviewer)
-    ).catch(() => {})
+    ).catch(err => console.error('[sync] non-blocking side effect failed:', err))
 
     return NextResponse.json({
       success: true,

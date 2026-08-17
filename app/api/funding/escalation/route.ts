@@ -199,7 +199,7 @@ export async function POST(request: NextRequest) {
 
   postFundingEvent(
     narrativeEvent(opp.pursuit_id, '', opp.name, 'escalated', String(updates.narrative_status ?? 'escalated'), actor)
-  ).catch(() => {})
+  ).catch(err => console.error('[escalation] non-blocking side effect failed:', err))
 
   return NextResponse.json({ success: true, message, emailDraft })
 }

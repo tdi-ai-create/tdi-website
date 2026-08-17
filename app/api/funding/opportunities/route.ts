@@ -199,7 +199,7 @@ export async function PATCH(request: NextRequest) {
     // Narrative status change
     if (body.narrative_status && body.narrative_status !== before.narrative_status) {
       const fromNs = before.narrative_status || 'not_started'
-      postFundingEvent(narrativeEvent(pId, pName, oName, fromNs, body.narrative_status, oppNow?.assigned_agent)).catch(() => {})
+      postFundingEvent(narrativeEvent(pId, pName, oName, fromNs, body.narrative_status, oppNow?.assigned_agent)).catch(err => console.error('[opportunities] non-blocking side effect failed:', err))
 
       // Push notification to agents when a draft is requested
       if (body.narrative_status === 'requested') {
@@ -212,29 +212,29 @@ export async function PATCH(request: NextRequest) {
             body: JSON.stringify({
               text: `New draft requested: "${oName}" for ${pName}. Assigned to ${agentName}. 72-hour deadline.`,
             }),
-          }).catch(() => {})
+          }).catch(err => console.error('[opportunities] non-blocking side effect failed:', err))
         }
       }
     }
     // Window status change
     if (body.window_status) {
-      postFundingEvent(windowEvent(pId, pName, oName, body.window_status)).catch(() => {})
+      postFundingEvent(windowEvent(pId, pName, oName, body.window_status)).catch(err => console.error('[opportunities] non-blocking side effect failed:', err))
     }
     // Client submitted
     if (body.client_submitted === true && !before.client_submitted) {
-      postFundingEvent(submittedEvent(pId, pName, oName, body.client_submitted_proof)).catch(() => {})
+      postFundingEvent(submittedEvent(pId, pName, oName, body.client_submitted_proof)).catch(err => console.error('[opportunities] non-blocking side effect failed:', err))
     }
     // Award recorded
     if (body.status === 'awarded' && before.status !== 'awarded') {
-      postFundingEvent(awardEvent(pId, pName, oName, oppNow?.awarded_amount || oppNow?.amount || 0)).catch(() => {})
+      postFundingEvent(awardEvent(pId, pName, oName, oppNow?.awarded_amount || oppNow?.amount || 0)).catch(err => console.error('[opportunities] non-blocking side effect failed:', err))
     }
     // Denial recorded
     if (body.status === 'denied' && before.status !== 'denied') {
-      postFundingEvent(denialEvent(pId, pName, oName, body.denial_reason)).catch(() => {})
+      postFundingEvent(denialEvent(pId, pName, oName, body.denial_reason)).catch(err => console.error('[opportunities] non-blocking side effect failed:', err))
     }
     // Research status change
     if (body.research_status) {
-      postFundingEvent(researchEvent(pId, pName, oName, body.research_status, oppNow?.assigned_agent)).catch(() => {})
+      postFundingEvent(researchEvent(pId, pName, oName, body.research_status, oppNow?.assigned_agent)).catch(err => console.error('[opportunities] non-blocking side effect failed:', err))
     }
 
     // Auto-compute and update pursuit phase based on opportunity states

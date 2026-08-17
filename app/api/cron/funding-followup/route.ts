@@ -976,7 +976,7 @@ export async function GET(request: NextRequest) {
               `${nudgesSoFar} reminders sent to ${ownerEmail ?? 'unknown'} with no resolution. ` +
               `Ceiling is ${MAX_NUDGES}. Handed to ${handTo}. ` +
               `The item stays open and keeps its due date; only the automated sending stops.`,
-          }).catch(() => {})
+          }).catch(err => console.error('[funding-followup] non-blocking side effect failed:', err))
 
           summary.details.push({
             item_id: item.id,
@@ -1308,7 +1308,7 @@ export async function GET(request: NextRequest) {
               subject: `[Agent Overdue] ${overdueItems.length} narrative${overdueItems.length > 1 ? 's' : ''} past deadline`,
               html: `<div style="font-family:sans-serif;max-width:600px;"><p>${overdueItems.length} narrative draft${overdueItems.length > 1 ? 's have' : ' has'} been requested for over 72 hours with no agent response.</p><table style="width:100%;border-collapse:collapse;font-size:14px;"><thead><tr style="background:#f9fafb;"><th style="padding:8px 12px;text-align:left;">Grant</th><th style="padding:8px 12px;text-align:left;">School</th><th style="padding:8px 12px;text-align:left;">Agent</th><th style="padding:8px 12px;text-align:left;">Overdue</th></tr></thead><tbody>${itemRows}</tbody></table><p style="margin-top:16px;color:#6b7280;font-size:13px;">This digest is sent once daily. Either re-trigger through Paperclip or draft manually.</p></div>`,
             }),
-          }).catch(() => {})
+          }).catch(err => console.error('[funding-followup] non-blocking side effect failed:', err))
         }
 
         const slackWebhook = process.env.SLACK_WEBHOOK_INTERNAL
@@ -1319,7 +1319,7 @@ export async function GET(request: NextRequest) {
             body: JSON.stringify({
               text: `Agent overdue daily digest: ${overdueItems.length} narratives past 72-hour deadline.\n${overdueItems.map(i => `  ${i.name} (${i.schoolName}) - ${i.agentName} - ${i.hoursAgo}h`).join('\n')}`,
             }),
-          }).catch(() => {})
+          }).catch(err => console.error('[funding-followup] non-blocking side effect failed:', err))
         }
       }
     }

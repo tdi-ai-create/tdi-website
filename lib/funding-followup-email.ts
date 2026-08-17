@@ -1,18 +1,29 @@
 /**
- * Shared email template + send logic for the funding follow-up system.
- * Used by both the automated cron engine and the manual "Send nudge" button.
+ * Email template + send logic for messages a PERSON chooses to send.
+ *
+ * Used by the manual "Send nudge" button and the send-email route. It is no
+ * longer shared with the follow-up cron: automation never emails a school at
+ * all, it writes a draft and stops, and that rule is enforced inside the cron's
+ * own send function.
  */
 
 // ── Recipient allowlist ──
 //
-// CLIENT ADDRESSES INTENTIONALLY EXCLUDED until Bella is onboarded
-// and go-live is approved. Add client contacts here to arm real
-// client sends. Until then, no client can be emailed by any path
-// — manual or automated.
+// Who a person may send to from the portal. Client addresses ARE included, on
+// purpose: a human clicked send, reviewed the message, and decided to contact
+// that school. That is the behaviour we want to keep possible.
 //
-// To arm Allenwood:
-//   'teri.gordonhernandez@pgcps.org',
-//   'sharonh.porter@pgcps.org',
+// This is a different list from the one in the follow-up cron, and the two
+// differ deliberately rather than by neglect. The cron's list holds TDI
+// addresses only, because automation must never reach a school. This one holds
+// clients too, because a person may.
+//
+// The comment that used to sit here read "CLIENT ADDRESSES INTENTIONALLY
+// EXCLUDED until go-live" while the list immediately below it contained every
+// client address in the system. Anyone reading this file to answer "can we
+// accidentally email a school" got the opposite of the truth. Worth saying
+// plainly: a comment that contradicts its own code is worse than no comment,
+// because it is trusted.
 
 export const ALLOWLIST_ENABLED = true
 export const SEND_ALLOWLIST: string[] = [
