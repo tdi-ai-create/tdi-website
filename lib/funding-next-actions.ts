@@ -200,11 +200,32 @@ export function computeNextActions(
 
     if (missing.length > 0) {
       const hasContractGap = missing.some(m => m.includes('Contract'))
+
+      // A contract showing unsigned usually means the signed quote was never
+      // linked to the gate, not that the school failed to sign.
+      //
+      // St. Peter Chanel signed on 11 June and 8 July. Nobody linked either
+      // quote, so this alert sat at high urgency telling Bella to chase Paula
+      // for signatures she had already given, while drafting stayed frozen for
+      // eighteen days. Acting on it as written would have cost us credibility
+      // with a client who had done everything asked of her.
+      //
+      // So the instruction now says to check our own record first. Whoever
+      // reads this should be looking at the quotes table before they look at
+      // the school.
+      const why = hasContractGap
+        ? `${missing.join(', ')}. Check whether a signed quote exists and simply was not linked ` +
+          `to the gate before asking the school for anything — that is the usual cause.`
+        : missing.join(', ')
+
       result.push({
         id: 'gate-incomplete',
         label: `Gate not satisfied — ${missing.length} condition${missing.length !== 1 ? 's' : ''} remaining`,
-        why: missing.join(', '),
-        owner: hasContractGap ? 'bella' : 'bella',
+        why,
+        // Both branches of the previous conditional returned 'bella', so the
+        // routing decision it implied was never finished. Collapsed rather than
+        // guessed at: Bella owns gate completion either way.
+        owner: 'bella',
         urgency: 'high',
         actionType: 'complete_gate',
         tab: 'overview',
