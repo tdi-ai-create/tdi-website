@@ -236,8 +236,11 @@ export function computeNextActions(
     if (opp.narrative_status === 'review') {
       result.push({
         id: `qa-${opp.id}`,
-        label: `Review "${opp.name}" narrative and send to QA`,
-        why: 'Agent finished the draft. Read it, then click "Send to QA" for Julie to review. After QA passes, you approve it.',
+        // Worded as a hand-off, not a review. This is the only narrative step
+        // before Julie, and calling it "review" invited Bella to grade the
+        // draft, which is Julie's job.
+        label: `Send "${opp.name}" narrative to Julie for QA`,
+        why: 'Agent finished the draft. Glance at it if you like, then click "Send to QA". Julie does the reviewing. You approve it after she passes it.',
         owner: 'bella',
         urgency: 'high',
         actionType: 'send_to_qa',
@@ -249,10 +252,16 @@ export function computeNextActions(
 
   // Narrative awaiting a QA verdict.
   //
-  // Who owns this depends on whether automated QA is actually running. Calling
-  // it agent work while no agent is configured is how five finished narratives
-  // sat silent for over a week. Two conditions hand it back to a person:
-  // automated QA being off, or it having gone quiet past QA_SILENCE_HOURS.
+  // QA is Julie's job and nobody else's. This used to hand the verdict to Bella
+  // whenever automated QA looked switched off or had gone quiet, which is how
+  // she ended up being asked to pass or fail narratives Julie had already ruled
+  // on. Bella is a final eye at the approval step, not a reviewer, so no branch
+  // here may ever produce a `bella` item.
+  //
+  // Silence is still not allowed to look like progress. Past QA_SILENCE_HOURS
+  // the item stops being muted agent work and becomes Rae's, framed as a stuck
+  // agent to unblock rather than a narrative to grade. The daily funding digest
+  // raises the same condition as a critical alert.
   for (const opp of opportunities) {
     if (opp.narrative_status !== 'qa_review' || opp.qa_passed === true) continue
     if (['awarded', 'denied', 'closed'].includes(opp.status)) continue
@@ -264,13 +273,13 @@ export function computeNextActions(
       : Infinity
     const goneQuiet = hoursWaiting >= qaSilenceHours
 
-    if (qaAgentEnabled && !goneQuiet) {
+    if (!goneQuiet) {
       result.push({
         id: `qa-wait-${opp.id}`,
-        label: `"${opp.name}" — in QA review`,
+        label: `"${opp.name}" — with Julie for QA`,
         why: attempt > 1
-          ? `Attempt ${attempt}. One more failure and this comes to you with options.`
-          : 'Waiting on a QA pass or fail.',
+          ? `Attempt ${attempt}. One more failure and this comes to Bella with options.`
+          : 'Waiting on Julie to pass or fail it.',
         owner: 'agent',
         urgency: 'low',
         actionType: 'waiting',
@@ -282,14 +291,16 @@ export function computeNextActions(
     }
 
     result.push({
-      id: `qa-verdict-${opp.id}`,
-      label: `Review "${opp.name}" and pass or fail it`,
-      why: qaAgentEnabled
-        ? `No QA verdict in ${hoursWaiting === Infinity ? 'a long time' : `${hoursWaiting} hours`}. Open the pursuit, read it inline, then pass or fail with notes.`
-        : 'Automated QA is not switched on yet, so this one is yours. Open the pursuit, read it inline, name the reviewer, then pass or fail with notes.',
-      owner: 'bella',
+      id: `qa-stalled-${opp.id}`,
+      label: `Julie has not returned a verdict on "${opp.name}"`,
+      why: `${hoursWaiting === Infinity ? 'No verdict for a long time' : `No verdict in ${hoursWaiting} hours`}, past the ${qaSilenceHours}-hour limit. ${
+        qaAgentEnabled
+          ? 'Check whether Julie is running and unblock her.'
+          : 'FUNDING_QA_AGENT_ENABLED is not set, so nothing is picking QA up.'
+      } Do not grade the narrative in her place.`,
+      owner: 'rae',
       urgency: 'high',
-      actionType: 'qa_verdict',
+      actionType: 'unblock_qa',
       targetId: opp.id,
       tab: 'opportunities',
     })

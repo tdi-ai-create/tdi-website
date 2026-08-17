@@ -4,6 +4,10 @@
 // Pattern: /lib/tdi-admin/alert-rules.ts
 // ============================================================
 
+// Same threshold the queue uses to decide QA has gone quiet, imported rather
+// than restated so the digest and the queue can never disagree about it.
+import { QA_SILENCE_HOURS as QA_STALLED_HOURS } from '@/lib/funding-qa'
+
 export type FundingAlertSeverity = 'critical' | 'warning' | 'info'
 
 export interface FundingAlert {
@@ -131,6 +135,36 @@ export function calculateFundingAlerts(params: {
         action: item.owner_type === 'client' ? 'Send nudge to client' : 'Complete or reassign',
       })
     }
+  })
+
+  // ---- STALLED QA ALERTS ----
+  //
+  // QA belongs to Julie alone. Nobody grades a narrative in her place, so a
+  // stuck reviewer has to be loud: without this, a narrative in qa_review with
+  // no verdict is indistinguishable from one being actively reviewed, and
+  // silence reads as progress. The fix is always to unblock Julie.
+  opportunities.forEach(opp => {
+    if (opp.narrative_status !== 'qa_review' || opp.qa_passed === true) return
+    if (['awarded', 'denied', 'closed'].includes(opp.status)) return
+
+    const since = opp.narrative_status_changed_at || opp.updated_at
+    if (!since) return
+
+    const hoursWaiting = Math.floor((Date.now() - new Date(since).getTime()) / 3600000)
+    if (hoursWaiting < QA_STALLED_HOURS) return
+
+    alerts.push({
+      id: `qa-stalled-${opp.id}`,
+      severity: 'critical',
+      category: 'stalled',
+      pursuit_id: opp.pursuit_id,
+      pursuit_name: pursuitNames[opp.pursuit_id] || 'Unknown',
+      opportunity_id: opp.id,
+      opportunity_name: opp.name,
+      title: `${opp.name} has sat in QA for ${hoursWaiting} hours with no verdict`,
+      description: `Julie has not passed or failed it. Attempt ${(opp.qa_attempt_count ?? 0) + 1}.`,
+      action: 'Check whether Julie is running and unblock her. Do not grade it in her place.',
+    })
   })
 
   // Sort: critical first, then warning, then info

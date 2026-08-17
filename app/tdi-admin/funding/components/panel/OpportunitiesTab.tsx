@@ -627,9 +627,6 @@ function NarrativeControl({ opp, gateOpen, onRequestDraft, onApprove, onPatch }:
 }) {
   const [agentPick, setAgentPick] = useState(defaultAgent(opp.plan_category))
   const [showContent, setShowContent] = useState(false)
-  const [qaReviewer, setQaReviewer] = useState(opp.qa_reviewer || '')
-  const [qaNotes, setQaNotes] = useState(opp.qa_notes || '')
-
   const ns = opp.narrative_status || 'not_started'
   const agent = opp.assigned_agent || ''
   const windowOpen = opp.window_status === 'open'
@@ -637,21 +634,13 @@ function NarrativeControl({ opp, gateOpen, onRequestDraft, onApprove, onPatch }:
   const hasUrl = !!opp.narrative_url
   const showReader = ['review', 'qa_review', 'approval', 'escalated', 'ready'].includes(ns) && hasContent
 
-  // Manual QA, for when a person reviews instead of Julie. Lands in the same
-  // states the automated path uses, so the two never diverge.
-  const handleQaPass = () => {
-    onPatch({ narrative_status: 'approval', qa_passed: true, qa_reviewer: qaReviewer, qa_notes: qaNotes })
-  }
-
-  const handleQaFail = () => {
-    onPatch({
-      narrative_status: 'requested',
-      qa_passed: null,
-      qa_reviewer: qaReviewer,
-      qa_notes: qaNotes,
-      redraft_guidance: qaNotes,
-    })
-  }
+  // There is deliberately no manual pass/fail here. QA is Julie's job and
+  // nobody else's: Bella is a final eye at the approval step, not a reviewer.
+  // The panel that used to live here handed her a grading decision Julie had
+  // already made, pre-filled with Julie's own verdict text. If Julie stops
+  // returning verdicts the answer is to unblock Julie, which the daily funding
+  // digest now raises as a critical alert, not to have a person grade the
+  // narrative in her place.
 
   return (
     <div style={{
@@ -824,54 +813,30 @@ function NarrativeControl({ opp, gateOpen, onRequestDraft, onApprove, onPatch }:
         </div>
       )}
 
-      {/* ── QA panel (shown during qa_review when QA hasn't passed yet) ── */}
+      {/* ── Awaiting Julie's verdict. Read-only by design: see the note on
+             handleQa* above. Nothing here is actionable by a person. ── */}
       {ns === 'qa_review' && opp.qa_passed !== true && (
         <div style={{
           padding: '10px 14px', background: '#F5F3FF', border: '1px solid #DDD6FE',
-          borderRadius: 8, display: 'flex', flexDirection: 'column', gap: 8,
+          borderRadius: 8, display: 'flex', flexDirection: 'column', gap: 6,
         }}>
           <div style={{ fontSize: 10, fontWeight: 700, color: '#6D28D9', textTransform: 'uppercase', letterSpacing: 0.5 }}>
-            QA Review
+            With Julie for QA
           </div>
-          <input
-            value={qaReviewer}
-            onChange={e => setQaReviewer(e.target.value)}
-            placeholder="Reviewer name (e.g. Julie)"
-            style={{ fontSize: 12, padding: '6px 10px', border: '1px solid #E5E7EB', borderRadius: 6 }}
-          />
-          <textarea
-            value={qaNotes}
-            onChange={e => setQaNotes(e.target.value)}
-            placeholder="QA notes (required for fail, optional for pass)"
-            rows={3}
-            style={{ fontSize: 12, padding: '6px 10px', border: '1px solid #E5E7EB', borderRadius: 6, resize: 'vertical' }}
-          />
-          <div style={{ display: 'flex', gap: 8 }}>
-            <button
-              onClick={handleQaPass}
-              disabled={!qaReviewer}
-              style={{
-                fontSize: 11, fontWeight: 600, padding: '5px 14px', borderRadius: 6,
-                border: 'none', background: qaReviewer ? '#10B981' : '#D1D5DB',
-                color: 'white', cursor: qaReviewer ? 'pointer' : 'default',
-              }}
-            >
-              Pass
-            </button>
-            <button
-              onClick={handleQaFail}
-              disabled={!qaReviewer || !qaNotes}
-              style={{
-                fontSize: 11, fontWeight: 600, padding: '5px 14px', borderRadius: 6,
-                border: 'none', background: (qaReviewer && qaNotes) ? '#DC2626' : '#D1D5DB',
-                color: 'white', cursor: (qaReviewer && qaNotes) ? 'pointer' : 'default',
-              }}
-            >
-              Fail (return to drafting)
-            </button>
+          <div style={{ fontSize: 11, color: '#4B5563', lineHeight: 1.45 }}>
+            Julie reviews this and either passes it to you for approval, sends it
+            back for a redraft, or escalates it with options. Nothing to do here.
           </div>
-          {!qaReviewer && <div style={{ fontSize: 9, color: '#9CA3AF' }}>Enter reviewer name to enable pass/fail</div>}
-          {qaReviewer && !qaNotes && <div style={{ fontSize: 9, color: '#9CA3AF' }}>Notes required to fail — agent needs feedback</div>}
+
+          {/* Her last verdict, if this is a repeat attempt. Context only. */}
+          {opp.qa_reviewer && opp.qa_notes && (
+            <div style={{ padding: '8px 10px', background: 'white', border: '1px solid #DDD6FE', borderRadius: 6 }}>
+              <div style={{ fontSize: 9, fontWeight: 700, color: '#6D28D9', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 4 }}>
+                Previous verdict from {opp.qa_reviewer}{(opp.qa_attempt_count ?? 0) > 0 ? ` (attempt ${opp.qa_attempt_count})` : ''}
+              </div>
+              <div style={{ fontSize: 11, color: '#4B5563', lineHeight: 1.45 }}>{opp.qa_notes}</div>
+            </div>
+          )}
         </div>
       )}
 
