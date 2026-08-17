@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServiceSupabase } from '@/lib/supabase'
 import { postFundingEvent } from '@/lib/funding-slack'
+import { isGateOpen } from '@/lib/funding-gate-gaps'
 
 // ══════════════════════════════════════════════════════════════
 // DRY_RUN — flip to false ONLY after verifying logic against
@@ -99,6 +100,11 @@ type Gate = {
   backup_name: string | null
   admin_sponsor_email: string | null
   admin_sponsor_name: string | null
+  // Fetched so isGateOpen can apply the same five conditions the gate route
+  // does. Without these the check silently degrades to "three contacts named",
+  // which is how a school with unsigned contracts got treated as ready.
+  contract1_signed: boolean | null
+  contract2_signed: boolean | null
 }
 
 type LadderStep = { rung: Rung; email: string }
@@ -570,7 +576,7 @@ export async function GET(request: NextRequest) {
     const { data: gates } = pursuitIds.length > 0
       ? await supabase
           .from('pursuit_gate')
-          .select('pursuit_id, submitter_email, submitter_name, backup_email, backup_name, admin_sponsor_email, admin_sponsor_name')
+          .select('pursuit_id, submitter_email, submitter_name, backup_email, backup_name, admin_sponsor_email, admin_sponsor_name, contract1_signed, contract2_signed')
           .in('pursuit_id', pursuitIds)
       : { data: [] as Gate[] }
 
@@ -688,8 +694,23 @@ export async function GET(request: NextRequest) {
       // (gate must be satisfied before any school outreach)
       if (item.owner_type === 'client') {
         const gate = gateByPursuit.get(item.pursuit_id)
-        const gateOpen = gate && gate.submitter_email && gate.backup_email && gate.admin_sponsor_email
-        if (!gateOpen) continue
+        // One definition of an open gate, shared with the gate route and the
+        // gap sync, rather than a private approximation of it.
+        //
+        // This used to check three email addresses and stop there, ignoring
+        // both signed contracts and gate_open entirely. So a school whose gate
+        // was shut, for whom no agent could draft a single word, was still
+        // treated as ready and chased about submitting.
+        //
+        // That is the St. Peter Chanel episode in one line. Her gate sat shut
+        // for eighteen days because two signed contracts were never linked to
+        // it, nothing was drafted the whole time, and she was emailed fourteen
+        // times about submitting an application nobody was writing.
+        //
+        // isGateOpen recomputes from the fields rather than trusting the stored
+        // gate_open flag, which is what a record disagreeing with reality looks
+        // like and is the most common bug in this codebase.
+        if (!isGateOpen(gate)) continue
       }
 
       // Don't send reminders for actions in phases ahead of the pursuit's current phase
