@@ -1558,6 +1558,10 @@ export default function PartnerDashboard() {
     // them, so an assumed contract value would invent a figure the school never paid.
     const costPerEducator: number | null = data.costPerEducator ?? null;
     const hasCost = typeof costPerEducator === 'number' && costPerEducator > 0;
+    // Memberships-only partnerships have no observation days or sessions behind them.
+    // Every services claim below is gated on this so a Hub-only school is never told
+    // it has deliverables to schedule or observation feedback coming.
+    const hasServices = data.totalDeliverables > 0 || data.observationDays > 0;
     // Describe only what this partnership actually includes.
     const includedItems = [
       'Learning Hub access (100+ hours of content)',
@@ -1566,6 +1570,14 @@ export default function PartnerDashboard() {
       'leadership dashboard with real-time data',
       'ongoing support',
     ].filter(Boolean).join(', ');
+    // Only show peer examples this school could actually replicate. The services-based
+    // ones are withheld from Hub-only partnerships, which also stops a NJ school of ~19
+    // reading the NJ example as its own numbers.
+    const caseStudies = [
+      { requiresServices: true, text: 'A K-8 school in New Jersey with 19 educators saw 68% Hub engagement in their first quarter, with teachers independently exploring stress management tools between observation visits. Their principal reported that "teachers are talking about TDI at lunch, which never happens with PD."' },
+      { requiresServices: true, text: 'A district in Illinois with 45 educators across multiple buildings achieved 82% login rates after their principal started each staff meeting with a 5-minute Quick Win from the Hub. Their observation day feedback showed measurable shifts in classroom management strategies within 6 weeks.' },
+      { requiresServices: false, text: "An elementary school in Pennsylvania used TDI's wellness tools to address mid-year burnout. Their educator wellness scores improved from 2.8 to 4.1 out of 5 over one semester. The principal credited the daily check-in feature with helping her identify struggling teachers before they reached crisis." },
+    ].filter(c => hasServices || !c.requiresServices).map(c => c.text).join('\n\n');
     const quotesBlock = data.quotes.length > 0 ? '\n\nWHAT EDUCATORS ARE SAYING\n\n' + data.quotes.map((q: {text:string;role:string}) => `"${q.text}"\n-- ${q.role}`).join('\n\n') : '';
     const kpiBlock = data.kpis.length > 0 ? '\n\nPARTNERSHIP GOALS\n\n' + data.kpis.map((k: {label:string;current:number;target:number;unit:string}) => `${k.label}: ${k.current}${k.unit} of ${k.target}${k.unit} target`).join('\n') : '';
 
@@ -1573,7 +1585,7 @@ export default function PartnerDashboard() {
       case 'board':
         return `THE 30-SECOND VERSION
 
-${s} has ${data.staffTotal} educators with TDI Learning Hub access. ${hasEngagement ? `${data.hubLoginPct}% are actively engaged, ${data.toolsExplored} tools explored, ${data.completedDeliverables} of ${data.totalDeliverables} contracted sessions delivered.` : `The team is onboarding now. Contracted sessions and Hub engagement tracking begin this school year.`} TDI's implementation rate is 74%, compared to 10% for traditional PD.${hasCost ? ` Investment: approximately $${costPerEducator} per educator for the full school year.` : ''}
+${s} has ${data.staffTotal} educators with TDI Learning Hub access. ${hasEngagement ? `${data.hubLoginPct}% are actively engaged, ${data.toolsExplored} tools explored.${hasServices ? ` ${data.completedDeliverables} of ${data.totalDeliverables} contracted sessions delivered.` : ''}` : hasServices ? `The team is onboarding now. Contracted sessions and Hub engagement tracking begin this school year.` : `The team is onboarding now. Hub engagement tracking begins as staff start logging in.`} TDI's implementation rate is 74%, compared to 10% for traditional PD.${hasCost ? ` Investment: approximately $${costPerEducator} per educator for the full school year.` : ''}
 
 EXECUTIVE SUMMARY
 
@@ -1587,7 +1599,7 @@ Hub Engagement: ${data.hubLoginPct}% of staff active
 Educators Enrolled: ${data.staffTotal}
 Tools and Strategies Explored: ${data.toolsExplored}
 Course Completions: ${data.courseCompletions}
-Deliverables Completed: ${data.completedDeliverables} of ${data.totalDeliverables}${data.wellnessScore ? `\nEducator Wellness Score: ${data.wellnessScore}/5` : ''}
+${hasServices ? `Deliverables Completed: ${data.completedDeliverables} of ${data.totalDeliverables}\n` : ''}${data.wellnessScore ? `\nEducator Wellness Score: ${data.wellnessScore}/5` : ''}
 ${kpiBlock}
 
 WHAT THE PARTNERSHIP INCLUDES
@@ -1598,7 +1610,7 @@ For comparison, a single-day PD conference costs $500-2,000 per teacher with no 
 
 HOW TDI IS DIFFERENT
 
-Most PD is consumed and forgotten. TDI measures what teachers DO, not what they watch. Every course includes classroom action steps. Every observation day produces personalized feedback. Every data point on this dashboard is evidence of real change happening in real classrooms.
+Most PD is consumed and forgotten. TDI measures what teachers DO, not what they watch. Every course includes classroom action steps.${hasServices ? ' Every observation day produces personalized feedback.' : ''} Every data point on this dashboard is evidence of real change happening in real classrooms.
 
 National PD implementation rate: 10%
 TDI partner implementation rate: 74%
@@ -1610,23 +1622,19 @@ ${data.staffLoggedIn > 0 ? `${data.staffLoggedIn} educator${data.staffLoggedIn >
 
 PARTNERSHIP CALENDAR
 
-${data.upcomingEvents && data.upcomingEvents.length > 0 ? `Upcoming this school year:\n${data.upcomingEvents.map((e: {title:string;date:string;status:string}) => `- ${e.title}${e.date ? ' (' + new Date(e.date).toLocaleDateString('en-US', {month: 'short', day: 'numeric'}) + ')' : ''} ${e.status === 'in_progress' ? '[In Progress]' : ''}`).join('\n')}` : `Your contracted deliverables for this school year include ${data.totalDeliverables} sessions. Dates will appear here as they are confirmed. Check the "Your Plan" tab on your dashboard to schedule.`}
+${data.upcomingEvents && data.upcomingEvents.length > 0 ? `Upcoming this school year:\n${data.upcomingEvents.map((e: {title:string;date:string;status:string}) => `- ${e.title}${e.date ? ' (' + new Date(e.date).toLocaleDateString('en-US', {month: 'short', day: 'numeric'}) + ')' : ''} ${e.status === 'in_progress' ? '[In Progress]' : ''}`).join('\n')}` : hasServices ? `Your contracted deliverables for this school year include ${data.totalDeliverables} sessions. Dates will appear here as they are confirmed. Check the "Your Plan" tab on your dashboard to schedule.` : `This is a Learning Hub membership partnership, so there are no scheduled sessions to track. Your calendar is driven by how your team uses the Hub. Consider setting a recurring staff-meeting slot to share one Quick Win each week.`}
 
 ${data.completedEvents && data.completedEvents.length > 0 ? `\nCompleted:\n${data.completedEvents.map((e: {title:string;date:string}) => `- ${e.title}${e.date ? ' (' + new Date(e.date).toLocaleDateString('en-US', {month: 'short', day: 'numeric'}) + ')' : ''}`).join('\n')}` : ''}
 
 WHAT OTHER TDI SCHOOLS ARE SEEING
 
-A K-8 school in New Jersey with 19 educators saw 68% Hub engagement in their first quarter, with teachers independently exploring stress management tools between observation visits. Their principal reported that "teachers are talking about TDI at lunch, which never happens with PD."
+${caseStudies}
 
-A district in Illinois with 45 educators across multiple buildings achieved 82% login rates after their principal started each staff meeting with a 5-minute Quick Win from the Hub. Their observation day feedback showed measurable shifts in classroom management strategies within 6 weeks.
-
-An elementary school in Pennsylvania used TDI's wellness tools to address mid-year burnout. Their educator wellness scores improved from 2.8 to 4.1 out of 5 over one semester. The principal credited the daily check-in feature with helping her identify struggling teachers before they reached crisis.
-
-These are real TDI partner outcomes. Every school's journey is different, but the pattern is consistent: when educators get practical tools with follow-up support, they use them.
+These are outcomes from other TDI partner schools, not from ${s}. Every school's journey is different, but the pattern is consistent: when educators get practical tools with follow-up support, they use them.
 
 TDI RECOMMENDATION
 
-${hasEngagement ? `${s} is showing strong early signals of engagement. ${data.hubLoginPct >= 50 ? 'With over half the staff actively using the Hub, this partnership is well-positioned to deepen classroom impact in the coming months.' : 'Continue building momentum by encouraging staff to explore Hub tools during PLCs and team meetings.'}` : `${s} is in the onboarding phase. The foundation is set with ${data.staffTotal} educators enrolled. As the team begins exploring the Hub and observation days take place, this report will show measurable impact on teaching practice, staff wellness, and classroom implementation.`}
+${hasEngagement ? `${s} is showing strong early signals of engagement. ${data.hubLoginPct >= 50 ? 'With over half the staff actively using the Hub, this partnership is well-positioned to deepen classroom impact in the coming months.' : 'Continue building momentum by encouraging staff to explore Hub tools during PLCs and team meetings.'}` : `${s} is in the onboarding phase. The foundation is set with ${data.staffTotal} educators enrolled. As the team begins exploring the Hub${hasServices ? ' and observation days take place' : ''}, this report will show measurable impact on teaching practice, staff wellness, and classroom implementation.`}
 
 ${data.phase === 'IGNITE' ? 'When your team is ready, Phase 2 (ACCELERATE) expands from a pilot group to full staff. Schools that make this move typically see 3x the implementation depth. Phase progression is based on your school\'s growth milestones, not a calendar.' : ''}
 
@@ -1727,8 +1735,7 @@ MEASURABLE OUTCOMES
 Hub Engagement: ${data.hubLoginPct}% of staff active
 Tools and Strategies Explored: ${data.toolsExplored}
 Courses Completed: ${data.courseCompletions}
-Deliverables Completed: ${data.completedDeliverables} of ${data.totalDeliverables}
-${data.wellnessScore ? `Educator Wellness Score: ${data.wellnessScore}/5` : ''}
+${hasServices ? `Deliverables Completed: ${data.completedDeliverables} of ${data.totalDeliverables}\n` : ''}${data.wellnessScore ? `Educator Wellness Score: ${data.wellnessScore}/5` : ''}
 ${kpiBlock}
 
 WHY THIS MATTERS
@@ -1747,15 +1754,14 @@ ${quotesBlock}
 
 GRANT-READY LANGUAGE
 
-"${s} has partnered with Teachers Deserve It (TDI) to provide ${data.staffTotal} educators with sustained, evidence-based professional development. The TDI model combines on-demand digital learning, in-person classroom observations with personalized feedback, and data-driven leadership support. TDI partners report a 74% classroom implementation rate, compared to the national average of 10% for traditional professional development."
+"${s} has partnered with Teachers Deserve It (TDI) to provide ${data.staffTotal} educators with sustained, evidence-based professional development. The TDI model combines on-demand digital learning${hasServices ? ', in-person classroom observations with personalized feedback,' : ''} and data-driven leadership support. TDI partners report a 74% classroom implementation rate, compared to the national average of 10% for traditional professional development."
 
 PROJECTED OUTCOMES
 
 ${data.phase === 'IGNITE' ? `As a Phase 1 (IGNITE) partnership, ${s} is building the foundation for school-wide change. Based on data from similar TDI partnerships, projected outcomes by end of this school year include:
 - 60-80% Hub engagement rate
 - 15-20% reduction in reported teacher stress
-- 50%+ course completion rate among active users
-- Observable changes in classroom practice during observation days
+- 50%+ course completion rate among active users${hasServices ? '\n- Observable changes in classroom practice during observation days' : ''}
 
 Phase progression is milestone-based. When your team demonstrates consistent engagement and classroom implementation, the conversation about Phase 2 (ACCELERATE) happens naturally. There is no pressure to move on a timeline that does not fit your school.` : `${s} is seeing deepening impact as the partnership matures. Schools in this phase typically see 3x the implementation depth compared to their first year. The growth is compounding.`}`;
 
@@ -1764,7 +1770,7 @@ Phase progression is milestone-based. When your team demonstrates consistent eng
 
 QUARTER HIGHLIGHTS
 
-${hasEngagement ? `${s} has ${data.staffLoggedIn} of ${data.staffTotal} educators actively using the Learning Hub (${data.hubLoginPct}%). ${data.toolsExplored > 0 ? `The team has explored ${data.toolsExplored} classroom tools and strategies.` : ''} ${data.completedDeliverables > 0 ? `${data.completedDeliverables} of ${data.totalDeliverables} contracted deliverables are complete.` : 'Deliverables are scheduled and upcoming.'}` : `${s} launched its TDI partnership this quarter with ${data.staffTotal} educators enrolled. The team is in the onboarding phase with Hub access being activated.`}
+${hasEngagement ? `${s} has ${data.staffLoggedIn} of ${data.staffTotal} educators actively using the Learning Hub (${data.hubLoginPct}%). ${data.toolsExplored > 0 ? `The team has explored ${data.toolsExplored} classroom tools and strategies.` : ''} ${!hasServices ? '' : data.completedDeliverables > 0 ? `${data.completedDeliverables} of ${data.totalDeliverables} contracted deliverables are complete.` : 'Deliverables are scheduled and upcoming.'}` : `${s} launched its TDI partnership this quarter with ${data.staffTotal} educators enrolled. The team is in the onboarding phase with Hub access being activated.`}
 ${kpiBlock}
 
 METRICS VS TARGETS
@@ -1772,14 +1778,13 @@ METRICS VS TARGETS
 Hub Engagement: ${data.hubLoginPct}% (TDI benchmark: 60-80%)
 Tools Explored: ${data.toolsExplored}
 Courses Completed: ${data.courseCompletions}
-Deliverables: ${data.completedDeliverables}/${data.totalDeliverables}
-Action Items: ${data.actionItemsCompleted} completed, ${data.actionItemsPending} pending
+${hasServices ? `Deliverables: ${data.completedDeliverables}/${data.totalDeliverables}\n` : ''}Action Items: ${data.actionItemsCompleted} completed, ${data.actionItemsPending} pending
 ${data.wellnessScore ? `Wellness Score: ${data.wellnessScore}/5` : ''}
 ${quotesBlock}
 
 WHAT TDI IS DELIVERING NEXT
 
-${data.completedDeliverables < data.totalDeliverables ? `Your partnership still has ${data.totalDeliverables - data.completedDeliverables} deliverables remaining this school year. These may include observation days, virtual strategy sessions, or executive impact sessions. Check your dashboard's "Your Plan" tab for details on what each session includes and how to prepare.` : 'All contracted deliverables have been completed for this school year.'}
+${!hasServices ? 'This is a Learning Hub membership partnership, so there are no sessions scheduled to deliver. What comes next is driven by your team: the more staff who log in and try a Quick Win, the more this report can tell you.' : data.completedDeliverables < data.totalDeliverables ? `Your partnership still has ${data.totalDeliverables - data.completedDeliverables} deliverables remaining this school year. These may include observation days, virtual strategy sessions, or executive impact sessions. Check your dashboard's "Your Plan" tab for details on what each session includes and how to prepare.` : 'All contracted deliverables have been completed for this school year.'}
 
 ${data.upcomingEvents && data.upcomingEvents.length > 0 ? `Coming up:\n${data.upcomingEvents.map((e: {title:string;date:string;status:string}) => `- ${e.title}${e.date ? ' (' + new Date(e.date).toLocaleDateString('en-US', {month: 'short', day: 'numeric'}) + ')' : ' (date TBD)'}`).join('\n')}` : ''}
 
@@ -1787,9 +1792,7 @@ The Learning Hub continues to add new content regularly, including seasonal tool
 
 HOW OTHER SCHOOLS ARE USING THIS QUARTER
 
-A middle school in the Midwest used their second observation day as a catalyst. After receiving Love Notes, 8 teachers independently started a "strategy swap" channel where they shared Hub tools with each other. Their Hub engagement jumped from 45% to 78% in two weeks.
-
-An elementary principal in the Southeast started reading one educator quote from the Hub aloud at each staff meeting. Within a month, teachers were asking to be the one quoted next. It became a quiet competition to try new strategies.
+${hasServices ? 'A middle school in the Midwest used their second observation day as a catalyst. After receiving Love Notes, 8 teachers independently started a "strategy swap" channel where they shared Hub tools with each other. Their Hub engagement jumped from 45% to 78% in two weeks.\n\n' : ''}An elementary principal in the Southeast started reading one educator quote from the Hub aloud at each staff meeting. Within a month, teachers were asking to be the one quoted next. It became a quiet competition to try new strategies.
 
 LOOKING AHEAD
 
