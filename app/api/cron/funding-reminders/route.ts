@@ -387,6 +387,24 @@ export async function GET(request: NextRequest) {
         `  _if any of these looks wrong, the rule is wrong — it can be overridden_`)
     }
 
+    // Applications sitting with a funder past the point where a decision would
+    // normally have landed. This is the only section about money already in
+    // play, and it is the one place where the answer may already exist and
+    // simply never reached us: the funder replies to the school, not to TDI, so
+    // an award can sit unrecorded indefinitely with nothing prompting anyone to
+    // ask. Criticals are listed; the softer 30-day check-ins roll into the tail
+    // count so this section stays short enough to act on.
+    const awaitingDecision = alerts.filter(
+      a => a.category === 'submission' && a.severity === 'critical')
+    if (awaitingDecision.length) {
+      const decisionLines = awaitingDecision.map(a =>
+        `  • ${tidySchool(a.pursuit_name)}: ${a.title.replace(`${a.opportunity_name} `, `${a.opportunity_name}, `)}`)
+      sections.push(
+        `*Waiting on a funder's answer (${awaitingDecision.length})*\n` +
+        `${cap(decisionLines, 6).join('\n')}\n` +
+        `  _ask the school what they have heard, then record the award or denial_`)
+    }
+
     const stalled = alerts.filter(a => a.category === 'stalled')
     if (stalled.length) {
       const byPursuit = new Map<string, number>()
@@ -398,7 +416,8 @@ export async function GET(request: NextRequest) {
 
     // Everything else becomes a number, not a list. This is the part that stops
     // the message turning back into wallpaper.
-    const accountedFor = decisions.length + approvals.length + stalled.length
+    const accountedFor =
+      decisions.length + approvals.length + stalled.length + awaitingDecision.length
     const remaining = Math.max(0, alerts.length - accountedFor)
 
     let digestPosted = false
