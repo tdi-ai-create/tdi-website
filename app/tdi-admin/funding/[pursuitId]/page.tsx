@@ -38,6 +38,21 @@ export default function PursuitPage() {
   const [data, setData] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [open, setOpen] = useState<string | null>(null)
+
+  // Opening a section from a button has to move you to it.
+  //
+  // Every one of these buttons worked and every one of them looked broken: the
+  // section they open sits below the fold, so the click set state that changed
+  // nothing you could see. The previous version of this page scrolled for
+  // exactly this reason and that behaviour was lost in the rebuild.
+  //
+  // Toggling a header is left alone. You are already looking at it.
+  const reveal = (id: string) => {
+    setOpen(id)
+    requestAnimationFrame(() => {
+      document.getElementById(`section-${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    })
+  }
   const [editingName, setEditingName] = useState(false)
   const [nameDraft, setNameDraft] = useState('')
 
@@ -92,7 +107,7 @@ export default function PursuitPage() {
   ].filter(Boolean).length
 
   const section = (id: string, title: string, body: React.ReactNode, note?: string) => (
-    <div style={{ border: `1px solid ${C.rule}`, borderRadius: 10, marginTop: 10, overflow: 'hidden' }}>
+    <div id={`section-${id}`} style={{ border: `1px solid ${C.rule}`, borderRadius: 10, marginTop: 10, overflow: 'hidden', scrollMarginTop: 16 }}>
       <button
         onClick={() => setOpen(open === id ? null : id)}
         style={{
@@ -163,14 +178,14 @@ export default function PursuitPage() {
 
       <div className="wb-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) 320px', gap: 18, alignItems: 'start' }}>
         <div style={{ minWidth: 0 }}>
-          <TheOneThing pick={pick} onOpen={() => setOpen(pick?.kind === 'funder' ? 'paths' : 'actions')} />
+          <TheOneThing pick={pick} onOpen={() => reveal(pick?.kind === 'funder' ? 'paths' : 'actions')} />
 
           <WorkGroup title="Waiting on you" count={work.you.length} tone={C.red}>
-            {work.you.map(a => <TaskRow key={a.id} item={a} onOpen={() => setOpen('actions')} />)}
+            {work.you.map(a => <TaskRow key={a.id} item={a} onOpen={() => reveal('actions')} />)}
           </WorkGroup>
 
           <WorkGroup title="Waiting on the school" count={work.school.length} tone={C.amber}>
-            {work.school.map(a => <TaskRow key={a.id} item={a} onOpen={() => setOpen('actions')} />)}
+            {work.school.map(a => <TaskRow key={a.id} item={a} onOpen={() => reveal('actions')} />)}
           </WorkGroup>
 
           <WorkGroup title="Running by itself" count={work.agent.length} tone={C.ink3}>
@@ -235,7 +250,7 @@ export default function PursuitPage() {
               Every note, email, review and reason written about this school.
             </div>
             <button
-              onClick={() => setOpen('record')}
+              onClick={() => reveal('record')}
               style={{
                 width: '100%', fontSize: 12, fontWeight: 620, padding: '7px 12px', borderRadius: 7,
                 border: `1px solid ${C.rule}`, background: C.card, color: C.ink2, cursor: 'pointer',
