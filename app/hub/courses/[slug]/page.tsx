@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import CourseCard from '@/components/hub/CourseCard';
 import CommunityTabs from '@/components/hub/CommunityTabs';
+import { useIsTDIAdmin } from '@/lib/use-is-tdi-admin';
 import AchievementInsights from '@/components/hub/AchievementInsights';
 import CapacityFeedbackPrompt, { shouldShowCapacityFeedback } from '@/components/hub/CapacityFeedbackPrompt';
 import { computeGatePositions, countCheckIns, describeCheckIn, summarizeCheckIns } from '@/lib/hub/quiz';
@@ -142,6 +143,7 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
   const { slug } = resolvedParams;
   const router = useRouter();
   const { user } = useHub();
+  const isTDIAdmin = useIsTDIAdmin(!!user?.email);
 
   const [course, setCourse] = useState<Course | null>(null);
   const [modules, setModules] = useState<Module[]>([]);
@@ -1091,7 +1093,7 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
             <CommunityTabs
               contentId={course.id}
               userId={user?.id}
-              isAdmin={!!user?.email?.toLowerCase().endsWith('@teachersdeserveit.com')}
+              isAdmin={isTDIAdmin}
               conversationApiPath={`/api/hub/courses/${course.id}/conversation`}
               qaApiPath={`/api/hub/courses/${course.id}/qa`}
             />

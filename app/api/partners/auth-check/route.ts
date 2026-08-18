@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { isTDIAdmin } from '@/lib/is-tdi-admin';
 
 // Service Supabase client (bypasses RLS)
 function getServiceSupabase() {
@@ -16,11 +17,6 @@ function getServiceSupabase() {
       persistSession: false,
     },
   });
-}
-
-// Check if TDI admin
-function isTDIAdmin(email: string) {
-  return email.toLowerCase().endsWith('@teachersdeserveit.com');
 }
 
 // POST - Verify user access to a partnership by slug
@@ -73,7 +69,7 @@ export async function POST(request: NextRequest) {
     };
 
     // Check authorization
-    const isAdmin = userEmail ? isTDIAdmin(userEmail) : false;
+    const isAdmin = userEmail ? await isTDIAdmin(userEmail) : false;
 
     if (!isAdmin) {
       // Check if user is linked to this partnership

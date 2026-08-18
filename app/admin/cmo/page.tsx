@@ -57,7 +57,10 @@ export default function CMODashboard() {
   useEffect(() => {
     const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.user?.email?.toLowerCase().endsWith('@teachersdeserveit.com')) {
+      const whoami = session?.user?.email
+        ? await fetch('/api/admin/whoami').then(r => r.ok ? r.json() : { isAdmin: false }).catch(() => ({ isAdmin: false }))
+        : { isAdmin: false };
+      if (!whoami.isAdmin) {
         setPageState('unauthorized');
         router.push('/admin/login');
         return;

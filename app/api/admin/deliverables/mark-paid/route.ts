@@ -1,14 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServiceSupabase } from '@/lib/supabase'
+import { isTDIAdmin } from '@/lib/is-tdi-admin'
 import { invoicePaid } from '@/lib/billing-slack'
-
-function isTDIAdmin(email: string) {
-  return email.toLowerCase().endsWith('@teachersdeserveit.com')
-}
 
 export async function POST(request: NextRequest) {
   const email = request.headers.get('x-user-email')
-  if (!email || !isTDIAdmin(email)) {
+  if (!email || !(await isTDIAdmin(email))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
   }
 

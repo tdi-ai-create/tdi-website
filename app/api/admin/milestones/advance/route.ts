@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { createSupabaseServerClient } from '@/lib/supabase-server';
 import { progressMilestone } from '@/lib/milestone-progression';
+import { isTDIAdmin } from '@/lib/is-tdi-admin';
 
 const VALID_CONTENT_PATHS = ['blog', 'download', 'course'] as const;
 
@@ -24,7 +25,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
     }
 
-    if (!user.email?.endsWith('@teachersdeserveit.com')) {
+    if (!(await isTDIAdmin(user.email))) {
       return NextResponse.json({ success: false, error: 'Forbidden' }, { status: 403 });
     }
 
