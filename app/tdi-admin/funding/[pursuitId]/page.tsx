@@ -43,15 +43,41 @@ export default function PursuitPage() {
   //
   // Every one of these buttons worked and every one of them looked broken: the
   // section they open sits below the fold, so the click set state that changed
-  // nothing you could see. The previous version of this page scrolled for
-  // exactly this reason and that behaviour was lost in the rebuild.
+  // nothing you could see.
+  //
+  // Two things had to be right, and the first attempt got neither.
+  //
+  // The document does not scroll. The admin shell puts the page inside
+  // <main class="flex-1 overflow-y-auto">, so documentElement.scrollHeight
+  // equals its clientHeight and every scroll happens in that container. A
+  // plain scrollIntoView did nothing here, and neither did scrollTo with
+  // behavior 'smooth' on the container, while assigning scrollTop moved it
+  // immediately. So this finds the real scrolling ancestor and sets scrollTop
+  // rather than trusting either helper.
+  //
+  // And the scroll has to happen after React has committed, not on the next
+  // frame after setState. Two frames is enough for the section body to exist,
+  // which is what makes the offset correct rather than measured against a
+  // collapsed row.
   //
   // Toggling a header is left alone. You are already looking at it.
   const reveal = (id: string) => {
     setOpen(id)
-    requestAnimationFrame(() => {
-      document.getElementById(`section-${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-    })
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      const el = document.getElementById(`section-${id}`)
+      if (!el) return
+
+      let box: HTMLElement | null = el.parentElement
+      while (box) {
+        const overflow = getComputedStyle(box).overflowY
+        if (/(auto|scroll|overlay)/.test(overflow) && box.scrollHeight > box.clientHeight + 4) break
+        box = box.parentElement
+      }
+
+      const top = el.getBoundingClientRect().top
+      if (box) box.scrollTop += top - box.getBoundingClientRect().top - 12
+      else window.scrollBy(0, top - 12)
+    }))
   }
   const [editingName, setEditingName] = useState(false)
   const [nameDraft, setNameDraft] = useState('')
