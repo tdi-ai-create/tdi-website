@@ -7,6 +7,7 @@ import { OpportunitiesTab } from './OpportunitiesTab'
 import { ActionsTab } from './ActionsTab'
 import { TimelineTab } from './TimelineTab'
 import { EmailsTab } from './EmailsTab'
+import { RecordTab } from './RecordTab'
 
 const TABS = [
   { id: 'overview', label: 'Overview' },
@@ -14,6 +15,7 @@ const TABS = [
   { id: 'actions', label: 'Actions' },
   { id: 'timeline', label: 'Timeline' },
   { id: 'emails', label: 'Emails' },
+  { id: 'record', label: 'Record' },
 ]
 
 interface PanelShellProps {
@@ -83,6 +85,7 @@ export function PanelShell({ pursuit, onClose, pursuitId, gate, partnershipHealt
         {activeTab === 'actions' && <ActionsTab pursuitId={pursuitId} />}
         {activeTab === 'timeline' && <TimelineTab pursuitId={pursuitId} />}
         {activeTab === 'emails' && <EmailsTab pursuitId={pursuitId} pursuit={pursuit} />}
+        {activeTab === 'record' && <RecordTab pursuitId={pursuitId} />}
       </div>
     </div>
   )
