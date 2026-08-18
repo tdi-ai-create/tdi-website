@@ -75,10 +75,72 @@ export function calculateFundingAlerts(params: {
     }
   })
 
+  // ---- AWAITING A FUNDER DECISION ----
+  //
+  // The 'submission' category existed in the type union above from the day this
+  // file was written and was never once emitted. The effect was that the
+  // pipeline pushed applications out to funders and had no way to pull the
+  // answer back: the moment waiting_on became 'funder' nothing watched the row
+  // again. Allenwood's NEA application sat 63 days with no item tracking it and
+  // no alert naming it.
+  //
+  // The clock here is days since the school submitted, not last_activity_at.
+  // Activity timestamps move whenever any cron touches a row, so they measure
+  // how recently the system looked at something rather than how long the school
+  // has been waiting, which is the number that matters.
+  opportunities.forEach(opp => {
+    if (['awarded', 'denied'].includes(opp.status)) return
+    if (!opp.client_submitted || opp.waiting_on !== 'funder') return
+    if (!opp.client_submitted_at) return
+
+    const submitted = new Date(opp.client_submitted_at)
+    const daysWaiting = Math.ceil((today.getTime() - submitted.getTime()) / (1000 * 60 * 60 * 24))
+    const pursuitName = pursuitNames[opp.pursuit_id] || 'Unknown'
+    const submittedLabel = submitted.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+
+    // The school is the applicant on nearly every one of these, so the funder
+    // replies to them and not to us. Asking the school what they have heard is
+    // the step that actually produces an answer; contacting the funder directly
+    // is the fallback, not the opener.
+    if (daysWaiting >= 60) {
+      alerts.push({
+        id: `submission-critical-${opp.id}`,
+        severity: 'critical',
+        category: 'submission',
+        pursuit_id: opp.pursuit_id,
+        pursuit_name: pursuitName,
+        opportunity_id: opp.id,
+        opportunity_name: opp.name,
+        title: `${opp.name} has been with the funder ${daysWaiting} days`,
+        description: `Submitted ${submittedLabel}. No decision recorded. Most funders decide well inside this window, so an answer may already exist that we have not captured.`,
+        action: 'Ask the school whether they have heard back, then record the award or denial',
+      })
+    } else if (daysWaiting >= 30) {
+      alerts.push({
+        id: `submission-warning-${opp.id}`,
+        severity: 'warning',
+        category: 'submission',
+        pursuit_id: opp.pursuit_id,
+        pursuit_name: pursuitName,
+        opportunity_id: opp.id,
+        opportunity_name: opp.name,
+        title: `${opp.name} awaiting a decision for ${daysWaiting} days`,
+        description: `Submitted ${submittedLabel}.`,
+        action: 'Check in with the school on whether the funder has responded',
+      })
+    }
+  })
+
   // ---- STALLED OPPORTUNITY ALERTS ----
   opportunities.forEach(opp => {
     if (['awarded', 'denied'].includes(opp.status)) return
     if (!opp.last_activity_at) return
+
+    // Rows waiting on a funder belong to the rule above. Without this the same
+    // opportunity produces two alerts that say different things: one measuring
+    // the wait for a decision, one measuring how recently a cron touched the
+    // row. Bella would have to work out which number meant anything.
+    if (opp.client_submitted && opp.waiting_on === 'funder') return
 
     const lastActivity = new Date(opp.last_activity_at)
     const daysSinceActivity = Math.ceil((today.getTime() - lastActivity.getTime()) / (1000 * 60 * 60 * 24))
