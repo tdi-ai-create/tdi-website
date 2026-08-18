@@ -1,4 +1,5 @@
 import { getServiceSupabase } from '@/lib/supabase';
+import { emailMatchSet } from '@/lib/canonical-email';
 
 /**
  * Single source of truth for "is this person a TDI admin?".
@@ -18,11 +19,14 @@ export async function isTDIAdmin(email: string | null | undefined): Promise<bool
   const normalized = email.toLowerCase().trim();
   if (normalized.endsWith('@teachersdeserveit.com')) return true;
 
+  // Matches the address given and the mailbox it delivers to, so a plus tag
+  // such as team+tdi@whatwilllast.com resolves to the team@ row that already
+  // grants access rather than being refused as an unknown address.
   const supabase = getServiceSupabase();
   const { data, error } = await supabase
     .from('tdi_team_members')
     .select('id')
-    .ilike('email', normalized)
+    .in('email', emailMatchSet(normalized))
     .eq('is_active', true)
     .limit(1);
 
