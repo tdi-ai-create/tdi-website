@@ -73,6 +73,16 @@ export function OpportunitiesTab({ pursuitId, gateOpen = false, contract2LineIte
   const [savedField, setSavedField] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [formError, setFormError] = useState('')
+  const [blocked, setBlocked] = useState<{
+    oppId: string
+    reason: string
+    rule: string | null
+    verdict: string
+    unblockedBy: string | null
+    retry: Record<string, unknown>
+  } | null>(null)
+  const [overrideReason, setOverrideReason] = useState('')
+  const [overriding, setOverriding] = useState(false)
 
   const showSaved = (field: string) => {
     setSavedField(field)
@@ -119,7 +129,50 @@ export function OpportunitiesTab({ pursuitId, gateOpen = false, contract2LineIte
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id, ...fields }),
     })
+
+    // The stop rule answers 409 with the reason and what would clear it. Until
+    // now nothing read that: the optimistic update was rolled back by the
+    // refetch and the click simply appeared to do nothing. A refused request
+    // has to say why, or the rule is indistinguishable from a broken button.
+    if (res.status === 409) {
+      const payload = await res.json().catch(() => null)
+      if (payload?.eligibility) {
+        setBlocked({
+          oppId: id,
+          reason: payload.error ?? payload.eligibility.reason ?? 'This path was refused.',
+          rule: payload.eligibility.rule ?? null,
+          verdict: payload.eligibility.verdict ?? 'stop',
+          unblockedBy: payload.eligibility.unblockedBy ?? null,
+          retry: fields,
+        })
+      }
+      fetchOpps()
+      return
+    }
+
     if (res.ok) showSaved(`${fieldKey}-${id}`)
+    fetchOpps()
+  }
+
+  // Push a refused path through anyway. The reason is required and is written
+  // as a note, so it lands in the record beside everything else rather than
+  // living only as a boolean nobody can interpret later.
+  const overrideBlocked = async () => {
+    if (!blocked || overrideReason.trim().length < 4) return
+    setOverriding(true)
+    await fetch('/api/funding/opportunities', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        id: blocked.oppId,
+        ...blocked.retry,
+        eligibility_override: true,
+        note: `Stop rule overridden (${blocked.rule ?? 'rule'}): ${overrideReason.trim()}`,
+      }),
+    })
+    setOverriding(false)
+    setBlocked(null)
+    setOverrideReason('')
     fetchOpps()
   }
 
@@ -372,6 +425,103 @@ export function OpportunitiesTab({ pursuitId, gateOpen = false, contract2LineIte
                 </button>
               </div>
             </div>
+
+            {/* ── The stop rule, said out loud ──
+                Shown for a refusal that just happened and for one recorded
+                earlier, because a path blocked last week is just as stuck as
+                one blocked a second ago and neither was visible anywhere. */}
+            {(() => {
+              const live = blocked?.oppId === opp.id ? blocked : null
+              const stored =
+                !live &&
+                opp.eligibility_verdict &&
+                opp.eligibility_verdict !== 'clear' &&
+                opp.eligibility_overridden !== true
+                  ? {
+                      reason: opp.eligibility_reason as string,
+                      rule: opp.eligibility_rule as string | null,
+                      verdict: opp.eligibility_verdict as string,
+                      unblockedBy: null as string | null,
+                    }
+                  : null
+              const b = live ?? stored
+              if (!b) return null
+
+              const isStop = b.verdict === 'stop'
+              const accent = isStop ? '#DC2626' : '#EA580C'
+              const tint = isStop ? '#FEF2F2' : '#FFF7ED'
+
+              return (
+                <div style={{
+                  marginTop: 10, padding: '10px 12px', background: tint,
+                  border: `1px solid ${accent}33`, borderLeft: `3px solid ${accent}`,
+                  borderRadius: 6,
+                }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: accent, letterSpacing: 0.3 }}>
+                    {isStop ? 'STOPPED BEFORE DRAFTING' : 'NEEDS A CHECK FIRST'}
+                  </div>
+                  <div style={{ fontSize: 12, color: '#374151', marginTop: 4, lineHeight: 1.5 }}>
+                    {b.reason}
+                  </div>
+                  {b.unblockedBy && (
+                    <div style={{ fontSize: 11, color: '#6B7280', marginTop: 4, lineHeight: 1.5 }}>
+                      Clears when: {b.unblockedBy}
+                    </div>
+                  )}
+                  {b.rule && (
+                    <div style={{ fontSize: 10, color: '#9CA3AF', marginTop: 4 }}>
+                      rule: {b.rule}
+                    </div>
+                  )}
+
+                  {live ? (
+                    <div style={{ marginTop: 9 }}>
+                      <div style={{ fontSize: 11, color: '#6B7280', marginBottom: 5 }}>
+                        If this rule is wrong, say why and push it through. The reason is recorded.
+                      </div>
+                      <div style={{ display: 'flex', gap: 6 }}>
+                        <input
+                          value={overrideReason}
+                          onChange={e => setOverrideReason(e.target.value)}
+                          placeholder="Why this path is actually eligible"
+                          style={{
+                            flex: 1, fontSize: 11, padding: '5px 8px',
+                            border: '1px solid #E5E7EB', borderRadius: 5, background: 'white',
+                          }}
+                        />
+                        <button
+                          onClick={overrideBlocked}
+                          disabled={overrideReason.trim().length < 4 || overriding}
+                          style={{
+                            fontSize: 11, fontWeight: 600, padding: '5px 10px', borderRadius: 5,
+                            border: `1px solid ${accent}`, background: 'white', color: accent,
+                            cursor: overrideReason.trim().length < 4 ? 'not-allowed' : 'pointer',
+                            opacity: overrideReason.trim().length < 4 ? 0.5 : 1,
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          {overriding ? 'Saving...' : 'Override'}
+                        </button>
+                        <button
+                          onClick={() => { setBlocked(null); setOverrideReason('') }}
+                          style={{
+                            fontSize: 11, padding: '5px 8px', borderRadius: 5,
+                            border: '1px solid #E5E7EB', background: 'white', color: '#6B7280',
+                            cursor: 'pointer',
+                          }}
+                        >
+                          Close
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 6 }}>
+                      Request a draft to override this.
+                    </div>
+                  )}
+                </div>
+              )
+            })()}
 
             {/* Middle row */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 8, flexWrap: 'wrap' }}>
