@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { resolveBillingContact, greetingName, billingContactFooterHtml } from '@/lib/billing-contact'
 import { createClient } from '@supabase/supabase-js'
 import { requireAdminAuth } from '@/lib/tdi-admin/auth'
 import { invoicePaid } from '@/lib/billing-slack'
@@ -127,7 +128,7 @@ export async function POST(
     const { data: partnership } = deliverable?.partnership_id
       ? await supabase
           .from('partnerships')
-          .select('org_name, contact_name, contact_email, primary_contact_email')
+          .select('org_name, contact_name, contact_email, primary_contact_name, primary_contact_email, billing_contact_name, billing_contact_email, billing_contact_title, billing_contact_source, billing_token')
           .eq('id', deliverable.partnership_id)
           .maybeSingle()
       : { data: null }
@@ -140,13 +141,14 @@ export async function POST(
           .maybeSingle()
       : { data: null }
 
-    const recipientEmail =
-      invoiceRow?.sent_to ||
-      partnership?.primary_contact_email ||
-      partnership?.contact_email ||
-      null
+    // A receipt is a billing email, so it follows the billing contact like the
+    // invoice and the reminders do. sent_to still wins, since that is who we
+    // actually mailed this specific invoice to.
+    const billing = resolveBillingContact(partnership)
+    const recipientEmail = invoiceRow?.sent_to || billing.email
     const schoolName = partnership?.org_name || district?.name || 'your team'
-    const firstName = (partnership?.contact_name || '').split(' ')[0] || 'there'
+    const firstName = greetingName(billing.name)
+    const billingFooter = billingContactFooterHtml(partnership?.billing_token, billing.isFallback)
 
     // 4. Send the confirmation, and report whether it actually went.
     let emailSent = false
@@ -184,6 +186,7 @@ export async function POST(
                 <p style="color: #6b7280; font-size: 13px; margin: 24px 0 0;">
                   Questions about billing? Contact <a href="mailto:Billing@Teachersdeserveit.com" style="color: #d97706;">Billing@Teachersdeserveit.com</a>
                 </p>
+                ${billingFooter}
               </div>`,
           }),
         })

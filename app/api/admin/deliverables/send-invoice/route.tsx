@@ -1,5 +1,6 @@
 /** @jsxImportSource react */
 import { NextRequest, NextResponse } from 'next/server';
+import { resolveBillingContact, greetingName, billingContactFooterHtml } from '@/lib/billing-contact';
 import { getServiceSupabase } from '@/lib/supabase';
 import { Resend } from 'resend';
 import { renderToBuffer } from '@react-pdf/renderer';
@@ -212,7 +213,7 @@ export async function POST(request: NextRequest) {
 
   const { data: partnership } = await supabase
     .from('partnerships')
-    .select('contact_name, contact_email, primary_contact_email, org_name')
+    .select('contact_name, contact_email, primary_contact_name, primary_contact_email, billing_contact_name, billing_contact_email, billing_contact_title, billing_contact_source, billing_token, org_name')
     .eq('id', partnershipId)
     .single();
 
@@ -301,8 +302,12 @@ export async function POST(request: NextRequest) {
       .eq('id', deliverableId);
   }
 
-  const recipientEmail = overrideEmail || partnership.primary_contact_email || partnership.contact_email;
-  const firstName = (partnership.contact_name || '').split(' ')[0] || 'there';
+  // An explicit override still wins, since Bella may know something the record
+  // does not. Otherwise the billing contact, then the signer.
+  const billing = resolveBillingContact(partnership);
+  const recipientEmail = overrideEmail || billing.email;
+  const firstName = overrideEmail ? 'there' : greetingName(billing.name);
+  const billingFooter = billingContactFooterHtml(partnership.billing_token, billing.isFallback);
   const amount = Number(deliverable.total_amount || 0);
 
   const pdfData: InvoiceData = {
@@ -354,6 +359,7 @@ export async function POST(request: NextRequest) {
           </div>
           ${poNumber ? `<p style="margin:0 0 16px;font-size:13px;color:#64748B;">PO Reference: <strong>${poNumber}</strong></p>` : ''}
           <p style="margin:0 0 16px;font-size:14px;color:#64748B;">The full invoice is attached as a PDF. If you need a W-9 or have specific AP requirements, just reply to this email.</p>
+          ${billingFooter}
           ${notes ? `<p style="margin:0 0 16px;font-size:13px;color:#64748B;font-style:italic;">${notes}</p>` : ''}
           <hr style="border:none;border-top:1px solid #E5E7EB;margin:24px 0 12px;" />
           <p style="font-size:11px;color:#9CA3AF;margin:0;text-align:center;">Teachers Deserve It, LLC | ${invoiceNumber}</p>

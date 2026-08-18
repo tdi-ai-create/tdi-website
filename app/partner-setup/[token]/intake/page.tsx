@@ -127,6 +127,11 @@ interface OrgData {
   org_type: 'district' | 'school';
   address_city: string;
   address_state: string;
+  // Who pays. Almost never the person filling this in.
+  billing_same_as_me: boolean;
+  billing_contact_name: string;
+  billing_contact_email: string;
+  billing_contact_title: string;
 }
 
 type Step = 1 | 2;
@@ -153,6 +158,10 @@ function IntakeWizardContent() {
     org_type: 'district',
     address_city: '',
     address_state: '',
+    billing_same_as_me: true,
+    billing_contact_name: '',
+    billing_contact_email: '',
+    billing_contact_title: '',
   });
 
   // Staff state
@@ -703,6 +712,110 @@ function IntakeWizardContent() {
                         ))}
                       </select>
                     </div>
+                  </div>
+
+                  {/* Who should get invoices.
+                      Asked here because the person completing setup signed the
+                      contract, and in K-12 that is rarely the person who pays.
+                      "Not sure yet" is a real answer: we leave it unset and the
+                      first invoice carries a link they can pass along. */}
+                  <div className="mt-8 pt-6 border-t border-gray-200">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {t('Who should receive invoices?', '\u00bfQui\u00e9n debe recibir las facturas?')}
+                    </label>
+                    <p className="text-sm text-gray-500 mb-4">
+                      {t(
+                        'Most schools send these to a business office rather than a principal.',
+                        'La mayor\u00eda de las escuelas las env\u00edan a la oficina administrativa, no al director.'
+                      )}
+                    </p>
+
+                    <button
+                      type="button"
+                      onClick={() => setOrgData(d => ({ ...d, billing_same_as_me: true }))}
+                      className={`w-full text-left flex items-start gap-3 p-4 rounded-lg border-2 mb-3 transition-colors ${
+                        orgData.billing_same_as_me ? 'border-[#ffba06] bg-[#FFF8E7]' : 'border-gray-200 bg-white hover:border-gray-300'
+                      }`}
+                    >
+                      <span className={`mt-0.5 w-4 h-4 rounded-full border-2 flex-shrink-0 ${
+                        orgData.billing_same_as_me ? 'border-[#ffba06] bg-[#ffba06]' : 'border-gray-300'
+                      }`} />
+                      <span>
+                        <span className="block font-medium text-[#1e2749]">
+                          {t('Send them to me', 'Env\u00edenmelas a m\u00ed')}
+                        </span>
+                        <span className="block text-sm text-gray-500">
+                          {t('I handle invoices for our school', 'Yo me encargo de las facturas de nuestra escuela')}
+                        </span>
+                      </span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setOrgData(d => ({ ...d, billing_same_as_me: false }))}
+                      className={`w-full text-left flex items-start gap-3 p-4 rounded-lg border-2 transition-colors ${
+                        !orgData.billing_same_as_me ? 'border-[#ffba06] bg-[#FFF8E7]' : 'border-gray-200 bg-white hover:border-gray-300'
+                      }`}
+                    >
+                      <span className={`mt-0.5 w-4 h-4 rounded-full border-2 flex-shrink-0 ${
+                        !orgData.billing_same_as_me ? 'border-[#ffba06] bg-[#ffba06]' : 'border-gray-300'
+                      }`} />
+                      <span>
+                        <span className="block font-medium text-[#1e2749]">
+                          {t('Someone else handles our invoices', 'Otra persona se encarga de nuestras facturas')}
+                        </span>
+                        <span className="block text-sm text-gray-500">
+                          {t('A business manager, bookkeeper, or district office', 'Un gerente administrativo, contador o la oficina del distrito')}
+                        </span>
+                      </span>
+                    </button>
+
+                    {!orgData.billing_same_as_me && (
+                      <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            {t('Their name', 'Su nombre')}
+                          </label>
+                          <input
+                            type="text"
+                            value={orgData.billing_contact_name}
+                            onChange={(e) => handleOrgChange('billing_contact_name', e.target.value)}
+                            placeholder={t('e.g., Dana Kellerman', 'ej., Dana Kellerman')}
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#80a4ed] focus:border-transparent outline-none"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            {t('Their email', 'Su correo electr\u00f3nico')}
+                          </label>
+                          <input
+                            type="email"
+                            value={orgData.billing_contact_email}
+                            onChange={(e) => handleOrgChange('billing_contact_email', e.target.value)}
+                            placeholder={t('business.office@yourschool.org', 'oficina@suescuela.org')}
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#80a4ed] focus:border-transparent outline-none"
+                          />
+                        </div>
+                        <div className="sm:col-span-2">
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            {t('Their role, optional', 'Su cargo, opcional')}
+                          </label>
+                          <input
+                            type="text"
+                            value={orgData.billing_contact_title}
+                            onChange={(e) => handleOrgChange('billing_contact_title', e.target.value)}
+                            placeholder={t('e.g., Business Manager', 'ej., Gerente Administrativo')}
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#80a4ed] focus:border-transparent outline-none"
+                          />
+                        </div>
+                        <p className="sm:col-span-2 text-sm text-gray-500 -mt-1">
+                          {t(
+                            'Not sure yet? Leave this blank. We will send the first invoice to you with a link to pass it along.',
+                            '\u00bfNo est\u00e1 seguro todav\u00eda? D\u00e9jelo en blanco. Enviaremos la primera factura a usted con un enlace para reenviarla.'
+                          )}
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

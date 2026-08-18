@@ -90,7 +90,7 @@
   <p><strong>Action:</strong> Click <strong>"Send Invoice"</strong>. A preview modal opens.</p>
   <p><strong>Before sending, you can edit:</strong></p>
   <ul>
-    <li><strong>Recipient email:</strong> defaults to the school's primary contact. Change it to send to AP, a different administrator, etc.</li>
+    <li><strong>Recipient email:</strong> defaults to the school's <strong>billing contact</strong>. If no billing contact is known yet, it falls back to whoever signed the contract, and the invoice carries a link the school can use to correct it. You can still override the address here for a one-off send.</li>
     <li><strong>PO Number:</strong> if the school requires a PO reference on invoices, enter it here. It appears on the PDF.</li>
     <li><strong>Notes:</strong> any special instructions, references, or context. Appears on the PDF invoice.</li>
   </ul>
@@ -107,6 +107,23 @@
   <p style="color:#064E3B;font-size:13px;"><strong>Resending:</strong> You can resend any invoiced service with the same editable preview. Use this when a school loses the invoice or you need to send it to a different email.</p>
 </div>
 
+<h3>Who invoices go to</h3>
+<div class="card">
+  <p>The person who signs a contract is almost never the person who pays it. Principals and superintendents sign; business offices pay. Every partnership therefore has two contacts, and they can be the same person if that is genuinely true:</p>
+  <ul>
+    <li><strong>Billing contact.</strong> Gets invoices, payment reminders, and receipts. Nothing else.</li>
+    <li><strong>Relationship contact.</strong> Gets everything else. Unchanged from before.</li>
+  </ul>
+  <p><strong>Where you see it:</strong> at the top of the Billing tab, it says plainly who invoices go to. If nobody has told us yet, it says that in amber rather than quietly showing the signer as though they were the billing contact.</p>
+  <p><strong>Three ways it gets set:</strong></p>
+  <ul>
+    <li><strong>At onboarding.</strong> Partner setup asks "Who should receive invoices?" with a "send them to me" default. Schools can also say they are not sure yet, and we leave it unset rather than record a guess.</li>
+    <li><strong>By the school.</strong> Every invoice, reminder, and receipt carries a line at the bottom: "Not the right person for billing? Tell us who is." It opens a short page with no login, so a business manager who was forwarded the invoice can fix it in about ten seconds. This is the main way it stays current.</li>
+    <li><strong>By us.</strong> Use <strong>Change</strong> on the Billing tab when you learn something on a call. There is also <strong>Copy link for school</strong> if you would rather send them the same page.</li>
+  </ul>
+  <p style="color:#064E3B;font-size:13px;margin-top:8px;"><strong>Every change is announced.</strong> The previous contact gets a short heads-up email, and it posts to <code>#financials</code>. If a change happens that nobody expected, you will know within minutes rather than at the next invoice. That link only ever changes where an invoice is sent; it exposes nothing about payments, amounts, or bank details.</p>
+</div>
+
 <h3>Step 3: Follow Up on Payment</h3>
 <div class="card">
   <p><strong>Who:</strong> Bella (primary), Omar (oversight)</p>
@@ -116,6 +133,7 @@
     <li><strong>Add a note:</strong> Record follow-up calls, emails, AP contact info</li>
     <li><strong>View timeline:</strong> See when the invoice was sent, any notes added</li>
     <li><strong>Check due date:</strong> Overdue items are flagged in red</li>
+    <li><strong>Automatic reminders</strong> at 14 days and on the due date go to the <strong>billing contact</strong>, not the signer, and carry the same "tell us who is" link</li>
   </ul>
 </div>
 
@@ -146,7 +164,7 @@
     <li>Changes status to <span class="status status-paid">Paid</span></li>
     <li>Logs the payment event with all details</li>
     <li>Updates the collections workflow</li>
-    <li><strong>Sends a "Payment Received" confirmation email to the school contact</strong> thanking them for their partnership</li>
+    <li><strong>Sends a "Payment Received" confirmation email to the billing contact</strong> thanking them for their partnership. If this ever fails, the toast now says so explicitly rather than implying the school was thanked.</li>
     <li>Sends a Slack notification to the billing channel</li>
   </ul>
 </div>

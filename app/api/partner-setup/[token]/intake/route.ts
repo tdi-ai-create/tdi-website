@@ -139,10 +139,33 @@ export async function POST(
       // Generate slug from org name
       const slug = await getUniqueSlug(supabase, orgData.name);
 
-      // Update partnership slug
+      // Update partnership slug, and the billing contact if they gave us one.
+      //
+      // Asked here because the signer is almost never the person who pays. When
+      // they pick "not sure yet" the fields come through empty and we leave the
+      // record alone, so invoices keep falling back to the signer and carry the
+      // "tell us who is" link instead. A guess recorded as fact is worse than
+      // no answer.
+      const billingUpdate: Record<string, unknown> = { slug, updated_at: new Date().toISOString() };
+      const billingEmail = typeof orgData.billing_contact_email === 'string'
+        ? orgData.billing_contact_email.trim().toLowerCase()
+        : '';
+      const billingName = typeof orgData.billing_contact_name === 'string'
+        ? orgData.billing_contact_name.trim()
+        : '';
+      if (billingEmail && /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(billingEmail) && billingName) {
+        billingUpdate.billing_contact_name = billingName.slice(0, 120);
+        billingUpdate.billing_contact_email = billingEmail.slice(0, 200);
+        billingUpdate.billing_contact_title = typeof orgData.billing_contact_title === 'string'
+          ? (orgData.billing_contact_title.trim().slice(0, 120) || null)
+          : null;
+        billingUpdate.billing_contact_source = 'onboarding';
+        billingUpdate.billing_contact_updated_at = new Date().toISOString();
+      }
+
       await supabase
         .from('partnerships')
-        .update({ slug, updated_at: new Date().toISOString() })
+        .update(billingUpdate)
         .eq('id', partnership.id);
 
       // Create or update organization (simplified fields)

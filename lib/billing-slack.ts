@@ -136,3 +136,18 @@ export async function grantUnlockedServices(pursuitName: string, count: number) 
     `*Grant Confirmed* — ${pursuitName}\n${count} service${count > 1 ? 's' : ''} unlocked for delivery and invoicing.`
   )
 }
+
+export async function billingContactChanged(
+  org: string,
+  previous: { name: string | null; email: string | null },
+  next: { name: string | null; email: string | null },
+  changedBy: 'school' | 'tdi' | 'onboarding'
+) {
+  const who = changedBy === 'school' ? 'The school updated' : 'Updated';
+  await postToSlack(
+    `${who} the billing contact for *${org}*.\n` +
+    `Was: ${previous.name || 'not set'} ${previous.email ? `<${previous.email}>` : ''}\n` +
+    `Now: ${next.name || 'not set'} ${next.email ? `<${next.email}>` : ''}\n` +
+    `Invoices and payment reminders will go to the new address from here.`
+  );
+}

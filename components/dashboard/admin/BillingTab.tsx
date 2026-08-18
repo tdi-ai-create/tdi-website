@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { DollarSign, Send, CheckCircle2, Clock, AlertCircle, ChevronDown, ChevronUp, Plus, X, RotateCcw } from 'lucide-react';
 import { SectionGuide, GUIDE_CONTENT } from '@/components/tdi-admin/InlineGuide';
+import BillingContactPanel from '@/components/dashboard/admin/BillingContactPanel';
 
 interface Deliverable {
   id: string;
@@ -366,6 +367,8 @@ export default function BillingTab({
 
   return (
     <>
+      <BillingContactPanel partnershipId={partnershipId} />
+
       {/* Toast */}
       {toast && (
         <div style={{
