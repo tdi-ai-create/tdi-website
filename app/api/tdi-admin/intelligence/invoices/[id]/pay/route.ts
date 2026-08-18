@@ -17,6 +17,11 @@ function getSupabaseAdmin() {
 }
 
 // POST - Mark invoice as paid
+//
+// Order matters here. The payment record is written first, so that a failure
+// leaves the invoice untouched rather than paid with the payment detail lost.
+// The previous version flipped the invoice to paid, then failed on the insert,
+// then returned early and never sent the school their confirmation email.
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -37,40 +42,11 @@ export async function POST(
       notes,
     } = body
 
-    // Update invoice status to paid
-    const { error: invoiceError } = await supabase
-      .from('intelligence_invoices')
-      .update({ status: 'paid' })
-      .eq('id', id)
+    const parsedAmount = amount_received ? parseFloat(amount_received) : null
 
-    if (invoiceError) {
-      console.error('[Invoices API] Update error:', invoiceError)
-      return NextResponse.json({ error: invoiceError.message }, { status: 500 })
-    }
-
-    // Update any linked deliverables to paid
-    await supabase
-      .from('contract_deliverables')
-      .update({ delivery_status: 'paid', updated_at: new Date().toISOString() })
-      .eq('invoice_id', id)
-      .eq('invoice_type', 'intelligence_invoice')
-
-    // Update collections_workflow to paid stage
-    const { error: workflowError } = await supabase
-      .from('collections_workflow')
-      .update({
-        current_stage: 'paid',
-        risk_flag: 'none'
-      })
-      .eq('invoice_id', id)
-
-    if (workflowError) {
-      console.error('[Invoices API] Workflow update error:', workflowError)
-    }
-
-    // Create payment_event record
+    // 1. Record the payment first. If this fails, nothing has changed yet.
     const summary = [
-      `Received $${parseFloat(amount_received || '0').toLocaleString()}`,
+      parsedAmount !== null ? `Received $${parsedAmount.toLocaleString()}` : 'Payment received',
       payment_method ? `via ${payment_method}` : null,
       check_number ? `(Check #${check_number})` : null,
       notes ? `- ${notes}` : null,
@@ -85,68 +61,160 @@ export async function POST(
         summary,
         payment_method: payment_method || null,
         check_number: check_number?.trim() || null,
-        amount_received: amount_received ? parseFloat(amount_received) : null,
+        amount_received: parsedAmount,
       })
       .select()
       .single()
 
     if (eventError) {
-      console.error('[Invoices API] Event error:', eventError)
-      return NextResponse.json({ error: eventError.message }, { status: 500 })
+      console.error('[invoice-pay] Could not record payment, invoice left unchanged:', eventError)
+      return NextResponse.json(
+        { error: `Payment was not recorded, so the invoice was left unchanged. ${eventError.message}` },
+        { status: 500 }
+      )
     }
 
-    // Send payment confirmation email to school
-    const { data: invoiceData } = await supabase
+    // 2. Now flip the invoice, its deliverables, and the collections stage.
+    const { error: invoiceError } = await supabase
       .from('intelligence_invoices')
-      .select('recipient_email, recipient_name, school_name, invoice_number, amount')
+      .update({ status: 'paid' })
+      .eq('id', id)
+
+    if (invoiceError) {
+      console.error('[invoice-pay] Invoice update error:', invoiceError)
+      return NextResponse.json({ error: invoiceError.message }, { status: 500 })
+    }
+
+    await supabase
+      .from('contract_deliverables')
+      .update({ delivery_status: 'paid', updated_at: new Date().toISOString() })
+      .eq('invoice_id', id)
+      .eq('invoice_type', 'intelligence_invoice')
+
+    const { error: workflowError } = await supabase
+      .from('collections_workflow')
+      .update({
+        current_stage: 'paid',
+        risk_flag: 'none'
+      })
+      .eq('invoice_id', id)
+
+    if (workflowError) {
+      console.error('[invoice-pay] Workflow update error:', workflowError)
+    }
+
+    // 3. Work out who to thank.
+    //
+    // intelligence_invoices holds no contact fields. The earlier version
+    // selected recipient_email, recipient_name and school_name from it, none
+    // of which exist, so the lookup always failed and no email ever sent.
+    // The contact lives on the partnership, reached through the deliverable,
+    // which is the same path send-invoice uses to mail the invoice out.
+    const { data: invoiceRow } = await supabase
+      .from('intelligence_invoices')
+      .select('invoice_number, amount, sent_to, district_id')
       .eq('id', id)
       .single()
 
-    if (invoiceData?.recipient_email) {
-      const resendKey = process.env.RESEND_API_KEY
-      if (resendKey) {
-        fetch('https://api.resend.com/emails', {
+    const { data: deliverable } = await supabase
+      .from('contract_deliverables')
+      .select('partnership_id')
+      .eq('invoice_id', id)
+      .eq('invoice_type', 'intelligence_invoice')
+      .limit(1)
+      .maybeSingle()
+
+    const { data: partnership } = deliverable?.partnership_id
+      ? await supabase
+          .from('partnerships')
+          .select('org_name, contact_name, contact_email, primary_contact_email')
+          .eq('id', deliverable.partnership_id)
+          .maybeSingle()
+      : { data: null }
+
+    const { data: district } = invoiceRow?.district_id
+      ? await supabase
+          .from('districts')
+          .select('name')
+          .eq('id', invoiceRow.district_id)
+          .maybeSingle()
+      : { data: null }
+
+    const recipientEmail =
+      invoiceRow?.sent_to ||
+      partnership?.primary_contact_email ||
+      partnership?.contact_email ||
+      null
+    const schoolName = partnership?.org_name || district?.name || 'your team'
+    const firstName = (partnership?.contact_name || '').split(' ')[0] || 'there'
+
+    // 4. Send the confirmation, and report whether it actually went.
+    let emailSent = false
+    let emailError: string | null = null
+
+    if (!recipientEmail) {
+      emailError = 'No contact email on the partnership for this invoice'
+    } else if (!process.env.RESEND_API_KEY) {
+      emailError = 'RESEND_API_KEY is not set in this environment'
+    } else {
+      try {
+        const res = await fetch('https://api.resend.com/emails', {
           method: 'POST',
-          headers: { Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
+          headers: {
+            Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
           body: JSON.stringify({
             from: 'Teachers Deserve It <noreply@teachersdeserveit.com>',
-            to: [invoiceData.recipient_email],
-            subject: `Payment Received - ${invoiceData.school_name || 'Your Partnership'}`,
+            to: [recipientEmail],
+            subject: `Payment Received - ${schoolName}`,
             html: `
               <div style="font-family: -apple-system, sans-serif; max-width: 560px; margin: 0 auto; padding: 24px;">
                 <img src="https://www.teachersdeserveit.com/images/logo.webp" alt="Teachers Deserve It" style="height: 40px; margin-bottom: 24px;" />
                 <h2 style="color: #111827; margin: 0 0 12px;">Payment received. Thank you!</h2>
                 <p style="color: #4b5563; margin: 0 0 16px;">
-                  Hi ${(invoiceData.recipient_name || '').split(' ')[0] || 'there'},
+                  Hi ${firstName},
                 </p>
                 <p style="color: #4b5563; margin: 0 0 16px;">
-                  We have received your payment${invoiceData.invoice_number ? ` for invoice <strong>${invoiceData.invoice_number}</strong>` : ''}. Your account is up to date.
+                  We have received your payment${invoiceRow?.invoice_number ? ` for invoice <strong>${invoiceRow.invoice_number}</strong>` : ''}. Your account is up to date.
                 </p>
                 <p style="color: #4b5563; margin: 0 0 16px;">
-                  Thank you for your partnership with Teachers Deserve It. We are grateful to be working with ${invoiceData.school_name || 'your team'}.
+                  Thank you for your partnership with Teachers Deserve It. We are grateful to be working with ${schoolName}.
                 </p>
                 <p style="color: #6b7280; font-size: 13px; margin: 24px 0 0;">
                   Questions about billing? Contact <a href="mailto:Billing@Teachersdeserveit.com" style="color: #d97706;">Billing@Teachersdeserveit.com</a>
                 </p>
               </div>`,
           }),
-        }).catch(err => console.error('[invoice-pay] Payment confirmation email failed:', err))
+        })
+        if (res.ok) {
+          emailSent = true
+        } else {
+          emailError = `Resend returned ${res.status}`
+          console.error('[invoice-pay] Confirmation email rejected:', res.status, await res.text())
+        }
+      } catch (err) {
+        emailError = 'Confirmation email request failed'
+        console.error('[invoice-pay] Confirmation email failed:', err)
       }
     }
 
-    // Slack notification to #financials
+    // 5. Slack the financials channel.
     invoicePaid(
-      invoiceData?.invoice_number || id,
-      invoiceData?.school_name || 'Unknown school',
-      amount_received ? parseFloat(amount_received) : Number(invoiceData?.amount || 0)
+      invoiceRow?.invoice_number || id,
+      schoolName,
+      parsedAmount ?? Number(invoiceRow?.amount || 0)
     )
 
     return NextResponse.json({
       success: true,
-      paymentEvent
+      paymentEvent,
+      emailSent,
+      emailError,
+      recipientEmail,
     })
   } catch (error) {
-    console.error('[Invoices API] Error:', error)
+    console.error('[invoice-pay] Error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

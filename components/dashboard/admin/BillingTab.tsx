@@ -288,11 +288,18 @@ export default function BillingTab({
       });
       const data = await res.json();
       if (data.success) {
-        showToast('Payment recorded');
+        // Say whether the school was actually thanked, rather than implying it.
+        showToast(
+          data.emailSent
+            ? 'Payment recorded. Confirmation emailed to the school.'
+            : `Payment recorded, but no confirmation email went out. ${data.emailError || ''}`.trim()
+        );
         setPayingId(null);
         setPaymentForm({ amount: '', method: 'check', checkNumber: '', notes: '' });
         fetchDeliverables();
         fetchInvoiceDetails(invoiceId);
+      } else {
+        showToast(data.error || 'Could not record payment');
       }
     } catch {
       showToast('Failed to record payment');
