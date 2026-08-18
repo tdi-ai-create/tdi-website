@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { resolveBillingContact, greetingName, billingContactFooterHtml } from '@/lib/billing-contact';
 import { getServiceSupabase } from '@/lib/supabase';
 import { slackNotify } from '@/lib/slack-notify';
 
@@ -68,7 +69,7 @@ export async function GET(request: NextRequest) {
       // Get partnership for contact info
       const { data: partnership } = await supabase
         .from('partnerships')
-        .select('contact_name, contact_email, primary_contact_email, org_name')
+        .select('contact_name, contact_email, primary_contact_name, primary_contact_email, billing_contact_name, billing_contact_email, billing_contact_title, billing_contact_source, billing_token, org_name')
         .eq('id', deliverable.partnership_id)
         .single();
 
@@ -84,13 +85,23 @@ export async function GET(request: NextRequest) {
 
       if (existingEvents && existingEvents.length > 0) continue;
 
-      const recipientEmail = partnership.primary_contact_email || partnership.contact_email;
-      const firstName = (partnership.contact_name || '').split(' ')[0] || 'there';
+      // Reminders chase money, so they go to whoever handles money. Falls back
+      // to the signer when no billing contact is known, which is what isFallback
+      // reports, and that also decides how the footer asks the question.
+      const billing = resolveBillingContact(partnership);
+      const recipientEmail = billing.email;
+      const firstName = greetingName(billing.name);
       const schoolName = partnership.org_name || partnership.contact_name || 'your school';
+      const billingFooter = billingContactFooterHtml(partnership.billing_token, billing.isFallback);
+
+      if (!recipientEmail) {
+        console.error(`[invoice-followup] No contact email for invoice ${inv.invoice_number}, skipping`);
+        continue;
+      }
 
       // Day 14: Friendly reminder
       if (daysSinceInvoice >= 14 && daysSinceInvoice < 30 && daysOverdue < 0) {
-        await sendReminder(inv, recipientEmail, firstName, schoolName, 'friendly', deliverable.label);
+        await sendReminder(inv, recipientEmail, firstName, schoolName, 'friendly', deliverable.label, billingFooter);
         await logEvent(supabase, inv.id, 'reminder_14d', `14-day reminder sent to ${recipientEmail}`);
         reminderDetails.push(`${schoolName} -- $${Number(inv.amount).toLocaleString()} (14-day reminder)`);
         reminders++;
@@ -99,7 +110,7 @@ export async function GET(request: NextRequest) {
       // Day 30 (due date): Firmer reminder + mark overdue
       if (daysOverdue >= 0 && daysOverdue < 15) {
         await supabase.from('intelligence_invoices').update({ status: 'overdue' }).eq('id', inv.id);
-        await sendReminder(inv, recipientEmail, firstName, schoolName, 'due', deliverable.label);
+        await sendReminder(inv, recipientEmail, firstName, schoolName, 'due', deliverable.label, billingFooter);
         await logEvent(supabase, inv.id, 'reminder_due', `Due date reminder sent. Invoice marked overdue.`);
         reminderDetails.push(`${schoolName} -- $${Number(inv.amount).toLocaleString()} (overdue, due ${inv.due_date})`);
         reminders++;
@@ -171,6 +182,7 @@ async function sendReminder(
   schoolName: string,
   tone: 'friendly' | 'due',
   serviceLabel: string,
+  billingFooter = '',
 ) {
   const amount = Number(inv.amount).toLocaleString();
   const dueDate = new Date(inv.due_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
@@ -192,6 +204,7 @@ async function sendReminder(
       ${tone === 'friendly' ? friendlyBody : dueBody}
       <p style="margin:0;">Thank you for your partnership.</p>
       <p style="margin:16px 0 0;font-size:14px;color:#64748B;">Teachers Deserve It Team</p>
+      ${billingFooter}
       <hr style="border:none;border-top:1px solid #E5E7EB;margin:24px 0 12px;" />
       <p style="font-size:11px;color:#9CA3AF;margin:0;">Invoice ${inv.invoice_number} | ${schoolName}</p>
     </div>
