@@ -367,6 +367,26 @@ export async function GET(request: NextRequest) {
       `  • ${nameFor.get(q.pursuit_id) ?? 'unknown'}: ${q.client_label || q.title}`)
     if (questionLines.length) sections.push(`*Asked and not answered (${questionLines.length})*\n${cap(questionLines, 6).join('\n')}`)
 
+    // Paths the stop rule refused. This is the safety net for blocking being on
+    // from day one: if a rule is wrong it surfaces here within a day, rather
+    // than quietly holding a real path for weeks.
+    const { data: stopped } = await supabase
+      .from('funding_opportunities')
+      .select('name, pursuit_id, eligibility_verdict, eligibility_reason')
+      .in('eligibility_verdict', ['stop', 'ask_first'])
+      .eq('eligibility_overridden', false)
+      .not('eligibility_checked_at', 'is', null)
+
+    const stoppedLines = (stopped ?? [])
+      .filter(o => activeIds.has(o.pursuit_id))
+      .map(o => `  • ${nameFor.get(o.pursuit_id) ?? 'unknown'}: ${o.name} — ${o.eligibility_reason}`)
+    if (stoppedLines.length) {
+      sections.push(
+        `*Paths stopped before drafting (${stoppedLines.length})*\n` +
+        `${cap(stoppedLines, 5).join('\n')}\n` +
+        `  _if any of these looks wrong, the rule is wrong — it can be overridden_`)
+    }
+
     const stalled = alerts.filter(a => a.category === 'stalled')
     if (stalled.length) {
       const byPursuit = new Map<string, number>()

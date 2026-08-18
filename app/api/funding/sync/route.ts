@@ -2,6 +2,7 @@ import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
 import { MAX_QA_ATTEMPTS, ESCALATION_OPTIONS, validateEscalation } from '@/lib/funding-qa'
 import { postFundingEvent, narrativeEvent } from '@/lib/funding-slack'
+import { screenPath } from '@/lib/funding-eligibility'
 
 /**
  * Funding Sync API -- Bridge between Paperclip and the Admin Funding Portal
@@ -123,6 +124,7 @@ export async function GET(request: NextRequest) {
     // up is that their gate happened to be closed.
     const narrativePursuitIds = [...new Set((rawNarrativeWork ?? []).map((o: any) => o.pursuit_id))]
     let servablePursuitIds: Set<string> = new Set()
+    let pursuitContext: Map<string, any> = new Map()
     if (narrativePursuitIds.length > 0) {
       const [gateRes, pursuitRes] = await Promise.all([
         supabase
@@ -132,7 +134,7 @@ export async function GET(request: NextRequest) {
           .eq('gate_open', true),
         supabase
           .from('funding_pursuits')
-          .select('id, archived')
+          .select('id, archived, sector, county, state_code, school_profile')
           .in('id', narrativePursuitIds),
       ])
       const gateOpen = new Set((gateRes.data ?? []).map(g => g.pursuit_id))
@@ -140,8 +142,76 @@ export async function GET(request: NextRequest) {
       servablePursuitIds = new Set(
         narrativePursuitIds.filter((id: string) => gateOpen.has(id) && live.has(id)),
       )
+      pursuitContext = new Map((pursuitRes.data ?? []).map(p => [p.id, p]))
     }
-    const narrativeWork = (rawNarrativeWork ?? []).filter((o: any) => servablePursuitIds.has(o.pursuit_id))
+    let narrativeWork = (rawNarrativeWork ?? []).filter((o: any) => servablePursuitIds.has(o.pursuit_id))
+
+    // The stop rule, enforced where it actually cannot be walked around.
+    //
+    // screenPath also runs in the opportunities PATCH route, which is where
+    // Bella requests a draft from the portal. That covers the human path and
+    // nothing else. Three other writes can set narrative_status to 'requested'
+    // without ever passing it: the opportunities POST, the agent's
+    // create_opportunity call, and the agent's generic field update.
+    //
+    // That gap lands hardest on precisely the work we least want unscreened.
+    // When Amara researches local funders and creates opportunities for a
+    // Rotary club or a community foundation, those are the paths whose
+    // eligibility is least certain, and every one of them would have arrived at
+    // an agent unchecked.
+    //
+    // Screening here closes all four doors at once, because find_work is the
+    // single point every agent passes through to receive drafting work. However
+    // a row reached 'requested', it is screened before anyone writes a word.
+    const blockedByScreen: Array<{ id: string; name: string; reason: string; rule: string }> = []
+    if (narrativeWork.length > 0) {
+      const cleared: any[] = []
+      for (const o of narrativeWork) {
+        const p = pursuitContext.get(o.pursuit_id)
+        const profile = (() => {
+          try {
+            const raw = p?.school_profile
+            if (!raw) return {} as Record<string, unknown>
+            const once = typeof raw === 'string' ? JSON.parse(raw) : raw
+            return (typeof once === 'string' ? JSON.parse(once) : once) as Record<string, unknown>
+          } catch { return {} as Record<string, unknown> }
+        })()
+
+        const result = screenPath(
+          {
+            name: o.name ?? '',
+            windowStatus: o.window_status ?? null,
+            namedApplicant: (profile.nea_member_name as string) ?? null,
+          },
+          {
+            sector: p?.sector ?? null,
+            county: p?.county ?? null,
+            stateCode: p?.state_code ?? null,
+            titleIStatus: (profile.title_i_status as string) ?? null,
+            designation: (profile.designation as string) ?? null,
+          },
+        )
+
+        if (result.verdict === 'clear') {
+          cleared.push(o)
+          continue
+        }
+
+        // Recorded, not just withheld. A path that silently fails to reach an
+        // agent is the same failure as a path that silently stalls: the portal
+        // has to be able to say why nothing is happening.
+        blockedByScreen.push({
+          id: o.id, name: o.name, reason: result.reason, rule: result.rule,
+        })
+        await supabase.from('funding_opportunities').update({
+          eligibility_verdict: result.verdict,
+          eligibility_reason: result.reason,
+          eligibility_rule: result.rule,
+          eligibility_checked_at: new Date().toISOString(),
+        }).eq('id', o.id)
+      }
+      narrativeWork = cleared
+    }
 
     // 2. Research work — NOT window-gated, NOT gate-gated (finding new funders is always allowed)
     //
@@ -166,7 +236,30 @@ export async function GET(request: NextRequest) {
       researchQuery = researchQuery.eq('assigned_agent', agent)
     }
 
-    const { data: researchWork } = await researchQuery
+    const { data: rawResearchWork } = await researchQuery
+
+    // Research is deliberately not gate-gated: finding funders for a school
+    // costs nothing and touches nobody, so it is allowed to run before the
+    // school has cleared anything.
+    //
+    // Archived is different, and was missed. Drafting gained an archive check
+    // and this branch did not, so a school that declined grant work would still
+    // generate research assignments. That was harmless only while the branch
+    // was dormant. Now that the daily cron seeds a discovery placeholder for
+    // every pursuit lacking a local source, a declined school would start
+    // producing real work for Amara on the next sync.
+    const researchPursuitIds = [...new Set((rawResearchWork ?? []).map((o: any) => o.pursuit_id))]
+    let liveResearchIds: Set<string> = new Set()
+    if (researchPursuitIds.length > 0) {
+      const { data: researchPursuits } = await supabase
+        .from('funding_pursuits')
+        .select('id, archived')
+        .in('id', researchPursuitIds)
+      liveResearchIds = new Set(
+        (researchPursuits ?? []).filter(p => !p.archived).map(p => p.id))
+    }
+    const researchWork = (rawResearchWork ?? []).filter((o: any) =>
+      liveResearchIds.has(o.pursuit_id))
 
     // 3. QA work — narratives waiting on a verdict.
     //
@@ -197,7 +290,7 @@ export async function GET(request: NextRequest) {
         request_type: 'draft_narrative' as const,
         ...item,
       })),
-      ...(researchWork ?? []).map((item: any) => ({
+      ...researchWork.map((item: any) => ({
         request_type: 'research_funders' as const,
         ...item,
       })),
@@ -215,9 +308,12 @@ export async function GET(request: NextRequest) {
       filters: {
         agent: agent || 'all',
         draft_narrative_count: narrativeWork.length,
-        research_funders_count: (researchWork ?? []).length,
+        research_funders_count: researchWork.length,
         qa_narrative_count: qaWork.length,
       },
+      // Returned so an agent finding no work can say why, rather than
+      // reporting an empty queue as though nothing had been asked for.
+      withheld: blockedByScreen,
     })
   }
 

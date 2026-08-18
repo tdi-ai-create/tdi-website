@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { screenPath } from '@/lib/funding-eligibility';
 import { createClient } from '@supabase/supabase-js';
 import { requireAdminAuth } from '@/lib/tdi-admin/auth';
 import { postFundingEvent, narrativeEvent, windowEvent, submittedEvent, awardEvent, denialEvent, researchEvent } from '@/lib/funding-slack';
@@ -97,6 +98,92 @@ export async function PATCH(request: NextRequest) {
     .eq('id', body.id)
     .single();
 
+  let updatesOverrideFlag = false;
+  // ── The stop rule ──
+  //
+  // Runs at the moment a draft is requested, which is the last point before
+  // real work begins and the first point where we know enough to judge.
+  //
+  // Blocking is on deliberately. A path that cannot win is refused rather than
+  // logged, because the alternative is what already happened: Saunemin spent
+  // nine drafting cycles and nine reviews learning three facts knowable on day
+  // one, and St. Peter Chanel was seeded two federal paths a private school can
+  // never apply for at any score.
+  //
+  // Two safeguards, because a wrong rule now removes real funding from a real
+  // school. Every refusal carries its reason in plain words, and every refusal
+  // appears in Bella's morning message, so a bad rule surfaces in a day rather
+  // than in weeks. An override exists and is recorded rather than silent.
+  if (
+    body.narrative_status === 'requested' &&
+    before?.narrative_status !== 'requested' &&
+    body.eligibility_override !== true
+  ) {
+    const { data: oppNow } = await supabase
+      .from('funding_opportunities')
+      .select('name, window_status, pursuit_id')
+      .eq('id', body.id)
+      .single();
+
+    const { data: pursuitNow } = oppNow?.pursuit_id
+      ? await supabase
+          .from('funding_pursuits')
+          .select('sector, county, state_code, school_profile')
+          .eq('id', oppNow.pursuit_id)
+          .single()
+      : { data: null };
+
+    const profile = (() => {
+      try {
+        const raw = pursuitNow?.school_profile;
+        if (!raw) return {} as Record<string, unknown>;
+        const once = typeof raw === 'string' ? JSON.parse(raw) : raw;
+        return (typeof once === 'string' ? JSON.parse(once) : once) as Record<string, unknown>;
+      } catch { return {} as Record<string, unknown>; }
+    })();
+
+    const result = screenPath(
+      {
+        name: oppNow?.name ?? '',
+        windowStatus: body.window_status ?? oppNow?.window_status ?? null,
+        namedApplicant: (profile.nea_member_name as string) ?? null,
+      },
+      {
+        sector: pursuitNow?.sector ?? null,
+        county: pursuitNow?.county ?? null,
+        stateCode: pursuitNow?.state_code ?? null,
+        titleIStatus: (profile.title_i_status as string) ?? null,
+        designation: (profile.designation as string) ?? null,
+      },
+    );
+
+    await supabase.from('funding_opportunities').update({
+      eligibility_verdict: result.verdict,
+      eligibility_reason: result.reason,
+      eligibility_rule: result.rule,
+      eligibility_checked_at: new Date().toISOString(),
+    }).eq('id', body.id);
+
+    if (result.verdict !== 'clear') {
+      return NextResponse.json({
+        error: result.reason,
+        eligibility: {
+          verdict: result.verdict,
+          rule: result.rule,
+          unblockedBy: result.unblockedBy ?? null,
+          // Deliberately explicit. If this rule is wrong, whoever meets it
+          // should be able to disagree and proceed without hunting for how.
+          override: 'Send eligibility_override: true to request the draft anyway. The override is recorded.',
+        },
+      }, { status: 409 });
+    }
+  }
+
+  // A human pushed a blocked path through. Recorded, never silent.
+  if (body.eligibility_override === true) {
+    updatesOverrideFlag = true;
+  }
+
   const updates: Record<string, unknown> = { updated_at: new Date().toISOString() };
   const fields = [
     'name', 'amount', 'status', 'contact_name', 'contact_email',
@@ -119,6 +206,7 @@ export async function PATCH(request: NextRequest) {
     'assigned_agent', 'research_status',
   ];
   fields.forEach(f => { if (body[f] !== undefined) updates[f] = body[f]; });
+  if (updatesOverrideFlag) updates.eligibility_overridden = true;
 
   // State clock: stamped only when narrative_status genuinely changes, so
   // "how long has this been in this state" stays answerable. See migration 116.
