@@ -173,8 +173,35 @@ export async function PATCH(request: NextRequest) {
       }
     }
 
+    // Record the transition, not just the fact that one happened.
+    //
+    // Only current_phase and last_phase_change_at were kept, so the pursuit
+    // could say where it is and when it last moved, but never where it had
+    // been. There is no phase history anywhere: zero phase-change events in the
+    // timeline, and no table storing them.
+    //
+    // That makes "collapse the phases you have finished" impossible to build
+    // honestly, because nothing can say which records belong to which phase.
+    // Grouping them by guesswork would produce exactly the kind of summary
+    // people trust and that turns out to be wrong.
+    //
+    // Writing it to the timeline rather than a new table, because the timeline
+    // is already the durable record and funding_record already reads it. History
+    // starts from here; it cannot be reconstructed backwards.
+    // Capture the previous phase before the write, but do not record the
+    // transition until the write has actually succeeded. Writing it first would
+    // leave the timeline claiming a phase change that never happened if the
+    // update failed, which is the same record-disagrees-with-reality bug this
+    // whole cleanup has been unpicking.
+    let priorPhase: string | null = null;
     if (updates.current_phase) {
       allowed.last_phase_change_at = new Date().toISOString();
+      const { data: prior } = await supabase
+        .from('funding_pursuits')
+        .select('current_phase')
+        .eq('id', pursuitId)
+        .single();
+      priorPhase = prior?.current_phase ?? null;
     }
 
     const { error } = await supabase
@@ -184,6 +211,26 @@ export async function PATCH(request: NextRequest) {
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    // Only now, with the write confirmed.
+    //
+    // Phase history did not exist anywhere: only current_phase and
+    // last_phase_change_at, so a pursuit could say where it is and when it last
+    // moved but never where it had been. That makes "collapse the phases you
+    // have finished" impossible to build honestly, because nothing can say which
+    // records belong to which phase. History starts here and cannot be
+    // reconstructed backwards.
+    if (updates.current_phase && priorPhase !== updates.current_phase) {
+      await supabase.from('funding_pursuit_timeline').insert({
+        pursuit_id: pursuitId,
+        event_date: new Date().toISOString().split('T')[0],
+        event_title: `Phase: ${priorPhase ?? 'unset'} → ${updates.current_phase}`,
+        event_detail:
+          `Moved by ${auth.member.email}. Recorded so the work done in each phase ` +
+          `can later be collapsed and reviewed against the phase it belonged to.`,
+        status: 'complete',
+      });
     }
 
     return NextResponse.json({ success: true });

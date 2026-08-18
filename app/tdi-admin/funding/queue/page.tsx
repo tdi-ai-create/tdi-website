@@ -10,13 +10,13 @@ import {
   TYPE_PAGE_SUBTITLE,
 } from '@/components/tdi-admin/ui/design-tokens'
 
-type Bucket = 'bella' | 'rae' | 'agent' | 'school'
+type Bucket = 'team' | 'agent' | 'school'
 
-const BUCKETS: { key: Bucket; emoji: string; label: string; muted?: boolean }[] = [
-  { key: 'bella', emoji: '\uD83D\uDC64', label: 'Needs Bella' },
-  { key: 'rae', emoji: '\uD83D\uDC54', label: 'Needs Rae' },
-  { key: 'agent', emoji: '\uD83E\uDD16', label: 'With Agents', muted: true },
-  { key: 'school', emoji: '\uD83C\uDFEB', label: 'Waiting on School', muted: true },
+// Emoji removed deliberately: they are not used anywhere else in TDI work.
+const BUCKETS: { key: Bucket; label: string; muted?: boolean }[] = [
+  { key: 'team', label: 'Needs us' },
+  { key: 'agent', label: 'With agents', muted: true },
+  { key: 'school', label: 'Waiting on the school', muted: true },
 ]
 
 const URGENCY_DOT: Record<string, string> = {
@@ -56,12 +56,12 @@ function Toast({ message, onDone }: { message: string; onDone: () => void }) {
 
 export default function QueuePage() {
   const [items, setItems] = useState<any[]>([])
-  const [counts, setCounts] = useState({ bella: 0, rae: 0, agent: 0, school: 0 })
+  const [counts, setCounts] = useState({ team: 0, agent: 0, school: 0 })
   const [metrics, setMetrics] = useState<{ pipeline: number; awarded: number; schools: number; overdue: number; fundedPct: number } | null>(null)
   const [loading, setLoading] = useState(true)
   const [toast, setToast] = useState<string | null>(null)
   const searchParams = useSearchParams()
-  const initialBucket = (searchParams.get('owner') as Bucket) || 'bella'
+  const initialBucket = (searchParams.get('owner') as Bucket) || 'team'
   const [bucket, setBucket] = useState<Bucket>(initialBucket)
   const [nudgeActionId, setNudgeActionId] = useState<string | null>(null)
   const [draftEmail, setDraftEmail] = useState<{ to: string; toName: string; subject: string; body: string; schoolName: string; pursuitId?: string } | null>(null)
@@ -113,8 +113,7 @@ export default function QueuePage() {
   useEffect(() => { load() }, [load])
 
   const filtered = items.filter(item => {
-    if (bucket === 'bella') return item.owner === 'bella' && !item.inProgress
-    if (bucket === 'rae') return item.owner === 'rae' && !item.inProgress
+    if (bucket === 'team') return item.owner === 'team' && !item.inProgress
     if (bucket === 'agent') return (item.owner === 'agent' || item.owner === 'auto')
     if (bucket === 'school') return item.owner === 'school'
     return false
@@ -321,7 +320,7 @@ export default function QueuePage() {
               display: 'flex', alignItems: 'center', gap: 6,
             }}
           >
-            <span>{b.emoji}</span>
+            <span></span>
             <span>{b.label}</span>
             <span style={{
               fontSize: 11, fontWeight: 700, padding: '1px 6px', borderRadius: 10,
@@ -345,7 +344,7 @@ export default function QueuePage() {
           padding: '40px 24px', textAlign: 'center', background: 'white',
           borderRadius: 14, border: '1px solid #E5E7EB',
         }}>
-          {bucket === 'bella' ? (
+          {bucket === 'team' ? (
             <div>
               <div style={{ fontSize: 16, fontWeight: 700, color: '#065F46', marginBottom: 8 }}>
                 Nothing needs you right now

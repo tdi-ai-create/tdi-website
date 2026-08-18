@@ -174,6 +174,17 @@ export async function GET(request: NextRequest) {
         .replace(/\s*[-–]\s*Grant Fund(ing|ed)$/i, '')
         .trim()
 
+      // Place and sector are what make this searchable at all. Without them the
+      // brief reduces to "find local funders", which is why the ten families
+      // below have never produced a single candidate.
+      const place = [p.city, p.county, p.state_code].filter(Boolean).join(', ')
+      const context = [
+        place && `Location: ${place}.`,
+        p.sector && `Sector: ${p.sector}.`,
+        p.authorizer && `Governing body: ${p.authorizer}.`,
+        p.employer_base && `Employers in or near the county: ${p.employer_base}.`,
+      ].filter(Boolean).join(' ')
+
       const { error: discErr } = await supabase.from('funding_opportunities').insert({
         pursuit_id: p.id,
         name: DISCOVERY_NAME,
@@ -185,7 +196,9 @@ export async function GET(request: NextRequest) {
         research_status: 'requested',
         assigned_agent: 'amara',
         notes:
-          `Find local funding sources for ${school}. Work through: service clubs ` +
+          `Find local funding sources for ${school}. ` +
+          (context ? `${context} ` : `No structured location on file — establish city, county and sector first, or this search cannot be done properly. `) +
+          `Work through: service clubs ` +
           `(Rotary, Lions, Kiwanis, Elks, Knights of Columbus); veteran posts ` +
           `(American Legion, VFW); the local employer base including plants and ` +
           `regional headquarters inside the county; county and regional community ` +
@@ -354,6 +367,44 @@ export async function GET(request: NextRequest) {
       `  • ${nameFor.get(q.pursuit_id) ?? 'unknown'}: ${q.client_label || q.title}`)
     if (questionLines.length) sections.push(`*Asked and not answered (${questionLines.length})*\n${cap(questionLines, 6).join('\n')}`)
 
+    // Paths the stop rule refused. This is the safety net for blocking being on
+    // from day one: if a rule is wrong it surfaces here within a day, rather
+    // than quietly holding a real path for weeks.
+    const { data: stopped } = await supabase
+      .from('funding_opportunities')
+      .select('name, pursuit_id, eligibility_verdict, eligibility_reason')
+      .in('eligibility_verdict', ['stop', 'ask_first'])
+      .eq('eligibility_overridden', false)
+      .not('eligibility_checked_at', 'is', null)
+
+    const stoppedLines = (stopped ?? [])
+      .filter(o => activeIds.has(o.pursuit_id))
+      .map(o => `  • ${nameFor.get(o.pursuit_id) ?? 'unknown'}: ${o.name} — ${o.eligibility_reason}`)
+    if (stoppedLines.length) {
+      sections.push(
+        `*Paths stopped before drafting (${stoppedLines.length})*\n` +
+        `${cap(stoppedLines, 5).join('\n')}\n` +
+        `  _if any of these looks wrong, the rule is wrong — it can be overridden_`)
+    }
+
+    // Applications sitting with a funder past the point where a decision would
+    // normally have landed. This is the only section about money already in
+    // play, and it is the one place where the answer may already exist and
+    // simply never reached us: the funder replies to the school, not to TDI, so
+    // an award can sit unrecorded indefinitely with nothing prompting anyone to
+    // ask. Criticals are listed; the softer 30-day check-ins roll into the tail
+    // count so this section stays short enough to act on.
+    const awaitingDecision = alerts.filter(
+      a => a.category === 'submission' && a.severity === 'critical')
+    if (awaitingDecision.length) {
+      const decisionLines = awaitingDecision.map(a =>
+        `  • ${tidySchool(a.pursuit_name)}: ${a.title.replace(`${a.opportunity_name} `, `${a.opportunity_name}, `)}`)
+      sections.push(
+        `*Waiting on a funder's answer (${awaitingDecision.length})*\n` +
+        `${cap(decisionLines, 6).join('\n')}\n` +
+        `  _ask the school what they have heard, then record the award or denial_`)
+    }
+
     const stalled = alerts.filter(a => a.category === 'stalled')
     if (stalled.length) {
       const byPursuit = new Map<string, number>()
@@ -365,7 +416,8 @@ export async function GET(request: NextRequest) {
 
     // Everything else becomes a number, not a list. This is the part that stops
     // the message turning back into wallpaper.
-    const accountedFor = decisions.length + approvals.length + stalled.length
+    const accountedFor =
+      decisions.length + approvals.length + stalled.length + awaitingDecision.length
     const remaining = Math.max(0, alerts.length - accountedFor)
 
     let digestPosted = false

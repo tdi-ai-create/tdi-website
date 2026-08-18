@@ -139,7 +139,7 @@ export async function PATCH(
     // doing it tells you nothing, the reply does.
     const { data: existing } = await supabase
       .from('funding_action_items')
-      .select('requires_answer, answer, outcome, title')
+      .select('requires_answer, answer, outcome, title, notes')
       .eq('id', body.actionId)
       .single()
 
@@ -147,13 +147,43 @@ export async function PATCH(
       const answer = (updates.answer ?? existing.answer) as string | null
       const outcome = (updates.outcome ?? existing.outcome) as string | null
 
-      if (!answer || !String(answer).trim()) {
+      // No step can be skipped, but every step can be overridden with a reason
+      // that is recorded.
+      //
+      // A gate that can never be passed is a trap. A gate that can be passed
+      // silently is decoration. A gate that can be passed on the record is a
+      // rule, and that is the only one of the three worth having.
+      //
+      // Without this, a question the school will never answer — a contact who
+      // has left, a programme that closed, a query overtaken by events — would
+      // sit open forever with no way to close it honestly. The override says
+      // out loud that we closed it without an answer, and why.
+      const skipReason = (body.closeWithoutAnswer ?? '').toString().trim()
+      if (skipReason) {
+        updates.answer = null
+        updates.outcome = 'still_blocked'
+        updates.answered_by = actorEmail
+        updates.answered_at = new Date().toISOString()
+        updates.notes = [
+          existing.notes,
+          `[closed without an answer by ${actorEmail}] ${skipReason}`,
+        ].filter(Boolean).join('\n')
+        // Skips the checks below deliberately. They exist to stop a question
+        // closing with nothing learned; this path closes it having recorded
+        // that nothing was learned, and why, which is the honest version of the
+        // same thing.
+      } else if (!answer || !String(answer).trim()) {
         return NextResponse.json({
           error: `"${existing.title}" is a question. Record what you were told before closing it.`,
           requires: { field: 'answer', label: 'What did they say?' },
+          // Stated in the response itself, so nobody has to hunt for the way out.
+          override: {
+            field: 'closeWithoutAnswer',
+            label: 'Or close it without an answer, and say why',
+            note: 'Recorded on the item. Use when an answer is never coming.',
+          },
         }, { status: 400 })
-      }
-      if (!outcome || !VALID_OUTCOMES.includes(String(outcome))) {
+      } else if (!outcome || !VALID_OUTCOMES.includes(String(outcome))) {
         return NextResponse.json({
           error: `"${existing.title}" needs to say what the answer means before closing.`,
           requires: {
