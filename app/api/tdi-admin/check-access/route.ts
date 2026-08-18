@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { emailMatchSet } from '@/lib/canonical-email';
 
 // Cache the supabase client
 let cachedSupabase: ReturnType<typeof createClient> | null = null;
@@ -33,14 +34,23 @@ export async function POST(request: NextRequest) {
     }
 
     const supabase = getSupabaseAdmin();
-    const normalizedEmail = email.toLowerCase().trim();
+
+    // Match the address typed and the mailbox it delivers to. Kristin signed in
+    // as team+tdi@whatwilllast.com against a team row reading
+    // team@whatwilllast.com, and was refused by an exact string compare on a
+    // brand new auth account, so neither the user_id nor the email matched.
+    const candidates = emailMatchSet(email);
+    const orClause = [
+      `user_id.eq.${userId}`,
+      ...candidates.map(e => `email.ilike.${e}`),
+    ].join(',');
 
     // Single query with OR condition - much faster than sequential queries
     const { data: members, error } = await supabase
       .from('tdi_team_members')
       .select('*')
       .eq('is_active', true)
-      .or(`user_id.eq.${userId},email.ilike.${normalizedEmail}`)
+      .or(orClause)
       .limit(1);
 
     if (error) {
