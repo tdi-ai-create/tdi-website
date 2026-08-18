@@ -56,9 +56,26 @@ export async function middleware(req: NextRequest) {
       },
     });
 
-    // This refreshes the session — if a session cookie exists, it
-    // refreshes the token; if not, it's a no-op.
-    await supabase.auth.getUser();
+    // This refreshes the session. If a session cookie exists it refreshes the
+    // token; if not, it is a no-op.
+    //
+    // This must never be allowed to throw. Middleware runs on every route in
+    // the matcher, so an unhandled rejection here does not degrade one page,
+    // it returns MIDDLEWARE_INVOCATION_FAILED for the entire site.
+    //
+    // That is exactly what happened to every Preview deployment. Preview had
+    // its own NEXT_PUBLIC_SUPABASE_URL pointing at a Supabase project that no
+    // longer exists, so this fetch failed at DNS. The env guard above did not
+    // help, because the values were present, just wrong.
+    //
+    // A failed session refresh is worth degrading for: the visitor may appear
+    // signed out and server routes fall back to their own auth checks. That is
+    // recoverable. A blank 500 on every page is not.
+    try {
+      await supabase.auth.getUser();
+    } catch (err) {
+      console.error('[middleware] Session refresh failed, continuing without it:', err);
+    }
   }
 
   return response;
