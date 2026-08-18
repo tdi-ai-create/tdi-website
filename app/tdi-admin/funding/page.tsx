@@ -13,7 +13,7 @@ interface QueueItem {
   id: string
   label: string
   why: string
-  owner: 'bella' | 'rae' | 'agent' | 'school' | 'auto'
+  owner: 'team' | 'agent' | 'school' | 'auto'
   urgency: 'critical' | 'high' | 'normal' | 'low'
   actionType: string
   targetId?: string | null
@@ -145,7 +145,7 @@ export default function FundingPage() {
 
   const totalPipeline = schools.reduce((s, sc) => s + sc.pipeline, 0)
   const totalGrants = schools.reduce((s, sc) => s + sc.grants.length, 0)
-  const needsYou = schools.reduce((s, sc) => s + sc.nextSteps.filter(i => !i.inProgress && (i.owner as string) === 'team').length, 0)
+  const needsYou = schools.reduce((s, sc) => s + sc.nextSteps.filter(i => !i.inProgress && i.owner === 'team').length, 0)
 
   return (
     <div style={{ padding: '32px 48px', fontFamily: "'DM Sans', sans-serif", maxWidth: 1000 }}>
