@@ -100,8 +100,7 @@ export async function GET() {
 
     // Counts
     const counts = {
-      bella: allItems.filter(i => i.owner === 'bella' && !i.inProgress).length,
-      rae: allItems.filter(i => i.owner === 'rae' && !i.inProgress).length,
+      team: allItems.filter(i => i.owner === 'team' && !i.inProgress).length,
       agent: allItems.filter(i => i.owner === 'agent' || i.owner === 'auto').length,
       school: allItems.filter(i => i.owner === 'school').length,
     }
