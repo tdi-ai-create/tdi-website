@@ -168,6 +168,10 @@ export async function PATCH(
           existing.notes,
           `[closed without an answer by ${actorEmail}] ${skipReason}`,
         ].filter(Boolean).join('\n')
+        // Skips the checks below deliberately. They exist to stop a question
+        // closing with nothing learned; this path closes it having recorded
+        // that nothing was learned, and why, which is the honest version of the
+        // same thing.
       } else if (!answer || !String(answer).trim()) {
         return NextResponse.json({
           error: `"${existing.title}" is a question. Record what you were told before closing it.`,
@@ -179,8 +183,7 @@ export async function PATCH(
             note: 'Recorded on the item. Use when an answer is never coming.',
           },
         }, { status: 400 })
-      }
-      if (!outcome || !VALID_OUTCOMES.includes(String(outcome))) {
+      } else if (!outcome || !VALID_OUTCOMES.includes(String(outcome))) {
         return NextResponse.json({
           error: `"${existing.title}" needs to say what the answer means before closing.`,
           requires: {
