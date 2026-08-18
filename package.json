@@ -7,6 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "deadcode": "knip",
     "check:schema": "node scripts/check-schema.mjs",
     "check:schema:update": "node scripts/check-schema.mjs --update-baseline",
     "validate:quizzes": "node scripts/validate-quizzes.mjs"
@@ -58,6 +60,7 @@
     "dotenv": "^17.2.3",
     "eslint": "^9",
     "eslint-config-next": "16.1.1",
+    "knip": "^6.32.2",
     "sharp": "^0.34.5",
     "tailwindcss": "^4",
     "typescript": "^5"
