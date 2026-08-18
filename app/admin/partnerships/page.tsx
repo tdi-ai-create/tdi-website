@@ -57,9 +57,18 @@ interface Stats {
   awaitingAccept: number;
 }
 
-// Check if user is TDI admin
+// Check if user is TDI admin. Membership lives in tdi_team_members, so this
+// asks the server rather than assuming a @teachersdeserveit.com address.
 async function checkTDIAdmin(email: string): Promise<boolean> {
-  return email.toLowerCase().endsWith('@teachersdeserveit.com');
+  if (!email) return false;
+  try {
+    const res = await fetch('/api/admin/whoami');
+    if (!res.ok) return false;
+    const data = await res.json();
+    return data.isAdmin === true;
+  } catch {
+    return false;
+  }
 }
 
 // Status badge colors
@@ -397,7 +406,7 @@ export default function AdminPartnershipsPage() {
               </p>
             )}
             <p className="text-gray-500 text-sm">
-              This area requires a <strong>@teachersdeserveit.com</strong> account.
+              This area requires a TDI team account. Contact Rae if you believe this is an error.
             </p>
           </div>
           <div className="space-y-3">

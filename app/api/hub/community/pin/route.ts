@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { isTDIAdmin } from '@/lib/is-tdi-admin'
 
 const supabase = createClient(
   process.env.LEARNING_HUB_SUPABASE_URL || process.env.NEXT_PUBLIC_LEARNING_HUB_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -32,7 +33,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 })
     }
 
-    if (!profile.email?.endsWith('@teachersdeserveit.com')) {
+    if (!(await isTDIAdmin(profile.email))) {
       return NextResponse.json({ error: 'Only TDI team members can pin posts' }, { status: 403 })
     }
 

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { createHubServerClient as createSupabaseServerClient } from '@/lib/supabase-hub-server';
+import { isTDIAdmin } from '@/lib/is-tdi-admin';
 
 const serviceClient = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -20,7 +21,7 @@ export async function PATCH(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    if (!user.email?.toLowerCase().endsWith('@teachersdeserveit.com')) {
+    if (!(await isTDIAdmin(user.email))) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 

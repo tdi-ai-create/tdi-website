@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
 import { createServerClient } from '@supabase/ssr';
+import { isTDIAdmin } from '@/lib/is-tdi-admin';
 
 // Get the current user from the session
 async function getCurrentUser() {
@@ -54,7 +55,7 @@ export async function GET() {
     }
 
     // TDI admin - redirect to admin portal
-    if (user.email?.toLowerCase().endsWith('@teachersdeserveit.com')) {
+    if (await isTDIAdmin(user.email)) {
       return NextResponse.json({ redirect: '/tdi-admin/leadership' });
     }
 

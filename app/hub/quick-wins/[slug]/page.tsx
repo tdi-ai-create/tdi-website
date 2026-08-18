@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import CapacityFeedbackPrompt, { shouldShowCapacityFeedback } from '@/components/hub/CapacityFeedbackPrompt';
 import CommunityTabs from '@/components/hub/CommunityTabs';
+import { useIsTDIAdmin } from '@/lib/use-is-tdi-admin';
 import CommunityNudge from '@/components/hub/CommunityNudge';
 import LessonQA from '@/components/hub/LessonQA';
 import AchievementInsights from '@/components/hub/AchievementInsights';
@@ -423,6 +424,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
   const { slug } = resolvedParams;
   const router = useRouter();
   const { user } = useHub();
+  const isTDIAdmin = useIsTDIAdmin(!!user?.email);
   const { language, t } = useLanguage();
   const lang = language === 'es' ? 'es' : 'en';
 
@@ -586,7 +588,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
               <CommunityTabs
                 contentId={gameConfig.contentUuid}
                 userId={user?.id}
-                isAdmin={!!user?.email?.toLowerCase().endsWith('@teachersdeserveit.com')}
+                isAdmin={isTDIAdmin}
                 conversationApiPath={`/api/hub/quick-wins/${gameConfig.contentUuid}/conversation`}
                 qaApiPath={`/api/hub/quick-wins/${gameConfig.contentUuid}/qa`}
               />
@@ -1570,7 +1572,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
             <CommunityTabs
               contentId={quickWin.id}
               userId={user?.id}
-              isAdmin={!!user?.email?.toLowerCase().endsWith('@teachersdeserveit.com')}
+              isAdmin={isTDIAdmin}
               conversationApiPath={`/api/hub/quick-wins/${quickWin.id}/conversation`}
               qaApiPath={`/api/hub/quick-wins/${quickWin.id}/qa`}
             />

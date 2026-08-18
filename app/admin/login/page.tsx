@@ -8,7 +8,19 @@ import { AlertCircle, RefreshCw, LogOut, Users, FileText, BarChart3 } from 'luci
 import { supabase } from '@/lib/supabase';
 import PortalSignIn from '@/components/auth/PortalSignIn';
 
-const isTDIEmail = (email: string) => email.toLowerCase().endsWith('@teachersdeserveit.com');
+// Admin membership lives in tdi_team_members, not in the email domain, so the
+// signed-in session is resolved server side rather than pattern matched here.
+const isTDIEmail = async (email: string): Promise<boolean> => {
+  if (!email) return false;
+  try {
+    const res = await fetch('/api/admin/whoami');
+    if (!res.ok) return false;
+    const data = await res.json();
+    return data.isAdmin === true;
+  } catch {
+    return false;
+  }
+};
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -22,7 +34,7 @@ export default function AdminLoginPage() {
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user?.email) {
-        if (isTDIEmail(session.user.email)) {
+        if (await isTDIEmail(session.user.email)) {
           router.push('/admin/partnerships');
           return;
         } else {
@@ -39,7 +51,7 @@ export default function AdminLoginPage() {
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_IN' && session?.user?.email) {
-        if (isTDIEmail(session.user.email)) {
+        if (await isTDIEmail(session.user.email)) {
           router.push('/admin/partnerships');
         } else {
           setCurrentUserEmail(session.user.email);
@@ -72,10 +84,10 @@ export default function AdminLoginPage() {
     }, 100);
   };
 
-  const handleEmailPreCheck = async (email: string): Promise<{ allowed: boolean; error?: string }> => {
-    if (!isTDIEmail(email)) {
-      return { allowed: false, error: 'This admin panel is only accessible to @teachersdeserveit.com accounts.' };
-    }
+  // Admin status can only be resolved once a session exists, and answering
+  // "is this address an admin?" before sign-in would leak the team roster.
+  // Sign-in proceeds; the session checks above redirect or show wrongAccount.
+  const handleEmailPreCheck = async (): Promise<{ allowed: boolean; error?: string }> => {
     return { allowed: true };
   };
 
@@ -84,7 +96,7 @@ export default function AdminLoginPage() {
     email: string,
   ): Promise<string | void> => {
     if (trigger === 'emailPassword') {
-      // Domain already validated by onEmailPreCheck; Supabase onAuthStateChange handles redirect
+      // Admin status is checked by onAuthStateChange above, which redirects or shows wrongAccount
       router.push('/admin/partnerships');
       return;
     }
@@ -114,7 +126,7 @@ export default function AdminLoginPage() {
               You&apos;re signed in as <strong className="text-[#1e2749]">{currentUserEmail}</strong>
             </p>
             <p className="text-gray-500 text-sm">
-              This area requires a <strong>@teachersdeserveit.com</strong> account.
+              This area requires a TDI team account. Contact Rae if you believe this is an error.
             </p>
           </div>
           <div className="space-y-3">

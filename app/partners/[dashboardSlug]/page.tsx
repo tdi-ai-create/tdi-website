@@ -576,9 +576,6 @@ export default function PartnerDashboard() {
     ? dashboardSlug.slice(0, -10) // Remove "-dashboard" (10 chars)
     : dashboardSlug;
 
-  // Check TDI admin
-  const isTDIAdmin = (email: string) => email.toLowerCase().endsWith('@teachersdeserveit.com');
-
   // Helper: Format date with ordinal suffix (e.g., "March 3rd")
   const formatDateWithOrdinal = (dateString: string) => {
     const date = new Date(dateString);

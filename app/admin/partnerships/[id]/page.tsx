@@ -143,9 +143,18 @@ interface SalesOpportunityEnrichment {
   website: string | null;
 }
 
-// Check if user is TDI admin
+// Check if user is TDI admin. Membership lives in tdi_team_members, so this
+// asks the server rather than assuming a @teachersdeserveit.com address.
 async function checkTDIAdmin(email: string): Promise<boolean> {
-  return email.toLowerCase().endsWith('@teachersdeserveit.com');
+  if (!email) return false;
+  try {
+    const res = await fetch('/api/admin/whoami');
+    if (!res.ok) return false;
+    const data = await res.json();
+    return data.isAdmin === true;
+  } catch {
+    return false;
+  }
 }
 
 // Status badge colors

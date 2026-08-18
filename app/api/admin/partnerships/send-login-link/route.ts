@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServiceSupabase } from '@/lib/supabase';
+import { isTDIAdmin } from '@/lib/is-tdi-admin';
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.teachersdeserveit.com';
@@ -15,7 +16,7 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.teachersdeserv
 export async function POST(request: NextRequest) {
   try {
     const adminEmail = request.headers.get('x-user-email');
-    if (!adminEmail || !adminEmail.toLowerCase().endsWith('@teachersdeserveit.com')) {
+    if (!adminEmail || !(await isTDIAdmin(adminEmail))) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
     }
 
