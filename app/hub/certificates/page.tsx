@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
+import MyGrowthPanel from '@/components/hub/MyGrowthPanel';
 import Link from 'next/link';
 import { useHub } from '@/components/hub/HubContext';
 import { useTranslation } from '@/lib/hub/useTranslation';
@@ -120,6 +121,7 @@ export default function CertificatesPage() {
   const [toolsExplored, setToolsExplored] = useState(0);
   const [daysActive, setDaysActive] = useState(0);
   const [activityByDay, setActivityByDay] = useState<ActivityDay[]>([]);
+  const [view, setView] = useState<'growth' | 'awards'>('awards');
   const [shareOpen, setShareOpen] = useState(false);
   const [shareMessage, setShareMessage] = useState('');
   const [shareTitle, setShareTitle] = useState('Share my journey');
@@ -129,6 +131,14 @@ export default function CertificatesPage() {
     const hours = Math.round(minutes / 60);
     return hours < 1 && toolsExplored > 0 ? '<1' : `~${hours}`;
   }, [toolsExplored]);
+
+  // /hub/transformation redirects here with ?view=growth so old links and
+  // bookmarks land on the panel the visitor actually asked for.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const requested = new URLSearchParams(window.location.search).get('view');
+    if (requested === 'growth' || requested === 'awards') setView(requested);
+  }, []);
 
   useEffect(() => {
     async function loadData() {
@@ -778,6 +788,42 @@ ${displayName}</div>
           {tUI('Share my journey')}
         </button>
       </div>
+
+      {/* ========== Growth / Awards switch ==========
+          My Growth used to be its own top-level nav item at /hub/transformation.
+          It lives here now: same destination for "how am I doing", two short
+          views instead of one long scroll, and one fewer item in the nav. */}
+      <div
+        className="inline-flex rounded-lg p-1 gap-1 mb-8"
+        style={{ backgroundColor: '#F1F3F7', border: '1px solid #E3E7EF' }}
+        role="tablist"
+        aria-label={tUI('Achievements view')}
+      >
+        {([
+          { id: 'growth', label: tUI('My Growth') },
+          { id: 'awards', label: tUI('Awards') },
+        ] as const).map((t) => (
+          <button
+            key={t.id}
+            role="tab"
+            aria-selected={view === t.id}
+            onClick={() => setView(t.id)}
+            className="px-4 py-2 rounded-md text-sm font-semibold transition-colors"
+            style={{
+              fontFamily: "'DM Sans', sans-serif",
+              backgroundColor: view === t.id ? '#1B2A4A' : 'transparent',
+              color: view === t.id ? '#ffffff' : '#6B7280',
+            }}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      {view === 'growth' && <MyGrowthPanel />}
+
+      {view === 'awards' && (
+      <>
 
       {/* ========== Recently Earned Highlight ========== */}
       {recentlyEarned && (() => {
@@ -1652,6 +1698,9 @@ ${displayName}</div>
             ))}
           </div>
         </section>
+      )}
+
+      </>
       )}
 
       {/* Universal Share Modal */}

@@ -9,7 +9,6 @@ import AvatarDisplay from './AvatarDisplay';
 import HubMobileNav from './HubMobileNav';
 import MomentMode from './MomentMode';
 import NotificationBell from './NotificationBell';
-import { checkTrackerEligibility } from '@/lib/hub/transformation';
 import { isAdmin } from '@/lib/hub/admin';
 import { isChampion } from '@/lib/hub/champion';
 import { useLanguage } from '@/lib/hub/useLanguage';
@@ -43,23 +42,23 @@ export default function HubNavBar({ profile, userEmail, userId }: HubNavBarProps
   const pathname = usePathname();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [momentModeOpen, setMomentModeOpen] = useState(false);
-  const [trackerEligible, setTrackerEligible] = useState(false);
   const [isUserAdmin, setIsUserAdmin] = useState(false);
   const [isUserChampion, setIsUserChampion] = useState(false);
   const { language, setLanguage } = useLanguage();
   const { tUI } = useTranslation();
 
-  // Check tracker eligibility, admin status, and champion status
+  // Check admin status and champion status.
+  // The tracker eligibility check used to run here too, costing two Supabase
+  // count queries on every Hub page load. Nothing reads it any more now that
+  // My Growth is a view inside Achievements rather than a nav item.
   useEffect(() => {
     async function checkUserStatus() {
       if (!userId) return;
       try {
-        const [trackerResult, adminResult, championResult] = await Promise.all([
-          checkTrackerEligibility(userId),
+        const [adminResult, championResult] = await Promise.all([
           isAdmin(userId, userEmail),
           isChampion(userId),
         ]);
-        setTrackerEligible(trackerResult.isEligible);
         setIsUserAdmin(adminResult);
         setIsUserChampion(championResult);
       } catch (error) {
@@ -69,20 +68,19 @@ export default function HubNavBar({ profile, userEmail, userId }: HubNavBarProps
     checkUserStatus();
   }, [userId, userEmail]);
 
-  // Build nav items with conditional "My Growth", "School", and "Admin"
+  // Build nav items with conditional "School"
   const navItems = useMemo(() => {
     const items = [...BASE_NAV_ITEMS];
-    if (trackerEligible) {
-      // Insert "My Growth" after Dashboard
-      items.splice(1, 0, { href: '/hub/transformation', label: 'My Growth', exact: false });
-    }
+    // "My Growth" is no longer a top-level item. It lives inside Achievements as
+    // a view, because it is gated on finishing a course plus two check-ins, so
+    // most members could never reach the nav item at all.
     if (isUserChampion) {
       // Add "School" after Settings
       items.push({ href: '/hub/champion', label: 'School', exact: false });
     }
     // Admin Portal accessible via /tdi-admin directly, not in nav
     return items;
-  }, [trackerEligible, isUserChampion, isUserAdmin]);
+  }, [isUserChampion]);
 
   const isActive = (href: string, exact: boolean) => {
     if (exact) {

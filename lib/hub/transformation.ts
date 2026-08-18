@@ -72,11 +72,15 @@ export async function checkTrackerEligibility(userId: string): Promise<TrackerEl
 export async function getStressOverTime(userId: string): Promise<StressDataPoint[]> {
   const supabase = getSupabase();
 
+  // Reads stress_score, not score. The table has both columns and the check-in
+  // writes stress_score; `score` is null on all 417 check-ins ever recorded, which
+  // is why this chart drew axis labels and no line for all 309 users who have one.
   const { data } = await supabase
     .from('hub_assessments')
-    .select('score, created_at')
+    .select('stress_score, created_at')
     .eq('user_id', userId)
     .eq('type', 'daily_check_in')
+    .not('stress_score', 'is', null)
     .order('created_at', { ascending: true });
 
   if (!data) return [];
@@ -85,7 +89,7 @@ export async function getStressOverTime(userId: string): Promise<StressDataPoint
     const date = new Date(item.created_at);
     return {
       date: item.created_at,
-      score: item.score,
+      score: item.stress_score,
       formattedDate: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
     };
   });
