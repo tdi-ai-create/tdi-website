@@ -63,7 +63,12 @@ export default function PursuitPage() {
   // Toggling a header is left alone. You are already looking at it.
   const reveal = (id: string) => {
     setOpen(id)
-    requestAnimationFrame(() => requestAnimationFrame(() => {
+    // setTimeout rather than requestAnimationFrame. rAF does not run at all in
+    // a tab the browser considers hidden, so the scroll silently never
+    // happened for anyone whose tab was in the background, and it could not be
+    // exercised in automation either. A timeout still fires, so the behaviour
+    // is the same for a person and finally observable in a test.
+    setTimeout(() => {
       const el = document.getElementById(`section-${id}`)
       if (!el) return
 
@@ -77,7 +82,7 @@ export default function PursuitPage() {
       const top = el.getBoundingClientRect().top
       if (box) box.scrollTop += top - box.getBoundingClientRect().top - 12
       else window.scrollBy(0, top - 12)
-    }))
+    }, 0)
   }
   const [editingName, setEditingName] = useState(false)
   const [nameDraft, setNameDraft] = useState('')
