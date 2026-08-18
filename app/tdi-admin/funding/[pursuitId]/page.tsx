@@ -15,6 +15,7 @@ import { OpportunitiesTab } from '../components/panel/OpportunitiesTab'
 import { ActionsTab } from '../components/panel/ActionsTab'
 import { TimelineTab } from '../components/panel/TimelineTab'
 import { EmailsTab } from '../components/panel/EmailsTab'
+import { RecordTab } from '../components/panel/RecordTab'
 import {
   TYPE_PAGE_TITLE,
   TYPE_PAGE_SUBTITLE,
@@ -37,6 +38,7 @@ export default function PursuitDetailPage() {
   const [showOpportunities, setShowOpportunities] = useState(false)
   const [showTimeline, setShowTimeline] = useState(false)
   const [showEmails, setShowEmails] = useState(false)
+  const [showRecord, setShowRecord] = useState(false)
   const [draftEmail, setDraftEmail] = useState<{ to: string; toName: string; subject: string; body: string; schoolName: string; pursuitId?: string } | null>(null)
 
   useEffect(() => {
@@ -258,6 +260,13 @@ export default function PursuitDetailPage() {
 
       <CollapsibleSection title="Emails" defaultOpen={showEmails} onToggle={setShowEmails}>
         <EmailsTab pursuitId={pursuitId} pursuit={p} />
+      </CollapsibleSection>
+
+      {/* Everything anyone has written about this school, in one place. Last
+          because it is the thing you go looking for rather than the thing you
+          act on, and it is long. */}
+      <CollapsibleSection title="Record" sectionId="section-record" defaultOpen={showRecord} onToggle={setShowRecord}>
+        <RecordTab pursuitId={pursuitId} />
       </CollapsibleSection>
     </div>
   )
