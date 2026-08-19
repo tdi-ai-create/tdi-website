@@ -955,7 +955,7 @@ function RenewalSection({ pursuit, renewalEligible, hasPartnership }: { pursuit:
                 alignSelf: 'flex-start',
               }}
             >
-              {creating ? 'Creating...' : 'Start renewal pursuit'}
+              {creating ? 'Creating...' : 'Start a renewal'}
             </button>
           ) : (
             <div style={{ fontSize: 12, color: '#065F46', fontWeight: 600 }}>

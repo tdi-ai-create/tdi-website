@@ -1,6 +1,9 @@
 import { createClient } from '@supabase/supabase-js';
 import { NextRequest, NextResponse } from 'next/server';
 import { CREATOR_STUDIO_RECIPIENTS } from '@/lib/creator-notification-recipients';
+import { creatorApplicationReceived } from '@/lib/creator-slack';
+
+const APPLICATION_QUEUE_URL = 'https://www.teachersdeserveit.com/tdi-admin/creators/applications';
 
 const TURNSTILE_VERIFY_URL = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
 
@@ -83,6 +86,19 @@ export async function POST(request: NextRequest) {
     }
   }
 
+  // Tell Bella in Slack, where she actually works, and say how many are now
+  // waiting. The count matters: an application arriving into a queue of one is
+  // a different thing from arriving into a queue of eight.
+  try {
+    const { count } = await supabase
+      .from('pending_creators')
+      .select('id', { count: 'exact', head: true })
+      .eq('status', 'pending');
+    creatorApplicationReceived(name, strategy, count ?? 1).catch(() => {});
+  } catch {
+    /* non-blocking, an application must never fail over a notification */
+  }
+
   // Always send email notification so no application is lost
   const resendApiKey = process.env.RESEND_API_KEY;
   if (resendApiKey) {
@@ -97,8 +113,10 @@ Strategy/Topic: ${strategy || '(not provided)'}
 Content Types: ${contentTypes || '(not selected)'}
 Referral Source: ${referralDropdown || '(not provided)'}
 
-Sign in to the Admin Portal to review:
-https://www.teachersdeserveit.com/tdi-admin/creators
+Accept, hold or decline this application here:
+${APPLICATION_QUEUE_URL}
+
+You will need to be signed in. Nothing happens from this email alone.
 
 - TDI Creator Studio
     `.trim();

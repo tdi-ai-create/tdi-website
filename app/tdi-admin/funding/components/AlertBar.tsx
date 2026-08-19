@@ -46,7 +46,7 @@ export function AlertBar({ alerts }: { alerts: Alerts }) {
     {
       label: 'Awarded YTD',
       value: `$${(alerts.awarded_total / 1000).toFixed(0)}K`,
-      sublabel: `${alerts.awarded_count} ${alerts.awarded_count === 1 ? 'pursuit' : 'pursuits'}`,
+      sublabel: `${alerts.awarded_count} ${alerts.awarded_count === 1 ? 'school' : 'schools'}`,
       borderColor: '#16A34A',
     },
   ]

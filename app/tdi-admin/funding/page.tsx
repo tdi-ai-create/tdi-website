@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { DraftEmailModal, introEmailDraft, gateBlockerEmailDraft } from './components/panel/DraftEmailModal'
+import { ImpactEvidence } from './components/ImpactEvidence'
 
 /**
  * One next-step item, exactly as computed by lib/funding-next-actions.ts and
@@ -57,6 +58,10 @@ interface SchoolData {
 
 export default function FundingPage() {
   const [schools, setSchools] = useState<SchoolData[]>([])
+  // Replaces the Work Queue page. Its only real contribution was letting a
+  // person ask "what is waiting on us" without reading every school, and that
+  // is a filter, not a destination.
+  const [ownerFilter, setOwnerFilter] = useState<'all' | 'team' | 'agent' | 'school'>('all')
   const [loading, setLoading] = useState(true)
   const [draftEmail, setDraftEmail] = useState<any & { opportunityId?: string; windowOpens?: string; windowCloses?: string } | null>(null)
   const [toast, setToast] = useState<string | null>(null)
@@ -147,6 +152,20 @@ export default function FundingPage() {
   const totalGrants = schools.reduce((s, sc) => s + sc.grants.length, 0)
   const needsYou = schools.reduce((s, sc) => s + sc.nextSteps.filter(i => !i.inProgress && i.owner === 'team').length, 0)
 
+  const openFor = (sc: SchoolData, owner: 'team' | 'agent' | 'school') =>
+    sc.nextSteps.filter(i => !i.inProgress && i.owner === owner).length
+
+  const ownerCounts = {
+    all: schools.length,
+    team: schools.filter(sc => openFor(sc, 'team') > 0).length,
+    agent: schools.filter(sc => openFor(sc, 'agent') > 0).length,
+    school: schools.filter(sc => openFor(sc, 'school') > 0).length,
+  }
+
+  const visibleSchools = ownerFilter === 'all'
+    ? schools
+    : schools.filter(sc => openFor(sc, ownerFilter) > 0)
+
   return (
     <div style={{ padding: '32px 48px', fontFamily: "'DM Sans', sans-serif", maxWidth: 1000 }}>
       {toast && <Toast message={toast} onDone={() => setToast(null)} />}
@@ -177,22 +196,39 @@ export default function FundingPage() {
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
         <h1 style={{ fontSize: 24, fontWeight: 700, color: '#1e2749', margin: 0 }}>Grant Funding</h1>
-        <div style={{ display: 'flex', gap: 8 }}>
-          <Link href="/tdi-admin/funding/queue" style={{ fontSize: 13, fontWeight: 600, padding: '8px 16px', borderRadius: 8, border: '1px solid #E5E7EB', background: 'white', color: '#374151', textDecoration: 'none' }}>
-            Work Queue
-          </Link>
-          <Link href="/tdi-admin/funding/portfolio" style={{ fontSize: 13, fontWeight: 600, padding: '8px 16px', borderRadius: 8, border: '1px solid #E5E7EB', background: 'white', color: '#374151', textDecoration: 'none' }}>
-            All Pursuits
-          </Link>
-        </div>
+
       </div>
-      <p style={{ fontSize: 14, color: '#6B7280', marginBottom: 24 }}>
+      <p style={{ fontSize: 14, color: '#6B7280', marginBottom: 14 }}>
         {schools.length} schools | ${(totalPipeline / 1000).toFixed(0)}K pipeline | {totalGrants} grants tracked{needsYou > 0 ? ` | ${needsYou} waiting on you` : ''}
       </p>
 
+      {/* Who the next move belongs to. This is the Work Queue, as a filter. */}
+      <div style={{ display: 'flex', gap: 8, marginBottom: 24, flexWrap: 'wrap' }}>
+        {([
+          { key: 'all' as const,    label: 'All schools' },
+          { key: 'team' as const,   label: 'Waiting on us' },
+          { key: 'agent' as const,  label: 'With agents' },
+          { key: 'school' as const, label: 'Waiting on the school' },
+        ]).map(f => (
+          <button
+            key={f.key}
+            onClick={() => setOwnerFilter(f.key)}
+            style={{
+              fontSize: 13, fontWeight: 600, padding: '7px 14px', borderRadius: 999,
+              border: `1px solid ${ownerFilter === f.key ? '#1e2749' : '#E5E7EB'}`,
+              background: ownerFilter === f.key ? '#1e2749' : 'white',
+              color: ownerFilter === f.key ? 'white' : '#374151',
+              cursor: 'pointer',
+            }}
+          >
+            {f.label} {ownerCounts[f.key]}
+          </button>
+        ))}
+      </div>
+
       {/* School cards */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-        {schools.map(school => (
+        {visibleSchools.map(school => (
           <SchoolCard
             key={school.id}
             school={school}
@@ -202,6 +238,19 @@ export default function FundingPage() {
             onToast={setToast}
           />
         ))}
+
+        {visibleSchools.length === 0 && (
+          <div style={{ padding: '32px 20px', textAlign: 'center', color: '#6B7280', fontSize: 14, background: 'white', borderRadius: 12, border: '1px solid #E5E7EB' }}>
+            Nothing is in that state right now.
+          </div>
+        )}
+      </div>
+
+      {/* Reference material, from the Portfolio page that used to hold it.
+          Collapsed by default: it is something you reach for while writing an
+          application, not something you read on the way past. */}
+      <div style={{ marginTop: 28 }}>
+        <ImpactEvidence />
       </div>
     </div>
   )
@@ -322,7 +371,7 @@ function SchoolCard({ school, onDraftEmail, onToast }: {
                 textDecoration: 'none', flexShrink: 0, whiteSpace: 'nowrap',
               }}
             >
-              {isBlocked ? 'Fix This' : 'Open Pursuit'}
+              {isBlocked ? 'Fix This' : 'Open School'}
             </Link>
           ) : null}
         </div>
