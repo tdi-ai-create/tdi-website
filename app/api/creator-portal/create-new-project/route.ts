@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { byPhaseThenOrder } from '@/lib/creator-phases';
 import { CREATOR_STUDIO_RECIPIENTS } from '@/lib/creator-notification-recipients';
 
 export async function POST(request: Request) {
@@ -97,21 +98,10 @@ export async function POST(request: Request) {
       .order('sort_order');
 
     if (milestones) {
-      // Sort milestones by phase and then by sort_order
-      const phaseOrder: Record<string, number> = {
-        onboarding: 0,
-        agreement: 1,
-        course_design: 2,
-        test_prep: 3,
-        production: 4,
-        launch: 5
-      };
-
-      const sortedMilestones = milestones.sort((a, b) => {
-        const phaseCompare = phaseOrder[a.phase_id] - phaseOrder[b.phase_id];
-        if (phaseCompare !== 0) return phaseCompare;
-        return a.sort_order - b.sort_order;
-      });
+      // Shared order. The local copy that used to live here left out
+      // marketing_blog, so comparing those steps produced NaN and the sort
+      // gave up, making "first" and "second" whatever Postgres returned first.
+      const sortedMilestones = [...milestones].sort(byPhaseThenOrder);
 
       // Create fresh milestone records for the new project
       // First milestone (intake_completed) is completed (they're returning)
@@ -130,7 +120,7 @@ export async function POST(request: Request) {
       const { error: milestoneError } = await supabase
         .from('creator_milestones')
         .upsert(milestoneRecords, {
-          onConflict: 'creator_id,milestone_id',
+          onConflict: 'creator_id,milestone_id,project_id',
           ignoreDuplicates: true
         });
 

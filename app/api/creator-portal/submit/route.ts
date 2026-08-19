@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { byPhaseThenOrder } from '@/lib/creator-phases';
 import { CREATOR_STUDIO_RECIPIENTS } from '@/lib/creator-notification-recipients';
 
 export async function POST(request: Request) {
@@ -340,19 +341,7 @@ export async function POST(request: Request) {
             // First milestone (intake_completed) is completed (admin added them)
             // Second milestone (content_path_selection) is available
             // Rest are locked
-            const sortedMilestones = milestones.sort((a, b) => {
-              const phaseOrder: Record<string, number> = {
-                onboarding: 0,
-                agreement: 1,
-                course_design: 2,
-                test_prep: 3,
-                production: 4,
-                launch: 5
-              };
-              const phaseCompare = phaseOrder[a.phase_id] - phaseOrder[b.phase_id];
-              if (phaseCompare !== 0) return phaseCompare;
-              return a.sort_order - b.sort_order;
-            });
+            const sortedMilestones = [...milestones].sort(byPhaseThenOrder);
 
             const milestoneRecords = sortedMilestones.map((milestone, index) => ({
               creator_id: creatorId,
@@ -367,7 +356,7 @@ export async function POST(request: Request) {
             await supabase
               .from('creator_milestones')
               .upsert(milestoneRecords, {
-                onConflict: 'creator_id,milestone_id',
+                onConflict: 'creator_id,milestone_id,project_id',
                 ignoreDuplicates: true
               });
           }

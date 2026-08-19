@@ -534,7 +534,7 @@ async function seedMilestones(supabase: DbClient, creatorId: string, now: Date):
 
   const { error } = await supabase
     .from('creator_milestones')
-    .upsert(records, { onConflict: 'creator_id,milestone_id', ignoreDuplicates: true });
+    .upsert(records, { onConflict: 'creator_id,milestone_id,project_id', ignoreDuplicates: true });
 
   if (error) {
     console.error('[applications] Milestone seeding failed:', error);
