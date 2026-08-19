@@ -254,9 +254,9 @@ export function ConfirmAction({ children, message, detail, onConfirm, confirmLab
 export const GUIDANCE = {
   // Sales
   sales: {
-    createPartnership: 'This creates a full Leadership Dashboard, provisions Hub access, sends a welcome email, and creates onboarding action items. For grant-funded deals, it also creates a funding pursuit.',
+    createPartnership: 'This creates a full Leadership Dashboard, provisions Hub access, sends a welcome email, and creates onboarding action items. For grant-funded deals, it also starts grant work for that school.',
     signedStage: 'Moving a deal to Signed triggers the partnership creation flow. Make sure contract details are ready.',
-    grantSupport: 'Grant-supported deals mean TDI is responsible for finding, drafting, and tracking funding. A funding pursuit will be auto-created.',
+    grantSupport: 'Grant-supported deals mean TDI is responsible for finding, drafting, and tracking funding. Grant work for that school is started automatically.',
   },
   // Leadership
   leadership: {
@@ -266,7 +266,7 @@ export const GUIDANCE = {
     batchProvision: 'This creates Hub All-Access accounts for every staff member in the roster who doesn\'t have one yet. Run this after the roster is uploaded.',
     prepareForCall: 'Generates a printable 1-page briefing with engagement data, KPI progress, recent notes, and AI-suggested talking points.',
     exportReports: 'If data is missing, the system will explain what\'s needed and offer to draft an email requesting it from the principal.',
-    grantTracking: 'Shows funding pursuit status for grant-funded partnerships. Edit paths and track amounts in the Funding tab.',
+    grantTracking: 'Shows grant progress for grant-funded partnerships. Edit paths and track amounts in the Funding tab.',
     notes: 'Notes stay internal by default. You can mark individual notes as "shared with partner" to make them visible on the principal\'s dashboard.',
     meetings: 'Log every touchpoint. Meeting action items are referenced in the Prepare for Call briefing.',
   },
@@ -281,7 +281,7 @@ export const GUIDANCE = {
   funding: {
     planABCD: 'Plan A (federal formula) is always pursued first. Plans B-D are staged as fallback. We pursue multiple paths in parallel with a 15% buffer above the gap.',
     fundingPaths: 'Each path has its own status, contact, deadline, and amount. The total across all paths should exceed the contract gap.',
-    pursuitPhases: 'Pursuits move through: intake, researching, strategy, writing, in review, delivered, submitted, awaiting decision, awarded/denied.',
+    pursuitPhases: 'Grant work moves through: intake, researching, strategy, writing, in review, delivered, submitted, awaiting decision, awarded/denied.',
   },
   // Hub
   hub: {
