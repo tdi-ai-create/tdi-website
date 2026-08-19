@@ -1,17 +1,18 @@
 'use client'
 import { useState } from 'react'
+import { Pencil } from 'lucide-react'
 import { updateDashboardField } from '@/lib/dashboard/updateDashboardField'
 
 interface InlineEditFieldProps {
   partnershipId: string
   field:         string
-  value:         any
+  value:         string | number | null | undefined
   type:          'text' | 'number' | 'select' | 'date' | 'textarea'
   options?:      string[]
   prefix?:       string
   suffix?:       string
   label?:        string
-  onSaved?:      (newValue: any) => void
+  onSaved?:      (newValue: string | number) => void
 }
 
 export function InlineEditField({
@@ -22,9 +23,11 @@ export function InlineEditField({
   const [localVal, setLocalVal] = useState(value ?? '')
   const [saving,   setSaving]   = useState(false)
   const [saved,    setSaved]    = useState(false)
+  const [error,    setError]    = useState('')
 
   const handleSave = async () => {
     setSaving(true)
+    setError('')
     const result = await updateDashboardField(partnershipId, field, localVal)
     setSaving(false)
     if (result.success) {
@@ -32,6 +35,11 @@ export function InlineEditField({
       setEditing(false)
       onSaved?.(localVal)
       setTimeout(() => setSaved(false), 2000)
+    } else {
+      // Previously this branch did not exist. A failed save left the field
+      // sitting there looking normal, which is how every inline edit on this
+      // page could be rejected for months without anyone knowing.
+      setError(result.error || 'Could not save. Please try again.')
     }
   }
 
@@ -43,9 +51,10 @@ export function InlineEditField({
         </span>
         <button
           onClick={() => setEditing(true)}
-          className="opacity-0 group-hover:opacity-100 text-xs text-violet-500 hover:text-violet-700 transition-opacity"
+          aria-label={label ? `Edit ${label}` : 'Edit'}
+          className="opacity-40 group-hover:opacity-100 text-violet-500 hover:text-violet-700 transition-opacity"
         >
-          ✎
+          <Pencil size={12} />
         </button>
         {saved && <span className="text-xs text-green-600 font-semibold">Saved ✓</span>}
       </div>
@@ -53,7 +62,8 @@ export function InlineEditField({
   }
 
   return (
-    <div className="flex items-center gap-2">
+    <div>
+      <div className="flex items-center gap-2">
       {type === 'select' ? (
         <select
           value={localVal}
@@ -78,7 +88,7 @@ export function InlineEditField({
             type={type}
             value={localVal}
             onChange={e => setLocalVal(e.target.value)}
-            className="text-sm border border-violet-300 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-violet-500 w-20"
+            className="text-sm border border-violet-300 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-violet-500 w-full min-w-[8rem]"
             autoFocus
             onKeyDown={e => { if (e.key === 'Enter') handleSave(); if (e.key === 'Escape') setEditing(false) }}
           />
@@ -99,6 +109,10 @@ export function InlineEditField({
       >
         Cancel
       </button>
+      </div>
+      {error && (
+        <p className="text-xs text-red-600 mt-1" role="alert">{error}</p>
+      )}
     </div>
   )
 }
