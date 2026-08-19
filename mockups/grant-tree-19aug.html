@@ -1,0 +1,270 @@
+<title>The Grant Tree</title>
+<style>
+  :root{
+    --navy:#1B2A4A; --ink:#1e2749;
+    --gold:#E8B84B; --blue:#80a4ed; --lightblue:#E8F0FD;
+    --page:#F7F8FA; --card:#fff; --rule:#E3E7EF;
+    --muted:#6B7489; --faint:#9AA2B5;
+    --live:#3F7A63;  --live-t:#EAF4EF;
+    --thin:#A87404;  --thin-t:#FDF4DF;
+    --stop:#A8452E;  --stop-t:#FAECE7;
+    --shadow:0 1px 2px rgba(27,42,74,.05), 0 10px 30px -18px rgba(27,42,74,.3);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --navy:#16223A; --ink:#EDF1FA; --page:#0F1626; --card:#181F31;
+      --rule:#29334D; --muted:#A8B2C9; --faint:#7C879F; --lightblue:#1E2A46;
+      --live:#7FBFA3; --live-t:#17281F;
+      --thin:#E8B84B; --thin-t:#2A2415;
+      --stop:#E89578; --stop-t:#2E1D18;
+      --shadow:0 1px 2px rgba(0,0,0,.3), 0 10px 30px -18px rgba(0,0,0,.7);
+    }
+  }
+  :root[data-theme="dark"]{
+    --navy:#16223A; --ink:#EDF1FA; --page:#0F1626; --card:#181F31;
+    --rule:#29334D; --muted:#A8B2C9; --faint:#7C879F; --lightblue:#1E2A46;
+    --live:#7FBFA3; --live-t:#17281F;
+    --thin:#E8B84B; --thin-t:#2A2415;
+    --stop:#E89578; --stop-t:#2E1D18;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 10px 30px -18px rgba(0,0,0,.7);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--page);color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.55;-webkit-font-smoothing:antialiased}
+  .serif{font-family:Georgia,"Iowan Old Style","Times New Roman",serif;font-weight:400}
+  .mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+  code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.86em;
+    background:var(--lightblue);border:1px solid var(--rule);border-radius:4px;padding:1px 5px}
+
+  .wrap{max-width:820px;margin:0 auto;padding:52px 22px 90px;display:flex;flex-direction:column;gap:40px}
+
+  .eyebrow{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);margin:0 0 12px;
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+  h1{font-size:clamp(32px,6vw,44px);line-height:1.1;margin:0 0 16px;letter-spacing:-.015em}
+  .lede{margin:0;color:var(--muted);font-size:17px;max-width:60ch}
+  .lede + .lede{margin-top:8px}
+
+  h2.sec{font-size:23px;margin:0 0 6px}
+  .sub{margin:0 0 22px;color:var(--muted);font-size:15px;max-width:64ch}
+  .kicker{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin:0 0 8px;
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+
+  /* legend */
+  .legend{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:26px}
+  .tag{font-size:11px;font-weight:700;padding:4px 11px;border-radius:999px;letter-spacing:.02em}
+  .t-live{color:var(--live);background:var(--live-t)}
+  .t-thin{color:var(--thin);background:var(--thin-t)}
+  .t-stop{color:var(--stop);background:var(--stop-t)}
+  .t-quiet{color:var(--muted);background:var(--lightblue)}
+
+  /* trunk */
+  .trunk{display:flex;flex-direction:column;align-items:stretch;gap:0}
+  .step{display:grid;grid-template-columns:34px 1fr auto;gap:14px;align-items:center;
+    background:var(--card);border:1px solid var(--rule);border-radius:11px;padding:13px 16px;box-shadow:var(--shadow)}
+  .step.gate{border-color:var(--stop);border-width:1.5px}
+  .step .no{font-size:11px;color:var(--faint);font-variant-numeric:tabular-nums}
+  .step .nm{font-weight:600;font-size:15px}
+  .step .ds{color:var(--muted);font-size:13px;display:block;margin-top:1px}
+  .drop{width:1px;height:14px;background:var(--rule);margin:0 auto}
+  .gatelabel{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--stop);
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace;margin-bottom:3px;display:block}
+
+  /* cards */
+  .card{background:var(--card);border:1px solid var(--rule);border-radius:13px;padding:24px;box-shadow:var(--shadow)}
+  .card + .card{margin-top:14px}
+
+  /* table */
+  .scroll{overflow-x:auto}
+  table{width:100%;border-collapse:collapse;font-size:14px;min-width:520px}
+  th{text-align:left;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);
+    font-weight:400;padding:0 10px 9px 0;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+  td{padding:11px 10px 11px 0;border-top:1px solid var(--rule);vertical-align:top}
+  td.n{font-variant-numeric:tabular-nums}
+  .school{font-weight:600}
+
+  /* register */
+  .reg{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:0}
+  .reg li{display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:start;
+    padding:14px 0;border-top:1px solid var(--rule)}
+  .reg li:first-child{border-top:none}
+  .dot{width:9px;height:9px;border-radius:50%;margin-top:7px;flex:none}
+  .d-live{background:var(--live)}
+  .d-thin{background:var(--thin)}
+  .d-stop{background:transparent;border:1.5px solid var(--faint)}
+  .reg .t{font-weight:600;font-size:15px;display:block}
+  .reg .d{color:var(--muted);font-size:13.5px;display:block;margin-top:2px}
+
+  .note{border-left:3px solid var(--gold);padding:3px 0 3px 18px}
+  .note p{margin:0;color:var(--muted);font-size:14.5px}
+  .note strong{color:var(--ink)}
+  .note + .note{margin-top:14px}
+
+  hr.div{border:none;border-top:1px solid var(--rule);margin:0}
+
+  @media (max-width:600px){
+    .wrap{padding:34px 16px 64px;gap:32px}
+    .step{grid-template-columns:26px 1fr;gap:10px}
+    .step .tag{grid-column:2}
+  }
+</style>
+
+<div class="wrap">
+
+  <header>
+    <p class="eyebrow">Grant pipeline &middot; process tree &middot; updated 19 Aug, measured</p>
+    <h1 class="serif">The Grant Tree</h1>
+    <p class="lede">Every branch from a signed contract to money in the door. The trunk is the path work takes when nothing goes wrong.</p>
+    <p class="lede">Every number on this page was read from the live database today, not carried over from the last version.</p>
+  </header>
+
+  <hr class="div" />
+
+  <section>
+    <p class="kicker">The whole shape</p>
+    <h2 class="sec serif">Trunk and guardrails</h2>
+    <p class="sub">Four guardrails divide the work, and nothing crosses one until its condition is true. Green is running in production. Amber is designed but has never actually run.</p>
+
+    <div class="legend">
+      <span class="tag t-live">Live</span>
+      <span class="tag t-thin">Never run</span>
+      <span class="tag t-quiet">Guardrail</span>
+    </div>
+
+    <div class="trunk">
+      <div class="step"><span class="no mono">01</span><span><span class="nm">Contract signed</span><span class="ds">School signs both agreements</span></span><span class="tag t-live">Live</span></div>
+      <div class="drop"></div>
+      <div class="step"><span class="no mono">02</span><span><span class="nm">School created</span><span class="ds">Grant paths and action items seeded</span></span><span class="tag t-live">Live</span></div>
+      <div class="drop"></div>
+      <div class="step gate"><span class="no mono">&#9679;</span><span><span class="gatelabel">Guardrail</span><span class="nm">The gate, five conditions</span><span class="ds">Submitter, backup, sponsor, both contracts linked. Recomputed on save, never set by hand.</span></span><span class="tag t-live">Live</span></div>
+      <div class="drop"></div>
+      <div class="step"><span class="no mono">03</span><span><span class="nm">School profile</span><span class="ds">Federal lookup fills enrollment, Title I, address, NCES id</span></span><span class="tag t-live">Live</span></div>
+      <div class="drop"></div>
+      <div class="step"><span class="no mono">04</span><span><span class="nm">Funder discovery</span><span class="ds">Find funders that exist for this school, rather than the same national list</span></span><span class="tag t-thin">Never run</span></div>
+      <div class="drop"></div>
+      <div class="step gate"><span class="no mono">&#9679;</span><span><span class="gatelabel">Guardrail &middot; new 19 Aug</span><span class="nm">The stop rule, five rules, three verdicts</span><span class="ds">Clear, cannot win, or needs an answer first. Runs monthly over every open path.</span></span><span class="tag t-live">Live</span></div>
+      <div class="drop"></div>
+      <div class="step"><span class="no mono">05</span><span><span class="nm">Questions to a person</span><span class="ds">"Needs an answer" becomes a real question owned by someone, due in 7 days</span></span><span class="tag t-live">Live</span></div>
+      <div class="drop"></div>
+      <div class="step"><span class="no mono">06</span><span><span class="nm">Narrative drafted</span><span class="ds">Only for paths the stop rule cleared</span></span><span class="tag t-live">Live</span></div>
+      <div class="drop"></div>
+      <div class="step gate"><span class="no mono">&#9679;</span><span><span class="gatelabel">Guardrail</span><span class="nm">QA, two attempts then a person</span><span class="ds">Julie reviews. Twice failed goes to a decision with concrete options.</span></span><span class="tag t-live">Live</span></div>
+      <div class="drop"></div>
+      <div class="step gate"><span class="no mono">&#9679;</span><span><span class="gatelabel">Guardrail</span><span class="nm">Bella approves, nothing skips this</span><span class="ds">Is this true about this school, and does it sound like us</span></span><span class="tag t-live">Live</span></div>
+      <div class="drop"></div>
+      <div class="step"><span class="no mono">07</span><span><span class="nm">Sent to the school</span><span class="ds">School submits, funder decides</span></span><span class="tag t-live">Live</span></div>
+      <div class="drop"></div>
+      <div class="step"><span class="no mono">08</span><span><span class="nm">Money allocated</span><span class="ds">The view stops at awarded; allocated and invoiced are not shown</span></span><span class="tag t-thin">Thin</span></div>
+    </div>
+  </section>
+
+  <hr class="div" />
+
+  <section>
+    <p class="kicker">Changed today</p>
+    <h2 class="sec serif">What is new, and running</h2>
+    <p class="sub">All four are live on production and were confirmed by reading the database, not the response.</p>
+
+    <ul class="reg">
+      <li><span class="dot d-live"></span>
+        <span><span class="t">The stop rule runs on a schedule</span>
+        <span class="d">It existed since 17 Aug but only fired when a draft was requested. Two of twenty-six paths had ever been screened. Now eighteen are, and it re-runs on the first of each month.</span></span>
+        <span class="tag t-live">Live</span></li>
+      <li><span class="dot d-live"></span>
+        <span><span class="t">"Needs an answer" reaches a person</span>
+        <span class="d">The rule could conclude that someone must confirm something and then tell nobody. Six real questions now exist, one per grant path, across three schools.</span></span>
+        <span class="tag t-live">Live</span></li>
+      <li><span class="dot d-live"></span>
+        <span><span class="t">"Stop this path" stops it</span>
+        <span class="d">It was a valid answer that nothing acted on. A path could be ruled out and stay open for an agent to keep drafting. Answering now closes it, keeping the answer, who gave it and when. Closed, never deleted.</span></span>
+        <span class="tag t-live">Live</span></li>
+      <li><span class="dot d-live"></span>
+        <span><span class="t">Five portal pages became three</span>
+        <span class="d">Portfolio and Queue were rearrangements of what the main page already showed. Queue is now a filter. The word "pursuit" is gone from every screen; it was always a school.</span></span>
+        <span class="tag t-live">Live</span></li>
+    </ul>
+  </section>
+
+  <hr class="div" />
+
+  <section>
+    <p class="kicker">Measured 19 Aug</p>
+    <h2 class="sec serif">Where each school actually is</h2>
+    <p class="sub">Gate means all five conditions true. Paths are grant routes on file. Stopped means the rule ruled it out, with a reason.</p>
+
+    <div class="card scroll">
+      <table>
+        <thead>
+          <tr><th>School</th><th>Phase</th><th>Gate</th><th>Paths</th><th>Stopped</th><th>Questions</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="school">Allenwood Elementary</td><td>Submitted</td><td><span class="tag t-live">Open</span></td><td class="n">8</td><td class="n">0</td><td class="n">0</td></tr>
+          <tr><td class="school">Saunemin CCSD #438</td><td>Submitted</td><td><span class="tag t-live">Open</span></td><td class="n">6</td><td class="n">0</td><td class="n">2</td></tr>
+          <tr><td class="school">St. Peter Chanel</td><td>Delivered</td><td><span class="tag t-live">Open</span></td><td class="n">6</td><td class="n">2</td><td class="n">1</td></tr>
+          <tr><td class="school">Glen Ellyn D41</td><td>Intake</td><td><span class="tag t-thin">Half</span></td><td class="n">6</td><td class="n">0</td><td class="n">3</td></tr>
+          <tr><td class="school">Go Christian Academy</td><td>Intake</td><td><span class="tag t-stop">Shut</span></td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr>
+          <tr><td class="school">Oak Grove SD 68</td><td>Intake</td><td><span class="tag t-stop">Shut</span></td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr>
+          <tr><td class="school">Roosevelt School, Lodi</td><td>Intake</td><td><span class="tag t-stop">Shut</span></td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr>
+          <tr><td class="school">WeGo D94</td><td>Intake</td><td><span class="tag t-stop">Shut</span></td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="note" style="margin-top:20px">
+      <p><strong>Four of eight schools have no grant paths at all.</strong> Their gates have never been filled in: no submitter, no backup, no sponsor, no contracts linked. Nothing is wrong with them, nothing has been started.</p>
+    </div>
+    <div class="note">
+      <p><strong>Glen Ellyn is the one to look at.</strong> Both contracts are linked but no people are named, so its gate is shut and no drafting can begin, while it carries three unanswered questions. It is the closest school to being unblocked.</p>
+    </div>
+  </section>
+
+  <hr class="div" />
+
+  <section>
+    <p class="kicker">Running register</p>
+    <h2 class="sec serif">What still needs adjusting</h2>
+    <p class="sub">Ordered by what it costs.</p>
+
+    <ul class="reg">
+      <li><span class="dot d-thin"></span>
+        <span><span class="t">Funder discovery has still never run</span>
+        <span class="d">The single most expensive gap. It is why four schools have zero paths and why every other school received the same national programmes. Nothing here finds money that is specific to a school.</span></span>
+        <span class="tag t-thin">Open</span></li>
+      <li><span class="dot d-thin"></span>
+        <span><span class="t">The eight QA checks do not exist</span>
+        <span class="d">Referenced once as a number and never enumerated. There is no rubric behind it.</span></span>
+        <span class="tag t-thin">Open</span></li>
+      <li><span class="dot d-thin"></span>
+        <span><span class="t">Account setup is not a real step</span>
+        <span class="d">Two schools are blocked on a Deed account rather than on writing. It exists only as a follow-up titled "check if they set it up".</span></span>
+        <span class="tag t-thin">Open</span></li>
+      <li><span class="dot d-thin"></span>
+        <span><span class="t">The money view stops at awarded</span>
+        <span class="d">Allocated and invoiced are not shown, and no path has awarded money yet.</span></span>
+        <span class="tag t-thin">Open</span></li>
+      <li><span class="dot d-thin"></span>
+        <span><span class="t">Proficiency figures still have no source</span>
+        <span class="d">Reading and maths numbers are typed by hand, and every narrative and eligibility judgement rests on them. One school's cannot be verified at all.</span></span>
+        <span class="tag t-thin">Open</span></li>
+      <li><span class="dot d-stop"></span>
+        <span><span class="t">The stop rule reasons from facts, never from scores</span>
+        <span class="d">Deliberate. Two of three live schools carry an unverified achievement figure, so a rule leaning on one would be worse than no rule.</span></span>
+        <span class="tag t-quiet">By design</span></li>
+      <li><span class="dot d-stop"></span>
+        <span><span class="t">A stopped path is answered, not deleted</span>
+        <span class="d">Deliberate. It keeps its reason, its decider and its date, and one click reopens it if the facts change.</span></span>
+        <span class="tag t-quiet">By design</span></li>
+    </ul>
+  </section>
+
+  <hr class="div" />
+
+  <section>
+    <p class="kicker">Worth recording</p>
+    <h2 class="sec serif">One thing that went wrong today</h2>
+    <div class="card">
+      <p style="margin:0 0 14px;color:var(--muted);font-size:15px;">The first live run of the audit reported <code>questionsRaised: 6</code> and wrote none. Two <code>CHECK</code> constraints rejected every insert, and the count had been taken when the code decided to raise a question rather than when the database accepted one.</p>
+      <p style="margin:0;color:var(--muted);font-size:15px;">It was caught by querying for the rows instead of trusting the response. Both are fixed, and the run now reports what was written and surfaces what failed. <strong>The same bug class appeared four separate times today across payments, the stress chart, contact saving, and this.</strong> A write fails, the failure is swallowed, the caller reports success.</p>
+    </div>
+  </section>
+
+</div>

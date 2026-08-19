@@ -154,6 +154,7 @@ export async function GET(request: NextRequest) {
     // opportunities list on purpose: a placeholder somebody can see and close is
     // better than a silent gap, which is what we have had.
     let discoveryCreated = 0
+    const discoveryFailures: string[] = []
     const SEEDED_NATIONAL = /(NEA Learning|Walmart Spark)/i
     const DISCOVERY_NAME = 'Local funder discovery'
 
@@ -195,9 +196,14 @@ export async function GET(request: NextRequest) {
         window_status: 'open',
         research_status: 'requested',
         assigned_agent: 'amara',
-        notes:
+        // next_action, not notes. funding_opportunities has no notes column, so
+        // every one of these inserts failed with an undefined-column error and
+        // the only trace was a console line. That is why local funder discovery
+        // has never run once. next_action is also the right home: this brief IS
+        // what happens next.
+        next_action:
           `Find local funding sources for ${school}. ` +
-          (context ? `${context} ` : `No structured location on file — establish city, county and sector first, or this search cannot be done properly. `) +
+          (context ? `${context} ` : `No structured location on file. Establish city, county and sector first, or this search cannot be done properly. `) +
           `Work through: service clubs ` +
           `(Rotary, Lions, Kiwanis, Elks, Knights of Columbus); veteran posts ` +
           `(American Legion, VFW); the local employer base including plants and ` +
@@ -214,7 +220,10 @@ export async function GET(request: NextRequest) {
       })
 
       if (discErr) {
+        // Collected and returned, never only logged. A silent failure here cost
+        // the system its entire local-funder capability for weeks.
         console.error('[funding-reminders] Failed to create discovery opportunity:', discErr)
+        discoveryFailures.push(`${school}: ${discErr.message}`)
       } else {
         discoveryCreated++
         console.log('[funding-reminders] Requested local funder discovery for', school)
@@ -379,12 +388,12 @@ export async function GET(request: NextRequest) {
 
     const stoppedLines = (stopped ?? [])
       .filter(o => activeIds.has(o.pursuit_id))
-      .map(o => `  • ${nameFor.get(o.pursuit_id) ?? 'unknown'}: ${o.name} — ${o.eligibility_reason}`)
+      .map(o => `  • ${nameFor.get(o.pursuit_id) ?? 'unknown'}: ${o.name}: ${o.eligibility_reason}`)
     if (stoppedLines.length) {
       sections.push(
         `*Paths stopped before drafting (${stoppedLines.length})*\n` +
         `${cap(stoppedLines, 5).join('\n')}\n` +
-        `  _if any of these looks wrong, the rule is wrong — it can be overridden_`)
+        `  _if any of these looks wrong, the rule is wrong, and it can be overridden_`)
     }
 
     // Applications sitting with a funder past the point where a decision would
@@ -459,6 +468,8 @@ export async function GET(request: NextRequest) {
       digest_sections: sections.length,
       unlinked_contracts: unlinkedContracts,
       discovery_requested: discoveryCreated,
+      discovery_failed: discoveryFailures.length,
+      discovery_failures: discoveryFailures,
       digest_sent: alerts.length > 0,
     })
   } catch (e: unknown) {

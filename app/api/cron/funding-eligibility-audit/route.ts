@@ -78,9 +78,14 @@ export async function GET(request: NextRequest) {
   try {
     const supabase = getSupabase()
 
+    // Archived schools are excluded, exactly as the daily reminders cron does.
+    // Without this the audit raised three questions for Glen Ellyn, a school
+    // that is archived because it is not doing grant work at all. Work invented
+    // for a school nobody is working with is worse than no work.
     const { data: pursuits, error: pErr } = await supabase
       .from('funding_pursuits')
       .select('id, district_name, sector, county, state_code, school_profile')
+      .neq('archived', true)
 
     if (pErr) {
       console.error('[eligibility-audit] Could not read pursuits:', pErr)
