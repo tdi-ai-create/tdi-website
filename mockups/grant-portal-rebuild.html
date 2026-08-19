@@ -1,0 +1,427 @@
+<title>Two Pages and a Stop Rule</title>
+<style>
+  :root{
+    --navy:#1B2A4A; --ink:#1e2749;
+    --gold:#E8B84B; --yellow:#ffba06; --blue:#80a4ed; --lightblue:#E8F0FD;
+    --page:#F5F6F8; --card:#fff; --rule:#E3E7EF;
+    --muted:#6B7489; --faint:#9AA2B5;
+    --stop:#A8452E; --stop-tint:#FAECE7;
+    --ask:#A87404; --ask-tint:#FDF4DF;
+    --clear:#3F7A63; --clear-tint:#EAF4EF;
+    --gone:#9AA2B5;
+    --shadow:0 1px 2px rgba(27,42,74,.05), 0 10px 30px -18px rgba(27,42,74,.35);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --navy:#16223A; --ink:#EDF1FA; --page:#0F1626; --card:#182135;
+      --rule:#2A3550; --muted:#A8B2C9; --faint:#7C879F; --lightblue:#1E2A46;
+      --stop:#E89578; --stop-tint:#2E1D18;
+      --ask:#E8B84B; --ask-tint:#2A2415;
+      --clear:#7FBFA3; --clear-tint:#182A22;
+      --shadow:0 1px 2px rgba(0,0,0,.3), 0 10px 30px -18px rgba(0,0,0,.7);
+    }
+  }
+  :root[data-theme="dark"]{
+    --navy:#16223A; --ink:#EDF1FA; --page:#0F1626; --card:#182135;
+    --rule:#2A3550; --muted:#A8B2C9; --faint:#7C879F; --lightblue:#1E2A46;
+    --stop:#E89578; --stop-tint:#2E1D18;
+    --ask:#E8B84B; --ask-tint:#2A2415;
+    --clear:#7FBFA3; --clear-tint:#182A22;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 10px 30px -18px rgba(0,0,0,.7);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--page);color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.55;-webkit-font-smoothing:antialiased}
+  .serif{font-family:Georgia,"Iowan Old Style","Times New Roman",serif;font-weight:400}
+  code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.86em;
+    background:var(--lightblue);border:1px solid var(--rule);border-radius:4px;padding:1px 5px}
+
+  .note{background:var(--lightblue);border-bottom:1px solid var(--rule);
+    padding:9px 20px;font-size:12.5px;color:var(--muted);text-align:center}
+  .note b{color:var(--ink)}
+
+  .wrap{max-width:840px;margin:0 auto;padding:36px 20px 80px;display:flex;flex-direction:column;gap:24px}
+  h1{font-size:clamp(27px,4.6vw,35px);margin:0 0 8px}
+  .lede{margin:0;color:var(--muted);font-size:16px;max-width:62ch}
+
+  .seg{display:inline-flex;background:var(--card);border:1px solid var(--rule);
+    border-radius:10px;padding:4px;gap:4px;box-shadow:var(--shadow);flex-wrap:wrap}
+  .seg button{font:inherit;font-size:13.5px;font-weight:600;cursor:pointer;border:none;
+    background:transparent;color:var(--muted);padding:8px 13px;border-radius:7px;white-space:nowrap}
+  .seg button:hover{color:var(--ink)}
+  .seg button[aria-selected="true"]{background:var(--navy);color:#fff}
+  .seg button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+
+  .panel[hidden]{display:none}
+  .frame{background:var(--card);border:1px solid var(--rule);border-radius:14px;box-shadow:var(--shadow);overflow:hidden}
+  .frame-bar{background:var(--navy);color:#fff;padding:9px 16px;font-size:11.5px;
+    letter-spacing:.06em;text-transform:uppercase;font-weight:600;opacity:.95}
+  .frame-body{padding:22px}
+  .stack{display:flex;flex-direction:column;gap:18px}
+
+  h2.sec{font-size:19px;margin:0 0 4px}
+  .sub{margin:0 0 16px;color:var(--muted);font-size:14px}
+  .kicker{font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--faint);margin:0 0 6px;
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+
+  /* before / after */
+  .ba{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:640px){.ba{grid-template-columns:1fr}}
+  .col h3{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--faint);margin:0 0 10px;
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-weight:400}
+  .navlist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:7px}
+  .navlist li{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:start;
+    padding:10px 12px;border-radius:9px;border:1px solid var(--rule);font-size:14px;background:var(--card)}
+  .navlist .n{font-weight:600}
+  .navlist .w{color:var(--muted);font-size:12.5px;display:block;margin-top:1px}
+  .navlist li.gone{opacity:.55;text-decoration-color:var(--gone)}
+  .navlist li.gone .n{text-decoration:line-through}
+  .navlist li.new{border-color:var(--gold);background:var(--ask-tint)}
+  .pip{width:8px;height:8px;border-radius:50%;margin-top:6px;flex:none;background:var(--blue)}
+  .gone .pip{background:transparent;border:1.5px solid var(--gone)}
+  .new .pip{background:var(--gold)}
+
+  /* school list */
+  .schools{list-style:none;margin:0;padding:0}
+  .schools li{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center;
+    padding:13px 2px;border-top:1px solid var(--rule)}
+  .schools li:first-child{border-top:none}
+  .schools .nm{font-weight:600;font-size:15px}
+  .schools .mt{color:var(--muted);font-size:12.5px;margin-top:2px;display:block}
+  .chips{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+  .chip{font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;white-space:nowrap}
+  .c-stop{color:var(--stop);background:var(--stop-tint)}
+  .c-ask{color:var(--ask);background:var(--ask-tint)}
+  .c-clear{color:var(--clear);background:var(--clear-tint)}
+  .c-quiet{color:var(--muted);background:var(--lightblue)}
+
+  /* phase chain */
+  .chain{display:flex;align-items:center;gap:0;flex-wrap:wrap;margin-bottom:18px}
+  .ph{font-size:11.5px;font-weight:600;padding:5px 11px;border-radius:999px;background:var(--lightblue);color:var(--muted)}
+  .ph.on{background:var(--navy);color:#fff}
+  .ph.done{background:var(--clear-tint);color:var(--clear)}
+  .arrow{color:var(--faint);font-size:11px;padding:0 5px}
+
+  /* tabs inside school page */
+  .subtabs{display:flex;gap:16px;border-bottom:1px solid var(--rule);margin-bottom:16px;flex-wrap:wrap}
+  .subtabs span{font-size:13.5px;color:var(--muted);padding-bottom:8px;white-space:nowrap}
+  .subtabs span.on{color:var(--ink);font-weight:600;border-bottom:2px solid var(--gold)}
+  .subtabs span.new{color:var(--ask)}
+
+  /* verdict rows */
+  .paths{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+  .path{border:1px solid var(--rule);border-radius:11px;padding:14px 16px;border-left-width:4px}
+  .path.stop{border-left-color:var(--stop)}
+  .path.ask{border-left-color:var(--gold)}
+  .path.clear{border-left-color:var(--clear)}
+  .path-top{display:flex;justify-content:space-between;gap:12px;align-items:baseline;flex-wrap:wrap}
+  .path .t{font-weight:600;font-size:14.5px}
+  .path .why{color:var(--muted);font-size:13.5px;margin-top:5px}
+  .path .meta{color:var(--faint);font-size:12px;margin-top:6px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+  .acts{display:flex;gap:7px;margin-top:11px;flex-wrap:wrap}
+  .btn{font:inherit;font-size:12.5px;font-weight:600;border-radius:7px;padding:6px 12px;cursor:pointer;
+    border:1px solid var(--rule);background:transparent;color:var(--ink)}
+  .btn.primary{background:var(--gold);color:#1B2A4A;border-color:var(--gold)}
+  .btn:hover{filter:brightness(1.04)}
+
+  .callout{border-left:3px solid var(--gold);padding:2px 0 2px 16px;margin-top:4px}
+  .callout p{margin:0;color:var(--muted);font-size:14px}
+  .callout strong{color:var(--ink)}
+
+  .qcard{border:1px solid var(--rule);border-radius:11px;padding:16px;background:var(--ask-tint);border-color:var(--gold)}
+  .qcard .q{font-weight:600;font-size:15px;margin:0 0 5px}
+  .qcard .ctx{color:var(--muted);font-size:13.5px;margin:0 0 14px}
+  .opts{display:flex;flex-direction:column;gap:8px}
+  .opt{display:grid;grid-template-columns:auto 1fr;gap:11px;align-items:start;
+    background:var(--card);border:1px solid var(--rule);border-radius:9px;padding:11px 13px;font-size:14px}
+  .opt .rad{width:16px;height:16px;border-radius:50%;border:2px solid var(--rule);margin-top:2px;flex:none}
+  .opt .lab{font-weight:600}
+  .opt .con{color:var(--muted);font-size:12.5px;display:block;margin-top:2px}
+</style>
+
+<div class="note">Mockup for review. Built from your real schools, real phases, and the stop rule that shipped <b>17 August</b>.</div>
+
+<div class="wrap">
+
+  <header>
+    <h1 class="serif">Two pages and a stop rule</h1>
+    <p class="lede">The grant portal has five pages where it needs two. And the eligibility logic you asked for already exists in the code; nothing on screen has ever shown it.</p>
+  </header>
+
+  <div class="seg" role="tablist" aria-label="View">
+    <button role="tab" aria-selected="true"  id="t1" aria-controls="p1">What changes</button>
+    <button role="tab" aria-selected="false" id="t2" aria-controls="p2">All schools</button>
+    <button role="tab" aria-selected="false" id="t3" aria-controls="p3">One school</button>
+    <button role="tab" aria-selected="false" id="t4" aria-controls="p4">The stop rule</button>
+    <button role="tab" aria-selected="false" id="t5" aria-controls="p5">Bella's questions</button>
+  </div>
+
+  <!-- 1 WHAT CHANGES -->
+  <section class="panel stack" id="p1" role="tabpanel" aria-labelledby="t1">
+    <div class="frame"><div class="frame-body">
+      <p class="kicker">Navigation</p>
+      <h2 class="sec serif">Five pages become three</h2>
+      <p class="sub">Nothing is lost. Two pages are absorbed, one is renamed.</p>
+
+      <div class="ba">
+        <div class="col">
+          <h3>Today</h3>
+          <ul class="navlist">
+            <li><span class="pip"></span><span><span class="n">Funding</span><span class="w">Overview of all work</span></span></li>
+            <li class="gone"><span class="pip"></span><span><span class="n">Portfolio</span><span class="w">"All Pursuits". A second overview of the same work.</span></span></li>
+            <li class="gone"><span class="pip"></span><span><span class="n">Queue</span><span class="w">717 lines, the largest page in the system. A third view of work already on the school pages.</span></span></li>
+            <li><span class="pip"></span><span><span class="n">Pursuit detail</span><span class="w">One per school, but named after a word nobody says out loud</span></span></li>
+            <li><span class="pip"></span><span><span class="n">Settings</span><span class="w">Configuration</span></span></li>
+          </ul>
+        </div>
+        <div class="col">
+          <h3>After</h3>
+          <ul class="navlist">
+            <li><span class="pip"></span><span><span class="n">Funding</span><span class="w">Every school, what each one needs, what is blocked. Absorbs Portfolio and Queue.</span></span></li>
+            <li><span class="pip"></span><span><span class="n">School</span><span class="w">Same page as today's pursuit detail, renamed. This is where all the specifics live.</span></span></li>
+            <li><span class="pip"></span><span><span class="n">Settings</span><span class="w">Unchanged</span></span></li>
+          </ul>
+          <div class="callout" style="margin-top:14px">
+            <p><strong>The word "pursuit" disappears everywhere a person can see it.</strong> There are 8 pursuits and 8 schools, one each. It was always a school.</p>
+          </div>
+        </div>
+      </div>
+    </div></div>
+
+    <div class="frame"><div class="frame-body">
+      <p class="kicker">What stops existing</p>
+      <h2 class="sec serif">So you know what to expect</h2>
+      <ul class="navlist" style="margin-top:12px">
+        <li class="gone"><span class="pip"></span><span><span class="n">/funding/portfolio</span><span class="w">Its "All Pursuits" table becomes the school list on the main page. Impact Evidence moves to the school page.</span></span></li>
+        <li class="gone"><span class="pip"></span><span><span class="n">/funding/queue</span><span class="w">Its three owner buckets, Needs us, With agents, Waiting on the school, become a filter on the main page rather than a page.</span></span></li>
+        <li class="gone"><span class="pip"></span><span><span class="n">The word "pursuit"</span><span class="w">In every label, heading, button and empty state. Stays in the database and the code.</span></span></li>
+        <li class="new"><span class="pip"></span><span><span class="n">New: an eligibility panel on every school page</span><span class="w">The stop rule has been running since 17 August with nowhere to appear</span></span></li>
+        <li class="new"><span class="pip"></span><span><span class="n">New: a monthly re-audit</span><span class="w">Today the rule only runs when a draft is requested</span></span></li>
+        <li class="new"><span class="pip"></span><span><span class="n">New: unanswered questions become Bella's tasks</span><span class="w">Today the system can conclude "someone must confirm this" and tell nobody</span></span></li>
+      </ul>
+    </div></div>
+  </section>
+
+  <!-- 2 ALL SCHOOLS -->
+  <section class="panel stack" id="p2" role="tabpanel" aria-labelledby="t2" hidden>
+    <div class="frame">
+      <div class="frame-bar">Admin portal &middot; Funding</div>
+      <div class="frame-body">
+        <h2 class="sec serif">Grant funding</h2>
+        <p class="sub">Every school on one page. Sorted by what is waiting on us.</p>
+
+        <div class="chips" style="justify-content:flex-start;margin-bottom:16px">
+          <span class="chip c-quiet">All 8</span>
+          <span class="chip c-ask">Needs us 3</span>
+          <span class="chip c-quiet">With agents 2</span>
+          <span class="chip c-quiet">Waiting on the school 2</span>
+          <span class="chip c-quiet">Nothing open 1</span>
+        </div>
+
+        <ul class="schools">
+          <li>
+            <span><span class="nm">St. Peter Chanel School</span>
+              <span class="mt">Delivered &middot; 6 paths &middot; Paula Poche</span></span>
+            <span class="chips"><span class="chip c-stop">2 cannot win</span><span class="chip c-ask">1 needs an answer</span></span>
+          </li>
+          <li>
+            <span><span class="nm">Saunemin CCSD #438</span>
+              <span class="mt">Submitted &middot; 6 paths &middot; Gary Doughan</span></span>
+            <span class="chips"><span class="chip c-ask">1 needs an answer</span><span class="chip c-clear">2 clear</span></span>
+          </li>
+          <li>
+            <span><span class="nm">Allenwood Elementary (renewal)</span>
+              <span class="mt">Submitted &middot; 8 paths &middot; Teri Gordon Hernandez</span></span>
+            <span class="chips"><span class="chip c-ask">Sitting with funder 63 days</span></span>
+          </li>
+          <li>
+            <span><span class="nm">Glen Ellyn D41</span>
+              <span class="mt">Intake &middot; 6 paths</span></span>
+            <span class="chips"><span class="chip c-quiet">Gate open</span></span>
+          </li>
+          <li>
+            <span><span class="nm">Go Christian Academy</span>
+              <span class="mt">Intake &middot; no paths yet</span></span>
+            <span class="chips"><span class="chip c-ask">Never audited</span></span>
+          </li>
+          <li>
+            <span><span class="nm">Oak Grove SD 68</span>
+              <span class="mt">Intake &middot; no paths yet</span></span>
+            <span class="chips"><span class="chip c-ask">Never audited</span></span>
+          </li>
+          <li>
+            <span><span class="nm">Roosevelt School, Lodi NJ</span>
+              <span class="mt">Intake &middot; no paths yet</span></span>
+            <span class="chips"><span class="chip c-ask">Never audited</span></span>
+          </li>
+          <li>
+            <span><span class="nm">WeGo D94</span>
+              <span class="mt">Intake &middot; no paths yet</span></span>
+            <span class="chips"><span class="chip c-ask">Never audited</span></span>
+          </li>
+        </ul>
+
+        <div class="callout" style="margin-top:18px">
+          <p><strong>Four of your eight schools have never had a single funding path found for them.</strong> That is real today, and the main page has never said so. Funder discovery has never run in production.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 ONE SCHOOL -->
+  <section class="panel stack" id="p3" role="tabpanel" aria-labelledby="t3" hidden>
+    <div class="frame">
+      <div class="frame-bar">Funding &middot; St. Peter Chanel School</div>
+      <div class="frame-body">
+        <div class="chain">
+          <span class="ph done">Signed</span><span class="arrow">&rsaquo;</span>
+          <span class="ph done">Intake</span><span class="arrow">&rsaquo;</span>
+          <span class="ph on">Delivered</span><span class="arrow">&rsaquo;</span>
+          <span class="ph">Submitted</span><span class="arrow">&rsaquo;</span>
+          <span class="ph">Decided</span>
+        </div>
+
+        <div class="subtabs">
+          <span class="on">Overview</span>
+          <span class="new">Eligibility</span>
+          <span>Grant paths</span>
+          <span>Actions</span>
+          <span>Emails</span>
+          <span>Record</span>
+        </div>
+
+        <h2 class="sec serif">Where this school stands</h2>
+        <p class="sub">Everything specific to St. Peter Chanel lives here and nowhere else.</p>
+
+        <ul class="schools">
+          <li><span><span class="nm">Waiting on the school</span><span class="mt">Deed account not confirmed. Paula was told on 6 August.</span></span>
+            <span class="chips"><span class="chip c-ask">Blocked</span></span></li>
+          <li><span><span class="nm">Waiting on us</span><span class="mt">One path needs an NEA member name before anything can be written</span></span>
+            <span class="chips"><span class="chip c-ask">Ask the school</span></span></li>
+          <li><span><span class="nm">Running by itself</span><span class="mt">Two narratives with Julie for QA</span></span>
+            <span class="chips"><span class="chip c-quiet">With agents</span></span></li>
+          <li><span><span class="nm">Stopped</span><span class="mt">Two paths ruled out. Reasons recorded, both overridable.</span></span>
+            <span class="chips"><span class="chip c-stop">Cannot win</span></span></li>
+        </ul>
+
+        <div class="callout" style="margin-top:18px">
+          <p>The only genuinely new tab is <strong>Eligibility</strong>. The other five already exist on this page today.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4 STOP RULE -->
+  <section class="panel stack" id="p4" role="tabpanel" aria-labelledby="t4" hidden>
+    <div class="frame">
+      <div class="frame-bar">St. Peter Chanel &middot; Eligibility</div>
+      <div class="frame-body">
+        <h2 class="sec serif">What this school can and cannot win</h2>
+        <p class="sub">Re-checked monthly, and whenever the school profile changes. Last run 19 August.</p>
+
+        <ul class="paths">
+          <li class="path stop">
+            <div class="path-top"><span class="t">Title I Section 1003 School Improvement</span><span class="chip c-stop">Cannot win</span></div>
+            <p class="why">A private school is not in the state accountability system at any score, so it can never hold the identification this grant requires.</p>
+            <p class="meta">rule: sector &middot; decided automatically &middot; 17 Aug</p>
+            <div class="acts">
+              <button class="btn">Override, with a reason</button>
+              <button class="btn">See why</button>
+            </div>
+          </li>
+
+          <li class="path stop">
+            <div class="path-top"><span class="t">Community Schools Budget</span><span class="chip c-stop">Cannot win</span></div>
+            <p class="why">The funder was never confirmed to exist, and the closest match has no open application window.</p>
+            <p class="meta">rule: window &middot; Julie recommended stopping &middot; Bella agreed 18 Aug</p>
+            <div class="acts">
+              <button class="btn">Reopen</button>
+            </div>
+          </li>
+
+          <li class="path ask">
+            <div class="path-top"><span class="t">NEA Learning &amp; Leadership Grant</span><span class="chip c-ask">Needs an answer first</span></div>
+            <p class="why">This grant requires a named NEA member as the applicant. We have not asked whether anyone at the school is one. Nothing will be drafted until we know.</p>
+            <p class="meta">rule: named_applicant &middot; question sent to Bella &middot; unanswered</p>
+            <div class="acts">
+              <button class="btn primary">Answer this</button>
+              <button class="btn">Stop it anyway</button>
+            </div>
+          </li>
+
+          <li class="path clear">
+            <div class="path-top"><span class="t">Walmart Spark Good</span><span class="chip c-clear">Clear</span></div>
+            <p class="why">No rule objects to this path for this school.</p>
+            <p class="meta">rule: none &middot; window closes 31 Aug</p>
+          </li>
+        </ul>
+
+        <div class="callout" style="margin-top:20px">
+          <p><strong>A stopped path is answered, not deleted.</strong> It stays visible with its reason, who decided, and when. If St. Peter Chanel hires an NEA member next year, the history is here and one click reopens it.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="frame"><div class="frame-body">
+      <p class="kicker">The monthly re-audit</p>
+      <h2 class="sec serif">What runs on the first of each month</h2>
+      <p class="sub">Today the rule only fires when someone asks for a draft, which is far too late.</p>
+      <ul class="navlist">
+        <li><span class="pip"></span><span><span class="n">Re-check every open path against every rule</span><span class="w">A path that has quietly become unwinnable stops before more work goes into it</span></span></li>
+        <li><span class="pip"></span><span><span class="n">Look for funding that did not exist last month</span><span class="w">National, state, county and local. This is the part that has never run for anyone.</span></span></li>
+        <li><span class="pip"></span><span><span class="n">Re-ask anything still unanswered</span><span class="w">An unanswered question does not expire quietly, it comes back</span></span></li>
+        <li><span class="pip"></span><span><span class="n">One summary to you and Bella</span><span class="w">What opened, what closed, what needs an answer. Not one alert per item.</span></span></li>
+      </ul>
+    </div></div>
+  </section>
+
+  <!-- 5 BELLA -->
+  <section class="panel stack" id="p5" role="tabpanel" aria-labelledby="t5" hidden>
+    <div class="frame">
+      <div class="frame-bar">Bella &middot; Questions to answer</div>
+      <div class="frame-body">
+        <h2 class="sec serif">The missing link</h2>
+        <p class="sub">Today the system can decide "a person must confirm this" and then tell nobody. This is where that goes.</p>
+
+        <div class="qcard">
+          <p class="q">Does anyone at St. Peter Chanel hold an NEA membership?</p>
+          <p class="ctx">One grant path needs a named member as the applicant. Nothing is being written for it until this is answered. Paula Poche is the contact.</p>
+          <div class="opts">
+            <div class="opt"><span class="rad"></span><span><span class="lab">Yes, and I have their name</span><span class="con">The path continues. The name is stored so nobody asks again.</span></span></div>
+            <div class="opt"><span class="rad"></span><span><span class="lab">No, nobody is a member</span><span class="con">The path stops permanently, with your name and today's date on it. It is not deleted, and it can be reopened if that changes.</span></span></div>
+            <div class="opt"><span class="rad"></span><span><span class="lab">I asked, still waiting</span><span class="con">Comes back in seven days. Nothing is drafted meanwhile.</span></span></div>
+            <div class="opt"><span class="rad"></span><span><span class="lab">Something else</span><span class="con">Write what you found. Rae sees it.</span></span></div>
+          </div>
+        </div>
+
+        <div class="callout" style="margin-top:20px">
+          <p><strong>Every answer is a decision with a name and a date on it.</strong> That is what turns this from a task list into the checks and balances you asked for. Bella is choosing between concrete options, never diagnosing anything.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+  var ids=['1','2','3','4','5'];
+  function show(n){
+    ids.forEach(function(i){
+      document.getElementById('t'+i).setAttribute('aria-selected', String(i===n));
+      document.getElementById('p'+i).hidden = (i!==n);
+    });
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+  ids.forEach(function(i){
+    document.getElementById('t'+i).addEventListener('click', function(){ show(i); });
+  });
+  document.querySelectorAll('.opt').forEach(function(o){
+    o.addEventListener('click', function(){
+      o.parentElement.querySelectorAll('.opt .rad').forEach(function(r){
+        r.style.background='transparent'; r.style.borderColor='var(--rule)';
+      });
+      var r=o.querySelector('.rad');
+      r.style.background='var(--gold)'; r.style.borderColor='var(--gold)';
+    });
+  });
+</script>

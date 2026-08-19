@@ -228,6 +228,47 @@ export async function PATCH(
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
+  // "stop_path" was a valid outcome that nothing acted on. A person could
+  // answer "nobody here is an NEA member, stop this path", it would be recorded
+  // faithfully, and the path would stay open for an agent to keep drafting.
+  //
+  // The path is closed, never deleted. It keeps the answer that closed it, who
+  // gave it and when, so it can be reopened if the facts change.
+  let pathStopped: { opportunityId: string; reason: string } | null = null
+
+  if (updates.outcome === 'stop_path') {
+    const { data: item } = await supabase
+      .from('funding_action_items')
+      .select('opportunity_id, answer, answered_by, title')
+      .eq('id', body.actionId)
+      .single()
+
+    if (item?.opportunity_id) {
+      const why = [
+        item.answer ? `"${item.answer}"` : null,
+        item.answered_by ? `answered by ${item.answered_by}` : null,
+        item.title ? `in reply to: ${item.title}` : null,
+      ].filter(Boolean).join(' · ')
+
+      const { error: stopErr } = await supabase
+        .from('funding_opportunities')
+        .update({
+          status: 'closed',
+          eligibility_verdict: 'stop',
+          eligibility_reason: why || 'Stopped by an answer recorded against this path.',
+          eligibility_rule: 'answered',
+          eligibility_checked_at: new Date().toISOString(),
+        })
+        .eq('id', item.opportunity_id)
+
+      if (stopErr) {
+        console.error('[actions] Answer said stop_path but the path did not close:', stopErr)
+      } else {
+        pathStopped = { opportunityId: item.opportunity_id, reason: why }
+      }
+    }
+  }
+
   // When a client action is completed, update the linked opportunity's last_activity_at
   if (updates.status === 'done') {
     const { data: action } = await supabase
@@ -244,5 +285,7 @@ export async function PATCH(
     }
   }
 
-  return NextResponse.json({ success: true })
+  // Tell the caller the path closed, so the UI can say so rather than leaving
+  // the person to wonder whether their answer did anything.
+  return NextResponse.json({ success: true, pathStopped })
 }
