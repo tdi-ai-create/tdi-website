@@ -48,6 +48,23 @@ async function postToSlack(text: string, channel: 'creator' | 'rae' = 'creator')
 
 // Creator Studio Events
 
+export async function creatorApplicationReceived(
+  applicantName: string,
+  wants: string,
+  waitingCount: number
+) {
+  const queue = waitingCount > 1 ? `\n${waitingCount} applications are now waiting on an answer.` : ''
+  await postToSlack(
+    `*New Creator Application* | ${applicantName}\nWants to make: ${wants || 'not stated'}\nAccept, hold or decline: https://www.teachersdeserveit.com/tdi-admin/creators/applications${queue}`
+  )
+}
+
+export async function creatorApplicationsWaiting(count: number, oldestDays: number) {
+  await postToSlack(
+    `*Applications waiting* | ${count} unanswered, oldest ${oldestDays} days\nNobody has heard back yet: https://www.teachersdeserveit.com/tdi-admin/creators/applications`
+  )
+}
+
 export async function creatorSubmittedDeliverable(creatorName: string, milestoneName: string, submissionVersion: number) {
   await postToSlack(
     `*Deliverable Submitted* | ${creatorName}\nMilestone: ${milestoneName} | Version ${submissionVersion}\nNeeds review in Creator Studio.`
