@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { calculateFundingAlerts } from '@/lib/tdi-admin/funding-alert-rules'
 import { syncGateActionItems } from '@/lib/funding-gate-sync'
 import { loadSettings } from '@/lib/funding-slack'
+import { guardCron } from '@/lib/cron-guard'
 
 /**
  * Daily cron endpoint for funding reminders.
@@ -14,12 +15,20 @@ import { loadSettings } from '@/lib/funding-slack'
  * Protected by CRON_SECRET header.
  */
 export async function GET(request: NextRequest) {
-  // Verify cron secret
-  const authHeader = request.headers.get('authorization')
-  const cronSecret = process.env.CRON_SECRET
-  if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  // guardCron rather than a hand-rolled check: it fails closed when CRON_SECRET
+  // is unset (the old check let anyone through in that case) and it gives us
+  // ?dryRun=1 for free.
+  //
+  // Dry run computes every decision and reports it while sending nothing and
+  // writing nothing. Worth stating plainly what this cron can reach even on a
+  // real run: the digest goes to Rae, nudges are inserted as status 'draft' and
+  // are never sent, and Slack goes to the internal webhook. Nothing here has
+  // ever reached a school contact.
+  const guard = guardCron(request)
+  if (!guard.ok) {
+    return NextResponse.json({ error: guard.error }, { status: guard.status ?? 401 })
   }
+  const { dryRun } = guard
 
   try {
     const supabase = createClient(
@@ -53,6 +62,8 @@ export async function GET(request: NextRequest) {
 
     const gateByPursuit = new Map((gates || []).map(g => [g.pursuit_id, g]))
     for (const p of pursuits) {
+      // Writes client action items, so it is skipped entirely on a dry run.
+      if (dryRun) continue
       const res = await syncGateActionItems(supabase, p.id, gateByPursuit.get(p.id) ?? null)
         .catch(() => ({ created: 0, resolved: 0 }))
       gateItemsCreated += res.created
@@ -77,7 +88,7 @@ export async function GET(request: NextRequest) {
       const digestHtml = buildDigestEmail(critical, warnings, pursuits)
 
       const resendKey = process.env.RESEND_API_KEY
-      if (resendKey) {
+      if (resendKey && !dryRun) {
         await fetch('https://api.resend.com/emails', {
           method: 'POST',
           headers: { Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
@@ -114,8 +125,8 @@ export async function GET(request: NextRequest) {
 
       if (recentEmails && recentEmails.length > 0) continue
 
-      // Auto-draft a nudge
-      await supabase.from('funding_email_log').insert({
+      // Auto-draft a nudge. status 'draft', never sent by this cron.
+      if (!dryRun) await supabase.from('funding_email_log').insert({
         pursuit_id: alert.pursuit_id,
         opportunity_id: alert.opportunity_id,
         template_id: 'deadline_reminder',
@@ -154,6 +165,9 @@ export async function GET(request: NextRequest) {
     // opportunities list on purpose: a placeholder somebody can see and close is
     // better than a silent gap, which is what we have had.
     let discoveryCreated = 0
+    const discoveryFailures: string[] = []
+    // On a dry run these are what a person needs to read before any agent acts.
+    const discoveryBriefs: { school: string; brief: string }[] = []
     const SEEDED_NATIONAL = /(NEA Learning|Walmart Spark)/i
     const DISCOVERY_NAME = 'Local funder discovery'
 
@@ -185,19 +199,11 @@ export async function GET(request: NextRequest) {
         p.employer_base && `Employers in or near the county: ${p.employer_base}.`,
       ].filter(Boolean).join(' ')
 
-      const { error: discErr } = await supabase.from('funding_opportunities').insert({
-        pursuit_id: p.id,
-        name: DISCOVERY_NAME,
-        plan_category: 'C',
-        status: 'not_started',
-        waiting_on: 'tdi',
-        narrative_status: 'not_started',
-        window_status: 'open',
-        research_status: 'requested',
-        assigned_agent: 'amara',
-        notes:
+      // Built once, so what is shown on a dry run is byte for byte what gets
+      // stored on a real one. A preview of something else is worthless.
+      const brief =
           `Find local funding sources for ${school}. ` +
-          (context ? `${context} ` : `No structured location on file — establish city, county and sector first, or this search cannot be done properly. `) +
+          (context ? `${context} ` : `No structured location on file. Establish city, county and sector first, or this search cannot be done properly. `) +
           `Work through: service clubs ` +
           `(Rotary, Lions, Kiwanis, Elks, Knights of Columbus); veteran posts ` +
           `(American Legion, VFW); the local employer base including plants and ` +
@@ -210,11 +216,35 @@ export async function GET(request: NextRequest) {
           `For each candidate confirm it is real and currently open before adding ` +
           `it: name, what it funds, typical award size, deadline or cycle, and how ` +
           `to apply. An unverified list is worse than no list. Create a real ` +
-          `opportunity for each verified candidate, then close this placeholder.`,
+          `opportunity for each verified candidate, then close this placeholder.`
+
+      const { error: discErr } = dryRun
+        ? { error: null }
+        : await supabase.from('funding_opportunities').insert({
+        pursuit_id: p.id,
+        name: DISCOVERY_NAME,
+        plan_category: 'C',
+        status: 'not_started',
+        waiting_on: 'tdi',
+        narrative_status: 'not_started',
+        window_status: 'open',
+        research_status: 'requested',
+        assigned_agent: 'amara',
+        // next_action, not notes. funding_opportunities has no notes column, so
+        // every one of these inserts failed with an undefined-column error and
+        // the only trace was a console line. That is why local funder discovery
+        // has never run once. next_action is also the right home: this brief IS
+        // what happens next.
+        next_action: brief,
       })
 
+      discoveryBriefs.push({ school, brief })
+
       if (discErr) {
+        // Collected and returned, never only logged. A silent failure here cost
+        // the system its entire local-funder capability for weeks.
         console.error('[funding-reminders] Failed to create discovery opportunity:', discErr)
+        discoveryFailures.push(`${school}: ${discErr.message}`)
       } else {
         discoveryCreated++
         console.log('[funding-reminders] Requested local funder discovery for', school)
@@ -379,12 +409,12 @@ export async function GET(request: NextRequest) {
 
     const stoppedLines = (stopped ?? [])
       .filter(o => activeIds.has(o.pursuit_id))
-      .map(o => `  • ${nameFor.get(o.pursuit_id) ?? 'unknown'}: ${o.name} — ${o.eligibility_reason}`)
+      .map(o => `  • ${nameFor.get(o.pursuit_id) ?? 'unknown'}: ${o.name}: ${o.eligibility_reason}`)
     if (stoppedLines.length) {
       sections.push(
         `*Paths stopped before drafting (${stoppedLines.length})*\n` +
         `${cap(stoppedLines, 5).join('\n')}\n` +
-        `  _if any of these looks wrong, the rule is wrong — it can be overridden_`)
+        `  _if any of these looks wrong, the rule is wrong, and it can be overridden_`)
     }
 
     // Applications sitting with a funder past the point where a decision would
@@ -423,7 +453,7 @@ export async function GET(request: NextRequest) {
     let digestPosted = false
     if (sections.length > 0) {
       const settings = await loadSettings()
-      if (settings.slack_enabled && settings.slack_webhook_url) {
+      if (settings.slack_enabled && settings.slack_webhook_url && !dryRun) {
         const mention = settings.bella_slack_handle ? ` <@${settings.bella_slack_handle}>` : ''
         const portalUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.teachersdeserveit.com'
         const tail = remaining > 0
@@ -458,7 +488,14 @@ export async function GET(request: NextRequest) {
       digest_posted: digestPosted,
       digest_sections: sections.length,
       unlinked_contracts: unlinkedContracts,
+      dryRun,
+      wouldSend: dryRun
+        ? 'Nothing was sent and nothing was written. On a real run the digest goes to Rae, nudges are inserted as drafts and never sent, and Slack posts to the internal webhook. No school contact is ever emailed by this cron.'
+        : undefined,
       discovery_requested: discoveryCreated,
+      discovery_briefs: discoveryBriefs,
+      discovery_failed: discoveryFailures.length,
+      discovery_failures: discoveryFailures,
       digest_sent: alerts.length > 0,
     })
   } catch (e: unknown) {
