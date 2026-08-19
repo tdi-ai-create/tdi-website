@@ -1,4 +1,5 @@
 import { isTDIAdmin } from '@/lib/tdi-admin/auth-check'
+import { requireAdminAuth } from '@/lib/tdi-admin/auth'
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
@@ -31,10 +32,29 @@ export async function PATCH(
 ) {
   try {
     const { id } = await params;
-    const email = request.headers.get('x-user-email');
 
-    if (!email || !(await isTDIAdmin(email))) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    // Accept either a real admin session or the legacy x-user-email header.
+    //
+    // Every inline edit on the School Information modal was failing with 401
+    // because InlineEditField calls updateDashboardField with three arguments
+    // and the fourth, userEmail, is the only thing that sets that header. The
+    // page's own handleFieldUpdate sends it, which is why some edits on this
+    // page worked and the inline ones never did. Bella reported this as
+    // "information isn't saving" on 18 Aug.
+    //
+    // Checking the session first is also simply better: x-user-email is
+    // supplied by the client and can be set to anything.
+    const sessionAuth = await requireAdminAuth();
+    let email: string | null = null;
+
+    if (!(sessionAuth instanceof NextResponse)) {
+      email = sessionAuth.user.email;
+    } else {
+      const headerEmail = request.headers.get('x-user-email');
+      if (!headerEmail || !(await isTDIAdmin(headerEmail))) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      }
+      email = headerEmail;
     }
 
     const body = await request.json();
