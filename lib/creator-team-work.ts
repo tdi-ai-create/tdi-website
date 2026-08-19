@@ -133,11 +133,19 @@ export async function loadTeamWork(
     return [];
   }
 
+  // Deliberately does not exclude published creators. publish_status describes
+  // a project but lives on the creator row, so someone who launched a course in
+  // February and is now building a download still reads as published forever.
+  // Katie Welch was invisible here for exactly that reason while Lily's build
+  // step sat open on her second project.
+  //
+  // Paused and closed are still excluded. A paused creator asked for a break,
+  // and chasing ourselves on their behalf while they rest helps nobody. If a
+  // creator is genuinely finished they have no open steps, so nothing appears.
   const live = (creators || []).filter(
     (c: Record<string, unknown>) =>
       c.status === 'active' &&
       (!c.lifecycle_state || c.lifecycle_state === 'active') &&
-      c.publish_status !== 'published' &&
       !c.is_test_account
   );
   if (live.length === 0) return [];
