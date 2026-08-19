@@ -71,8 +71,11 @@ export async function POST(request: NextRequest) {
   if (!applicationId) {
     return NextResponse.json({ error: 'applicationId is required' }, { status: 400 });
   }
-  if (!['accept', 'hold', 'decline'].includes(decision)) {
-    return NextResponse.json({ error: 'decision must be accept, hold or decline' }, { status: 400 });
+  if (!['accept', 'hold', 'decline', 'dismiss'].includes(decision)) {
+    return NextResponse.json(
+      { error: 'decision must be accept, hold, decline or dismiss' },
+      { status: 400 }
+    );
   }
 
   const result = await decideApplication(db(), {
