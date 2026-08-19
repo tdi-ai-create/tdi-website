@@ -257,6 +257,10 @@ export interface MilestoneWithStatus extends Milestone {
   status: MilestoneStatus;
   completed_at: string | null;
   progress_id: string | null;
+  /** Recommended date for this step. Never a deadline; the creator can move it. */
+  due_on?: string | null;
+  /** How many times they have asked for longer on this step. */
+  extension_count?: number | null;
   metadata: Record<string, unknown> | null;
   submission_data: SubmissionData | null;
   isApplicable: boolean;
