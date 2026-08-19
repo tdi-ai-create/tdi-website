@@ -47,6 +47,18 @@ function readProfile(raw: unknown): Record<string, unknown> {
 // for no benefit and could reopen a decision someone already made.
 const SETTLED = new Set(['awarded', 'denied', 'closed', 'submitted', 'applied'])
 
+/**
+ * The question a person has to answer, per rule. The rule's own reason is
+ * written for a reader, so it becomes the body; this is the one-line ask.
+ */
+const QUESTION_BY_RULE: Record<string, string> = {
+  named_applicant: 'Does anyone at this school hold the membership this grant requires?',
+  designation:     'Does this school hold a school-improvement designation?',
+  tdi_authorization: 'Is TDI an approved vendor with this state agency?',
+  window:          'Is this funder actually open, and when does it close?',
+  sector:          'Does this school sit inside the state accountability system?',
+}
+
 interface Change {
   school: string
   path: string
@@ -87,6 +99,8 @@ export async function GET(request: NextRequest) {
     const bySchool = new Map((pursuits ?? []).map(p => [p.id, p]))
 
     const changes: Change[] = []
+    const questionsToRaise: { school: string; path: string; question: string; because: string }[] = []
+    const questionsExisting: string[] = []
     const unchanged: string[] = []
     const skipped: { path: string; why: string }[] = []
     const counts = { stop: 0, ask_first: 0, clear: 0 }
@@ -125,6 +139,56 @@ export async function GET(request: NextRequest) {
 
       counts[result.verdict]++
 
+      // An "ask first" verdict means the system has concluded a person must
+      // confirm something. Until now it could reach that conclusion and tell
+      // nobody, which is why six paths are waiting on questions that were never
+      // asked. Raise it as a real question, owned by a person, that cannot be
+      // closed without recording what they were told.
+      if (result.verdict === 'ask_first') {
+        const title = QUESTION_BY_RULE[result.rule]
+          ?? 'Confirm this before any drafting starts'
+
+        // Idempotent. A monthly re-audit must not stack twelve copies of the
+        // same unanswered question.
+        const { data: already } = await supabase
+          .from('funding_action_items')
+          .select('id')
+          .eq('opportunity_id', opp.id)
+          .eq('requires_answer', true)
+          .not('status', 'in', '("done","skipped","cancelled")')
+          .limit(1)
+          .maybeSingle()
+
+        if (already) {
+          questionsExisting.push(`${school.district_name} · ${opp.name}`)
+        } else {
+          questionsToRaise.push({
+            school: school.district_name ?? '',
+            path: opp.name ?? '',
+            question: title,
+            because: result.reason,
+          })
+
+          if (!dryRun) {
+            const { error: qErr } = await supabase.from('funding_action_items').insert({
+              pursuit_id: opp.pursuit_id,
+              opportunity_id: opp.id,
+              owner_type: 'tdi',
+              title,
+              description:
+                `${result.reason}\n\nNothing will be drafted for "${opp.name}" until this is answered.`,
+              status: 'open',
+              category: 'eligibility',
+              requires_answer: true,
+              due_date: new Date(Date.now() + 7 * 86400000).toISOString().split('T')[0],
+            })
+            if (qErr) {
+              console.error(`[eligibility-audit] Could not raise question for ${opp.id}:`, qErr)
+            }
+          }
+        }
+      }
+
       if (result.verdict === opp.eligibility_verdict) {
         unchanged.push(opp.name ?? '')
         continue
@@ -154,6 +218,7 @@ export async function GET(request: NextRequest) {
           console.error(`[eligibility-audit] Could not record verdict for ${opp.id}:`, uErr)
         }
       }
+
     }
 
     return NextResponse.json({
@@ -163,6 +228,9 @@ export async function GET(request: NextRequest) {
       verdicts: counts,
       changed: changes.length,
       changes,
+      questionsRaised: questionsToRaise.length,
+      questions: questionsToRaise,
+      questionsAlreadyOpen: questionsExisting.length,
       unchangedCount: unchanged.length,
       skipped,
       note: dryRun
