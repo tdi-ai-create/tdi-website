@@ -46,6 +46,14 @@ async function postToSlack(text: string, channel: 'creator' | 'rae' = 'creator')
   }
 }
 
+/**
+ * Posts a message already composed elsewhere. Used by the waiting on TDI list,
+ * which builds its own body so the wording lives next to the data it describes.
+ */
+export async function postCreatorMessage(text: string, channel: 'creator' | 'rae' = 'creator') {
+  await postToSlack(text, channel)
+}
+
 // Creator Studio Events
 
 export async function creatorApplicationReceived(
