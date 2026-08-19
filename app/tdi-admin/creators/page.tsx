@@ -46,7 +46,7 @@ import {
   GraduationCap, Sparkles, Languages, HeartHandshake, Music, Library,
   HeartPulse, Lightbulb, Route, ClipboardCheck, NotebookPen,
   PencilRuler, Baby, Puzzle, MessagesSquare, Star, Sprout,
-  Target, Home as HomeIcon, Laptop, Scale, Mail, MoreVertical,
+  Target, Home as HomeIcon, Laptop, Scale, Mail, MoreVertical, Inbox,
   UserPlus, Award,
 } from 'lucide-react';
 
@@ -1803,6 +1803,7 @@ export default function CreatorStudioPage() {
 
   // Feedback review queue state
   const [feedbackQueue, setFeedbackQueue] = useState<any[]>([]);
+  const [waitingApplications, setWaitingApplications] = useState(0);
   const [newSubmissions, setNewSubmissions] = useState<any[]>([]);
   const [pendingRecruitment, setPendingRecruitment] = useState<any[]>([]);
   const [feedbackLoading, setFeedbackLoading] = useState(false);
@@ -2040,6 +2041,13 @@ export default function CreatorStudioPage() {
           }
         })
         .catch(err => console.error('Failed to load location data:', err));
+      // Load the application queue count. Applications used to land in a table
+      // nothing read, so seven people waited months without an answer. The
+      // count is surfaced here so the queue cannot go quiet again.
+      fetch('/api/tdi-admin/creator-applications?status=open')
+        .then(res => res.json())
+        .then(data => setWaitingApplications((data.applications || []).length))
+        .catch(() => {});
       // Load recent email activity
       fetch('/api/admin/creator-email-activity')
         .then(res => res.json())
@@ -2916,6 +2924,22 @@ export default function CreatorStudioPage() {
         <div className="flex items-center justify-between mb-6">
           <h1 style={TYPE_PAGE_TITLE}>Creator Studio</h1>
           <div className="flex items-center gap-3">
+            <Link
+              href="/tdi-admin/creators/applications"
+              className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all duration-200 border ${
+                waitingApplications > 0
+                  ? 'border-amber-300 bg-amber-50 text-amber-800 hover:bg-amber-100'
+                  : 'border-gray-200 text-gray-600 hover:bg-gray-50'
+              }`}
+            >
+              <Inbox className="w-4 h-4" />
+              Applications
+              {waitingApplications > 0 && (
+                <span className="ml-1 px-2 py-0.5 rounded-full bg-amber-600 text-white text-xs font-bold">
+                  {waitingApplications}
+                </span>
+              )}
+            </Link>
             <Link
               href="/tdi-admin/creator-updates"
               className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all duration-200 border border-violet-200 text-violet-600 hover:bg-violet-50"
