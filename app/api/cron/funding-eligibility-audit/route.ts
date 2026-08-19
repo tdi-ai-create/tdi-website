@@ -101,6 +101,7 @@ export async function GET(request: NextRequest) {
     const changes: Change[] = []
     const questionsToRaise: { school: string; path: string; question: string; because: string }[] = []
     const questionsExisting: string[] = []
+    const questionsFailed: { school: string; path: string; question: string; because: string; error: string }[] = []
     const unchanged: string[] = []
     const skipped: { path: string; why: string }[] = []
     const counts = { stop: 0, ask_first: 0, clear: 0 }
@@ -162,14 +163,16 @@ export async function GET(request: NextRequest) {
         if (already) {
           questionsExisting.push(`${school.district_name} · ${opp.name}`)
         } else {
-          questionsToRaise.push({
+          const intended = {
             school: school.district_name ?? '',
             path: opp.name ?? '',
             question: title,
             because: result.reason,
-          })
+          }
 
-          if (!dryRun) {
+          if (dryRun) {
+            questionsToRaise.push(intended)
+          } else {
             const { error: qErr } = await supabase.from('funding_action_items').insert({
               pursuit_id: opp.pursuit_id,
               opportunity_id: opp.id,
@@ -177,13 +180,25 @@ export async function GET(request: NextRequest) {
               title,
               description:
                 `${result.reason}\n\nNothing will be drafted for "${opp.name}" until this is answered.`,
-              status: 'open',
-              category: 'eligibility',
+              // 'pending' and 'gate' because those are what the CHECK
+              // constraints on this table allow. 'open' and 'eligibility' were
+              // rejected on every insert, and because the failure was only
+              // logged, the run reported six questions raised while writing
+              // none. A gate is also the honest description: this is a rule
+              // that holds work back until a person answers.
+              status: 'pending',
+              category: 'gate',
               requires_answer: true,
               due_date: new Date(Date.now() + 7 * 86400000).toISOString().split('T')[0],
             })
+            // Only count it once the database has accepted it. Counting the
+            // intent is how a run reported six questions raised and created
+            // zero, with nothing but a console line to say so.
             if (qErr) {
               console.error(`[eligibility-audit] Could not raise question for ${opp.id}:`, qErr)
+              questionsFailed.push({ ...intended, error: qErr.message })
+            } else {
+              questionsToRaise.push(intended)
             }
           }
         }
@@ -231,6 +246,10 @@ export async function GET(request: NextRequest) {
       questionsRaised: questionsToRaise.length,
       questions: questionsToRaise,
       questionsAlreadyOpen: questionsExisting.length,
+      // Surfaced in the response, never only in a log. A silent write failure
+      // is indistinguishable from success to whoever reads this.
+      questionsFailed: questionsFailed.length,
+      questionFailures: questionsFailed,
       unchangedCount: unchanged.length,
       skipped,
       note: dryRun
