@@ -9,6 +9,7 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "deadcode": "knip",
+    "check:writes": "node scripts/check-db-writes.mjs",
     "check:schema": "node scripts/check-schema.mjs",
     "check:schema:update": "node scripts/check-schema.mjs --update-baseline",
     "validate:quizzes": "node scripts/validate-quizzes.mjs"

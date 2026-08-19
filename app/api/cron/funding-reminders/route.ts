@@ -104,6 +104,7 @@ export async function GET(request: NextRequest) {
 
     // Auto-draft nudge emails for critical deadline alerts
     let draftCount = 0
+    const draftFailures: string[] = []
     for (const alert of critical) {
       if (alert.category !== 'deadline' || !alert.opportunity_id) continue
 
@@ -126,7 +127,9 @@ export async function GET(request: NextRequest) {
       if (recentEmails && recentEmails.length > 0) continue
 
       // Auto-draft a nudge. status 'draft', never sent by this cron.
-      if (!dryRun) await supabase.from('funding_email_log').insert({
+      const { error: draftErr } = dryRun
+        ? { error: null }
+        : await supabase.from('funding_email_log').insert({
         pursuit_id: alert.pursuit_id,
         opportunity_id: alert.opportunity_id,
         template_id: 'deadline_reminder',
@@ -138,7 +141,15 @@ export async function GET(request: NextRequest) {
         sent_by: 'system',
         email_type: 'deadline_reminder',
       })
-      draftCount++
+
+      // Counted only once the row exists. Counting the attempt is how the
+      // eligibility audit reported six questions raised and wrote zero.
+      if (draftErr) {
+        console.error('[funding-reminders] Could not draft nudge:', draftErr)
+        draftFailures.push(`${alert.opportunity_name}: ${draftErr.message}`)
+      } else {
+        draftCount++
+      }
     }
 
     // ── Local funder discovery: give the agents something to actually research ──
@@ -492,6 +503,8 @@ export async function GET(request: NextRequest) {
       wouldSend: dryRun
         ? 'Nothing was sent and nothing was written. On a real run the digest goes to Rae, nudges are inserted as drafts and never sent, and Slack posts to the internal webhook. No school contact is ever emailed by this cron.'
         : undefined,
+      drafts_failed: draftFailures.length,
+      draft_failures: draftFailures,
       discovery_requested: discoveryCreated,
       discovery_briefs: discoveryBriefs,
       discovery_failed: discoveryFailures.length,

@@ -165,9 +165,26 @@ npm run build          # production build
 npm run typecheck      # tsc --noEmit, check the exit code
 npm run lint           # eslint
 npm run deadcode       # knip: unused files, exports, and dependencies
+npm run check:writes   # fails if a changed file has a Supabase write whose error is discarded
 npm run check:schema   # detects DB schema drift against the baseline
 npm run validate:quizzes
 ```
+
+**The defining bug of this codebase is a silent write.** Five separate features
+were found broken in two days, every one the same shape: a write fails, the
+returned error is discarded, and the caller reports success. Confirm Payment,
+the Hub stress chart, saving a partnership contact, the grant eligibility
+questions, and local funder discovery, which had never once produced a row
+because it wrote to a column that does not exist.
+
+Writing this rule down did not prevent the fourth instance, which was committed
+hours later. So it is now mechanical: `npm run check:writes` fails when a file
+you changed has a Supabase write whose `error` is thrown away. It judges only
+changed files, because roughly 492 such writes already exist and a check nobody
+can pass is a check nobody runs.
+
+Never write `await supabase.from(x).insert(...)` on its own. Take the `error`,
+and never count something as done before the database has accepted it.
 
 Schema drift is a known bug class here: a wrong column name plus a swallowed
 error produces a silently dead feature. `check:schema` exists for that reason.
