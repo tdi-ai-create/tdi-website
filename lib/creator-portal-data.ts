@@ -1,4 +1,5 @@
 import { supabase, getServiceSupabase } from './supabase';
+import { PHASE_ORDER as SHARED_PHASE_ORDER } from './creator-phases';
 import type {
   Creator,
   CreatorMilestone,
@@ -15,16 +16,9 @@ import type {
   ProgressBreakdown,
 } from '@/types/creator-portal';
 
-// Phase order for progression
-const PHASE_ORDER: PhaseId[] = [
-  'onboarding',
-  'agreement',
-  'course_design',
-  'test_prep',
-  'production',
-  'marketing_blog',
-  'launch',
-];
+// Phase order for progression. Defined once in lib/creator-phases.ts, because
+// two other copies of this list had drifted and were missing marketing_blog.
+const PHASE_ORDER = SHARED_PHASE_ORDER as readonly PhaseId[];
 
 // ============================================
 // Content-Path-Aware Milestone Titles & Descriptions
@@ -244,7 +238,7 @@ export async function createCreator(data: {
   const { error: progressError } = await serviceSupabase
     .from('creator_milestones')
     .upsert(milestoneRecords, {
-      onConflict: 'creator_id,milestone_id',
+      onConflict: 'creator_id,milestone_id,project_id',
       ignoreDuplicates: true
     });
 
@@ -530,7 +524,7 @@ export async function getCreatorDashboardData(
     }));
     const { error: initError } = await serviceSupabase
       .from('creator_milestones')
-      .upsert(milestoneRecords, { onConflict: 'creator_id,milestone_id', ignoreDuplicates: true });
+      .upsert(milestoneRecords, { onConflict: 'creator_id,milestone_id,project_id', ignoreDuplicates: true });
     if (initError) {
       console.error('[dashboard] Auto-init milestones failed:', initError);
     } else {

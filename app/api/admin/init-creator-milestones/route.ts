@@ -55,7 +55,7 @@ export async function POST(request: Request) {
     const { error: insertError } = await supabase
       .from('creator_milestones')
       .upsert(milestoneRecords, {
-        onConflict: 'creator_id,milestone_id',
+        onConflict: 'creator_id,milestone_id,project_id',
         ignoreDuplicates: true
       });
 
