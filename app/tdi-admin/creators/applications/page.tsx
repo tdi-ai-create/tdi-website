@@ -89,7 +89,7 @@ export default function CreatorApplicationsPage() {
   const [view, setView] = useState<'open' | 'all'>('open')
   const [busy, setBusy] = useState<string | null>(null)
   const [message, setMessage] = useState<{ tone: 'ok' | 'bad'; text: string } | null>(null)
-  const [drafting, setDrafting] = useState<{ id: string; decision: 'hold' | 'decline' } | null>(null)
+  const [drafting, setDrafting] = useState<{ id: string; decision: 'hold' | 'decline' | 'dismiss' } | null>(null)
   const [reason, setReason] = useState('')
   const [revisitOn, setRevisitOn] = useState('')
 
@@ -113,7 +113,7 @@ export default function CreatorApplicationsPage() {
 
   const decide = async (
     app: Application,
-    decision: 'accept' | 'hold' | 'decline',
+    decision: 'accept' | 'hold' | 'decline' | 'dismiss',
     extra: { reason?: string; revisitOn?: string } = {}
   ) => {
     setBusy(app.id)
@@ -311,7 +311,11 @@ export default function CreatorApplicationsPage() {
                     <div style={{ marginTop: 12, display: 'grid', gap: 10 }}>
                       <div>
                         <div style={LABEL}>
-                          {drafting.decision === 'hold' ? 'Why are we holding this' : 'Why are we declining'}
+                          {drafting.decision === 'hold'
+                            ? 'Why are we holding this'
+                            : drafting.decision === 'dismiss'
+                              ? 'Why is this not a real application'
+                              : 'Why are we declining'}
                         </div>
                         <textarea
                           value={reason}
@@ -320,7 +324,9 @@ export default function CreatorApplicationsPage() {
                           placeholder={
                             drafting.decision === 'hold'
                               ? 'Good fit, no capacity until the new term'
-                              : 'Not a fit for what we publish'
+                              : drafting.decision === 'dismiss'
+                                ? 'Test row from June, not a person'
+                                : 'Not a fit for what we publish'
                           }
                           style={{
                             width: '100%', padding: '8px 10px', borderRadius: 8, border: '1px solid #E5E7EB',
@@ -328,9 +334,9 @@ export default function CreatorApplicationsPage() {
                           }}
                         />
                         <div style={{ fontSize: 12, color: '#6B7280', marginTop: 4 }}>
-                          {drafting.decision === 'hold'
-                            ? 'Only we see this. Nothing is sent to the applicant.'
-                            : 'Only we see this. The applicant gets a warm note inviting them to apply again.'}
+                          {drafting.decision === 'decline'
+                            ? 'Only we see this. The applicant gets a warm note inviting them to apply again.'
+                            : 'Only we see this. Nothing is sent to anyone.'}
                         </div>
                       </div>
 
@@ -365,7 +371,11 @@ export default function CreatorApplicationsPage() {
                             opacity: !reason.trim() || (drafting.decision === 'hold' && !revisitOn) ? 0.4 : 1,
                           }}
                         >
-                          {drafting.decision === 'hold' ? 'Hold it' : 'Send the decline'}
+                          {drafting.decision === 'hold'
+                            ? 'Hold it'
+                            : drafting.decision === 'dismiss'
+                              ? 'Remove it'
+                              : 'Send the decline'}
                         </button>
                         <button
                           onClick={() => { setDrafting(null); setReason(''); setRevisitOn('') }}
@@ -403,6 +413,14 @@ export default function CreatorApplicationsPage() {
                         style={{ ...BTN, background: 'white', color: '#B91C1C', borderColor: '#FECACA' }}
                       >
                         Decline
+                      </button>
+                      <button
+                        disabled={busy === app.id}
+                        onClick={() => { setDrafting({ id: app.id, decision: 'dismiss' }); setReason('') }}
+                        title="For a test row or a duplicate created by a system error. Sends nothing."
+                        style={{ ...BTN, background: 'white', color: '#6B7280', borderColor: '#E5E7EB' }}
+                      >
+                        Not a real application
                       </button>
                     </div>
                   )}

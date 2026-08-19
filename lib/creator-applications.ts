@@ -17,12 +17,13 @@
 import { SITE_URL } from './reengagement-config';
 import { creatorEmailTemplate } from './creator-email-template';
 import { logCreatorEmail } from './creator-email-log';
+import { creatorApplicationDecided } from './creator-slack';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 type DbClient = any;
 
-export type ApplicationStatus = 'pending' | 'accepted' | 'held' | 'declined';
-export type Decision = 'accept' | 'hold' | 'decline';
+export type ApplicationStatus = 'pending' | 'accepted' | 'held' | 'declined' | 'dismissed';
+export type Decision = 'accept' | 'hold' | 'decline' | 'dismiss';
 
 interface Application {
   id: string;
@@ -230,7 +231,7 @@ export async function decideApplication(
     return fail(decision, application, `Already ${app.status}. Decisions are made once.`);
   }
 
-  if ((decision === 'hold' || decision === 'decline') && !reason?.trim()) {
+  if ((decision === 'hold' || decision === 'decline' || decision === 'dismiss') && !reason?.trim()) {
     return fail(decision, application, 'A reason is required so the decision can be understood later.');
   }
   if (decision === 'hold' && !revisitOn) {
@@ -251,6 +252,7 @@ export async function decideApplication(
         .eq('id', applicationId);
       if (error) return fail(decision, application, error.message);
     }
+    if (!dryRun) announce(application, `held until ${revisitOn}`, decidedBy, false, false);
     return {
       ok: true,
       dryRun,
@@ -261,10 +263,39 @@ export async function decideApplication(
     };
   }
 
+  if (decision === 'dismiss') {
+    // Sends nothing. This is for a test row or a duplicate created by a system
+    // error, which is not a person and must never receive a decline.
+    if (!dryRun) {
+      const { error } = await supabase
+        .from('pending_creators')
+        .update({
+          status: 'dismissed',
+          reviewed_by: decidedBy,
+          reviewed_at: now.toISOString(),
+          decision_reason: reason!.trim(),
+        })
+        .eq('id', applicationId);
+      if (error) return fail(decision, application, error.message);
+    }
+    if (!dryRun) announce(application, 'removed as not a real application', decidedBy, false, false);
+    return {
+      ok: true,
+      dryRun,
+      decision,
+      application,
+      effect: 'Removed from the queue. Nothing was sent to anyone. The row is kept with the reason, so this can be undone.',
+      emailSent: false,
+    };
+  }
+
   if (decision === 'decline') {
     let emailSent = false;
     if (!dryRun) {
-      emailSent = await sendDeclineEmail(application, now);
+      // Record first, send second. The reverse order emailed a real applicant
+      // and then failed the write on a CHECK constraint, leaving them told and
+      // the row still reading pending, which is the exact state this queue
+      // exists to prevent. A failed write now means nothing was sent.
       const { error } = await supabase
         .from('pending_creators')
         .update({
@@ -274,7 +305,10 @@ export async function decideApplication(
           decision_reason: reason!.trim(),
         })
         .eq('id', applicationId);
-      if (error) return fail(decision, application, error.message);
+      if (error) return fail(decision, application, `Nothing was sent. The decision could not be recorded: ${error.message}`);
+
+      emailSent = await sendDeclineEmail(application, now);
+      announce(application, 'declined', decidedBy, emailSent, true);
     }
     return {
       ok: true,
@@ -288,6 +322,24 @@ export async function decideApplication(
 
   // ── accept ──
   return acceptApplication(supabase, app, decidedBy, dryRun, now);
+}
+
+function announce(
+  application: { name: string | null; email: string | null },
+  decision: string,
+  decidedBy: string,
+  emailSent: boolean,
+  sendsEmail: boolean
+): void {
+  creatorApplicationDecided(
+    application.name || application.email || 'Unknown applicant',
+    decision,
+    decidedBy,
+    emailSent,
+    sendsEmail
+  ).catch(() => {
+    /* a decision must never fail over a notification */
+  });
 }
 
 function fail(decision: Decision, application: DecisionResult['application'], error: string): DecisionResult {
@@ -392,7 +444,13 @@ async function acceptApplication(
 
   // Link the application to what it became. Without this an accepted
   // application stays pending forever, which is how seven of them piled up.
-  await supabase
+  //
+  // The error here was previously discarded. A CHECK constraint rejected the
+  // status and nothing said so, so a creator existed, a welcome went out, and
+  // the application still read as waiting for an answer. The creator is real by
+  // this point and must not be rolled back, so the failure is surfaced instead:
+  // the account is fine, the queue entry needs a hand.
+  const { error: linkError } = await supabase
     .from('pending_creators')
     .update({
       status: 'accepted',
@@ -410,7 +468,24 @@ async function acceptApplication(
     phase_id: 'onboarding',
   });
 
+  if (linkError) {
+    // Do not send. An unrecorded acceptance can be accepted a second time, and
+    // a second welcome to someone who already has an account is worse than a
+    // late one.
+    return {
+      ok: false,
+      dryRun: false,
+      decision: 'accept',
+      application,
+      creatorId,
+      effect: `The account was created and is fine, but this application could not be marked accepted, so no welcome was sent. Resend it from their record once the queue entry is corrected.`,
+      emailSent: false,
+      error: `Account created. Marking the application accepted failed: ${linkError.message}`,
+    };
+  }
+
   const emailSent = await sendWelcomeEmail(supabase, { creatorId, name, email }, decidedBy);
+  announce(application, 'accepted', decidedBy, emailSent, true);
 
   return {
     ok: true,
@@ -576,7 +651,7 @@ async function send(apiKey: string, to: string, subject: string, html: string): 
       body: JSON.stringify({
         from: EMAIL_FROM,
         to: [to],
-        bcc: ['bella@teachersdeserveit.com'],
+        bcc: ['bella@teachersdeserveit.com', 'creatorstudio@teachersdeserveit.com'],
         subject,
         html,
         reply_to: REPLY_TO,

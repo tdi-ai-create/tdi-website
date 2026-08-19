@@ -59,6 +59,28 @@ export async function creatorApplicationReceived(
   )
 }
 
+/**
+ * Confirms what a decision actually did, including whether the email left.
+ * A copy landing in an inbox proves a send was attempted; this says plainly
+ * whether it succeeded, which a blind copy cannot.
+ */
+export async function creatorApplicationDecided(
+  applicantName: string,
+  decision: string,
+  decidedBy: string,
+  emailSent: boolean,
+  sendsEmail: boolean
+) {
+  const mail = !sendsEmail
+    ? 'No email is sent for this outcome.'
+    : emailSent
+      ? 'Email sent, copy in your inbox.'
+      : 'EMAIL DID NOT SEND. Nobody was contacted, this needs another look.'
+  await postToSlack(
+    `*Application ${decision}* | ${applicantName}\nBy ${decidedBy}\n${mail}\nQueue: https://www.teachersdeserveit.com/tdi-admin/creators/applications`
+  )
+}
+
 export async function creatorApplicationsWaiting(count: number, oldestDays: number) {
   await postToSlack(
     `*Applications waiting* | ${count} unanswered, oldest ${oldestDays} days\nNobody has heard back yet: https://www.teachersdeserveit.com/tdi-admin/creators/applications`
