@@ -61,7 +61,7 @@ export async function POST(request: Request) {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const m = milestone as any;
-    const milestoneName = m?.title || m?.name || m?.admin_description || 'Milestone';
+    const milestoneName = m?.name || m?.name || m?.admin_description || 'Milestone';
 
     // Handle specific action types that update creator table
     if (actionType === 'path_selection' && content?.selected_path) {
@@ -206,7 +206,7 @@ export async function POST(request: Request) {
     // Unlock next milestone - find next active milestone in same phase (skip deactivated sort_order >= 98)
     let { data: nextMilestone } = await supabase
       .from('milestones')
-      .select('id, title, name, phase_id')
+      .select('id, name, phase_id')
       .eq('phase_id', milestone.phase_id)
       .gt('sort_order', milestone.sort_order)
       .lt('sort_order', 98)
@@ -233,7 +233,7 @@ export async function POST(request: Request) {
 
       const { data: futureMilestones } = await supabase
         .from('milestones')
-        .select('id, title, name, phase_id, applies_to, phases!inner(sort_order)')
+        .select('id, name, phase_id, applies_to, phases!inner(sort_order)')
         .gt('phases.sort_order', currentPhaseOrder)
         .lt('sort_order', 98)
         .order('phases(sort_order)', { ascending: true })
@@ -299,7 +299,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       success: true,
-      nextMilestone: nextMilestone ? (nextMilestone.title || nextMilestone.name) : null
+      nextMilestone: nextMilestone ? (nextMilestone.name) : null
     });
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';

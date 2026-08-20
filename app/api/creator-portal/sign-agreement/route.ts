@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { progressMilestone } from '@/lib/milestone-progression';
 import { CREATOR_STUDIO_RECIPIENTS } from '@/lib/creator-notification-recipients';
 
 export async function POST(request: NextRequest) {
@@ -116,33 +117,30 @@ export async function POST(request: NextRequest) {
         console.log('[sign-agreement] Milestone updated:', milestoneUpdateData);
       }
 
-      // Unlock the next milestone if there is one
-      const { data: allMilestones } = await supabase
-        .from('milestones')
-        .select('id, phase_id, sort_order')
-        .order('phase_id')
-        .order('sort_order');
+      // Hand off to the shared progression rather than guessing here.
+      //
+      // This used to order phases with .order('phase_id'), which is
+      // alphabetical: agreement, course_design, launch, marketing_blog,
+      // onboarding, production, test_prep. Signing therefore unlocked
+      // course_design regardless of what the creator was actually making, so a
+      // download creator was pointed at Draft Course Outline. It also ignored
+      // retired steps entirely.
+      //
+      // It did no harm while nothing was locked, because everything was open
+      // anyway. Now that each creator sees exactly one step, it would put the
+      // wrong one in front of them.
+      const { data: creatorRow } = await supabase
+        .from('creators')
+        .select('content_path')
+        .eq('id', creatorId)
+        .single();
 
-      if (allMilestones) {
-        const currentIndex = allMilestones.findIndex((m) => m.id === milestoneId);
-        console.log('[sign-agreement] Current milestone index:', currentIndex, 'of', allMilestones.length);
-
-        if (currentIndex !== -1 && currentIndex < allMilestones.length - 1) {
-          const nextMilestone = allMilestones[currentIndex + 1];
-          console.log('[sign-agreement] Unlocking next milestone:', nextMilestone.id);
-
-          const { error: unlockError } = await supabase
-            .from('creator_milestones')
-            .update({ status: 'available' })
-            .eq('creator_id', creatorId)
-            .eq('milestone_id', nextMilestone.id)
-            .eq('status', 'locked');
-
-          if (unlockError) {
-            console.error('[sign-agreement] Unlock error:', unlockError);
-          }
-        }
-      }
+      await progressMilestone(supabase, {
+        creatorId,
+        milestoneId,
+        completedBy: signedName || 'creator',
+        contentPath: creatorRow?.content_path ?? null,
+      });
     } else {
       console.warn('[sign-agreement] No agreement milestones found - agreement signed but milestone not updated');
     }

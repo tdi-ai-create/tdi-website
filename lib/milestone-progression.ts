@@ -1,6 +1,9 @@
-import { createClient } from '@supabase/supabase-js';
-
-type DbClient = ReturnType<typeof createClient>;
+// Callers construct their Supabase client with different generic parameters,
+// so pinning this to one of them makes the shared helper unusable from half
+// the routes that should be using it. That is how sign-agreement ended up
+// with its own copy of progression logic ordering phases alphabetically.
+/* eslint-disable @typescript-eslint/no-explicit-any */
+type DbClient = any;
 
 function milestoneAppliesTo(
   milestone: { applies_to?: string[] | null },
@@ -26,7 +29,7 @@ export async function progressMilestone(
 
   const { data: milestone } = await (supabase
     .from('milestones') as any)
-    .select('id, phase_id, sort_order, title, name, applies_to')
+    .select('id, phase_id, sort_order, name, applies_to')
     .eq('id', milestoneId)
     .single();
 
@@ -52,15 +55,22 @@ export async function progressMilestone(
 
   let nextMilestoneName: string | null = null;
 
-  let { data: nextMilestone } = await (supabase
+  // Within the current phase. This previously took the next step by sort order
+  // alone, ignoring content path and retired steps, so a download creator could
+  // be handed a course step. Ask for the candidates and pick the first that
+  // actually applies.
+  const { data: samePhase } = await (supabase
     .from('milestones') as any)
-    .select('id, sort_order, title, name')
+    .select('id, sort_order, name, applies_to')
     .eq('phase_id', milestone.phase_id)
     .gt('sort_order', milestone.sort_order)
     .lt('sort_order', 98)
-    .order('sort_order', { ascending: true })
-    .limit(1)
-    .maybeSingle();
+    .is('is_collapsed_into', null)
+    .order('sort_order', { ascending: true });
+
+  let nextMilestone =
+    (samePhase as Array<{ id: string; sort_order: number; name?: string; applies_to?: string[] | null }> | null)
+      ?.find((m) => !contentPath || milestoneAppliesTo(m, contentPath)) ?? null;
 
   if (!nextMilestone) {
     const { data: phases } = await (supabase
@@ -73,9 +83,10 @@ export async function progressMilestone(
 
     const { data: futureMilestones } = await supabase
       .from('milestones')
-      .select('id, sort_order, title, name, applies_to, phases!inner(sort_order)')
+      .select('id, sort_order, name, applies_to, phases!inner(sort_order)')
       .gt('phases.sort_order', currentPhaseOrder)
       .lt('sort_order', 98)
+      .is('is_collapsed_into', null)
       .order('phases(sort_order)', { ascending: true })
       .order('sort_order', { ascending: true });
 
