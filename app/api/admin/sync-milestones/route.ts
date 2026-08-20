@@ -88,7 +88,7 @@ export async function GET() {
             milestone_id: 'agreement_sign',
             status: 'locked' // Will be unlocked when they complete onboarding
           }, {
-            onConflict: 'creator_id,milestone_id'
+            onConflict: 'creator_id,milestone_id,project_id'
           });
       }
       console.log(`[sync-milestones] Updated ${creators.length} creators`);

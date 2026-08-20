@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import type { PhaseWithMilestones, MilestoneWithStatus, MilestoneStatus, SubmissionData } from '@/types/creator-portal';
 import { MilestoneAction } from './MilestoneAction';
+import { StepDate } from './StepDate';
 import { RichContentAccordion } from './RichContentAccordion';
 import { MilestoneMeetingBanner } from './MilestoneMeetingBanner';
 import { getContextAwareMilestoneDescription, getContextAwareMilestoneTitle } from '@/lib/creator-portal-data';
@@ -422,6 +423,18 @@ function MilestoneItem({
         {!milestone.requires_team_action && milestone.status !== 'locked' && milestone.action_type !== 'sign_agreement' && (
           /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
           <RichContentAccordion richContent={(milestone as any).rich_content} />
+        )}
+
+        {/* Suggested date. Deliberately worded as a recommendation, with the
+            way out sitting right next to it, because a date with no way to
+            move it stops being a suggestion however it is phrased. */}
+        {isActionable && !milestone.requires_team_action && milestone.due_on && (
+          <StepDate
+            milestoneRecordId={milestone.progress_id}
+            dueOn={milestone.due_on}
+            extensions={milestone.extension_count ?? 0}
+            onExtended={onRefresh}
+          />
         )}
 
         {/* Action buttons - use MilestoneAction if creatorId available, otherwise fallback to legacy */}

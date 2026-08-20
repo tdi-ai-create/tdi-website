@@ -20,59 +20,69 @@ import { SITE_URL } from './reengagement-config';
 type DbClient = any;
 
 interface Guidance {
-  /** Who does this. Bella routes anything left open. */
-  owner: string;
+  /**
+   * Agent work is done by one of the AI team, human work by a person.
+   * There is no third category. Nothing is ever assigned to Rae personally:
+   * she is not a queue, and a step she has to notice is a step with no owner.
+   */
+  kind: 'agent' | 'human';
+  /** The agent's name, or the person who normally holds it. */
+  who: string;
   /** The actual move, written so it can be done without opening anything else. */
   action: string;
 }
 
 /**
- * Bella's own steps here are approval and routing only. She is never given a
- * pass or fail judgement on content quality, which is Julie's work.
+ * Who is a person and who is an agent comes from lib/data/team.ts, where every
+ * member carries an isHuman flag. Bella, Jim and Mel are people. Lily, Anne
+ * Marie and the rest are agents.
+ *
+ * A human step here is approval, a decision, or publishing. Bella is never
+ * given a quality judgement on content, which is Julie's work.
  */
 const TEAM_STEP_GUIDE: Record<string, Guidance> = {
   'Final Outline Approved': {
-    owner: 'Bella',
+    kind: 'human', who: 'Bella',
     action: 'Read their outline and approve it, or send it back saying what to change.',
   },
   'Course Scripts Approved': {
-    owner: 'Bella',
+    kind: 'human', who: 'Bella',
     action: 'Read the scripts and approve, or send them back saying what to change.',
   },
   'Marketing Blog Review & Publishing': {
-    owner: 'Bella',
-    action: 'Edit and format the post, show the creator the preview, then publish it.',
+    kind: 'human', who: 'Bella',
+    action: 'Edit and format the post, show the creator the preview, then publish it. Izzy can draft the edit for you to approve.',
   },
   'Videos & Downloads In Progress': {
-    owner: 'Open',
-    action: 'Their videos need editing and the course needs building. Decide who picks this up.',
+    kind: 'human', who: 'Bella',
+    action: 'Their videos need editing and the course needs building. Decide who picks this up and set a date the creator can be told.',
   },
   'Lily Builds Your Download': {
-    owner: 'Lily',
-    action: 'Build the branded download. Chase it if it is past seven working days.',
+    kind: 'agent', who: 'Lily',
+    action: 'Lily builds the branded download from their specs.',
   },
   'Marketing Assets Created': {
-    owner: 'Lily',
-    action: 'Build the cover, bio page and promo assets.',
+    kind: 'agent', who: 'Lily',
+    action: 'Lily builds the cover, bio page and promo assets.',
   },
   'Download Review & Handoff': {
-    owner: 'Lily',
-    action: 'Send the branded version back to the creator.',
+    kind: 'human', who: 'Bella',
+    action: 'Check the branded version reads right, then send it back to the creator.',
   },
   'Uploaded to Platform': {
-    owner: 'Rae',
+    kind: 'human', who: 'Bella',
     action: 'Upload the finished content to the Hub.',
   },
   'Launch Date Set': {
-    owner: 'Rae',
+    kind: 'human', who: 'Bella',
     action: 'Agree a launch date with the creator and set it on their record.',
   },
   'Content Launched': {
-    owner: 'Rae',
+    kind: 'human', who: 'Bella',
     action: 'Publish on the Hub, then mark this done so their affiliate step opens.',
   },
   'Download Goes Live': {
-    owner: 'Rae',
+    kind: 'human', who: 'Bella',
     action: 'Publish the download on the Hub, then mark this done.',
   },
 };
@@ -82,8 +92,15 @@ export interface TeamWorkItem {
   creatorName: string;
   step: string;
   phase: string;
-  owner: string;
+  kind: 'agent' | 'human' | 'unassigned';
+  who: string;
   action: string;
+  /**
+   * True when this is agent work and nothing records the agent ever being
+   * asked. Every creator reads this way today, because assigned_agent and
+   * last_agent_activity_at are written by nothing.
+   */
+  agentNeverAsked: boolean;
   /** Days since the creator last completed anything, which is when it became ours. */
   daysWaiting: number;
   /** What the creator is being told while they wait, so we know what we promised. */
@@ -109,18 +126,26 @@ export async function loadTeamWork(
 ): Promise<TeamWorkItem[]> {
   const { data: creators, error } = await supabase
     .from('creators')
-    .select('id, name, content_path, created_at, status, lifecycle_state, publish_status, is_test_account');
+    .select('id, name, content_path, created_at, status, lifecycle_state, publish_status, is_test_account, last_agent_activity_at');
 
   if (error) {
     console.error('[team-work] Failed to load creators:', error);
     return [];
   }
 
+  // Deliberately does not exclude published creators. publish_status describes
+  // a project but lives on the creator row, so someone who launched a course in
+  // February and is now building a download still reads as published forever.
+  // Katie Welch was invisible here for exactly that reason while Lily's build
+  // step sat open on her second project.
+  //
+  // Paused and closed are still excluded. A paused creator asked for a break,
+  // and chasing ourselves on their behalf while they rest helps nobody. If a
+  // creator is genuinely finished they have no open steps, so nothing appears.
   const live = (creators || []).filter(
     (c: Record<string, unknown>) =>
       c.status === 'active' &&
       (!c.lifecycle_state || c.lifecycle_state === 'active') &&
-      c.publish_status !== 'published' &&
       !c.is_test_account
   );
   if (live.length === 0) return [];
@@ -167,8 +192,10 @@ export async function loadTeamWork(
       creatorName: creator.name || 'Unnamed creator',
       step: ms.name,
       phase: ms.phase_id,
-      owner: guide?.owner ?? 'Open',
+      kind: guide?.kind ?? 'unassigned',
+      who: guide?.who ?? 'nobody yet',
       action: guide?.action ?? 'No guidance written for this step yet. Decide what it needs and who does it.',
+      agentNeverAsked: guide?.kind === 'agent' && !creator.last_agent_activity_at,
       daysWaiting: daysBetween(since, now),
       creatorSees: ms.team_status_message ?? null,
       url: `${SITE_URL}/tdi-admin/creators/${r.creator_id}`,
@@ -194,10 +221,17 @@ export function formatTeamWork(items: TeamWorkItem[]): string {
 
   const lines = items.map((i) => {
     const promised = i.creatorSees ? `\n_They are being told: ${i.creatorSees}_` : '';
+    const label =
+      i.kind === 'agent' ? `${i.who}, agent work` :
+      i.kind === 'human' ? `${i.who}, a person` :
+      'nobody, needs an owner';
+    const stalled = i.agentNeverAsked
+      ? '\n_No record of this agent ever being asked. Agent work does not start on its own yet._'
+      : '';
     return (
       `\n\n*${i.creatorName}* · ${i.step}\n` +
-      `${i.daysWaiting} days · ${i.owner}\n` +
-      `${i.action}${promised}\n${i.url}`
+      `${i.daysWaiting} days · ${label}\n` +
+      `${i.action}${stalled}${promised}\n${i.url}`
     );
   });
 
