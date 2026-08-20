@@ -131,13 +131,13 @@ export async function POST(request: NextRequest) {
       const milestoneRecords = milestones.map((milestone, index) => {
         // Skip intake/welcome milestones - mark as completed
         const isIntakeMilestone = milestone.id === 'intake_form' ||
-          milestone.title?.toLowerCase().includes('intake') ||
-          milestone.title?.toLowerCase().includes('welcome');
+          milestone.name?.toLowerCase().includes('intake') ||
+          milestone.name?.toLowerCase().includes('welcome');
 
         // First non-intake milestone is available, rest are locked
         const firstAvailableFound = milestones
           .slice(0, index)
-          .some(m => !m.title?.toLowerCase().includes('intake') && !m.title?.toLowerCase().includes('welcome'));
+          .some(m => !m.name?.toLowerCase().includes('intake') && !m.name?.toLowerCase().includes('welcome'));
 
         let status = 'locked';
         if (isIntakeMilestone) {
@@ -146,7 +146,7 @@ export async function POST(request: NextRequest) {
           // This is the first non-intake milestone
           const prevNonIntake = milestones
             .slice(0, index)
-            .filter(m => !m.title?.toLowerCase().includes('intake') && !m.title?.toLowerCase().includes('welcome'));
+            .filter(m => !m.name?.toLowerCase().includes('intake') && !m.name?.toLowerCase().includes('welcome'));
           if (prevNonIntake.length === 0) {
             status = 'available';
           }

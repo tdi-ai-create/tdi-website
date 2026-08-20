@@ -56,10 +56,10 @@ export async function POST(request: Request) {
     // Get milestone names for the note
     const { data: milestones } = await supabase
       .from('milestones')
-      .select('id, title, name')
+      .select('id, name')
       .in('id', milestoneIds);
 
-    const milestoneNames = milestones?.map(m => m.title || m.name).join(', ') || 'milestones';
+    const milestoneNames = milestones?.map(m => m.name).join(', ') || 'milestones';
 
     // Update milestone(s) optional status via metadata
     // Get current milestones to merge metadata

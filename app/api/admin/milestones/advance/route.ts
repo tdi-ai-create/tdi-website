@@ -61,7 +61,7 @@ export async function POST(request: Request) {
 
     const { data: candidates, error: milestoneError } = await supabase
       .from('milestones')
-      .select('id, sort_order, phase_id, applies_to, title, name')
+      .select('id, sort_order, phase_id, applies_to, name')
       .eq('sort_order', milestoneOrder);
 
     if (milestoneError) {

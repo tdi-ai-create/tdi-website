@@ -54,11 +54,11 @@ export async function POST(request: NextRequest) {
           .eq('id', feedbackRow.milestone_record_id)
           .single()
         const { data: milestone } = milestoneRec?.milestone_id
-          ? await supabase.from('milestones').select('title').eq('id', milestoneRec.milestone_id).single()
+          ? await supabase.from('milestones').select('name').eq('id', milestoneRec.milestone_id).single()
           : { data: null }
         creatorRequestedCall(
           creator?.name || 'Unknown creator',
-          milestone?.title || `Milestone ${milestoneRec?.milestone_id || '?'}`
+          milestone?.name || `Milestone ${milestoneRec?.milestone_id || '?'}`
         ).catch(() => {})
       }
     } catch { /* non-blocking */ }

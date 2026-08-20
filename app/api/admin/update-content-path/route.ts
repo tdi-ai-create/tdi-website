@@ -80,7 +80,7 @@ export async function POST(request: Request) {
     // Get all milestones
     const { data: allMilestones, error: milestonesError } = await supabase
       .from('milestones')
-      .select('id, title, applies_to, sort_order')
+      .select('id, name, applies_to, sort_order')
       .order('sort_order');
 
     if (milestonesError) {

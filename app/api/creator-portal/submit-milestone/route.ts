@@ -95,12 +95,12 @@ export async function POST(request: NextRequest) {
         .single()
       const { data: milestone } = await supabase
         .from('milestones')
-        .select('title')
+        .select('name')
         .eq('id', milestoneRecord.milestone_id)
         .single()
       creatorSubmittedDeliverable(
         creator?.name || 'Unknown creator',
-        milestone?.title || `Milestone ${milestoneRecord.milestone_id}`,
+        milestone?.name || `Milestone ${milestoneRecord.milestone_id}`,
         submissionVersion
       ).catch(() => {})
     } catch { /* non-blocking */ }
