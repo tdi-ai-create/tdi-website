@@ -17,6 +17,7 @@ export const maxDuration = 60
  * - Upload a thumbnail image (upload_thumbnail)
  * - Record that QA passed (mark_reviewed)  <- required before publish
  * - Publish a Quick Win (publish)
+ * - Repair metadata on an already-published Quick Win (backfill_published)
  *
  * Auth: Bearer token via PAPERCLIP_SYNC_KEY env var
  */
@@ -505,6 +506,103 @@ export async function POST(request: NextRequest) {
       // automatically create 5 role-aware community posts
 
       return NextResponse.json({ success: true, id, slug: qw.slug, qa_bypassed: !!force })
+    }
+
+    // ── backfill_published: repair metadata debt on live Quick Wins ──
+    //
+    // update_draft deliberately refuses published rows so agents cannot silently
+    // rewrite live educator-facing content. That guard stays. This is the narrow
+    // exception it forces: the fields below describe an item without changing
+    // what it is, so correcting them on a live item is safe. Anything that alters
+    // identity (title, slug, category, type, files) still requires the reviewed
+    // unpublish/edit/republish path.
+    //
+    // Exists because 174 of 264 published Quick Wins shipped with no objectives
+    // and no path to add them. See TEA-230.
+    if (action === 'backfill_published') {
+      const { id, reason, dryRun } = body
+
+      if (!id) return NextResponse.json({ error: 'id is required' }, { status: 400 })
+      if (!reason?.trim()) {
+        return NextResponse.json(
+          { error: 'reason is required and is written to qa_notes, so every backfill says why it happened' },
+          { status: 400 },
+        )
+      }
+
+      // Fields that describe the item. Safe to correct while live.
+      const BACKFILLABLE = [
+        'objectives', 'topic_tags', 'danielson_domains', 'roles',
+        'title_es', 'description_es',
+      ] as const
+
+      // Fields that define what the item IS. Changing these on a live item
+      // silently swaps the thing a teacher already saved or linked to.
+      const IDENTITY_FIELDS = [
+        'title', 'slug', 'category', 'quick_win_type', 'file_url', 'tool_file_url',
+        'tool_type', 'is_published', 'status', 'reviewed_at', 'reviewed_by', 'lift',
+      ]
+
+      const rejected = IDENTITY_FIELDS.filter(f => body[f] !== undefined)
+      if (rejected.length > 0) {
+        return NextResponse.json({
+          error: `backfill_published cannot change ${rejected.join(', ')}. These define what the item is. Unpublish, edit as a draft, and republish through QA instead.`,
+        }, { status: 400 })
+      }
+
+      const { data: qw, error: fetchErr } = await supabase
+        .from('hub_quick_wins')
+        .select('id, slug, is_published, qa_notes')
+        .eq('id', id)
+        .single()
+
+      if (fetchErr || !qw) return NextResponse.json({ error: 'Quick Win not found' }, { status: 404 })
+      if (!qw.is_published) {
+        return NextResponse.json(
+          { error: 'This Quick Win is a draft. Use update_draft, which allows the full field set.' },
+          { status: 400 },
+        )
+      }
+
+      const updates: Record<string, unknown> = {}
+      for (const field of BACKFILLABLE) {
+        if (body[field] !== undefined) updates[field] = body[field]
+      }
+
+      if (Object.keys(updates).length === 0) {
+        return NextResponse.json(
+          { error: `Nothing to backfill. Supply at least one of: ${BACKFILLABLE.join(', ')}` },
+          { status: 400 },
+        )
+      }
+
+      const stamp = new Date().toISOString()
+      const auditLine = `${stamp.slice(0, 10)} backfill_published (${Object.keys(updates).join(', ')}): ${reason.trim()}`
+
+      // Dry run reports exactly what would change without touching the row,
+      // so a bulk backfill can be inspected before any of it lands.
+      if (dryRun) {
+        return NextResponse.json({
+          dry_run: true, id, slug: qw.slug,
+          would_update: updates,
+          would_append_to_qa_notes: auditLine,
+        })
+      }
+
+      const { data, error } = await supabase
+        .from('hub_quick_wins')
+        .update({
+          ...updates,
+          qa_notes: qw.qa_notes ? `${qw.qa_notes}\n${auditLine}` : auditLine,
+          updated_at: stamp,
+        })
+        .eq('id', id)
+        .select('id, slug, objectives, topic_tags, danielson_domains, roles')
+        .single()
+
+      if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+      return NextResponse.json({ success: true, updated_fields: Object.keys(updates), quick_win: data })
     }
 
     return NextResponse.json({ error: `Unknown action: ${action}` }, { status: 400 })
