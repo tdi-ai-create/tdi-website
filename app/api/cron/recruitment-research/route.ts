@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
-import { recruitmentWeeklyDigest, recruitmentResearchFailed } from '@/lib/creator-slack'
+import { recruitmentWeeklyDigest, recruitmentResearchFailed, postCreatorMessage } from '@/lib/creator-slack'
 import { validateCandidate, type ValidCandidate } from '@/lib/recruitment-quality'
 import {
   researchCandidates,
@@ -24,6 +24,8 @@ import {
  */
 
 export const maxDuration = 300
+
+const RECRUITMENT_TAB = 'https://www.teachersdeserveit.com/tdi-admin/creators'
 
 function portalDb() {
   return createClient(
@@ -50,19 +52,38 @@ export async function GET(request: NextRequest) {
 
   try {
     // ─── How many do we still owe this week? ───
-    const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
+    //
+    // Counted from the most recent Monday, not from a rolling seven days. The
+    // first batch landed on Thursday 13 Aug, so a rolling window still counted
+    // those five on Monday the 17th, decided the week was already covered, and
+    // skipped. Bella asked for five every Monday, got them once on a Thursday,
+    // then heard nothing, which reads as broken however correct the arithmetic.
+    const weekStart = new Date()
+    weekStart.setHours(0, 0, 0, 0)
+    const daysSinceMonday = (weekStart.getDay() + 6) % 7
+    weekStart.setDate(weekStart.getDate() - daysSinceMonday)
+
     const { count: addedThisWeek } = await supabase
       .from('creator_recruitment_candidates')
       .select('id', { count: 'exact', head: true })
-      .gte('created_at', weekAgo)
+      .gte('created_at', weekStart.toISOString())
 
     const needed = WEEKLY_TARGET - (addedThisWeek || 0)
     if (needed <= 0) {
+      // Say so. A quiet Monday is indistinguishable from a broken job, and that
+      // is exactly the conclusion this drew from Bella last week.
+      await postCreatorMessage(
+        `*Creator Candidates* | none this week, and that is deliberate\n` +
+        `${addedThisWeek} already added since Monday, which meets the target of ${WEEKLY_TARGET}.\n` +
+        `${RECRUITMENT_TAB}`
+      ).catch(() => {})
+
       console.log('[recruitment-research] Weekly target already met, skipping')
       return NextResponse.json({
         success: true,
         skipped: 'weekly target already met',
         added_this_week: addedThisWeek || 0,
+        week_started: weekStart.toISOString(),
       })
     }
 
@@ -175,12 +196,19 @@ export async function GET(request: NextRequest) {
         continue
       }
 
-      await supabase.from('creator_recruitment_notes').insert({
+      const { error: provenanceError } = await supabase.from('creator_recruitment_notes').insert({
         candidate_id: data.id,
         content: `Researched by Anne Marie. ${c.source_detail}`,
         author: 'anne-marie',
         note_type: 'note',
       })
+
+      if (provenanceError) {
+        // The candidate exists either way. Losing this note means losing the
+        // record of where they came from, which is the thing that lets anyone
+        // judge whether the research was any good.
+        console.error('[recruitment-research] Provenance note not written for', c.name, provenanceError.message)
+      }
 
       const gap = gaps.find(g => g.id === c.gap_id)
       inserted.push({ ...c, id: data.id, gapCategory: gap?.category || 'unknown' })
@@ -199,6 +227,19 @@ export async function GET(request: NextRequest) {
           draft: c.outreach_draft,
         })),
         WEEKLY_TARGET
+      ).catch(() => {})
+    } else {
+      // Research ran and produced nobody usable. Saying nothing here is the
+      // third version of the same mistake: silence on a Monday reads as a
+      // broken job, and Bella has no way to tell the difference.
+      const why = rejected.length > 0
+        ? rejected.slice(0, 5).map(r => `• ${r.name}: ${r.reasons.join(', ')}`).join('\n')
+        : 'The search returned nobody at all.'
+
+      await postCreatorMessage(
+        `*Creator Candidates* | none this week, and that is not deliberate\n` +
+        `Looked for ${needed} against ${gaps.map(g => g.category).join(', ')} and none passed.\n\n${why}\n\n` +
+        `Worth a look. Running it again is unlikely to change the answer on its own.\n${RECRUITMENT_TAB}`
       ).catch(() => {})
     }
 

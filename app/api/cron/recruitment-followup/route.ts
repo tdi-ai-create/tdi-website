@@ -59,17 +59,26 @@ export async function GET(request: NextRequest) {
 
       // 19+ days: auto-archive to no_response
       if (daysSinceSend >= 19 && candidate.outreach_follow_up_2_at) {
-        await supabase
+        const { error: archiveError } = await supabase
           .from('creator_recruitment_candidates')
           .update({ stage: 'no_response' })
           .eq('id', candidate.id)
 
-        await supabase.from('creator_recruitment_notes').insert({
+        if (archiveError) {
+          console.error('[recruitment-followup] Auto archive failed, this one will be raised again tomorrow:', archiveError.message)
+          continue
+        }
+
+        const { error: archiveNoteError } = await supabase.from('creator_recruitment_notes').insert({
           candidate_id: candidate.id,
           content: `Auto-archived after ${daysSinceSend} days with no response. Two follow-ups were sent.`,
           author: 'system',
           note_type: 'stage_change',
         })
+
+        if (archiveNoteError) {
+          console.error('[recruitment-followup] Archive note not written:', archiveNoteError.message)
+        }
 
         closedOut.push({
           name: candidate.name,
@@ -82,17 +91,24 @@ export async function GET(request: NextRequest) {
 
       // 12+ days: follow-up #2
       if (daysSinceSend >= 12 && !candidate.outreach_follow_up_2_at) {
-        await supabase
+        const { error: fu2Error } = await supabase
           .from('creator_recruitment_candidates')
           .update({ outreach_follow_up_2_at: now.toISOString() })
           .eq('id', candidate.id)
 
-        await supabase.from('creator_recruitment_notes').insert({
+        if (fu2Error) {
+          console.error('[recruitment-followup] Follow up not stamped, it will be raised again tomorrow:', fu2Error.message)
+          continue
+        }
+
+        const { error: fu2NoteError } = await supabase.from('creator_recruitment_notes').insert({
           candidate_id: candidate.id,
           content: `Follow-up #2 due (${daysSinceSend} days since outreach). No response yet. Consider a different approach or channel.`,
           author: 'system',
           note_type: 'follow_up',
         })
+
+        if (fu2NoteError) console.error('[recruitment-followup] Note not written:', fu2NoteError.message)
 
         dueNow.push({
           name: candidate.name,
@@ -105,17 +121,24 @@ export async function GET(request: NextRequest) {
 
       // 5+ days: follow-up #1
       if (daysSinceSend >= 5 && !candidate.outreach_follow_up_1_at) {
-        await supabase
+        const { error: fu1Error } = await supabase
           .from('creator_recruitment_candidates')
           .update({ outreach_follow_up_1_at: now.toISOString() })
           .eq('id', candidate.id)
 
-        await supabase.from('creator_recruitment_notes').insert({
+        if (fu1Error) {
+          console.error('[recruitment-followup] Follow up not stamped, it will be raised again tomorrow:', fu1Error.message)
+          continue
+        }
+
+        const { error: fu1NoteError } = await supabase.from('creator_recruitment_notes').insert({
           candidate_id: candidate.id,
           content: `Follow-up #1 due (${daysSinceSend} days since outreach). No response yet.`,
           author: 'system',
           note_type: 'follow_up',
         })
+
+        if (fu1NoteError) console.error('[recruitment-followup] Note not written:', fu1NoteError.message)
 
         dueNow.push({
           name: candidate.name,
@@ -138,17 +161,24 @@ export async function GET(request: NextRequest) {
       const reason = candidate.revisit_reason || 'No reason recorded'
 
       // Move back to suggested
-      await supabase
+      const { error: revisitError } = await supabase
         .from('creator_recruitment_candidates')
         .update({ stage: 'suggested' })
         .eq('id', candidate.id)
 
-      await supabase.from('creator_recruitment_notes').insert({
+      if (revisitError) {
+        console.error('[recruitment-followup] Revisit candidate not moved back to suggested:', revisitError.message)
+        continue
+      }
+
+      const { error: revisitNoteError } = await supabase.from('creator_recruitment_notes').insert({
         candidate_id: candidate.id,
         content: `Revisit date reached. Originally said: ${reason}. Consider re-engaging.`,
         author: 'system',
         note_type: 'stage_change',
       })
+
+      if (revisitNoteError) console.error('[recruitment-followup] Revisit note not written:', revisitNoteError.message)
 
       // Slack notification (non-blocking)
       try {
