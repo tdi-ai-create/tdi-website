@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { creatorSubmittedDeliverable } from '@/lib/creator-slack'
+import { recordSubmission } from '@/lib/creator-submissions'
 
 function db() {
   return createClient(
@@ -37,54 +38,41 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: `Milestone is not in a submittable state (current: ${milestoneRecord.status})` }, { status: 400 })
     }
 
-    // Calculate submission version (auto-increment based on existing submissions)
-    const { count: existingCount } = await supabase
-      .from('creator_milestone_feedback')
-      .select('id', { count: 'exact', head: true })
-      .eq('milestone_record_id', milestone_record_id)
+    // One recorder, shared with the portal's own submit route, so the two can
+    // never diverge again. They already had: this one recorded submissions
+    // properly and was reachable only after feedback existed, while the route
+    // the portal actually calls recorded nothing.
+    const recorded = await recordSubmission(supabase, {
+      milestoneRecordId: milestone_record_id,
+      creatorId: milestoneRecord.creator_id,
+      submittedValue: submitted_value,
+      submissionNotes: submission_notes || null,
+      stepName: null,
+      announce: false,
+    })
 
-    const submissionVersion = (existingCount || 0) + 1
-
-    // Create feedback row (submission without feedback yet)
-    const { data: feedback, error: feedbackError } = await supabase
-      .from('creator_milestone_feedback')
-      .insert({
-        milestone_record_id,
-        creator_id: milestoneRecord.creator_id,
-        submission_version: submissionVersion,
-        submitted_value,
-        submission_notes: submission_notes || null,
-        submitted_at: new Date().toISOString(),
-        visible_to_creator: false,
-      })
-      .select()
-      .single()
-
-    if (feedbackError) {
-      return NextResponse.json({ error: feedbackError.message }, { status: 500 })
+    if (!recorded.ok) {
+      return NextResponse.json({ error: recorded.error }, { status: 500 })
     }
 
-    // Update creator_milestones: status, review_status, submitted values
-    const { error: updateError } = await supabase
+    const { error: statusError } = await supabase
       .from('creator_milestones')
-      .update({
-        status: 'waiting_approval',
-        review_status: 'submitted',
-        submitted_value,
-        submission_notes: submission_notes || null,
-        updated_at: new Date().toISOString(),
-      })
+      .update({ status: 'waiting_approval', updated_at: new Date().toISOString() })
       .eq('id', milestone_record_id)
 
-    if (updateError) {
-      console.error('[submit-milestone] Error updating milestone:', updateError)
+    if (statusError) {
+      console.error('[submit-milestone] Could not move the step to waiting_approval:', statusError.message)
     }
 
     // Also bump creator updated_at
-    await supabase
+    const { error: touchError } = await supabase
       .from('creators')
       .update({ updated_at: new Date().toISOString() })
       .eq('id', milestoneRecord.creator_id)
+
+    if (touchError) {
+      console.error('[submit-milestone] Could not bump the creator timestamp:', touchError.message)
+    }
 
     // Slack notification -- get creator name and milestone label for context
     try {
@@ -101,14 +89,14 @@ export async function POST(request: NextRequest) {
       creatorSubmittedDeliverable(
         creator?.name || 'Unknown creator',
         milestone?.name || `Milestone ${milestoneRecord.milestone_id}`,
-        submissionVersion
+        recorded.version
       ).catch(() => {})
     } catch { /* non-blocking */ }
 
     return NextResponse.json({
       success: true,
-      submission_version: submissionVersion,
-      feedback_id: feedback.id,
+      submission_version: recorded.version,
+      feedback_id: recorded.feedbackId,
     })
   } catch (err) {
     console.error('[submit-milestone] Unexpected error:', err)
