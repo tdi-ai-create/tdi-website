@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { byPhaseThenOrder } from '@/lib/creator-phases';
+import { recordSubmission } from '@/lib/creator-submissions';
 import { CREATOR_STUDIO_RECIPIENTS } from '@/lib/creator-notification-recipients';
 
 export async function POST(request: Request) {
@@ -41,20 +42,10 @@ export async function POST(request: Request) {
       }, { status: 404 });
     }
 
-    // 1. Try to save the submission (table may not exist yet)
-    const { error: submitError } = await supabase
-      .from('creator_submissions')
-      .insert({
-        creator_id: creatorId,
-        milestone_id: milestoneId,
-        submission_type: submissionType,
-        content
-      });
-
-    if (submitError) {
-      // If table doesn't exist, log but continue (backwards compatibility)
-      console.log('[submit] Note: creator_submissions insert:', submitError.message);
-    }
+    // There was an insert into creator_submissions here, wrapped in a comment
+    // saying the table might not exist yet. It does not exist and never has, so
+    // every submission since February failed this write, logged a friendly line,
+    // and carried on. Removed rather than left looking like a safety net.
 
     // 2. Handle preferences submission - update creator table
     if (submissionType === 'preferences') {
@@ -222,13 +213,17 @@ export async function POST(request: Request) {
       };
 
       // Also update the creator's course_title field
-      await supabase
+      const { error: titleError } = await supabase
         .from('creators')
         .update({
           course_title: content.title,
           updated_at: new Date().toISOString()
         })
         .eq('id', creatorId);
+
+      if (titleError) {
+        console.error('[submit] Course title not saved to the creator:', titleError.message);
+      }
     }
 
     // If course outline submission, store the document URL
@@ -246,13 +241,17 @@ export async function POST(request: Request) {
       };
 
       // Also update the creator's google_doc_link field
-      await supabase
+      const { error: docLinkError } = await supabase
         .from('creators')
         .update({
           google_doc_link: content.document_url,
           updated_at: new Date().toISOString()
         })
         .eq('id', creatorId);
+
+      if (docLinkError) {
+        console.error('[submit] Outline link not saved to the creator:', docLinkError.message);
+      }
     }
 
     // If create_again_choice submission, store the choice and handle project creation
@@ -282,13 +281,20 @@ export async function POST(request: Request) {
 
       // Mark current project as completed
       if (activeProject) {
-        await supabase
+        const { error: closeError } = await supabase
           .from('creator_projects')
           .update({
             status: 'completed',
             completed_at: chosenAt
           })
           .eq('id', activeProject.id);
+
+        if (closeError) {
+          return NextResponse.json(
+            { error: `Could not close the current project: ${closeError.message}` },
+            { status: 500 }
+          );
+        }
       }
 
       // If creator chose "yes", create a new project
@@ -296,7 +302,10 @@ export async function POST(request: Request) {
         const newProjectNumber = (activeProject?.project_number || 1) + 1;
 
         // Create new project
-        const { data: newProject } = await supabase
+        // Taking the error here matters more than most. A failed insert used to
+        // leave the previous project closed and no new one open, so a creator
+        // who said yes to creating again ended up with nothing at all.
+        const { data: newProject, error: newProjectError } = await supabase
           .from('creator_projects')
           .insert({
             creator_id: creatorId,
@@ -306,9 +315,16 @@ export async function POST(request: Request) {
           .select()
           .single();
 
+        if (newProjectError || !newProject) {
+          return NextResponse.json(
+            { error: `Could not start the new project: ${newProjectError?.message || 'no row returned'}` },
+            { status: 500 }
+          );
+        }
+
         if (newProject) {
           // Reset creator to onboarding phase and clear content-specific fields
-          await supabase
+          const { error: resetError } = await supabase
             .from('creators')
             .update({
               current_phase: 'onboarding',
@@ -328,6 +344,10 @@ export async function POST(request: Request) {
               updated_at: new Date().toISOString()
             })
             .eq('id', creatorId);
+
+          if (resetError) {
+            console.error('[submit] Creator not reset for the new project:', resetError.message);
+          }
 
           // Get all active milestones (excluding collapsed/retired ones)
           const { data: milestones } = await supabase
@@ -353,12 +373,16 @@ export async function POST(request: Request) {
             }));
 
             // Use upsert with ignoreDuplicates in case trigger already created records
-            await supabase
+            const { error: seedError } = await supabase
               .from('creator_milestones')
               .upsert(milestoneRecords, {
                 onConflict: 'creator_id,milestone_id,project_id',
                 ignoreDuplicates: true
               });
+
+            if (seedError) {
+              console.error('[submit] New project has no steps, seeding failed:', seedError.message);
+            }
           }
         }
       }
@@ -499,7 +523,7 @@ export async function POST(request: Request) {
 
         if (nextMilestone) {
           // Clear completion data when unlocking to ensure clean state
-          await supabase
+          const { error: unlockError } = await supabase
             .from('creator_milestones')
             .update({
               status: 'available',
@@ -510,6 +534,10 @@ export async function POST(request: Request) {
             .eq('creator_id', creatorId)
             .eq('milestone_id', nextMilestone.id)
             .eq('status', 'locked');
+
+          if (unlockError) {
+            console.error('[submit] Next step not unlocked, creator may see an empty board:', unlockError.message);
+          }
         }
       }
 
@@ -560,7 +588,7 @@ export async function POST(request: Request) {
 
           if (allOthersComplete) {
             // Unlock the create_again milestone - clear completion data for clean state
-            await supabase
+            const { error: createAgainError } = await supabase
               .from('creator_milestones')
               .update({
                 status: 'available',
@@ -571,6 +599,10 @@ export async function POST(request: Request) {
               .eq('creator_id', creatorId)
               .eq('milestone_id', 'create_again')
               .eq('status', 'locked');
+
+            if (createAgainError) {
+              console.error('[submit] Create again step not unlocked:', createAgainError.message);
+            }
 
             console.log('[submit] All milestones complete - unlocked create_again milestone');
           }
@@ -730,7 +762,7 @@ export async function POST(request: Request) {
         notificationType = 'change_request';
       }
 
-      await supabase
+      const { error: notifyError } = await supabase
         .from('admin_notifications')
         .insert({
           creator_id: creatorId,
@@ -738,6 +770,10 @@ export async function POST(request: Request) {
           message: notificationMessage,
           link: `/admin/creators/${creatorId}`,
         });
+
+      if (notifyError) {
+        console.error('[submit] Admin notification not created:', notifyError.message);
+      }
     }
 
     // 6. Create auto-note for audit trail
@@ -806,7 +842,7 @@ export async function POST(request: Request) {
         .eq('id', milestoneId)
         .single();
 
-      await supabase
+      const { error: noteError } = await supabase
         .from('creator_notes')
         .insert({
           creator_id: creatorId,
@@ -815,7 +851,48 @@ export async function POST(request: Request) {
           visible_to_creator: false,
           phase_id: milestonePhase?.phase_id || null,
         });
-      console.log('[submit] Auto-note created:', autoNoteContent.substring(0, 50) + '...');
+      if (noteError) {
+        console.error('[submit] Auto-note failed:', noteError.message);
+      }
+    }
+
+    // Record the actual deliverable.
+    //
+    // Until now a submitted link produced only the internal note above, so it
+    // never reached the creator's own page and never reached the review queue.
+    // Thirteen submissions from eight creators went that way between February
+    // and August. Bella opened her queue on 20 August, found nothing from
+    // Catherine, and was right: Catherine's document was in a note nobody was
+    // ever shown.
+    const submittedLink: string | null =
+      submissionType === 'link' ? (content?.link ?? null)
+      : submissionType === 'course_outline' ? (content?.document_url ?? null)
+      : null;
+
+    if (submittedLink) {
+      const { data: stepRow, error: stepLookupError } = await supabase
+        .from('creator_milestones')
+        .select('id')
+        .eq('creator_id', creatorId)
+        .eq('milestone_id', milestoneId)
+        .order('updated_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (stepLookupError || !stepRow) {
+        console.error('[submit] Could not find the step to attach the submission to:', stepLookupError?.message);
+      } else {
+        const recorded = await recordSubmission(supabase, {
+          milestoneRecordId: stepRow.id,
+          creatorId,
+          submittedValue: submittedLink,
+          submissionNotes: content?.notes ?? null,
+          stepName: milestoneName,
+        });
+        if (!recorded.ok) {
+          console.error('[submit] Submission not recorded:', recorded.error);
+        }
+      }
     }
 
     return NextResponse.json({ success: true });
