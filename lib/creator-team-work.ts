@@ -15,6 +15,7 @@
 // ---------------------------------------------------------------------------
 
 import { SITE_URL } from './reengagement-config';
+import { phaseRank } from './creator-phases';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 type DbClient = any;
@@ -105,6 +106,16 @@ export interface TeamWorkItem {
   daysWaiting: number;
   /** What the creator is being told while they wait, so we know what we promised. */
   creatorSees: string | null;
+  /**
+   * The thing being reviewed, if there is one.
+   *
+   * For six months the portal recorded a submitted link as an internal note and
+   * nowhere else, so a review step could be open with nothing behind it. This
+   * list told Bella to "edit and format the post" for two creators who had no
+   * post in the system at all. Saying nothing is attached is far more useful
+   * than describing work that is not there.
+   */
+  attachment: string | null;
   url: string;
 }
 
@@ -154,7 +165,7 @@ export async function loadTeamWork(
 
   const { data: rows } = await supabase
     .from('creator_milestones')
-    .select('creator_id, status, completed_at, milestones!inner(name, phase_id, requires_team_action, applies_to, is_collapsed_into, team_status_message)')
+    .select('creator_id, status, completed_at, submitted_value, milestones!inner(name, phase_id, sort_order, requires_team_action, applies_to, is_collapsed_into, team_status_message)')
     .in('creator_id', ids);
 
   const all = (rows || []) as Array<Record<string, any>>;
@@ -170,6 +181,18 @@ export async function loadTeamWork(
   }
 
   const byId = new Map(live.map((c: Record<string, any>) => [c.id, c]));
+
+  // What each creator has actually handed in, in pipeline order, so a review
+  // step can point at the thing it is reviewing.
+  const submissionsByCreator = new Map<string, Array<{ pos: number; link: string }>>();
+  for (const r of all) {
+    if (!r.submitted_value || !r.milestones) continue;
+    const pos = phaseRank(r.milestones.phase_id) * 1000 + (r.milestones.sort_order ?? 0);
+    const list = submissionsByCreator.get(r.creator_id) ?? [];
+    list.push({ pos, link: r.submitted_value });
+    submissionsByCreator.set(r.creator_id, list);
+  }
+
   const items: TeamWorkItem[] = [];
 
   for (const r of all) {
@@ -187,6 +210,13 @@ export async function loadTeamWork(
     const guide = TEAM_STEP_GUIDE[ms.name as string];
     const since = lastHandover.get(r.creator_id) || creator.created_at;
 
+    // The nearest thing they submitted before reaching this step.
+    const stepPos = phaseRank(ms.phase_id) * 1000 + (ms.sort_order ?? 0);
+    const attachment =
+      (submissionsByCreator.get(r.creator_id) ?? [])
+        .filter((sub) => sub.pos <= stepPos)
+        .sort((a, b) => b.pos - a.pos)[0]?.link ?? null;
+
     items.push({
       creatorId: r.creator_id,
       creatorName: creator.name || 'Unnamed creator',
@@ -198,6 +228,7 @@ export async function loadTeamWork(
       agentNeverAsked: guide?.kind === 'agent' && !creator.last_agent_activity_at,
       daysWaiting: daysBetween(since, now),
       creatorSees: ms.team_status_message ?? null,
+      attachment,
       url: `${SITE_URL}/tdi-admin/creators/${r.creator_id}`,
     });
   }
@@ -228,10 +259,17 @@ export function formatTeamWork(items: TeamWorkItem[]): string {
     const stalled = i.agentNeverAsked
       ? '\n_No record of this agent ever being asked. Agent work does not start on its own yet._'
       : '';
+
+    // Do not describe work that is not there. Until 21 August this said "edit
+    // and format the post" for two creators whose post was never in the system.
+    const work = i.attachment
+      ? `\nWhat you are reviewing: ${i.attachment}\n${i.action}`
+      : `\n*Nothing is attached to this step.* Their work is not in the system, so find out where it is before anything else.`;
+
     return (
       `\n\n*${i.creatorName}* · ${i.step}\n` +
-      `${i.daysWaiting} days · ${label}\n` +
-      `${i.action}${stalled}${promised}\n${i.url}`
+      `${i.daysWaiting} days · ${label}` +
+      `${work}${stalled}${promised}\n${i.url}`
     );
   });
 
