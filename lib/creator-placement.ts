@@ -99,6 +99,8 @@ export async function placeCreator(
 
   const open = applicable.filter((s) => s.status === 'available');
   if (open.length === 1) {
+    const dated = await ensureDated(supabase, creatorId, open[0].id);
+    if (dated) return { ...base, error: dated };
     return { ...base, ok: true, alreadyPlaced: true, openedStep: open[0].name, phase: open[0].phaseId };
   }
 
@@ -134,6 +136,13 @@ export async function placeCreator(
     .eq('id', next.id);
   if (openError) return { ...base, error: `Opening the next step failed: ${openError.message}` };
 
+  // The trigger stamps a date on the transition into available. If this step
+  // was already available it never transitioned, so no date was set. That is
+  // how Holly Stuart came out of placement with one correct step and no date
+  // on it, invisible to the reminder that exists to watch it.
+  const dated = await ensureDated(supabase, creatorId, next.id);
+  if (dated) return { ...base, error: dated };
+
   const { error: phaseError } = await supabase
     .from('creators')
     .update({ current_phase: next.phaseId, updated_at: new Date().toISOString() })
@@ -148,4 +157,52 @@ export async function placeCreator(
     locked: toLock.length,
     alreadyPlaced: false,
   };
+}
+
+/**
+ * Gives a step a date if it somehow has none. Returns an error string, or null.
+ *
+ * Team steps deliberately get no date, so those are left alone. The clock runs
+ * from the creator's last completed work rather than from now, so a step that
+ * has been sitting does not read as fresh.
+ */
+async function ensureDated(
+  supabase: DbClient,
+  creatorId: string,
+  milestoneRecordId: string
+): Promise<string | null> {
+  const { data: row, error: readError } = await supabase
+    .from('creator_milestones')
+    .select('id, due_on, opened_at, milestones!inner(requires_team_action, allowance_days)')
+    .eq('id', milestoneRecordId)
+    .single();
+
+  if (readError) return `Reading the step back failed: ${readError.message}`;
+  if (!row) return null;
+
+  const ms = row.milestones as { requires_team_action?: boolean; allowance_days?: number } | null;
+  if (!ms || ms.requires_team_action) return null;
+  if (row.due_on) return null;
+
+  const { data: lastDone } = await supabase
+    .from('creator_milestones')
+    .select('completed_at')
+    .eq('creator_id', creatorId)
+    .not('completed_at', 'is', null)
+    .order('completed_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  const due = new Date();
+  due.setDate(due.getDate() + (ms.allowance_days ?? 14));
+
+  const { error: writeError } = await supabase
+    .from('creator_milestones')
+    .update({
+      due_on: due.toISOString().slice(0, 10),
+      opened_at: row.opened_at ?? lastDone?.completed_at ?? new Date().toISOString(),
+    })
+    .eq('id', milestoneRecordId);
+
+  return writeError ? `Setting the date failed: ${writeError.message}` : null;
 }

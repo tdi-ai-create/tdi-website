@@ -12,6 +12,7 @@
  */
 
 import tsParser from '@typescript-eslint/parser';
+import tsPlugin from '@typescript-eslint/eslint-plugin';
 import noUncheckedDbWrite from './eslint-rules/no-unchecked-db-write.mjs';
 
 export default [
@@ -38,9 +39,20 @@ export default [
     },
     plugins: {
       tdi: { rules: { 'no-unchecked-db-write': noUncheckedDbWrite } },
+      // Registered so its rule names resolve, with none of them enabled.
+      // Files across this codebase carry eslint-disable comments for
+      // @typescript-eslint rules. Without the plugin loaded, ESLint treats each
+      // one as naming a rule that does not exist and fails the file, so the
+      // gate reports "a database write here can fail without anything noticing"
+      // about a file whose writes are all checked. A gate that cries wolf is
+      // one people learn to skip.
+      '@typescript-eslint': tsPlugin,
     },
     rules: {
       'tdi/no-unchecked-db-write': 'error',
+    },
+    linterOptions: {
+      reportUnusedDisableDirectives: 'off',
     },
   },
 ];
