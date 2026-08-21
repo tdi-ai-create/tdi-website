@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { placeCreator } from '@/lib/creator-placement';
 
 export async function POST(
   request: NextRequest,
@@ -28,8 +29,9 @@ export async function POST(
       return NextResponse.json({ success: false, already_active: true })
     }
 
-    // Unpause
-    await (supabase.from('creators') as any)
+    // Unpause. The error here used to be discarded, so a failed write returned
+    // success and the creator was told they were back when they were not.
+    const { error: unpauseError } = await (supabase.from('creators') as any)
       .update({
         lifecycle_state: 'active',
         unpaused_at: new Date().toISOString(),
@@ -37,6 +39,19 @@ export async function POST(
         updated_at: new Date().toISOString(),
       })
       .eq('id', creator.id)
+
+    if (unpauseError) {
+      return NextResponse.json({ error: unpauseError.message }, { status: 500 })
+    }
+
+    // Put them back on one step. Without this a returning creator arrives to
+    // the board everyone else had before 19 August: every step open at once,
+    // no dates, no order. Holly Stuart came back that way and filled nine of
+    // the twelve slots in the next morning's waiting on TDI message.
+    const placement = await placeCreator(supabase, creator.id)
+    if (!placement.ok) {
+      console.error('[unpause] Placement failed, creator is active but their board was not reset:', placement.error)
+    }
 
     await (supabase.from('creator_pause_history') as any).insert({
       creator_id: creator.id,
