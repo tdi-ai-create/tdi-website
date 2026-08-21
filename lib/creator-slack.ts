@@ -280,16 +280,22 @@ export type FollowUpItem = { name: string; days: number; note: string }
 export async function recruitmentFollowUpDigest(
   dueNow: FollowUpItem[],
   revisits: FollowUpItem[],
-  closedOut: FollowUpItem[]
+  closedOut: FollowUpItem[],
+  /**
+   * Candidates who already said yes and have gone quiet since. Nothing used to
+   * watch this stage at all, so the warmest people in the pipeline were the
+   * only ones nobody chased.
+   */
+  warmButQuiet: FollowUpItem[] = []
 ) {
-  if (dueNow.length === 0 && revisits.length === 0 && closedOut.length === 0) return
+  if (dueNow.length === 0 && revisits.length === 0 && closedOut.length === 0 && warmButQuiet.length === 0) return
 
   const section = (title: string, items: FollowUpItem[]) =>
     items.length
       ? `\n\n*${title}*\n` + items.map(i => `• ${i.name} | ${i.note}`).join('\n')
       : ''
 
-  const total = dueNow.length + revisits.length
+  const total = dueNow.length + revisits.length + warmButQuiet.length
   const header =
     total > 0
       ? `*Recruitment Follow Ups* | ${total} need${total === 1 ? 's' : ''} you today`
@@ -297,6 +303,7 @@ export async function recruitmentFollowUpDigest(
 
   await postToSlack(
     header +
+      section('They said yes and it has gone quiet', warmButQuiet) +
       section('Send a follow up', dueNow) +
       section('Revisit is due', revisits) +
       section('Closed out after no reply', closedOut) +
