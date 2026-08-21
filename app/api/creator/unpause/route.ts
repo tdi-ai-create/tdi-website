@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { CREATOR_STUDIO_RECIPIENTS } from '@/lib/creator-notification-recipients'
+import { placeCreator } from '@/lib/creator-placement';
 
 export async function POST(request: NextRequest) {
   try {
@@ -39,6 +40,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: updateError.message }, { status: 500 })
     }
 
+
+    // Put them back on one step. Without this a returning creator arrives to
+    // the board everyone else had before 19 August: every step open at once,
+    // no dates, no order. Holly Stuart came back that way and filled nine of
+    // the twelve slots in the next morning's waiting on TDI message.
+    const placement = await placeCreator(supabase, creatorId)
+    if (!placement.ok) {
+      console.error('[unpause] Placement failed, creator is active but their board was not reset:', placement.error)
+    }
     await (supabase.from('creator_pause_history') as any).insert({
       creator_id: creatorId,
       event_type: 'unpaused',
