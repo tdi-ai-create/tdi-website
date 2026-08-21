@@ -203,12 +203,15 @@ export async function GET(request: NextRequest) {
         blockedByScreen.push({
           id: o.id, name: o.name, reason: result.reason, rule: result.rule,
         })
-        await supabase.from('funding_opportunities').update({
+        // Best effort: the verdict is already being returned to the caller in
+        // blockedByScreen, so a failure here loses a cached value, not a decision.
+        const { error: verdictErr } = await supabase.from('funding_opportunities').update({
           eligibility_verdict: result.verdict,
           eligibility_reason: result.reason,
           eligibility_rule: result.rule,
           eligibility_checked_at: new Date().toISOString(),
         }).eq('id', o.id)
+        if (verdictErr) console.error('[sync] Could not cache eligibility verdict:', verdictErr)
       }
       narrativeWork = cleared
     }
@@ -231,6 +234,10 @@ export async function GET(request: NextRequest) {
         pursuit:funding_pursuits!pursuit_id(id, pursuit_name, district_name)
       `)
       .eq('research_status', 'requested')
+      // Belt and braces. A closed opportunity is finished regardless of what its
+      // research_status says, and handing an agent work she has already done is
+      // how a queue becomes noise she learns to ignore.
+      .not('status', 'in', '("closed","awarded","denied")')
 
     if (agent) {
       researchQuery = researchQuery.eq('assigned_agent', agent)
@@ -400,14 +407,16 @@ export async function POST(request: NextRequest) {
 
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-    // Auto-create timeline event
-    await supabase.from('funding_pursuit_timeline').insert({
+    // Auto-create timeline event. Best effort: losing the timeline entry must
+    // not fail the opportunity that was just created successfully.
+    const { error: timelineErr } = await supabase.from('funding_pursuit_timeline').insert({
       pursuit_id: pursuitId,
       event_date: new Date().toISOString().split('T')[0],
       event_title: `New opportunity discovered: ${name}`,
       event_detail: notes || `Added by Paperclip Grant Discovery. ${amount ? '$' + Number(amount).toLocaleString() : 'Amount TBD'}.`,
       status: 'complete',
     })
+    if (timelineErr) console.error('[sync] Opportunity created but timeline entry failed:', timelineErr)
 
     return NextResponse.json({ success: true, opportunity: data })
   }
@@ -425,6 +434,20 @@ export async function POST(request: NextRequest) {
       'client_submitted', 'client_submitted_proof',
       'decision_date', 'awarded_amount', 'denial_reason',
       'next_action', 'next_action_due',
+      // research_status was missing from this list, and the omission cost the
+      // system its entire local-funder capability for two days.
+      //
+      // Amara's instructions tell her to set research_status='researching' when
+      // she starts and 'found' when she finishes. Both calls were silently
+      // dropped here, because a field absent from this array is skipped without
+      // comment and the response still says success.
+      //
+      // So she did the research, created nine real local funders, could not mark
+      // the placeholder done, fell back to status='closed', and find_work kept
+      // handing her the same three items every hour. Forty-plus heartbeats
+      // reporting "the same 3 stuck placeholders". She was right; it was stuck.
+      'research_status',
+      'window_status', 'window_opens', 'window_closes',
     ]
 
     const { data: beforeRow } = await supabase
@@ -550,13 +573,14 @@ export async function POST(request: NextRequest) {
         qa_review: 'Narrative in QA review',
         ready: 'Narrative approved and ready',
       }
-      await supabase.from('funding_pursuit_timeline').insert({
+      const { error: narrTimelineErr } = await supabase.from('funding_pursuit_timeline').insert({
         pursuit_id: opp.pursuit_id,
         event_date: new Date().toISOString().split('T')[0],
         event_title: `${statusLabels[narrativeStatus] || 'Narrative updated'}: ${opp.name}`,
         event_detail: note || (narrativeUrl ? `Document: ${narrativeUrl}` : ''),
         status: narrativeStatus === 'ready' ? 'complete' : 'active',
       })
+      if (narrTimelineErr) console.error('[sync] Narrative updated but timeline entry failed:', narrTimelineErr)
     }
 
     return NextResponse.json({ success: true })
@@ -597,7 +621,10 @@ export async function POST(request: NextRequest) {
     const attempt = (opp.qa_attempt_count ?? 0) + 1
     const now = new Date().toISOString()
 
-    await supabase.from('funding_narrative_qa_reviews').insert({
+    // Not best effort. This row IS the QA review. If it does not land, the
+    // opportunity must not be advanced on the strength of a review that was
+    // never recorded, so this fails the request rather than continuing.
+    const { error: qaErr } = await supabase.from('funding_narrative_qa_reviews').insert({
       opportunity_id: opportunityId,
       attempt,
       passed,
@@ -606,6 +633,14 @@ export async function POST(request: NextRequest) {
       summary: summary || null,
       issues: issues ?? null,
     })
+
+    if (qaErr) {
+      console.error('[sync] QA review not recorded, refusing to advance:', qaErr)
+      return NextResponse.json(
+        { error: `QA review was not recorded, so nothing was advanced. ${qaErr.message}` },
+        { status: 500 },
+      )
+    }
 
     const updates: Record<string, unknown> = {
       qa_passed: passed,
@@ -654,16 +689,17 @@ export async function POST(request: NextRequest) {
 
     const labels: Record<string, string> = {
       approval: `QA passed (${reviewer}) — ready for Bella's approval`,
-      requested: `QA failed attempt ${attempt} — returned to writer`,
-      escalated: `QA failed ${attempt} times — escalated to Bella with a recommendation`,
+      requested: `QA failed attempt ${attempt}, returned to writer`,
+      escalated: `QA failed ${attempt} times, escalated to Bella with a recommendation`,
     }
-    await supabase.from('funding_pursuit_timeline').insert({
+    const { error: qaTimelineErr } = await supabase.from('funding_pursuit_timeline').insert({
       pursuit_id: opp.pursuit_id,
       event_date: now.split('T')[0],
       event_title: `${labels[outcome]}: ${opp.name}`,
       event_detail: summary || '',
       status: outcome === 'approval' ? 'complete' : 'active',
     })
+    if (qaTimelineErr) console.error('[sync] QA recorded but timeline entry failed:', qaTimelineErr)
 
     postFundingEvent(
       narrativeEvent(opp.pursuit_id, '', opp.name, 'qa_review', outcome, reviewer)
