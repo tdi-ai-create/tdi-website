@@ -340,7 +340,13 @@ export async function GET() {
   // If no issues, all good. Clear any open alert state so a problem that comes
   // back later is correctly reported as new rather than resuming an old streak.
   if (issues.length === 0) {
-    await supabase.from('hub_alert_state').delete().eq('source', 'hub-content-health');
+    // If this fails the state stays open, so the next real problem resumes an old
+    // streak and is reported as days old on its first day.
+    const { error: clearError } = await supabase
+      .from('hub_alert_state').delete().eq('source', 'hub-content-health');
+    if (clearError) {
+      console.error('[hub-content-health] Could not clear alert state, next alert may report a stale age:', clearError);
+    }
     return NextResponse.json({
       status: 'healthy',
       message: 'All Hub content checks passed',
@@ -375,18 +381,31 @@ export async function GET() {
       // Days 0,1,2 always send. After that, every third day.
       shouldSend = daysOpen < 3 || daysOpen % 3 === 0;
 
-      await supabase
+      // If this fails, send_count never advances and the backoff never kicks in,
+      // so the same alert mails every morning again. That is the exact behaviour
+      // the escalation logic above exists to prevent.
+      const { error: bumpError } = await supabase
         .from('hub_alert_state')
         .update({
           last_seen: timestamp,
           ...(shouldSend ? { last_sent: timestamp, send_count: prior.send_count + 1 } : {}),
         })
         .eq('fingerprint', fingerprint);
+      if (bumpError) {
+        console.error('[hub-content-health] Alert state not advanced, backoff will not apply:', bumpError);
+      }
     } else {
       // New problem. Retire any previous fingerprint for this source so the
       // changed alert does not inherit a stale age.
-      await supabase.from('hub_alert_state').delete().eq('source', 'hub-content-health');
-      await supabase.from('hub_alert_state').insert({
+      const { error: retireError } = await supabase
+        .from('hub_alert_state').delete().eq('source', 'hub-content-health');
+      if (retireError) {
+        console.error('[hub-content-health] Could not retire previous fingerprint:', retireError);
+      }
+
+      // If this insert fails there is no state row at all, so tomorrow this same
+      // problem looks new again and the alert restarts at day zero forever.
+      const { error: openError } = await supabase.from('hub_alert_state').insert({
         fingerprint,
         source: 'hub-content-health',
         first_seen: timestamp,
@@ -395,6 +414,9 @@ export async function GET() {
         send_count: 1,
         sample: issues[0]?.slice(0, 500) || null,
       });
+      if (openError) {
+        console.error('[hub-content-health] Alert state not opened, this alert will re-report as new each day:', openError);
+      }
     }
   } catch (err) {
     console.error('[hub-content-health] Alert state error, sending anyway:', err);
