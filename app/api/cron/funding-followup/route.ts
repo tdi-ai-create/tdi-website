@@ -1228,9 +1228,17 @@ export async function GET(request: NextRequest) {
     // archived pursuits only incidentally, because a declined school's gate is
     // usually shut. That is luck rather than logic, so it is closed properly in
     // the sync route as part of this change.
+    // One more thing this never checked: whether the narrative was actually written.
+    // On 24 Aug it reported vanessa overdue by 596 hours on Title II-A and IDEA/CEIS
+    // for St. Peter Chanel. Both narratives existed, 5367 and 5185 characters, and
+    // every record read waiting_on: 'tdi'. She had done the work and it was sitting
+    // with us. An agent that produced 5000 characters has responded, whatever the
+    // status field says. Status is workflow metadata; the narrative is the artifact.
+    const MIN_NARRATIVE_CHARS = 200
+
     const { data: staleAgentWork } = await supabase
       .from('funding_opportunities')
-      .select('id, name, pursuit_id, narrative_status, assigned_agent, updated_at')
+      .select('id, name, pursuit_id, narrative_status, assigned_agent, updated_at, narrative_content, waiting_on')
       .eq('narrative_status', 'requested')
       .eq('window_status', 'open')
       .lt('updated_at', new Date(Date.now() - 72 * 60 * 60 * 1000).toISOString())
@@ -1261,7 +1269,29 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    const hiddenFromAgents = (staleAgentWork ?? []).length - agentVisible.length
+    // The agent already delivered. Do not call this overdue.
+    const delivered = agentVisible.filter(
+      o => (o.narrative_content ?? '').trim().length >= MIN_NARRATIVE_CHARS,
+    )
+    agentVisible = agentVisible.filter(
+      o => (o.narrative_content ?? '').trim().length < MIN_NARRATIVE_CHARS,
+    )
+
+    if (delivered.length > 0) {
+      console.log(
+        LOG,
+        `[AGENT OVERDUE] ${delivered.length} narrative(s) suppressed: content already written. ` +
+          delivered
+            .map(
+              o =>
+                `${o.name} (${o.assigned_agent ?? 'unassigned'}, ` +
+                `${(o.narrative_content ?? '').trim().length} chars, waiting_on=${o.waiting_on ?? 'unset'})`,
+            )
+            .join('; '),
+      )
+    }
+
+    const hiddenFromAgents = (staleAgentWork ?? []).length - agentVisible.length - delivered.length
     if (hiddenFromAgents > 0) {
       console.log(
         LOG,
