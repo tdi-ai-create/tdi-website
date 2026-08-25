@@ -1224,7 +1224,7 @@ export default function ExampleDashboard() {
                 <span className="text-[10px] font-bold text-[#E8B84B] uppercase tracking-widest">Partnership Intelligence</span>
               </div>
               <p className="text-base md:text-lg leading-relaxed text-gray-700" style={{ fontFamily: 'Georgia, serif' }}>
-                Your team is engaged. {overviewData.stats.hubEngagement.percent}% of {overviewData.stats.educatorsEnrolled.total} educators logged into the Hub this month, exploring 342 tools across {districtSchools.length} buildings. Strategy implementation is at 62% district-wide, 6x the national average. Your team has logged 472 PD hours so far this year. Your educators&apos; average wellness score is 4.5 out of 5, stronger than the national average.
+                Your team is engaged. {overviewData.stats.hubEngagement.percent}% of {overviewData.stats.educatorsEnrolled.total} educators logged into the Hub this month, exploring 342 tools across {districtSchools.length} buildings. Strategy implementation is at 62% district-wide, 6x the national average. Your educators&apos; average wellness score is 4.5 out of 5, stronger than the national average.
               </p>
               <button
                 onClick={() => setOpenSections(prev => ({ ...prev, 'overview-hub-detail': !prev['overview-hub-detail'] }))}
@@ -1256,7 +1256,7 @@ export default function ExampleDashboard() {
                   </div>
                   <div className="flex items-center gap-3 p-3 rounded-xl bg-gray-50">
                     <Award className="w-4 h-4 text-[#E8B84B] flex-shrink-0" />
-                    <p className="text-sm text-gray-600"><strong>472 PD hours</strong> logged. <strong>38</strong> courses completed. Board-ready compliance data.</p>
+                    <p className="text-sm text-gray-600"><strong>38</strong> courses completed. Board-ready compliance data.</p>
                   </div>
                 </div>
               )}
@@ -1557,7 +1557,7 @@ export default function ExampleDashboard() {
                   },
                   {
                     title: 'Professional Growth',
-                    description: '500+ combined PD hours through Hub courses and observations by June 2026',
+                    description: 'Sustained professional growth through Hub courses and observation cycles by June 2026',
                     baseline: 0, target: 500, current: 472, unit: ' hrs',
                     baselineLabel: '0 hrs (Aug 2025)', color: '#8B5CF6',
                     status: 'on-track',
@@ -2662,7 +2662,7 @@ export default function ExampleDashboard() {
                     <p className="text-xs text-gray-500">For budget justification and grant reporting</p>
                   </div>
                 </div>
-                <p className="text-xs text-gray-600 mb-4 leading-relaxed">Investment analysis, measurable outcomes, wellness improvements, PD hours earned, and projected outcomes. Perfect for budget season and grant applications.</p>
+                <p className="text-xs text-gray-600 mb-4 leading-relaxed">Investment analysis, measurable outcomes, wellness improvements, and projected outcomes. Perfect for budget season and grant applications.</p>
                 <button
                   onClick={handleDisabledClick}
                   className="w-full py-2.5 rounded-lg text-sm font-semibold bg-[#1B2A4A] text-white hover:bg-[#2a3459] transition-colors opacity-60 cursor-not-allowed flex items-center justify-center gap-2"
