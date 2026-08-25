@@ -93,15 +93,33 @@ export async function GET() {
       ? (scores.reduce((sum, s) => sum + s, 0) / scores.length).toFixed(1)
       : 'N/A';
 
-    // Get membership breakdown
-    const { data: membershipData } = await supabase
+    // Get membership breakdown.
+    //
+    // status alone is not entitlement. lib/hub/membership-access.ts downgrades a
+    // membership to free once expires_at has passed, and that is what an educator
+    // actually experiences on the Hub. This count read status only, so it reported
+    // people as current whom the Hub itself already treats as expired.
+    //
+    // On 2026-08-25 that was 218 rows: 213 free district_partner seats that all
+    // expired 2026-07-31 when the school year ended, plus 2 stripe essentials,
+    // 2 sales_deal and 1 sales_lead. The free tier read 213 too high.
+    //
+    // The expiry test below is deliberately identical to membership-access.ts. Two
+    // different definitions of "expired" is how the dashboard and the product start
+    // disagreeing again.
+    const { data: membershipData, error: membershipError } = await supabase
       .from('hub_memberships')
-      .select('tier, source, status');
+      .select('tier, source, status, expires_at');
+
+    if (membershipError) {
+      console.error('[tdi-admin/stats] Membership breakdown unavailable:', membershipError);
+    }
 
     const membershipByTier: Record<string, number> = {};
     const membershipBySource: Record<string, number> = {};
-    (membershipData || []).forEach((m: { tier: string; source: string; status: string }) => {
-      if (m.status === 'active') {
+    (membershipData || []).forEach((m: { tier: string; source: string; status: string; expires_at: string | null }) => {
+      const isExpired = !!m.expires_at && new Date(m.expires_at).getTime() <= Date.now();
+      if (m.status === 'active' && !isExpired) {
         membershipByTier[m.tier] = (membershipByTier[m.tier] || 0) + 1;
         membershipBySource[m.source] = (membershipBySource[m.source] || 0) + 1;
       }
