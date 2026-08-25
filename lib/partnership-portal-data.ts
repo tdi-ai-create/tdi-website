@@ -729,6 +729,18 @@ export async function getPartnershipStats(): Promise<{
 // AUTH HELPERS
 // ============================================================================
 
-export async function isTDIAdmin(email: string): Promise<boolean> {
-  return email.toLowerCase().endsWith('@teachersdeserveit.com');
-}
+/**
+ * Re-exported from the canonical implementation rather than reimplemented.
+ *
+ * This module used to decide admin access with nothing but a domain test:
+ *
+ *   return email.toLowerCase().endsWith('@teachersdeserveit.com');
+ *
+ * Twelve routes import it, including every data source behind the Lead
+ * Dashboard. Team members on other domains (Omar on secureplusfinancial.com,
+ * Kristin on whatwilllast.com) are owners in tdi_team_members, but nothing
+ * here ever read that table, so all twelve returned 401. The client swallows
+ * the 401 and renders an empty list, so the portal told Omar "No partnerships
+ * yet" rather than "you do not have access" for months.
+ */
+export { isTDIAdmin } from '@/lib/is-tdi-admin';

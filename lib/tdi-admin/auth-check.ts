@@ -1,28 +1,15 @@
-import { getServiceSupabase } from '@/lib/supabase'
-
 /**
- * Check if an email belongs to a TDI admin team member.
- * Checks both the @teachersdeserveit.com domain AND the team_members table.
- * This allows external team members (like Omar) to access admin APIs.
+ * Re-exported from the canonical implementation rather than reimplemented.
+ *
+ * This module used to query a table named `team_members`. That table does not
+ * exist in this database. The only table is `tdi_team_members`. The failing
+ * query was wrapped in `try { ... } catch { return false }`, so the missing
+ * table never surfaced as an error: it just returned false forever for anyone
+ * whose address did not end in @teachersdeserveit.com.
+ *
+ * Nine routes import this, all of them the leadership detail pages behind
+ * /tdi-admin/leadership/[id] plus the sales coach evaluator. The comment it
+ * shipped with claimed it existed to let "external team members (like Omar)"
+ * through, which is the exact thing it could never do.
  */
-export async function isTDIAdmin(email: string): Promise<boolean> {
-  // Fast path: TDI domain emails are always admin
-  if (email.toLowerCase().endsWith('@teachersdeserveit.com')) {
-    return true
-  }
-
-  // Check team_members table for external team members
-  try {
-    const supabase = getServiceSupabase()
-    const { data } = await supabase
-      .from('team_members')
-      .select('id, is_active')
-      .eq('email', email.toLowerCase())
-      .eq('is_active', true)
-      .single()
-
-    return !!data
-  } catch {
-    return false
-  }
-}
+export { isTDIAdmin } from '@/lib/is-tdi-admin'
