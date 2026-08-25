@@ -436,7 +436,7 @@ export default function CourseCatalogPage() {
               icon={BookOpen}
               iconBgColor="#E0E7FF"
               title={tUI('Courses are coming soon.')}
-              description={tUI('We are building practical, teacher-tested courses that earn PD hours. Check back soon.')}
+              description={tUI('We are building practical, teacher-tested courses. Check back soon.')}
             />
             <p
               className="text-center text-sm mt-4"

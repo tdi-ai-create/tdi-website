@@ -18,7 +18,6 @@ const TIERS = [
     features: [
       { text: 'A handful of rotating tools each week', included: true },
       { text: 'Save your favorites (yes, even on Free)', included: true },
-      { text: 'Track your PD hours automatically', included: true },
       { text: 'Individual quick wins', included: false },
       { text: 'Resource packs', included: false },
       { text: 'Full course library', included: false },
