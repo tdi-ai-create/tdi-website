@@ -27,14 +27,38 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Invoice not found' }, { status: 404 })
   }
 
-  // 2. Mark invoice as paid
-  await supabase
+  // 2. Mark invoice as paid, recording HOW it was paid.
+  //
+  // Bella reported on 2026-08-18 that this "records as paid but doesnt save the check
+  // number". She was right. All four payment fields were destructured above and then
+  // dropped, because quote_invoices had no columns for them. The columns were added on
+  // 2026-08-25. payment_events was not an option here: its invoice_id foreign key
+  // points at intelligence_invoices, which is a different invoice system.
+  //
+  // The error was also being discarded, so a failed write reported success.
+  const { error: invoiceError } = await supabase
     .from('quote_invoices')
-    .update({ status: 'paid', paid_at: new Date().toISOString() })
+    .update({
+      status: 'paid',
+      paid_at: new Date().toISOString(),
+      payment_method: payment_method?.trim() || null,
+      check_number: check_number?.trim() || null,
+      payment_date: payment_date || null,
+      payment_notes: notes?.trim() || null,
+      updated_at: new Date().toISOString(),
+    })
     .eq('id', invoice_id)
 
+  if (invoiceError) {
+    console.error('[mark-paid] Invoice not marked paid, nothing was changed:', invoiceError)
+    return NextResponse.json(
+      { error: `The invoice was not marked paid, so nothing was changed. ${invoiceError.message}` },
+      { status: 500 }
+    )
+  }
+
   // 3. Flip all linked deliverables to paid
-  const { data: updated } = await supabase
+  const { data: updated, error: deliverablesError } = await supabase
     .from('contract_deliverables')
     .update({
       delivery_status: 'paid',
@@ -42,6 +66,18 @@ export async function POST(request: NextRequest) {
     })
     .eq('invoice_id', invoice_id)
     .select('quote_id')
+
+  if (deliverablesError) {
+    console.error('[mark-paid] Invoice is paid but deliverables did not flip:', deliverablesError)
+    return NextResponse.json(
+      {
+        error:
+          `The invoice was marked paid, but its deliverables were not updated. ` +
+          `They will still show as unpaid. ${deliverablesError.message}`,
+      },
+      { status: 500 }
+    )
+  }
 
   // 4. Update sales_opportunity payment_received if all deliverables for that quote are paid
   if (updated?.length) {
@@ -64,7 +100,11 @@ export async function POST(request: NextRequest) {
         .single()
 
       if (quote?.district_id) {
-        await supabase
+        // Not fatal. The invoice and its deliverables are already paid and correct;
+        // this only mirrors that onto the opportunity. Log it rather than failing the
+        // request, but never let it fail in silence, because a missing
+        // payment_received is invisible until someone chases a school that has paid.
+        const { error: opportunityError } = await supabase
           .from('sales_opportunities')
           .update({
             payment_received: true,
@@ -73,6 +113,14 @@ export async function POST(request: NextRequest) {
           })
           .eq('district_id', quote.district_id)
           .eq('stage', 'signed')
+
+        if (opportunityError) {
+          console.error(
+            `[mark-paid] Invoice ${invoice_id} is paid but sales_opportunities was not ` +
+            `updated for district ${quote.district_id}. It will still read as unpaid in the CRM:`,
+            opportunityError
+          )
+        }
       }
     }
   }
