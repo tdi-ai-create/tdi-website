@@ -71,11 +71,21 @@ export async function GET(request: NextRequest) {
 
       if (emailResponse.ok) {
         sent++;
-        await supabase.from('activity_log').insert({
+        // Unlike the daily reminder jobs, nothing reads this row back and the cron
+        // only fires on the 15th, so losing it cannot cause a repeat send. What it
+        // does lose is the only record that we emailed this partner at all, which
+        // is the thing anyone reconstructing a client relationship would look for.
+        const { error: logError } = await supabase.from('activity_log').insert({
           partnership_id: p.id,
           action: 'seasonal_email_sent',
           details: { month: month + 1, subject: email.subject },
         });
+        if (logError) {
+          console.error(
+            `[seasonal-partner-email] SENT to ${p.contact_email} but failed to record it. ` +
+            `There will be no trace of this email on the partnership:`, logError
+          );
+        }
       }
     }
 
@@ -101,7 +111,11 @@ function getSeasonalEmail(
   hubUrl: string,
   partnership: Partnership
 ): { subject: string; body: string } | null {
-  const staff = partnership.staff_enrolled || 0;
+  // staff_enrolled is deliberately not quoted to partners. It is an expected
+  // headcount rather than provisioned seats, and it is demonstrably unreliable:
+  // St. Mary's read 22 against a signed contract for 10. The August mail used to
+  // say "your 22 educators", which is a number we cannot stand behind and which
+  // this job never verified, since it does not query staff_members at all.
   const hasObservations = (partnership.observation_days_total || 0) > 0;
 
   switch (month) {
@@ -126,7 +140,7 @@ The TDI Team`
         subject: `${firstName}, time to get your team set up`,
         body: `${firstName},
 
-School is almost here. Now is the perfect time to make sure your ${staff} educators have Learning Hub access before the first day.
+School is almost here. Now is the perfect time to make sure your team has Learning Hub access before the first day.
 
 Here is what to do:
 1. Upload your staff roster if you have not already (Team tab on your dashboard)
