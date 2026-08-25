@@ -521,18 +521,19 @@ export default function SalesPage() {
       setOpportunities(mapped)
       setLastSynced(new Date())
 
-      // Load notes
-      const { data: notesData } = await supabase
-        .from('sales_opportunity_notes')
-        .select('opportunity_id, body, created_at')
-        .order('created_at', { ascending: false })
-      if (notesData) {
-        const grouped: Record<string, { body: string; created_at: string }[]> = {}
-        notesData.forEach((n: any) => {
-          if (!grouped[n.opportunity_id]) grouped[n.opportunity_id] = []
-          grouped[n.opportunity_id].push({ body: n.body, created_at: n.created_at })
-        })
-        setOppNotes(grouped)
+      // Load notes through the API rather than querying Supabase directly.
+      // Notes live in two tables, and sales_opportunity_notes has RLS on with no
+      // policies, so an anon-key read of it returns nothing at all.
+      try {
+        const notesRes = await fetch('/api/sales/notes/summary')
+        if (notesRes.ok) {
+          const { notes } = await notesRes.json()
+          setOppNotes(notes ?? {})
+        } else {
+          console.error('[sales] notes summary failed:', notesRes.status)
+        }
+      } catch (e) {
+        console.error('[sales] notes summary request failed:', e)
       }
     } catch (err: any) {
       setError(err.message || 'Failed to load opportunities')
@@ -706,59 +707,46 @@ export default function SalesPage() {
     const body = quickNoteText.trim()
     const now = new Date().toISOString()
 
-    await supabase.from('opportunity_notes').insert({
-      opportunity_id: quickNoteOppId,
-      body,
-      created_at: now,
-      created_by: 'admin',
-    })
+    // Save through the notes API. This previously inserted `body` and
+    // `created_by` straight into opportunity_notes, whose columns are actually
+    // `note_text` and `author_email`, with no error check. Every quick note was
+    // silently discarded: the table has never held a single row written here.
+    // The API route uses the right columns, stamps last_activity_at, logs the
+    // activity entry and handles sibling mirroring server-side.
+    try {
+      const res = await fetch(`/api/sales/opportunities/${quickNoteOppId}/notes`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          note_text: body,
+          note_type: 'update',
+          author_email: 'rae@teachersdeserveit.com',
+        }),
+      })
 
-    // Mirror note to sibling signed opportunities (same school, split grant/non-grant)
-    const thisOpp = opportunities.find(o => o.supabase_id === quickNoteOppId)
-    if (thisOpp?.stage === 'signed') {
-      const baseName = thisOpp.name
-        .replace(/\s*-\s*(grant funded|non-grant)$/i, '')
-        .replace(/^\(renewal\)\s*/i, '')
-        .trim()
-      const siblings = opportunities.filter(o =>
-        o.supabase_id !== quickNoteOppId &&
-        o.stage === 'signed' &&
-        o.name.toLowerCase().includes(baseName.toLowerCase())
-      )
-      if (siblings.length) {
-        const mirrorInserts = siblings.map(s => ({
-          opportunity_id: s.supabase_id,
-          body: `[Mirrored] ${body}`,
-          created_at: now,
-          created_by: 'admin',
-        }))
-        await supabase.from('opportunity_notes').insert(mirrorInserts)
-        // Update local note state for siblings
-        setOppNotes(prev => {
-          const updated = { ...prev }
-          siblings.forEach(s => {
-            updated[s.supabase_id] = [{ body: `[Mirrored] ${body}`, created_at: now }, ...(prev[s.supabase_id] || [])]
-          })
-          return updated
-        })
+      if (!res.ok) {
+        const { error } = await res.json().catch(() => ({ error: 'Unknown error' }))
+        console.error('[sales] quick note failed:', error)
+        alert(`Note was not saved: ${error}`)
+        setSavingQuickNote(false)
+        return
       }
+
+      // Only reflect it locally once the write is known to have succeeded.
+      setOppNotes(prev => ({
+        ...prev,
+        [quickNoteOppId]: [{ body, created_at: now }, ...(prev[quickNoteOppId] || [])],
+      }))
+
+      setOpportunities(prev => prev.map(o =>
+        o.supabase_id === quickNoteOppId ? { ...o, lastActivityAt: now } : o
+      ))
+    } catch (e) {
+      console.error('[sales] quick note request failed:', e)
+      alert('Note was not saved. Check your connection and try again.')
+      setSavingQuickNote(false)
+      return
     }
-
-    // Update local state
-    setOppNotes(prev => ({
-      ...prev,
-      [quickNoteOppId]: [{ body, created_at: now }, ...(prev[quickNoteOppId] || [])],
-    }))
-
-    // Update last_activity_at
-    await supabase
-      .from('sales_opportunities')
-      .update({ last_activity_at: now, updated_at: now })
-      .eq('id', quickNoteOppId)
-
-    setOpportunities(prev => prev.map(o =>
-      o.supabase_id === quickNoteOppId ? { ...o, lastActivityAt: now } : o
-    ))
 
     setSavingQuickNote(false)
     setQuickNoteText('')
