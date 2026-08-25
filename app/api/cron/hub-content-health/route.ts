@@ -114,7 +114,7 @@ export async function GET() {
   try {
     const { data: unpublished, error } = await supabase
       .from('hub_quick_wins')
-      .select('id, slug, title, status, quick_win_type, file_url, tool_file_url, tool_type, description, lift, category, topic_tags, roles, danielson_domains')
+      .select('id, slug, title, status, qa_notes, quick_win_type, file_url, tool_file_url, tool_type, description, lift, category, topic_tags, roles, danielson_domains')
       .eq('is_published', false)
       .lt('created_at', staleCutoff);
 
@@ -128,7 +128,16 @@ export async function GET() {
       //   quiz     -> the detail page renders "Take Quiz" off file_url and falls back to
       //               a "Quiz coming soon" placeholder without it, so file_url is required
       //   game / activity -> interactive, rendered by their own routes, need no PDF
+      // An item can be complete and still be dark on purpose. 3-tiny-wellness-habits-educators
+      // was pulled on 2026-08-21 for disguised product advertising, and because this check only
+      // measured field completeness it spent the next three days reporting CRITICAL and telling
+      // whoever read it to publish the one item that must never go live. A withheld item is a
+      // correct state, not a defect. Withholding is recorded in qa_notes by a human or by QA.
+      const isWithheld = (q: typeof unpublished[number]) =>
+        /QA FAIL|DO NOT PUBLISH/i.test(q.qa_notes ?? '');
+
       const isReady = (q: typeof unpublished[number]) => {
+        if (isWithheld(q)) return false;
         const tagged =
           !!q.title?.trim() && !!q.description?.trim() && !!q.lift && !!q.category &&
           nonEmpty(q.topic_tags) && nonEmpty(q.roles) && nonEmpty(q.danielson_domains);
@@ -140,8 +149,20 @@ export async function GET() {
         return true;
       };
 
+      const withheld = unpublished.filter(isWithheld);
       const ready = unpublished.filter(isReady);
-      const incomplete = unpublished.filter(q => !isReady(q));
+      // Withheld items are neither ready nor incomplete. Left in `incomplete` they would
+      // simply move from a CRITICAL line to a WARNING line and keep the alert firing.
+      const incomplete = unpublished.filter(q => !isReady(q) && !isWithheld(q));
+
+      // Visible in the cron log without raising an alert, so a deliberate hold stays
+      // auditable rather than silently disappearing from the check.
+      if (withheld.length > 0) {
+        console.log(
+          `[hub-content-health] ${withheld.length} item(s) withheld by QA, not counted as a defect: ` +
+          withheld.map(q => q.slug).join(', ')
+        );
+      }
 
       if (ready.length > 0) {
         issues.push(
@@ -319,7 +340,13 @@ export async function GET() {
   // If no issues, all good. Clear any open alert state so a problem that comes
   // back later is correctly reported as new rather than resuming an old streak.
   if (issues.length === 0) {
-    await supabase.from('hub_alert_state').delete().eq('source', 'hub-content-health');
+    // If this fails the state stays open, so the next real problem resumes an old
+    // streak and is reported as days old on its first day.
+    const { error: clearError } = await supabase
+      .from('hub_alert_state').delete().eq('source', 'hub-content-health');
+    if (clearError) {
+      console.error('[hub-content-health] Could not clear alert state, next alert may report a stale age:', clearError);
+    }
     return NextResponse.json({
       status: 'healthy',
       message: 'All Hub content checks passed',
@@ -354,18 +381,31 @@ export async function GET() {
       // Days 0,1,2 always send. After that, every third day.
       shouldSend = daysOpen < 3 || daysOpen % 3 === 0;
 
-      await supabase
+      // If this fails, send_count never advances and the backoff never kicks in,
+      // so the same alert mails every morning again. That is the exact behaviour
+      // the escalation logic above exists to prevent.
+      const { error: bumpError } = await supabase
         .from('hub_alert_state')
         .update({
           last_seen: timestamp,
           ...(shouldSend ? { last_sent: timestamp, send_count: prior.send_count + 1 } : {}),
         })
         .eq('fingerprint', fingerprint);
+      if (bumpError) {
+        console.error('[hub-content-health] Alert state not advanced, backoff will not apply:', bumpError);
+      }
     } else {
       // New problem. Retire any previous fingerprint for this source so the
       // changed alert does not inherit a stale age.
-      await supabase.from('hub_alert_state').delete().eq('source', 'hub-content-health');
-      await supabase.from('hub_alert_state').insert({
+      const { error: retireError } = await supabase
+        .from('hub_alert_state').delete().eq('source', 'hub-content-health');
+      if (retireError) {
+        console.error('[hub-content-health] Could not retire previous fingerprint:', retireError);
+      }
+
+      // If this insert fails there is no state row at all, so tomorrow this same
+      // problem looks new again and the alert restarts at day zero forever.
+      const { error: openError } = await supabase.from('hub_alert_state').insert({
         fingerprint,
         source: 'hub-content-health',
         first_seen: timestamp,
@@ -374,6 +414,9 @@ export async function GET() {
         send_count: 1,
         sample: issues[0]?.slice(0, 500) || null,
       });
+      if (openError) {
+        console.error('[hub-content-health] Alert state not opened, this alert will re-report as new each day:', openError);
+      }
     }
   } catch (err) {
     console.error('[hub-content-health] Alert state error, sending anyway:', err);
