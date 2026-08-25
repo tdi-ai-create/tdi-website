@@ -1224,7 +1224,7 @@ export default function ExampleDashboard() {
                 <span className="text-[10px] font-bold text-[#E8B84B] uppercase tracking-widest">Partnership Intelligence</span>
               </div>
               <p className="text-base md:text-lg leading-relaxed text-gray-700" style={{ fontFamily: 'Georgia, serif' }}>
-                Your team is engaged. {overviewData.stats.hubEngagement.percent}% of {overviewData.stats.educatorsEnrolled.total} educators logged into the Hub this month, exploring 342 tools across {districtSchools.length} buildings. Strategy implementation is at 62% district-wide -- 6x the national average. Your team has logged 472 PD hours so far this year. Your educators&apos; average wellness score is 4.5 out of 5 -- stronger than the national average.
+                Your team is engaged. {overviewData.stats.hubEngagement.percent}% of {overviewData.stats.educatorsEnrolled.total} educators logged into the Hub this month, exploring 342 tools across {districtSchools.length} buildings. Strategy implementation is at 62% district-wide, 6x the national average. Your educators&apos; average wellness score is 4.5 out of 5, stronger than the national average.
               </p>
               <button
                 onClick={() => setOpenSections(prev => ({ ...prev, 'overview-hub-detail': !prev['overview-hub-detail'] }))}
@@ -1256,7 +1256,7 @@ export default function ExampleDashboard() {
                   </div>
                   <div className="flex items-center gap-3 p-3 rounded-xl bg-gray-50">
                     <Award className="w-4 h-4 text-[#E8B84B] flex-shrink-0" />
-                    <p className="text-sm text-gray-600"><strong>472 PD hours</strong> logged -- <strong>38</strong> courses completed. Board-ready compliance data.</p>
+                    <p className="text-sm text-gray-600"><strong>38</strong> courses completed. Board-ready compliance data.</p>
                   </div>
                 </div>
               )}
@@ -1389,7 +1389,7 @@ export default function ExampleDashboard() {
                       &ldquo;{q.text}&rdquo;
                     </p>
                     <p className="text-[10px] text-gray-400 mt-1">
-                      -- {q.role}, {q.date}
+                      {q.role}, {q.date}
                     </p>
                   </div>
                 ))}
@@ -1557,7 +1557,7 @@ export default function ExampleDashboard() {
                   },
                   {
                     title: 'Professional Growth',
-                    description: '500+ combined PD hours through Hub courses and observations by June 2026',
+                    description: 'Sustained professional growth through Hub courses and observation cycles by June 2026',
                     baseline: 0, target: 500, current: 472, unit: ' hrs',
                     baselineLabel: '0 hrs (Aug 2025)', color: '#8B5CF6',
                     status: 'on-track',
@@ -1614,7 +1614,7 @@ export default function ExampleDashboard() {
                     <div className="flex items-center gap-3">
                       <div className="w-9 h-9 rounded-lg flex items-center justify-center font-bold text-white text-sm" style={{ background: '#D97706' }}>#2</div>
                       <div>
-                        <p className="font-bold text-[#1B2A4A] text-sm">Teacher Cohort -- Motown Middle School</p>
+                        <p className="font-bold text-[#1B2A4A] text-sm">Teacher Cohort: Motown Middle School</p>
                         <p className="text-xs text-gray-400">February 26, 2026</p>
                       </div>
                     </div>
@@ -1649,7 +1649,7 @@ export default function ExampleDashboard() {
                       <div className="bg-[#FEF9E7] rounded-lg p-4 border-l-3 border-[#FFBA06]" style={{ borderLeft: '3px solid #FFBA06' }}>
                         <div className="flex items-center gap-2 mb-2">
                           <Heart className="w-3.5 h-3.5 text-[#FFBA06]" />
-                          <span className="font-semibold text-[#1B2A4A] text-xs">Love Note -- Ms. Carter, 6th Grade Math</span>
+                          <span className="font-semibold text-[#1B2A4A] text-xs">Love Note: Ms. Carter, 6th Grade Math</span>
                         </div>
                         <p className="text-sm text-gray-700 italic leading-relaxed">
                           &quot;Your wait time during questioning was exceptional today. You gave students space to think, and the quality of responses showed it. That patience is building real thinkers.&quot;
@@ -1658,19 +1658,19 @@ export default function ExampleDashboard() {
                       <div className="bg-[#FEF9E7] rounded-lg p-4 border-l-3 border-[#FFBA06]" style={{ borderLeft: '3px solid #FFBA06' }}>
                         <div className="flex items-center gap-2 mb-2">
                           <Heart className="w-3.5 h-3.5 text-[#FFBA06]" />
-                          <span className="font-semibold text-[#1B2A4A] text-xs">Love Note -- Mr. Davis, 7th Grade Social Studies</span>
+                          <span className="font-semibold text-[#1B2A4A] text-xs">Love Note: Mr. Davis, 7th Grade Social Studies</span>
                         </div>
                         <p className="text-sm text-gray-700 italic leading-relaxed">
-                          &quot;The way you used primary sources to spark debate was masterful. Students weren&apos;t just answering questions -- they were arguing with evidence. That&apos;s the kind of critical thinking that transfers beyond your classroom.&quot;
+                          &quot;The way you used primary sources to spark debate was masterful. Students weren&apos;t just answering questions. They were arguing with evidence. That&apos;s the kind of critical thinking that transfers beyond your classroom.&quot;
                         </p>
                       </div>
                       <div className="bg-[#FEF9E7] rounded-lg p-4 border-l-3 border-[#FFBA06]" style={{ borderLeft: '3px solid #FFBA06' }}>
                         <div className="flex items-center gap-2 mb-2">
                           <Heart className="w-3.5 h-3.5 text-[#FFBA06]" />
-                          <span className="font-semibold text-[#1B2A4A] text-xs">Love Note -- Ms. Reyes, 8th Grade Reading</span>
+                          <span className="font-semibold text-[#1B2A4A] text-xs">Love Note: Ms. Reyes, 8th Grade Reading</span>
                         </div>
                         <p className="text-sm text-gray-700 italic leading-relaxed">
-                          &quot;Your reading groups were seamless today. The way you transitioned between guided and independent work -- students knew exactly what to do because you&apos;ve built those routines with care. The quietest student in Group B raised her hand twice. That&apos;s your culture showing.&quot;
+                          &quot;Your reading groups were seamless today. The way you transitioned between guided and independent work meant students knew exactly what to do because you&apos;ve built those routines with care. The quietest student in Group B raised her hand twice. That&apos;s your culture showing.&quot;
                         </p>
                       </div>
                     </div>
@@ -1689,7 +1689,7 @@ export default function ExampleDashboard() {
                           <li className="flex items-start gap-2"><Check className="w-4 h-4 text-[#2A9D8F] mt-0.5 flex-shrink-0" />Updated partner dashboard with full observation notes</li>
                         </ul>
                         <div className="bg-gray-50 rounded-lg p-3">
-                          <p className="text-xs text-gray-500"><strong>Admin response:</strong> &quot;I appreciate your flexibility and all the feedback you&apos;ve provided. Have a great night!&quot; -- District Coordinator</p>
+                          <p className="text-xs text-gray-500"><strong>Admin response:</strong> &quot;I appreciate your flexibility and all the feedback you&apos;ve provided. Have a great night!&quot; (District Coordinator)</p>
                         </div>
                       </div>
                     </Accordion>
@@ -1702,8 +1702,8 @@ export default function ExampleDashboard() {
                     <div className="flex items-center gap-3">
                       <div className="w-9 h-9 rounded-lg flex items-center justify-center font-bold text-white text-sm" style={{ background: '#D97706' }}>#1</div>
                       <div>
-                        <p className="font-bold text-[#1B2A4A] text-sm">Para Cohort -- 3 Buildings</p>
-                        <p className="text-xs text-gray-400">Harmony Elementary, Rhythm Academy, Bridges Alt -- February 13, 2026</p>
+                        <p className="font-bold text-[#1B2A4A] text-sm">Para Cohort: 3 Buildings</p>
+                        <p className="text-xs text-gray-400">Harmony Elementary, Rhythm Academy, Bridges Alt on February 13, 2026</p>
                       </div>
                     </div>
                     <span className="text-[10px] bg-green-50 text-green-600 font-semibold px-2 py-0.5 rounded-full flex items-center gap-1">
@@ -1736,7 +1736,7 @@ export default function ExampleDashboard() {
                       <div className="bg-[#FEF9E7] rounded-lg p-4" style={{ borderLeft: '3px solid #FFBA06' }}>
                         <div className="flex items-center gap-2 mb-2">
                           <Heart className="w-3.5 h-3.5 text-[#FFBA06]" />
-                          <span className="font-semibold text-[#1B2A4A] text-xs">Love Note -- Marcus T., Para at Harmony Elementary</span>
+                          <span className="font-semibold text-[#1B2A4A] text-xs">Love Note: Marcus T., Para at Harmony Elementary</span>
                         </div>
                         <p className="text-sm text-gray-700 italic leading-relaxed">
                           &quot;The way you redirected Jaylen back to the group without missing a beat showed real skill. You kept the whole table on track while giving him exactly what he needed. That&apos;s the kind of support that changes outcomes.&quot;
@@ -1745,16 +1745,16 @@ export default function ExampleDashboard() {
                       <div className="bg-[#FEF9E7] rounded-lg p-4" style={{ borderLeft: '3px solid #FFBA06' }}>
                         <div className="flex items-center gap-2 mb-2">
                           <Heart className="w-3.5 h-3.5 text-[#FFBA06]" />
-                          <span className="font-semibold text-[#1B2A4A] text-xs">Love Note -- Rosa M., Para at Harmony Elementary</span>
+                          <span className="font-semibold text-[#1B2A4A] text-xs">Love Note: Rosa M., Para at Harmony Elementary</span>
                         </div>
                         <p className="text-sm text-gray-700 italic leading-relaxed">
-                          &quot;Your use of Spanish during the math lesson wasn&apos;t just translation -- it was instructional. You caught the moment a student was confused about place value and explained it in a way that clicked. That bilingual instinct is a superpower.&quot;
+                          &quot;Your use of Spanish during the math lesson wasn&apos;t just translation. It was instructional. You caught the moment a student was confused about place value and explained it in a way that clicked. That bilingual instinct is a superpower.&quot;
                         </p>
                       </div>
                       <div className="bg-[#FEF9E7] rounded-lg p-4" style={{ borderLeft: '3px solid #FFBA06' }}>
                         <div className="flex items-center gap-2 mb-2">
                           <Heart className="w-3.5 h-3.5 text-[#FFBA06]" />
-                          <span className="font-semibold text-[#1B2A4A] text-xs">Love Note -- Denise K., Para at Bridges Alternative</span>
+                          <span className="font-semibold text-[#1B2A4A] text-xs">Love Note: Denise K., Para at Bridges Alternative</span>
                         </div>
                         <p className="text-sm text-gray-700 italic leading-relaxed">
                           &quot;You de-escalated a situation today that most adults would have made worse. You stayed calm, gave space, and then re-engaged with exactly the right tone. That student came back to work because of you.&quot;
@@ -1776,7 +1776,7 @@ export default function ExampleDashboard() {
                           <li className="flex items-start gap-2"><Check className="w-4 h-4 text-[#2A9D8F] mt-0.5 flex-shrink-0" />Updated partner dashboard with full notes</li>
                         </ul>
                         <div className="bg-gray-50 rounded-lg p-3">
-                          <p className="text-xs text-gray-500"><strong>Admin response:</strong> &quot;I am glad we were able to connect and appreciate all the work you did to ensure staff received immediate feedback on all the positive strategies they are implementing.&quot; -- District Coordinator</p>
+                          <p className="text-xs text-gray-500"><strong>Admin response:</strong> &quot;I am glad we were able to connect and appreciate all the work you did to ensure staff received immediate feedback on all the positive strategies they are implementing.&quot; (District Coordinator)</p>
                         </div>
                       </div>
                     </Accordion>
@@ -1796,7 +1796,7 @@ export default function ExampleDashboard() {
                   <div className="flex items-center gap-3 mb-3">
                     <div className="w-9 h-9 rounded-lg flex items-center justify-center font-bold text-gray-400 text-sm bg-gray-100">#3</div>
                     <div>
-                      <p className="font-medium text-gray-400 text-sm">Spring Observation Day -- Teacher Cohort</p>
+                      <p className="font-medium text-gray-400 text-sm">Spring Observation Day: Teacher Cohort</p>
                       <p className="text-xs text-gray-300">April 2026</p>
                     </div>
                     <span className="ml-auto text-[10px] bg-blue-50 text-blue-600 font-semibold px-2 py-0.5 rounded-full">Scheduled</span>
@@ -1804,7 +1804,7 @@ export default function ExampleDashboard() {
                   <div className="flex items-center gap-3">
                     <div className="w-9 h-9 rounded-lg flex items-center justify-center font-bold text-gray-400 text-sm bg-gray-100">#4</div>
                     <div>
-                      <p className="font-medium text-gray-400 text-sm">Spring Observation Day -- Para Cohort</p>
+                      <p className="font-medium text-gray-400 text-sm">Spring Observation Day: Para Cohort</p>
                       <p className="text-xs text-gray-300">April 2026</p>
                     </div>
                     <span className="ml-auto text-[10px] bg-blue-50 text-blue-600 font-semibold px-2 py-0.5 rounded-full">Scheduled</span>
@@ -1881,9 +1881,9 @@ export default function ExampleDashboard() {
               <h3 className="text-sm font-semibold text-[#1B2A4A] mb-4">Sessions & Leadership Meetings</h3>
               <div className="space-y-2">
                 {[
-                  { title: 'Virtual Session 1 -- Para Cohort (district-wide)', date: 'January 2026', status: 'complete' },
-                  { title: 'Virtual Session 2 -- Teacher Cohort (Harmony + Crescendo)', date: 'February 2026', status: 'complete' },
-                  { title: 'Mid-year Leadership Recap -- all 6 building principals', date: 'February 2026', status: 'complete' },
+                  { title: 'Virtual Session 1: Para Cohort (district-wide)', date: 'January 2026', status: 'complete' },
+                  { title: 'Virtual Session 2: Teacher Cohort (Harmony + Crescendo)', date: 'February 2026', status: 'complete' },
+                  { title: 'Mid-year Leadership Recap: all 6 building principals', date: 'February 2026', status: 'complete' },
                 ].map((session, i) => (
                   <div key={i} className="flex items-center gap-3 bg-green-50 rounded-xl p-3 border border-green-100">
                     <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
@@ -1897,7 +1897,7 @@ export default function ExampleDashboard() {
                 <div className="flex items-center gap-3 bg-amber-50 rounded-xl p-3 border border-amber-200">
                   <Star className="w-4 h-4 text-amber-600 flex-shrink-0" />
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-[#1B2A4A]">Spring Leadership Recap -- District Team</p>
+                    <p className="text-sm font-medium text-[#1B2A4A]">Spring Leadership Recap: District Team</p>
                     <p className="text-xs text-gray-500">April 2026</p>
                   </div>
                   <span className="text-[10px] font-medium text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full flex-shrink-0">Renewal</span>
@@ -1905,7 +1905,7 @@ export default function ExampleDashboard() {
                 <div className="flex items-center gap-3 bg-blue-50 rounded-xl p-3 border border-blue-100">
                   <Calendar className="w-4 h-4 text-blue-600 flex-shrink-0" />
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-[#1B2A4A]">Spring Observation Days -- both cohorts</p>
+                    <p className="text-sm font-medium text-[#1B2A4A]">Spring Observation Days: both cohorts</p>
                     <p className="text-xs text-gray-500">April 2026</p>
                   </div>
                   <span className="text-[10px] font-medium text-blue-600 bg-blue-100 px-2 py-0.5 rounded-full flex-shrink-0">Scheduled</span>
@@ -1947,7 +1947,7 @@ export default function ExampleDashboard() {
                   <span className="text-4xl font-black">62%</span>
                   <div className="pb-1">
                     <p className="text-white/80 text-sm font-medium">strategy implementation rate</p>
-                    <p className="text-white/50 text-xs">6x the 10% national average -- approaching TDI partner benchmark</p>
+                    <p className="text-white/50 text-xs">6x the 10% national average, approaching TDI partner benchmark</p>
                   </div>
                 </div>
                 <div className="space-y-2">
@@ -1986,14 +1986,14 @@ export default function ExampleDashboard() {
                     <Trophy className="w-4 h-4 text-amber-600" />
                     <span className="font-bold text-amber-800 text-sm">Harmony Elementary</span>
                   </div>
-                  <p className="text-xs text-amber-700">100% Hub login rate -- leading the district</p>
+                  <p className="text-xs text-amber-700">100% Hub login rate, leading the district</p>
                 </div>
                 <div className="bg-amber-50 rounded-xl p-4 border border-amber-100">
                   <div className="flex items-center gap-2 mb-1">
                     <Trophy className="w-4 h-4 text-amber-600" />
                     <span className="font-bold text-amber-800 text-sm">Crescendo Middle</span>
                   </div>
-                  <p className="text-xs text-amber-700">68% implementation rate -- highest in district</p>
+                  <p className="text-xs text-amber-700">68% implementation rate, highest in district</p>
                 </div>
               </div>
             </div>
@@ -2662,7 +2662,7 @@ export default function ExampleDashboard() {
                     <p className="text-xs text-gray-500">For budget justification and grant reporting</p>
                   </div>
                 </div>
-                <p className="text-xs text-gray-600 mb-4 leading-relaxed">Investment analysis, measurable outcomes, wellness improvements, PD hours earned, and projected outcomes. Perfect for budget season and grant applications.</p>
+                <p className="text-xs text-gray-600 mb-4 leading-relaxed">Investment analysis, measurable outcomes, wellness improvements, and projected outcomes. Perfect for budget season and grant applications.</p>
                 <button
                   onClick={handleDisabledClick}
                   className="w-full py-2.5 rounded-lg text-sm font-semibold bg-[#1B2A4A] text-white hover:bg-[#2a3459] transition-colors opacity-60 cursor-not-allowed flex items-center justify-center gap-2"
@@ -2794,7 +2794,7 @@ export default function ExampleDashboard() {
                 <div>
                   <h2 className="text-sm font-bold mb-1" style={{ color: '#FFFFFF' }}>We Find the Funding. You Focus on Teaching.</h2>
                   <p className="text-sm text-white/70 leading-relaxed mb-3">
-                    80% of schools we partner with find over $35K in funding for TDI. We research every option, write the grant language, prepare the board proposals -- you just review and submit.
+                    80% of schools we partner with find over $35K in funding for TDI. We research every option, write the grant language, prepare the board proposals. You just review and submit.
                   </p>
                   <div className="grid grid-cols-3 gap-3 mt-4">
                     <div className="bg-white/10 rounded-lg p-3 text-center">
