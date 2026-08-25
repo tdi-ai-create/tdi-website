@@ -125,7 +125,7 @@ The TDI Team`
 
 Just checking in. Your partnership dashboard has been live for a week and we want to make sure everything is working for you.
 
-Your ${p.staff_enrolled || 0} educators are ready to get started on the Learning Hub as soon as you complete the setup checklist. The sooner they have access, the sooner they start benefiting.
+Your team can get started on the Learning Hub as soon as you complete the setup checklist. The sooner they have access, the sooner they start benefiting.
 
 <a href="${dashboardUrl}" style="display:inline-block;padding:12px 24px;background:#1e2749;color:white;text-decoration:none;border-radius:8px;font-size:14px;font-weight:600;margin:16px 0;">Complete Your Setup</a>
 
@@ -159,10 +159,9 @@ The TDI Team`
 It has been three weeks since your partnership dashboard was set up and your team is missing out on tools that could make their days easier right now.
 
 Here is what is waiting for them:
-- ${p.staff_enrolled || 0} Hub accounts ready to activate
 - Quick Wins your teachers can use in 5 minutes
-- PD hours that count toward their requirements
-- Stress management tools for the hard days
+- Practical tools for behaviour, planning and the hard days
+- A Spanish toggle across the whole library
 
 The setup takes less than 5 minutes. Upload your staff roster and they get access the same day.
 
@@ -223,9 +222,20 @@ The TDI Team`
           });
           if (resp.ok) {
             sent++;
-            await supabase.from('activity_log').insert({
+            // This row IS the dedupe. If it does not land, the mail has already
+            // gone and nothing records it, so the identical email sends again
+            // tomorrow and every day after. That is how a six step sequence
+            // turns into daily mail, and it is how two principals received 27
+            // and 14 copies of the same message.
+            const { error: logError } = await supabase.from('activity_log').insert({
               partnership_id: p.id, action: reminderKey, details: { day: daysSinceInvite },
             });
+            if (logError) {
+              console.error(
+                `[partner-onboarding-reminders] SENT ${reminderKey} to ${p.contact_email} but failed to ` +
+                `record it. This email WILL repeat daily until this is fixed:`, logError
+              );
+            }
           }
         }
       }
@@ -308,9 +318,17 @@ The TDI Team`;
             });
             if (resp.ok) {
               sent++;
-              await supabase.from('activity_log').insert({
+              // Same dedupe rule as the login reminders above. A lost row here
+              // means this event reminder repeats every day until the event.
+              const { error: logError } = await supabase.from('activity_log').insert({
                 partnership_id: p.id, action: reminderType, details: { event_id: event.id, event_title: event.event_title },
               });
+              if (logError) {
+                console.error(
+                  `[partner-onboarding-reminders] SENT ${reminderType} to ${p.contact_email} but failed to ` +
+                  `record it. This email WILL repeat daily until this is fixed:`, logError
+                );
+              }
             }
           }
         }
@@ -367,11 +385,19 @@ The TDI Team`, schoolName, dashboardUrl),
 
         if (resp.ok) {
           sent++;
-          await supabase.from('activity_log').insert({
+          // Same dedupe rule again. Without this row the "your team has started
+          // using the Hub" note repeats daily forever.
+          const { error: logError } = await supabase.from('activity_log').insert({
             partnership_id: p.id,
             action: 'first_hub_login_notification',
             details: { loginCount },
           });
+          if (logError) {
+            console.error(
+              `[partner-onboarding-reminders] SENT first_hub_login_notification to ${p.contact_email} ` +
+              `but failed to record it. This email WILL repeat daily until this is fixed:`, logError
+            );
+          }
         }
       }
     }
