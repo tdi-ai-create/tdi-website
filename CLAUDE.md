@@ -54,6 +54,43 @@ before assuming they did not do it.
 **State that permits a mechanism is not proof the mechanism fired.** For any
 "X is happening" claim, require a timestamp, a log row, or an output artifact.
 
+**Absence of a record is the weakest evidence there is.** The inverse of the
+rule above bites more often than the rule itself. An empty table, a zero
+counter, a grep with no hits, a search returning nothing: none of these are
+proof the thing did not happen. On 25 Aug every session counter read zero and
+the conclusion drawn was that we had no record of delivering what we bill for.
+The calendar then showed four of those sessions plainly had happened. Before
+reporting an absence, name the mechanism that would have written the record and
+confirm it was ever wired up and ever reachable.
+
+**Before raising an alarm, spend one deliberate attempt disproving it.**
+
+This is the rule that would have caught the most mistakes in this codebase, and
+running the same check again is not it. A repeated query returns the same answer
+and feels like confirmation. The failure is almost never the query, it is an
+unchecked assumption in the frame around it. So check something *different*:
+
+- **Ask what the innocent explanation is, then go look for it specifically.**
+  Every counter read zero because every contract had started seven weeks
+  earlier. `contract_start` was one column over in the same row.
+- **For "this code is a problem", confirm the code is reachable** before saying
+  it is a problem. Five PD hours strings were reported as the most public brand
+  exposure. Nothing called the function. Grep the caller, not just the string.
+- **For "this is not deployed", confirm what deploys** before blaming the code.
+  Two Paperclip disk fixes were merged into a repo Railway does not deploy from.
+  Both looked like the fix failing. Neither had ever run.
+
+The tell is emotional, not technical: the moment a finding feels urgent and
+worth leading with is the moment to slow down, because that is when being wrong
+is most expensive and when the temptation to skip this step is strongest.
+
+**Say which sentences are conclusions.** Measured and Derived above are about
+data, and the same discipline applies to what gets said out loud. "Every
+counter reads zero" is a reading. "We have no record of delivering what we bill
+for" is a conclusion built on top of it. Handing both over in the same
+confident voice is how a correct query becomes a wrong answer. State the
+reading, then state the inference separately, and say what would falsify it.
+
 ---
 
 ## 2. Environments and the two traps
