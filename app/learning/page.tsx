@@ -79,7 +79,7 @@ export default function HubWelcomePage() {
  <div style={{ padding: 20, background: '#F9FAFB', borderRadius: 12, border: '0.5px solid #E5E7EB' }}>
  <h4 style={{ fontSize: 15, fontWeight: 600, color: '#1e2749', margin: '0 0 6px 0' }}>PD Certificates</h4>
  <p style={{ fontSize: 13, color: '#6B7280', lineHeight: 1.6, margin: 0 }}>
- Earn certificates as you complete courses. Track PD hours for licensure and evaluation.
+ Earn certificates as you complete courses.
  </p>
  </div>
  </div>
@@ -386,7 +386,6 @@ export default function HubWelcomePage() {
  'Teacher & administrator evaluation evidence',
  'ROI documentation for district leadership',
  'Classroom implementation rate tracking',
- 'Professional development hours & licensure records',
  'Principal & leadership evaluation support',
  'Continuous improvement documentation year over year',
  ].map((item, i) => (
@@ -426,7 +425,6 @@ export default function HubWelcomePage() {
  <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 24px 0', fontSize: 13, color: '#4B5563' }}>
  <li style={{ marginBottom: 8 }}>✓ Rotating free content weekly</li>
  <li style={{ marginBottom: 8 }}>✓ Save favorites for later</li>
- <li style={{ marginBottom: 8 }}>✓ Track your PD hours</li>
  </ul>
  <Link href="/hub" style={{ display: 'block', textAlign: 'center', padding: '12px', background: '#F3F4F6', color: '#1e2749', borderRadius: 8, fontWeight: 600, fontSize: 14, textDecoration: 'none' }}>
  Get Started
@@ -515,7 +513,7 @@ export default function HubWelcomePage() {
  },
  {
  q: "How does the Hub measure success?",
- a: "Implementation rate, classroom impact stories, wellbeing check-ins across 5 dimensions, and PD hours completed. Admins see all of this in their Implementation & Compliance Analytics Dashboard - included with every TDI service."
+ a: "Implementation rate, classroom impact stories, and wellbeing check-ins across 5 dimensions. Admins see all of this in their Implementation & Compliance Analytics Dashboard - included with every TDI service."
  },
  {
  q: "What does rollout look like for a school?",

@@ -36,7 +36,6 @@ const PRICING_TIERS: PricingTier[] = [
     features: [
       { text: 'A handful of rotating tools each week', included: true },
       { text: 'Save your favorites (yes, even on Free)', included: true },
-      { text: 'Track your PD hours automatically', included: true },
       { text: 'Quick Win library', included: false },
       { text: 'Practice games', included: false },
       { text: 'Full course library', included: false },
@@ -117,7 +116,7 @@ const MEMBERSHIP_FAQ = [
   },
   {
     q: 'Do courses count toward PD credit hours?',
-    a: 'Yes. Each course lists its estimated PD hours. When you complete a course, you receive a certificate that documents the hours for your records or district PD requirements.',
+    a: 'Yes. When you complete a course, you receive a certificate that documents the hours for your records or district PD requirements.',
   },
   {
     q: 'Do I earn certificates?',

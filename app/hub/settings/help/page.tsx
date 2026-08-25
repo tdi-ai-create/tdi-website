@@ -58,7 +58,7 @@ const FAQ_SECTIONS = [
       },
       {
         q: 'Can I use certificates for PD credit?',
-        a: 'Each course lists its estimated PD hours. Your certificate documents those hours, the course title, and your completion date. Check with your district on their specific PD credit requirements.',
+        a: 'Your certificate documents the hours, the course title, and your completion date. Check with your district on their specific PD credit requirements.',
       },
     ],
   },
