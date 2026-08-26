@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { clearFlagForCompletedMilestone } from '@/lib/creator-agent-flags';
 import { creatorFlag } from '@/lib/creator-flags';
-import { advanceStep } from '@/lib/creator-step-engine';
+import { advanceStep, resolveStepRow } from '@/lib/creator-step-engine';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -16,45 +16,6 @@ const PAIRED_MILESTONES: Record<string, string> = {
   test_video_recorded: 'test_video_submitted',
   drive_folder_created: 'assets_submitted',
 };
-
-/**
- * Finds the one step row this request means.
- *
- * The route has always been given a creator and a milestone, which does not
- * identify a row: a creator on a second project has two rows for the same step.
- * The old code took whichever the database returned first and completed both.
- *
- * Ambiguity is an error here rather than a guess. Katie Welch is the only
- * creator with two projects today, so a wrong guess is silent and rare, which is
- * the worst combination.
- */
-async function resolveStepRow(
-  supabase: any,
-  creatorId: string,
-  milestoneId: string,
-  explicitRecordId?: string
-): Promise<{ recordId?: string; error?: string }> {
-  if (explicitRecordId) return { recordId: explicitRecordId };
-
-  const { data, error } = await supabase
-    .from('creator_milestones')
-    .select('id, project_id')
-    .eq('creator_id', creatorId)
-    .eq('milestone_id', milestoneId);
-
-  if (error) return { error: `Could not find the step: ${error.message}` };
-  if (!data || data.length === 0) return { error: 'No matching creator_milestone record found' };
-
-  if (data.length > 1) {
-    return {
-      error:
-        'This creator has more than one project carrying that step. ' +
-        'Send milestoneRecordId to say which one.',
-    };
-  }
-
-  return { recordId: data[0].id as string };
-}
 
 export async function POST(request: Request) {
   try {

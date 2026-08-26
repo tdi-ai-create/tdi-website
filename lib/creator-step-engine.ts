@@ -73,6 +73,57 @@ export const FINAL_STEP = 'create_again';
 
 export type StepDecision = 'approve' | 'changes';
 
+/**
+ * Finds the one step row a (creator, milestone) pair means.
+ *
+ * Callers have always passed that pair, and it does not identify a row: a
+ * creator on a second project has two rows for the same step. The old routes
+ * took whichever the database returned first, or whichever was updated most
+ * recently, and completed or reopened the wrong one without saying so.
+ *
+ * Ambiguity is an error here rather than a guess, because a wrong guess is
+ * silent and rare, which is the worst combination.
+ */
+export async function resolveStepRow(
+  supabase: DbClient,
+  creatorId: string,
+  milestoneId: string,
+  explicitRecordId?: string
+): Promise<{ recordId?: string; error?: string }> {
+  if (explicitRecordId) return { recordId: explicitRecordId };
+
+  const { data, error } = await supabase
+    .from('creator_milestones')
+    .select('id, project_id')
+    .eq('creator_id', creatorId)
+    .eq('milestone_id', milestoneId);
+
+  if (error) return { error: `Could not find the step: ${error.message}` };
+  if (!data || data.length === 0) return { error: 'No matching creator_milestone record found' };
+  if (data.length === 1) return { recordId: data[0].id as string };
+
+  // More than one project carries this step. Prefer the creator's active
+  // project rather than guessing, and refuse if even that cannot decide.
+  const { data: creatorRow } = await supabase
+    .from('creators')
+    .select('active_project_id')
+    .eq('id', creatorId)
+    .maybeSingle();
+
+  const onActive = (data as Array<{ id: string; project_id: string | null }>)
+    .find((r) => r.project_id === creatorRow?.active_project_id);
+
+  if (!onActive) {
+    return {
+      error:
+        'This creator has more than one project carrying that step and none is active. ' +
+        'Send milestoneRecordId to say which one.',
+    };
+  }
+
+  return { recordId: onActive.id };
+}
+
 export interface StepRef {
   recordId: string;
   milestoneId: string;
