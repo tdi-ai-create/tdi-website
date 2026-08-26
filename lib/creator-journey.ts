@@ -39,14 +39,47 @@ export interface JourneyStage {
   current: boolean;
 }
 
+/**
+ * Everything MilestoneAction needs to render the actual control for the open
+ * step. Carried here so the dashboard never has to go and fetch the milestone
+ * definition separately, and so the two can never disagree about which step is
+ * open.
+ */
+export interface OpenStepAction {
+  id: string;
+  name: string;
+  action_type: string | null;
+  action_config: Record<string, unknown> | null;
+  status: string;
+  submitted_value: string | null;
+  team_status_message: string | null;
+  description: string | null;
+}
+
 export interface Journey {
   path: 'course' | 'download' | null;
   stages: JourneyStage[];
   openStep: JourneyStep | null;
   /** The stage name above the open step, for the card. */
   openStageName: string | null;
+  /** The open step's control, ready to hand to MilestoneAction. */
+  openStepAction: OpenStepAction | null;
   totalSteps: number;
   completedSteps: number;
+}
+
+/** Packs one raw row into what MilestoneAction expects. */
+function actionFor(r: Record<string, any>): OpenStepAction {
+  return {
+    id: r.milestone_id,
+    name: r.milestones.name,
+    action_type: r.milestones.action_type ?? null,
+    action_config: (r.milestones.action_config as Record<string, unknown> | null) ?? null,
+    status: r.status,
+    submitted_value: r.submitted_value ?? null,
+    team_status_message: r.milestones.team_status_message ?? null,
+    description: r.milestones.description ?? null,
+  };
 }
 
 function displayStatus(row: { status: string; review_status: string | null }): JourneyStep['status'] {
@@ -82,7 +115,7 @@ export async function getJourney(supabase: DbClient, projectId: string): Promise
   if (!path) {
     const { data: rows } = await supabase
       .from('creator_milestones')
-      .select('id, milestone_id, status, review_status, due_on, round, milestones!inner(name, requires_team_action, retired_at, is_collapsed_into)')
+      .select('id, milestone_id, status, review_status, due_on, round, submitted_value, milestones!inner(name, description, action_type, action_config, team_status_message, requires_team_action, retired_at, is_collapsed_into)')
       .eq('project_id', projectId)
       .eq('status', 'available');
 
@@ -99,7 +132,15 @@ export async function getJourney(supabase: DbClient, projectId: string): Promise
         }
       : null;
 
-    return { path: null, stages: [], openStep, openStageName: null, totalSteps: 0, completedSteps: 0 };
+    return {
+      path: null,
+      stages: [],
+      openStep,
+      openStageName: null,
+      openStepAction: first ? actionFor(first) : null,
+      totalSteps: 0,
+      completedSteps: 0,
+    };
   }
 
   const [{ data: stageRows }, { data: mapRows }, { data: stepRows }] = await Promise.all([
@@ -107,7 +148,7 @@ export async function getJourney(supabase: DbClient, projectId: string): Promise
     supabase.from('milestone_stages').select('milestone_id, stage_key').eq('path', path),
     supabase
       .from('creator_milestones')
-      .select('id, milestone_id, status, review_status, due_on, round, milestones!inner(name, sort_order, phase_id, requires_team_action, retired_at, is_collapsed_into, applies_to)')
+      .select('id, milestone_id, status, review_status, due_on, round, submitted_value, milestones!inner(name, description, sort_order, phase_id, action_type, action_config, team_status_message, requires_team_action, retired_at, is_collapsed_into, applies_to)')
       .eq('project_id', projectId),
   ]);
 
@@ -155,6 +196,7 @@ export async function getJourney(supabase: DbClient, projectId: string): Promise
   });
 
   const open = steps.find((s) => s.status !== 'complete' && s.status !== 'todo') ?? null;
+  const openRaw = open ? visible.find((r) => r.id === open.recordId) ?? null : null;
 
   const stages: JourneyStage[] = (stageRows as Array<{ stage_key: string; name: string }>)
     .map((sr) => {
@@ -177,6 +219,7 @@ export async function getJourney(supabase: DbClient, projectId: string): Promise
     stages,
     openStep: open ? publish(open) : null,
     openStageName: open ? stages.find((s) => s.current)?.name ?? null : null,
+    openStepAction: openRaw ? actionFor(openRaw) : null,
     totalSteps: steps.length,
     completedSteps: steps.filter((s) => s.status === 'complete').length,
   };
