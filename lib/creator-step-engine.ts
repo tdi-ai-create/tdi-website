@@ -36,15 +36,12 @@ type DbClient = any;
 export const MAX_FEEDBACK_ROUNDS = 2;
 
 /**
- * Steps retired in the 26 August review. They still exist as rows on live boards
- * until the Phase 2 cleanup removes them, so the engine has to refuse to open one
- * rather than trusting the table to be clean.
+ * Steps retired in the 26 August review, kept only as a floor.
  *
- * The outline cluster folds into `outline_drafted`, which now loops until it is
- * approved instead of being drafted, met about, and finalised as three steps.
- * The two `*_approved` team steps duplicated an approval that now happens inside
- * the review loop. `download_specs_submitted` merges into `download_drafted`, so
- * design receives the file and the specs describing it together.
+ * The real answer lives on `milestones.retired_at`, so retiring the next step
+ * is a database update rather than a release. This set exists so that a failed
+ * read of that column degrades to refusing the ten we already know about,
+ * rather than to offering everything.
  */
 export const RETIRED_STEPS = new Set([
   'outline_meeting_scheduled',
@@ -56,9 +53,6 @@ export const RETIRED_STEPS = new Set([
   'download_specs_submitted',
   'blog_topic_approved',
   'download_concept_approved',
-  // Sort order 98 puts this after Content Launched and Download Goes Live, so
-  // the step that sets a launch date fired after the launch. It was also
-  // stamped complete by a migration for three creators who never launched.
   'launch_date_set',
 ]);
 
@@ -159,6 +153,8 @@ interface MilestoneRow {
   collapsedInto: string | null;
   requiresTeamAction: boolean;
   allowanceDays: number;
+  /** From milestones.retired_at. A retired step never opens. */
+  retired: boolean;
   position: number;
 }
 
@@ -196,7 +192,9 @@ function appliesToPath(m: { appliesTo: string[] | null }, contentPath: string | 
 /** A step the engine is willing to put a creator on. */
 function isOpenable(m: MilestoneRow, contentPath: string | null): boolean {
   if (m.collapsedInto) return false;
-  if (RETIRED_STEPS.has(m.milestoneId)) return false;
+  // The database is the authority. The constant is the floor underneath it, so
+  // a step retired after this deployed is still refused without a release.
+  if (m.retired || RETIRED_STEPS.has(m.milestoneId)) return false;
   return appliesToPath(m, contentPath);
 }
 
@@ -225,7 +223,7 @@ async function loadBoard(supabase: DbClient, projectId: string): Promise<Milesto
   const { data, error } = await supabase
     .from('creator_milestones')
     .select(
-      'id, milestone_id, status, round, milestones!inner(name, phase_id, sort_order, applies_to, is_collapsed_into, requires_team_action, allowance_days)'
+      'id, milestone_id, status, round, milestones!inner(name, phase_id, sort_order, applies_to, is_collapsed_into, requires_team_action, allowance_days, retired_at)'
     )
     .eq('project_id', projectId);
 
@@ -245,6 +243,7 @@ async function loadBoard(supabase: DbClient, projectId: string): Promise<Milesto
       collapsedInto: (m.is_collapsed_into as string | null) ?? null,
       requiresTeamAction: Boolean(m.requires_team_action),
       allowanceDays: (m.allowance_days as number) ?? 14,
+      retired: m.retired_at !== null && m.retired_at !== undefined,
       position: position(m.phase_id as string, (m.sort_order as number) ?? 0),
     };
   });
