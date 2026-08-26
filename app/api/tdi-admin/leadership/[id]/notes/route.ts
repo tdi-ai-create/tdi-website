@@ -24,6 +24,7 @@ export async function GET(
   const { data, error } = await supabase
     .from('partnership_notes')
     .select('*')
+    .is('archived_at', null)
     .eq('partnership_id', id)
     .order('created_at', { ascending: false });
 
@@ -31,7 +32,28 @@ export async function GET(
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  return NextResponse.json({ notes: data || [] });
+  // Open flags come back alongside the notes so the page can show them as a
+  // separate stream. They used to be notes, which is how 364 cron rows buried
+  // the nine a person actually wrote.
+  const { data: flags, error: flagsError } = await supabase
+    .from('partnership_flags')
+    .select('id, flag_key, severity, message, first_raised_at, last_seen_at')
+    .eq('partnership_id', id)
+    .is('resolved_at', null)
+    .order('severity', { ascending: true })
+    .order('first_raised_at', { ascending: true });
+
+  if (flagsError) {
+    // Not fatal. Notes are still worth returning, but say so rather than
+    // silently presenting an incomplete picture as a complete one.
+    console.error('[notes] flags read failed:', flagsError.message);
+  }
+
+  return NextResponse.json({
+    notes: data || [],
+    flags: flags || [],
+    flagsUnavailable: Boolean(flagsError),
+  });
 }
 
 // POST -- add a new note
