@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getHubServiceClient, resolvePartnershipMembers } from '@/lib/hub/partnership-members'
 
-const supabase = getHubServiceClient()
 
 export interface LoginTrendWeek {
   weekLabel: string
@@ -13,6 +12,10 @@ export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  // Built per request, not at module scope. A module-scope call runs
+  // during Next.js page-data collection at build time, which fails every
+  // build where the Hub service key is absent, such as every preview.
+  const supabase = getHubServiceClient()
   const { id: partnershipId } = await params
 
   try {

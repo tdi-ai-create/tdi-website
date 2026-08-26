@@ -58,6 +58,7 @@ import { NotesPanel } from '@/components/creator-portal/NotesPanel';
 import { NotePreview } from '@/components/creator-portal/NotePreview';
 import { NoteModal } from '@/components/creator-portal/NoteModal';
 import { RichTextEditor } from '@/components/creator-portal/RichTextEditor';
+import { CreatorAccessRow } from '@/components/admin/CreatorAccessRow';
 import {
   getCreatorDashboardData,
   getCreatorNotes,
@@ -1060,6 +1061,7 @@ export default function TDIAdminCreatorDetailPage() {
                 </span>
               )}
             </div>
+            <CreatorAccessRow creatorId={creatorId} creatorName={creator.name} adminEmail={adminEmail} />
             <div className="flex items-center gap-2">
               <p className="text-white/70">{creator.email}</p>
               <button

@@ -864,34 +864,87 @@ export async function POST(request: Request) {
     // and August. Bella opened her queue on 20 August, found nothing from
     // Catherine, and was right: Catherine's document was in a note nobody was
     // ever shown.
-    const submittedLink: string | null =
+    // Three submission types carry work a creator actually made, and all three
+    // need a versioned row. Until now only the two link shaped ones were kept,
+    // so every form went unversioned: the blog pitch with its four fields, the
+    // download concept, the creator profile.
+    //
+    // That matters more now than it did. With two rounds of feedback, a creator
+    // submits, hears back, and resubmits. The step row holds one value and the
+    // second submission overwrites the first, so without a row per version you
+    // end up with feedback and no way to see what it was written about.
+    //
+    // Choices and acknowledgements are deliberately not recorded. Confirming a
+    // path or ticking that you read the guide is not a deliverable and a history
+    // of it is noise.
+    const submittedValue: string | null =
       submissionType === 'link' ? (content?.link ?? null)
       : submissionType === 'course_outline' ? (content?.document_url ?? null)
+      : submissionType === 'form' ? JSON.stringify(content ?? {})
       : null;
 
-    if (submittedLink) {
-      const { data: stepRow, error: stepLookupError } = await supabase
+    if (submittedValue) {
+      // A creator on two projects has two rows for this step. Prefer the one on
+      // their active project; the old code took whichever was updated most
+      // recently, which is a guess that is silent when it is wrong.
+      const { data: stepRows, error: stepLookupError } = await supabase
         .from('creator_milestones')
-        .select('id')
+        .select('id, project_id')
         .eq('creator_id', creatorId)
-        .eq('milestone_id', milestoneId)
-        .order('updated_at', { ascending: false })
-        .limit(1)
-        .maybeSingle();
+        .eq('milestone_id', milestoneId);
 
-      if (stepLookupError || !stepRow) {
-        console.error('[submit] Could not find the step to attach the submission to:', stepLookupError?.message);
-      } else {
-        const recorded = await recordSubmission(supabase, {
-          milestoneRecordId: stepRow.id,
-          creatorId,
-          submittedValue: submittedLink,
-          submissionNotes: content?.notes ?? null,
-          stepName: milestoneName,
-        });
-        if (!recorded.ok) {
-          console.error('[submit] Submission not recorded:', recorded.error);
+      if (stepLookupError) {
+        console.error('[submit] Could not find the step to attach the submission to:', stepLookupError.message);
+        return NextResponse.json(
+          { success: false, error: 'Your work was saved but could not be filed for review. Please tell us so we can attach it.' },
+          { status: 500 }
+        );
+      }
+
+      let stepRow = stepRows?.[0] ?? null;
+      if (stepRows && stepRows.length > 1) {
+        const { data: creatorRow } = await supabase
+          .from('creators')
+          .select('active_project_id')
+          .eq('id', creatorId)
+          .maybeSingle();
+
+        const onActive = stepRows.find((r) => r.project_id === creatorRow?.active_project_id);
+        if (!onActive) {
+          console.error('[submit] Ambiguous step: creator has several projects and none is active.');
+          return NextResponse.json(
+            { success: false, error: 'Your work was saved but we could not tell which project it belongs to. Please tell us so we can attach it.' },
+            { status: 500 }
+          );
         }
+        stepRow = onActive;
+      }
+
+      if (!stepRow) {
+        console.error('[submit] No step row found for', creatorId, milestoneId);
+        return NextResponse.json(
+          { success: false, error: 'Your work was saved but could not be filed for review. Please tell us so we can attach it.' },
+          { status: 500 }
+        );
+      }
+
+      const recorded = await recordSubmission(supabase, {
+        milestoneRecordId: stepRow.id,
+        creatorId,
+        submittedValue,
+        submissionNotes: content?.notes ?? null,
+        stepName: milestoneName,
+      });
+
+      // Reporting success here when the submission was never filed is how
+      // thirteen deliverables went missing between February and August. The
+      // creator is told plainly rather than being left thinking it landed.
+      if (!recorded.ok) {
+        console.error('[submit] Submission not recorded:', recorded.error);
+        return NextResponse.json(
+          { success: false, error: 'Your work was saved but could not be filed for review. Please tell us so we can attach it.' },
+          { status: 500 }
+        );
       }
     }
 

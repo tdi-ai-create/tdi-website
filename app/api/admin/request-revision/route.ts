@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { creatorFlag } from '@/lib/creator-flags';
+import { advanceStep, resolveStepRow } from '@/lib/creator-step-engine';
 
 export async function POST(request: NextRequest) {
   try {
@@ -58,7 +60,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const milestoneTitle = milestone?.title || milestone?.name || 'Milestone';
+    const milestoneTitle = milestone?.name || 'Milestone';
 
     // 3. Get the current creator_milestone to preserve existing metadata
     const { data: creatorMilestone } = await supabase
@@ -87,6 +89,70 @@ export async function POST(request: NextRequest) {
       }
     };
 
+    // ---- The step engine, behind creator_config.step_engine ----------------
+    //
+    // Asking for changes is the other half of the same decision as approving,
+    // so both go through one function. Everything after this block is the old
+    // path, kept working so the flag switches between two implementations.
+    //
+    // Three things the old path got wrong and this does not:
+    //
+    //   It set submitted_value to null, deleting the creator's work at the
+    //   moment we asked them to revise it. Now the submission stays, and every
+    //   version of it is kept, so feedback can be read next to what it was
+    //   written about.
+    //
+    //   It had no round counter, so a creator could be sent back forever. The
+    //   engine caps it at two and approves instead of opening a third.
+    //
+    //   It locked "everything after this step" using .order('phase_id'), which
+    //   sorts phases alphabetically: agreement, course_design, launch,
+    //   marketing_blog, onboarding, production, test_prep. That is not the
+    //   pipeline order, so it locked a near-random set of steps.
+    const useEngine = await creatorFlag(supabase, 'step_engine');
+    let cappedOut = false;
+
+    if (useEngine) {
+      const resolved = await resolveStepRow(supabase, creatorId, milestoneId);
+      if (resolved.error || !resolved.recordId) {
+        return NextResponse.json({ success: false, error: resolved.error }, { status: 400 });
+      }
+
+      const { data: creatorState } = await supabase
+        .from('creators')
+        .select('lifecycle_state')
+        .eq('id', creatorId)
+        .maybeSingle();
+
+      const result = await advanceStep(supabase, {
+        milestoneRecordId: resolved.recordId,
+        decision: 'changes',
+        actor: adminEmail ? `admin:${adminEmail}` : 'admin',
+        startClock: creatorState?.lifecycle_state !== 'paused',
+      });
+
+      if (!result.ok) {
+        console.error('[request-revision] Engine refused:', result.error);
+        return NextResponse.json({ success: false, error: result.error }, { status: 500 });
+      }
+
+      // The cap was already spent, so this approved instead. The caller must
+      // not tell the creator that changes were requested when they were not.
+      cappedOut = result.outcome === 'forced_approve';
+
+      // The feedback still belongs on the step, but the submission stays put.
+      const { error: metaError } = await supabase
+        .from('creator_milestones')
+        .update({ metadata: updatedMetadata })
+        .eq('id', resolved.recordId);
+
+      if (metaError) {
+        console.error('[request-revision] Could not attach the feedback:', metaError.message);
+        return NextResponse.json({ success: false, error: metaError.message }, { status: 500 });
+      }
+    }
+
+    if (!useEngine) {
     const { error: updateError } = await supabase
       .from('creator_milestones')
       .update({
@@ -123,7 +189,7 @@ export async function POST(request: NextRequest) {
         const milestonesToLock = allMilestones.slice(currentIndex + 1).map((m) => m.id);
 
         if (milestonesToLock.length > 0) {
-          await supabase
+          const { error: lockError } = await supabase
             .from('creator_milestones')
             .update({
               status: 'locked',
@@ -131,19 +197,29 @@ export async function POST(request: NextRequest) {
             })
             .eq('creator_id', creatorId)
             .in('milestone_id', milestonesToLock);
+
+          if (lockError) {
+            console.error('[request-revision] Locking later steps failed:', lockError.message);
+          }
         }
       }
     }
 
+    } // end of the pre-engine revision path
+
     // 6. Update creator's current phase if needed
     if (milestone?.phase_id) {
-      await supabase
+      const { error: phaseError } = await supabase
         .from('creators')
         .update({
           current_phase: milestone.phase_id,
           updated_at: new Date().toISOString(),
         })
         .eq('id', creatorId);
+
+      if (phaseError) {
+        console.error('[request-revision] Setting the phase failed:', phaseError.message);
+      }
     }
 
     // 7. Add a note explaining the revision request
@@ -153,16 +229,35 @@ export async function POST(request: NextRequest) {
       year: 'numeric'
     });
 
-    await supabase.from('creator_notes').insert({
+    const { error: noteError } = await supabase.from('creator_notes').insert({
       creator_id: creatorId,
-      content: `[Revision Requested] ${milestoneTitle}\n${note}\n— ${adminName}, ${dateStr}`,
+      content: `[Revision Requested] ${milestoneTitle}\n${note}\n${adminName}, ${dateStr}`,
       author: adminName,
       visible_to_creator: true,
       phase_id: milestone?.phase_id || null,
     });
 
+    if (noteError) {
+      console.error('[request-revision] Revision note failed to write:', noteError.message);
+    }
+
     // 8. Send email to creator
+    //
+    // Unless the cap was already spent. In that case the engine approved rather
+    // than opening a third round, and telling the creator that changes were
+    // requested would be a straightforward lie. They are told they are through.
     const resendApiKey = process.env.RESEND_API_KEY;
+
+    if (cappedOut) {
+      console.log('[request-revision] Two rounds already used. Approved instead, no revision email sent.');
+      return NextResponse.json({
+        success: true,
+        outcome: 'approved_at_cap',
+        message:
+          'This step had already used both rounds of feedback, so it was approved and the creator has moved on. ' +
+          'Your notes were saved on the step but no revision request was sent.',
+      });
+    }
 
     if (resendApiKey && creator.email) {
       try {
@@ -190,11 +285,11 @@ export async function POST(request: NextRequest) {
                   <p style="color: #78350f; margin: 0; white-space: pre-wrap;">${note}</p>
                 </div>
 
-                <p style="color: #374151; line-height: 1.6;">Don't worry — this is a normal part of the process! We want to make sure your content is the best it can be.</p>
+                <p style="color: #374151; line-height: 1.6;">This is a normal part of the process. We want your content to be the best it can be.</p>
 
                 <a href="https://www.teachersdeserveit.com/creator-portal/dashboard"
                    style="display: inline-block; background: #1e2749; color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; margin-top: 16px; font-weight: 600;">
-                  Go to Creator Studio →
+                  Go to Creator Studio
                 </a>
 
                 <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 32px 0;" />
@@ -203,7 +298,7 @@ export async function POST(request: NextRequest) {
                   Questions? Reach out to the TDI team at <a href="mailto:creatorstudio@teachersdeserveit.com" style="color: #80a4ed;">creatorstudio@teachersdeserveit.com</a>
                 </p>
 
-                <p style="color: #6b7280; font-size: 14px;"> -  The TDI Team</p>
+                <p style="color: #6b7280; font-size: 14px;">The TDI Team</p>
               </div>
             `,
           }),

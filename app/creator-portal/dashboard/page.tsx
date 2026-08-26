@@ -8,6 +8,8 @@ import { LogOut, AlertCircle, Mail, User, CheckCircle, X, ExternalLink, FileText
 import { supabase } from '@/lib/supabase';
 import { CreatorDashboardHeader } from '@/components/creator-portal/CreatorDashboardHeader';
 import { PhaseProgress } from '@/components/creator-portal/PhaseProgress';
+import { CreatorJourney } from '@/components/creator-portal/CreatorJourney';
+import type { Journey } from '@/lib/creator-journey';
 import { CourseDetailsPanel } from '@/components/creator-portal/CourseDetailsPanel';
 import { NotesPanel } from '@/components/creator-portal/NotesPanel';
 import { CompletionBanner } from '@/components/creator-portal/CompletionBanner';
@@ -555,8 +557,18 @@ export default function CreatorDashboardPage() {
 
               {/* Content grid */}
               <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* Main content - Phase progress */}
+                {/* Main content */}
                 <div className="lg:col-span-2">
+                  {/* The journey: stages rather than a flat list of steps, named
+                      for this creator's path. Falls back to the old progress
+                      list if the journey could not be built, so a creator always
+                      sees their board. */}
+                  {(dashboardData as unknown as { journey?: Journey | null }).journey?.stages?.length ? (
+                    <div className="mb-8">
+                      <CreatorJourney journey={(dashboardData as unknown as { journey: Journey }).journey} />
+                    </div>
+                  ) : null}
+
                   <h2 className="text-xl font-semibold text-[#1e2749] mb-4">
                     Your Progress
                   </h2>

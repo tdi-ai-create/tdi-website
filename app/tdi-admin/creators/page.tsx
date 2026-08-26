@@ -46,7 +46,7 @@ import {
   GraduationCap, Sparkles, Languages, HeartHandshake, Music, Library,
   HeartPulse, Lightbulb, Route, ClipboardCheck, NotebookPen,
   PencilRuler, Baby, Puzzle, MessagesSquare, Star, Sprout,
-  Target, Home as HomeIcon, Laptop, Scale, Mail, MoreVertical, Inbox,
+  Target, Home as HomeIcon, Laptop, Scale, Mail, MoreVertical, Inbox, KeyRound,
   UserPlus, Award,
 } from 'lucide-react';
 
@@ -2939,6 +2939,13 @@ export default function CreatorStudioPage() {
                   {waitingApplications}
                 </span>
               )}
+            </Link>
+            <Link
+              href="/tdi-admin/creators/access"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all duration-200 border border-gray-200 text-gray-600 hover:bg-gray-50"
+            >
+              <KeyRound className="w-4 h-4" />
+              Who can get in
             </Link>
             <Link
               href="/tdi-admin/creator-updates"

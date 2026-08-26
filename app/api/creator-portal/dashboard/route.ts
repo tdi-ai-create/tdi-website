@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { getJourney } from '@/lib/creator-journey';
 
 // Helper to check if a milestone applies to a content path
 function milestoneAppliesTo(
@@ -262,8 +263,34 @@ export async function POST(request: NextRequest) {
       contentPath,
     };
 
+    // The journey the creator actually sees: stages rather than a flat list of
+    // steps, named for their path. Attached to this response rather than fetched
+    // separately, so the two can never disagree about which step is open.
+    //
+    // Never fails the dashboard. A creator whose journey cannot be built should
+    // still see their board, so this degrades to null and the page falls back.
+    let journey = null;
+    try {
+      const { data: activeProject, error: projectError } = await supabase
+        .from('creator_projects')
+        .select('id')
+        .eq('creator_id', creator.id)
+        .eq('status', 'active')
+        .order('project_number', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (projectError) {
+        console.error('[dashboard-api] Could not find the active project:', projectError.message);
+      } else if (activeProject) {
+        journey = await getJourney(supabase, activeProject.id);
+      }
+    } catch (journeyError) {
+      console.error('[dashboard-api] Journey build failed, falling back:', journeyError);
+    }
+
     console.log('[dashboard-api] Success, returning data');
-    return NextResponse.json(dashboardData);
+    return NextResponse.json({ ...dashboardData, journey });
 
   } catch (error) {
     console.error('[dashboard-api] Unexpected error:', error);
