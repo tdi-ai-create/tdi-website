@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useTDIAdmin } from '@/lib/tdi-admin/context';
+import { Shell as BillingShell, Banner } from '@/components/tdi-admin/billing/ui';
 
 const ACC = '#B45309';
 
@@ -79,12 +80,6 @@ export default function BillingPage() {
 
   return (
     <Shell>
-      <div style={{ fontSize: 12, color: '#64748B', marginBottom: 5 }}>TDI Admin / <b style={{ color: '#0B1120' }}>Billing</b></div>
-      <h1 style={{ fontSize: 25, margin: '0 0 4px', fontWeight: 700, letterSpacing: '-.018em' }}>Contracts</h1>
-      <p style={{ color: '#64748B', margin: '0 0 20px', maxWidth: 720 }}>
-        Signed contracts pull straight from Sales. Open a contract to see its line items, then open a line to see the whole story behind it.
-      </p>
-
       <div style={S.money}>
         <Stat label="Contracted" value={money(totals.value)} note={`${totals.contracts} contracts`} dot="#0B1120" />
         <Stat label="Collected" value={money(totals.collected)} note="payment recorded" dot="#059669" />
@@ -308,7 +303,14 @@ function LineRow({ l }: { l: Line }) {
 
 /* ---------- small pieces ---------- */
 function Shell({ children }: { children: React.ReactNode }) {
-  return <div style={{ padding: '24px 30px 80px', maxWidth: 1340 }}>{children}</div>;
+  return (
+    <BillingShell
+      title="Contracts"
+      blurb="Signed contracts pull straight from Sales. Open a contract to see its line items, then open a line to see the whole story behind it."
+    >
+      {children}
+    </BillingShell>
+  );
 }
 function Caret({ open, small }: { open: boolean; small?: boolean }) {
   const s = small ? 14 : 16;
