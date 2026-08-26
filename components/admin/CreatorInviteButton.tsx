@@ -13,14 +13,12 @@ import { useState } from 'react';
 export function CreatorInviteButton({
   creatorId,
   creatorName,
-  adminEmail,
   lastInviteSent,
   compact = false,
   onSent,
 }: {
   creatorId: string;
   creatorName: string;
-  adminEmail: string;
   lastInviteSent?: string | null;
   compact?: boolean;
   onSent?: () => void;
@@ -36,7 +34,7 @@ export function CreatorInviteButton({
     try {
       const res = await fetch('/api/admin/creators/send-invite', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-user-email': adminEmail },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ creatorId, dryRun: true }),
       });
       const data = await res.json();
@@ -55,7 +53,7 @@ export function CreatorInviteButton({
     try {
       const res = await fetch('/api/admin/creators/send-invite', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-user-email': adminEmail },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ creatorId }),
       });
       const data = await res.json();

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServiceSupabase } from '@/lib/supabase';
-import { isTDIAdmin } from '@/lib/is-tdi-admin';
+import { requireAdminAuth } from '@/lib/tdi-admin/auth';
 import { creatorEmailTemplate } from '@/lib/creator-email-template';
 import { logCreatorEmail } from '@/lib/creator-email-log';
 
@@ -35,10 +35,12 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.teachersdeserv
 
 export async function POST(request: NextRequest) {
   try {
-    const adminEmail = request.headers.get('x-user-email');
-    if (!adminEmail || !(await isTDIAdmin(adminEmail))) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
-    }
+    // Verifies the session cookie, not a header. This route causes real email
+    // to reach a real creator, and an x-user-email header is a claim anyone can
+    // make: the middleware refreshes sessions and blocks nothing.
+    const auth = await requireAdminAuth();
+    if (auth instanceof NextResponse) return auth;
+    const adminEmail = auth.user.email;
 
     const { creatorId, dryRun } = await request.json();
     if (!creatorId) {
@@ -93,15 +95,21 @@ export async function POST(request: NextRequest) {
 
     const signInUrl = linkData.properties.action_link;
     const firstName = creator.name?.split(' ')[0] || 'there';
-    const subject = `Creator Studio | Your way in, ${firstName}`;
+    const subject = `Creator Studio | We rebuilt it for you, ${firstName}`;
 
     const html = creatorEmailTemplate({
       firstName,
       tagline: 'Your Creator Studio is ready',
       body: `
         <p>Hey ${firstName},</p>
-        <p>Here is your way into Creator Studio. The button below signs you straight in and
-        there is no password to set up.</p>
+        <p>We have rebuilt a good deal of Creator Studio over the last few weeks, and the
+        changes are all aimed at one thing: making it easier for you to actually finish what
+        you started with us.</p>
+        <p>You now see one step at a time instead of everything at once. Every step says
+        plainly whether it is with you or with us, so you are never waiting on something
+        invisible. Feedback is capped at two rounds and then you move on. And your work is
+        kept version by version, so nothing you send us can go missing.</p>
+        <p>The button below signs you straight in. There is no password to set up.</p>
         ${stepName
           ? `<p>When you land, there is one thing waiting: <strong>${stepName}</strong>. Just the one.
              You will see the whole road it sits on, but only ever one thing to do at a time.</p>`

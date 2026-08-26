@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { getServiceSupabase } from '@/lib/supabase';
-import { isTDIAdmin } from '@/lib/is-tdi-admin';
+import { requireAdminAuth } from '@/lib/tdi-admin/auth';
 
 /**
  * GET /api/admin/creators/access-status
@@ -18,11 +18,12 @@ import { isTDIAdmin } from '@/lib/is-tdi-admin';
 
 type Blocker = 'no_account' | 'never_invited' | 'invited_not_arrived' | null;
 
-export async function GET(request: NextRequest) {
-  const adminEmail = request.headers.get('x-user-email');
-  if (!adminEmail || !(await isTDIAdmin(adminEmail))) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
-  }
+export async function GET() {
+  // Verifies the session cookie, not a header. This lists every creator with
+  // their email and whether they can sign in, which is not something a header
+  // claim should be enough to read.
+  const auth = await requireAdminAuth();
+  if (auth instanceof NextResponse) return auth;
 
   const supabase = getServiceSupabase();
 

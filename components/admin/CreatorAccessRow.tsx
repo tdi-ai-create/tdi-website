@@ -35,7 +35,7 @@ export function CreatorAccessRow({
   const fetchAccess = useCallback(async (): Promise<Access | null> => {
     if (!adminEmail) return null;
     try {
-      const res = await fetch('/api/admin/creators/access-status', { headers: { 'x-user-email': adminEmail } });
+      const res = await fetch('/api/admin/creators/access-status');
       if (!res.ok) return null;
       const body = await res.json();
       return (body.creators || []).find((c: { id: string }) => c.id === creatorId) ?? null;
@@ -89,7 +89,6 @@ export function CreatorAccessRow({
           <CreatorInviteButton
             creatorId={creatorId}
             creatorName={creatorName}
-            adminEmail={adminEmail}
             lastInviteSent={access.lastInviteSent}
             compact
             onSent={refresh}

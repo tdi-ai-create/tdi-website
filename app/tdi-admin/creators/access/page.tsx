@@ -60,7 +60,7 @@ export default function CreatorAccessPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch('/api/admin/creators/access-status', { headers: { 'x-user-email': adminEmail } });
+      const res = await fetch('/api/admin/creators/access-status');
       const body = await res.json();
       if (!res.ok) { setError(body.error || 'Could not load access status.'); return; }
       setData(body);
@@ -143,7 +143,6 @@ export default function CreatorAccessPage() {
                   <CreatorInviteButton
                     creatorId={c.id}
                     creatorName={c.name}
-                    adminEmail={adminEmail}
                     lastInviteSent={c.lastInviteSent}
                     compact
                     onSent={load}
