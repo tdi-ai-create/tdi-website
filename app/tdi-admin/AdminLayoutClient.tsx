@@ -48,18 +48,6 @@ const NAV_ITEMS = [
     ),
   },
   {
-    id: 'intelligence',
-    label: 'Operations',
-    href: '/tdi-admin/ops',
-    section: 'intelligence',
-    accent: PORTAL_COLORS.intelligence.accent,
-    icon: (active: boolean) => (
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={active ? 2.5 : 2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-      </svg>
-    ),
-  },
-  {
     id: 'billing',
     label: 'Billing',
     href: '/tdi-admin/billing',
