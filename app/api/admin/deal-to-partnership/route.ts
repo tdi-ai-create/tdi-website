@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { writeSchoolProfile } from '@/lib/funding/school-profile'
 import { createClient } from '@supabase/supabase-js';
 
 /**
@@ -147,8 +148,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Partnership created but ID missing' }, { status: 500 });
     }
 
-    // Also create the organization record so org_name appears in the admin view
-    await supabase.from('organizations').insert({
+    // Also create the organization record so org_name appears in the admin view.
+    // Without it the partnership shows with no name in the admin list.
+    const { error: orgErr } = await supabase.from('organizations').insert({
       partnership_id: partnershipId,
       name: deal.name,
       org_type: partnershipType,
@@ -156,6 +158,7 @@ export async function POST(request: NextRequest) {
       address_state: deal.state || null,
       website: deal.website || null,
     });
+    if (orgErr) console.error('[deal-to-partnership] partnership created but its organization record failed, so it will show unnamed:', orgErr.message);
 
     console.log('[deal-to-partnership] Partnership created:', partnershipId, slug);
 
@@ -268,8 +271,8 @@ export async function POST(request: NextRequest) {
       console.log('[deal-to-partnership] Created', actionItems.length, 'onboarding action items');
     }
 
-    // 6. Log activity
-    await supabase.from('activity_log').insert({
+    // 6. Log activity. A lost entry costs history, not function.
+    const { error: logErr } = await supabase.from('activity_log').insert({
       partnership_id: partnershipId,
       user_id: null,
       action: 'partnership_created_from_deal',
@@ -280,15 +283,19 @@ export async function POST(request: NextRequest) {
         automated: true,
       },
     });
+    if (logErr) console.error('[deal-to-partnership] activity log entry lost:', logErr.message);
 
     // 7. Update Sales deal with partnership link
-    await supabase
+    // If this fails the deal stays unsigned in the CRM while a partnership
+    // exists for it, which is the two-records-disagree problem in miniature.
+    const { error: stageErr } = await supabase
       .from('sales_opportunities')
       .update({
         stage: 'signed',
         updated_at: new Date().toISOString(),
       })
       .eq('id', dealId);
+    if (stageErr) console.error('[deal-to-partnership] partnership created but the deal was not marked signed:', stageErr.message);
 
     // 8. Provision Hub access for contact
     let hubProvisioned = false;
@@ -438,7 +445,9 @@ export async function POST(request: NextRequest) {
               { plan: 'B', label: 'State formula', amount: 0, status: 'not_started', deadline: null, contact: '', notes: 'State-level discretionary dollars.' },
               { plan: 'C', label: 'Foundation/corporate', amount: 0, status: 'not_started', deadline: null, contact: '', notes: 'Competitive applications. Match school profile to funder mission.' },
             ]),
-            school_profile: JSON.stringify({
+            // Stored as an object, not stringified. This is the second of two
+            // routes that wrote the text of the object into a jsonb column.
+            school_profile: writeSchoolProfile({
               state: deal.state || '',
               city: deal.city || '',
               staffCount: staffCount || 0,
@@ -453,7 +462,7 @@ export async function POST(request: NextRequest) {
           console.log('[deal-to-partnership] Grant pursuit created for:', deal.name);
 
           // Add grant-specific action items
-          await supabase.from('action_items').insert([
+          const { error: grantActErr } = await supabase.from('action_items').insert([
             {
               partnership_id: partnershipId,
               title: 'Grant: Build school funding profile',
@@ -495,6 +504,7 @@ export async function POST(request: NextRequest) {
               sort_order: 23,
             },
           ]);
+          if (grantActErr) console.error('[deal-to-partnership] grant action items failed to create:', grantActErr.message);
         } else {
           console.error('[deal-to-partnership] Grant pursuit error:', grantError);
         }
