@@ -22,6 +22,8 @@
  * Three owners, because there are three genuinely different kinds of work:
  * ours, the agents', and the school's.
  */
+import { readSchoolProfile } from '@/lib/funding/school-profile'
+
 export type ActionOwner = 'team' | 'agent' | 'school' | 'auto'
 export type ActionUrgency = 'critical' | 'high' | 'normal' | 'low'
 
@@ -506,7 +508,9 @@ export function computeNextActions(
     let profileFields = 0
     let profileFilled = 0
     try {
-      const sp = typeof pursuit.school_profile === 'string' ? JSON.parse(pursuit.school_profile) : (pursuit.school_profile || {})
+      // Single parse returned a string for double-encoded rows, so every
+      // lookup below missed and profile completeness always computed zero.
+      const sp = readSchoolProfile(pursuit.school_profile)
       const required = ['school_name', 'district', 'educator_count', 'title_i_status', 'frl_pct', 'budget_holder', 'atsi_status']
       profileFields = required.length
       profileFilled = required.filter(k => sp[k] != null && sp[k] !== '' && sp[k] !== false).length
