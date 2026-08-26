@@ -9,6 +9,7 @@ import { supabase } from '@/lib/supabase';
 import { CreatorDashboardHeader } from '@/components/creator-portal/CreatorDashboardHeader';
 import { PhaseProgress } from '@/components/creator-portal/PhaseProgress';
 import { CreatorJourney } from '@/components/creator-portal/CreatorJourney';
+import { CurrentStepCard } from '@/components/creator-portal/CurrentStepCard';
 import type { Journey } from '@/lib/creator-journey';
 import { CourseDetailsPanel } from '@/components/creator-portal/CourseDetailsPanel';
 import { NotesPanel } from '@/components/creator-portal/NotesPanel';
@@ -312,6 +313,15 @@ export default function CreatorDashboardPage() {
   // THE GATE: dashboard is only visible when ALL THREE are true
   const showDashboard = animationComplete && dataLoaded && timerDone;
 
+  // One place decides whether the journey exists, so the two branches cannot
+  // drift into both rendering. Showing the journey AND the old phase list put
+  // two contradicting progress systems on the same page: the journey read
+  // "7 of 27" while the list below it read "Content Design 6 of 8", because the
+  // list still counts steps retired on 26 August.
+  const hasJourney = Boolean(
+    (dashboardData as unknown as { journey?: Journey | null } | null)?.journey?.stages?.length
+  );
+
   return (
     <>
       {/* Location Prompt Modal */}
@@ -516,7 +526,12 @@ export default function CreatorDashboardPage() {
                 progressPercentage={dashboardData.progressPercentage}
               />
 
-              {/* Projected Completion Date Countdown */}
+              {/* Projected Completion Date Countdown
+                  Only when there is no journey. Every step now carries its own
+                  suggested date and a way to move it, so a page level "your date
+                  was 28 days ago" is exactly the deadline pressure the step
+                  clocks were designed to replace. */}
+              {!hasJourney && (
               <div className="mt-6">
                 <ProjectedDateCountdown
                   creatorId={dashboardData.creator.id}
@@ -535,9 +550,13 @@ export default function CreatorDashboardPage() {
                   }}
                 />
               </div>
+              )}
 
-
-              {/* Submissions & Feedback Portal */}
+              {/* Submissions & Feedback Portal
+                  Only when there is no journey. The journey already shows what
+                  is with us and what is with them, step by step, which is what
+                  this panel was standing in for. */}
+              {!hasJourney && (
               <div className="mt-6">
                 <FeedbackPortal
                   creatorId={dashboardData.creator.id}
@@ -554,6 +573,7 @@ export default function CreatorDashboardPage() {
                   onRefresh={refreshDashboard}
                 />
               </div>
+              )}
 
               {/* Content grid */}
               <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -563,12 +583,32 @@ export default function CreatorDashboardPage() {
                       for this creator's path. Falls back to the old progress
                       list if the journey could not be built, so a creator always
                       sees their board. */}
-                  {(dashboardData as unknown as { journey?: Journey | null }).journey?.stages?.length ? (
-                    <div className="mb-8">
+                  {hasJourney ? (
+                    <>
+                      {/* One thing to do, then the road it sits on. */}
+                      <div className="mb-8">
+                        <CurrentStepCard
+                          journey={(dashboardData as unknown as { journey: Journey }).journey}
+                          creatorId={dashboardData.creator.id}
+                          creatorName={dashboardData.creator.name}
+                          onComplete={refreshDashboard}
+                          teamNotes={dashboardData.notes.filter(n => n.visible_to_creator).map(n => n.content).join('\n\n')}
+                          creator={{
+                            google_doc_link: dashboardData.creator.google_doc_link,
+                            drive_folder_link: dashboardData.creator.drive_folder_link,
+                            marketing_doc_link: dashboardData.creator.marketing_doc_link,
+                            course_url: dashboardData.creator.course_url,
+                            discount_code: dashboardData.creator.discount_code,
+                            wants_video_editing: dashboardData.creator.wants_video_editing,
+                            wants_download_design: dashboardData.creator.wants_download_design,
+                            content_path: dashboardData.creator.content_path,
+                          }}
+                        />
+                      </div>
                       <CreatorJourney journey={(dashboardData as unknown as { journey: Journey }).journey} />
-                    </div>
-                  ) : null}
-
+                    </>
+                  ) : (
+                    <>
                   <h2 className="text-xl font-semibold text-[#1e2749] mb-4">
                     Your Progress
                   </h2>
@@ -592,6 +632,8 @@ export default function CreatorDashboardPage() {
                       content_path: dashboardData.creator.content_path,
                     }}
                   />
+                    </>
+                  )}
 
                   {/* Pep talk callout — shows after path selection during onboarding */}
                   {dashboardData.creator.current_phase === 'onboarding' && dashboardData.creator.content_path && (

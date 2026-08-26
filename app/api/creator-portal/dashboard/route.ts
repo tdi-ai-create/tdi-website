@@ -289,8 +289,24 @@ export async function POST(request: NextRequest) {
       console.error('[dashboard-api] Journey build failed, falling back:', journeyError);
     }
 
+    // The journey is the source of truth for progress once it exists.
+    //
+    // The counts above are computed from a different set: they include steps
+    // retired on 26 August. That is how the header came to read "11 of 34" on
+    // the same screen where the journey read "7 of 27". Two progress numbers on
+    // one page, and the bigger, older, more discouraging one on top.
+    const reconciled = journey
+      ? {
+          totalMilestones: journey.totalSteps,
+          completedMilestones: journey.completedSteps,
+          progressPercentage: journey.totalSteps > 0
+            ? Math.round((journey.completedSteps / journey.totalSteps) * 100)
+            : 0,
+        }
+      : {};
+
     console.log('[dashboard-api] Success, returning data');
-    return NextResponse.json({ ...dashboardData, journey });
+    return NextResponse.json({ ...dashboardData, ...reconciled, journey });
 
   } catch (error) {
     console.error('[dashboard-api] Unexpected error:', error);
