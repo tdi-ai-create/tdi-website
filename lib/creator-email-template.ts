@@ -9,7 +9,7 @@ export interface CreatorEmailOptions {
   body: string;
   ctaLabel?: string;
   ctaUrl?: string;
-  /** Optional tagline under the header — changes per email type */
+  /** Optional tagline under the header, changes per email type */
   tagline?: string;
   /** Whether to show the mission footer block */
   showMission?: boolean;
@@ -45,7 +45,7 @@ export function creatorEmailTemplate(options: CreatorEmailOptions): string {
       <div style="background: #fefce8; border-radius: 8px; padding: 16px; margin: 20px 0; border-left: 3px solid #eab308;">
         <p style="margin: 0; font-size: 13px; color: #854d0e; line-height: 1.6;">
           <strong>Why we do this:</strong> Every educator has hard-won knowledge that deserves to be shared.
-          The Creator Studio exists to make that happen — you bring the expertise, we handle the rest.
+          The Creator Studio exists to make that happen. You bring the expertise, we handle the rest.
         </p>
       </div>
     `
@@ -101,11 +101,11 @@ export function creatorEmailTemplate(options: CreatorEmailOptions): string {
         <!-- Signature -->
         <div style="margin-top: 28px; padding-top: 16px; border-top: 1px solid #f3f4f6;">
           <p style="margin: 0; font-size: 13px; color: #6b7280;">
-            Bella Duran | Creator Success<br/>
+            Bella Dailey | Creator Success<br/>
             <span style="color: #9ca3af;">Teachers Deserve It</span>
           </p>
           <p style="margin: 8px 0 0; font-size: 11px; color: #9ca3af;">
-            Questions? Just reply to this email — I read every one.
+            Questions? Just reply to this email. I read every one.
           </p>
         </div>
       </div>
