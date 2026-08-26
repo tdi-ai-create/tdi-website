@@ -8,11 +8,10 @@ import { hasAnySectionPermission } from '@/lib/tdi-admin/permissions';
 import { PORTAL_THEMES } from '@/lib/tdi-admin/theme';
 
 import { HorizontalBarChart, DonutChart, DonutLegend, ProgressRing, LiveSectionHeader } from '@/components/tdi-admin/hub-charts/HubCharts';
+import OnboardingMatrix from '@/components/tdi-admin/leadership/OnboardingMatrix';
 import {
   Building2,
   School,
-  ClipboardList,
-  DollarSign,
   Search,
   Filter,
   Users,
@@ -21,11 +20,9 @@ import {
   Mail,
   Loader2,
   ChevronRight,
-  AlertCircle,
   Plus,
   Copy,
   BarChart3,
-  TrendingUp,
   Calendar,
   RefreshCw,
   ExternalLink,
@@ -35,10 +32,7 @@ import {
   TYPE_PAGE_TITLE,
   TYPE_PAGE_SUBTITLE,
   TYPE_SECTION_HEADER,
-  TYPE_CARD_TITLE,
   TYPE_STAT_VALUE,
-  TYPE_STAT_LABEL,
-  TYPE_TABLE_HEADER,
 } from '@/components/tdi-admin/ui/design-tokens';
 
 // Leadership theme colors
@@ -104,7 +98,6 @@ const TABS = [
   { id: 'dashboards', label: 'School Dashboards' },
   { id: 'reports', label: 'School Reports' },
   { id: 'actions', label: 'Action Items' },
-  { id: 'pipeline', label: 'Onboarding Pipeline' },
 ] as const;
 
 type TabId = (typeof TABS)[number]['id'];
@@ -431,14 +424,6 @@ export default function LeadershipDashboardPage() {
     (filterStatus !== 'all' ? 1 : 0) +
     (filterPhase !== 'all' ? 1 : 0);
 
-  // Pipeline counts
-  const pipelineCounts = {
-    invited: partnerships.filter((p) => p.invite_sent_at && !p.invite_accepted_at && p.status !== 'completed' && p.status !== 'paused').length,
-    setup: partnerships.filter((p) => p.status === 'setup_in_progress' || (p.status === 'active' && !p.invite_sent_at)).length,
-    active: partnerships.filter((p) => p.status === 'active' && p.invite_accepted_at).length,
-    paused: partnerships.filter((p) => p.status === 'paused').length,
-    completed: partnerships.filter((p) => p.status === 'completed').length,
-  };
 
   // Get active partnerships for dashboards tab (with legacy_dashboard_url or slug)
   const activePartnerships = partnerships.filter(
@@ -689,6 +674,22 @@ export default function LeadershipDashboardPage() {
         {/* =========== PARTNERSHIPS TAB =========== */}
         {activeTab === 'partnerships' && (
           <div>
+            {/* ─── ONBOARDING ───
+                The first thing on the page, because "how many partnerships do
+                we have" was never the question. This replaces the Onboarding
+                Pipeline tab, which bucketed schools on invite_accepted_at, a
+                field an auth check stamps automatically. It read as accepted
+                for two schools that have never logged in. */}
+            <div className="p-4 pb-0">
+              <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 mb-3">
+                <h2 style={TYPE_SECTION_HEADER}>Onboarding</h2>
+                <span className="text-[13px] text-gray-500">
+                  One definition, computed from both databases.
+                </span>
+              </div>
+              <OnboardingMatrix userEmail={teamMember?.email ?? null} />
+            </div>
+
             {/* Search and Filters */}
             <div className="p-4 border-b border-gray-100">
               <div className="flex flex-col md:flex-row gap-3">
@@ -1487,177 +1488,6 @@ export default function LeadershipDashboardPage() {
           </div>
         )}
 
-        {/* =========== ONBOARDING PIPELINE TAB =========== */}
-        {activeTab === 'pipeline' && (
-          <div className="p-6">
-            <div className="mb-6">
-              <h2
-                style={TYPE_SECTION_HEADER}
-              >
-                Onboarding Pipeline
-              </h2>
-              <p className="text-sm text-gray-500">
-                Track partnerships through each stage
-              </p>
-            </div>
-
-            {/* Pipeline Visual */}
-            <div className="flex items-center justify-between mb-8 overflow-x-auto pb-4">
-              {[
-                {
-                  label: 'Invited',
-                  count: pipelineCounts.invited,
-                  color: 'bg-gray-100 text-gray-700',
-                  barColor: 'bg-gray-400',
-                },
-                {
-                  label: 'Setup',
-                  count: pipelineCounts.setup,
-                  color: 'bg-amber-100 text-amber-700',
-                  barColor: 'bg-amber-400',
-                },
-                {
-                  label: 'Active',
-                  count: pipelineCounts.active,
-                  color: 'bg-green-100 text-green-700',
-                  barColor: 'bg-green-500',
-                },
-                {
-                  label: 'Paused',
-                  count: pipelineCounts.paused,
-                  color: 'bg-orange-100 text-orange-700',
-                  barColor: 'bg-orange-400',
-                },
-                {
-                  label: 'Completed',
-                  count: pipelineCounts.completed,
-                  color: 'bg-blue-100 text-blue-700',
-                  barColor: 'bg-blue-500',
-                },
-              ].map((stage, index) => (
-                <div key={stage.label} className="flex items-center">
-                  <div className="text-center min-w-[100px]">
-                    <div
-                      className={`w-16 h-16 rounded-full mx-auto mb-2 flex items-center justify-center ${stage.color}`}
-                    >
-                      <span style={TYPE_STAT_VALUE}>{stage.count}</span>
-                    </div>
-                    <p className="text-sm font-medium text-gray-700">
-                      {stage.label}
-                    </p>
-                  </div>
-                  {index < 4 && (
-                    <div className="w-12 h-1 bg-gray-200 mx-2 flex-shrink-0">
-                      <div className={`h-full ${stage.barColor}`} style={{ width: '100%' }} />
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-
-            {/* Pipeline Lists */}
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {/* Invited */}
-              <div className="bg-gray-50 rounded-xl p-4">
-                <h3 className="font-semibold text-gray-700 mb-3 flex items-center gap-2">
-                  <Mail className="w-4 h-4" />
-                  Invited ({pipelineCounts.invited})
-                </h3>
-                <div className="space-y-2">
-                  {partnerships
-                    .filter((p) => p.invite_sent_at && !p.invite_accepted_at && p.status !== 'completed' && p.status !== 'paused')
-                    .slice(0, 5)
-                    .map((p) => (
-                      <Link
-                        key={p.id}
-                        href={`/tdi-admin/leadership/${p.id}`}
-                        className="block p-3 bg-white rounded-lg border border-gray-200 hover:border-gray-300 transition-colors"
-                      >
-                        <p className="font-medium text-sm" style={{ color: '#2B3A67' }}>
-                          {p.org_name || p.contact_name}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          {getRelativeTime(p.created_at)}
-                        </p>
-                      </Link>
-                    ))}
-                  {pipelineCounts.invited === 0 && (
-                    <p className="text-sm text-gray-400 text-center py-4">
-                      No pending invites
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              {/* Setup In Progress */}
-              <div className="bg-white rounded-xl p-4 border border-gray-100" style={{ borderLeft: '3px solid #F59E0B', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-                <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full" style={{ background: '#F59E0B' }} />
-                  Setup ({pipelineCounts.setup})
-                </h3>
-                <div className="space-y-2">
-                  {partnerships
-                    .filter((p) => p.status === 'setup_in_progress' || (p.status === 'active' && !p.invite_sent_at))
-                    .slice(0, 5)
-                    .map((p) => (
-                      <Link
-                        key={p.id}
-                        href={`/tdi-admin/leadership/${p.id}`}
-                        className="block p-3 bg-gray-50 rounded-lg border border-gray-200 hover:border-gray-300 transition-colors"
-                      >
-                        <p className="font-medium text-sm" style={{ color: '#2B3A67' }}>
-                          {p.org_name || p.contact_name}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          {p.staff_count ?? 0} educators
-                        </p>
-                      </Link>
-                    ))}
-                  {pipelineCounts.setup === 0 && (
-                    <p className="text-sm text-gray-400 text-center py-4">
-                      No partnerships in setup
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              {/* Active */}
-              <div className="bg-white rounded-xl p-4 border border-gray-100" style={{ borderLeft: '3px solid #2563EB', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-                <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full" style={{ background: '#2563EB' }} />
-                  Active ({pipelineCounts.active})
-                </h3>
-                <div className="space-y-2">
-                  {partnerships
-                    .filter((p) => p.status === 'active' && p.invite_accepted_at)
-                    .slice(0, 5)
-                    .map((p) => (
-                      <Link
-                        key={p.id}
-                        href={`/tdi-admin/leadership/${p.id}`}
-                        className="block p-3 bg-gray-50 rounded-lg border border-gray-200 hover:border-gray-300 transition-colors"
-                      >
-                        <p className="font-medium text-sm" style={{ color: '#2B3A67' }}>
-                          {p.org_name || p.contact_name}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          {p.staff_count ?? 0} educators •{' '}
-                          <span className={`${phaseColors[p.contract_phase]} px-1 rounded`}>
-                            {p.contract_phase}
-                          </span>
-                        </p>
-                      </Link>
-                    ))}
-                  {pipelineCounts.active === 0 && (
-                    <p className="text-sm text-green-400 text-center py-4">
-                      No active partnerships
-                    </p>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
 
       </div>
     </div>
