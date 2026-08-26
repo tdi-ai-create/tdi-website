@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { writeSchoolProfile } from '@/lib/funding/school-profile'
 import { createClient } from '@supabase/supabase-js';
 import { requireAdminAuth } from '@/lib/tdi-admin/auth';
 import { STANDARD_OPPORTUNITIES, STANDARD_ACTIONS, computeDueDate } from '@/lib/funding-pursuit-template';
@@ -56,7 +57,9 @@ export async function POST(request: NextRequest) {
         buffer_amount: bufferAmount,
         current_phase: 'intake',
         implementation_date: implementationDate || null,
-        school_profile: schoolProfile ? JSON.stringify(schoolProfile) : '{}',
+        // Stored as an object. JSON.stringify here put the *text* of the
+        // object into a jsonb column, so nothing could query it.
+        school_profile: writeSchoolProfile(schoolProfile),
         // funding_paths is a legacy display field and this default was a second
         // hardcoded list of funding paths, separate from STANDARD_OPPORTUNITIES
         // and maintained by nobody. It seeded six generic labels that drifted
@@ -113,7 +116,16 @@ export async function POST(request: NextRequest) {
       notes: opp.notes,
     }));
 
-    await supabase.from('funding_opportunities').insert(oppInserts);
+    // If this fails the school ends up with a pursuit and no grants at all,
+    // which looks identical to a school nobody has researched yet.
+    const { error: oppErr } = await supabase.from('funding_opportunities').insert(oppInserts);
+    if (oppErr) {
+      console.error('[pursuits] created pursuit but FAILED to create its opportunities:', oppErr.message);
+      return NextResponse.json(
+        { error: `Pursuit created but its funding opportunities failed: ${oppErr.message}` },
+        { status: 500 }
+      );
+    }
 
     // Auto-generate standard action items with computed due dates
     const actionInserts = STANDARD_ACTIONS.map(action => ({
@@ -129,10 +141,18 @@ export async function POST(request: NextRequest) {
       sort_order: action.sort_order,
     }));
 
-    await supabase.from('funding_action_items').insert(actionInserts);
+    const { error: actErr } = await supabase.from('funding_action_items').insert(actionInserts);
+    if (actErr) {
+      console.error('[pursuits] created pursuit but FAILED to create its action items:', actErr.message);
+      return NextResponse.json(
+        { error: `Pursuit created but its action items failed: ${actErr.message}` },
+        { status: 500 }
+      );
+    }
 
-    // Create initial timeline event
-    await supabase.from('funding_pursuit_timeline').insert({
+    // Create initial timeline event. A lost entry costs history, not function,
+    // so it logs rather than failing the request.
+    const { error: tlErr } = await supabase.from('funding_pursuit_timeline').insert({
       pursuit_id: data.id,
       event_date: new Date().toISOString().split('T')[0],
       event_title: 'Pursuit created',
@@ -140,6 +160,7 @@ export async function POST(request: NextRequest) {
       status: 'complete',
       display_order: 1,
     });
+    if (tlErr) console.error('[pursuits] timeline entry for pursuit creation lost:', tlErr.message);
 
     return NextResponse.json({ success: true, pursuit: data });
   } catch (error) {
@@ -222,7 +243,7 @@ export async function PATCH(request: NextRequest) {
     // records belong to which phase. History starts here and cannot be
     // reconstructed backwards.
     if (updates.current_phase && priorPhase !== updates.current_phase) {
-      await supabase.from('funding_pursuit_timeline').insert({
+      const { error: phaseTlErr } = await supabase.from('funding_pursuit_timeline').insert({
         pursuit_id: pursuitId,
         event_date: new Date().toISOString().split('T')[0],
         event_title: `Phase: ${priorPhase ?? 'unset'} → ${updates.current_phase}`,
@@ -231,6 +252,7 @@ export async function PATCH(request: NextRequest) {
           `can later be collapsed and reviewed against the phase it belonged to.`,
         status: 'complete',
       });
+      if (phaseTlErr) console.error('[pursuits] phase-change timeline entry lost:', phaseTlErr.message);
     }
 
     return NextResponse.json({ success: true });

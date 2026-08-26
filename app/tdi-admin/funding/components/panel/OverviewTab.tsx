@@ -1,4 +1,5 @@
 'use client'
+import { readSchoolProfile } from '@/lib/funding/school-profile'
 
 import { useState } from 'react'
 import { OwnerAvatar, ownerName } from '../OwnerAvatar'
@@ -544,12 +545,9 @@ function SchoolProfileSection({ pursuit }: { pursuit: any }) {
   const [saving, setSaving] = useState(false)
   const [justSaved, setJustSaved] = useState(false)
 
-  let profile: Record<string, any> = {}
-  try {
-    profile = typeof pursuit.school_profile === 'string'
-      ? JSON.parse(pursuit.school_profile)
-      : (pursuit.school_profile || {})
-  } catch { profile = {} }
+  // Was a single parse, which returned a string for every double-encoded row
+  // and so rendered an empty profile panel.
+  const profile: Record<string, any> = readSchoolProfile(pursuit.school_profile)
 
   const [draft, setDraft] = useState<Record<string, any>>({ ...profile })
   const [ncesSearching, setNcesSearching] = useState(false)
@@ -600,7 +598,9 @@ function SchoolProfileSection({ pursuit }: { pursuit: any }) {
     setSaving(false)
     setEditing(false)
     // Force page-level data to reflect the change
-    pursuit.school_profile = JSON.stringify(merged)
+    // Object, matching what the PATCH above actually saved. This used to
+    // stringify, so the in-memory copy disagreed with the database.
+    pursuit.school_profile = merged
     if (res.ok) {
       setJustSaved(true)
       setTimeout(() => setJustSaved(false), 2000)
