@@ -1,0 +1,183 @@
+// ---------------------------------------------------------------------------
+// What a creator sees: one open step, and the road it sits on.
+//
+// The road is eight stages for a course and five for a download, not twenty
+// seven tasks and sixteen tasks. A course is 27 steps and 8 of them are ours,
+// so showing the flat list reads as homework and overstates their workload by
+// about a third.
+//
+// Stage names come from the database, per path, because the two paths are
+// different journeys. Sharing them is why a download creator used to see an
+// empty "Content Design" stage and do their whole content build inside one
+// called "Prep & Resources", described as "Prepare for recording".
+// ---------------------------------------------------------------------------
+
+import { phaseRank } from './creator-phases';
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
+type DbClient = any;
+
+export interface JourneyStep {
+  recordId: string;
+  milestoneId: string;
+  name: string;
+  /** True when TDI does this, not the creator. Shown, never hidden. */
+  ours: boolean;
+  status: 'complete' | 'open' | 'in_review' | 'changes_requested' | 'todo';
+  dueOn: string | null;
+  /** Feedback rounds used. Surfaced so a creator can see revision ends. */
+  round: number;
+}
+
+export interface JourneyStage {
+  key: string;
+  name: string;
+  steps: JourneyStep[];
+  done: number;
+  total: number;
+  /** The stage holding their open step. The only one expanded by default. */
+  current: boolean;
+}
+
+export interface Journey {
+  path: 'course' | 'download' | null;
+  stages: JourneyStage[];
+  openStep: JourneyStep | null;
+  /** The stage name above the open step, for the card. */
+  openStageName: string | null;
+  totalSteps: number;
+  completedSteps: number;
+}
+
+function displayStatus(row: { status: string; review_status: string | null }): JourneyStep['status'] {
+  if (row.status === 'completed') return 'complete';
+  if (row.review_status === 'changes_requested') return 'changes_requested';
+  if (row.status === 'waiting_approval' || row.review_status === 'submitted' || row.review_status === 'under_review') {
+    return 'in_review';
+  }
+  if (row.status === 'available') return 'open';
+  return 'todo';
+}
+
+/**
+ * Builds the whole journey for one project.
+ *
+ * Retired steps never appear. Collapsed steps never appear. Steps belonging to
+ * the other path never appear. What is left is exactly what that creator will
+ * ever be asked to do, plus the steps we owe them, marked as ours.
+ */
+export async function getJourney(supabase: DbClient, projectId: string): Promise<Journey | null> {
+  const { data: project, error: projectError } = await supabase
+    .from('creator_projects')
+    .select('id, content_path')
+    .eq('id', projectId)
+    .maybeSingle();
+
+  if (projectError || !project) return null;
+
+  const path = (project.content_path as 'course' | 'download' | null) ?? null;
+
+  // No path chosen yet means no journey to draw. They get the one question that
+  // decides it, and the road appears once they have answered.
+  if (!path) {
+    const { data: rows } = await supabase
+      .from('creator_milestones')
+      .select('id, milestone_id, status, review_status, due_on, round, milestones!inner(name, requires_team_action, retired_at, is_collapsed_into)')
+      .eq('project_id', projectId)
+      .eq('status', 'available');
+
+    const first = (rows || [])[0];
+    const openStep: JourneyStep | null = first
+      ? {
+          recordId: first.id,
+          milestoneId: first.milestone_id,
+          name: first.milestones.name,
+          ours: Boolean(first.milestones.requires_team_action),
+          status: displayStatus(first),
+          dueOn: first.due_on ?? null,
+          round: first.round ?? 0,
+        }
+      : null;
+
+    return { path: null, stages: [], openStep, openStageName: null, totalSteps: 0, completedSteps: 0 };
+  }
+
+  const [{ data: stageRows }, { data: mapRows }, { data: stepRows }] = await Promise.all([
+    supabase.from('creator_stages').select('stage_key, name, sort_order').eq('path', path).order('sort_order'),
+    supabase.from('milestone_stages').select('milestone_id, stage_key').eq('path', path),
+    supabase
+      .from('creator_milestones')
+      .select('id, milestone_id, status, review_status, due_on, round, milestones!inner(name, sort_order, phase_id, requires_team_action, retired_at, is_collapsed_into, applies_to)')
+      .eq('project_id', projectId),
+  ]);
+
+  if (!stageRows || !mapRows || !stepRows) return null;
+
+  const stageOf = new Map<string, string>(
+    (mapRows as Array<{ milestone_id: string; stage_key: string }>).map((r) => [r.milestone_id, r.stage_key])
+  );
+
+  const visible = (stepRows as Array<Record<string, any>>).filter((r) => {
+    const m = r.milestones;
+    if (m.retired_at) return false;
+    if (m.is_collapsed_into) return false;
+    const applies = m.applies_to as string[] | null;
+    if (applies && applies.length > 0 && !applies.includes(path)) return false;
+    return stageOf.has(r.milestone_id);
+  });
+
+  const steps: Array<JourneyStep & { stageKey: string; sortOrder: number }> = visible.map((r) => ({
+    recordId: r.id,
+    milestoneId: r.milestone_id,
+    name: r.milestones.name,
+    ours: Boolean(r.milestones.requires_team_action),
+    status: displayStatus(r as { status: string; review_status: string | null }),
+    dueOn: r.due_on ?? null,
+    round: r.round ?? 0,
+    stageKey: stageOf.get(r.milestone_id)!,
+    // Phase first, then order within the phase. sort_order alone restarts at 1
+    // in every phase, and a stage can span two of them: Getting started holds
+    // three onboarding steps and the agreement, which lives in its own phase
+    // at sort_order 1. Sorting on sort_order put Sign Agreement second.
+    sortOrder: phaseRank(r.milestones.phase_id) * 1000 + (r.milestones.sort_order ?? 0),
+  }));
+
+  // Strips the two fields that exist only for grouping and sorting, so callers
+  // never see internals they have no use for.
+  const publish = (s: JourneyStep & { stageKey: string; sortOrder: number }): JourneyStep => ({
+    recordId: s.recordId,
+    milestoneId: s.milestoneId,
+    name: s.name,
+    ours: s.ours,
+    status: s.status,
+    dueOn: s.dueOn,
+    round: s.round,
+  });
+
+  const open = steps.find((s) => s.status !== 'complete' && s.status !== 'todo') ?? null;
+
+  const stages: JourneyStage[] = (stageRows as Array<{ stage_key: string; name: string }>)
+    .map((sr) => {
+      const mine = steps
+        .filter((s) => s.stageKey === sr.stage_key)
+        .sort((a, b) => a.sortOrder - b.sortOrder);
+      return {
+        key: sr.stage_key,
+        name: sr.name,
+        steps: mine.map(publish),
+        done: mine.filter((s) => s.status === 'complete').length,
+        total: mine.length,
+        current: open ? mine.some((s) => s.recordId === open.recordId) : false,
+      };
+    })
+    .filter((s) => s.total > 0);
+
+  return {
+    path,
+    stages,
+    openStep: open ? publish(open) : null,
+    openStageName: open ? stages.find((s) => s.current)?.name ?? null : null,
+    totalSteps: steps.length,
+    completedSteps: steps.filter((s) => s.status === 'complete').length,
+  };
+}
