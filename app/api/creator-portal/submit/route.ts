@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { byPhaseThenOrder } from '@/lib/creator-phases';
 import { recordSubmission } from '@/lib/creator-submissions';
+import { creatorFlag } from '@/lib/creator-flags';
+import { advanceStep, resolveStepRow } from '@/lib/creator-step-engine';
 import { CREATOR_STUDIO_RECIPIENTS } from '@/lib/creator-notification-recipients';
 
 export async function POST(request: Request) {
@@ -438,8 +440,49 @@ export async function POST(request: Request) {
       }
     }
 
+    // ---- The step engine, behind creator_config.step_engine ----------------
+    //
+    // A fourth copy of the walk lived here, so this route had its own idea of
+    // what came next and could disagree with the three in the admin routes.
+    // Everything below is that old path, kept working so the flag switches
+    // between two implementations rather than into a half finished one.
+    //
+    // Only completion types advance. A submission that needs review does not
+    // move the board: it waits for a person to approve or ask for changes,
+    // which is the whole point of the review loop.
+    const useEngine = completionTypes.includes(submissionType)
+      && (await creatorFlag(supabase, 'step_engine'));
+
+    if (useEngine) {
+      const resolved = await resolveStepRow(supabase, creatorId, milestoneId);
+      if (resolved.error || !resolved.recordId) {
+        console.error('[submit] Engine could not find the step:', resolved.error);
+        return NextResponse.json({ success: false, error: resolved.error }, { status: 400 });
+      }
+
+      const { data: creatorState } = await supabase
+        .from('creators')
+        .select('lifecycle_state')
+        .eq('id', creatorId)
+        .maybeSingle();
+
+      const advanced = await advanceStep(supabase, {
+        milestoneRecordId: resolved.recordId,
+        decision: 'approve',
+        actor: `creator:${creatorId}`,
+        startClock: creatorState?.lifecycle_state !== 'paused',
+      });
+
+      if (!advanced.ok) {
+        console.error('[submit] Engine refused to advance:', advanced.error);
+        return NextResponse.json({ success: false, error: advanced.error }, { status: 500 });
+      }
+
+      console.log('[submit] Engine advanced. Next:', advanced.openStep?.name ?? 'end of path');
+    }
+
     // 4. If this is a completion type (not needing review), unlock next milestone
-    if (completionTypes.includes(submissionType)) {
+    if (!useEngine && completionTypes.includes(submissionType)) {
       // Get current milestone info
       const { data: milestone } = await supabase
         .from('milestones')
