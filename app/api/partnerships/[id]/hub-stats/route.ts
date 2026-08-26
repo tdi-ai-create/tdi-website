@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { resolvePartnershipMembers } from '@/lib/hub/partnership-members'
 
 // Hub Supabase (where hub_activity_log, hub_profiles, etc. live)
 const hubSupabase = createClient(
@@ -7,11 +8,6 @@ const hubSupabase = createClient(
   process.env.LEARNING_HUB_SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
-// Creator-portal Supabase (where partnerships, organizations, hub_org_members live)
-const portalSupabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
 
 export async function GET(
   request: NextRequest,
@@ -20,39 +16,15 @@ export async function GET(
   const { id: partnershipId } = await params
 
   try {
-    // Try to get Hub users linked to this partnership via hub_org_members
-    const { data: members } = await portalSupabase
-      .from('hub_org_members')
-      .select('user_id')
-      .eq('partnership_id', partnershipId)
-
-    let userIds: string[] = (members || []).map(m => m.user_id)
-
-    // Fallback: if no org members linked, match by org name from partnership
-    if (userIds.length === 0) {
-      const { data: partnership } = await portalSupabase
-        .from('partnerships')
-        .select('contact_name')
-        .eq('id', partnershipId)
-        .single()
-
-      const { data: org } = await portalSupabase
-        .from('organizations')
-        .select('name')
-        .eq('partnership_id', partnershipId)
-        .single()
-
-      const orgName = org?.name || partnership?.contact_name || ''
-      if (orgName) {
-        const { data: profiles } = await hubSupabase
-          .from('hub_profiles')
-          .select('id')
-          .or(`school_name.ilike.%${orgName}%,district.ilike.%${orgName}%`)
-          .limit(200)
-
-        userIds = (profiles || []).map(p => p.id)
-      }
-    }
+    // Who belongs to this partnership. One definition, in lib/hub/partnership-members.
+    //
+    // Two things were wrong here. The primary lookup read hub_org_members, an
+    // unpopulated join table, through the portal client. The fallback then
+    // matched Hub profiles on school or district name with a wildcard, which
+    // silently pulls in any school whose name happens to contain the string.
+    // Fuzzy name matching across a 104,000 user table is not a fallback, it is
+    // a way to attribute strangers' data to a partner. Both are gone.
+    const { userIds } = await resolvePartnershipMembers(partnershipId)
 
     if (userIds.length === 0) {
       return NextResponse.json({
@@ -88,6 +60,7 @@ export async function GET(
       hubSupabase
         .from('hub_activity_log')
         .select('user_id')
+        .neq('action', 'account_provisioned')
         .in('user_id', userIds)
         .gte('created_at', startOfMonth),
 
@@ -95,6 +68,7 @@ export async function GET(
       hubSupabase
         .from('hub_activity_log')
         .select('user_id')
+        .neq('action', 'account_provisioned')
         .in('user_id', userIds)
         .gte('created_at', sevenDaysAgo),
 
@@ -109,8 +83,7 @@ export async function GET(
         .from('hub_activity_log')
         .select('id')
         .in('user_id', userIds)
-        .eq('action', 'quick_win_completed')
-        .eq('is_example', false),
+        .eq('action', 'quick_win_completed'),
 
       // Moment mode uses last 7 days
       hubSupabase

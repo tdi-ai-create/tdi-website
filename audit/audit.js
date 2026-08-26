@@ -165,7 +165,17 @@ async function auditPage(page, pagePath) {
   const startTime = Date.now();
   let response;
   try {
-    response = await page.goto(url, { waitUntil: 'networkidle', timeout: 30000 });
+    // Was waitUntil: 'networkidle', which waits for 500ms of complete network
+    // silence. Any analytics beacon, poll or keep-alive means that never
+    // happens, so the call sat until the 30s timeout and the page was recorded
+    // as a critical "Failed to load page" error. /about failed this way on
+    // 25 Aug and blocked two unrelated PRs, while curl fetched the same page in
+    // 0.3s and the audit passed locally. Playwright's own docs discourage
+    // networkidle for exactly this reason.
+    response = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
+    // Best effort settle for the content checks below. Never fails the page:
+    // a slow third party script is not a broken page.
+    await page.waitForLoadState('load', { timeout: 10000 }).catch(() => {});
     pageResults.loadTime = Date.now() - startTime;
     pageResults.status = response?.status() || 0;
   } catch (error) {

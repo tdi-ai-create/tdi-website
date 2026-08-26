@@ -262,8 +262,16 @@ function SchoolCard({ school, onDraftEmail, onToast }: {
   onToast: (msg: string) => void
 }) {
   const [showCompleted, setShowCompleted] = useState(false)
-  const completedGrants = school.grants.filter(g => g.status !== 'denied' && g.forwardingStatus === 'sent' && g.narrativeStatus === 'ready')
-  const activeGrants = school.grants.filter(g => g.status !== 'denied' && !(g.forwardingStatus === 'sent' && g.narrativeStatus === 'ready'))
+  // A grant is finished when it has actually been submitted or decided. It was
+  // previously counted as complete the moment the forwarding email was sent,
+  // which meant emailing a school closed the grant on screen while its real
+  // status stayed not_started. Title II-A for Saunemin sat in this collapsed
+  // section for nine days: written, QA passed, forwarded, never submitted.
+  //
+  // Emailing someone is not an outcome. Only these are.
+  const FINISHED = new Set(['applied', 'submitted', 'awarded', 'closed'])
+  const completedGrants = school.grants.filter(g => g.status !== 'denied' && FINISHED.has(g.status))
+  const activeGrants = school.grants.filter(g => g.status !== 'denied' && !FINISHED.has(g.status))
   const deniedGrants = school.grants.filter(g => g.status === 'denied')
 
   // The next step comes from the shared engine, never from logic local to this
@@ -668,17 +676,28 @@ function GrantRow({ grant, school, onDraftEmail, onToast, onRefresh }: {
 }
 
 function GrantStatusBadge({ grant }: { grant: SchoolData['grants'][0] }) {
+  // What actually happened in the world comes first. This used to be checked
+  // last, so a grant the school had already submitted still read "Approved"
+  // because its narrative happened to be ready.
+  if (grant.status === 'applied' || grant.status === 'waiting') {
+    return <Badge label={grant.status === 'applied' ? 'Submitted' : 'Waiting'} color="#065F46" bg="#D1FAE5" />
+  }
+
+  // Sent to the school and not submitted. Previously this rendered as
+  // "Approved", which reads like an ending. It is the opposite: it is the one
+  // state where somebody still has to do something and nobody is being told.
+  if (grant.forwardingStatus === 'sent' && grant.narrativeStatus === 'ready') {
+    return <Badge label="Sent, not submitted" color="#9B2C3A" bg="#FBE9EC" />
+  }
+
   if (grant.narrativeStatus === 'review' || grant.narrativeStatus === 'qa_review') {
     return <Badge label="Draft ready" color="#6D28D9" bg="#F5F3FF" />
   }
   if (grant.narrativeStatus === 'ready') {
-    return <Badge label="Approved" color="#065F46" bg="#D1FAE5" />
+    return <Badge label="Ready to send" color="#8A5500" bg="#FFF2D4" />
   }
   if (grant.narrativeStatus === 'drafting' || grant.narrativeStatus === 'requested') {
     return <Badge label="Agent drafting" color="#1D4ED8" bg="#DBEAFE" />
-  }
-  if (grant.status === 'applied' || grant.status === 'waiting') {
-    return <Badge label={grant.status === 'applied' ? 'Applied' : 'Waiting'} color="#D97706" bg="#FEF3C7" />
   }
   if (grant.windowOpen) {
     return <Badge label="Window open" color="#065F46" bg="#D1FAE5" />

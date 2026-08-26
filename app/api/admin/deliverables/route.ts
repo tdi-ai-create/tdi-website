@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServiceSupabase } from '@/lib/supabase'
+import { fromLegacyStatus } from '@/lib/billing/state'
 
 async function isTDIAdmin(email: string) {
   // Check if email belongs to a team member
@@ -77,7 +78,7 @@ export async function PATCH(request: NextRequest) {
   const supabase = getServiceSupabase()
 
   const updateFields: Record<string, unknown> = { updated_at: new Date().toISOString() }
-  if (delivery_status) updateFields.delivery_status = delivery_status
+  if (delivery_status) Object.assign(updateFields, fromLegacyStatus(delivery_status))
   if (delivery_date) updateFields.delivery_date = delivery_date
   if (delivery_notes !== undefined) updateFields.delivery_notes = delivery_notes
   if (delivered_by) updateFields.delivered_by = delivered_by

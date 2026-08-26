@@ -21,13 +21,11 @@ import { generateSuggestions, type TDISuggestion } from '@/lib/dashboard/generat
 import { StaffRosterWithPhotos, StaffPhotoUpload, FindStaffSearch } from '@/components/tdi-admin/leadership/staff'
 import { ArrowLeft, Loader2, Building2, ExternalLink, Calendar, Mail, Phone, MessageCircle, Eye, FileText, BarChart3, Users, AlertTriangle, TrendingUp, Briefcase, Edit3, ChevronRight, X } from 'lucide-react'
 import Image from 'next/image'
-import OnboardingChecklist from '@/components/dashboard/leadership/OnboardingChecklist'
 import StaffEngagementRoster from '@/components/dashboard/leadership/StaffEngagementRoster'
-import ActivationReadinessScore from '@/components/dashboard/leadership/ActivationReadinessScore'
 import CourseCompletionFunnel from '@/components/dashboard/leadership/CourseCompletionFunnel'
 import LoginTrendChart from '@/components/dashboard/leadership/LoginTrendChart'
 import ObservationImpactScorecard from '@/components/dashboard/leadership/ObservationImpactScorecard'
-import BillingTab from '@/components/dashboard/admin/BillingTab'
+import PositionStrip from '@/components/tdi-admin/billing/PositionStrip'
 import DeliverablesList from '@/components/tdi-admin/leadership/DeliverablesList'
 import BriefingModal from '@/components/tdi-admin/leadership/BriefingModal'
 import ActionItemsSidebar from '@/components/tdi-admin/leadership/ActionItemsSidebar'
@@ -175,7 +173,6 @@ export default function AdminPartnershipDetailPage() {
 
   // V2 state: Timeline filter, expanded sidebar sections, slide-out panels
   const [timelineFilter, setTimelineFilter] = useState<'all' | 'notes' | 'meetings' | 'actions'>('all')
-  const [showBillingPanel, setShowBillingPanel] = useState(false)
   const [showTeamPanel, setShowTeamPanel] = useState(false)
   const [show90DaysPanel, setShow90DaysPanel] = useState(false)
   const [showOverviewPanel, setShowOverviewPanel] = useState(false)
@@ -1277,15 +1274,13 @@ export default function AdminPartnershipDetailPage() {
               <div className="flex items-center gap-2 mb-3">
                 <FileText size={14} style={{ color: '#1e2749' }} />
                 <h3 className="text-sm font-bold text-gray-900">Contract</h3>
-                {editMode && (
-                  <button onClick={() => setShowBillingPanel(!showBillingPanel)} className="ml-auto text-[10px] font-medium text-violet-600 hover:text-violet-800">
-                    Full billing
-                  </button>
-                )}
               </div>
 
               {/* Deliverables summary */}
               <DeliverablesList partnershipId={partnershipId} userEmail={userEmail} />
+
+              {/* Money position, read only. Billing is the only place that writes. */}
+              <PositionStrip partnershipId={partnershipId} userEmail={userEmail || ''} />
 
               {/* Grant Pursuits */}
               {grantPursuits.length > 0 && (
@@ -1645,13 +1640,13 @@ export default function AdminPartnershipDetailPage() {
                   <span className="text-xs font-medium text-gray-700">90 Days Framework</span>
                   <ChevronRight size={12} style={{ color: '#9CA3AF', transform: show90DaysPanel ? 'rotate(90deg)' : 'none', transition: 'transform 0.15s' }} />
                 </button>
-                <button
-                  onClick={() => setShowBillingPanel(!showBillingPanel)}
+                <Link
+                  href="/tdi-admin/billing"
                   className="w-full flex items-center justify-between px-2.5 py-2 rounded-lg border border-gray-100 hover:bg-gray-50 text-left transition"
                 >
                   <span className="text-xs font-medium text-gray-700">Billing</span>
-                  <ChevronRight size={12} style={{ color: '#9CA3AF', transform: showBillingPanel ? 'rotate(90deg)' : 'none', transition: 'transform 0.15s' }} />
-                </button>
+                  <span className="text-[10px] font-semibold" style={{ color: '#B45309' }}>Open →</span>
+                </Link>
                 <button
                   onClick={() => setShowOverviewPanel(!showOverviewPanel)}
                   className="w-full flex items-center justify-between px-2.5 py-2 rounded-lg border border-gray-100 hover:bg-gray-50 text-left transition"
@@ -1755,23 +1750,7 @@ export default function AdminPartnershipDetailPage() {
             ═════════════════════════════════════════════════════════════ */}
 
         {/* Billing Panel */}
-        {showBillingPanel && (
-          <div className="mt-4">
-            <div className="bg-white rounded-2xl shadow-sm p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-bold text-gray-900">Billing</h2>
-                <button onClick={() => setShowBillingPanel(false)} className="text-gray-400 hover:text-gray-600">
-                  <X size={18} />
-                </button>
-              </div>
-              <BillingTab
-                partnershipId={partnershipId}
-                userEmail={userEmail || ''}
-                partnership={partnership}
-              />
-            </div>
-          </div>
-        )}
+        
 
         {/* Team Panel */}
         {showTeamPanel && (
@@ -1851,10 +1830,11 @@ export default function AdminPartnershipDetailPage() {
                 </button>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-0">
-                <ActivationReadinessScore partnershipId={partnershipId} />
-                <OnboardingChecklist partnershipId={partnershipId} />
-              </div>
+              {/* Onboarding status moved to the Leadership home, where the
+                  matrix is the single definition. The two panels that used to
+                  sit here could not return a correct answer: one queried Hub
+                  tables through the portal client and joined an empty table,
+                  the other selected a column that does not exist. */}
 
               <StaffEngagementRoster partnershipId={partnershipId} />
 

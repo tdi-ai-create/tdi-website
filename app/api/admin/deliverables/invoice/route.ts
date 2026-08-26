@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServiceSupabase } from '@/lib/supabase';
+import { asInvoiced } from '@/lib/billing/state'
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
 
@@ -173,7 +174,7 @@ export async function POST(request: NextRequest) {
       invoice_id: invoice.id,
       invoice_type: 'intelligence_invoice',
       invoiced_at: now.toISOString(),
-      delivery_status: 'invoiced',
+      ...asInvoiced(),
       updated_at: now.toISOString(),
     })
     .eq('id', deliverableId);

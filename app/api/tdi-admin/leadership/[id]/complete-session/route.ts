@@ -2,6 +2,7 @@ import { isTDIAdmin } from '@/lib/tdi-admin/auth-check'
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { serviceDelivered } from '@/lib/billing-slack';
+import { asDelivered } from '@/lib/billing/state'
 
 // Service Supabase client
 function getServiceSupabase() {
@@ -125,7 +126,7 @@ export async function POST(
           .select('id')
           .eq('partnership_id', id)
           .eq('service_type', deliverableType)
-          .in('delivery_status', ['pending', 'scheduled'])
+          .eq('delivery_state', 'scheduled')
           .order('sequence_number', { ascending: true })
           .limit(1)
           .single()
@@ -134,7 +135,7 @@ export async function POST(
           await supabase
             .from('contract_deliverables')
             .update({
-              delivery_status: 'delivered',
+              ...asDelivered(),
               delivery_date: sessionDate,
               delivered_by: email,
               delivery_notes: internalNotes || null,

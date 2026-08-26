@@ -3,6 +3,7 @@ import { resolveBillingContact, greetingName, billingContactFooterHtml } from '@
 import { createClient } from '@supabase/supabase-js'
 import { requireAdminAuth } from '@/lib/tdi-admin/auth'
 import { invoicePaid } from '@/lib/billing-slack'
+import { asPaid } from '@/lib/billing/state'
 
 function getSupabaseAdmin() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -88,7 +89,7 @@ export async function POST(
 
     await supabase
       .from('contract_deliverables')
-      .update({ delivery_status: 'paid', updated_at: new Date().toISOString() })
+      .update({ ...asPaid(), updated_at: new Date().toISOString() })
       .eq('invoice_id', id)
       .eq('invoice_type', 'intelligence_invoice')
 
