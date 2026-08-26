@@ -82,7 +82,6 @@ export const PORTAL_THEMES: Record<PortalSection, PortalTheme> = {
 };
 
 export function getPortalTheme(pathname: string): PortalTheme {
-  if (pathname.includes('/tdi-admin/ops')) return PORTAL_THEMES.intelligence;
   if (pathname.includes('/tdi-admin/cmo')) return PORTAL_THEMES.cmo;
   if (pathname.includes('/tdi-admin/sales')) return PORTAL_THEMES.sales;
   if (pathname.includes('/tdi-admin/intelligence')) return PORTAL_THEMES.intelligence;
