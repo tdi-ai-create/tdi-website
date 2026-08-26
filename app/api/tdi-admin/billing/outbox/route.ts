@@ -43,6 +43,7 @@ export async function POST(request: NextRequest) {
   const body = await request.json().catch(() => ({}));
 
   if (body.action === 'send') return sendDraft(sb, body, email!, dryRun);
+  if (body.action === 'edit') return editDraft(sb, body);
   if (body.action === 'cancel') {
     await sb.from('billing_outbox').update({ status: 'cancelled', updated_at: new Date().toISOString() }).eq('id', body.outbox_id);
     return NextResponse.json({ ok: true });
@@ -108,6 +109,29 @@ async function draft(sb: any, b: any, email: string) {
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
   return NextResponse.json({ ok: true, draft: data, from: BILLING_FROM, reply_to: BILLING_REPLY_TO });
+}
+
+/**
+ * Edit a draft before it goes. This is the editable preview the old per-school billing
+ * panel had, kept because reviewing a message you cannot change is not really a review.
+ * Only drafts can be edited; a sent message is a record of what the client received.
+ */
+async function editDraft(sb: any, b: any) {
+  const { outbox_id, subject, body, to_email, cc_email } = b;
+  const { data: o } = await sb.from('billing_outbox').select('status').eq('id', outbox_id).single();
+  if (!o) return NextResponse.json({ error: 'Draft not found' }, { status: 404 });
+  if (o.status !== 'draft') {
+    return NextResponse.json({ error: `This message was already ${o.status}. Sent copies are never edited: they are the record of what the client received.` }, { status: 422 });
+  }
+  const patch: Record<string, unknown> = { updated_at: new Date().toISOString() };
+  if (subject !== undefined) patch.subject = subject;
+  if (body !== undefined) patch.body = body;
+  if (to_email !== undefined) patch.to_email = to_email;
+  if (cc_email !== undefined) patch.cc_email = cc_email;
+
+  const { data, error } = await sb.from('billing_outbox').update(patch).eq('id', outbox_id).select().single();
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  return NextResponse.json({ ok: true, draft: data });
 }
 
 async function sendDraft(sb: any, b: any, email: string, dryRun: boolean) {
