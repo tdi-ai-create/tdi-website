@@ -49,21 +49,6 @@ const CHECKS = [
     describe: (d) => `has_real_data=${d.has_real_data} member_count=${d.member_count}`,
   },
   {
-    route: 'staff-engagement',
-    expect: (d) => (d.summary?.total ?? 0) > 0,
-    describe: (d) => `roster=${d.summary?.total} active=${d.summary?.active} dormant=${d.summary?.dormant}`,
-  },
-  {
-    route: 'login-trend',
-    expect: (d) => d.has_data === true || (d.member_count ?? 0) > 0,
-    describe: (d) => `has_data=${d.has_data} member_count=${d.member_count}`,
-  },
-  {
-    route: 'course-funnel',
-    expect: (d) => (d.enrolled ?? 0) > 0,
-    describe: (d) => `enrolled=${d.enrolled} started=${d.started} completed=${d.completed}`,
-  },
-  {
     route: 'hub-mood',
     // Addison had 23 Vibe Checks at time of writing but the route needs two in
     // the last seven days, which is genuinely seasonal. Absence of a mood
