@@ -543,10 +543,24 @@ function ActionItem({ action, onToggle, onCancel, onUpdateClientLabel, onNudge, 
           </div>
         )}
 
-        {/* Client-specific: prepared materials */}
-        {action.owner_type === 'client' && action.prepared_materials && !isCancelled && (
-          <div style={{ fontSize: 11, color: '#9CA3AF', fontStyle: 'italic', marginTop: 4 }}>
-            TDI prepared: {action.prepared_materials}
+        {/* Shown for every owner type. This was gated on client, which hid it
+            on the 22 of 28 open tasks that TDI owns. Rendered pre-wrap because
+            it is an email and was previously collapsed onto one grey line. */}
+        {action.prepared_materials && !isCancelled && (
+          <div style={{ marginTop: 8 }}>
+            <div style={{
+              fontSize: 10, fontWeight: 700, letterSpacing: '0.08em',
+              textTransform: 'uppercase', color: '#1e2749', marginBottom: 4,
+            }}>
+              Ready to send
+            </div>
+            <pre style={{
+              margin: 0, padding: '10px 12px', background: '#E8F0FD',
+              border: '1px solid #80a4ed', borderRadius: 6,
+              fontSize: 12, lineHeight: 1.5, color: '#1e2749',
+              whiteSpace: 'pre-wrap', wordBreak: 'break-word',
+              fontFamily: 'inherit',
+            }}>{action.prepared_materials}</pre>
           </div>
         )}
 
