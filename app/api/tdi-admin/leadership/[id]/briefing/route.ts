@@ -44,7 +44,7 @@ export async function GET(
     supabase.from('partnerships').select('*').eq('id', partnershipId).single(),
     supabase.from('organizations').select('name, address_city, address_state').eq('partnership_id', partnershipId).limit(1).single(),
     supabase.from('partnership_kpis').select('*').eq('partnership_id', partnershipId).eq('status', 'active').order('sort_order'),
-    supabase.from('partnership_notes').select('*').eq('partnership_id', partnershipId).order('created_at', { ascending: false }).limit(5),
+    supabase.from('partnership_notes').select('*').is('archived_at', null).eq('partnership_id', partnershipId).order('created_at', { ascending: false }).limit(5),
     supabase.from('partnership_meetings').select('*').eq('partnership_id', partnershipId).order('meeting_date', { ascending: false }).limit(3),
     supabase.from('staff_members').select('hub_enrolled, hub_login_date').eq('partnership_id', partnershipId),
     supabase.from('action_items').select('title, status, priority').eq('partnership_id', partnershipId).eq('status', 'pending').order('sort_order'),
