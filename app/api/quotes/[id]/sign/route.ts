@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServiceSupabase } from '@/lib/supabase'
 import { contractSigned } from '@/lib/billing-slack'
 import { quoteSigned } from '@/lib/sales-slack'
+import { asNewLine } from '@/lib/billing/state'
 
 export async function POST(
   request: NextRequest,
@@ -89,7 +90,7 @@ export async function POST(
               line_item_index: idx, label: `${item.label} (${i} of ${qty})`,
               service_type: stype, quantity: 1, unit_price: item.unit_price, total_amount: item.unit_price,
               is_complimentary: item.is_complimentary || false,
-              funding_type: fundingType, delivery_status: deliveryStatus,
+              funding_type: fundingType, ...asNewLine(deliveryStatus === 'pending_funding'),
               sequence_number: i, sequence_total: qty,
             })
           }
@@ -99,7 +100,7 @@ export async function POST(
             line_item_index: idx, label: item.label,
             service_type: stype, quantity: qty, unit_price: item.unit_price, total_amount: item.total,
             is_complimentary: item.is_complimentary || false,
-            funding_type: fundingType, delivery_status: deliveryStatus,
+            funding_type: fundingType, ...asNewLine(deliveryStatus === 'pending_funding'),
             sequence_number: 1, sequence_total: 1,
           })
         }

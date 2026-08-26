@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServiceSupabase } from '@/lib/supabase'
 import { isTDIAdmin } from '@/lib/is-tdi-admin'
 import { grantUnlockedServices } from '@/lib/billing-slack'
+import { asReleasedFromFunding } from '@/lib/billing/state'
 
 export async function POST(request: NextRequest) {
   const email = request.headers.get('x-user-email')
@@ -42,7 +43,7 @@ export async function POST(request: NextRequest) {
     await supabase
       .from('contract_deliverables')
       .update({
-        delivery_status: 'pending',
+        ...asReleasedFromFunding(),
         funding_type: 'grant_confirmed',
         updated_at: new Date().toISOString(),
       })
