@@ -35,27 +35,89 @@ export async function GET(
     return NextResponse.json({ error: 'Not found' }, { status: 404 })
   }
 
-  // Fetch notes — graceful if table doesn't exist yet
-  let notes_list: unknown[] = []
-  const { data: notesData, error: notesErr } = await supabase
-    .from('opportunity_notes')
-    .select('*')
-    .eq('opportunity_id', id)
-    .order('created_at', { ascending: false })
-    .limit(50)
-  if (!notesErr) notes_list = notesData ?? []
+  // Sales notes live in two tables with different shapes. `opportunity_notes` is
+  // written by the portal UI; `sales_opportunity_notes` is written by agents and
+  // scripts. Reading only the first hid 477 notes across 123 leads, so read both
+  // and merge. Rows from the second table are namespaced `son:` so the delete
+  // route can tell them apart, otherwise a delete silently matches nothing.
+  const VALID_NOTE_TYPES = new Set(['call', 'email', 'meeting', 'demo', 'update', 'system'])
 
-  // Backfill legacy notes field as a synthetic entry when table is empty
-  if (notes_list.length === 0 && opp.notes && opp.notes.length > 10) {
-    notes_list = [{
+  const [portalNotes, agentNotes] = await Promise.all([
+    supabase
+      .from('opportunity_notes')
+      .select('*')
+      .eq('opportunity_id', id)
+      .order('created_at', { ascending: false })
+      .limit(500),
+    supabase
+      .from('sales_opportunity_notes')
+      .select('id, opportunity_id, body, created_by, created_at')
+      .eq('opportunity_id', id)
+      .order('created_at', { ascending: false })
+      .limit(500),
+  ])
+
+  if (portalNotes.error) console.error('[opportunities] opportunity_notes read failed:', portalNotes.error.message)
+  if (agentNotes.error) console.error('[opportunities] sales_opportunity_notes read failed:', agentNotes.error.message)
+
+  type MergedNote = {
+    id: string
+    opportunity_id: string
+    author_email: string
+    note_text: string
+    note_type: string
+    created_at: string
+    source_table: string
+  }
+
+  const notes_list: MergedNote[] = []
+
+  for (const n of portalNotes.data ?? []) {
+    notes_list.push({
+      id: n.id,
+      opportunity_id: n.opportunity_id,
+      // The panel calls author_email.split('@'), so it must never be null.
+      author_email: n.author_email || 'system@teachersdeserveit.com',
+      note_text: n.note_text || '',
+      note_type: VALID_NOTE_TYPES.has(n.note_type) ? n.note_type : 'update',
+      created_at: n.created_at,
+      source_table: 'opportunity_notes',
+    })
+  }
+
+  for (const n of agentNotes.data ?? []) {
+    notes_list.push({
+      id: `son:${n.id}`,
+      opportunity_id: n.opportunity_id,
+      author_email: n.created_by || 'system@teachersdeserveit.com',
+      note_text: n.body || '',
+      // This table has no type column. These are agent and script written
+      // records, which is what 'system' means everywhere else in the panel.
+      note_type: 'system',
+      created_at: n.created_at,
+      source_table: 'sales_opportunity_notes',
+    })
+  }
+
+  // The legacy `notes` text column is a third store, imported before either
+  // table existed. It used to be shown only when opportunity_notes was empty,
+  // which meant it masked real history on 48 leads. Always surface it as a
+  // clearly labelled archive entry instead of as a substitute.
+  if (opp.notes && opp.notes.trim().length > 10) {
+    notes_list.push({
       id: 'legacy',
       opportunity_id: id,
       author_email: 'system@teachersdeserveit.com',
-      note_text: opp.notes,
+      note_text: `[Imported record]\n\n${opp.notes}`,
       note_type: 'system',
       created_at: opp.created_at,
-    }]
+      source_table: 'legacy_column',
+    })
   }
+
+  notes_list.sort((a, b) =>
+    new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+  )
 
   // Fetch activity — graceful if table doesn't exist yet
   let activity: unknown[] = []
