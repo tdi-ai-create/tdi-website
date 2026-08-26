@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAdminAuth } from '@/lib/tdi-admin/auth';
 import { getServiceSupabase } from '@/lib/supabase';
-import { isTDIAdmin } from '@/lib/is-tdi-admin';
 
 export const dynamic = 'force-dynamic';
 
@@ -9,9 +9,12 @@ export const dynamic = 'force-dynamic';
  * almost never need one in isolation from the other, and keeping them apart is how a
  * paid invoice with no payment behind it goes unnoticed for three weeks.
  */
-export async function GET(request: NextRequest) {
-  const email = request.headers.get('x-user-email');
-  if (!(await isTDIAdmin(email))) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+export async function GET(_request: NextRequest) {
+  // An x-user-email header is a claim, not proof. Anyone could send it.
+  // requireAdminAuth verifies the actual signed-in session.
+  const auth = await requireAdminAuth();
+  if (auth instanceof NextResponse) return auth;
+  const email = auth.member.email;
 
   const sb = getServiceSupabase();
   const today = new Date().toISOString().slice(0, 10);

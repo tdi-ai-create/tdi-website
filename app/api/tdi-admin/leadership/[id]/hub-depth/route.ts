@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAdminAuth } from '@/lib/tdi-admin/auth';
 import { getHubServiceClient, resolvePartnershipMembers } from '@/lib/hub/partnership-members';
-import { isTDIAdmin } from '@/lib/partnership-portal-data';
 
 /**
  * What a partnership's educators are actually doing in the Hub.
@@ -42,12 +42,13 @@ const ENGAGEMENT_ACTIONS = [
   'tour_completed',
 ];
 
-export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const email = request.headers.get('x-user-email');
-    if (!email || !(await isTDIAdmin(email))) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
-    }
+    // An x-user-email header is a claim, not proof. Anyone could send it.
+    // requireAdminAuth verifies the actual signed-in session.
+    const auth = await requireAdminAuth();
+    if (auth instanceof NextResponse) return auth;
+    const email = auth.member.email;
 
     const { id: partnershipId } = await params;
     const hub = getHubServiceClient();
