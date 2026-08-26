@@ -56,7 +56,20 @@ export const RETIRED_STEPS = new Set([
   'download_specs_submitted',
   'blog_topic_approved',
   'download_concept_approved',
+  // Sort order 98 puts this after Content Launched and Download Goes Live, so
+  // the step that sets a launch date fired after the launch. It was also
+  // stamped complete by a migration for three creators who never launched.
+  'launch_date_set',
 ]);
+
+/**
+ * The last step of a project. A finished project ends here rather than closing
+ * silently, because the end of one project is where the next one starts.
+ *
+ * Answering it archives the project. Yes opens a new one; no leaves them on the
+ * roster to be asked again later. Neither answer reopens anything.
+ */
+export const FINAL_STEP = 'create_again';
 
 export type StepDecision = 'approve' | 'changes';
 
