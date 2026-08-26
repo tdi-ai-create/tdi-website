@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { requireAdminAuth } from '@/lib/tdi-admin/auth'
 import { getServiceSupabase } from '@/lib/supabase'
 import Anthropic from '@anthropic-ai/sdk'
 
@@ -28,13 +29,13 @@ export async function POST(
 ) {
   try {
     const { id: partnershipId } = await params
-    const userEmail = request.headers.get('x-user-email')
+    // This checked only that the header was present, not that it belonged to
+    // an admin, so any value at all opened the route.
+    const auth = await requireAdminAuth()
+    if (auth instanceof NextResponse) return auth
+
     const body = await request.json()
     const { fileId } = body
-
-    if (!userEmail) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
 
     if (!fileId) {
       return NextResponse.json({ error: 'File ID required' }, { status: 400 })

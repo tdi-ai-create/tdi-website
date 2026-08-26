@@ -1,5 +1,6 @@
 import { isTDIAdmin } from '@/lib/tdi-admin/auth-check'
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAdminAuth } from '@/lib/tdi-admin/auth';
 import { createClient } from '@supabase/supabase-js';
 import { serviceDelivered } from '@/lib/billing-slack';
 import { asDelivered } from '@/lib/billing/state'
@@ -32,11 +33,11 @@ export async function POST(
 ) {
   try {
     const { id } = await params;
-    const email = request.headers.get('x-user-email');
-
-    if (!email || !(await isTDIAdmin(email))) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
-    }
+    // An x-user-email header is a claim, not proof. Anyone could send it.
+    // requireAdminAuth verifies the actual signed-in session.
+    const auth = await requireAdminAuth();
+    if (auth instanceof NextResponse) return auth;
+    const email = auth.member.email;
 
     const {
       sessionType,
@@ -82,7 +83,14 @@ export async function POST(
         }));
 
       if (validQuotes.length > 0) {
-        await supabase.from('teacher_quotes').insert(validQuotes);
+        // These become "What Educators Are Saying" on the school's own
+        // dashboard. Losing them silently is how that block stays empty while
+        // everyone believes the debrief was captured.
+        const { error: quotesError } = await supabase.from('teacher_quotes').insert(validQuotes);
+        if (quotesError) {
+          console.error('[complete-session] quotes not saved:', quotesError.message);
+          return NextResponse.json({ error: `Session saved but quotes failed: ${quotesError.message}` }, { status: 500 });
+        }
       }
     }
 
@@ -103,13 +111,17 @@ export async function POST(
 
       const partnershipData = partnership as Record<string, unknown> | null;
       const currentCount = (partnershipData?.[field] as number) || 0;
-      await supabase
+      // This count is what the school sees as sessions delivered.
+      const { error: countError } = await supabase
         .from('partnerships')
         .update({
           [field]: currentCount + 1,
           data_updated_at: new Date().toISOString(),
         })
         .eq('id', id);
+      if (countError) {
+        console.error('[complete-session] session count not incremented:', countError.message);
+      }
     }
 
     // 4. Mark next matching contract deliverable as delivered
@@ -132,7 +144,7 @@ export async function POST(
           .single()
 
         if (nextDeliverable) {
-          await supabase
+          const { error: deliverableError } = await supabase
             .from('contract_deliverables')
             .update({
               ...asDelivered(),
@@ -143,6 +155,11 @@ export async function POST(
               updated_at: new Date().toISOString(),
             })
             .eq('id', nextDeliverable.id)
+
+          // The school sees this as their delivered count.
+          if (deliverableError) {
+            console.error('[complete-session] deliverable not marked:', deliverableError.message);
+          }
         }
       }
     }
@@ -156,10 +173,13 @@ export async function POST(
         .single();
 
       const currentNotes = partnership?.love_notes_count || 0;
-      await supabase
+      const { error: loveNotesError } = await supabase
         .from('partnerships')
         .update({ love_notes_count: currentNotes + loveNotesCount })
         .eq('id', id);
+      if (loveNotesError) {
+        console.error('[complete-session] love notes count not updated:', loveNotesError.message);
+      }
     }
 
     // 5. Auto-create timeline event
@@ -175,7 +195,8 @@ export async function POST(
         ? `${label} ${sessionNumber} - ${loveNotesCount} Love Notes delivered`
         : `${label} ${sessionNumber} complete`;
 
-    await supabase.from('timeline_events').insert({
+    // The Impact Spotlight on the school dashboard anchors to this.
+    const { error: timelineError } = await supabase.from('timeline_events').insert({
       partnership_id: id,
       event_title: eventTitle,
       event_type: sessionType,
@@ -184,8 +205,13 @@ export async function POST(
       sort_order: 100, // Will appear after manually set events
     });
 
+    if (timelineError) {
+      console.error('[complete-session] timeline_events write failed:', timelineError.message);
+    }
+
     // Log activity
-    await supabase.from('activity_log').insert({
+    // The only durable record that this session was completed.
+    const { error: activityError } = await supabase.from('activity_log').insert({
       partnership_id: id,
       action: 'session_completed',
       details: {
@@ -195,6 +221,10 @@ export async function POST(
         completed_by: email,
       },
     });
+
+    if (activityError) {
+      console.error('[complete-session] activity_log write failed:', activityError.message);
+    }
 
     // Slack notification
     serviceDelivered(id, '', `${label} ${sessionNumber}`, email || 'unknown').catch(() => {})

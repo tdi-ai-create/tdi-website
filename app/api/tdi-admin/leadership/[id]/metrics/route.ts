@@ -1,5 +1,6 @@
 import { isTDIAdmin } from '@/lib/tdi-admin/auth-check'
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAdminAuth } from '@/lib/tdi-admin/auth';
 import { createClient } from '@supabase/supabase-js';
 
 // Service Supabase client
@@ -31,11 +32,11 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const email = request.headers.get('x-user-email');
-
-    if (!email || !(await isTDIAdmin(email))) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    // An x-user-email header is a claim, not proof. Anyone could send it.
+    // requireAdminAuth verifies the actual signed-in session.
+    const auth = await requireAdminAuth();
+    if (auth instanceof NextResponse) return auth;
+    const email = auth.member.email;
 
     const supabase = getServiceSupabase();
 
@@ -68,11 +69,11 @@ export async function POST(
 ) {
   try {
     const { id } = await params;
-    const email = request.headers.get('x-user-email');
-
-    if (!email || !(await isTDIAdmin(email))) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    // An x-user-email header is a claim, not proof. Anyone could send it.
+    // requireAdminAuth verifies the actual signed-in session.
+    const auth = await requireAdminAuth();
+    if (auth instanceof NextResponse) return auth;
+    const email = auth.member.email;
 
     const body = await request.json();
     const { metric_name, metric_value, snapshot_date, source } = body;
@@ -101,11 +102,16 @@ export async function POST(
     }
 
     // Log activity
-    await supabase.from('activity_log').insert({
+    // The only durable record that this happened.
+    const { error: logError } = await supabase.from('activity_log').insert({
       partnership_id: id,
       action: 'metric_recorded',
       details: { metric_name, metric_value, recorded_by: email },
     });
+
+    if (logError) {
+      console.error('[metrics] activity log write failed:', logError.message);
+    }
 
     return NextResponse.json({
       success: true,

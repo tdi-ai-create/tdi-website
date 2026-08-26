@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAdminAuth } from '@/lib/tdi-admin/auth';
 import { getServiceSupabase } from '@/lib/supabase';
-import { isTDIAdmin } from '@/lib/is-tdi-admin';
 import { BILLING_FROM, BILLING_REPLY_TO, invoiceEmail, reminderEmail, resendEmail, poRequestEmail } from '@/lib/billing/email';
 import { slackNotify } from '@/lib/slack-notify';
 
@@ -11,8 +11,11 @@ const money = (n: number | string) =>
 
 /** Everything drafted, waiting for review, and everything already sent. */
 export async function GET(request: NextRequest) {
-  const email = request.headers.get('x-user-email');
-  if (!(await isTDIAdmin(email))) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  // An x-user-email header is a claim, not proof. Anyone could send it.
+  // requireAdminAuth verifies the actual signed-in session.
+  const auth = await requireAdminAuth();
+  if (auth instanceof NextResponse) return auth;
+  const email = auth.member.email;
 
   const sb = getServiceSupabase();
   const { data } = await sb.from('billing_outbox').select('*').order('created_at', { ascending: false }).limit(200);
@@ -36,8 +39,11 @@ export async function GET(request: NextRequest) {
  * out on a draft invoice the client had never received.
  */
 export async function POST(request: NextRequest) {
-  const email = request.headers.get('x-user-email');
-  if (!(await isTDIAdmin(email))) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  // An x-user-email header is a claim, not proof. Anyone could send it.
+  // requireAdminAuth verifies the actual signed-in session.
+  const auth = await requireAdminAuth();
+  if (auth instanceof NextResponse) return auth;
+  const email = auth.member.email;
 
   const sb = getServiceSupabase();
   const dryRun = request.nextUrl.searchParams.get('dryRun') === '1';
@@ -46,7 +52,16 @@ export async function POST(request: NextRequest) {
   if (body.action === 'send') return sendDraft(sb, body, email!, dryRun);
   if (body.action === 'edit') return editDraft(sb, body);
   if (body.action === 'cancel') {
-    await sb.from('billing_outbox').update({ status: 'cancelled', updated_at: new Date().toISOString() }).eq('id', body.outbox_id);
+    const { error: cancelError } = await sb
+      .from('billing_outbox')
+      .update({ status: 'cancelled', updated_at: new Date().toISOString() })
+      .eq('id', body.outbox_id);
+    // Reporting ok on a failed cancel leaves a draft that still looks cancelled
+    // in the UI and is still sitting there ready to send.
+    if (cancelError) {
+      console.error('[billing/outbox] cancel failed:', cancelError.message);
+      return NextResponse.json({ error: cancelError.message }, { status: 500 });
+    }
     return NextResponse.json({ ok: true });
   }
   return draft(sb, body, email!);
@@ -161,7 +176,9 @@ async function sendDraft(sb: any, b: any, email: string, dryRun: boolean) {
   });
   const result = await res.json().catch(() => ({}));
 
-  await sb.from('billing_outbox').update({
+  // This is the record that the email went out. If it fails silently the
+  // outbox believes the send never happened, and the next run sends again.
+  const { error: recordError } = await sb.from('billing_outbox').update({
     status: res.ok ? 'sent' : 'failed',
     send_result: res.ok ? (result.id ?? 'sent') : JSON.stringify(result).slice(0, 500),
     sent_by: email,
@@ -169,11 +186,18 @@ async function sendDraft(sb: any, b: any, email: string, dryRun: boolean) {
     updated_at: new Date().toISOString(),
   }).eq('id', o.id);
 
+  if (recordError) {
+    console.error('[billing/outbox] could not record send result:', recordError.message);
+  }
+
   // Sending the invoice itself is what moves it out of draft.
   if (res.ok && o.kind === 'invoice' && o.invoice_id) {
-    await sb.from('intelligence_invoices').update({
+    const { error: invoiceError } = await sb.from('intelligence_invoices').update({
       status: 'sent', sent_to: o.to_email, updated_at: new Date().toISOString(),
     }).eq('id', o.invoice_id);
+    if (invoiceError) {
+      console.error('[billing/outbox] invoice status not updated:', invoiceError.message);
+    }
   }
 
   slackNotify('financials', res.ok
