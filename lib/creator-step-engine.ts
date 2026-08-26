@@ -106,12 +106,15 @@ function position(phaseId: string, sortOrder: number): number {
 }
 
 /**
- * Every path a step can be tagged for. `blog` is listed on nine milestones but
- * Confirm Your Path only offers download and course, so no creator can ever
- * become one. It is kept here so a step tagged for all three still counts as
- * shared rather than being treated as course-and-download only.
+ * Every path a creator can be on. There are two.
+ *
+ * A third, `blog`, was tagged on nine milestones but Confirm Your Path never
+ * offered it, so nobody could become one. It was removed from the milestones
+ * table on 26 August and the one project carrying it became a download. If it
+ * ever comes back it has to come back as a real choice on the selector, not as
+ * a tag nothing can produce.
  */
-const ALL_PATHS = ['blog', 'download', 'course'] as const;
+const ALL_PATHS = ['download', 'course'] as const;
 
 function appliesToPath(m: { appliesTo: string[] | null }, contentPath: string | null): boolean {
   // An empty applies_to means course only, matching the column default.
