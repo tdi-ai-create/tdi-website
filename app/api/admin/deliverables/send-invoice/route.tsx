@@ -6,6 +6,7 @@ import { Resend } from 'resend';
 import { renderToBuffer } from '@react-pdf/renderer';
 import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
 import React from 'react';
+import { asInvoiced } from '@/lib/billing/state'
 
 function getResend() {
   return new Resend(process.env.RESEND_API_KEY);
@@ -289,7 +290,7 @@ export async function POST(request: NextRequest) {
       invoice_id: invoiceId,
       invoice_type: 'intelligence_invoice',
       invoiced_at: now.toISOString(),
-      delivery_status: 'invoiced',
+      ...asInvoiced(),
       updated_at: now.toISOString(),
     };
     if (!deliverable.delivery_date) {

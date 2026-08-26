@@ -314,8 +314,9 @@ async function checkBacklog(supabase: ReturnType<typeof getServiceSupabase>) {
   const { count } = await supabase
     .from('contract_deliverables')
     .select('id', { count: 'exact', head: true })
-    .eq('delivery_status', 'delivered')
-    .is('invoice_id', null)
+    .eq('delivery_state', 'delivered')
+    .eq('billing_state', 'not_billed')
+    .eq('funding_hold', false)
     .eq('is_complimentary', false);
 
   return { uninvoiced_services: count || 0 };

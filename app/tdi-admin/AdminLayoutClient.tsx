@@ -12,6 +12,7 @@ import type { User } from '@supabase/supabase-js';
 const PORTAL_COLORS = {
   cmo: { accent: '#2A9D8F', light: '#E0F7F6', bg15: 'rgba(42, 157, 143, 0.15)', border30: 'rgba(42, 157, 143, 0.3)' },
   sales: { accent: '#10B981', light: '#D1FAE5', bg15: 'rgba(16, 185, 129, 0.15)', border30: 'rgba(16, 185, 129, 0.3)' },
+  billing: { accent: '#B45309', light: '#FFFBEB', bg15: 'rgba(180, 83, 9, 0.15)', border30: 'rgba(180, 83, 9, 0.3)' },
   intelligence: { accent: '#F97316', light: '#FFF7ED', bg15: 'rgba(249, 115, 22, 0.15)', border30: 'rgba(249, 115, 22, 0.3)' },
   leadership: { accent: '#2563EB', light: '#DBEAFE', bg15: 'rgba(37, 99, 235, 0.15)', border30: 'rgba(37, 99, 235, 0.3)' },
   hub: { accent: '#EAB308', light: '#FEF9C3', bg15: 'rgba(234, 179, 8, 0.15)', border30: 'rgba(234, 179, 8, 0.3)' },
@@ -55,6 +56,18 @@ const NAV_ITEMS = [
     icon: (active: boolean) => (
       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={active ? 2.5 : 2}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+    ),
+  },
+  {
+    id: 'billing',
+    label: 'Billing',
+    href: '/tdi-admin/billing',
+    section: 'intelligence',
+    accent: PORTAL_COLORS.billing.accent,
+    icon: (active: boolean) => (
+      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={active ? 2.5 : 2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9 8.25H7.5a2.25 2.25 0 00-2.25 2.25v9a2.25 2.25 0 002.25 2.25h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25H15m0-3l-3-3m0 0l-3 3m3-3v11.25" />
       </svg>
     ),
   },

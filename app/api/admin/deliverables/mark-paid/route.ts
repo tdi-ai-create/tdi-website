@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServiceSupabase } from '@/lib/supabase'
 import { isTDIAdmin } from '@/lib/is-tdi-admin'
 import { invoicePaid } from '@/lib/billing-slack'
+import { asPaid } from '@/lib/billing/state'
 
 export async function POST(request: NextRequest) {
   const email = request.headers.get('x-user-email')
@@ -61,7 +62,7 @@ export async function POST(request: NextRequest) {
   const { data: updated, error: deliverablesError } = await supabase
     .from('contract_deliverables')
     .update({
-      delivery_status: 'paid',
+      ...asPaid(),
       updated_at: new Date().toISOString(),
     })
     .eq('invoice_id', invoice_id)
