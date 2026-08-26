@@ -153,6 +153,7 @@ export default function AdminPartnershipDetailPage() {
 
   // Internal tab state (notes + meetings)
   const [internalNotes, setInternalNotes] = useState<{ id: string; content: string; author: string; note_type: string; visible_to_partner: boolean; created_at: string }[]>([])
+  const [openFlags, setOpenFlags] = useState<{ id: string; flag_key: string; severity: string; message: string; first_raised_at: string; last_seen_at: string }[]>([])
   const [internalMeetings, setInternalMeetings] = useState<{ id: string; meeting_date: string; meeting_type: string; attendees: string | null; summary: string | null; action_items: string | null; logged_by: string; created_at: string }[]>([])
   const [newNoteContent, setNewNoteContent] = useState('')
   const [newNoteType, setNewNoteType] = useState('general')
@@ -284,6 +285,7 @@ export default function AdminPartnershipDetailPage() {
       if (notesRes.ok) {
         const nd = await notesRes.json()
         if (nd.notes) setInternalNotes(nd.notes)
+        if (nd.flags) setOpenFlags(nd.flags)
       }
       if (meetingsRes.ok) {
         const md = await meetingsRes.json()
@@ -1115,6 +1117,40 @@ export default function AdminPartnershipDetailPage() {
                   >
                     {addingMeeting ? 'Saving...' : 'Log meeting'}
                   </button>
+                </div>
+              )}
+
+              {/* Open flags. Their own stream, above the human timeline.
+                  These used to be notes, and the cron wrote three new ones per
+                  school every morning: St. Peter Chanel had 96 rows that were
+                  really three concerns restated 32 times. One row per issue
+                  now, so the age of a problem is visible instead of smeared
+                  across dozens of duplicates. */}
+              {openFlags.length > 0 && (
+                <div className="mb-4 rounded-xl border border-gray-100 overflow-hidden">
+                  <div className="px-3.5 py-2 bg-gray-50 border-b border-gray-100 flex items-center justify-between gap-2">
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-gray-500">Open flags</span>
+                    <span className="text-[10px] font-semibold text-gray-400">{openFlags.length} open</span>
+                  </div>
+                  {openFlags.map((f) => {
+                    const days = Math.floor((Date.now() - new Date(f.first_raised_at).getTime()) / 86400000)
+                    const urgent = f.severity === 'urgent'
+                    return (
+                      <div key={f.id} className="flex items-start gap-2.5 px-3.5 py-2.5 border-b border-gray-50 last:border-0">
+                        <span
+                          className="w-1.5 h-1.5 rounded-full mt-1.5 flex-shrink-0"
+                          style={{ background: urgent ? '#B03325' : '#9A6608' }}
+                        />
+                        <div className="min-w-0">
+                          <p className="text-[12.5px] text-gray-700">{f.message}</p>
+                          <p className="text-[10px] text-gray-400 mt-0.5">
+                            first raised {new Date(f.first_raised_at).toLocaleDateString()}
+                            {days > 0 ? `, open ${days} day${days === 1 ? '' : 's'}` : ''}
+                          </p>
+                        </div>
+                      </div>
+                    )
+                  })}
                 </div>
               )}
 

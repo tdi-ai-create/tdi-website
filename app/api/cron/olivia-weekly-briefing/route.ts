@@ -380,6 +380,7 @@ async function gatherWeeklyPartnershipData(
       const { count: flags } = await supabase
         .from('partnership_notes')
         .select('*', { count: 'exact', head: true })
+        .is('archived_at', null)
         .eq('partnership_id', p.id)
         .eq('note_type', 'concern')
         .gte('created_at', weekAgo);
