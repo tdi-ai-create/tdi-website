@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServiceSupabase } from '@/lib/supabase';
 import { isTDIAdmin } from '@/lib/is-tdi-admin';
 import { asDelivered, asInvoiced, asPaid, asNotBilled } from '@/lib/billing/state';
+import { slackNotify } from '@/lib/slack-notify';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,7 +16,16 @@ export const dynamic = 'force-dynamic';
  * stays. A billing system you can delete from cannot be audited.
  *
  * Pass ?dryRun=1 to any of these to see what would change without changing it.
+ *
+ * Every action that changes money or delivery posts to #financials, so Omar and Bella
+ * see it without having to open the portal. Dry runs never post.
  */
+
+const money = (n: number) =>
+  Number(n).toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 });
+
+/** Who did it, so the channel is a record rather than an anonymous feed. */
+const by = (email: string) => email.split('@')[0];
 export async function POST(request: NextRequest) {
   const email = request.headers.get('x-user-email');
   if (!(await isTDIAdmin(email))) {
@@ -76,6 +86,11 @@ async function markDelivered(sb: any, b: any, email: string, dryRun: boolean) {
   }).eq('id', deliverable_id);
   if (error) throw new Error(error.message);
 
+  slackNotify('financials',
+    `Delivered: ${line.label}` +
+    (willBeBillable ? `. ${money(Number(line.total_amount))} is now ready to bill.` : '. No charge.') +
+    ` Marked by ${by(delivered_by || email)}.`);
+
   return NextResponse.json({ ok: true, ...plan });
 }
 
@@ -125,6 +140,9 @@ async function createInvoice(sb: any, b: any, email: string, dryRun: boolean) {
     updated_at: new Date().toISOString(),
   }).in('id', deliverable_ids);
   if (dErr) throw new Error(dErr.message);
+
+  slackNotify('financials',
+    `Invoice ${number} created as a draft for ${money(amount)}, ${lines.length} line(s), by ${by(email)}. Nothing has been emailed yet.`);
 
   return NextResponse.json({ ok: true, invoice_id: invoice.id, ...plan });
 }
@@ -184,6 +202,11 @@ async function recordPayment(sb: any, b: any, email: string, dryRun: boolean) {
     }
   }
 
+  slackNotify('financials',
+    `Payment received: ${money(total)}${method ? ` by ${method}` : ''}${reference ? ` (${reference})` : ''}, ` +
+    `settling ${plan.settles.join(' and ')}. Recorded by ${by(email)}.` +
+    (method && received_on ? '' : ' Method or receipt date was not captured, so it is flagged as unverified.'));
+
   return NextResponse.json({ ok: true, payment_id: payment.id, ...plan });
 }
 
@@ -209,6 +232,10 @@ async function voidInvoice(sb: any, b: any, email: string, dryRun: boolean) {
     ...asNotBilled(), invoice_id: null, invoiced_at: null, updated_at: new Date().toISOString(),
   }).eq('invoice_id', invoice_id);
 
+  slackNotify('financials',
+    `Invoice ${inv.invoice_number} for ${money(Number(inv.amount))} VOIDED by ${by(email)}. Reason: ${reason}. ` +
+    `${plan.lines_returned_to_not_billed} line(s) returned to not billed. The invoice stays on the record.`);
+
   return NextResponse.json({ ok: true, ...plan });
 }
 
@@ -231,6 +258,10 @@ async function deleteDraft(sb: any, b: any, dryRun: boolean) {
     ...asNotBilled(), invoice_id: null, invoiced_at: null, updated_at: new Date().toISOString(),
   }).eq('invoice_id', invoice_id);
   await sb.from('intelligence_invoices').delete().eq('id', invoice_id);
+
+  slackNotify('financials',
+    `Draft ${inv.invoice_number} deleted. It was never sent, so nothing left the building. ` +
+    `The number is retired rather than reused. ${plan.lines_returned_to_not_billed} line(s) returned to not billed.`);
 
   return NextResponse.json({ ok: true, ...plan });
 }
@@ -266,6 +297,10 @@ async function fixMismatch(sb: any, b: any, email: string, dryRun: boolean) {
   } else {
     return NextResponse.json({ error: 'resolution must be invoice_is_right or line_is_right' }, { status: 400 });
   }
+
+  slackNotify('financials',
+    `Reconciled ${inv.invoice_number}: the line said ${money(Number(line.total_amount))} and the invoice said ` +
+    `${money(Number(inv.amount))}. Resolved as "${resolution}" by ${by(email)}. Reason: ${reason}`);
 
   return NextResponse.json({ ok: true, ...plan });
 }

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServiceSupabase } from '@/lib/supabase';
 import { isTDIAdmin } from '@/lib/is-tdi-admin';
 import { BILLING_FROM, BILLING_REPLY_TO, invoiceEmail, reminderEmail, resendEmail, poRequestEmail } from '@/lib/billing/email';
+import { slackNotify } from '@/lib/slack-notify';
 
 export const dynamic = 'force-dynamic';
 
@@ -174,6 +175,10 @@ async function sendDraft(sb: any, b: any, email: string, dryRun: boolean) {
       status: 'sent', sent_to: o.to_email, updated_at: new Date().toISOString(),
     }).eq('id', o.invoice_id);
   }
+
+  slackNotify('financials', res.ok
+    ? `Sent ${o.kind.replace('_', ' ')} to ${o.to_email}: "${o.subject}". Sent by ${email.split('@')[0]} from Billing@teachersdeserveit.com.`
+    : `FAILED to send ${o.kind.replace('_', ' ')} to ${o.to_email}: "${o.subject}". It is still sitting in the outbox.`);
 
   return NextResponse.json(res.ok ? { ok: true, id: result.id } : { error: 'Send failed', detail: result }, { status: res.ok ? 200 : 502 });
 }
