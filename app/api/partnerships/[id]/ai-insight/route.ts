@@ -1,10 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-const hubSupabase = createClient(
-  process.env.LEARNING_HUB_SUPABASE_URL || process.env.NEXT_PUBLIC_LEARNING_HUB_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.LEARNING_HUB_SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
 
 const portalSupabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -39,13 +35,22 @@ export async function GET(
     );
     const hubStats = await hubStatsRes.json();
 
-    // Get recent action items
-    const { data: actionItems } = await portalSupabase
-      .from('partnership_action_items')
+    // Get recent action items.
+    //
+    // This read `partnership_action_items`, a table that has never existed.
+    // PostgREST returns an error for an unknown relation, the error was
+    // discarded, and actionItems was therefore always undefined. The real
+    // table is `action_items`.
+    const { data: actionItems, error: actionItemsError } = await portalSupabase
+      .from('action_items')
       .select('title, status, priority')
       .eq('partnership_id', partnershipId)
       .neq('status', 'completed')
       .limit(5);
+
+    if (actionItemsError) {
+      console.error('[ai-insight] action_items read failed:', actionItemsError.message);
+    }
 
     const pendingActions = (actionItems || []).filter(a => a.status !== 'completed').length;
 

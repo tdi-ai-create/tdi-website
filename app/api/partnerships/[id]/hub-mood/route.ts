@@ -1,10 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { getHubServiceClient, resolvePartnershipMembers } from '@/lib/hub/partnership-members'
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+const supabase = getHubServiceClient()
 
 export async function GET(
   request: NextRequest,
@@ -13,17 +10,14 @@ export async function GET(
   const { id: partnershipId } = await params
 
   try {
-    // Get Hub users for this partnership
-    const { data: members } = await supabase
-      .from('hub_org_members')
-      .select('user_id')
-      .eq('partnership_id', partnershipId)
+    // Who belongs to this partnership. One definition, in lib/hub/partnership-members.
+    // This previously read an unpopulated join table through the portal client:
+    // the wrong table, in the wrong database, so it always returned nothing.
+    const { userIds } = await resolvePartnershipMembers(partnershipId)
 
-    if (!members || members.length === 0) {
+    if (userIds.length === 0) {
       return NextResponse.json({ has_data: false, alert: null, trend: null })
     }
-
-    const userIds = members.map(m => m.user_id)
     const now = new Date()
     const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString()
     const fourteenDaysAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000).toISOString()

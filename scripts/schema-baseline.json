@@ -19,8 +19,6 @@
     "app/api/hub/polaroids/route.ts :: hub_polaroids.pin_color does not exist",
     "app/api/partners/action-item-data/route.ts :: partnerships.metadata does not exist",
     "app/api/partners/roster/route.ts :: partnerships.organization_id does not exist",
-    "app/api/partnerships/[id]/activation-score/route.ts :: partnerships.staff_count does not exist",
-    "app/api/partnerships/[id]/ai-insight/route.ts :: table \"partnership_action_items\" does not exist in any project",
     "app/api/sales/opportunities/[id]/renewal-risk/route.ts :: partnerships.end_date does not exist",
     "app/api/sales/opportunities/[id]/renewal-risk/route.ts :: partnerships.name does not exist",
     "app/api/sales/opportunities/[id]/renewal-risk/route.ts :: partnerships.start_date does not exist",
