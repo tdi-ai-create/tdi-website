@@ -21,9 +21,7 @@ import { generateSuggestions, type TDISuggestion } from '@/lib/dashboard/generat
 import { StaffRosterWithPhotos, StaffPhotoUpload, FindStaffSearch } from '@/components/tdi-admin/leadership/staff'
 import { ArrowLeft, Loader2, Building2, ExternalLink, Calendar, Mail, Phone, MessageCircle, Eye, FileText, BarChart3, Users, AlertTriangle, TrendingUp, Briefcase, Edit3, ChevronRight, X } from 'lucide-react'
 import Image from 'next/image'
-import OnboardingChecklist from '@/components/dashboard/leadership/OnboardingChecklist'
 import StaffEngagementRoster from '@/components/dashboard/leadership/StaffEngagementRoster'
-import ActivationReadinessScore from '@/components/dashboard/leadership/ActivationReadinessScore'
 import CourseCompletionFunnel from '@/components/dashboard/leadership/CourseCompletionFunnel'
 import LoginTrendChart from '@/components/dashboard/leadership/LoginTrendChart'
 import ObservationImpactScorecard from '@/components/dashboard/leadership/ObservationImpactScorecard'
@@ -1832,10 +1830,11 @@ export default function AdminPartnershipDetailPage() {
                 </button>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-0">
-                <ActivationReadinessScore partnershipId={partnershipId} />
-                <OnboardingChecklist partnershipId={partnershipId} />
-              </div>
+              {/* Onboarding status moved to the Leadership home, where the
+                  matrix is the single definition. The two panels that used to
+                  sit here could not return a correct answer: one queried Hub
+                  tables through the portal client and joined an empty table,
+                  the other selected a column that does not exist. */}
 
               <StaffEngagementRoster partnershipId={partnershipId} />
 
