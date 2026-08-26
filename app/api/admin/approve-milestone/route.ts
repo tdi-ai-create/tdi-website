@@ -1,6 +1,60 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { clearFlagForCompletedMilestone } from '@/lib/creator-agent-flags';
+import { creatorFlag } from '@/lib/creator-flags';
+import { advanceStep } from '@/lib/creator-step-engine';
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+/**
+ * Steps that were merged into another and still exist as their own rows on
+ * older boards. Completing the parent has to complete these too, or the board
+ * keeps a leftover open. Only the pre-engine path needs this: both targets are
+ * marked collapsed, and the engine refuses to open a collapsed step at all.
+ */
+const PAIRED_MILESTONES: Record<string, string> = {
+  test_video_recorded: 'test_video_submitted',
+  drive_folder_created: 'assets_submitted',
+};
+
+/**
+ * Finds the one step row this request means.
+ *
+ * The route has always been given a creator and a milestone, which does not
+ * identify a row: a creator on a second project has two rows for the same step.
+ * The old code took whichever the database returned first and completed both.
+ *
+ * Ambiguity is an error here rather than a guess. Katie Welch is the only
+ * creator with two projects today, so a wrong guess is silent and rare, which is
+ * the worst combination.
+ */
+async function resolveStepRow(
+  supabase: any,
+  creatorId: string,
+  milestoneId: string,
+  explicitRecordId?: string
+): Promise<{ recordId?: string; error?: string }> {
+  if (explicitRecordId) return { recordId: explicitRecordId };
+
+  const { data, error } = await supabase
+    .from('creator_milestones')
+    .select('id, project_id')
+    .eq('creator_id', creatorId)
+    .eq('milestone_id', milestoneId);
+
+  if (error) return { error: `Could not find the step: ${error.message}` };
+  if (!data || data.length === 0) return { error: 'No matching creator_milestone record found' };
+
+  if (data.length > 1) {
+    return {
+      error:
+        'This creator has more than one project carrying that step. ' +
+        'Send milestoneRecordId to say which one.',
+    };
+  }
+
+  return { recordId: data[0].id as string };
+}
 
 export async function POST(request: Request) {
   try {
@@ -19,7 +73,7 @@ export async function POST(request: Request) {
     const body = await request.json();
     console.log('[approve-milestone] Request body:', body);
 
-    const { milestoneId, creatorId, adminEmail, outOfOrder, note } = body;
+    const { milestoneId, creatorId, adminEmail, outOfOrder, note, milestoneRecordId } = body;
 
     if (!milestoneId || !creatorId) {
       console.error('[approve-milestone] Missing required fields:', { milestoneId, creatorId });
@@ -34,7 +88,7 @@ export async function POST(request: Request) {
     // 1. Get creator info
     const { data: creator, error: creatorError } = await supabase
       .from('creators')
-      .select('name, email, content_path')
+      .select('name, email, content_path, lifecycle_state')
       .eq('id', creatorId)
       .single();
 
@@ -57,11 +111,54 @@ export async function POST(request: Request) {
     }
     console.log('[approve-milestone] Found milestone:', milestone);
 
-    // 3. Mark milestone as completed (only update columns that exist)
-    // Build update object with optional metadata for out-of-order completions
     const completedAt = new Date().toISOString();
     const adminName = adminEmail?.split('@')[0] || 'admin';
 
+    // ---- The step engine, behind creator_config.step_engine ----------------
+    //
+    // One function completes the step and decides what opens next, scoped to
+    // the project. Everything below this block is the old path, kept intact so
+    // the flag switches between two working implementations rather than
+    // between a working one and a half finished one.
+    //
+    // Out of order approval still uses the old path. It is a deliberate
+    // override of sequence, which is the one thing the engine is built to
+    // refuse, so it needs its own design rather than being forced through this.
+    const useEngine = !isOutOfOrder && (await creatorFlag(supabase, 'step_engine'));
+    let engineNextStep: string | null = null;
+
+    if (useEngine) {
+      const resolved = await resolveStepRow(supabase, creatorId, milestoneId, milestoneRecordId);
+      if (resolved.error || !resolved.recordId) {
+        return NextResponse.json({ success: false, error: resolved.error }, { status: 400 });
+      }
+
+      // A paused creator gets a correct board and no clock. Repairing a board
+      // and starting a deadline are two different things, and a paused creator
+      // waking to an overdue step is the reason step reminders are still off.
+      const isPaused = creator?.lifecycle_state === 'paused';
+
+      const result = await advanceStep(supabase, {
+        milestoneRecordId: resolved.recordId,
+        decision: 'approve',
+        actor: adminEmail ? `admin:${adminEmail}` : 'admin',
+        startClock: !isPaused,
+      });
+
+      if (!result.ok) {
+        console.error('[approve-milestone] Engine refused:', result.error);
+        return NextResponse.json({ success: false, error: result.error }, { status: 500 });
+      }
+
+      engineNextStep = result.openStep?.name ?? null;
+      await clearFlagForCompletedMilestone(supabase, creatorId, milestoneId);
+      console.log('[approve-milestone] Engine completed the step. Next:', engineNextStep ?? 'end of path');
+    }
+
+    // 3. Mark milestone as completed (only update columns that exist)
+    // Build update object with optional metadata for out-of-order completions
+
+    if (!useEngine) {
     const updateObj: Record<string, unknown> = {
       status: 'completed',
       updated_at: completedAt,
@@ -114,12 +211,10 @@ export async function POST(request: Request) {
     }
 
     // 3b. Handle paired milestones that should auto-complete together
-    const pairedMilestones: Record<string, string> = {
-      'test_video_recorded': 'test_video_submitted',
-      'drive_folder_created': 'assets_submitted',
-    };
-
-    const pairedMilestoneId = pairedMilestones[milestoneId];
+    //
+    // Both targets are collapsed steps, so the engine never opens one and never
+    // needs them completed by hand. This exists only for the pre-engine path.
+    const pairedMilestoneId = PAIRED_MILESTONES[milestoneId];
     if (pairedMilestoneId) {
       const { error: pairedError } = await supabase
         .from('creator_milestones')
@@ -144,10 +239,15 @@ export async function POST(request: Request) {
       }
     }
 
-    // 4. Handle unlock logic
-    let nextMilestoneName = null;
+    } // end of the pre-engine completion path
 
-    if (isOutOfOrder) {
+    // 4. Handle unlock logic
+    let nextMilestoneName: string | null = engineNextStep;
+
+    if (useEngine) {
+      // The engine already completed the step and opened exactly one next step,
+      // scoped to the project. Nothing else here should touch status.
+    } else if (isOutOfOrder) {
       // Out-of-order completion: Don't auto-unlock next milestone
       // Instead, recalculate which milestones can now be unlocked
       console.log('[approve-milestone] Out-of-order completion - recalculating unlocks');
@@ -214,11 +314,12 @@ export async function POST(request: Request) {
       // Normal sequential completion: unlock next milestone in sequence
       // Determine search starting point - if paired milestone, search from the higher sort_order
       let searchFromSortOrder = milestone.sort_order;
-      if (pairedMilestoneId) {
+      const pairedForSearch = PAIRED_MILESTONES[milestoneId];
+      if (pairedForSearch) {
         const { data: pairedMs } = await supabase
           .from('milestones')
           .select('sort_order')
-          .eq('id', pairedMilestoneId)
+          .eq('id', pairedForSearch)
           .single();
         if (pairedMs) {
           searchFromSortOrder = Math.max(searchFromSortOrder, pairedMs.sort_order);
@@ -289,7 +390,7 @@ export async function POST(request: Request) {
 
         if (deactivatedMilestones && deactivatedMilestones.length > 0) {
           for (const dm of deactivatedMilestones) {
-            await supabase
+            const { error: skipError } = await supabase
               .from('creator_milestones')
               .update({
                 status: 'completed',
@@ -304,7 +405,14 @@ export async function POST(request: Request) {
               })
               .eq('creator_id', creatorId)
               .eq('milestone_id', dm.id);
-            console.log('[approve-milestone] Auto-completed deactivated milestone:', dm.id);
+
+            if (skipError) {
+              // A retired step left open is a step the creator sees and cannot
+              // action, so this is worth surfacing rather than swallowing.
+              console.error('[approve-milestone] Could not auto-complete retired step', dm.id, skipError.message);
+            } else {
+              console.log('[approve-milestone] Auto-completed deactivated milestone:', dm.id);
+            }
           }
         }
       }
@@ -375,7 +483,7 @@ export async function POST(request: Request) {
             console.log('[approve-milestone] Auto-enabled website visibility for creator:', creator?.name);
 
             // Add note about auto-enabling
-            await supabase
+            const { error: visibilityNoteError } = await supabase
               .from('creator_notes')
               .insert({
                 creator_id: creatorId,
@@ -384,18 +492,22 @@ export async function POST(request: Request) {
                 visible_to_creator: true,
                 phase_id: milestone.phase_id,
               });
+
+            if (visibilityNoteError) {
+              console.error('[approve-milestone] Website visibility note failed:', visibilityNoteError.message);
+            }
           }
         }
       }
     }
 
     // 6. Create auto-note for audit trail
-    const milestoneName = milestone?.title || milestone?.name || 'Milestone';
+    const milestoneName = milestone?.name || 'Milestone';
     const autoNoteContent = isOutOfOrder
       ? `[Auto] Milestone approved out of sequence: "${milestoneName}"${note ? ` - Note: ${note}` : ''}`
       : `[Auto] Milestone approved: "${milestoneName}"`;
 
-    await supabase
+    const { error: auditNoteError } = await supabase
       .from('creator_notes')
       .insert({
         creator_id: creatorId,
@@ -404,7 +516,15 @@ export async function POST(request: Request) {
         visible_to_creator: false,
         phase_id: milestone?.phase_id || null,
       });
-    console.log('[approve-milestone] Auto-note created');
+
+    if (auditNoteError) {
+      // The approval itself already happened, so this does not fail the request.
+      // But an audit trail with holes in it is worse than none, so it is logged
+      // loudly rather than dropped.
+      console.error('[approve-milestone] Audit note failed to write:', auditNoteError.message);
+    } else {
+      console.log('[approve-milestone] Auto-note created');
+    }
 
     // 6. Send email to creator
     const resendApiKey = process.env.RESEND_API_KEY;
@@ -415,8 +535,8 @@ export async function POST(request: Request) {
         : `You've completed this phase! Check your portal for what's next.`;
 
       const emailSubject = isOutOfOrder
-        ? `Creator Studio | Milestone completed: ${milestone?.title || milestone?.name || 'Your milestone'}`
-        : `Creator Studio | You're approved — next step unlocked!`;
+        ? `Creator Studio | Milestone completed: ${milestone?.name || 'Your milestone'}`
+        : `Creator Studio | You're approved, next step unlocked`;
 
       await fetch('https://api.resend.com/emails', {
         method: 'POST',
@@ -430,19 +550,19 @@ export async function POST(request: Request) {
           subject: emailSubject,
           html: `
             <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
-              <h2 style="color: #1e2749;">Great news, ${creator.name}! 🎉</h2>
+              <h2 style="color: #1e2749;">Great news, ${creator.name}!</h2>
 
               <p>The TDI team has updated your progress:</p>
 
               <div style="background: #f0fdf4; border-left: 4px solid #22c55e; padding: 16px; margin: 20px 0;">
-                <strong style="color: #166534;">✓ Completed:</strong> ${milestone?.title || milestone?.name || 'Your milestone'}
+                <strong style="color: #166534;">Completed:</strong> ${milestone?.name || 'Your milestone'}
               </div>
 
               <p>${nextStepText}</p>
 
               <a href="https://www.teachersdeserveit.com/creator-portal/dashboard"
                  style="display: inline-block; background: #1e2749; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; margin-top: 16px;">
-                Continue in Creator Studio →
+                Continue in Creator Studio
               </a>
 
               <p style="color: #666; margin-top: 30px; font-size: 14px;">

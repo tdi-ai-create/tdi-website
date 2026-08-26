@@ -199,12 +199,6 @@ async function loadBoard(supabase: DbClient, projectId: string): Promise<Milesto
   });
 }
 
-function dueDateFrom(allowanceDays: number): string {
-  const d = new Date();
-  d.setDate(d.getDate() + allowanceDays);
-  return d.toISOString().slice(0, 10);
-}
-
 /**
  * Puts a project on exactly one open step and returns it.
  *
@@ -306,26 +300,47 @@ export async function placeProject(
     if (error) return { ok: false, openStep: null, locked: 0, error: `Locking failed: ${error.message}` };
   }
 
-  // A team owned step carries no creator deadline, and a paused creator gets a
-  // correct board with no clock on it. Repairing a board and starting a clock
-  // are two different things, and treating them as one is why placement only
-  // ever ran on unpause.
-  const patch: Record<string, unknown> = {
-    status: 'available',
-    updated_at: new Date().toISOString(),
-  };
-  if (startClock && !next.requiresTeamAction) {
-    patch.opened_at = new Date().toISOString();
-    patch.due_on = dueDateFrom(next.allowanceDays);
-  }
-
+  // Opening the step. The clock is NOT set here.
+  //
+  // A trigger, creator_milestones_set_clock, fires BEFORE UPDATE OF status and
+  // stamps opened_at and due_on on any transition into available, using the
+  // step's own allowance_days and correctly leaving due_on null for team steps.
+  // It overwrites anything passed in the same statement, so setting the dates
+  // here does nothing and reads as though it works.
+  //
+  // That matters for pause. A paused creator is meant to get a correct board
+  // with no clock on it, and the trigger will give them a deadline regardless.
+  // So the clock is cleared afterwards, in a statement that does not touch
+  // status and therefore does not re-fire the trigger.
+  //
+  // When every writer has moved onto this engine, the trigger should retire and
+  // the dates move back into this function. Until then it is the safety net for
+  // the other writers and has to keep working.
   const { error: openError } = await supabase
     .from('creator_milestones')
-    .update(patch)
+    .update({ status: 'available', updated_at: new Date().toISOString() })
     .eq('id', next.recordId);
 
   if (openError) {
     return { ok: false, openStep: null, locked: toLock.length, error: `Opening the step failed: ${openError.message}` };
+  }
+
+  if (!startClock) {
+    const { error: clockError } = await supabase
+      .from('creator_milestones')
+      .update({ due_on: null, opened_at: null, updated_at: new Date().toISOString() })
+      .eq('id', next.recordId);
+
+    if (clockError) {
+      // A paused creator silently carrying a deadline is exactly the outcome
+      // this exists to prevent, so it fails loudly rather than being logged.
+      return {
+        ok: false,
+        openStep: null,
+        locked: toLock.length,
+        error: `The step opened but its clock could not be cleared: ${clockError.message}`,
+      };
+    }
   }
 
   return {
@@ -383,15 +398,16 @@ export async function advanceStep(
   const effective: StepDecision = capReached ? 'approve' : decision;
 
   if (effective === 'changes') {
-    const allowance = (row.milestones as { allowance_days?: number })?.allowance_days ?? 14;
+    // The clock restarts here, giving them the step's full allowance again to
+    // revise. The set_step_clock trigger does that on the transition back into
+    // available, so no dates are set in this statement: anything passed would
+    // be overwritten by the identical value and read as though it mattered.
     const { error } = await supabase
       .from('creator_milestones')
       .update({
         status: 'available',
         review_status: 'changes_requested',
         round: round + 1,
-        opened_at: now,
-        due_on: dueDateFrom(allowance),
         updated_at: now,
       })
       .eq('id', milestoneRecordId);
