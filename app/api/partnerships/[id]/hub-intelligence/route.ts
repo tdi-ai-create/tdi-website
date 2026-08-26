@@ -1,15 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from '@supabase/supabase-js'
+import { resolvePartnershipMembers } from '@/lib/hub/partnership-members';
 
 const hubSupabase = createClient(
   process.env.LEARNING_HUB_SUPABASE_URL || process.env.NEXT_PUBLIC_LEARNING_HUB_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.LEARNING_HUB_SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
-const portalSupabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
 
 /**
  * GET /api/partnerships/[id]/hub-intelligence
@@ -31,38 +28,12 @@ export async function GET(
   const { id: partnershipId } = await params;
 
   try {
-    // Step 1: Find Hub user IDs for this partnership
-    // Try org members first, then fallback to name matching
-    const { data: members } = await portalSupabase
-      .from('hub_org_members')
-      .select('user_id')
-      .eq('partnership_id', partnershipId);
-
-    let userIds: string[] = (members || []).map(m => m.user_id);
-
-    if (userIds.length === 0) {
-      const { data: org } = await portalSupabase
-        .from('organizations')
-        .select('name')
-        .eq('partnership_id', partnershipId)
-        .single();
-
-      const { data: partnership } = await portalSupabase
-        .from('partnerships')
-        .select('contact_name')
-        .eq('id', partnershipId)
-        .single();
-
-      const orgName = org?.name || partnership?.contact_name || '';
-      if (orgName) {
-        const { data: profiles } = await hubSupabase
-          .from('hub_profiles')
-          .select('id')
-          .or(`school_name.ilike.%${orgName}%,district.ilike.%${orgName}%`)
-          .limit(200);
-        userIds = (profiles || []).map(p => p.id);
-      }
-    }
+    // Step 1: who belongs to this partnership.
+    // One definition, in lib/hub/partnership-members. Previously this read the
+    // unpopulated hub_org_members join through the portal client, then fell back
+    // to wildcard name matching against hub_profiles, which can attribute an
+    // unrelated school's data to a partner.
+    const { userIds } = await resolvePartnershipMembers(partnershipId);
 
     if (userIds.length === 0) {
       return NextResponse.json({ hasData: false });

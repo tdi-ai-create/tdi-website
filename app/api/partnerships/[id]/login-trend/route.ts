@@ -1,10 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { getHubServiceClient, resolvePartnershipMembers } from '@/lib/hub/partnership-members'
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+const supabase = getHubServiceClient()
 
 export interface LoginTrendWeek {
   weekLabel: string
@@ -19,16 +16,13 @@ export async function GET(
   const { id: partnershipId } = await params
 
   try {
-    const { data: members } = await supabase
-      .from('hub_org_members')
-      .select('user_id')
-      .eq('partnership_id', partnershipId)
+    // Who belongs to this partnership. One definition, in lib/hub/partnership-members.
+    // This previously read an unpopulated join table through the portal client.
+    const { userIds } = await resolvePartnershipMembers(partnershipId)
 
-    if (!members || members.length === 0) {
+    if (userIds.length === 0) {
       return NextResponse.json({ weeks: [], has_data: false, member_count: 0 })
     }
-
-    const userIds = members.map((m) => m.user_id)
 
     // 12 weeks back from today
     const now = new Date()
@@ -37,8 +31,8 @@ export async function GET(
     const { data: activity } = await supabase
       .from('hub_activity_log')
       .select('user_id, created_at')
+      .neq('action', 'account_provisioned')
       .in('user_id', userIds)
-      .eq('is_example', false)
       .gte('created_at', twelveWeeksAgo.toISOString())
       .order('created_at')
 
