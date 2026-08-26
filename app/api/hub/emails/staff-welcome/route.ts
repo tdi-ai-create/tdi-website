@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
 
         <ul style="margin:0 0 14px;padding-left:20px;">
           <li style="margin-bottom:6px;">Quick Wins that take 5 minutes and work the next class period</li>
-          <li style="margin-bottom:6px;">Courses that count toward your PD hours</li>
+          <li style="margin-bottom:6px;">Short courses you can take a lesson at a time</li>
           <li style="margin-bottom:6px;">Stress management tools for the hard days</li>
           <li style="margin-bottom:6px;">Classroom strategies built by real teachers</li>
         </ul>
