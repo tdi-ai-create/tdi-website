@@ -183,17 +183,56 @@ export async function GET(request: NextRequest) {
     const SEEDED_NATIONAL = /(NEA Learning|Walmart Spark)/i
     const DISCOVERY_NAME = 'Local funder discovery'
 
+    // How often we go looking again. Local money is not a fixed list: budgets
+    // are adopted, foundations open cycles, a district's circumstances change.
+    // Rae's framing is that the system should always be looking, so absence of
+    // a grant this month is never evidence there is nothing to find.
+    const DISCOVERY_INTERVAL_DAYS = 30
+    const nowMs = Date.now()
+
     for (const p of pursuits) {
       const oppsHere = opportunities.filter(o => o.pursuit_id === p.id)
       if (oppsHere.length === 0) continue
 
-      // Already has one, or already has a genuinely local source: nothing to do.
-      if (oppsHere.some(o => (o.name || '') === DISCOVERY_NAME)) continue
-      const hasLocal = oppsHere.some(o => {
+      // When did anyone last look for local money for this school?
+      //
+      // This replaces two guards that each locked discovery off permanently
+      // rather than pausing it. The first skipped any pursuit that already had
+      // a placeholder, and the placeholder is never deleted, only closed. The
+      // second skipped any pursuit that had a local opportunity, so the moment
+      // discovery succeeded it disqualified the school from ever running again.
+      // Together they meant discovery could run exactly once per school, which
+      // is what happened: three placeholders on 19 August and nothing since.
+      //
+      // Both questions collapse into one that is actually about time. A closed
+      // placeholder and a real local grant are both evidence that somebody
+      // looked, and both go stale.
+      const lastLookedAt = oppsHere.reduce<number>((newest, o) => {
+        const isPlaceholder = (o.name || '').startsWith(DISCOVERY_NAME)
         const cat = (o.plan_category || '').toUpperCase()
-        return (cat === 'C' || cat === 'D') && !SEEDED_NATIONAL.test(o.name || '')
-      })
-      if (hasLocal) continue
+        const isLocalFind =
+          (cat === 'C' || cat === 'D') && !SEEDED_NATIONAL.test(o.name || '')
+        if (!isPlaceholder && !isLocalFind) return newest
+        const at = o.created_at ? new Date(o.created_at).getTime() : 0
+        return at > newest ? at : newest
+      }, 0)
+
+      // If last cycle's placeholder is still open, the work is queued and not
+      // yet done. Adding a second one does not make an agent more likely to
+      // pick it up; it just stacks unworked rows on the school. Wait.
+      const openPlaceholder = oppsHere.some(
+        o =>
+          (o.name || '').startsWith(DISCOVERY_NAME) &&
+          !['closed', 'awarded', 'denied', 'archived'].includes(
+            (o.status || '').toLowerCase()
+          )
+      )
+      if (openPlaceholder) continue
+
+      const daysSinceLook = lastLookedAt
+        ? Math.floor((nowMs - lastLookedAt) / 86400000)
+        : Infinity
+      if (daysSinceLook < DISCOVERY_INTERVAL_DAYS) continue
 
       const school = (p.district_name || p.pursuit_name || '')
         .replace(/^\(RENEWAL\)\s*/i, '')
@@ -234,7 +273,7 @@ export async function GET(request: NextRequest) {
         ? { error: null }
         : await supabase.from('funding_opportunities').insert({
         pursuit_id: p.id,
-        name: DISCOVERY_NAME,
+        name: `${DISCOVERY_NAME} — ${new Date(nowMs).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`,
         plan_category: 'C',
         status: 'not_started',
         waiting_on: 'tdi',

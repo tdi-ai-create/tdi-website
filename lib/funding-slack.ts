@@ -111,13 +111,22 @@ export async function postFundingEvent(event: SlackEvent): Promise<void> {
   // Write to timeline (durable record)
   if (event.timelineTitle) {
     try {
-      await db().from('funding_pursuit_timeline').insert({
-        pursuit_id: event.pursuitId,
-        event_date: new Date().toISOString().split('T')[0],
-        event_title: event.timelineTitle,
-        event_detail: event.timelineDetail || event.message,
-        status: 'complete',
-      })
+      // The error is destructured, not left to the catch below. Supabase
+      // returns database errors rather than throwing them, so this try/catch
+      // never fired for a failed insert: the timeline entry vanished while the
+      // code looked careful. That is the shape behind the silent write bugs.
+      const { error: timelineErr } = await db()
+        .from('funding_pursuit_timeline')
+        .insert({
+          pursuit_id: event.pursuitId,
+          event_date: new Date().toISOString().split('T')[0],
+          event_title: event.timelineTitle,
+          event_detail: event.timelineDetail || event.message,
+          status: 'complete',
+        })
+      if (timelineErr) {
+        console.error(LOG, 'Timeline write failed:', timelineErr.message)
+      }
     } catch (err) {
       console.error(LOG, 'Timeline write failed:', err)
     }
