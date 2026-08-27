@@ -19,8 +19,8 @@ import { TDISuggestions } from '@/components/dashboard/shared/TDISuggestions'
 import { STATIC_DEFAULTS } from '@/lib/dashboard/dashboardDefaults'
 import { generateSuggestions, type TDISuggestion } from '@/lib/dashboard/generateSuggestions'
 import { StaffRosterWithPhotos, StaffPhotoUpload, FindStaffSearch } from '@/components/tdi-admin/leadership/staff'
-import { ArrowLeft, Loader2, Building2, ExternalLink, Calendar, Mail, Phone, MessageCircle, Eye, FileText, BarChart3, Users, AlertTriangle, TrendingUp, Briefcase, Edit3, ChevronRight, X,
-  Target,
+import { ArrowLeft, Loader2, Building2, ExternalLink, Calendar, Mail, Phone, MessageCircle, Eye,
+  FileText, BarChart3, Users, AlertTriangle, TrendingUp, Briefcase, Edit3, X, Target,
 } from 'lucide-react'
 import Image from 'next/image'
 import ObservationImpactScorecard from '@/components/dashboard/leadership/ObservationImpactScorecard'
@@ -181,6 +181,27 @@ export default function AdminPartnershipDetailPage() {
   const [showKpiSelector, setShowKpiSelector] = useState(false)
   const [showSchoolInfo, setShowSchoolInfo] = useState(false)
   const [showObservationPanel, setShowObservationPanel] = useState(false)
+
+  // Opening one panel closes the others. Reports has no panel of its own, it
+  // just scrolls to the report buttons that are already on the page.
+  type DetailPanel = 'people' | 'observations' | 'reports' | 'team' | 'client' | 'record'
+  function openPanel(panel: DetailPanel) {
+    const next = {
+      people: panel === 'people' ? !show90DaysPanel : false,
+      observations: panel === 'observations' ? !showObservationPanel : false,
+      team: panel === 'team' ? !showTeamPanel : false,
+      client: panel === 'client' ? !showOverviewPanel : false,
+      record: panel === 'record' ? !showSchoolInfo : false,
+    }
+    setShow90DaysPanel(next.people)
+    setShowObservationPanel(next.observations)
+    setShowTeamPanel(next.team)
+    setShowOverviewPanel(next.client)
+    setShowSchoolInfo(next.record)
+    if (panel === 'reports') {
+      document.getElementById('leadership-reports')?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }
+  }
 
   // Inline editing state for partnership goal
   const [editingField, setEditingField] = useState<string | null>(null)
@@ -1609,7 +1630,7 @@ export default function AdminPartnershipDetailPage() {
             </div>
 
             {/* ─── 5. Reports Card ───────────────────────────────────── */}
-            <div className="bg-white rounded-2xl shadow-sm p-4">
+            <div id="leadership-reports" className="bg-white rounded-2xl shadow-sm p-4">
               <div className="flex items-center gap-2 mb-3">
                 <BarChart3 size={14} style={{ color: '#1e2749' }} />
                 <h3 className="text-sm font-bold text-gray-900">Reports</h3>
@@ -1662,50 +1683,40 @@ export default function AdminPartnershipDetailPage() {
                 ))}
               </div>
 
-              {/* Quick view panels */}
-              <div className="mt-3 space-y-1.5">
-                <button
-                  onClick={() => setShowObservationPanel(!showObservationPanel)}
-                  className="w-full flex items-center justify-between px-2.5 py-2 rounded-lg border border-gray-100 hover:bg-gray-50 text-left transition"
-                >
-                  <span className="text-xs font-medium text-gray-700">Observations & Love Notes</span>
-                  <ChevronRight size={12} style={{ color: '#9CA3AF', transform: showObservationPanel ? 'rotate(90deg)' : 'none', transition: 'transform 0.15s' }} />
-                </button>
-                <button
-                  onClick={() => setShowTeamPanel(!showTeamPanel)}
-                  className="w-full flex items-center justify-between px-2.5 py-2 rounded-lg border border-gray-100 hover:bg-gray-50 text-left transition"
-                >
-                  <span className="text-xs font-medium text-gray-700">Staff Roster & Team</span>
-                  <ChevronRight size={12} style={{ color: '#9CA3AF', transform: showTeamPanel ? 'rotate(90deg)' : 'none', transition: 'transform 0.15s' }} />
-                </button>
-                <button
-                  onClick={() => setShow90DaysPanel(!show90DaysPanel)}
-                  className="w-full flex items-center justify-between px-2.5 py-2 rounded-lg border border-gray-100 hover:bg-gray-50 text-left transition"
-                >
-                  <span className="text-xs font-medium text-gray-700">90 Days Framework</span>
-                  <ChevronRight size={12} style={{ color: '#9CA3AF', transform: show90DaysPanel ? 'rotate(90deg)' : 'none', transition: 'transform 0.15s' }} />
-                </button>
-                <Link
-                  href="/tdi-admin/billing"
-                  className="w-full flex items-center justify-between px-2.5 py-2 rounded-lg border border-gray-100 hover:bg-gray-50 text-left transition"
-                >
-                  <span className="text-xs font-medium text-gray-700">Billing</span>
-                  <span className="text-[10px] font-semibold" style={{ color: '#B45309' }}>Open →</span>
-                </Link>
-                <button
-                  onClick={() => setShowOverviewPanel(!showOverviewPanel)}
-                  className="w-full flex items-center justify-between px-2.5 py-2 rounded-lg border border-gray-100 hover:bg-gray-50 text-left transition"
-                >
-                  <span className="text-xs font-medium text-gray-700">Overview (Client View)</span>
-                  <ChevronRight size={12} style={{ color: '#9CA3AF', transform: showOverviewPanel ? 'rotate(90deg)' : 'none', transition: 'transform 0.15s' }} />
-                </button>
-                <button
-                  onClick={() => setShowSchoolInfo(!showSchoolInfo)}
-                  className="w-full flex items-center justify-between px-2.5 py-2 rounded-lg border border-gray-100 hover:bg-gray-50 text-left transition"
-                >
-                  <span className="text-xs font-medium text-gray-700">School Info & Settings</span>
-                  <ChevronRight size={12} style={{ color: '#9CA3AF', transform: showSchoolInfo ? 'rotate(90deg)' : 'none', transition: 'transform 0.15s' }} />
-                </button>
+              {/* One panel at a time, as tabs rather than a stack of toggles.
+                  These were six independent booleans, so any combination could
+                  be open at once and the page had no sense of where you were.
+                  Same panels, one place. */}
+              <div className="mt-3 flex flex-wrap gap-1 p-1 rounded-xl" style={{ background: '#F1F3F8' }}>
+                {([
+                  ['people', 'Your people'],
+                  ['observations', 'Observations'],
+                  ['reports', 'Reports'],
+                  ['team', 'Roster'],
+                  ['client', 'Client view'],
+                  ['record', 'Record'],
+                ] as const).map(([key, label]) => {
+                  const active =
+                    (key === 'people' && show90DaysPanel) ||
+                    (key === 'observations' && showObservationPanel) ||
+                    (key === 'team' && showTeamPanel) ||
+                    (key === 'client' && showOverviewPanel) ||
+                    (key === 'record' && showSchoolInfo);
+                  return (
+                    <button
+                      key={key}
+                      onClick={() => openPanel(key)}
+                      className="px-3 py-1.5 rounded-lg text-[12px] font-semibold transition-colors"
+                      style={{
+                        background: active ? '#FFFFFF' : 'transparent',
+                        color: active ? '#2B3A67' : '#6B7280',
+                        boxShadow: active ? '0 1px 3px rgba(27,42,74,.08)' : 'none',
+                      }}
+                    >
+                      {label}
+                    </button>
+                  );
+                })}
               </div>
 
               {/* Hub provisioning */}
