@@ -401,6 +401,17 @@ export async function POST(request: NextRequest) {
         application_closes: applicationCloses || null,
         waiting_on: waitingOn || 'tdi',
         narrative_status: narrativeStatus || 'not_started',
+        // A newly discovered funder is by definition not yet understood. We
+        // rarely know its dates, its focus or whether the school qualifies at
+        // the moment it is found.
+        //
+        // This was never set, so it defaulted to 'none', and the research
+        // branch of find_work matches only 'requested'. Discovery therefore
+        // created work that nothing could ever pick up. All nine funders found
+        // on 19 Aug, including a community foundation twelve miles from
+        // Saunemin and a Catholic education trust in St. Peter Chanel's own
+        // diocese, have sat untouched since.
+        research_status: 'requested',
       })
       .select()
       .single()
