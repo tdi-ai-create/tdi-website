@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { createSupabaseServerClient } from '@/lib/supabase-server';
 import { progressMilestone } from '@/lib/milestone-progression';
+import { creatorFlag } from '@/lib/creator-flags';
+import { advanceStep, resolveStepRow } from '@/lib/creator-step-engine';
 import { isTDIAdmin } from '@/lib/is-tdi-admin';
 
 const VALID_CONTENT_PATHS = ['blog', 'download', 'course'] as const;
@@ -107,24 +109,58 @@ export async function POST(request: Request) {
       }, { status: 422 });
     }
 
-    const { nextMilestoneName, phaseId } = await progressMilestone(
-      supabase as Parameters<typeof progressMilestone>[0],
-      {
-        creatorId,
-        milestoneId: milestone.id,
-        completedBy: `admin:${adminEmail}`,
-        contentPath,
-      },
-    );
+    let nextMilestoneName: string | null;
+    let phaseId: string | null;
+
+    if (await creatorFlag(supabase, 'step_engine')) {
+      const resolved = await resolveStepRow(supabase, creatorId, milestone.id);
+      if (resolved.error || !resolved.recordId) {
+        return NextResponse.json({ success: false, error: resolved.error }, { status: 400 });
+      }
+
+      const { data: creatorRow } = await supabase
+        .from('creators')
+        .select('lifecycle_state')
+        .eq('id', creatorId)
+        .maybeSingle();
+
+      const advanced = await advanceStep(supabase, {
+        milestoneRecordId: resolved.recordId,
+        decision: 'approve',
+        actor: `admin:${adminEmail}`,
+        startClock: creatorRow?.lifecycle_state !== 'paused',
+      });
+
+      if (!advanced.ok) {
+        return NextResponse.json({ success: false, error: advanced.error }, { status: 500 });
+      }
+
+      nextMilestoneName = advanced.openStep?.name ?? null;
+      phaseId = advanced.openStep?.phaseId ?? null;
+    } else {
+      ({ nextMilestoneName, phaseId } = await progressMilestone(
+        supabase as Parameters<typeof progressMilestone>[0],
+        {
+          creatorId,
+          milestoneId: milestone.id,
+          completedBy: `admin:${adminEmail}`,
+          contentPath,
+        },
+      ));
+    }
 
     if (notes && typeof notes === 'string' && notes.trim()) {
-      await supabase.from('creator_notes').insert({
+      const { error: noteError } = await supabase.from('creator_notes').insert({
         creator_id: creatorId,
         content: notes.trim(),
         author: adminEmail,
         visible_to_creator: false,
         phase_id: phaseId || null,
       });
+
+      if (noteError) {
+        console.error('[advance] The admin note failed to save:', noteError.message);
+      }
     }
 
     return NextResponse.json({ success: true, nextMilestone: nextMilestoneName });

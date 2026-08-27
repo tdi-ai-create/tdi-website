@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { progressMilestone } from '@/lib/milestone-progression';
+import { creatorFlag } from '@/lib/creator-flags';
+import { advanceStep, resolveStepRow } from '@/lib/creator-step-engine';
 import { CREATOR_STUDIO_RECIPIENTS } from '@/lib/creator-notification-recipients';
 
 export async function POST(request: NextRequest) {
@@ -131,16 +133,41 @@ export async function POST(request: NextRequest) {
       // wrong one in front of them.
       const { data: creatorRow } = await supabase
         .from('creators')
-        .select('content_path')
+        .select('content_path, lifecycle_state')
         .eq('id', creatorId)
         .single();
 
-      await progressMilestone(supabase, {
-        creatorId,
-        milestoneId,
-        completedBy: signedName || 'creator',
-        contentPath: creatorRow?.content_path ?? null,
-      });
+      if (await creatorFlag(supabase, 'step_engine')) {
+        const resolved = await resolveStepRow(supabase, creatorId, milestoneId);
+        if (resolved.error || !resolved.recordId) {
+          console.error('[sign-agreement] Engine could not find the agreement step:', resolved.error);
+          return NextResponse.json({ success: false, error: resolved.error }, { status: 400 });
+        }
+
+        const advanced = await advanceStep(supabase, {
+          milestoneRecordId: resolved.recordId,
+          decision: 'approve',
+          actor: `creator:${signedName || creatorId}`,
+          startClock: creatorRow?.lifecycle_state !== 'paused',
+        });
+
+        if (!advanced.ok) {
+          // Signing is the gate on everything after it. If the board did not
+          // move, saying the agreement is signed leaves them stuck on a step
+          // they have already completed.
+          console.error('[sign-agreement] Engine refused to advance:', advanced.error);
+          return NextResponse.json({ success: false, error: advanced.error }, { status: 500 });
+        }
+
+        console.log('[sign-agreement] Engine advanced. Next:', advanced.openStep?.name ?? 'end of path');
+      } else {
+        await progressMilestone(supabase, {
+          creatorId,
+          milestoneId,
+          completedBy: signedName || 'creator',
+          contentPath: creatorRow?.content_path ?? null,
+        });
+      }
     } else {
       console.warn('[sign-agreement] No agreement milestones found - agreement signed but milestone not updated');
     }
@@ -184,15 +211,13 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Create admin notification
-    await supabase
-      .from('admin_notifications')
-      .insert({
-        creator_id: creatorId,
-        type: 'agreement_signed',
-        message: `${existingCreator.name} signed their creator agreement`,
-        link: `/admin/creators/${creatorId}`,
-      });
+    // There is no admin_notifications table in this database, verified 27 Aug
+    // 2026. This wrote into nothing, so every agreement signed since it was
+    // added notified nobody while the code read as though it had.
+    //
+    // The team already learns about a signature from the email below and from
+    // the Waiting on TDI list, so nothing is lost by removing it. Putting the
+    // write back means creating the table first.
 
     return NextResponse.json({ success: true });
   } catch (error) {

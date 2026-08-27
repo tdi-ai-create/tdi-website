@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { placeCreator } from '@/lib/creator-placement';
+import { creatorFlag } from '@/lib/creator-flags';
+import { placeCreatorProjects } from '@/lib/creator-step-engine';
 
 export async function POST(
   request: NextRequest,
@@ -48,9 +50,20 @@ export async function POST(
     // the board everyone else had before 19 August: every step open at once,
     // no dates, no order. Holly Stuart came back that way and filled nine of
     // the twelve slots in the next morning's waiting on TDI message.
-    const placement = await placeCreator(supabase, creator.id)
+    // Each project placed on its own. The old placeCreator read every row a
+    // creator owned across all projects and locked all but one, which
+    // collapsed a two-project creator onto a single open step.
+    //
+    // The clock starts here because they are coming back. That is the one
+    // moment a returning creator should get a date, and it runs from today
+    // rather than from whenever they left.
+    const useEngine = await creatorFlag(supabase, 'step_engine')
+    const placement = useEngine
+      ? await placeCreatorProjects(supabase, creator.id, { startClock: true })
+      : await placeCreator(supabase, creator.id)
     if (!placement.ok) {
-      console.error('[unpause] Placement failed, creator is active but their board was not reset:', placement.error)
+      const why = 'errors' in placement ? placement.errors.join('; ') : placement.error
+      console.error('[unpause] Placement failed, creator is active but their board was not reset:', why)
     }
 
     await (supabase.from('creator_pause_history') as any).insert({
