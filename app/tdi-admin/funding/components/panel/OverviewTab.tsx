@@ -1,5 +1,6 @@
 'use client'
 import { readSchoolProfile } from '@/lib/funding/school-profile'
+import { SchoolFactsPanel } from './SchoolFactsPanel'
 
 import { useState } from 'react'
 import { OwnerAvatar, ownerName } from '../OwnerAvatar'
@@ -278,6 +279,11 @@ export function OverviewTab({ pursuit, gate: initialGate, onGateUpdate, partners
 
       {/* School Profile + Data Quality */}
       <SchoolProfileSection pursuit={p} />
+
+      {/* The same school, but showing which of those values can actually be
+          used. The panel above answers "what do we have". This answers "what
+          can we stand behind", and they are not the same question. */}
+      <SchoolFactsPanel pursuitId={p.id} />
 
       {/* Funding Stats */}
       <Section title="Funding Stats">
