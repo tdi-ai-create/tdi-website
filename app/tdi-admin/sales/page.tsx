@@ -1559,7 +1559,6 @@ export default function SalesPage() {
                           onClick={async () => {
                             if (!confirm(`Delete contract "${q.title}"? This cannot be undone.`)) return
                             await supabase.from('quote_packages').delete().eq('quote_id', q.id)
-                            await supabase.from('quote_invoices').delete().eq('quote_id', q.id)
                             await supabase.from('quotes').delete().eq('id', q.id)
                             setQuotes(prev => prev.filter(qq => qq.id !== q.id))
                             showToastMsg(`Contract "${q.title}" deleted`, 'success')
