@@ -8,6 +8,7 @@ import {
 } from '@/lib/creator-slack'
 import { buildActionQueue, summarizeGoals, QUEUE_LABELS } from '@/lib/recruitment-goals'
 import { normalizeEmail, conversionBlockedMessage } from '@/lib/recruitment-contact'
+import { requireAdminAuth } from '@/lib/tdi-admin/auth'
 
 const GAP_PRIORITIES = ['critical', 'high', 'medium', 'low']
 const GAP_STATUSES = ['active', 'filled', 'monitoring']
@@ -16,8 +17,16 @@ const CONTENT_PATHS = ['course', 'download', 'blog']
 /**
  * Admin Creator Recruitment API -- Used by the TDI Admin Portal UI
  *
- * No PAPERCLIP_SYNC_KEY required (admin session handles auth).
- * Provides read/write access to the recruitment pipeline for the admin UI.
+ * Read/write access to the recruitment pipeline for the admin UI.
+ *
+ * This file used to carry the line "No PAPERCLIP_SYNC_KEY required (admin
+ * session handles auth)". No session was ever checked. An unauthenticated GET
+ * returned the whole candidate pipeline, names, schools and roles included, and
+ * POST accepted nominate, update_gap and convert_to_creator from anyone.
+ *
+ * Middleware does not help. It refreshes a session cookie when one exists and
+ * says so in its own comment: it does not block unauthenticated requests. The
+ * guard has to be in the route.
  */
 
 function db() {
@@ -28,8 +37,32 @@ function db() {
   )
 }
 
+/**
+ * A pipeline note, written so a failure cannot pass unnoticed.
+ *
+ * Every note insert on this route discarded its error. That is the shape that
+ * silently broke five features in two days: the write fails, nothing looks at
+ * the result, and the caller reports success. These are secondary writes, so a
+ * failure must not fail the request the way a lost note must not be invisible.
+ * Log it and return it.
+ */
+async function recordNote(
+  supabase: ReturnType<typeof db>,
+  row: Record<string, unknown>
+): Promise<string | null> {
+  const { error } = await supabase.from('creator_recruitment_notes').insert(row)
+  if (error) {
+    console.error('[creator-recruitment] note insert failed:', error.message, row)
+    return error.message
+  }
+  return null
+}
+
 // GET -- Read pipeline data for admin UI
 export async function GET(request: NextRequest) {
+  const auth = await requireAdminAuth()
+  if (auth instanceof NextResponse) return auth
+
   const url = request.nextUrl
   const action = url.searchParams.get('action')
   const supabase = db()
@@ -273,6 +306,9 @@ export async function GET(request: NextRequest) {
 
 // POST -- Write pipeline data from admin UI
 export async function POST(request: NextRequest) {
+  const auth = await requireAdminAuth()
+  if (auth instanceof NextResponse) return auth
+
   const body = await request.json()
   const action = body.action
   const supabase = db()
@@ -299,7 +335,7 @@ export async function POST(request: NextRequest) {
 
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-    await supabase.from('creator_recruitment_notes').insert({
+    await recordNote(supabase, {
       candidate_id,
       content: `Outreach approved by ${approved_by || 'admin'}${edited_outreach ? ' (with edits)' : ''}`,
       author: approved_by || 'admin',
@@ -332,7 +368,7 @@ export async function POST(request: NextRequest) {
 
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-    await supabase.from('creator_recruitment_notes').insert({
+    await recordNote(supabase, {
       candidate_id,
       content: 'Outreach sent',
       author: 'system',
@@ -370,7 +406,7 @@ export async function POST(request: NextRequest) {
 
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-    await supabase.from('creator_recruitment_notes').insert({
+    await recordNote(supabase, {
       candidate_id,
       content: `Response received. New stage: ${new_stage}. ${response_notes || ''}`.trim(),
       author: 'system',
@@ -404,7 +440,7 @@ export async function POST(request: NextRequest) {
 
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-    await supabase.from('creator_recruitment_notes').insert({
+    await recordNote(supabase, {
       candidate_id,
       content: `Stage changed to: ${stage}${stageNotes ? '. ' + stageNotes : ''}`,
       author: 'admin',
@@ -480,7 +516,7 @@ export async function POST(request: NextRequest) {
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
     if (payload.email) {
-      await supabase.from('creator_recruitment_notes').insert({
+      await recordNote(supabase, {
         candidate_id,
         content: `Email recorded: ${payload.email}`,
         author: 'admin',
@@ -541,10 +577,13 @@ export async function POST(request: NextRequest) {
     // Keep the candidate row in step, so the address is not lost if the
     // creator insert fails for some other reason.
     if (checked.email !== candidate.email) {
-      await supabase
+      const { error: emailSyncErr } = await supabase
         .from('creator_recruitment_candidates')
         .update({ email: checked.email })
         .eq('id', candidate_id)
+      if (emailSyncErr) {
+        console.error('[creator-recruitment] candidate email sync failed:', emailSyncErr.message)
+      }
     }
 
     const finalContentPath = content_path || candidate.content_path || 'course'
@@ -568,10 +607,16 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: creatorErr?.message || 'Failed to create creator' }, { status: 500 })
     }
 
-    await supabase
+    const warnings: string[] = []
+
+    const { error: archiveErr } = await supabase
       .from('creator_recruitment_candidates')
       .update({ stage: 'archived', converted_creator_id: creator.id })
       .eq('id', candidate_id)
+    if (archiveErr) {
+      console.error('[creator-recruitment] archiving the converted candidate failed:', archiveErr.message)
+      warnings.push('The creator was made but the candidate is still showing in the pipeline.')
+    }
 
     if (candidate.gap_id) {
       const { data: gap } = await supabase
@@ -581,26 +626,38 @@ export async function POST(request: NextRequest) {
         .single()
 
       if (gap) {
-        await supabase
+        const { error: gapErr } = await supabase
           .from('creator_content_gaps')
           .update({ active_creator_count: (gap.active_creator_count || 0) + 1 })
           .eq('id', candidate.gap_id)
+        if (gapErr) {
+          console.error('[creator-recruitment] gap creator count not incremented:', gapErr.message)
+          warnings.push('The gap still shows its old creator count.')
+        }
       }
     }
 
-    await supabase.from('creator_recruitment_notes').insert({
+    const noteErr = await recordNote(supabase, {
       candidate_id,
       content: `Converted to creator (ID: ${creator.id})`,
       author: 'admin',
       note_type: 'stage_change',
     })
+    if (noteErr) warnings.push('The conversion note was not saved.')
 
     // Slack notification (non-blocking)
     try {
       recruitmentCandidateConverted(candidate.name, candidate.name, finalContentPath).catch(() => {})
     } catch {}
 
-    return NextResponse.json({ success: true, creator_id: creator.id })
+    // A partial conversion has to look different from a clean one. Collecting
+    // warnings and then dropping them would just be the original bug wearing a
+    // helper function.
+    return NextResponse.json({
+      success: true,
+      creator_id: creator.id,
+      ...(warnings.length ? { warnings } : {}),
+    })
   }
 
   // ─── create_gap: a human adds a content gap ───
@@ -749,7 +806,7 @@ export async function POST(request: NextRequest) {
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
     if (nominationNotes) {
-      await supabase.from('creator_recruitment_notes').insert({
+      await recordNote(supabase, {
         candidate_id: candidate.id,
         content: nominationNotes,
         author: nominated_by || 'admin',
@@ -789,7 +846,7 @@ export async function POST(request: NextRequest) {
 
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-    await supabase.from('creator_recruitment_notes').insert({
+    await recordNote(supabase, {
       candidate_id,
       content: `Dismissed${reason ? ': ' + reason : ''}`,
       author: 'admin',
