@@ -28,6 +28,7 @@ import BriefingModal from '@/components/tdi-admin/leadership/BriefingModal'
 import ActionItemsSidebar from '@/components/tdi-admin/leadership/ActionItemsSidebar'
 import ErrorBoundary from '@/components/tdi-admin/leadership/ErrorBoundary'
 import YourPeoplePanel from '@/components/tdi-admin/leadership/YourPeoplePanel'
+import LogSessionPanel from '@/components/tdi-admin/leadership/LogSessionPanel'
 import ObservationPanel from '@/components/tdi-admin/leadership/ObservationPanel'
 
 const NOTE_TYPE_COLORS: Record<string, string> = {
@@ -2205,6 +2206,23 @@ export default function AdminPartnershipDetailPage() {
                   <X size={18} />
                 </button>
               </div>
+              {/* Recording a session is what fills the school's own dashboard.
+                  complete-session has existed for months with zero callers,
+                  which is why teacher_quotes is empty for every partnership and
+                  0 of 62 deliverables are marked delivered. There was no
+                  button. This is the button. */}
+              <div className="mb-5">
+                <LogSessionPanel
+                  partnershipId={partnershipId}
+                  contracted={{
+                    observation: partnership?.observation_days_total || 0,
+                    virtual: partnership?.virtual_sessions_total || 0,
+                    executive: partnership?.executive_sessions_total || 0,
+                  }}
+                  onLogged={() => window.location.reload()}
+                />
+              </div>
+
               <ObservationPanel partnershipId={partnershipId} showToast={showToast} />
             </div>
           </div>
