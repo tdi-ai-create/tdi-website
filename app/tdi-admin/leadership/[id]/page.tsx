@@ -562,7 +562,10 @@ export default function AdminPartnershipDetailPage() {
     const loginThreshold = partnershipAge < 30 ? 7 : 14
 
     // Check last login
-    const lastLogin = partnership.last_principal_login
+    // partnerships.last_principal_login does not exist as a column, so this was
+    // always undefined and every school read "Never" regardless of reality.
+    // Five of the nine have real logins in activity_log.
+    const lastLogin = partnership.last_leader_login
     const daysSinceLogin = lastLogin
       ? Math.floor((Date.now() - new Date(lastLogin).getTime()) / (1000 * 60 * 60 * 24))
       : null
@@ -704,7 +707,7 @@ export default function AdminPartnershipDetailPage() {
     const metrics: { label: string; value: string; color: string }[] = []
 
     // Last login
-    const lastLogin = partnership.last_principal_login
+    const lastLogin = partnership.last_leader_login
     if (lastLogin) {
       const days = Math.floor((Date.now() - new Date(lastLogin).getTime()) / (1000 * 60 * 60 * 24))
       const color = days <= 3 ? '#10B981' : days <= 14 ? '#EAB308' : '#EF4444'
@@ -725,10 +728,16 @@ export default function AdminPartnershipDetailPage() {
     const grantTotal = grantPursuits.reduce((s, g) => s + (g.total_awarded || 0), 0)
     metrics.push({ label: 'Grant', value: grantTotal > 0 ? `$${grantTotal.toLocaleString()}` : '$0', color: '#8B5CF6' })
 
-    // Provisioned
-    const enrolled = partnership.staff_enrolled || 0
-    const totalStaff = hubStats?.member_count || partnership.total_staff || 0
-    metrics.push({ label: 'Provisioned', value: totalStaff > 0 ? `${enrolled}/${totalStaff}` : 'N/A', color: totalStaff === 0 ? '#9CA3AF' : enrolled >= totalStaff ? '#10B981' : '#EAB308' })
+    // Provisioned. This read staff_enrolled over member_count, which is
+    // contracted over provisioned, printed the wrong way round. Addison showed
+    // "136/128" when it has 128 of its 136 contracted seats live.
+    const contracted = partnership.staff_enrolled || 0
+    const provisioned = hubStats?.member_count || 0
+    metrics.push({
+      label: 'Provisioned',
+      value: contracted > 0 ? `${provisioned}/${contracted}` : provisioned > 0 ? `${provisioned}` : 'N/A',
+      color: contracted === 0 ? '#9CA3AF' : provisioned >= contracted ? '#10B981' : provisioned === 0 ? '#EF4444' : '#EAB308',
+    })
 
     // Hub Login %
     const loginPct = hubStats?.hub_login_pct ?? partnership.hub_login_pct

@@ -5,6 +5,8 @@ import Link from 'next/link'
 import { DraftEmailModal, introEmailDraft, gateBlockerEmailDraft } from './components/panel/DraftEmailModal'
 import { ImpactEvidence } from './components/ImpactEvidence'
 import NeedsYouBoard from './components/NeedsYouBoard'
+import FundersTab from './components/FundersTab'
+import AwardedTab from './components/AwardedTab'
 
 /**
  * One next-step item, exactly as computed by lib/funding-next-actions.ts and
@@ -66,7 +68,7 @@ export default function FundingPage() {
   // Which lens the portal opens on. The board answers "what is mine today"
   // without opening a single school, which is the question the school-grouped
   // view could never answer directly.
-  const [view, setView] = useState<'board' | 'schools'>('board')
+  const [view, setView] = useState<'board' | 'schools' | 'funders' | 'awarded'>('board')
   const [highlight, setHighlight] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [draftEmail, setDraftEmail] = useState<any & { opportunityId?: string; windowOpens?: string; windowCloses?: string } | null>(null)
@@ -199,36 +201,40 @@ export default function FundingPage() {
         }} />
       )}
 
-      {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-        <h1 style={{ fontSize: 24, fontWeight: 700, color: '#1e2749', margin: 0 }}>Grant Funding</h1>
-
-      </div>
-      <p style={{ fontSize: 14, color: '#6B7280', marginBottom: 14 }}>
-        {schools.length} schools | ${(totalPipeline / 1000).toFixed(0)}K pipeline | {totalGrants} grants tracked{needsYou > 0 ? ` | ${needsYou} waiting on you` : ''}
-      </p>
-
-      {/* Two lenses on the same data. The board asks who is blocking; the
-          school view asks what is happening at one place. */}
-      <div style={{ display: 'flex', gap: 4, marginBottom: 20, borderBottom: `1px solid #E5E7EB` }}>
-        {([
-          { key: 'board' as const, label: 'Needs you' },
-          { key: 'schools' as const, label: 'Schools' },
-        ]).map(t => (
-          <button
-            key={t.key}
-            onClick={() => setView(t.key)}
-            style={{
-              fontSize: 14, fontWeight: view === t.key ? 700 : 500,
-              padding: '9px 16px', border: 'none', background: 'transparent',
-              color: view === t.key ? '#1e2749' : '#7b8399', cursor: 'pointer',
-              borderBottom: `2px solid ${view === t.key ? '#ffba06' : 'transparent'}`,
-              marginBottom: -1,
-            }}
-          >
-            {t.label}{t.key === 'board' && needsYou > 0 ? ` (${needsYou})` : ''}
-          </button>
-        ))}
+      {/* One card, with the tabs living in its topbar. The page had a title
+          and a stats line above this that repeated the money strip word for
+          word, so both are gone: the strip is the header. */}
+      <div style={{
+        background: '#fff', border: '1px solid #e3e7ef', borderRadius: 14,
+        overflow: 'hidden', boxShadow: '0 1px 3px rgba(30,39,73,.06)',
+      }}>
+      <div style={{
+        display: 'flex', alignItems: 'center', gap: 16, padding: '12px 18px',
+        borderBottom: '1px solid #e3e7ef', flexWrap: 'wrap',
+      }}>
+        <span style={{ fontWeight: 800, fontSize: 15, color: '#1e2749', letterSpacing: '-.01em' }}>Grants</span>
+        <div style={{ display: 'flex', gap: 2, marginLeft: 'auto', flexWrap: 'wrap' }}>
+          {([
+            { key: 'board' as const, label: 'Needs you' },
+            { key: 'schools' as const, label: 'Schools' },
+            { key: 'funders' as const, label: 'Funders' },
+            { key: 'awarded' as const, label: 'Awarded' },
+          ]).map(t => (
+            <button
+              key={t.key}
+              onClick={() => setView(t.key)}
+              style={{
+                fontSize: 13, padding: '6px 12px', borderRadius: 7, border: 'none',
+                cursor: 'pointer',
+                background: view === t.key ? '#E8F0FD' : 'transparent',
+                color: view === t.key ? '#1e2749' : '#7b8399',
+                fontWeight: view === t.key ? 700 : 500,
+              }}
+            >
+              {t.label}{t.key === 'board' && needsYou > 0 ? ` ${needsYou}` : ''}
+            </button>
+          ))}
+        </div>
       </div>
 
       {view === 'board' && (
@@ -244,6 +250,18 @@ export default function FundingPage() {
           }}
         />
       )}
+
+      {view === 'funders' && <FundersTab />}
+
+      {view === 'awarded' && (
+        <AwardedTab
+          grants={schools.flatMap(sc => sc.grants.map(g => ({
+            id: g.id, name: g.name, amount: g.amount, status: g.status, school: sc.name,
+          })))}
+        />
+      )}
+
+      </div>
 
       {view === 'schools' && (
         <>

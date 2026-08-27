@@ -20,19 +20,25 @@ export async function POST(request: NextRequest) {
   const secret = process.env.RESEND_WEBHOOK_SECRET;
   const raw = await request.text();
 
-  // An unsigned webhook is an open door: anyone could mark an invoice delivered.
-  if (secret) {
-    try {
-      new Webhook(secret).verify(raw, {
-        'svix-id': request.headers.get('svix-id') ?? '',
-        'svix-timestamp': request.headers.get('svix-timestamp') ?? '',
-        'svix-signature': request.headers.get('svix-signature') ?? '',
-      });
-    } catch {
-      return NextResponse.json({ error: 'Bad signature' }, { status: 401 });
-    }
-  } else {
-    console.warn('[resend-webhook] RESEND_WEBHOOK_SECRET is not set, accepting unverified events');
+  // An unsigned webhook is an open door: anyone could post a fake "delivered" and
+  // hide a bounce, which is precisely the failure this endpoint exists to prevent.
+  // So it fails closed. No secret configured means no events accepted, rather than
+  // events accepted from anyone.
+  if (!secret) {
+    console.error('[resend-webhook] RESEND_WEBHOOK_SECRET is not set. Refusing events.');
+    return NextResponse.json(
+      { error: 'Webhook is not configured. Set RESEND_WEBHOOK_SECRET and point Resend at this endpoint.' },
+      { status: 503 },
+    );
+  }
+  try {
+    new Webhook(secret).verify(raw, {
+      'svix-id': request.headers.get('svix-id') ?? '',
+      'svix-timestamp': request.headers.get('svix-timestamp') ?? '',
+      'svix-signature': request.headers.get('svix-signature') ?? '',
+    });
+  } catch {
+    return NextResponse.json({ error: 'Bad signature' }, { status: 401 });
   }
 
   let payload: any;
