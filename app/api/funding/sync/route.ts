@@ -365,10 +365,40 @@ export async function POST(request: NextRequest) {
   // When Grant Discovery Assistant finds a new funding source
   if (action === 'create_opportunity') {
     const { pursuitId, name, amount, planCategory, status, contactName, contactEmail,
-      applicationOpens, applicationCloses, waitingOn, narrativeStatus, notes } = body
+      applicationOpens, applicationCloses, waitingOn, narrativeStatus, notes,
+      windowStatus, sourceUrl } = body
 
     if (!pursuitId || !name) {
       return NextResponse.json({ error: 'pursuitId and name required' }, { status: 400 })
+    }
+
+    // A funder must arrive with a window status and a source.
+    //
+    // This refusal is the point of the skill layer. Agents build these calls by
+    // hand from a URL in a markdown table, with nothing requiring the fields to
+    // be right, and the result was thirteen grants at window_status 'unknown'
+    // where find_work could never return them. All nine funders discovered on
+    // 19 Aug were among them: a community foundation twelve miles from
+    // Saunemin, a Catholic education trust in St. Peter Chanel's own diocese.
+    // Good research that reached nobody.
+    //
+    // 'unknown' is a legitimate answer. Not saying is not.
+    const VALID_WINDOW = ['open', 'closed_missed', 'closed_awarded', 'closed_denied', 'unknown']
+    if (!windowStatus || !VALID_WINDOW.includes(windowStatus)) {
+      return NextResponse.json({
+        error:
+          `windowStatus is required and must be one of: ${VALID_WINDOW.join(', ')}. ` +
+          `If you could not determine whether applications are open, send 'unknown' ` +
+          `deliberately. Leaving it out is how nine discovered funders became ` +
+          `invisible to every agent for a week.`,
+      }, { status: 400 })
+    }
+    if (!sourceUrl || typeof sourceUrl !== 'string' || !sourceUrl.trim()) {
+      return NextResponse.json({
+        error:
+          'sourceUrl is required. A funder nobody can trace back to a page is a ' +
+          'funder the next person has to research again from nothing.',
+      }, { status: 400 })
     }
 
     // Check for duplicates (same name on same pursuit)
@@ -401,6 +431,7 @@ export async function POST(request: NextRequest) {
         application_closes: applicationCloses || null,
         waiting_on: waitingOn || 'tdi',
         narrative_status: narrativeStatus || 'not_started',
+        window_status: windowStatus,
         // A newly discovered funder is by definition not yet understood. We
         // rarely know its dates, its focus or whether the school qualifies at
         // the moment it is found.
@@ -499,8 +530,32 @@ export async function POST(request: NextRequest) {
   // ---- UPDATE NARRATIVE ----
   // Shortcut for the common case: agent drafted/reviewed a narrative
   if (action === 'update_narrative') {
-    const { opportunityId, narrativeStatus, narrativeUrl, narrativeContent, note } = body
+    const { opportunityId, narrativeStatus, narrativeUrl, narrativeContent, note,
+      factsCited } = body
     if (!opportunityId) return NextResponse.json({ error: 'opportunityId required' }, { status: 400 })
+
+    // A draft submitted for QA must declare the facts it used.
+    //
+    // Two applications cited a 48% reading figure nobody could reproduce. Julie
+    // caught it by reading carefully, twice. That is a person doing a check a
+    // machine should do, and it only worked because she happened to look.
+    //
+    // Every fact about a school now carries a source and a date, so a draft can
+    // name what it leaned on and the claim becomes checkable. Of 42 facts across
+    // the three live schools, 9 currently have a source, so this will refuse a
+    // lot at first. That refusal is the accurate state of the evidence, not an
+    // obstacle to route around.
+    const submittingForReview =
+      narrativeStatus === 'qa_review' || narrativeStatus === 'review'
+    if (submittingForReview && (!Array.isArray(factsCited) || factsCited.length === 0)) {
+      return NextResponse.json({
+        error:
+          'factsCited is required when submitting a narrative for QA. List the ' +
+          'school facts this draft relies on, by key, so each one can be checked ' +
+          'against its source. If the draft genuinely cites no facts about the ' +
+          'school, say so with an empty reason rather than omitting the field.',
+      }, { status: 400 })
+    }
 
     const { data: prior } = await supabase
       .from('funding_opportunities')
@@ -731,6 +786,38 @@ export async function POST(request: NextRequest) {
 
     if (!pursuitId || !title) {
       return NextResponse.json({ error: 'pursuitId and title required' }, { status: 400 })
+    }
+
+    // An agent cannot aim a task at a school.
+    //
+    // A client-owned item resolves its address to the school itself, and the
+    // reminder engine used to mail it. Three internally worded titles reached a
+    // principal at Prince George's County on 13 July, including "Get Dr. Porter
+    // to send ATSI email to Dr. Gloster", written about her and sent to her. An
+    // earlier run sent 41 such messages to two principals, and St. Peter Chanel
+    // was chased fourteen times about submitting an application nobody was
+    // writing.
+    //
+    // Only a person contacts a school. An agent that needs something from one
+    // creates work for Bella, with the wording ready, and she sends it.
+    if (ownerType === 'client') {
+      return NextResponse.json({
+        error:
+          'Agents cannot create client-owned tasks. Create it as TDI-owned and put ' +
+          'the client-facing wording in preparedMaterials, so Bella sends it. The ' +
+          'system does not email schools.',
+      }, { status: 400 })
+    }
+
+    // A task with no due date is invisible. The follow-up engine skips anything
+    // without one, so two Saunemin grants sat unchaseable for nine days with
+    // Gary's address on the pursuit the whole time.
+    if (!dueDate) {
+      return NextResponse.json({
+        error:
+          'dueDate is required. The follow-up engine skips items without one, so ' +
+          'a task with no date is created and then never chased by anything.',
+      }, { status: 400 })
     }
 
     const { data, error } = await supabase
