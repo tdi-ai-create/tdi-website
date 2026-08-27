@@ -57,6 +57,84 @@ function passesFilter(eventLevel: EventLevel, settingsVerbosity: string): boolea
   return true
 }
 
+// ── Daily digest ──
+
+export type DigestAlert = {
+  /** Which school, so a line is actionable without opening anything. */
+  pursuitName?: string | null
+  message: string
+}
+
+/**
+ * The daily funding digest, posted to the grant channel.
+ *
+ * It used to email rae@teachersdeserveit.com and nobody else. Bella does the
+ * work and lives in Slack, so the person who needed it never saw it, and the
+ * person who saw it was not the one acting on it.
+ *
+ * Deliberately one post rather than one per alert. A digest that arrives as
+ * fourteen separate messages is a notification storm people mute, and a muted
+ * channel is worse than no channel.
+ */
+export async function postFundingDigest(
+  critical: DigestAlert[],
+  warnings: DigestAlert[],
+): Promise<boolean> {
+  const settings = await loadSettings()
+  if (!settings.slack_enabled || !settings.slack_webhook_url) return false
+  if (critical.length === 0 && warnings.length === 0) return false
+
+  const portalUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.teachersdeserveit.com'
+
+  const line = (a: DigestAlert) =>
+    a.pursuitName ? `• *${a.pursuitName}* — ${a.message}` : `• ${a.message}`
+
+  const parts: string[] = []
+  const headline =
+    critical.length > 0
+      ? `${critical.length} need${critical.length === 1 ? 's' : ''} attention today`
+      : `${warnings.length} thing${warnings.length === 1 ? '' : 's'} to keep an eye on`
+  parts.push(`*Funding digest* — ${headline}`)
+
+  if (critical.length > 0) {
+    parts.push('', '*Critical*', ...critical.map(line))
+  }
+  if (warnings.length > 0) {
+    // Capped. A digest nobody finishes reading is a digest nobody reads.
+    const shown = warnings.slice(0, 8)
+    parts.push('', '*Worth watching*', ...shown.map(line))
+    if (warnings.length > shown.length) {
+      parts.push(`_and ${warnings.length - shown.length} more_`)
+    }
+  }
+
+  // Bella is mentioned because she acts on it. Rae sees it in the channel
+  // rather than in an inbox, which is what she asked for.
+  if (settings.bella_slack_handle) {
+    parts.push('', `<@${settings.bella_slack_handle}>`)
+  }
+  parts.push(`<${portalUrl}/tdi-admin/funding|Open the funding portal>`)
+
+  try {
+    const res = await fetch(settings.slack_webhook_url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        text: parts.join('\n'),
+        ...(settings.slack_channel ? { channel: settings.slack_channel } : {}),
+      }),
+    })
+    if (!res.ok) {
+      console.error('[funding-slack] digest post failed:', res.status, await res.text())
+      return false
+    }
+    return true
+  } catch (err) {
+    console.error('[funding-slack] digest post threw:', err)
+    return false
+  }
+}
+
 // ── Event posting ──
 
 export interface SlackEvent {
@@ -111,13 +189,21 @@ export async function postFundingEvent(event: SlackEvent): Promise<void> {
   // Write to timeline (durable record)
   if (event.timelineTitle) {
     try {
-      await db().from('funding_pursuit_timeline').insert({
+      // The error is destructured, not left to the catch below. Supabase
+      // returns database errors rather than throwing them, so this try/catch
+      // never fired for a failed insert and the timeline entry vanished while
+      // the code looked careful. That is the shape that silently broke five
+      // features in two days.
+      const { error: timelineErr } = await db().from('funding_pursuit_timeline').insert({
         pursuit_id: event.pursuitId,
         event_date: new Date().toISOString().split('T')[0],
         event_title: event.timelineTitle,
         event_detail: event.timelineDetail || event.message,
         status: 'complete',
       })
+      if (timelineErr) {
+        console.error(LOG, 'Timeline write failed:', timelineErr.message)
+      }
     } catch (err) {
       console.error(LOG, 'Timeline write failed:', err)
     }
