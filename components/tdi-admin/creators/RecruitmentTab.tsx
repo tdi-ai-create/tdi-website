@@ -33,6 +33,29 @@ import { getTopicConfig, TOPIC_MAP } from '@/lib/data/creator-topics';
 
 const theme = PORTAL_THEMES.creators;
 
+/**
+ * The pipeline as one funnel.
+ *
+ * Outreach approved and outreach sent are one step here on purpose. From the
+ * outside they are the same thing, waiting to hear back, and splitting them
+ * made the old strip look busier than the pipeline actually is.
+ */
+type StatsShape = { total_candidates_by_stage?: Record<string, number>; conversions_this_month?: number } | null;
+
+const FUNNEL_STEPS: { key: string; label: string; count: (s: StatsShape) => number }[] = [
+  { key: 'suggested', label: 'Suggested', count: (s) => s?.total_candidates_by_stage?.suggested || 0 },
+  {
+    key: 'outreach',
+    label: 'Outreach sent',
+    count: (s) =>
+      (s?.total_candidates_by_stage?.outreach_approved || 0) +
+      (s?.total_candidates_by_stage?.outreach_sent || 0),
+  },
+  { key: 'interested', label: 'Interested', count: (s) => s?.total_candidates_by_stage?.interested || 0 },
+  { key: 'committed', label: 'Committed', count: (s) => s?.total_candidates_by_stage?.committed || 0 },
+  { key: 'converted', label: 'Converted', count: (s) => s?.conversions_this_month || 0 },
+];
+
 type ShowToast = (message: string, type?: 'success' | 'error') => void;
 
 export function RecruitmentTab({
@@ -96,6 +119,19 @@ export function RecruitmentTab({
     demand_signal: string; recommended_content_path: string; notes: string;
   } | null>(null);
   const [gapSaving, setGapSaving] = useState(false);
+
+  const [expandedCandidates, setExpandedCandidates] = useState<Set<string>>(new Set());
+  const [nominateOpen, setNominateOpen] = useState(false);
+
+  // Figures the header needs. Derived rather than stored, so they cannot drift
+  // from the rows underneath them the way the two old summaries did.
+  const activePipeline =
+    recruitmentStats?.goals?.active_pipeline ?? recruitmentCandidates.length;
+  const criticalUncovered = recruitmentStats?.critical_gaps_without_candidates || 0;
+  const longestWait = (recruitmentQueue?.queue || []).reduce(
+    (max, item) => (typeof item.days === 'number' && item.days > max ? item.days : max),
+    0
+  );
 
   // ── Recruitment data loading ──
   const loadRecruitmentData = useCallback(async () => {
@@ -255,60 +291,83 @@ export function RecruitmentTab({
             </div>
           ) : (
             <>
-              {/* Section 0: Needs You, and progress against the weekly goal */}
+              {/* ── Header: one funnel, not two summaries ──
+                  This used to be two cards. The first carried three goal
+                  figures, the second five stage counts, about 200px apart,
+                  with conversions appearing in both. They are one thing now.
+
+                  The green "All critical gaps covered" badge is gone. Covered
+                  meant a candidate existed at any stage, which was true while
+                  nobody had committed and nothing had converted. The funnel
+                  says that better by ending in the real numbers. */}
               <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-                <div className="p-4 border-b border-gray-100 flex items-center justify-between gap-3 flex-wrap">
+                <div className="p-4 flex items-end justify-between gap-3 flex-wrap">
                   <div>
-                    <h3 style={TYPE_SECTION_HEADER}>Needs You</h3>
+                    <h3 style={TYPE_SECTION_HEADER}>Recruitment</h3>
                     <p className="text-xs text-gray-400 mt-0.5">
-                      {recruitmentQueue?.queue.length
-                        ? `${recruitmentQueue.queue.length} candidate${recruitmentQueue.queue.length === 1 ? '' : 's'} waiting on a decision from you`
-                        : 'Nothing waiting. Everything in the pipeline is moving.'}
+                      {activePipeline} candidate{activePipeline === 1 ? '' : 's'} against{' '}
+                      {recruitmentGaps.length} open gap{recruitmentGaps.length === 1 ? '' : 's'}
+                      {criticalUncovered > 0 && (
+                        <span className="text-red-600 font-medium">
+                          {' '}&middot; {criticalUncovered} critical gap{criticalUncovered === 1 ? '' : 's'} with nobody on them
+                        </span>
+                      )}
                     </p>
                   </div>
-                  {recruitmentStats?.goals && (
-                    <div className="flex items-center gap-5 text-sm">
-                      <div>
-                        <div className="text-xs text-gray-400">Sourced this week</div>
-                        <div className="font-semibold text-gray-900">
-                          {recruitmentStats.goals.sourced_this_week}
-                          <span className="text-gray-400 font-normal"> of {recruitmentStats.goals.sourcing_target}</span>
-                        </div>
-                      </div>
-                      <div>
-                        <div className="text-xs text-gray-400">Converted this month</div>
-                        <div className="font-semibold text-gray-900">
-                          {recruitmentStats.goals.converted_this_month}
-                          <span className="text-gray-400 font-normal"> of {recruitmentStats.goals.conversion_target}</span>
-                        </div>
-                      </div>
-                      <div>
-                        <div className="text-xs text-gray-400">Active pipeline</div>
-                        <div className="font-semibold text-gray-900">{recruitmentStats.goals.active_pipeline}</div>
-                      </div>
-                    </div>
-                  )}
+                  <div className="flex items-center gap-2">
+                    {!gapForm && (
+                      <button
+                        onClick={() => setGapForm({ id: null, category: '', priority: 'high', demand_signal: '', recommended_content_path: '', notes: '' })}
+                        className="px-3 py-1.5 text-xs font-medium rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-50"
+                      >Add gap</button>
+                    )}
+                    <button
+                      onClick={() => {
+                        setNominateOpen(true);
+                        document.getElementById('recruitment-nominate')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                      }}
+                      className="px-3 py-1.5 text-xs font-medium text-white rounded-lg"
+                      style={{ backgroundColor: theme.accent }}
+                    >Nominate someone</button>
+                  </div>
                 </div>
 
-                {recruitmentStats?.goals && (
-                  <div className="h-1.5 bg-gray-100">
-                    <div
-                      className="h-full transition-all"
-                      style={{
-                        width: `${Math.min(100, Math.round((recruitmentStats.goals.sourced_this_week / Math.max(1, recruitmentStats.goals.sourcing_target)) * 100))}%`,
-                        backgroundColor:
-                          recruitmentStats.goals.sourced_this_week >= recruitmentStats.goals.sourcing_target
-                            ? '#059669'
-                            : theme.accent,
-                      }}
-                    />
-                  </div>
-                )}
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 border-t border-gray-100">
+                  {FUNNEL_STEPS.map((step, i) => {
+                    const n = step.count(recruitmentStats);
+                    return (
+                      <div
+                        key={step.key}
+                        className={`px-4 py-2.5 ${i > 0 ? 'lg:border-l border-gray-100' : ''}`}
+                      >
+                        <div
+                          className="text-lg font-semibold tabular-nums leading-tight"
+                          style={{ color: n === 0 ? '#c3cadd' : '#141b33' }}
+                        >
+                          {n}
+                        </div>
+                        <div className="text-[11px] text-gray-500">{step.label}</div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
 
-                {recruitmentQueue && recruitmentQueue.queue.length > 0 && (
+              {/* ── Waiting on you ──
+                  Kept at the top because it is the only block that is about
+                  today. Everything below it is reference. */}
+              {recruitmentQueue && recruitmentQueue.queue.length > 0 && (
+                <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                  <div className="px-4 py-3 border-b border-gray-100 flex items-baseline gap-2">
+                    <h3 style={TYPE_SECTION_HEADER}>Waiting on you</h3>
+                    <span className="text-xs text-amber-700 font-medium">
+                      {recruitmentQueue.queue.length}
+                      {longestWait > 0 && `, longest ${longestWait} day${longestWait === 1 ? '' : 's'}`}
+                    </span>
+                  </div>
                   <div className="divide-y divide-gray-100">
                     {recruitmentQueue.queue.slice(0, 8).map(item => (
-                      <div key={`${item.id}-${item.reason}`} className="px-4 py-2.5 flex items-center justify-between gap-3">
+                      <div key={`${item.id}-${item.reason}`} className="px-4 py-2 flex items-center justify-between gap-3">
                         <div className="min-w-0">
                           <span className="text-sm font-medium text-gray-900">{item.name}</span>
                           <span className="text-xs text-gray-500 ml-2">{item.detail}</span>
@@ -332,49 +391,9 @@ export function RecruitmentTab({
                       </div>
                     )}
                   </div>
-                )}
-              </div>
-
-              {/* Section 1: Pipeline Health Bar */}
-              <div className="bg-white rounded-xl border border-gray-200 p-4">
-                <div className="flex items-center justify-between flex-wrap gap-3">
-                  {recruitmentStats?.critical_gaps_without_candidates ? (
-                    <div className="flex items-center gap-2 px-3 py-1.5 bg-red-50 border border-red-200 rounded-lg">
-                      <div className="w-2.5 h-2.5 rounded-full bg-red-500" />
-                      <span className="text-sm font-semibold text-red-700">
-                        {recruitmentStats.critical_gaps_without_candidates} Critical Gap{recruitmentStats.critical_gaps_without_candidates > 1 ? 's' : ''} Uncovered
-                      </span>
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-2 px-3 py-1.5 bg-green-50 border border-green-200 rounded-lg">
-                      <div className="w-2.5 h-2.5 rounded-full bg-green-500" />
-                      <span className="text-sm font-semibold text-green-700">All critical gaps covered</span>
-                    </div>
-                  )}
-                  <div className="flex items-center gap-4 text-sm text-gray-600 flex-wrap">
-                    <span className="flex items-center gap-1.5">
-                      <div className="w-2 h-2 rounded-full bg-purple-400" />
-                      Suggested: <strong>{recruitmentStats?.total_candidates_by_stage?.suggested || 0}</strong>
-                    </span>
-                    <span className="flex items-center gap-1.5">
-                      <div className="w-2 h-2 rounded-full bg-blue-400" />
-                      Outreach: <strong>{(recruitmentStats?.total_candidates_by_stage?.outreach_approved || 0) + (recruitmentStats?.total_candidates_by_stage?.outreach_sent || 0)}</strong>
-                    </span>
-                    <span className="flex items-center gap-1.5">
-                      <div className="w-2 h-2 rounded-full bg-amber-400" />
-                      Interested: <strong>{recruitmentStats?.total_candidates_by_stage?.interested || 0}</strong>
-                    </span>
-                    <span className="flex items-center gap-1.5">
-                      <div className="w-2 h-2 rounded-full bg-green-400" />
-                      Committed: <strong>{recruitmentStats?.total_candidates_by_stage?.committed || 0}</strong>
-                    </span>
-                    <span className="flex items-center gap-1.5">
-                      <Award className="w-3.5 h-3.5 text-yellow-600" />
-                      Conversions: <strong>{recruitmentStats?.conversions_this_month || 0}</strong>
-                    </span>
-                  </div>
                 </div>
-              </div>
+              )}
+
 
               {/* Section 2: Gap Priorities */}
               <div className="bg-white rounded-xl border border-gray-200">
@@ -391,13 +410,7 @@ export function RecruitmentTab({
                       <p className="text-xs text-gray-400">
                         Refreshed weekly from the Hub catalog. Add your own for demand the catalog cannot see.
                       </p>
-                      {!gapForm && (
-                        <button
-                          onClick={() => setGapForm({ id: null, category: '', priority: 'high', demand_signal: '', recommended_content_path: '', notes: '' })}
-                          className="px-3 py-1.5 text-xs font-medium text-white rounded-lg shrink-0"
-                          style={{ backgroundColor: theme.accent }}
-                        >Add Gap</button>
-                      )}
+
                     </div>
 
                     {gapForm && (
@@ -460,62 +473,66 @@ export function RecruitmentTab({
                         No active content gaps. The weekly Hub scan runs Monday, or add one now with the button above.
                       </p>
                     ) : (
-                      <div className="grid gap-3">
+                      <div className="border-t border-gray-100">
+                        <div className="hidden sm:grid grid-cols-[10px_1fr_82px_88px_92px] gap-3 px-1 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-gray-400 border-b border-gray-200">
+                          <span />
+                          <span>Category and why</span>
+                          <span>Wants</span>
+                          <span>Candidates</span>
+                          <span />
+                        </div>
                         {recruitmentGaps.map((gap: any) => (
-                          <div key={gap.id} className="border border-gray-100 rounded-lg p-3 hover:border-gray-200 transition-colors">
-                            <div className="flex items-start justify-between gap-3">
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-2 flex-wrap">
-                                  <span className="font-semibold text-gray-900 text-sm">{gap.category}</span>
-                                  <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                                    gap.priority === 'critical' ? 'bg-red-100 text-red-700' :
-                                    gap.priority === 'high' ? 'bg-amber-100 text-amber-700' :
-                                    gap.priority === 'medium' ? 'bg-blue-100 text-blue-700' :
-                                    'bg-gray-100 text-gray-600'
-                                  }`}>
-                                    {(gap.priority || 'low').toUpperCase()}
-                                  </span>
-                                  {gap.recommended_content_path && (
-                                    <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-indigo-50 text-indigo-700 border border-indigo-200">
-                                      {gap.recommended_content_path}
-                                    </span>
-                                  )}
-                                </div>
-                                {gap.demand_signal && (
-                                  <p className="text-xs text-gray-500 mt-1">{gap.demand_signal}</p>
-                                )}
-                                <div className="flex items-center gap-3 mt-1.5 text-xs text-gray-400">
-                                  <span>{gap.hub_course_count || 0} course{(gap.hub_course_count || 0) === 1 ? '' : 's'}</span>
-                                  <span>{gap.hub_quick_win_count || 0} quick win{(gap.hub_quick_win_count || 0) === 1 ? '' : 's'}</span>
-                                  {gap.active_creator_count > 0 && <span>{gap.active_creator_count} active creator{gap.active_creator_count > 1 ? 's' : ''}</span>}
-                                  {gap.sales_mentions > 0 && <span>{gap.sales_mentions} sales mention{gap.sales_mentions > 1 ? 's' : ''}</span>}
-                                  {gap.identified_by === 'system' && <span className="text-gray-400">auto detected</span>}
-                                </div>
-                              </div>
-                              <div className="flex flex-col items-end gap-1.5 shrink-0">
-                                <div className="flex items-center gap-1.5 text-xs text-gray-500">
-                                  <Users className="w-3.5 h-3.5" />
-                                  <span>{gap.candidate_count} candidate{gap.candidate_count !== 1 ? 's' : ''}</span>
-                                </div>
-                                <div className="flex items-center gap-1">
-                                  <button
-                                    onClick={() => setGapForm({
-                                      id: gap.id,
-                                      category: gap.category,
-                                      priority: gap.priority || 'high',
-                                      demand_signal: gap.demand_signal || '',
-                                      recommended_content_path: gap.recommended_content_path || '',
-                                      notes: gap.notes || '',
-                                    })}
-                                    className="px-2 py-1 text-xs font-medium text-gray-600 bg-gray-100 rounded hover:bg-gray-200"
-                                  >Edit</button>
-                                  <button
-                                    onClick={() => handleResolveGap(gap.id)}
-                                    disabled={gapSaving}
-                                    className="px-2 py-1 text-xs font-medium text-green-700 bg-green-50 rounded hover:bg-green-100 disabled:opacity-50"
-                                  >Filled</button>
-                                </div>
-                              </div>
+                          <div
+                            key={gap.id}
+                            className="grid grid-cols-[10px_1fr] sm:grid-cols-[10px_1fr_82px_88px_92px] gap-3 items-center px-1 py-2 border-b border-gray-50 hover:bg-gray-50/70 transition-colors"
+                          >
+                            <span
+                              className="w-2 h-2 rounded-full"
+                              title={(gap.priority || 'low') + ' priority'}
+                              style={{
+                                backgroundColor:
+                                  gap.priority === 'critical' ? '#b4322e'
+                                  : gap.priority === 'high' ? '#b4680d'
+                                  : gap.priority === 'medium' ? '#3c5fa8'
+                                  : '#c3cadd',
+                              }}
+                            />
+                            <div className="min-w-0">
+                              <span className="text-sm font-semibold text-gray-900">{gap.category}</span>
+                              {gap.demand_signal && (
+                                <span className="text-xs text-gray-500 ml-2">{gap.demand_signal}</span>
+                              )}
+                            </div>
+                            <span className="hidden sm:block">
+                              {gap.recommended_content_path && (
+                                <span className="px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wide bg-indigo-50 text-indigo-700 border border-indigo-100">
+                                  {gap.recommended_content_path}
+                                </span>
+                              )}
+                            </span>
+                            <span
+                              className="hidden sm:block text-xs tabular-nums"
+                              style={{ color: gap.candidate_count ? '#4d587a' : '#c3cadd' }}
+                            >
+                              {gap.candidate_count} candidate{gap.candidate_count !== 1 ? 's' : ''}
+                            </span>
+                            <div className="hidden sm:flex items-center gap-1 justify-end">
+                              <button
+                                onClick={() => setGapForm({
+                                  id: gap.id,
+                                  category: gap.category,
+                                  priority: gap.priority || 'high',
+                                  demand_signal: gap.demand_signal || '',
+                                  recommended_content_path: gap.recommended_content_path || '',
+                                  notes: gap.notes || '',
+                                })}
+                                className="px-2 py-1 text-xs font-medium text-gray-600 rounded hover:bg-gray-200"
+                              >Edit</button>
+                              <button
+                                onClick={() => handleResolveGap(gap.id)}
+                                disabled={gapSaving}
+                                className="px-2 py-1 text-xs font-medium text-green-700 rounded hover:bg-green-50 disabled:opacity-50"
+                              >Filled</button>
                             </div>
                           </div>
                         ))}
@@ -573,6 +590,10 @@ export function RecruitmentTab({
                         const isNoteForm = recruitmentNoteForm?.candidateId === candidate.id;
                         const isConvertForm = recruitmentConvertForm?.candidateId === candidate.id;
                         const isFitExpanded = recruitmentExpandedFit.has(candidate.id);
+                        const isExpanded = expandedCandidates.has(candidate.id);
+                        const idleDays = candidate.updated_at
+                          ? Math.floor((Date.now() - new Date(candidate.updated_at).getTime()) / 86400000)
+                          : null;
 
                         const sourceBadgeColor: Record<string, string> = {
                           hub_user: 'bg-blue-100 text-blue-700',
@@ -581,6 +602,18 @@ export function RecruitmentTab({
                           referral: 'bg-amber-100 text-amber-700',
                           inbound: 'bg-teal-100 text-teal-700',
                           substack: 'bg-orange-100 text-orange-700',
+                        };
+
+                        const stageDotColor: Record<string, string> = {
+                          suggested: '#8b5cf6',
+                          outreach_approved: '#80a4ed',
+                          outreach_sent: '#80a4ed',
+                          interested: '#ffba06',
+                          evaluation: '#06b6d4',
+                          call_scheduled: '#14b8a6',
+                          committed: '#1f7a5c',
+                          revisit: '#c3cadd',
+                          declined: '#b4322e',
                         };
 
                         const stageBadgeColor: Record<string, string> = {
@@ -596,40 +629,62 @@ export function RecruitmentTab({
                         };
 
                         return (
-                          <div key={candidate.id} className="border border-gray-200 rounded-lg p-4 hover:border-gray-300 transition-colors">
-                            {/* Header row */}
-                            <div className="flex items-start justify-between gap-3">
+                          <div key={candidate.id} className="border border-gray-200 rounded-lg hover:border-gray-300 transition-colors overflow-hidden">
+                            {/* Collapsed row. Everything below opens on click. */}
+                            <button
+                              type="button"
+                              onClick={() => setExpandedCandidates(prev => {
+                                const next = new Set(prev);
+                                if (next.has(candidate.id)) next.delete(candidate.id); else next.add(candidate.id);
+                                return next;
+                              })}
+                              aria-expanded={isExpanded}
+                              className="w-full text-left px-3 py-2 grid grid-cols-[10px_1fr_auto] sm:grid-cols-[10px_170px_1fr_120px_74px_18px] gap-3 items-center hover:bg-gray-50/70"
+                            >
+                              <span
+                                className="w-2 h-2 rounded-full"
+                                title={(candidate.stage || '').replace(/_/g, ' ')}
+                                style={{ backgroundColor: stageDotColor[candidate.stage] || '#c3cadd' }}
+                              />
+                              <span className="text-sm font-semibold text-gray-900 truncate">{candidate.name}</span>
+                              <span className="hidden sm:block text-xs text-gray-500 truncate">
+                                {candidate.school_org || candidate.role || candidate.expertise_area || ''}
+                              </span>
+                              <span className="hidden sm:block text-xs text-gray-500 truncate">
+                                {candidate.gap?.category || ''}
+                              </span>
+                              <span className="hidden sm:block text-xs tabular-nums text-gray-400">
+                                {idleDays === null ? '' : `${idleDays}d`}
+                              </span>
+                              <span className="text-gray-400 justify-self-end">
+                                {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                              </span>
+                            </button>
+
+                            {isExpanded && (
+                            <div className="px-4 pb-4 pt-1 border-t border-gray-100">
+                            {/* The original header row, kept for the detail it carries. */}
+                            <div className="flex items-start justify-between gap-3 mb-1">
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-2 flex-wrap">
-                                  <span className="font-semibold text-gray-900">{candidate.name}</span>
                                   <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${sourceBadgeColor[candidate.source] || 'bg-gray-100 text-gray-600'}`}>
                                     {(candidate.source || 'unknown').replace(/_/g, ' ')}
                                   </span>
                                   <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${stageBadgeColor[candidate.stage] || 'bg-gray-100 text-gray-600'}`}>
                                     {(candidate.stage || '').replace(/_/g, ' ')}
                                   </span>
+                                  {!candidate.email && (
+                                    <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-amber-50 text-amber-800 border border-amber-200">
+                                      no way to contact them yet
+                                    </span>
+                                  )}
                                 </div>
                                 <div className="flex items-center gap-3 mt-1 text-xs text-gray-500">
                                   {candidate.email && <a href={`mailto:${candidate.email}`} className="text-blue-600 hover:underline">{candidate.email}</a>}
                                   {candidate.social_url && <a href={candidate.social_url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline inline-flex items-center gap-0.5"><ExternalLink className="w-3 h-3" /></a>}
-                                  {candidate.school_org && <span>{candidate.school_org}</span>}
                                   {candidate.role && <span>{candidate.role}</span>}
                                 </div>
                               </div>
-                              {/* Gap badge */}
-                              {candidate.gap && (
-                                <div className="flex items-center gap-1.5 shrink-0">
-                                  <span className="text-xs text-gray-500">{candidate.gap.category}</span>
-                                  <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${
-                                    candidate.gap.priority === 'critical' ? 'bg-red-100 text-red-700' :
-                                    candidate.gap.priority === 'high' ? 'bg-amber-100 text-amber-700' :
-                                    candidate.gap.priority === 'medium' ? 'bg-blue-100 text-blue-700' :
-                                    'bg-gray-100 text-gray-600'
-                                  }`}>
-                                    {(candidate.gap.priority || '').toUpperCase()}
-                                  </span>
-                                </div>
-                              )}
                             </div>
 
                             {/* Content path + fit */}
@@ -1050,6 +1105,8 @@ export function RecruitmentTab({
                                 style={{ backgroundColor: theme.accent }}
                               >+</button>
                             </div>
+                            </div>
+                            )}
                           </div>
                         );
                       })}
@@ -1058,10 +1115,24 @@ export function RecruitmentTab({
                 </div>
               </div>
 
-              {/* Section 4: Quick Nominate Form */}
-              <div className="bg-white rounded-xl border border-gray-200 p-4">
-                <h3 style={TYPE_SECTION_HEADER}>Quick Nominate</h3>
-                <p className="text-xs text-gray-500 mt-1 mb-3">Add someone to the recruitment pipeline</p>
+              {/* Nominate. A permanent form at the foot of the page was a
+                  standing invitation to scroll past everything above it, so it
+                  opens from the header button now. */}
+              <div id="recruitment-nominate" className="bg-white rounded-xl border border-gray-200 p-4">
+                <button
+                  type="button"
+                  onClick={() => setNominateOpen(o => !o)}
+                  aria-expanded={nominateOpen}
+                  className="w-full flex items-center justify-between text-left"
+                >
+                  <span>
+                    <span style={TYPE_SECTION_HEADER}>Nominate someone</span>
+                    <span className="block text-xs text-gray-500 mt-1">Add a person to the recruitment pipeline</span>
+                  </span>
+                  {nominateOpen ? <ChevronUp className="w-5 h-5 text-gray-400" /> : <ChevronDown className="w-5 h-5 text-gray-400" />}
+                </button>
+                {nominateOpen && (
+                <div className="mt-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                   <div>
                     <label className="text-xs font-medium text-gray-600">Name *</label>
@@ -1172,6 +1243,8 @@ export function RecruitmentTab({
                     Nominate
                   </button>
                 </div>
+                </div>
+                )}
               </div>
             </>
           )}
