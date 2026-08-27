@@ -1,0 +1,51 @@
+name: Post Deploy Check
+
+# Asks the live site whether the partnership data routes actually return data.
+#
+# This is the check that was missing. On 26 Aug 2026 all eleven of those routes
+# were returning nothing and had been for weeks: eight queried Learning Hub
+# tables through the partnerships database client, and nine joined through
+# hub_org_members, a table with zero rows in both projects. Everything compiled,
+# every page rendered, and nine schools saw empty dashboards. Nothing was
+# watching, so nobody knew.
+#
+# It runs after a push to main rather than on a pull request, because preview
+# deployments return 500 for every page, so there is nothing to point it at
+# until the change is live.
+#
+# It fails loudly rather than warning. A route that should have data and returns
+# none is the exact failure this exists to catch.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      base:
+        description: 'Base URL to check'
+        required: false
+        default: 'https://www.teachersdeserveit.com'
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Wait for the deploy to land
+        # A push to main triggers this immediately, while Vercel is still
+        # building. Checking too early would test the previous deploy and pass
+        # for the wrong reason.
+        run: sleep 180
+
+      - name: Verify the partnership routes return data
+        run: |
+          node scripts/verify-partnership-routes.mjs \
+            --base "${{ github.event.inputs.base || 'https://www.teachersdeserveit.com' }}"

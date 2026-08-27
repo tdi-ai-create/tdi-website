@@ -679,6 +679,12 @@ export default function CreatorDashboardPage() {
                   {hasJourney && (
                     <CreatorJourney journey={(dashboardData as unknown as { journey: Journey }).journey} />
                   )}
+
+                  {/* Directly under the journey, not in the row below it.
+                      These are the things a creator needs while doing the step
+                      in front of them, so they should not be somewhere you have
+                      to scroll past the task to find. */}
+                  <CourseDetailsPanel creator={dashboardData.creator} />
                 </div>
               </div>
 
@@ -686,7 +692,6 @@ export default function CreatorDashboardPage() {
                   rail, so the page stops being as tall as a column of six
                   panels. Nothing here is removed, only moved. */}
               <div className="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-                  <CourseDetailsPanel creator={dashboardData.creator} />
 
                   {/* Affiliate Link Card */}
                   {(dashboardData.creator as any).affiliate_slug && (

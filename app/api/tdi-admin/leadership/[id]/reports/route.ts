@@ -97,10 +97,14 @@ export async function GET(
           .eq('partnership_id', partnershipId)
           .eq('status', 'active');
 
+        // Only the items the school can act on. Counting our internal ones too
+        // made their progress read worse than it is: 3 of 12 rather than 3 of
+        // 8, on a report they may take to a board.
         const { data: actionItems } = await supabase
           .from('action_items')
           .select('status')
-          .eq('partnership_id', partnershipId);
+          .eq('partnership_id', partnershipId)
+          .eq('visible_to_partner', true);
 
         const totalStaff = staff?.length || 0;
         const hubLogins = staff?.filter(s => s.hub_login_date).length || 0;
@@ -327,8 +331,29 @@ export async function GET(
         // Everything in one export
         const { data: staff } = await supabase.from('staff_members').select('*').eq('partnership_id', partnershipId).order('last_name');
         const { data: kpis } = await supabase.from('partnership_kpis').select('*').eq('partnership_id', partnershipId).eq('status', 'active');
-        const { data: actionItems } = await supabase.from('action_items').select('*').eq('partnership_id', partnershipId).order('sort_order');
-        const { data: notes } = await supabase.from('partnership_notes').select('*').eq('partnership_id', partnershipId).order('created_at', { ascending: false });
+        // Only items a school is meant to see. Sixteen across the active
+        // partnerships are internal, including "Verify principal dashboard
+        // login", "Review Phase 0 gate", and four grant items about funding we
+        // are pursuing on their behalf.
+        const { data: actionItems } = await supabase
+          .from('action_items')
+          .select('*')
+          .eq('partnership_id', partnershipId)
+          .eq('visible_to_partner', true)
+          .order('sort_order');
+        // Only notes deliberately marked shareable. This selected every note,
+        // including 364 internal concern notes written by the attention cron,
+        // all flagged visible_to_partner false. A full export handed to a
+        // principal would have shown them sentences like "Principal has STILL
+        // not logged in after 21 days. This is a red flag." written about them
+        // and never meant for them.
+        const { data: notes } = await supabase
+          .from('partnership_notes')
+          .select('*')
+          .eq('partnership_id', partnershipId)
+          .eq('visible_to_partner', true)
+          .is('archived_at', null)
+          .order('created_at', { ascending: false });
         const { data: meetings } = await supabase.from('partnership_meetings').select('*').eq('partnership_id', partnershipId).order('meeting_date', { ascending: false });
         const { data: timeline } = await supabase.from('timeline_events').select('*').eq('partnership_id', partnershipId).order('event_date');
 
