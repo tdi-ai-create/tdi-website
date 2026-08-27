@@ -62,10 +62,13 @@ export async function POST(request: NextRequest) {
       .eq('partnership_id', partnership.id)
       .maybeSingle();
 
-    // Enrich partnership with org_name
+    // partnerships.org_name is the real column and select('*') already returned
+    // it. Overwriting it with the organizations lookup wiped the name for the
+    // two active partnerships that have no organizations row, so their
+    // principal opened their own dashboard and read "Your School".
     const enrichedPartnership = {
       ...partnership,
-      org_name: organization?.name || null,
+      org_name: partnership.org_name || organization?.name || null,
     };
 
     // Check authorization
@@ -88,15 +91,27 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Mark invite as accepted on first successful login
+    // Mark invite as accepted on first successful login.
+    //
+    // Worth knowing what this field actually means, because a lot of code has
+    // read more into it than it carries: it is stamped here, by an auth check,
+    // the first time anyone passes. It does not mean a leader finished setup,
+    // and it is set for schools that have never opened their dashboard. Nothing
+    // should treat it as a signal of onboarding progress.
     if (!partnership.invite_accepted_at) {
-      await supabase
+      const { error: acceptError } = await supabase
         .from('partnerships')
         .update({
           invite_accepted_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         })
         .eq('id', partnership.id);
+
+      // Not fatal, the leader is still authorised either way, but a silent
+      // failure here would leave the field permanently unset for that school.
+      if (acceptError) {
+        console.error('[partners/auth-check] invite_accepted_at not stamped:', acceptError.message);
+      }
     }
 
     return NextResponse.json({
