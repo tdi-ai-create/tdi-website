@@ -33,7 +33,7 @@ import type { CSSProperties } from 'react'
 
 // ── Types mirrored from the page, kept local so the board has one input ──
 
-export interface BoardQueueItem {
+interface BoardQueueItem {
   id: string
   label: string
   why: string
@@ -44,7 +44,7 @@ export interface BoardQueueItem {
   pursuitId: string
 }
 
-export interface BoardGrant {
+interface BoardGrant {
   name: string
   id: string
   amount: number
@@ -148,7 +148,24 @@ function Row({
             {pill}
           </span>
         </div>
-        <div style={{ fontSize: 13.5, color: C.soft, marginTop: 3, lineHeight: 1.45 }}>{why}</div>
+        {/* Clamped to three lines. One escalation note runs to a full
+            paragraph and pushed every other row off the screen, which defeats
+            the point of a board you can scan. The full text is on the school
+            card behind Open. */}
+        <div
+          style={{
+            fontSize: 13.5,
+            color: C.soft,
+            marginTop: 3,
+            lineHeight: 1.45,
+            display: '-webkit-box',
+            WebkitLineClamp: 3,
+            WebkitBoxOrient: 'vertical',
+            overflow: 'hidden',
+          }}
+        >
+          {why}
+        </div>
       </div>
       {action && (
         <button
@@ -259,8 +276,20 @@ export default function NeedsYouBoard({
 }) {
   const nameOf = (pursuitId: string) => schools.find(s => s.id === pursuitId)?.name ?? ''
 
-  const steps = schools.flatMap(s => s.nextSteps.filter(i => !i.inProgress))
-  const waitingOnUs = steps.filter(i => i.owner === 'team')
+  const steps = schools.flatMap(s => s.nextSteps)
+
+  // Only the "waiting on you" lane filters out in-progress work. Everywhere
+  // else, inProgress means "in flight, nothing for you to do right now",
+  // which is the definition of the other three lanes rather than a reason to
+  // hide the row.
+  //
+  // Filtering it everywhere made "waiting on the school" structurally empty:
+  // the engine marks a client task inProgress the moment it is nudged, so
+  // chasing a school caused the item to disappear from the board. Both of
+  // Gary's outstanding questions at Saunemin were invisible for that reason,
+  // and they are what two grants are blocked on. That is the same shape as
+  // Title II-A vanishing for nine days once it was emailed.
+  const waitingOnUs = steps.filter(i => i.owner === 'team' && !i.inProgress)
   const waitingOnSchool = steps.filter(i => i.owner === 'school')
   const movingAlone = steps.filter(i => i.owner === 'agent' || i.owner === 'auto')
 
