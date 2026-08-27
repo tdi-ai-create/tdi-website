@@ -1,0 +1,82 @@
+name: Code Gates
+
+# The two checks that catch this codebase's two most expensive bug classes, run
+# where they cannot be forgotten.
+#
+# check:writes catches a Supabase write whose error is discarded. Your own notes
+# call that the defining bug here: five features were found broken in two days,
+# every one the same shape, a write fails and the caller reports success. The
+# gate has existed for a while and only ever ran when somebody remembered to
+# type it. On 26 Aug 2026 it surfaced 28 unchecked writes across billing and
+# leadership the moment those files were touched, including one that could void
+# an invoice, fail, and report success.
+#
+# typecheck was not enforced anywhere either. Nothing stopped a type error
+# reaching main except a person running it locally.
+#
+# Both judge the pull request, so neither can block work already on main.
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  gates:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        # check:writes diffs against origin/main, so it needs real history. A
+        # shallow clone makes it find no changed files and pass, which is a
+        # check that cannot fail.
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Make origin/main available
+        # The PR checkout does not necessarily leave origin/main as a local
+        # ref. Without it the script falls back, and on failure it exits 0 with
+        # "checking nothing", so this has to be explicit.
+        run: git fetch origin main:refs/remotes/origin/main --force
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        # npm install rather than npm ci, matching site-audit.yml, because
+        # package.json and package-lock.json are currently out of sync and
+        # npm ci refuses with EUSAGE. That drift is a real problem and worth
+        # fixing, but not in a pull request whose job is to add a check, and
+        # regenerating the lockfile here could quietly move dependency
+        # versions for everyone.
+        run: npm install --no-audit --no-fund
+
+      - name: Typecheck
+        run: npx tsc --noEmit
+
+      - name: Unchecked database writes
+        # The script exits 0 when it cannot work out the diff, which would make
+        # this pass silently on a broken checkout. So capture the output and
+        # fail if it says it checked nothing while the PR clearly changed
+        # TypeScript files.
+        run: |
+          set -o pipefail
+          npm run check:writes 2>&1 | tee /tmp/writes.log
+          status=$?
+
+          if grep -q "Could not work out what changed" /tmp/writes.log; then
+            echo "::error::check:writes could not determine the diff, so it checked nothing. Treating that as a failure."
+            exit 1
+          fi
+
+          changed_ts=$(git diff --name-only origin/main...HEAD | grep -cE '^(app|lib|components|scripts)/.*\.(ts|tsx)$' || true)
+          if [ "$changed_ts" -gt 0 ] && grep -q "Nothing to check" /tmp/writes.log; then
+            echo "::error::This PR changed $changed_ts TypeScript files but check:writes examined none of them."
+            exit 1
+          fi
+
+          exit $status
