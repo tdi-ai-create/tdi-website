@@ -80,3 +80,19 @@ jobs:
           fi
 
           exit $status
+
+      - name: Admin API auth
+        # Every /api/admin route must establish who is calling. 60 do not today,
+        # so this is baselined and fails only on a new hole or on a fixed route
+        # whose baseline entry was not removed.
+        #
+        # The script writes the baseline when the file is missing and exits 0,
+        # which would pass silently if the baseline were ever deleted. So fail
+        # explicitly on that case rather than letting it self-heal in CI.
+        run: |
+          set -o pipefail
+          if [ ! -f scripts/integrity/admin-api-auth-baseline.json ]; then
+            echo "::error::admin-api-auth-baseline.json is missing, so the audit would rewrite it and pass. Restore it."
+            exit 1
+          fi
+          npm run check:adminauth
