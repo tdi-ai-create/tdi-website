@@ -64,6 +64,8 @@ export async function GET(_request: NextRequest) {
       // An invoice marked paid with nothing behind it is the exact shape of the
       // Saunemin problem: the money may have arrived, but nothing can prove it.
       paid_applied: paid,
+      outstanding: Math.max(0, Number(i.amount) - paid),
+      part_paid: paid > 0 && paid < Number(i.amount),
       missing_payment_record: i.status === 'paid' && paid === 0,
       sends: sends.get(i.id) ?? [],
     };
@@ -89,11 +91,16 @@ export async function GET(_request: NextRequest) {
   });
 
   const live = invoiceRows.filter((i) => i.status !== 'voided');
+  // An invoice can be part paid. Allenwood paid $6,000 of a $7,920 invoice, so its face
+  // value overstates what they owe by exactly that. Outstanding is always face value
+  // minus what has been applied, never the face value on its own.
+  const owed = (i: (typeof live)[number]) => Math.max(0, i.amount - i.paid_applied);
   const totals = {
     collected: paymentRows.reduce((s, p) => s + p.amount, 0),
-    outstanding: live.filter((i) => i.status === 'sent').reduce((s, i) => s + i.amount, 0),
-    overdue: live.filter((i) => i.status === 'overdue').reduce((s, i) => s + i.amount, 0),
-    draft: live.filter((i) => i.status === 'draft').reduce((s, i) => s + i.amount, 0),
+    outstanding: live.filter((i) => i.status === 'sent').reduce((s, i) => s + owed(i), 0),
+    overdue: live.filter((i) => i.status === 'overdue').reduce((s, i) => s + owed(i), 0),
+    draft: live.filter((i) => i.status === 'draft').reduce((s, i) => s + owed(i), 0),
+    part_paid: live.filter((i) => i.paid_applied > 0 && i.paid_applied < i.amount).length,
     invoices: live.length,
     payments: paymentRows.length,
     voided: invoiceRows.filter((i) => i.status === 'voided').length,

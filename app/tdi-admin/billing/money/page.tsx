@@ -8,7 +8,8 @@ type Send = { id: string; kind: string; to_email: string; subject: string; statu
 type Invoice = {
   kind: 'invoice'; id: string; ref: string; client: string; contract: string | null;
   amount: number; status: string; date: string | null; due_date: string | null; po_number: string | null;
-  days_overdue: number; paid_applied: number; missing_payment_record: boolean;
+  days_overdue: number; paid_applied: number; outstanding: number; part_paid: boolean;
+  missing_payment_record: boolean;
   voided_at: string | null; void_reason: string | null; sends: Send[];
 };
 type Payment = {
@@ -102,7 +103,14 @@ export default function MoneyPage() {
                 </span>
                 <span style={{ flex: '0 0 118px', textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>
                   <span style={{ display: 'block', fontSize: 10.5, textTransform: 'uppercase', letterSpacing: '.05em', color: '#94A3B8' }}>Amount</span>
-                  <b style={{ color: r.kind === 'payment' ? '#059669' : '#0B1120' }}>{money2(r.amount)}</b>
+                  <b style={{ color: r.kind === 'payment' ? '#059669' : '#0B1120' }}>
+                    {r.kind === 'invoice' && r.part_paid ? money2(r.outstanding) : money2(r.amount)}
+                  </b>
+                  {r.kind === 'invoice' && r.part_paid && (
+                    <span style={{ display: 'block', fontSize: 10.5, color: '#64748B', fontWeight: 400 }}>
+                      of {money2(r.amount)}
+                    </span>
+                  )}
                 </span>
                 <span style={{ flex: '0 0 106px', textAlign: 'right', fontSize: 12.5, color: '#64748B' }}>
                   {r.kind === 'invoice' ? (r.due_date ? `due ${shortDate(r.due_date)}` : 'no due date') : (r.received_on ? shortDate(r.received_on) : 'date unknown')}
@@ -148,7 +156,7 @@ function InvoiceDetail({ i }: { i: Invoice }) {
         </Pane>
         <Pane title="Payments applied" bad={i.missing_payment_record}>
           {i.paid_applied > 0
-            ? <><KV k="Applied" v={money2(i.paid_applied)} /><KV k="Outstanding" v={money2(i.amount - i.paid_applied)} /></>
+            ? <><KV k="Invoice total" v={money2(i.amount)} /><KV k="Applied" v={money2(i.paid_applied)} /><KV k="Still owed" v={money2(i.outstanding)} tone={i.outstanding > 0 ? '#DC2626' : '#059669'} /></>
             : <div style={{ fontSize: 12.8, color: '#64748B' }}>Nothing recorded against this invoice.</div>}
         </Pane>
       </div>
