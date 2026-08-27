@@ -90,6 +90,35 @@ const ENDED = new Set(['denied', 'closed', 'not_applicable'])
 const money = (n: number) =>
   n >= 1000 ? `$${(n / 1000).toFixed(n % 1000 === 0 ? 0 : 1)}K` : `$${n.toLocaleString()}`
 
+/**
+ * The verb for a row's button, taken from the step the engine actually
+ * computed. Every row saying "Open" throws away the one piece of information
+ * that makes a board scannable: what the next move is. The button still opens
+ * the school card, because that is where the move is completed and sends must
+ * live in exactly one place.
+ */
+const VERBS: Record<string, string> = {
+  send_nudge: 'Nudge',
+  send_to_client: 'Review and send',
+  send_to_qa: 'Send to Julie',
+  resolve_escalation: 'Decide',
+  request_draft: 'Request draft',
+  approve_draft: 'Approve',
+  request_research: 'Request research',
+  verify_window: 'Verify window',
+  verify_contact: 'Check contact',
+  prepare_submission: 'Prepare',
+  complete_profile: 'Complete profile',
+  complete_gate: 'Open gate',
+  allocate_award: 'Record award',
+  unblock_qa: 'Unblock',
+  unblock_draft: 'Unblock',
+  resume_drafting: 'Resume',
+  setup_pursuit: 'Send intro',
+  complete_action: 'Open',
+}
+const verbFor = (actionType: string) => VERBS[actionType] ?? 'Open'
+
 // ── Row ──
 
 function Row({
@@ -303,15 +332,7 @@ export default function NeedsYouBoard({
   const stillNeeded = Math.max(0, schools.reduce((sum, s) => sum + s.pipeline, 0) - awardedTotal)
 
   return (
-    <div
-      style={{
-        background: C.card,
-        border: `1px solid ${C.line}`,
-        borderRadius: 14,
-        overflow: 'hidden',
-        boxShadow: '0 1px 3px rgba(30,39,73,.06)',
-      }}
-    >
+    <div>
       {/* Money first, including the awarded figure while it still reads zero. */}
       <div style={{ display: 'flex', flexWrap: 'wrap', borderBottom: `1px solid ${C.line}` }}>
         <Metric
@@ -347,7 +368,7 @@ export default function NeedsYouBoard({
             name={i.label}
             pill={i.urgency === 'critical' ? 'Needs you now' : 'Waiting on you'}
             why={`${nameOf(i.pursuitId)}. ${i.why}`}
-            action="Open"
+            action={verbFor(i.actionType)}
             onAction={() => onOpenSchool(i.pursuitId)}
           />
         ))}
@@ -367,7 +388,7 @@ export default function NeedsYouBoard({
             name={i.label}
             pill="Asked, not answered"
             why={`${nameOf(i.pursuitId)}. ${i.why}`}
-            action="Open"
+            action="Nudge"
             onAction={() => onOpenSchool(i.pursuitId)}
           />
         ))}
