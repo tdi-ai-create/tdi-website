@@ -401,6 +401,49 @@ export async function placeProject(
 }
 
 /**
+ * Places every one of a creator's active projects.
+ *
+ * Unpause is creator-shaped, not project-shaped, so this is the wrapper for it.
+ * The old placeCreator read every row a creator owned across all projects and
+ * then locked all but one, which collapsed a two-project creator onto a single
+ * open step. Each project is placed on its own here.
+ *
+ * `startClock` is false for a paused creator. Repairing a board and starting a
+ * deadline are different things, and someone returning after months should not
+ * arrive to something already overdue.
+ */
+export async function placeCreatorProjects(
+  supabase: DbClient,
+  creatorId: string,
+  opts: { startClock?: boolean } = {}
+): Promise<{ ok: boolean; placed: Array<{ projectId: string; openStep: string | null }>; errors: string[] }> {
+  const { data: projects, error } = await supabase
+    .from('creator_projects')
+    .select('id')
+    .eq('creator_id', creatorId)
+    .eq('status', 'active');
+
+  if (error) return { ok: false, placed: [], errors: [`Could not load their projects: ${error.message}`] };
+  if (!projects || projects.length === 0) {
+    return { ok: false, placed: [], errors: ['This creator has no active project to place.'] };
+  }
+
+  const placed: Array<{ projectId: string; openStep: string | null }> = [];
+  const errors: string[] = [];
+
+  for (const project of projects as Array<{ id: string }>) {
+    const result = await placeProject(supabase, project.id, opts);
+    if (result.ok) {
+      placed.push({ projectId: project.id, openStep: result.openStep?.name ?? null });
+    } else {
+      errors.push(`${project.id}: ${result.error}`);
+    }
+  }
+
+  return { ok: errors.length === 0, placed, errors };
+}
+
+/**
  * Records a decision on one step and moves the project accordingly.
  *
  * This is the only function permitted to complete a step or open the next one.

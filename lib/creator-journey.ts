@@ -27,6 +27,8 @@ export interface JourneyStep {
   dueOn: string | null;
   /** Feedback rounds used. Surfaced so a creator can see revision ends. */
   round: number;
+  /** Times this step's date has been moved. Three reaches Bella. */
+  extensions: number;
 }
 
 export interface JourneyStage {
@@ -115,7 +117,7 @@ export async function getJourney(supabase: DbClient, projectId: string): Promise
   if (!path) {
     const { data: rows } = await supabase
       .from('creator_milestones')
-      .select('id, milestone_id, status, review_status, due_on, round, submitted_value, milestones!inner(name, description, action_type, action_config, team_status_message, requires_team_action, retired_at, is_collapsed_into)')
+      .select('id, milestone_id, status, review_status, due_on, round, extension_count, submitted_value, milestones!inner(name, description, action_type, action_config, team_status_message, requires_team_action, retired_at, is_collapsed_into)')
       .eq('project_id', projectId)
       .eq('status', 'available');
 
@@ -129,6 +131,7 @@ export async function getJourney(supabase: DbClient, projectId: string): Promise
           status: displayStatus(first),
           dueOn: first.due_on ?? null,
           round: first.round ?? 0,
+          extensions: first.extension_count ?? 0,
         }
       : null;
 
@@ -148,7 +151,7 @@ export async function getJourney(supabase: DbClient, projectId: string): Promise
     supabase.from('milestone_stages').select('milestone_id, stage_key').eq('path', path),
     supabase
       .from('creator_milestones')
-      .select('id, milestone_id, status, review_status, due_on, round, submitted_value, milestones!inner(name, description, sort_order, phase_id, action_type, action_config, team_status_message, requires_team_action, retired_at, is_collapsed_into, applies_to)')
+      .select('id, milestone_id, status, review_status, due_on, round, extension_count, submitted_value, milestones!inner(name, description, sort_order, phase_id, action_type, action_config, team_status_message, requires_team_action, retired_at, is_collapsed_into, applies_to)')
       .eq('project_id', projectId),
   ]);
 
@@ -175,6 +178,7 @@ export async function getJourney(supabase: DbClient, projectId: string): Promise
     status: displayStatus(r as { status: string; review_status: string | null }),
     dueOn: r.due_on ?? null,
     round: r.round ?? 0,
+    extensions: r.extension_count ?? 0,
     stageKey: stageOf.get(r.milestone_id)!,
     // Phase first, then order within the phase. sort_order alone restarts at 1
     // in every phase, and a stage can span two of them: Getting started holds
@@ -193,6 +197,7 @@ export async function getJourney(supabase: DbClient, projectId: string): Promise
     status: s.status,
     dueOn: s.dueOn,
     round: s.round,
+    extensions: s.extensions,
   });
 
   const open = steps.find((s) => s.status !== 'complete' && s.status !== 'todo') ?? null;

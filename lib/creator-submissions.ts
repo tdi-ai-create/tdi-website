@@ -84,14 +84,29 @@ export async function recordSubmission(
     return { ok: false, version, error: `Recording the submission failed: ${feedbackError.message}` };
   }
 
+  // Whether this step is waiting on a review, or is already done.
+  //
+  // Some submissions complete the step outright: a form, a confirmation, a
+  // choice. Marking one of those "submitted" puts a finished step into the
+  // review queue, where it sits looking like work Bella owes somebody.
+  const { data: stepNow } = await supabase
+    .from('creator_milestones')
+    .select('status, review_status')
+    .eq('id', milestoneRecordId)
+    .maybeSingle();
+
+  const alreadyDone = stepNow?.status === 'completed';
+
+  const stepPatch: Record<string, unknown> = {
+    submitted_value: submittedValue,
+    submission_notes: submissionNotes,
+    updated_at: new Date().toISOString(),
+  };
+  if (!alreadyDone) stepPatch.review_status = 'submitted';
+
   const { error: stepError } = await supabase
     .from('creator_milestones')
-    .update({
-      submitted_value: submittedValue,
-      submission_notes: submissionNotes,
-      review_status: 'submitted',
-      updated_at: new Date().toISOString(),
-    })
+    .update(stepPatch)
     .eq('id', milestoneRecordId);
 
   if (stepError) {

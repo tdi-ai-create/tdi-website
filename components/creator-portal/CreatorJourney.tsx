@@ -31,7 +31,10 @@ function markFor(step: JourneyStep): { glyph: string; color: string } {
   if (step.status === 'changes_requested') return { glyph: '●', color: CHANGE };
   if (step.status === 'in_review') return { glyph: '◐', color: BLUE };
   if (step.status === 'open') return { glyph: '●', color: YELLOW };
-  return { glyph: '○', color: step.ours ? BLUE : INK_3 };
+  // A square for our steps, not a blue circle. Colour alone is not a
+  // distinction: it reads the same at a glance and disappears entirely for
+  // anyone colourblind. The shape does the work and the colour reinforces it.
+  return step.ours ? { glyph: '▪', color: BLUE } : { glyph: '○', color: INK_3 };
 }
 
 function StageRow({ stage, expanded, onToggle }: { stage: JourneyStage; expanded: boolean; onToggle: () => void }) {
@@ -139,7 +142,7 @@ export function CreatorJourney({ journey }: { journey: Journey }) {
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px 18px', padding: '12px 16px', background: '#f4f6fb', borderTop: `1px solid ${LINE}`, fontSize: 12.5, color: INK_3 }}>
           <span><span aria-hidden style={{ color: PASS, fontSize: 11 }}>{'✓'}</span> done</span>
           <span><span aria-hidden style={{ color: YELLOW, fontSize: 11 }}>{'●'}</span> you are here</span>
-          <span><span aria-hidden style={{ color: BLUE, fontSize: 11 }}>{'○'}</span> we do this</span>
+          <span><span aria-hidden style={{ color: BLUE, fontSize: 11 }}>{'▪'}</span> we do this</span>
           <span><span aria-hidden style={{ color: INK_3, fontSize: 11 }}>{'○'}</span> still to come</span>
         </div>
       </div>
