@@ -29,12 +29,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Pursuit not found' }, { status: 404 })
   }
 
-  // 2. Find all pending_funding deliverables linked to this pursuit
+  // 2. Everything this pursuit is holding. The hold is its own flag now, not a
+  // status value, so releasing it cannot disturb delivery or billing state.
   const { data: deliverables } = await supabase
     .from('contract_deliverables')
     .select('id, label, service_type, total_amount')
     .eq('funding_pursuit_id', funding_pursuit_id)
-    .eq('delivery_status', 'pending_funding')
+    .eq('funding_hold', true)
 
   const flippedCount = deliverables?.length || 0
 
@@ -48,16 +49,16 @@ export async function POST(request: NextRequest) {
         updated_at: new Date().toISOString(),
       })
       .eq('funding_pursuit_id', funding_pursuit_id)
-      .eq('delivery_status', 'pending_funding')
+      .eq('funding_hold', true)
   }
 
   // 4. If partnership exists, recalculate service totals from all deliverables
   if (pursuit.partnership_id) {
     const { data: allDeliverables } = await supabase
       .from('contract_deliverables')
-      .select('service_type, quantity, delivery_status')
+      .select('service_type, quantity, delivery_state')
       .eq('partnership_id', pursuit.partnership_id)
-      .neq('delivery_status', 'cancelled')
+      .neq('delivery_state', 'cancelled')
 
     if (allDeliverables) {
       const counts = {

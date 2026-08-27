@@ -34,7 +34,7 @@ export default function DeliverablesList({ partnershipId, userEmail }: { partner
   const renderGroup = (items: any[], title: string, accentColor: string) => {
     if (items.length === 0) return null
     const totalValue = items.reduce((s: number, d: any) => s + Number(d.total_amount || 0), 0)
-    const deliveredCount = items.filter((d: any) => ['delivered', 'invoiced', 'paid'].includes(d.delivery_status)).length
+    const deliveredCount = items.filter((d: any) => d.delivery_state === 'delivered').length
 
     return (
       <div className="mb-3">
@@ -47,7 +47,15 @@ export default function DeliverablesList({ partnershipId, userEmail }: { partner
         </div>
         <div className="space-y-1">
           {items.map((d: any) => {
-            const sc = statusConfig[d.delivery_status] || statusConfig.pending
+            // Delivery and billing are separate facts now. Show the one that
+            // actually tells you where the line stands, money first.
+            const key = d.funding_hold ? 'pending_funding'
+              : d.billing_state === 'paid' ? 'paid'
+              : d.billing_state === 'invoiced' ? 'invoiced'
+              : d.delivery_state === 'cancelled' ? 'cancelled'
+              : d.delivery_state === 'delivered' ? 'delivered'
+              : 'pending'
+            const sc = statusConfig[key]
             return (
               <div key={d.id} className="flex items-center justify-between px-2.5 py-1.5 rounded-lg border border-gray-100 hover:border-gray-200 transition-colors" style={{ borderLeft: `3px solid ${accentColor}` }}>
                 <div className="flex-1 min-w-0">
@@ -56,8 +64,8 @@ export default function DeliverablesList({ partnershipId, userEmail }: { partner
                     {d.delivery_date && `Delivered ${new Date(d.delivery_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`}
                     {d.delivered_by && ` by ${d.delivered_by.split('@')[0]}`}
                     {!d.delivery_date && d.is_complimentary && 'Complimentary'}
-                    {!d.delivery_date && !d.is_complimentary && d.delivery_status === 'pending' && 'Not yet scheduled'}
-                    {!d.delivery_date && d.delivery_status === 'pending_funding' && 'Waiting on grant funding'}
+                    {!d.delivery_date && !d.is_complimentary && !d.funding_hold && d.delivery_state !== 'delivered' && 'Not yet delivered'}
+                    {!d.delivery_date && d.funding_hold && 'Waiting on grant funding'}
                   </div>
                 </div>
                 <div className="flex items-center gap-2 flex-shrink-0">

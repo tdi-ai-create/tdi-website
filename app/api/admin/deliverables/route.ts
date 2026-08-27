@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServiceSupabase } from '@/lib/supabase'
-import { fromLegacyStatus } from '@/lib/billing/state'
 
 async function isTDIAdmin(email: string) {
   // Check if email belongs to a team member
@@ -42,14 +41,15 @@ export async function GET(request: NextRequest) {
 
   if (partnershipId) query = query.eq('partnership_id', partnershipId)
   if (quoteId) query = query.eq('quote_id', quoteId)
-  if (status) query = query.eq('delivery_status', status)
+  if (status) query = query.eq('billing_state', status)
   if (fundingType) query = query.eq('funding_type', fundingType)
 
-  // Invoice-ready: delivered, not invoiced, not complimentary
+  // Ready to bill: the work happened, it is unbilled, and no grant is holding it.
   if (invoiceReady === 'true') {
     query = query
-      .eq('delivery_status', 'delivered')
-      .is('invoice_id', null)
+      .eq('delivery_state', 'delivered')
+      .eq('billing_state', 'not_billed')
+      .eq('funding_hold', false)
       .eq('is_complimentary', false)
   }
 
@@ -69,7 +69,7 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
   }
 
-  const { id, delivery_status, delivery_date, delivery_notes, delivered_by } = await request.json()
+  const { id, delivery_state, billing_state, delivery_date, delivery_notes, delivered_by } = await request.json()
 
   if (!id) {
     return NextResponse.json({ error: 'deliverable id required' }, { status: 400 })
@@ -78,7 +78,8 @@ export async function PATCH(request: NextRequest) {
   const supabase = getServiceSupabase()
 
   const updateFields: Record<string, unknown> = { updated_at: new Date().toISOString() }
-  if (delivery_status) Object.assign(updateFields, fromLegacyStatus(delivery_status))
+  if (delivery_state) updateFields.delivery_state = delivery_state
+  if (billing_state) updateFields.billing_state = billing_state
   if (delivery_date) updateFields.delivery_date = delivery_date
   if (delivery_notes !== undefined) updateFields.delivery_notes = delivery_notes
   if (delivered_by) updateFields.delivered_by = delivered_by
