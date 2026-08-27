@@ -32,6 +32,16 @@ let failures = 0;
 const pass = (m) => console.log(`  PASS  ${m}`);
 const fail = (m) => { console.log(`  FAIL  ${m}`); failures += 1; };
 
+// The flag is global, not scoped to the test creator, so this run turns the
+// engine on for everybody for its duration. Refuse to run if it is already on:
+// otherwise cleanup() would switch it off for the whole roster afterwards.
+const { data: flagBefore } = await sb.from('creator_config').select('enabled').eq('key', 'step_engine').maybeSingle();
+if (flagBefore?.enabled) {
+  console.log('The step engine is already ON for everyone.');
+  console.log('This test toggles that global flag and would turn it off afterwards. Not running.');
+  process.exit(1);
+}
+
 let creatorId = null;
 let projectId = null;
 let authId = null;

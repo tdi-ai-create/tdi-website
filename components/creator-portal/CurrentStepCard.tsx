@@ -1,6 +1,7 @@
 'use client';
 
 import { MilestoneAction } from './MilestoneAction';
+import { StepDate } from './StepDate';
 import type { Journey } from '@/lib/creator-journey';
 
 /**
@@ -98,9 +99,17 @@ export function CurrentStepCard({
         )}
 
         {dueLabel(step.dueOn) && (
-          <p style={{ margin: '10px 0 0', fontSize: 13, color: INK_3 }}>
-            {dueLabel(step.dueOn)}. This is a suggestion, never a deadline.
-          </p>
+          <div style={{ margin: '12px 0 0', display: 'flex', flexWrap: 'wrap', gap: '6px 14px', alignItems: 'baseline' }}>
+            <p style={{ margin: 0, fontSize: 13, color: INK_3 }}>
+              {dueLabel(step.dueOn)}. This is a suggestion, never a deadline.
+            </p>
+            <StepDate
+              milestoneRecordId={step.recordId}
+              dueOn={step.dueOn as string}
+              extensions={step.extensions}
+              onExtended={onComplete}
+            />
+          </div>
         )}
       </div>
 
@@ -112,6 +121,10 @@ export function CurrentStepCard({
             action_type: action.action_type ?? undefined,
             action_config: action.action_config ?? undefined,
             status: action.status,
+            // Without this, a step sitting in review showed the live Submit
+            // button again: the pill above said "With the TDI team" while the
+            // control invited a second submission and wrote another version.
+            awaiting_approval: inReview,
             submitted_value: action.submitted_value,
             team_status_message: action.team_status_message,
           }}

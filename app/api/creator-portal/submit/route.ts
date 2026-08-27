@@ -66,11 +66,72 @@ export async function POST(request: Request) {
       }
     }
 
-    // 2b. Handle content path selection - update creator table
+    // The project this submission belongs to, captured before anything below can
+    // move it. Answering "create again" creates a NEW project and repoints
+    // creators.active_project_id at it partway through this route, so anything
+    // resolving the project later gets the wrong one.
+    const { data: submittingProject } = await supabase
+      .from('creator_milestones')
+      .select('id, project_id')
+      .eq('creator_id', creatorId)
+      .eq('milestone_id', milestoneId)
+      .not('project_id', 'is', null)
+      .order('updated_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    const submittingProjectId: string | null = submittingProject?.project_id ?? null;
+
+    // 2b. Handle content path selection
+    //
+    // The path belongs to the PROJECT, not the creator. A creator with a course
+    // and a download has two answers and the creator row can only hold one:
+    // Katie Welch is that creator today. The engine and the journey both read
+    // creator_projects.content_path.
+    //
+    // This used to write only creators.content_path, and nothing syncs the two.
+    // The 17 projects that currently carry a path were backfilled by hand on
+    // 26 August, so the next creator to choose one would have been placed on a
+    // pathless board: every step specific to their path locked, and no journey
+    // at all. Celia Correa, Denis Sheeran, Keelie Taylor and Nancy Hankee are
+    // all sitting on this step right now.
+    //
+    // Both are written. The creator row stays in step for the many older
+    // queries that still read it, and the project row is the one that decides.
     if (submissionType === 'path_selection') {
       const selectedPath = content.selected_path;
-      if (!selectedPath || !['blog', 'download', 'course'].includes(selectedPath)) {
+
+      // blog was removed on 26 August. It was tagged on nine milestones but the
+      // selector never offered it, so nobody could ever become one.
+      if (!selectedPath || !['download', 'course'].includes(selectedPath)) {
         return NextResponse.json({ success: false, error: 'Invalid content path' }, { status: 400 });
+      }
+
+      const { data: targetProject, error: projectLookupError } = await supabase
+        .from('creator_projects')
+        .select('id')
+        .eq('creator_id', creatorId)
+        .eq('status', 'active')
+        .order('project_number', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (projectLookupError || !targetProject) {
+        console.error('[submit] No active project to record the path against:', projectLookupError?.message);
+        return NextResponse.json(
+          { success: false, error: 'We could not find the project to save your choice against. Please tell us.' },
+          { status: 500 }
+        );
+      }
+
+      const { error: projectPathError } = await supabase
+        .from('creator_projects')
+        .update({ content_path: selectedPath })
+        .eq('id', targetProject.id);
+
+      if (projectPathError) {
+        console.error('[submit] Error saving the path on the project:', projectPathError);
+        return NextResponse.json({ success: false, error: projectPathError.message }, { status: 500 });
       }
 
       const { error: pathError } = await supabase
@@ -395,11 +456,20 @@ export async function POST(request: Request) {
       updateData.submission_data = submissionData;
     }
 
-    const { error: updateError } = await supabase
+    // Scoped to one project. Without this, answering "create again" marked the
+    // step complete on BOTH the finished project and the one just created, and
+    // the engine then saw the new board's last step already done, found nothing
+    // after it, and locked every remaining row. A creator saying "yes, I have
+    // more to share" ended up with a new project and no open step at all.
+    let stepUpdate = supabase
       .from('creator_milestones')
       .update(updateData)
       .eq('creator_id', creatorId)
       .eq('milestone_id', milestoneId);
+
+    if (submittingProjectId) stepUpdate = stepUpdate.eq('project_id', submittingProjectId);
+
+    const { error: updateError } = await stepUpdate;
 
     if (updateError) {
       console.error('[submit] Error updating milestone:', updateError);
@@ -454,7 +524,12 @@ export async function POST(request: Request) {
       && (await creatorFlag(supabase, 'step_engine'));
 
     if (useEngine) {
-      const resolved = await resolveStepRow(supabase, creatorId, milestoneId);
+      // The row on the project this submission belongs to, not on whichever
+      // project happens to be active by now.
+      const resolved = submittingProject?.id
+        ? { recordId: submittingProject.id as string, error: undefined }
+        : await resolveStepRow(supabase, creatorId, milestoneId);
+
       if (resolved.error || !resolved.recordId) {
         console.error('[submit] Engine could not find the step:', resolved.error);
         return NextResponse.json({ success: false, error: resolved.error }, { status: 400 });

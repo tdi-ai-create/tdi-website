@@ -295,7 +295,10 @@ export async function POST(request: NextRequest) {
     // retired on 26 August. That is how the header came to read "11 of 34" on
     // the same screen where the journey read "7 of 27". Two progress numbers on
     // one page, and the bigger, older, more discouraging one on top.
-    const reconciled = journey
+    // Guarded on stages, matching the page. A project with no path chosen yet
+    // returns a journey with zero stages, and reconciling on that alone wrote
+    // "0 of 0" into the header while the old list showed a full board below it.
+    const reconciled = journey?.stages?.length
       ? {
           totalMilestones: journey.totalSteps,
           completedMilestones: journey.completedSteps,

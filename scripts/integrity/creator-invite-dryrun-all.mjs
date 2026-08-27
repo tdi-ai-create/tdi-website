@@ -19,15 +19,22 @@ const sb = createClient(
   { auth: { autoRefreshToken: false, persistSession: false } }
 );
 
-const { data: creators } = await sb
+const { data: creators, error: creatorsError } = await sb
   .from('creators')
   .select('id, name, email, lifecycle_state')
   .eq('status', 'active')
   .order('name');
+if (creatorsError) { console.error('could not read creators:', creatorsError.message); process.exit(1); }
 
 const authByEmail = new Map();
-const { data: users } = await sb.auth.admin.listUsers({ page: 1, perPage: 1000 });
-for (const u of users.users) if (u.email) authByEmail.set(u.email.toLowerCase(), u);
+let page = 1;
+for (;;) {
+  const { data: users, error: usersError } = await sb.auth.admin.listUsers({ page, perPage: 1000 });
+  if (usersError) { console.error('could not read accounts:', usersError.message); process.exit(1); }
+  for (const u of users.users) if (u.email) authByEmail.set(u.email.toLowerCase(), u);
+  if (users.users.length < 1000) break;
+  page += 1;
+}
 
 const rows = [];
 let noAccount = 0;

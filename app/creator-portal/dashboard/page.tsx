@@ -553,10 +553,12 @@ export default function CreatorDashboardPage() {
               )}
 
               {/* Submissions & Feedback Portal
-                  Only when there is no journey. The journey already shows what
-                  is with us and what is with them, step by step, which is what
-                  this panel was standing in for. */}
-              {!hasJourney && (
+                  Always. This is the only component that fetches the feedback a
+                  creator was actually sent, and the only place offering Revise
+                  and Resubmit. Hiding it behind the journey left anyone asked
+                  for changes unable to read what we wrote or reply to it. The
+                  journey shows WHERE their work sits; this shows WHAT was said
+                  about it, and those are different things. */}
               <div className="mt-6">
                 <FeedbackPortal
                   creatorId={dashboardData.creator.id}
@@ -573,7 +575,6 @@ export default function CreatorDashboardPage() {
                   onRefresh={refreshDashboard}
                 />
               </div>
-              )}
 
               {/* Content grid */}
               <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
