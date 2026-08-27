@@ -10,6 +10,7 @@ import { CreatorDashboardHeader } from '@/components/creator-portal/CreatorDashb
 import { PhaseProgress } from '@/components/creator-portal/PhaseProgress';
 import { CreatorJourney } from '@/components/creator-portal/CreatorJourney';
 import { CurrentStepCard } from '@/components/creator-portal/CurrentStepCard';
+import { CreatorGreeting } from '@/components/creator-portal/CreatorGreeting';
 import type { Journey } from '@/lib/creator-journey';
 import { CourseDetailsPanel } from '@/components/creator-portal/CourseDetailsPanel';
 import { NotesPanel } from '@/components/creator-portal/NotesPanel';
@@ -518,13 +519,25 @@ export default function CreatorDashboardPage() {
                 return null;
               })()}
 
-              {/* Dashboard header with progress */}
-              <CreatorDashboardHeader
-                creator={dashboardData.creator}
-                completedMilestones={dashboardData.completedMilestones}
-                totalMilestones={dashboardData.totalMilestones}
-                progressPercentage={dashboardData.progressPercentage}
-              />
+              {/* Who they are and what they are making.
+                  The percentage hero this replaces framed a creator's work as a
+                  completion rate and told them they were making good progress
+                  regardless of whether they were. The journey carries progress
+                  properly now, stage by stage. */}
+              {hasJourney ? (
+                <CreatorGreeting
+                  name={dashboardData.creator.name}
+                  courseTitle={dashboardData.creator.course_title}
+                  contentPath={dashboardData.contentPath || dashboardData.creator.content_path}
+                />
+              ) : (
+                <CreatorDashboardHeader
+                  creator={dashboardData.creator}
+                  completedMilestones={dashboardData.completedMilestones}
+                  totalMilestones={dashboardData.totalMilestones}
+                  progressPercentage={dashboardData.progressPercentage}
+                />
+              )}
 
               {/* Projected Completion Date Countdown
                   Only when there is no journey. Every step now carries its own
@@ -550,6 +563,27 @@ export default function CreatorDashboardPage() {
                   }}
                 />
               </div>
+              )}
+
+              {/* One thing to do, before anything else on the page. */}
+              {hasJourney && (
+                <CurrentStepCard
+                  journey={(dashboardData as unknown as { journey: Journey }).journey}
+                  creatorId={dashboardData.creator.id}
+                  creatorName={dashboardData.creator.name}
+                  onComplete={refreshDashboard}
+                  teamNotes={dashboardData.notes.filter(n => n.visible_to_creator).map(n => n.content).join('\n\n')}
+                  creator={{
+                    google_doc_link: dashboardData.creator.google_doc_link,
+                    drive_folder_link: dashboardData.creator.drive_folder_link,
+                    marketing_doc_link: dashboardData.creator.marketing_doc_link,
+                    course_url: dashboardData.creator.course_url,
+                    discount_code: dashboardData.creator.discount_code,
+                    wants_video_editing: dashboardData.creator.wants_video_editing,
+                    wants_download_design: dashboardData.creator.wants_download_design,
+                    content_path: dashboardData.creator.content_path,
+                  }}
+                />
               )}
 
               {/* Submissions & Feedback Portal
@@ -584,31 +618,7 @@ export default function CreatorDashboardPage() {
                       for this creator's path. Falls back to the old progress
                       list if the journey could not be built, so a creator always
                       sees their board. */}
-                  {hasJourney ? (
-                    <>
-                      {/* One thing to do, then the road it sits on. */}
-                      <div className="mb-8">
-                        <CurrentStepCard
-                          journey={(dashboardData as unknown as { journey: Journey }).journey}
-                          creatorId={dashboardData.creator.id}
-                          creatorName={dashboardData.creator.name}
-                          onComplete={refreshDashboard}
-                          teamNotes={dashboardData.notes.filter(n => n.visible_to_creator).map(n => n.content).join('\n\n')}
-                          creator={{
-                            google_doc_link: dashboardData.creator.google_doc_link,
-                            drive_folder_link: dashboardData.creator.drive_folder_link,
-                            marketing_doc_link: dashboardData.creator.marketing_doc_link,
-                            course_url: dashboardData.creator.course_url,
-                            discount_code: dashboardData.creator.discount_code,
-                            wants_video_editing: dashboardData.creator.wants_video_editing,
-                            wants_download_design: dashboardData.creator.wants_download_design,
-                            content_path: dashboardData.creator.content_path,
-                          }}
-                        />
-                      </div>
-                      <CreatorJourney journey={(dashboardData as unknown as { journey: Journey }).journey} />
-                    </>
-                  ) : (
+                  {hasJourney ? null : (
                     <>
                   <h2 className="text-xl font-semibold text-[#1e2749] mb-4">
                     Your Progress
@@ -650,6 +660,12 @@ export default function CreatorDashboardPage() {
 
                 {/* Sidebar */}
                 <div className="space-y-6">
+                  {/* The road, beside the task rather than under it. Eight
+                      stages collapsed to their names, only the current one
+                      open, our steps marked as ours. */}
+                  {hasJourney && (
+                    <CreatorJourney journey={(dashboardData as unknown as { journey: Journey }).journey} />
+                  )}
                   <CourseDetailsPanel creator={dashboardData.creator} />
 
                   {/* Affiliate Link Card */}
