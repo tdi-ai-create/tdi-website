@@ -9,6 +9,8 @@ type Draft = {
   subject: string; body: string; status: string; sent_at: string | null;
   send_result: string | null; drafted_by: string | null; sent_by: string | null;
   attachments: { name: string }[]; created_at: string;
+  delivered_at: string | null; bounced_at: string | null; bounce_reason: string | null;
+  opened_at: string | null; last_event: string | null;
 };
 
 const KIND: Record<string, string> = {
@@ -65,9 +67,16 @@ export default function OutboxPage() {
     >
       <MoneyStrip items={[
         { label: 'Waiting for you', value: String(t.drafts), note: 'not sent yet', dot: '#B45309' },
-        { label: 'Sent', value: String(t.sent), note: 'delivered to clients', dot: '#059669' },
-        { label: 'Failed', value: String(t.failed), note: 'still here, not lost', dot: '#DC2626' },
+        { label: 'Sent', value: String(t.sent), note: 'left the building', dot: '#059669' },
+        { label: 'Unconfirmed', value: String(t.unconfirmed ?? 0), note: 'no delivery receipt yet', dot: '#D97706' },
+        { label: 'Bounced', value: String(t.bounced ?? 0), note: 'never arrived', dot: '#DC2626' },
       ]} />
+
+      {(t.bounced ?? 0) > 0 && (
+        <Banner tone="red" title={`${t.bounced} message${t.bounced > 1 ? 's' : ''} never reached the client`}>
+          A bounced invoice is worse than an unsent one, because the clock keeps running while nobody knows. Fix the address and resend.
+        </Banner>
+      )}
 
       <Banner tone="blue" title={`Everything sends from ${data.from}`}>
         Signed &quot;Billing, TDI Team&quot;. Replies come back to that address, so your own name is never on collections work. If a client wants to talk, offer a call with a team member.
@@ -101,11 +110,16 @@ export default function OutboxPage() {
                     to {d.to_email}{d.cc_email ? `, cc ${d.cc_email}` : ''}
                   </span>
                 </span>
-                <span style={{ flex: '0 0 150px' }}>
+                <span style={{ flex: '0 0 190px', display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                   {d.status === 'draft' ? <Pill tone="acc">Waiting for you</Pill>
-                    : d.status === 'sent' ? <Pill tone="green">Sent</Pill>
+                    : d.bounced_at ? <Pill tone="red">Bounced</Pill>
                     : d.status === 'failed' ? <Pill tone="red">Failed</Pill>
+                    : d.status === 'sent' ? (
+                        d.delivered_at ? <Pill tone="green">Delivered</Pill>
+                                       : <Pill tone="amber">Sent, unconfirmed</Pill>
+                      )
                     : <Pill tone="slate">Cancelled</Pill>}
+                  {d.opened_at && <Pill tone="blue">Opened</Pill>}
                 </span>
                 <span style={{ flex: '0 0 128px', fontSize: 12.5, color: '#64748B', textAlign: 'right' }}>
                   {KIND[d.kind] ?? d.kind}
@@ -114,9 +128,27 @@ export default function OutboxPage() {
 
               {isOpen && (
                 <div style={S.body}>
-                  {d.status === 'failed' && (
+                  {d.bounced_at && (
+                    <Banner tone="red" title="This never reached them">
+                      Bounced on {new Date(d.bounced_at).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}.
+                      {d.bounce_reason ? ` ${d.bounce_reason}` : ''} The client has not seen this, so do not chase them for it.
+                      Fix the address and send again.
+                    </Banner>
+                  )}
+                  {d.status === 'failed' && !d.bounced_at && (
                     <Banner tone="red" title="This did not send">
                       It is still here and nothing was lost. {d.send_result?.slice(0, 200)}
+                    </Banner>
+                  )}
+                  {d.status === 'sent' && !d.delivered_at && !d.bounced_at && (
+                    <Banner tone="amber" title="Sent, but not yet confirmed delivered">
+                      The provider accepted it. Until a delivery confirmation arrives we know it left, not that it landed.
+                      This usually resolves within a minute or two.
+                    </Banner>
+                  )}
+                  {d.delivered_at && (
+                    <Banner tone="green" title={`Delivered ${new Date(d.delivered_at).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}`}>
+                      Confirmed by the provider.{d.opened_at ? ` Opened ${new Date(d.opened_at).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}.` : ' Not opened yet.'}
                     </Banner>
                   )}
                   {d.status === 'sent' && (
