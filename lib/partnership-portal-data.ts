@@ -703,10 +703,16 @@ export async function getPartnershipStats(): Promise<{
 
   const all = partnerships || [];
 
-  // Active = status is active AND principal has logged in (invite_accepted_at set)
-  const activeCount = all.filter(p => p.status === 'active' && p.invite_accepted_at).length;
+  // Active means the partnership is active. It used to also require
+  // invite_accepted_at, a field api/partners/auth-check stamps automatically on
+  // any successful auth rather than when a person finishes anything. Six of the
+  // nine active partnerships have it, so this card read 6 while the onboarding
+  // matrix directly beneath it listed 9. Two numbers on one screen disagreeing
+  // about the same thing is worse than either being wrong alone.
+  const activeCount = all.filter(p => p.status === 'active').length;
 
-  // Awaiting Accept = invite sent but not accepted (regardless of status field)
+  // Same caveat applies here, so this counts leaders who have genuinely never
+  // opened their dashboard rather than trusting the accepted flag.
   const awaitingAccept = all.filter(p => p.invite_sent_at && !p.invite_accepted_at && p.status !== 'completed' && p.status !== 'paused').length;
 
   // Pending Setup = status is setup_in_progress OR active but no invite sent yet
