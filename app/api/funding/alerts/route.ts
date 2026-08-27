@@ -2,6 +2,7 @@ import { createClient } from '@supabase/supabase-js'
 import { NextResponse } from 'next/server'
 import { requireAdminAuth } from '@/lib/tdi-admin/auth'
 import { calculateFundingAlerts } from '@/lib/tdi-admin/funding-alert-rules'
+import { NOT_TERMINAL_FILTER } from '@/lib/funding/task-status'
 
 export async function GET() {
   try {
@@ -17,7 +18,7 @@ export async function GET() {
     const [pursuitRes, oppRes, actionRes] = await Promise.all([
       supabase.from('funding_pursuits').select('id, pursuit_name, district_name'),
       supabase.from('funding_opportunities').select('*').not('status', 'in', '("awarded","denied")'),
-      supabase.from('funding_action_items').select('*').not('status', 'in', '("done","skipped")'),
+      supabase.from('funding_action_items').select('*').not('status', 'in', NOT_TERMINAL_FILTER),
     ])
 
     const alerts = calculateFundingAlerts({
