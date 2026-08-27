@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { requireAdminAuth } from '@/lib/tdi-admin/auth';
+import { resolvePartnershipMembers } from '@/lib/hub/partnership-members';
 
 function getSupabaseAdmin() {
   return createClient(
@@ -202,12 +203,27 @@ export async function GET(
         // empty. The course title comes from the hub_courses foreign key; the
         // email needs a separate lookup because the user FK points at
         // auth.users rather than hub_profiles.
+        //
+        // It also had no partnership filter at all. It pulled every enrolment
+        // in the Hub, so a report generated for one school would have listed
+        // other schools' educators. Scoped now.
         let courseData = null;
         if (hubSupabase) {
           try {
+            const { userIds: courseMembers } = await resolvePartnershipMembers(partnershipId);
+            if (courseMembers.length === 0) {
+              return NextResponse.json({
+                type: 'courses',
+                hasData: false,
+                message: 'No Hub seats for this partnership, so there are no enrolments to report.',
+                rowCount: 0,
+              });
+            }
+
             const { data: enrollments, error: enrollErr } = await hubSupabase
               .from('hub_enrollments')
               .select('user_id, status, completed_at, enrolled_at, course:hub_courses(title)')
+              .in('user_id', courseMembers)
               .limit(2000);
 
             if (enrollErr) {
@@ -259,20 +275,31 @@ export async function GET(
 
       case 'wellness': {
         // Anonymized wellness summary (never individual names)
-        let vibeData = null;
+        // Two things were wrong. It read hub_activity_log for a
+        // 'wellbeing_check' action, which holds 20 rows, while the actual Vibe
+        // Check answers live in hub_assessments, which holds 450. And it had no
+        // partnership filter, so it averaged every school together and called
+        // the result one school's wellbeing.
+        let vibeData: { stress_score: number }[] | null = null;
         if (hubSupabase) {
-          try {
-            const { data } = await hubSupabase
-              .from('hub_activity_log')
-              .select('metadata, created_at')
-              .eq('action', 'wellbeing_check')
+          const { userIds: vibeMembers } = await resolvePartnershipMembers(partnershipId);
+          if (vibeMembers.length > 0) {
+            const { data, error: vibeErr } = await hubSupabase
+              .from('hub_assessments')
+              .select('stress_score')
+              .in('user_id', vibeMembers)
+              .eq('type', 'daily_check_in')
+              .not('stress_score', 'is', null)
               .gte('created_at', new Date(Date.now() - 90 * 86400000).toISOString())
               .limit(5000);
-            vibeData = data;
-          } catch {}
+            if (vibeErr) {
+              console.error('[reports] wellness read failed:', vibeErr.message);
+            }
+            vibeData = data as { stress_score: number }[] | null;
+          }
         }
 
-        const scores = (vibeData || []).map((v: { metadata: { score?: number } }) => v.metadata?.score).filter(Boolean) as number[];
+        const scores = (vibeData || []).map((v) => Number(v.stress_score)).filter((n) => !Number.isNaN(n));
         const avgScore = scores.length > 0 ? (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(1) : null;
         const hasData = scores.length > 0;
 

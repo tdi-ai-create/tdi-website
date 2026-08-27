@@ -19,7 +19,9 @@ import { TDISuggestions } from '@/components/dashboard/shared/TDISuggestions'
 import { STATIC_DEFAULTS } from '@/lib/dashboard/dashboardDefaults'
 import { generateSuggestions, type TDISuggestion } from '@/lib/dashboard/generateSuggestions'
 import { StaffRosterWithPhotos, StaffPhotoUpload, FindStaffSearch } from '@/components/tdi-admin/leadership/staff'
-import { ArrowLeft, Loader2, Building2, ExternalLink, Calendar, Mail, Phone, MessageCircle, Eye, FileText, BarChart3, Users, AlertTriangle, TrendingUp, Briefcase, Edit3, ChevronRight, X } from 'lucide-react'
+import { ArrowLeft, Loader2, Building2, ExternalLink, Calendar, Mail, Phone, MessageCircle, Eye, FileText, BarChart3, Users, AlertTriangle, TrendingUp, Briefcase, Edit3, ChevronRight, X,
+  Target,
+} from 'lucide-react'
 import Image from 'next/image'
 import ObservationImpactScorecard from '@/components/dashboard/leadership/ObservationImpactScorecard'
 import PositionStrip from '@/components/tdi-admin/billing/PositionStrip'
@@ -1617,6 +1619,14 @@ export default function AdminPartnershipDetailPage() {
                   { type: 'roster', label: 'Staff Roster', icon: Users },
                   { type: 'engagement', label: 'Hub Engagement', icon: BarChart3 },
                   { type: 'board_summary', label: 'Board Summary', icon: FileText },
+                  // These three were built in the reports route and never had a
+                  // button, so nobody could reach them. Courses and wellness
+                  // also had no partnership filter until now: the course report
+                  // pulled every enrolment in the Hub, so a report for one
+                  // school listed other schools' educators.
+                  { type: 'courses', label: 'Course Progress', icon: BarChart3 },
+                  { type: 'kpi_standings', label: 'Goal Standings', icon: Target },
+                  { type: 'wellness', label: 'Team Wellness', icon: Users },
                   { type: 'full_export', label: 'Full Export', icon: FileText },
                 ].map(report => (
                   <button
