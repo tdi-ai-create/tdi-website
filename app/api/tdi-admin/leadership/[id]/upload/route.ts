@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { requireAdminAuth } from '@/lib/tdi-admin/auth';
 import { getServiceSupabase } from '@/lib/supabase'
 
 export async function POST(
@@ -7,11 +8,11 @@ export async function POST(
 ) {
   try {
     const { id: partnershipId } = await params
-    const userEmail = request.headers.get('x-user-email')
-
-    if (!userEmail) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+    // An x-user-email header is a claim, not proof. Anyone could send it.
+    // requireAdminAuth verifies the actual signed-in session.
+    const auth = await requireAdminAuth();
+    if (auth instanceof NextResponse) return auth;
+    const userEmail = auth.member.email;
 
     const formData = await request.formData()
     const file = formData.get('file') as File
@@ -129,7 +130,7 @@ export async function POST(
 
 // GET: List files for a partnership
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
@@ -163,11 +164,11 @@ export async function DELETE(
     const { id: partnershipId } = await params
     const { searchParams } = new URL(request.url)
     const fileId = searchParams.get('fileId')
-    const userEmail = request.headers.get('x-user-email')
-
-    if (!userEmail) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+    // An x-user-email header is a claim, not proof. Anyone could send it.
+    // requireAdminAuth verifies the actual signed-in session.
+    const auth = await requireAdminAuth();
+    if (auth instanceof NextResponse) return auth;
+    const userEmail = auth.member.email;
 
     if (!fileId) {
       return NextResponse.json({ error: 'File ID required' }, { status: 400 })

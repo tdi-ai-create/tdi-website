@@ -1,13 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAdminAuth } from '@/lib/tdi-admin/auth';
 import { getServiceSupabase } from '@/lib/supabase';
-import { isTDIAdmin } from '@/lib/is-tdi-admin';
 
 export const dynamic = 'force-dynamic';
 
 /** Documents on file, plus what each district has told us it needs before it will pay. */
-export async function GET(request: NextRequest) {
-  const email = request.headers.get('x-user-email');
-  if (!(await isTDIAdmin(email))) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+export async function GET(_request: NextRequest) {
+  // An x-user-email header is a claim, not proof. Anyone could send it.
+  // requireAdminAuth verifies the actual signed-in session.
+  const auth = await requireAdminAuth();
+  if (auth instanceof NextResponse) return auth;
+  const email = auth.member.email;
 
   const sb = getServiceSupabase();
   const [{ data: docs }, { data: reqs }, { data: districts }] = await Promise.all([
@@ -49,8 +52,11 @@ export async function GET(request: NextRequest) {
 
 /** Record a document, or record that a district requires one. */
 export async function POST(request: NextRequest) {
-  const email = request.headers.get('x-user-email');
-  if (!(await isTDIAdmin(email))) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  // An x-user-email header is a claim, not proof. Anyone could send it.
+  // requireAdminAuth verifies the actual signed-in session.
+  const auth = await requireAdminAuth();
+  if (auth instanceof NextResponse) return auth;
+  const email = auth.member.email;
 
   const sb = getServiceSupabase();
   const b = await request.json().catch(() => ({}));

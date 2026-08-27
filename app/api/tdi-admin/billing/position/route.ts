@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAdminAuth } from '@/lib/tdi-admin/auth';
 import { getServiceSupabase } from '@/lib/supabase';
-import { isTDIAdmin } from '@/lib/is-tdi-admin';
 
 export const dynamic = 'force-dynamic';
 
@@ -11,8 +11,11 @@ export const dynamic = 'force-dynamic';
  * that writes. Three writers is how Oak Grove drifted.
  */
 export async function GET(request: NextRequest) {
-  const email = request.headers.get('x-user-email');
-  if (!(await isTDIAdmin(email))) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  // An x-user-email header is a claim, not proof. Anyone could send it.
+  // requireAdminAuth verifies the actual signed-in session.
+  const auth = await requireAdminAuth();
+  if (auth instanceof NextResponse) return auth;
+  const email = auth.member.email;
 
   const partnershipId = request.nextUrl.searchParams.get('partnershipId');
   if (!partnershipId) return NextResponse.json({ error: 'partnershipId required' }, { status: 400 });

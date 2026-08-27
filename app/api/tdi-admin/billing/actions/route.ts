@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAdminAuth } from '@/lib/tdi-admin/auth';
 import { getServiceSupabase } from '@/lib/supabase';
-import { isTDIAdmin } from '@/lib/is-tdi-admin';
 import { asDelivered, asInvoiced, asPaid, asNotBilled } from '@/lib/billing/state';
 import { slackNotify } from '@/lib/slack-notify';
 
@@ -27,10 +27,11 @@ const money = (n: number) =>
 /** Who did it, so the channel is a record rather than an anonymous feed. */
 const by = (email: string) => email.split('@')[0];
 export async function POST(request: NextRequest) {
-  const email = request.headers.get('x-user-email');
-  if (!(await isTDIAdmin(email))) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  // An x-user-email header is a claim, not proof. Anyone could send it.
+  // requireAdminAuth verifies the actual signed-in session.
+  const auth = await requireAdminAuth();
+  if (auth instanceof NextResponse) return auth;
+  const email = auth.member.email;
 
   const dryRun = request.nextUrl.searchParams.get('dryRun') === '1';
   const body = await request.json().catch(() => ({}));
@@ -197,8 +198,14 @@ async function recordPayment(sb: any, b: any, email: string, dryRun: boolean) {
     const { data: apps } = await sb.from('billing_payment_applications').select('amount').eq('invoice_id', inv.id);
     const paidSoFar = (apps ?? []).reduce((s: number, a: any) => s + Number(a.amount), 0);
     if (paidSoFar + 0.005 >= Number(inv.amount)) {
-      await sb.from('intelligence_invoices').update({ status: 'paid', updated_at: new Date().toISOString() }).eq('id', inv.id);
-      await sb.from('contract_deliverables').update({ ...asPaid(), updated_at: new Date().toISOString() }).eq('invoice_id', inv.id);
+      // Marking an invoice paid is the moment money is considered received.
+      const { error: paidErr } = await sb.from('intelligence_invoices')
+        .update({ status: 'paid', updated_at: new Date().toISOString() }).eq('id', inv.id);
+      if (paidErr) console.error('[billing/actions] invoice not marked paid:', paidErr.message);
+
+      const { error: delivPaidErr } = await sb.from('contract_deliverables')
+        .update({ ...asPaid(), updated_at: new Date().toISOString() }).eq('invoice_id', inv.id);
+      if (delivPaidErr) console.error('[billing/actions] deliverables not marked paid:', delivPaidErr.message);
     }
   }
 
@@ -225,12 +232,21 @@ async function voidInvoice(sb: any, b: any, email: string, dryRun: boolean) {
   const plan = { invoice: inv.invoice_number, amount: Number(inv.amount), lines_returned_to_not_billed: count ?? 0 };
   if (dryRun) return NextResponse.json({ dry_run: true, plan });
 
-  await sb.from('intelligence_invoices').update({
+  // Voiding is what tells the client an invoice no longer stands. A silent
+  // failure here leaves a live invoice that everyone believes is void.
+  const { error: voidErr } = await sb.from('intelligence_invoices').update({
     status: 'voided', voided_at: new Date().toISOString(), void_reason: reason, updated_at: new Date().toISOString(),
   }).eq('id', invoice_id);
-  await sb.from('contract_deliverables').update({
+  if (voidErr) {
+    console.error('[billing/actions] void failed:', voidErr.message);
+    return NextResponse.json({ error: voidErr.message }, { status: 500 });
+  }
+
+  const { error: unbillErr } = await sb.from('contract_deliverables').update({
     ...asNotBilled(), invoice_id: null, invoiced_at: null, updated_at: new Date().toISOString(),
   }).eq('invoice_id', invoice_id);
+  // Not fatal, but leaves deliverables attached to a voided invoice.
+  if (unbillErr) console.error('[billing/actions] deliverables not unbilled:', unbillErr.message);
 
   slackNotify('financials',
     `Invoice ${inv.invoice_number} for ${money(Number(inv.amount))} VOIDED by ${by(email)}. Reason: ${reason}. ` +
@@ -254,10 +270,21 @@ async function deleteDraft(sb: any, b: any, dryRun: boolean) {
   const plan = { invoice: inv.invoice_number, lines_returned_to_not_billed: count ?? 0, number_retired_not_reused: true };
   if (dryRun) return NextResponse.json({ dry_run: true, plan });
 
-  await sb.from('contract_deliverables').update({
+  // Detach the deliverables before deleting, and stop if that fails, or the
+  // rows are left pointing at an invoice that no longer exists.
+  const { error: detachErr } = await sb.from('contract_deliverables').update({
     ...asNotBilled(), invoice_id: null, invoiced_at: null, updated_at: new Date().toISOString(),
   }).eq('invoice_id', invoice_id);
-  await sb.from('intelligence_invoices').delete().eq('id', invoice_id);
+  if (detachErr) {
+    console.error('[billing/actions] detach failed, not deleting:', detachErr.message);
+    return NextResponse.json({ error: detachErr.message }, { status: 500 });
+  }
+
+  const { error: deleteErr } = await sb.from('intelligence_invoices').delete().eq('id', invoice_id);
+  if (deleteErr) {
+    console.error('[billing/actions] invoice delete failed:', deleteErr.message);
+    return NextResponse.json({ error: deleteErr.message }, { status: 500 });
+  }
 
   slackNotify('financials',
     `Draft ${inv.invoice_number} deleted. It was never sent, so nothing left the building. ` +
@@ -281,19 +308,27 @@ async function fixMismatch(sb: any, b: any, email: string, dryRun: boolean) {
   if (dryRun) return NextResponse.json({ dry_run: true, plan });
 
   if (resolution === 'invoice_is_right') {
-    await sb.from('contract_deliverables').update({
+    const { error: reconcileErr } = await sb.from('contract_deliverables').update({
       total_amount: inv.amount,
       unit_price: line.quantity ? Number(inv.amount) / Number(line.quantity) : inv.amount,
       delivery_notes: `${reason} (reconciled by ${email})`,
       updated_at: new Date().toISOString(),
     }).eq('id', deliverable_id);
+    if (reconcileErr) {
+      console.error('[billing/actions] reconcile failed:', reconcileErr.message);
+      return NextResponse.json({ error: reconcileErr.message }, { status: 500 });
+    }
   } else if (resolution === 'line_is_right') {
     if (inv.status !== 'draft') {
       return NextResponse.json({ error: 'That invoice has been sent. Void and reissue rather than editing a number the client already has.' }, { status: 422 });
     }
-    await sb.from('intelligence_invoices').update({
+    const { error: amountErr } = await sb.from('intelligence_invoices').update({
       amount: line.total_amount, notes: reason, updated_at: new Date().toISOString(),
     }).eq('id', inv.id);
+    if (amountErr) {
+      console.error('[billing/actions] invoice amount not updated:', amountErr.message);
+      return NextResponse.json({ error: amountErr.message }, { status: 500 });
+    }
   } else {
     return NextResponse.json({ error: 'resolution must be invoice_is_right or line_is_right' }, { status: 400 });
   }

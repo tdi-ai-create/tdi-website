@@ -1,5 +1,6 @@
 import { isTDIAdmin } from '@/lib/tdi-admin/auth-check'
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAdminAuth } from '@/lib/tdi-admin/auth';
 import { createClient } from '@supabase/supabase-js';
 
 // Service Supabase client
@@ -26,11 +27,11 @@ function getServiceSupabase() {
 
 export async function POST(request: NextRequest) {
   try {
-    const email = request.headers.get('x-user-email');
-
-    if (!email || !(await isTDIAdmin(email))) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
-    }
+    // An x-user-email header is a claim, not proof. Anyone could send it.
+    // requireAdminAuth verifies the actual signed-in session.
+    const auth = await requireAdminAuth();
+    if (auth instanceof NextResponse) return auth;
+    const email = auth.member.email;
 
     const { partnershipId, email: inviteEmail, name } = await request.json();
 
@@ -59,16 +60,27 @@ export async function POST(request: NextRequest) {
 
         if (existingUser) {
           // Link to partnership
-          await supabase.from('partnership_users').upsert({
+          // Reporting "linked to partnership" without checking is how a leader
+          // ends up believing they have access they were never granted.
+          const { error: linkError } = await supabase.from('partnership_users').upsert({
             partnership_id: partnershipId,
             user_id: existingUser.id,
             role: 'admin',
           }, { onConflict: 'partnership_id,user_id' });
 
-          await supabase.from('partnerships').update({
+          if (linkError) {
+            console.error('[leadership/invite] link failed:', linkError.message);
+            return NextResponse.json({ error: linkError.message }, { status: 500 });
+          }
+
+          const { error: stampError } = await supabase.from('partnerships').update({
             invite_sent_at: new Date().toISOString(),
             portal_user_id: existingUser.id,
           }).eq('id', partnershipId);
+
+          if (stampError) {
+            console.error('[leadership/invite] invite_sent_at not stamped:', stampError.message);
+          }
 
           return NextResponse.json({
             success: true,
@@ -82,20 +94,30 @@ export async function POST(request: NextRequest) {
 
     // Link new user to partnership
     if (inviteData?.user) {
-      await supabase.from('partnership_users').upsert({
+      const { error: linkError } = await supabase.from('partnership_users').upsert({
         partnership_id: partnershipId,
         user_id: inviteData.user.id,
         role: 'admin',
       }, { onConflict: 'partnership_id,user_id' });
 
-      await supabase.from('partnerships').update({
+      // The invite email has already gone at this point, so this is not fatal,
+      // but an unlinked user cannot see the partnership they were invited to.
+      if (linkError) {
+        console.error('[leadership/invite] link failed:', linkError.message);
+      }
+
+      const { error: stampError } = await supabase.from('partnerships').update({
         invite_sent_at: new Date().toISOString(),
         portal_user_id: inviteData.user.id,
       }).eq('id', partnershipId);
+
+      if (stampError) {
+        console.error('[leadership/invite] invite_sent_at not stamped:', stampError.message);
+      }
     }
 
-    // Log to activity log
-    await supabase.from('activity_log').insert({
+    // Log to activity log. The only durable record that an invite was sent.
+    const { error: logError } = await supabase.from('activity_log').insert({
       partnership_id: partnershipId,
       action: 'portal_invite_sent',
       details: {

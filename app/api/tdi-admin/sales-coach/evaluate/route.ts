@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { requireAdminAuth } from '@/lib/tdi-admin/auth';
 import Anthropic from '@anthropic-ai/sdk'
-import { isTDIAdmin } from '@/lib/tdi-admin/auth-check'
 
 export const maxDuration = 120 // AI evaluation can take time
 
@@ -123,10 +123,11 @@ Return a JSON object with this exact structure:
 
 export async function POST(request: NextRequest) {
   try {
-    const email = request.headers.get('x-user-email')
-    if (!email || !(await isTDIAdmin(email))) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
-    }
+    // An x-user-email header is a claim, not proof. Anyone could send it.
+    // requireAdminAuth verifies the actual signed-in session.
+    const auth = await requireAdminAuth();
+    if (auth instanceof NextResponse) return auth;
+    const email = auth.member.email;
 
     const { transcript, prospectName, districtName } = await request.json()
 

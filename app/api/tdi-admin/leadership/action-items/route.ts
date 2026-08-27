@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAdminAuth } from '@/lib/tdi-admin/auth';
 import { createClient } from '@supabase/supabase-js';
-import { isTDIAdmin } from '@/lib/partnership-portal-data';
 
 // Service Supabase client with admin privileges
 function getServiceSupabase() {
@@ -20,17 +20,13 @@ function getServiceSupabase() {
 }
 
 // GET - Fetch all action items across all partnerships
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   try {
-    const email = request.headers.get('x-user-email');
-
-    // Verify TDI admin
-    if (!email || !(await isTDIAdmin(email))) {
-      return NextResponse.json(
-        { success: false, error: 'Unauthorized' },
-        { status: 403 }
-      );
-    }
+    // An x-user-email header is a claim, not proof. Anyone could send it.
+    // requireAdminAuth verifies the actual signed-in session.
+    const auth = await requireAdminAuth();
+    if (auth instanceof NextResponse) return auth;
+    const email = auth.member.email;
 
     const supabase = getServiceSupabase();
 

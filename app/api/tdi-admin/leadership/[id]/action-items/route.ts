@@ -1,5 +1,6 @@
 import { isTDIAdmin } from '@/lib/tdi-admin/auth-check'
 import { NextRequest, NextResponse } from 'next/server'
+import { requireAdminAuth } from '@/lib/tdi-admin/auth';
 import { getServiceSupabase } from '@/lib/supabase'
 
 // function isTDIAdmin(email: string) {
@@ -8,16 +9,16 @@ import { getServiceSupabase } from '@/lib/supabase'
 
 // GET - Fetch action items for a specific partnership
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await params
-    const email = request.headers.get('x-user-email')
-
-    if (!email || !(await isTDIAdmin(email))) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
-    }
+    // An x-user-email header is a claim, not proof. Anyone could send it.
+    // requireAdminAuth verifies the actual signed-in session.
+    const auth = await requireAdminAuth();
+    if (auth instanceof NextResponse) return auth;
+    const email = auth.member.email;
 
     const supabase = getServiceSupabase()
 
@@ -46,11 +47,11 @@ export async function POST(
 ) {
   try {
     const { id } = await params
-    const email = request.headers.get('x-user-email')
-
-    if (!email || !(await isTDIAdmin(email))) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
-    }
+    // An x-user-email header is a claim, not proof. Anyone could send it.
+    // requireAdminAuth verifies the actual signed-in session.
+    const auth = await requireAdminAuth();
+    if (auth instanceof NextResponse) return auth;
+    const email = auth.member.email;
 
     const body = await request.json()
     const supabase = getServiceSupabase()
@@ -87,11 +88,11 @@ export async function PATCH(
 ) {
   try {
     const { id } = await params
-    const email = request.headers.get('x-user-email')
-
-    if (!email || !(await isTDIAdmin(email))) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
-    }
+    // An x-user-email header is a claim, not proof. Anyone could send it.
+    // requireAdminAuth verifies the actual signed-in session.
+    const auth = await requireAdminAuth();
+    if (auth instanceof NextResponse) return auth;
+    const email = auth.member.email;
 
     const { itemId, status } = await request.json()
     const supabase = getServiceSupabase()
@@ -125,11 +126,11 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params
-    const email = request.headers.get('x-user-email')
-
-    if (!email || !(await isTDIAdmin(email))) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
-    }
+    // An x-user-email header is a claim, not proof. Anyone could send it.
+    // requireAdminAuth verifies the actual signed-in session.
+    const auth = await requireAdminAuth();
+    if (auth instanceof NextResponse) return auth;
+    const email = auth.member.email;
 
     const { searchParams } = new URL(request.url)
     const itemId = searchParams.get('itemId')

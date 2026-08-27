@@ -44,18 +44,12 @@ export async function PATCH(
     //
     // Checking the session first is also simply better: x-user-email is
     // supplied by the client and can be set to anything.
+    // The header fallback is gone. The comment above was right that
+    // x-user-email can be set to anything, and keeping it as a fallback meant
+    // anyone without a session simply took the unsafe path instead.
     const sessionAuth = await requireAdminAuth();
-    let email: string | null = null;
-
-    if (!(sessionAuth instanceof NextResponse)) {
-      email = sessionAuth.user.email;
-    } else {
-      const headerEmail = request.headers.get('x-user-email');
-      if (!headerEmail || !(await isTDIAdmin(headerEmail))) {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-      }
-      email = headerEmail;
-    }
+    if (sessionAuth instanceof NextResponse) return sessionAuth;
+    const email = sessionAuth.user.email;
 
     const body = await request.json();
     const { field, value } = body;
@@ -172,21 +166,31 @@ export async function PATCH(
         .eq('id', id)
         .single();
 
-      await supabase.from('contract_amendments').insert({
+      // A lost amendment is a contract change nobody can evidence.
+      const { error: contractError } = await supabase.from('contract_amendments').insert({
         partnership_id: id,
         field_changed: field,
         old_value: current?.[field]?.toString() || null,
         new_value: value?.toString() || null,
         changed_by: email,
       });
+
+      if (contractError) {
+        console.error('[leadership/update] contract_amendments write failed:', contractError.message);
+      }
     }
 
     // Log the activity
-    await supabase.from('activity_log').insert({
+    // The only durable record that this edit happened.
+    const { error: activityError } = await supabase.from('activity_log').insert({
       partnership_id: id,
       action: 'partnership_updated',
       details: { field, value, updated_by: email },
     });
+
+    if (activityError) {
+      console.error('[leadership/update] activity_log write failed:', activityError.message);
+    }
 
     return NextResponse.json({
       success: true,

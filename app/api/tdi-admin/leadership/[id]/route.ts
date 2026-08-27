@@ -1,5 +1,6 @@
 import { isTDIAdmin } from '@/lib/tdi-admin/auth-check'
 import { NextRequest, NextResponse } from 'next/server'
+import { requireAdminAuth } from '@/lib/tdi-admin/auth';
 import { getServiceSupabase } from '@/lib/supabase'
 
 // function isTDIAdmin(email: string) {
@@ -7,16 +8,16 @@ import { getServiceSupabase } from '@/lib/supabase'
 // }
 
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await params
-    const email = request.headers.get('x-user-email')
-
-    if (!email || !(await isTDIAdmin(email))) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
-    }
+    // An x-user-email header is a claim, not proof. Anyone could send it.
+    // requireAdminAuth verifies the actual signed-in session.
+    const auth = await requireAdminAuth();
+    if (auth instanceof NextResponse) return auth;
+    const email = auth.member.email;
 
     const supabase = getServiceSupabase()
 

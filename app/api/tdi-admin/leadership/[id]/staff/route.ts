@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { requireAdminAuth } from '@/lib/tdi-admin/auth';
 import { getServiceSupabase } from '@/lib/supabase'
 
 const PERMANENT_ROLES = ['teacher', 'coach', 'para', 'paraprofessional']
@@ -15,11 +16,10 @@ export async function GET(
 ) {
   try {
     const { id: partnershipId } = await params
-    const userEmail = request.headers.get('x-user-email')
-
-    if (!userEmail) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+    // An x-user-email header is a claim, not proof. Anyone could send it.
+    // requireAdminAuth verifies the actual signed-in session.
+    const auth = await requireAdminAuth();
+    if (auth instanceof NextResponse) return auth;
 
     const { searchParams } = new URL(request.url)
     const permanentOnly = searchParams.get('permanentOnly') === 'true'

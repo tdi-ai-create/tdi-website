@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAdminAuth } from '@/lib/tdi-admin/auth';
 import { createClient } from '@supabase/supabase-js';
 import { getHubServiceClient } from '@/lib/hub/partnership-members';
-import { isTDIAdmin } from '@/lib/partnership-portal-data';
 
 /**
  * Where every active partnership stands, on one screen.
@@ -74,12 +74,13 @@ function pluraliseDays(n: number) {
   return n === 1 ? '1 day' : `${n} days`;
 }
 
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   try {
-    const email = request.headers.get('x-user-email');
-    if (!email || !(await isTDIAdmin(email))) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
-    }
+    // An x-user-email header is a claim, not proof. Anyone could send it.
+    // requireAdminAuth verifies the actual signed-in session.
+    const auth = await requireAdminAuth();
+    if (auth instanceof NextResponse) return auth;
+    const email = auth.member.email;
 
     const portal = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,

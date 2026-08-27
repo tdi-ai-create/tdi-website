@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { requireAdminAuth } from '@/lib/tdi-admin/auth';
 import { getServiceSupabase } from '@/lib/supabase'
 import sharp from 'sharp'
 
@@ -63,11 +64,11 @@ export async function POST(
 ) {
   try {
     const { id: partnershipId } = await params
-    const userEmail = request.headers.get('x-user-email')
-
-    if (!userEmail) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+    // An x-user-email header is a claim, not proof. Anyone could send it.
+    // requireAdminAuth verifies the actual signed-in session.
+    const auth = await requireAdminAuth();
+    if (auth instanceof NextResponse) return auth;
+    const userEmail = auth.member.email;
 
     const formData = await request.formData()
     const consentChecked = formData.get('consentChecked') === 'true'
@@ -146,7 +147,7 @@ export async function POST(
           const { data: { publicUrl: fullUrl } } = supabase.storage
             .from('staff-photos').getPublicUrl(`${basePath}/full.webp`)
 
-          await supabase.from('partnership_staff').update({
+          const { error: photoError } = await supabase.from('partnership_staff').update({
             photo_url: fullUrl,
             photo_thumb_url: thumbUrl,
             photo_uploaded_at: now,
@@ -154,6 +155,8 @@ export async function POST(
             consent_checked_at: now,
             updated_at: now
           }).eq('id', staffMember.id)
+          // A failed photo link leaves the roster looking complete when it is not.
+          if (photoError) console.error('[staff-photos/bulk] photo link failed:', photoError.message);
 
           result.uploaded++
         } catch (err) {
@@ -216,7 +219,7 @@ export async function POST(
           const { data: { publicUrl: fullUrl } } = supabase.storage
             .from('staff-photos').getPublicUrl(`${basePath}/full.webp`)
 
-          await supabase.from('partnership_staff').update({
+          const { error: photoError } = await supabase.from('partnership_staff').update({
             photo_url: fullUrl,
             photo_thumb_url: thumbUrl,
             photo_uploaded_at: now,
@@ -224,6 +227,8 @@ export async function POST(
             consent_checked_at: now,
             updated_at: now
           }).eq('id', staffMember.id)
+          // A failed photo link leaves the roster looking complete when it is not.
+          if (photoError) console.error('[staff-photos/bulk] photo link failed:', photoError.message);
 
           result.uploaded++
         } catch (err) {
