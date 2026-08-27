@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useTDIAdmin } from '@/lib/tdi-admin/context';
 import { Shell as BillingShell, Banner } from '@/components/tdi-admin/billing/ui';
+import { ActionDialog, ActionButton, type Field } from '@/components/tdi-admin/billing/ActionDialog';
 
 const ACC = '#B45309';
 
@@ -11,7 +12,7 @@ type Line = {
   unit_price: string; total_amount: string; is_complimentary: boolean;
   delivery_state: string | null; billing_state: string | null; funding_hold: boolean;
   delivery_date: string | null; delivered_by: string | null;
-  invoice: { invoice_number: string; status: string; amount: string; due_date: string | null } | null;
+  invoice: { id: string; invoice_number: string; status: string; amount: string; due_date: string | null } | null;
   mismatch: boolean;
 };
 type Contract = {
@@ -38,17 +39,33 @@ export default function BillingPage() {
   const [err, setErr] = useState('');
   const [open, setOpen] = useState<Set<string>>(new Set());
   const [filter, setFilter] = useState<'all' | 'ready' | 'out' | 'funding' | 'settled'>('all');
+  const [action, setAction] = useState<null | { line: Line; kind: string; client: string }>(null);
+  const [flash, setFlash] = useState('');
 
-  useEffect(() => {
-    if (!teamMember?.email) return;
-    fetch('/api/tdi-admin/billing/contracts', { headers: { 'x-user-email': teamMember.email } })
+  /** Every action posts here. The API refuses anything the rules do not allow. */
+  async function runAction(payload: any): Promise<string | void> {
+    const r = await fetch('/api/tdi-admin/billing/actions', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) return j.error || `That did not work (${r.status})`;
+    setAction(null);
+    setFlash(j.message || 'Done. Refreshing…');
+    load();
+  }
+
+  function load() {
+    fetch('/api/tdi-admin/billing/contracts')
       .then(async (r) => {
         if (!r.ok) throw new Error((await r.json()).error || `HTTP ${r.status}`);
         return r.json();
       })
       .then(setData)
       .catch((e) => setErr(e.message));
-  }, [teamMember?.email]);
+  }
+  useEffect(() => { load(); }, []);
 
   function toggle(id: string) {
     setOpen((prev) => {
@@ -172,7 +189,7 @@ export default function BillingPage() {
                       <span style={{ flex: '0 0 104px', textAlign: 'right' }}>Amount</span>
                       <span style={{ flex: '0 0 128px' }}>Next step</span>
                     </div>
-                    {c.items.map((l) => <LineRow key={l.id} l={l} />)}
+                    {c.items.map((l) => <LineRow key={l.id} l={l} onAction={(kind) => setAction({ line: l, kind, client: c.client })} />)}
                   </div>
 
                   <div style={S.panes}>
@@ -203,11 +220,141 @@ export default function BillingPage() {
           );
         })}
       </div>
+
+      {flash && (
+        <div role="status" style={{ position: 'fixed', left: '50%', bottom: 26, transform: 'translateX(-50%)',
+          background: '#0B1120', color: '#fff', padding: '12px 20px', borderRadius: 10, fontSize: 13.5,
+          fontWeight: 650, boxShadow: '0 10px 30px rgba(11,17,32,.3)', zIndex: 120 }}>
+          {flash}
+        </div>
+      )}
+
+      {action && <ActionFor a={action} onCancel={() => setAction(null)} run={runAction} />}
     </Shell>
   );
 }
 
-function LineRow({ l }: { l: Line }) {
+/**
+ * Turns a line item plus an action name into the right dialog. Each one states
+ * what will change before it happens, and the destructive ones require a reason.
+ */
+function ActionFor({ a, onCancel, run }: {
+  a: { line: Line; kind: string; client: string };
+  onCancel: () => void;
+  run: (payload: any) => Promise<string | void>;
+}) {
+  const l = a.line;
+  const amount = money2(l.total_amount);
+  const today = new Date().toISOString().slice(0, 10);
+  const net30 = new Date(Date.now() + 30 * 86400000).toISOString().slice(0, 10);
+
+  if (a.kind === 'mark_delivered') {
+    return (
+      <ActionDialog
+        title="Mark delivered"
+        subtitle={`${l.label}, ${a.client}`}
+        tone="green"
+        confirmLabel="Mark delivered"
+        fields={[
+          { name: 'delivered_on', label: 'Date delivered', type: 'date', required: true, value: today,
+            hint: 'The day the work actually happened, not today if they differ.' },
+          { name: 'delivered_by', label: 'Delivered by', type: 'text' },
+          { name: 'notes', label: 'Notes', type: 'textarea',
+            hint: 'Attendance, anything that changed on the day, anything worth remembering at renewal.' },
+        ]}
+        effects={[
+          'Records that the work happened. Nothing is billed by this.',
+          l.is_complimentary
+            ? 'This line is complimentary, so it stays at no charge.'
+            : `${amount} becomes ready to bill.`,
+        ]}
+        onCancel={onCancel}
+        onConfirm={(v) => run({ action: 'mark_delivered', deliverable_id: l.id, ...v })}
+      />
+    );
+  }
+
+  if (a.kind === 'create_invoice') {
+    return (
+      <ActionDialog
+        title="Create invoice"
+        subtitle={`${l.label}, ${a.client}, ${amount}`}
+        confirmLabel="Create invoice"
+        fields={[
+          { name: 'due_date', label: 'Due date', type: 'date', value: net30, hint: 'Net 30 from today.' },
+          { name: 'po_number', label: 'PO number', type: 'text',
+            hint: 'Some districts will not process an invoice without one.' },
+        ]}
+        effects={[
+          'Creates a draft invoice. Nothing is emailed.',
+          'The line moves to invoiced. Its delivery record is untouched.',
+          'Send it from the Outbox when you are ready.',
+        ]}
+        onCancel={onCancel}
+        onConfirm={(v) => run({ action: 'create_invoice', deliverable_ids: [l.id], ...v })}
+      />
+    );
+  }
+
+  if (a.kind === 'record_payment') {
+    return (
+      <ActionDialog
+        title="Record payment"
+        subtitle={`${l.label}, ${a.client}`}
+        tone="green"
+        confirmLabel="Record payment"
+        fields={[
+          { name: 'amount', label: 'Amount received', type: 'text', required: true, value: String(Number(l.total_amount)) },
+          { name: 'received_on', label: 'Date received', type: 'date', required: true, value: today,
+            hint: 'The day the money arrived, not the day you are entering it.' },
+          { name: 'method', label: 'Method', type: 'select', required: true, options: ['check', 'ach', 'card', 'wire', 'other'] },
+          { name: 'reference', label: 'Reference', type: 'text', hint: 'Cheque number or ACH trace.' },
+          { name: 'note', label: 'Note', type: 'textarea' },
+        ]}
+        effects={[
+          'Records the money against this invoice.',
+          'The invoice is marked paid once payments cover it in full.',
+        ]}
+        onCancel={onCancel}
+        onConfirm={(v) => run({
+          action: 'record_payment',
+          applications: [{ invoice_id: l.invoice?.id, amount: Number(v.amount) }],
+          amount: Number(v.amount),
+          method: v.method, reference: v.reference, received_on: v.received_on, note: v.note,
+        })}
+      />
+    );
+  }
+
+  if (a.kind === 'fix_mismatch') {
+    const inv = l.invoice;
+    return (
+      <ActionDialog
+        title="Fix mismatch"
+        subtitle={`${l.label}, ${a.client}`}
+        tone="danger"
+        confirmLabel="Apply the fix"
+        warning={inv
+          ? `The line says ${amount} and invoice ${inv.invoice_number} says ${money2(inv.amount)}. One of them is wrong.`
+          : 'This line and its invoice disagree.'}
+        fields={[
+          { name: 'resolution', label: 'Which is right', type: 'select', required: true,
+            options: ['invoice_is_right', 'line_is_right'],
+            hint: 'invoice_is_right changes the contract line. line_is_right changes the invoice, and only works while it is still a draft.' },
+          { name: 'reason', label: 'Reason', type: 'textarea', required: true,
+            hint: 'Recorded permanently on both records. Say how you confirmed which figure is correct.' },
+        ]}
+        effects={['Billing on this contract stays blocked until the two agree.']}
+        onCancel={onCancel}
+        onConfirm={(v) => run({ action: 'fix_mismatch', deliverable_id: l.id, ...v })}
+      />
+    );
+  }
+
+  return null;
+}
+
+function LineRow({ l, onAction }: { l: Line; onAction: (kind: string) => void }) {
   const [open, setOpen] = useState(false);
   const delivered = l.delivery_state === 'delivered';
   const free = l.is_complimentary;
@@ -239,10 +386,12 @@ function LineRow({ l }: { l: Line }) {
           {money2(l.total_amount)}
         </span>
         <span style={{ flex: '0 0 128px' }}>
-          {l.mismatch ? <Tag tone="red">Fix mismatch</Tag>
-            : !delivered ? <Tag tone="green">Mark delivered</Tag>
-            : l.billing_state === 'not_billed' ? <Tag tone="acc">Create invoice</Tag>
-            : l.billing_state === 'invoiced' ? <Tag tone="dark">Record payment</Tag>
+          {l.mismatch ? <ActionButton tone="danger" onClick={() => onAction('fix_mismatch')}>Fix mismatch</ActionButton>
+            : l.funding_hold ? <span style={{ color: '#94A3B8', fontSize: 12 }}>On funding</span>
+            : !delivered ? <ActionButton tone="green" onClick={() => onAction('mark_delivered')}>Mark delivered</ActionButton>
+            : free ? <span style={{ color: '#94A3B8', fontSize: 12 }}>No charge</span>
+            : l.billing_state === 'not_billed' ? <ActionButton tone="acc" onClick={() => onAction('create_invoice')}>Create invoice</ActionButton>
+            : l.billing_state === 'invoiced' ? <ActionButton tone="dark" onClick={() => onAction('record_payment')}>Record payment</ActionButton>
             : <span style={{ color: '#94A3B8', fontSize: 12 }}>Settled</span>}
         </span>
       </button>

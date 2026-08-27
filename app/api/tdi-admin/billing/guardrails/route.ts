@@ -130,7 +130,22 @@ export async function GET(_request: NextRequest) {
     (docs ?? []).filter((d) => d.expires_on && d.expires_on <= in90)
       .map((d) => ({ client: d.district_id ? dName.get(d.district_id) ?? '?' : 'TDI company wide', document: d.doc_type, expires: d.expires_on })), 'documents');
 
-  // 11. Delivered work should not sit unbilled indefinitely.
+  // 11. A part-paid invoice must not be reported at its face value.
+  const appliedByInvoice = paidByInvoice;
+  add('Outstanding is net of part payments',
+    'Reporting an invoice at face value after a partial payment overstates what a client owes.',
+    (invoices ?? []).filter((i) => {
+      const paid = appliedByInvoice.get(i.id) ?? 0;
+      return paid > 0 && paid < Number(i.amount) && !['paid', 'voided'].includes(i.status);
+    }).map((i) => ({
+      invoice: i.invoice_number,
+      client: dName.get(i.district_id ?? '') ?? '?',
+      face_value: Number(i.amount),
+      paid: appliedByInvoice.get(i.id) ?? 0,
+      truly_owed: Number((Number(i.amount) - (appliedByInvoice.get(i.id) ?? 0)).toFixed(2)),
+    })), 'data');
+
+  // 12. Delivered work should not sit unbilled indefinitely.
   add('Delivered work is billed within 30 days',
     'Work you have done and not invoiced is your money sitting in someone else’s budget.',
     (lines ?? []).filter((l) => l.delivery_state === 'delivered' && l.billing_state === 'not_billed' && !l.funding_hold && !l.is_complimentary)

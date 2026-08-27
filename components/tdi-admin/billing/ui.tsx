@@ -13,6 +13,7 @@ const TABS = [
   ['/tdi-admin/billing/money', 'Money'],
   ['/tdi-admin/billing/documents', 'Documents'],
   ['/tdi-admin/billing/outbox', 'Outbox'],
+  ['/tdi-admin/billing/guardrails', 'Guardrails'],
 ] as const;
 
 /** Three pages. Everything else opens in place. */

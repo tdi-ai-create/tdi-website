@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useTDIAdmin } from '@/lib/tdi-admin/context';
 import { Shell, MoneyStrip, Pill, Caret, Banner, S, shortDate } from '@/components/tdi-admin/billing/ui';
+import { ActionDialog } from '@/components/tdi-admin/billing/ActionDialog';
 
 type Doc = { id: string; doc_type: string; title: string; expires_on: string | null; note: string | null; created_at: string; attach_by_default: boolean };
 type Client = { client: string; documents: Doc[]; required: string[]; missing: string[] };
@@ -19,13 +20,36 @@ export default function DocumentsPage() {
   const [data, setData] = useState<{ company: Doc[]; clients: Client[]; totals: any } | null>(null);
   const [err, setErr] = useState('');
   const [open, setOpen] = useState<Set<string>>(new Set());
+  const [adding, setAdding] = useState<null | { client?: string }>(null);
+  const [flash, setFlash] = useState('');
 
-  useEffect(() => {
-    if (!teamMember?.email) return;
-    fetch('/api/tdi-admin/billing/documents', { headers: { 'x-user-email': teamMember.email } })
+  const load = () => {
+    fetch('/api/tdi-admin/billing/documents')
       .then(async (r) => { if (!r.ok) throw new Error((await r.json()).error); return r.json(); })
       .then(setData).catch((e) => setErr(e.message));
-  }, [teamMember?.email]);
+  };
+  useEffect(load, []);
+
+  /**
+   * Records that a document exists and where it lives. The file itself is not uploaded
+   * here: districts send these by email and portal, and pretending otherwise would mean
+   * a second place for them to go missing. What matters is that the system knows we
+   * have it, so a send is not blocked on a document sitting in someone's inbox.
+   */
+  async function addDoc(v: Record<string, string>): Promise<string | void> {
+    const r = await fetch('/api/tdi-admin/billing/documents', {
+      method: 'POST', headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        doc_type: v.doc_type, title: v.title, storage_path: v.location || null,
+        expires_on: v.expires_on || null, note: v.note || null,
+        is_company_wide: !v.client, district_id: null,
+      }),
+    });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) return j.error || 'That did not save';
+    setAdding(null); setFlash('Recorded.'); load();
+    setTimeout(() => setFlash(''), 3000);
+  }
 
   const toggle = (k: string) => setOpen((p) => { const n = new Set(p); n.has(k) ? n.delete(k) : n.add(k); return n; });
 
@@ -37,6 +61,9 @@ export default function DocumentsPage() {
 
   return (
     <Shell title="Documents" blurb="Everything an accounts payable office asks for, and everything that proves the work happened. Most of it files itself.">
+      <div style={{ display: 'flex', gap: 8, marginBottom: 14 }}>
+        <button onClick={() => setAdding({})} style={{ ...S.btn, background: '#B45309' }}>Record a document</button>
+      </div>
       <MoneyStrip items={[
         { label: 'On file', value: String(t.on_file), note: 'documents', dot: '#0B1120' },
         { label: 'Missing, required', value: String(t.missing_required), note: 'a district asked for these', dot: '#DC2626' },
@@ -121,6 +148,36 @@ export default function DocumentsPage() {
           );
         })}
       </div>
+      {flash && (
+        <div role="status" style={{ position: 'fixed', left: '50%', bottom: 26, transform: 'translateX(-50%)',
+          background: '#0B1120', color: '#fff', padding: '12px 20px', borderRadius: 10, fontSize: 13.5,
+          fontWeight: 650, boxShadow: '0 10px 30px rgba(11,17,32,.3)', zIndex: 120 }}>{flash}</div>
+      )}
+
+      {adding && (
+        <ActionDialog
+          title="Record a document"
+          subtitle="Tells the system we hold this, so a send is not blocked on a file in someone's inbox."
+          confirmLabel="Record it"
+          fields={[
+            { name: 'doc_type', label: 'Type', type: 'select', required: true,
+              options: ['purchase_order','w9','coi','signed_contract','vendor_registration','delivery_evidence','check_photo','roster','invoice_pdf','other'] },
+            { name: 'title', label: 'Title', type: 'text', required: true,
+              hint: 'What someone would search for, such as "PGCPS purchase order 867826".' },
+            { name: 'location', label: 'Where it lives', type: 'text',
+              hint: 'A Drive link, an email subject, wherever the actual file is.' },
+            { name: 'expires_on', label: 'Expires', type: 'date',
+              hint: 'Leave blank if it does not expire. Certificates of insurance and W-9s usually do.' },
+            { name: 'note', label: 'Note', type: 'textarea' },
+          ]}
+          effects={[
+            'Appears under company documents and clears any matching requirement.',
+            'If you set an expiry, a guardrail warns 90 days out.',
+          ]}
+          onCancel={() => setAdding(null)}
+          onConfirm={addDoc}
+        />
+      )}
     </Shell>
   );
 }
