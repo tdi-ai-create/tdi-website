@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminAuth } from '@/lib/tdi-admin/auth';
 import { createClient } from '@supabase/supabase-js';
-import { getHubServiceClient } from '@/lib/hub/partnership-members';
+import { getHubServiceClient, isEngagementAction } from '@/lib/hub/partnership-members';
 
 /**
  * Where every active partnership stands, on one screen.
@@ -54,11 +54,39 @@ export interface MatrixRow {
   seatsProvisioned: number;
   rosterCount: number;
   activeEducators: number;
+  /**
+   * The Engagement view of the same table. Counted over the seats that belong
+   * to this partnership, from the same reads that decide the onboarding marks,
+   * so the two views can never disagree about the same school.
+   */
+  engagement: {
+    quickWinsViewed: number;
+    lessonsViewed: number;
+    coursesCompleted: number;
+    checkIns: number;
+    questionsAsked: number;
+    recognitions: number;
+  };
   steps: MatrixStep[];
   /** Steps complete over steps that apply. Not a score, a fraction. */
   completed: number;
   applicable: number;
 }
+
+/**
+ * The Engagement view of the matrix. Order matters: the component renders these
+ * left to right and reads the matching keys off row.engagement.
+ */
+export const ENGAGEMENT_LABELS = [
+  { key: 'seatsProvisioned', label: 'Seats' },
+  { key: 'activeEducators', label: 'Signed in' },
+  { key: 'quickWinsViewed', label: 'Quick Wins' },
+  { key: 'lessonsViewed', label: 'Lessons' },
+  { key: 'coursesCompleted', label: 'Courses done' },
+  { key: 'checkIns', label: 'Check-ins' },
+  { key: 'questionsAsked', label: 'Questions' },
+  { key: 'recognitions', label: 'Recognitions' },
+] as const;
 
 const STEP_LABELS = [
   'Dashboard access',
@@ -186,28 +214,93 @@ export async function GET(_request: NextRequest) {
       }
     }
 
-    // Genuine activity only. account_provisioned is written when TDI creates
-    // the seat, so counting it reports a school as active on the strength of
-    // our own bulk operation.
+    // Genuine activity only, via the one shared allowlist. Everything it
+    // leaves out was written by TDI rather than earned by the educator: the
+    // seat we created, the welcome we sent, the perk we granted. Counting any
+    // of it reports a school as active on the strength of our own outbound.
     const allSeatIds = [...new Set([...seatUserIds.values()].flatMap((s) => [...s]))];
     const activeByPartnership = new Map<string, Set<string>>();
-    if (allSeatIds.length > 0) {
-      const { data: hubActivity, error: hubActivityError } = await hub
-        .from('hub_activity_log')
-        .select('user_id')
-        .in('user_id', allSeatIds)
-        .neq('action', 'account_provisioned');
+    const actionCounts = new Map<string, Map<string, number>>();
 
-      if (hubActivityError) {
-        console.error('[onboarding-matrix] hub_activity_log read failed:', hubActivityError.message);
-        return NextResponse.json({ error: hubActivityError.message }, { status: 500 });
+    const emptyEngagement = () => ({
+      quickWinsViewed: 0,
+      lessonsViewed: 0,
+      coursesCompleted: 0,
+      checkIns: 0,
+      questionsAsked: 0,
+      recognitions: 0,
+    });
+
+    const qaByPartnership = new Map<string, number>();
+    const recognitionsByPartnership = new Map<string, number>();
+
+    if (allSeatIds.length > 0) {
+      const [activityRes2, qaRes, recognitionRes] = await Promise.all([
+        hub.from('hub_activity_log').select('user_id, action').in('user_id', allSeatIds),
+        // parent_id null is a question rather than a reply, matching the
+        // definition the per-school Hub depth panel already uses.
+        hub.from('hub_qa_posts').select('user_id, parent_id').in('user_id', allSeatIds),
+        hub.from('hub_earned_recognitions').select('user_id').in('user_id', allSeatIds),
+      ]);
+
+      for (const [label, res] of [
+        ['hub_activity_log', activityRes2],
+        ['hub_qa_posts', qaRes],
+        ['hub_earned_recognitions', recognitionRes],
+      ] as const) {
+        if (res.error) {
+          console.error(`[onboarding-matrix] ${label} read failed:`, res.error.message);
+          return NextResponse.json({ error: res.error.message }, { status: 500 });
+        }
       }
 
-      const activeUsers = new Set((hubActivity ?? []).map((a) => a.user_id as string));
+      const genuine = (activityRes2.data ?? []).filter((a) =>
+        isEngagementAction(a.action as string | null)
+      );
+      const activeUsers = new Set(genuine.map((a) => a.user_id as string));
+
+      const partnershipOfUser = new Map<string, string>();
       for (const [pid, set] of seatUserIds) {
         activeByPartnership.set(pid, new Set([...set].filter((u) => activeUsers.has(u))));
+        for (const uid of set) partnershipOfUser.set(uid, pid);
+      }
+
+      for (const row of genuine) {
+        const pid = partnershipOfUser.get(row.user_id as string);
+        if (!pid) continue;
+        if (!actionCounts.has(pid)) actionCounts.set(pid, new Map());
+        const bucket = actionCounts.get(pid)!;
+        const action = row.action as string;
+        bucket.set(action, (bucket.get(action) ?? 0) + 1);
+      }
+
+      for (const row of qaRes.data ?? []) {
+        if (row.parent_id) continue;
+        const pid = partnershipOfUser.get(row.user_id as string);
+        if (!pid) continue;
+        qaByPartnership.set(pid, (qaByPartnership.get(pid) ?? 0) + 1);
+      }
+
+      for (const row of recognitionRes.data ?? []) {
+        const pid = partnershipOfUser.get(row.user_id as string);
+        if (!pid) continue;
+        recognitionsByPartnership.set(pid, (recognitionsByPartnership.get(pid) ?? 0) + 1);
       }
     }
+
+    const engagementFor = (pid: string) => {
+      const bucket = actionCounts.get(pid);
+      if (!bucket) return emptyEngagement();
+      const n = (action: string) => bucket.get(action) ?? 0;
+      return {
+        quickWinsViewed: n('quick_win_viewed'),
+        lessonsViewed: n('lesson_viewed'),
+        coursesCompleted: n('course_completed'),
+        checkIns: n('checkin_completed'),
+        questionsAsked: qaByPartnership.get(pid) ?? 0,
+        recognitions: recognitionsByPartnership.get(pid) ?? 0,
+      };
+    };
 
     const rosterByPartnership = new Map<string, number>();
     for (const s of staffRes.data ?? []) {
@@ -343,6 +436,7 @@ export async function GET(_request: NextRequest) {
         seatsProvisioned: seats,
         rosterCount: roster,
         activeEducators: active,
+        engagement: engagementFor(p.id),
         steps,
         completed,
         applicable,
@@ -352,6 +446,7 @@ export async function GET(_request: NextRequest) {
     return NextResponse.json({
       partnerships: result,
       stepLabels: STEP_LABELS,
+      engagementLabels: ENGAGEMENT_LABELS,
       asOf: new Date().toISOString(),
     });
   } catch (error) {
