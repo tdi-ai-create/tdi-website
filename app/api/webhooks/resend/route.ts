@@ -56,10 +56,24 @@ export async function POST(request: NextRequest) {
   // Not one of ours. Resend carries other TDI mail too.
   if (!msg) return NextResponse.json({ ok: true, ignored: 'not a billing message' });
 
-  await sb.from('billing_delivery_events').insert({
+  // The audit trail is the point of this endpoint. If the insert fails we must know,
+  // not carry on updating the summary as though the event was recorded.
+  const { error: eventError } = await sb.from('billing_delivery_events').insert({
     outbox_id: msg.id, provider_id: providerId, event_type: type,
     occurred_at: occurredAt, recipient, detail: data,
   });
+  // A duplicate is expected: providers retry, and the unique index is what makes that
+  // safe. Anything else means the trail has a hole in it.
+  const isDuplicate = eventError?.code === '23505';
+  if (eventError && !isDuplicate) {
+    console.error('[resend-webhook] could not record event:', eventError.message);
+    slackNotify('financials',
+      `Delivery tracking problem: a ${type} event for "${msg.subject}" could not be recorded. ` +
+      `The message state in Billing may be out of date.`);
+    return NextResponse.json({ error: 'Could not record event' }, { status: 500 });
+  }
+  // Already seen. Do not re-run the side effects, which would post to Slack twice.
+  if (isDuplicate) return NextResponse.json({ ok: true, duplicate: type });
 
   const patch: Record<string, unknown> = { last_event: type, last_event_at: new Date().toISOString() };
 
