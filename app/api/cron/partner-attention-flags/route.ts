@@ -59,6 +59,7 @@ export async function GET(request: NextRequest) {
 
     const now = new Date();
     let flagsCreated = 0;
+    let concernsComputed = 0;
 
     for (const p of partnerships) {
       if (!p.contract_start) continue;
@@ -127,31 +128,53 @@ export async function GET(request: NextRequest) {
         });
       }
 
+      concernsComputed += flags.length;
+
       const nowIso = now.toISOString();
       const openKeys = flags.map((f) => f.key);
 
       if (!dryRun) {
         for (const flag of flags) {
-          // Upsert on the partial unique index: one open row per issue. An
-          // existing open flag keeps its first_raised_at, which is the whole
-          // point, and only last_seen_at moves.
-          const { error: upsertError } = await supabase
+          // Deliberately not an upsert. The unique index on (partnership_id,
+          // flag_key) is partial, scoped to resolved_at is null, so that a
+          // problem which returns later gets a fresh row and a fresh
+          // first_raised_at. PostgREST generates ON CONFLICT (partnership_id,
+          // flag_key), which cannot match a partial index, so every upsert
+          // errored and this cron wrote nothing at all on its first run.
+          const { data: existing, error: findError } = await supabase
             .from('partnership_flags')
-            .upsert(
-              {
+            .select('id')
+            .eq('partnership_id', p.id)
+            .eq('flag_key', flag.key)
+            .is('resolved_at', null)
+            .maybeSingle();
+
+          if (findError) {
+            console.error('[partner-attention-flags] flag lookup failed:', p.id, flag.key, findError.message);
+            continue;
+          }
+
+          const payload = {
+            severity: flag.severity,
+            message: flag.message,
+            detail: { daysSinceStart, loginPct, loggedInStaff, totalStaff },
+            last_seen_at: nowIso,
+            updated_at: nowIso,
+          };
+
+          // An open flag keeps its first_raised_at. That is the whole point:
+          // the age of a problem is the thing worth seeing.
+          const { error: writeError } = existing
+            ? await supabase.from('partnership_flags').update(payload).eq('id', existing.id)
+            : await supabase.from('partnership_flags').insert({
                 partnership_id: p.id,
                 flag_key: flag.key,
-                severity: flag.severity,
-                message: flag.message,
-                detail: { daysSinceStart, loginPct, loggedInStaff, totalStaff },
-                last_seen_at: nowIso,
-                updated_at: nowIso,
-              },
-              { onConflict: 'partnership_id,flag_key', ignoreDuplicates: false }
-            );
+                first_raised_at: nowIso,
+                ...payload,
+              });
 
-          if (upsertError) {
-            console.error('[partner-attention-flags] flag upsert failed:', p.id, flag.key, upsertError.message);
+          if (writeError) {
+            console.error('[partner-attention-flags] flag write failed:', p.id, flag.key, writeError.message);
             continue;
           }
           flagsCreated++;
@@ -192,9 +215,27 @@ export async function GET(request: NextRequest) {
 
     console.log('[partner-attention-flags]', flagsCreated, 'flags created across', partnerships.length, 'partnerships');
 
+    // A check that cannot fail is not a check. This cron ran once and wrote
+    // nothing at all, because every upsert errored against a partial index and
+    // the errors only went to a log nobody reads. If concerns were computed and
+    // none were written, that is a failure, not a quiet success.
+    if (!dryRun && concernsComputed > 0 && flagsCreated === 0) {
+      console.error('[partner-attention-flags] computed', concernsComputed, 'concerns and wrote 0 flags');
+      return NextResponse.json(
+        {
+          success: false,
+          error: `Computed ${concernsComputed} concerns and wrote none. The flag write is failing.`,
+          concernsComputed,
+          flagsCreated: 0,
+        },
+        { status: 500 }
+      );
+    }
+
     return NextResponse.json({
       success: true,
       dryRun,
+      concernsComputed,
       flagsCreated,
       partnershipsChecked: partnerships.length,
       message: dryRun
