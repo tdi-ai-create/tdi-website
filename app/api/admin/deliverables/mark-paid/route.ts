@@ -87,8 +87,8 @@ export async function POST(request: NextRequest) {
       .from('contract_deliverables')
       .select('id')
       .eq('quote_id', quoteId)
-      .neq('delivery_status', 'paid')
-      .neq('delivery_status', 'cancelled')
+      .neq('billing_state', 'paid')
+      .neq('delivery_state', 'cancelled')
       .eq('is_complimentary', false)
 
     // If no unpaid billable deliverables remain, mark opportunity as paid

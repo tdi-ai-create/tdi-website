@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
 
   // Validate all are delivered + not yet invoiced + not complimentary
   const invalid = deliverables.filter(
-    (d: any) => d.delivery_status !== 'delivered' || d.invoice_id || d.is_complimentary
+    (d: any) => d.delivery_state !== 'delivered' || d.billing_state !== 'not_billed' || d.funding_hold || d.is_complimentary
   )
   if (invalid.length > 0) {
     return NextResponse.json({
