@@ -19,13 +19,18 @@ export async function GET(request: NextRequest) {
 
   const sb = getServiceSupabase();
   const { data } = await sb.from('billing_outbox').select('*').order('created_at', { ascending: false }).limit(200);
-  const drafts = (data ?? []).filter((o) => o.status === 'draft');
+  const rows = data ?? [];
+  const drafts = rows.filter((o) => o.status === 'draft');
   return NextResponse.json({
-    outbox: data ?? [],
+    outbox: rows,
     totals: {
       drafts: drafts.length,
-      sent: (data ?? []).filter((o) => o.status === 'sent').length,
-      failed: (data ?? []).filter((o) => o.status === 'failed').length,
+      sent: rows.filter((o) => o.status === 'sent').length,
+      failed: rows.filter((o) => o.status === 'failed').length,
+      // Sent but with no delivery confirmation yet. Not necessarily wrong, but it is
+      // the state Allenwood sat in for three weeks while nobody knew.
+      unconfirmed: rows.filter((o) => o.status === 'sent' && !o.delivered_at && !o.bounced_at).length,
+      bounced: rows.filter((o) => o.bounced_at).length,
     },
     from: BILLING_FROM,
   });
@@ -180,6 +185,9 @@ async function sendDraft(sb: any, b: any, email: string, dryRun: boolean) {
   // outbox believes the send never happened, and the next run sends again.
   const { error: recordError } = await sb.from('billing_outbox').update({
     status: res.ok ? 'sent' : 'failed',
+    // Resend's message id. Delivery events arrive later carrying this, and it is the
+    // only way to tie a bounce back to the invoice it belongs to.
+    provider_id: res.ok ? (result.id ?? null) : null,
     send_result: res.ok ? (result.id ?? 'sent') : JSON.stringify(result).slice(0, 500),
     sent_by: email,
     sent_at: res.ok ? new Date().toISOString() : null,

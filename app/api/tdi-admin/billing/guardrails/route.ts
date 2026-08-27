@@ -20,7 +20,7 @@ export async function GET(_request: NextRequest) {
   const sb = getServiceSupabase();
   const today = new Date().toISOString().slice(0, 10);
 
-  const [{ data: lines }, { data: invoices }, { data: payments }, { data: apps }, { data: districts }, { data: quotes }, { data: reqs }, { data: docs }] =
+  const [{ data: lines }, { data: invoices }, { data: payments }, { data: apps }, { data: districts }, { data: quotes }, { data: reqs }, { data: docs }, { data: sends }] =
     await Promise.all([
       sb.from('contract_deliverables').select('id, label, quote_id, district_id, total_amount, delivery_state, billing_state, funding_hold, invoice_id, is_complimentary'),
       sb.from('intelligence_invoices').select('id, invoice_number, amount, status, due_date, district_id, quote_id, po_number'),
@@ -30,6 +30,7 @@ export async function GET(_request: NextRequest) {
       sb.from('quotes').select('id, quote_number, status, po_required, district_id'),
       sb.from('billing_requirements').select('district_id, requirement'),
       sb.from('billing_documents').select('district_id, doc_type, expires_on'),
+      sb.from('billing_outbox').select('invoice_id, subject, to_email, status, sent_at, delivered_at, bounced_at, bounce_reason, kind'),
     ]);
 
   const dName = new Map((districts ?? []).map((d) => [d.id, d.name]));
@@ -130,7 +131,37 @@ export async function GET(_request: NextRequest) {
     (docs ?? []).filter((d) => d.expires_on && d.expires_on <= in90)
       .map((d) => ({ client: d.district_id ? dName.get(d.district_id) ?? '?' : 'TDI company wide', document: d.doc_type, expires: d.expires_on })), 'documents');
 
-  // 11. A part-paid invoice must not be reported at its face value.
+  // 11. An invoice the client never received must not be chased.
+  add('No invoice is outstanding on a message that bounced',
+    'A bounced invoice is worse than an unsent one: the due date keeps running while nobody knows they never saw it.',
+    (sends ?? []).filter((m) => m.bounced_at && m.invoice_id).map((m) => {
+      const inv = invById.get(m.invoice_id!);
+      return {
+        invoice: inv?.invoice_number ?? 'unknown',
+        client: dName.get(inv?.district_id ?? '') ?? '?',
+        bounced_to: m.to_email,
+        reason: (m.bounce_reason ?? 'no reason given').slice(0, 80),
+        amount: Number(inv?.amount ?? 0),
+      };
+    }));
+
+  // 12. Sent a while ago with no delivery receipt is worth a look.
+  const dayAgo = new Date(Date.now() - 86400000).toISOString();
+  add('Sent invoices are confirmed delivered',
+    'Handing a message to the provider is not the same as it arriving. Anything unconfirmed after a day deserves a look.',
+    (sends ?? []).filter((m) =>
+      m.status === 'sent' && m.invoice_id && !m.delivered_at && !m.bounced_at && m.sent_at && m.sent_at < dayAgo,
+    ).map((m) => {
+      const inv = invById.get(m.invoice_id!);
+      return {
+        invoice: inv?.invoice_number ?? 'unknown',
+        client: dName.get(inv?.district_id ?? '') ?? '?',
+        sent_to: m.to_email,
+        sent_at: m.sent_at,
+      };
+    }), 'data');
+
+  // 13. A part-paid invoice must not be reported at its face value.
   const appliedByInvoice = paidByInvoice;
   add('Outstanding is net of part payments',
     'Reporting an invoice at face value after a partial payment overstates what a client owes.',

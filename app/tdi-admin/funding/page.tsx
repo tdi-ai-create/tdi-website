@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { DraftEmailModal, introEmailDraft, gateBlockerEmailDraft } from './components/panel/DraftEmailModal'
 import { ImpactEvidence } from './components/ImpactEvidence'
+import NeedsYouBoard from './components/NeedsYouBoard'
 
 /**
  * One next-step item, exactly as computed by lib/funding-next-actions.ts and
@@ -62,6 +63,11 @@ export default function FundingPage() {
   // person ask "what is waiting on us" without reading every school, and that
   // is a filter, not a destination.
   const [ownerFilter, setOwnerFilter] = useState<'all' | 'team' | 'agent' | 'school'>('all')
+  // Which lens the portal opens on. The board answers "what is mine today"
+  // without opening a single school, which is the question the school-grouped
+  // view could never answer directly.
+  const [view, setView] = useState<'board' | 'schools'>('board')
+  const [highlight, setHighlight] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [draftEmail, setDraftEmail] = useState<any & { opportunityId?: string; windowOpens?: string; windowCloses?: string } | null>(null)
   const [toast, setToast] = useState<string | null>(null)
@@ -202,6 +208,45 @@ export default function FundingPage() {
         {schools.length} schools | ${(totalPipeline / 1000).toFixed(0)}K pipeline | {totalGrants} grants tracked{needsYou > 0 ? ` | ${needsYou} waiting on you` : ''}
       </p>
 
+      {/* Two lenses on the same data. The board asks who is blocking; the
+          school view asks what is happening at one place. */}
+      <div style={{ display: 'flex', gap: 4, marginBottom: 20, borderBottom: `1px solid #E5E7EB` }}>
+        {([
+          { key: 'board' as const, label: 'Needs you' },
+          { key: 'schools' as const, label: 'Schools' },
+        ]).map(t => (
+          <button
+            key={t.key}
+            onClick={() => setView(t.key)}
+            style={{
+              fontSize: 14, fontWeight: view === t.key ? 700 : 500,
+              padding: '9px 16px', border: 'none', background: 'transparent',
+              color: view === t.key ? '#1e2749' : '#7b8399', cursor: 'pointer',
+              borderBottom: `2px solid ${view === t.key ? '#ffba06' : 'transparent'}`,
+              marginBottom: -1,
+            }}
+          >
+            {t.label}{t.key === 'board' && needsYou > 0 ? ` (${needsYou})` : ''}
+          </button>
+        ))}
+      </div>
+
+      {view === 'board' && (
+        <NeedsYouBoard
+          schools={schools}
+          onOpenSchool={id => {
+            setView('schools')
+            setOwnerFilter('all')
+            setHighlight(id)
+            setTimeout(() => {
+              document.getElementById(`school-${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+            }, 60)
+          }}
+        />
+      )}
+
+      {view === 'schools' && (
+        <>
       {/* Who the next move belongs to. This is the Work Queue, as a filter. */}
       <div style={{ display: 'flex', gap: 8, marginBottom: 24, flexWrap: 'wrap' }}>
         {([
@@ -225,18 +270,33 @@ export default function FundingPage() {
           </button>
         ))}
       </div>
+        </>
+      )}
 
       {/* School cards */}
+      {view === 'schools' && (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
         {visibleSchools.map(school => (
-          <SchoolCard
+          <div
             key={school.id}
+            id={`school-${school.id}`}
+            style={{
+              // Arriving here from the board, the row you clicked should be
+              // obvious without you having to hunt for it.
+              outline: highlight === school.id ? '2px solid #ffba06' : 'none',
+              outlineOffset: 4,
+              borderRadius: 12,
+              transition: 'outline-color .3s',
+            }}
+          >
+          <SchoolCard
             school={school}
             onDraftEmail={(to, toName, subject, body, schoolName, pursuitId, extra) => {
               setDraftEmail({ to, toName, subject, body, schoolName, pursuitId, ...extra })
             }}
             onToast={setToast}
           />
+          </div>
         ))}
 
         {visibleSchools.length === 0 && (
@@ -245,6 +305,7 @@ export default function FundingPage() {
           </div>
         )}
       </div>
+      )}
 
       {/* Reference material, from the Portfolio page that used to hold it.
           Collapsed by default: it is something you reach for while writing an
