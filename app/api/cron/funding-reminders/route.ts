@@ -4,6 +4,7 @@ import { calculateFundingAlerts } from '@/lib/tdi-admin/funding-alert-rules'
 import { syncGateActionItems } from '@/lib/funding-gate-sync'
 import { loadSettings } from '@/lib/funding-slack'
 import { guardCron } from '@/lib/cron-guard'
+import { NOT_TERMINAL_FILTER } from '@/lib/funding/task-status'
 
 /**
  * Daily cron endpoint for funding reminders.
@@ -42,7 +43,7 @@ export async function GET(request: NextRequest) {
     const [pursuitRes, oppRes, actionRes] = await Promise.all([
       supabase.from('funding_pursuits').select('*').neq('archived', true),
       supabase.from('funding_opportunities').select('*').not('status', 'in', '("awarded","denied")'),
-      supabase.from('funding_action_items').select('*').not('status', 'in', '("done","skipped")'),
+      supabase.from('funding_action_items').select('*').not('status', 'in', NOT_TERMINAL_FILTER),
     ])
 
     const pursuits = pursuitRes.data || []
@@ -74,7 +75,7 @@ export async function GET(request: NextRequest) {
       const { data: refreshed } = await supabase
         .from('funding_action_items')
         .select('*')
-        .not('status', 'in', '("done","skipped")')
+        .not('status', 'in', NOT_TERMINAL_FILTER)
       actionItems = (refreshed || []).filter(a => activeIds.has(a.pursuit_id))
     }
 

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { guardCron } from '@/lib/cron-guard'
 import { screenPath, type EligibilityResult } from '@/lib/funding-eligibility'
+import { NOT_TERMINAL_FILTER } from '@/lib/funding/task-status'
 
 /**
  * The monthly eligibility re-audit.
@@ -161,7 +162,7 @@ export async function GET(request: NextRequest) {
           .select('id')
           .eq('opportunity_id', opp.id)
           .eq('requires_answer', true)
-          .not('status', 'in', '("done","skipped","cancelled")')
+          .not('status', 'in', NOT_TERMINAL_FILTER)
           .limit(1)
           .maybeSingle()
 

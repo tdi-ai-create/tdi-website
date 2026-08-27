@@ -565,55 +565,55 @@ export default function CreatorDashboardPage() {
               </div>
               )}
 
-              {/* One thing to do, before anything else on the page. */}
-              {hasJourney && (
-                <CurrentStepCard
-                  journey={(dashboardData as unknown as { journey: Journey }).journey}
-                  creatorId={dashboardData.creator.id}
-                  creatorName={dashboardData.creator.name}
-                  onComplete={refreshDashboard}
-                  teamNotes={dashboardData.notes.filter(n => n.visible_to_creator).map(n => n.content).join('\n\n')}
-                  creator={{
-                    google_doc_link: dashboardData.creator.google_doc_link,
-                    drive_folder_link: dashboardData.creator.drive_folder_link,
-                    marketing_doc_link: dashboardData.creator.marketing_doc_link,
-                    course_url: dashboardData.creator.course_url,
-                    discount_code: dashboardData.creator.discount_code,
-                    wants_video_editing: dashboardData.creator.wants_video_editing,
-                    wants_download_design: dashboardData.creator.wants_download_design,
-                    content_path: dashboardData.creator.content_path,
-                  }}
-                />
-              )}
-
-              {/* Submissions & Feedback Portal
-                  Always. This is the only component that fetches the feedback a
-                  creator was actually sent, and the only place offering Revise
-                  and Resubmit. Hiding it behind the journey left anyone asked
-                  for changes unable to read what we wrote or reply to it. The
-                  journey shows WHERE their work sits; this shows WHAT was said
-                  about it, and those are different things. */}
-              <div className="mt-6">
-                <FeedbackPortal
-                  creatorId={dashboardData.creator.id}
-                  milestones={dashboardData.phases.flatMap(p =>
-                    p.milestones
-                      .filter((m: MilestoneWithStatus) => m.isApplicable !== false)
-                      .map((m: MilestoneWithStatus) => ({
-                        progress_id: m.progress_id || m.id,
-                        id: m.id,
-                        title: m.title,
-                        status: m.status,
-                      }))
-                  )}
-                  onRefresh={refreshDashboard}
-                />
-              </div>
-
               {/* Content grid */}
               <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Main content */}
                 <div className="lg:col-span-2">
+                  {/* One thing to do, before anything else on the page. */}
+                  {hasJourney && (
+                    <CurrentStepCard
+                      journey={(dashboardData as unknown as { journey: Journey }).journey}
+                      creatorId={dashboardData.creator.id}
+                      creatorName={dashboardData.creator.name}
+                      onComplete={refreshDashboard}
+                      teamNotes={dashboardData.notes.filter(n => n.visible_to_creator).map(n => n.content).join('\n\n')}
+                      creator={{
+                        google_doc_link: dashboardData.creator.google_doc_link,
+                        drive_folder_link: dashboardData.creator.drive_folder_link,
+                        marketing_doc_link: dashboardData.creator.marketing_doc_link,
+                        course_url: dashboardData.creator.course_url,
+                        discount_code: dashboardData.creator.discount_code,
+                        wants_video_editing: dashboardData.creator.wants_video_editing,
+                        wants_download_design: dashboardData.creator.wants_download_design,
+                        content_path: dashboardData.creator.content_path,
+                      }}
+                    />
+                  )}
+
+                  {/* Submissions & Feedback Portal
+                      Always. This is the only component that fetches the feedback a
+                      creator was actually sent, and the only place offering Revise
+                      and Resubmit. Hiding it behind the journey left anyone asked
+                      for changes unable to read what we wrote or reply to it. The
+                      journey shows WHERE their work sits; this shows WHAT was said
+                      about it, and those are different things. */}
+                  <div className="mt-6">
+                    <FeedbackPortal
+                      creatorId={dashboardData.creator.id}
+                      milestones={dashboardData.phases.flatMap(p =>
+                        p.milestones
+                          .filter((m: MilestoneWithStatus) => m.isApplicable !== false)
+                          .map((m: MilestoneWithStatus) => ({
+                            progress_id: m.progress_id || m.id,
+                            id: m.id,
+                            title: m.title,
+                            status: m.status,
+                          }))
+                      )}
+                      onRefresh={refreshDashboard}
+                    />
+                  </div>
+
                   {/* The journey: stages rather than a flat list of steps, named
                       for this creator's path. Falls back to the old progress
                       list if the journey could not be built, so a creator always
@@ -656,6 +656,19 @@ export default function CreatorDashboardPage() {
                       pepTalkRequestedAt={(dashboardData.creator as any).pep_talk_requested_at || null}
                     />
                   )}
+                  {/* Notes from the team, beside the work they are about.
+                      This was filed in the reference rail under the affiliate
+                      link. It is the one panel on the page carrying something a
+                      person wrote to this creator by hand. */}
+                  <div className="mt-6">
+                    <NotesPanel
+                      notes={dashboardData.notes}
+                      creatorId={dashboardData.creator.id}
+                      creatorName={dashboardData.creator.name}
+                      onNoteReply={refreshDashboard}
+                    />
+                  </div>
+
                 </div>
 
                 {/* Sidebar */}
@@ -666,6 +679,13 @@ export default function CreatorDashboardPage() {
                   {hasJourney && (
                     <CreatorJourney journey={(dashboardData as unknown as { journey: Journey }).journey} />
                   )}
+                </div>
+              </div>
+
+              {/* Reference, not action. Side by side rather than stacked in the
+                  rail, so the page stops being as tall as a column of six
+                  panels. Nothing here is removed, only moved. */}
+              <div className="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
                   <CourseDetailsPanel creator={dashboardData.creator} />
 
                   {/* Affiliate Link Card */}
@@ -689,12 +709,6 @@ export default function CreatorDashboardPage() {
                     </Link>
                   )}
 
-                  <NotesPanel
-                    notes={dashboardData.notes}
-                    creatorId={dashboardData.creator.id}
-                    creatorName={dashboardData.creator.name}
-                    onNoteReply={refreshDashboard}
-                  />
 
                   {/* Past Projects (if any) */}
                   {dashboardData.pastProjects && dashboardData.pastProjects.length > 0 && (
@@ -737,7 +751,6 @@ export default function CreatorDashboardPage() {
                       </a>
                     </div>
                   </div>
-                </div>
               </div>
             </main>
 
