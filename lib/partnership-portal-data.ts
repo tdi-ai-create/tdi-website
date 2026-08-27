@@ -693,13 +693,20 @@ export async function getPartnershipStats(): Promise<{
   totalEducators: number;
   pendingSetup: number;
   awaitingAccept: number;
+  neverSignedIn: { id: string; orgName: string; contactName: string | null; invitedAt: string | null }[];
 }> {
   const supabase = getServiceSupabase();
 
   // Get counts using both status AND invite acceptance state
-  const { data: partnerships } = await supabase
+  const { data: partnerships, error } = await supabase
     .from('partnerships')
-    .select('status, invite_sent_at, invite_accepted_at, staff_enrolled');
+    .select('id, org_name, primary_contact_name, status, invite_sent_at, invite_accepted_at, staff_enrolled');
+
+  // A failed read here used to return zeros for every card, which looks exactly
+  // like a quiet week rather than a broken query.
+  if (error) {
+    throw new Error(`Could not read partnerships for the leadership stats: ${error.message}`);
+  }
 
   const all = partnerships || [];
 
@@ -711,12 +718,28 @@ export async function getPartnershipStats(): Promise<{
   // about the same thing is worse than either being wrong alone.
   const activeCount = all.filter(p => p.status === 'active').length;
 
-  // Same caveat applies here, so this counts leaders who have genuinely never
-  // opened their dashboard rather than trusting the accepted flag.
-  const awaitingAccept = all.filter(p => p.invite_sent_at && !p.invite_accepted_at && p.status !== 'completed' && p.status !== 'paused').length;
-
-  // Pending Setup = status is setup_in_progress OR active but no invite sent yet
+  // Still returned because the older /admin/partnerships page renders it. The
+  // Leadership dashboard dropped the card: it reads 0 and by this definition
+  // can only read otherwise when a partnership is created and left un-invited.
   const pendingSetup = all.filter(p => p.status === 'setup_in_progress' || (p.status === 'active' && !p.invite_sent_at)).length;
+
+  // invite_accepted_at is stamped by api/partners/auth-check on any successful
+  // sign in, so a leader who was invited and still has no value there has never
+  // once opened their dashboard. That is the useful reading of this field, and
+  // it is worth naming the people rather than showing a bare count nobody can
+  // act on.
+  const neverSignedInRows = all.filter(
+    p => p.invite_sent_at && !p.invite_accepted_at && p.status !== 'completed' && p.status !== 'paused'
+  );
+  const awaitingAccept = neverSignedInRows.length;
+  const neverSignedIn = neverSignedInRows
+    .sort((a, b) => String(a.invite_sent_at).localeCompare(String(b.invite_sent_at)))
+    .map(p => ({
+      id: p.id as string,
+      orgName: (p.org_name as string) || 'Unnamed partnership',
+      contactName: (p.primary_contact_name as string) || null,
+      invitedAt: (p.invite_sent_at as string) || null,
+    }));
 
   // Total educators from all non-completed partnerships
   const totalEducators = all
@@ -728,6 +751,7 @@ export async function getPartnershipStats(): Promise<{
     totalEducators,
     pendingSetup,
     awaitingAccept,
+    neverSignedIn,
   };
 }
 

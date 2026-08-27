@@ -720,14 +720,6 @@ export default function AdminPartnershipDetailPage() {
     const pendingItems = actionItems.filter(a => a.status !== 'completed').length
     metrics.push({ label: 'Items Due', value: String(pendingItems), color: pendingItems > 5 ? '#EF4444' : pendingItems > 2 ? '#EAB308' : '#10B981' })
 
-    // Direct Pay
-    const directPay = partnership.direct_pay_amount || partnership.contract_value || 0
-    metrics.push({ label: 'Direct Pay', value: directPay > 0 ? `$${Number(directPay).toLocaleString()}` : '$0', color: '#3B82F6' })
-
-    // Grant
-    const grantTotal = grantPursuits.reduce((s, g) => s + (g.total_awarded || 0), 0)
-    metrics.push({ label: 'Grant', value: grantTotal > 0 ? `$${grantTotal.toLocaleString()}` : '$0', color: '#8B5CF6' })
-
     // Provisioned. This read staff_enrolled over member_count, which is
     // contracted over provisioned, printed the wrong way round. Addison showed
     // "136/128" when it has 128 of its 136 contracted seats live.
@@ -766,7 +758,7 @@ export default function AdminPartnershipDetailPage() {
     }
 
     return metrics
-  }, [partnership, actionItems, grantPursuits, hubStats, internalNotes, internalMeetings])
+  }, [partnership, actionItems,  hubStats, internalNotes, internalMeetings])
 
   // Access denied
   if (!hasAccess) {

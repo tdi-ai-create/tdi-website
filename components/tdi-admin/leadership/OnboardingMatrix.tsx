@@ -24,6 +24,15 @@ interface Step {
   evidence: string;
 }
 
+interface Engagement {
+  quickWinsViewed: number;
+  lessonsViewed: number;
+  coursesCompleted: number;
+  checkIns: number;
+  questionsAsked: number;
+  recognitions: number;
+}
+
 interface Row {
   id: string;
   orgName: string;
@@ -32,9 +41,27 @@ interface Row {
   seatsContracted: number;
   seatsProvisioned: number;
   activeEducators: number;
+  engagement: Engagement;
   steps: Step[];
   completed: number;
   applicable: number;
+}
+
+interface EngagementColumn {
+  key: string;
+  label: string;
+}
+
+type View = 'onboarding' | 'engagement';
+
+/**
+ * Seats and Signed in live on the row itself, everything else on row.engagement.
+ * Reading both through one function keeps the column order the route publishes.
+ */
+function engagementValue(row: Row, key: string): number {
+  if (key === 'seatsProvisioned') return row.seatsProvisioned;
+  if (key === 'activeEducators') return row.activeEducators;
+  return (row.engagement?.[key as keyof Engagement] as number) ?? 0;
 }
 
 const MARK: Record<Step['state'], { bg: string; fg: string; Icon: typeof Check }> = {
@@ -47,7 +74,13 @@ const MARK: Record<Step['state'], { bg: string; fg: string; Icon: typeof Check }
 export default function OnboardingMatrix({ userEmail }: { userEmail: string | null }) {
   const [rows, setRows] = useState<Row[] | null>(null);
   const [stepLabels, setStepLabels] = useState<string[]>([]);
+  const [engagementLabels, setEngagementLabels] = useState<EngagementColumn[]>([]);
   const [error, setError] = useState<string | null>(null);
+
+  // Onboarding answers where a school is stuck. Engagement answers whether
+  // anyone is using what they were given. Same nine rows either way, which is
+  // why this is a toggle and not a second screen.
+  const [view, setView] = useState<View>('onboarding');
 
   useEffect(() => {
     if (!userEmail) return;
@@ -65,6 +98,7 @@ export default function OnboardingMatrix({ userEmail }: { userEmail: string | nu
         if (cancelled) return;
         setRows(body.partnerships ?? []);
         setStepLabels(body.stepLabels ?? []);
+        setEngagementLabels(body.engagementLabels ?? []);
       })
       .catch((err) => {
         // Say what went wrong rather than rendering an empty grid, which is
@@ -109,6 +143,39 @@ export default function OnboardingMatrix({ userEmail }: { userEmail: string | nu
   return (
     <div className="bg-white rounded-xl border border-gray-100 overflow-hidden" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
       <div className="h-0.5 w-full" style={{ background: '#2563EB' }} />
+
+      <div className="flex items-center justify-between gap-3 px-5 py-3 border-b border-gray-100">
+        <p className="text-[12px] text-gray-500" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+          {view === 'onboarding'
+            ? 'Where each partnership is stuck.'
+            : 'What their educators have actually done in the Hub.'}
+        </p>
+        <div className="inline-flex bg-gray-100 rounded-lg p-0.5 shrink-0">
+          {(
+            [
+              ['onboarding', 'Onboarding'],
+              ['engagement', 'Engagement'],
+            ] as const
+          ).map(([id, label]) => (
+            <button
+              key={id}
+              type="button"
+              onClick={() => setView(id)}
+              aria-pressed={view === id}
+              className="px-3 py-1.5 text-[11px] font-bold rounded-md transition-colors"
+              style={{
+                background: view === id ? '#FFFFFF' : 'transparent',
+                color: view === id ? '#1e2749' : '#6B7280',
+                boxShadow: view === id ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
+                fontFamily: "'DM Sans', sans-serif",
+              }}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
+
       <div className="overflow-x-auto">
         <table className="w-full" style={{ minWidth: 900, borderCollapse: 'collapse' }}>
           <thead>
@@ -119,18 +186,28 @@ export default function OnboardingMatrix({ userEmail }: { userEmail: string | nu
               >
                 Partnership
               </th>
-              {stepLabels.map((label, i) => (
-                <th
-                  key={label}
-                  className="px-2 py-3 border-b border-gray-200 align-bottom"
-                  style={{ ...TYPE_TABLE_HEADER, textAlign: 'center', lineHeight: 1.35 }}
-                >
-                  <span className="block text-[9px] mb-1" style={{ color: '#2563EB', letterSpacing: '0.1em' }}>
-                    {String(i + 1).padStart(2, '0')}
-                  </span>
-                  {label}
-                </th>
-              ))}
+              {view === 'onboarding'
+                ? stepLabels.map((label, i) => (
+                    <th
+                      key={label}
+                      className="px-2 py-3 border-b border-gray-200 align-bottom"
+                      style={{ ...TYPE_TABLE_HEADER, textAlign: 'center', lineHeight: 1.35 }}
+                    >
+                      <span className="block text-[9px] mb-1" style={{ color: '#2563EB', letterSpacing: '0.1em' }}>
+                        {String(i + 1).padStart(2, '0')}
+                      </span>
+                      {label}
+                    </th>
+                  ))
+                : engagementLabels.map((col) => (
+                    <th
+                      key={col.key}
+                      className="px-2 py-3 border-b border-gray-200 align-bottom"
+                      style={{ ...TYPE_TABLE_HEADER, textAlign: 'center', lineHeight: 1.35 }}
+                    >
+                      {col.label}
+                    </th>
+                  ))}
             </tr>
           </thead>
           <tbody>
@@ -146,40 +223,66 @@ export default function OnboardingMatrix({ userEmail }: { userEmail: string | nu
                     </span>
                   </Link>
                 </td>
-                {row.steps.map((step) => {
-                  const { bg, fg, Icon } = MARK[step.state];
-                  return (
-                    <td key={step.key} className="px-2 py-3 border-b border-gray-100 text-center">
-                      <span
-                        className="inline-flex items-center justify-center w-6 h-6 rounded-full"
-                        style={{ background: bg, color: fg }}
-                        title={`${step.label}: ${step.evidence}`}
-                      >
-                        <Icon className="w-3.5 h-3.5" strokeWidth={3} />
-                      </span>
-                    </td>
-                  );
-                })}
+                {view === 'onboarding'
+                  ? row.steps.map((step) => {
+                      const { bg, fg, Icon } = MARK[step.state];
+                      return (
+                        <td key={step.key} className="px-2 py-3 border-b border-gray-100 text-center">
+                          <span
+                            className="inline-flex items-center justify-center w-6 h-6 rounded-full"
+                            style={{ background: bg, color: fg }}
+                            title={`${step.label}: ${step.evidence}`}
+                          >
+                            <Icon className="w-3.5 h-3.5" strokeWidth={3} />
+                          </span>
+                        </td>
+                      );
+                    })
+                  : engagementLabels.map((col) => {
+                      const value = engagementValue(row, col.key);
+                      return (
+                        <td
+                          key={col.key}
+                          className="px-2 py-3 border-b border-gray-100 text-center text-[12px]"
+                          style={{
+                            fontVariantNumeric: 'tabular-nums',
+                            color: value === 0 ? '#C4C9D4' : '#2B3A67',
+                            fontWeight: value === 0 ? 400 : 600,
+                          }}
+                        >
+                          {value}
+                        </td>
+                      );
+                    })}
               </tr>
             ))}
           </tbody>
         </table>
       </div>
       <div className="flex flex-wrap items-center gap-x-5 gap-y-2 px-5 py-3 bg-gray-50 border-t border-gray-100 text-[11px] text-gray-500">
-        {(
-          [
-            ['done', 'Complete'],
-            ['partial', 'Partial'],
-            ['gap', 'Not started'],
-            ['na', 'Not in this contract'],
-          ] as const
-        ).map(([state, label]) => (
-          <span key={state} className="inline-flex items-center gap-2">
-            <i className="w-2.5 h-2.5 rounded-full inline-block" style={{ background: MARK[state].fg }} />
-            {label}
+        {view === 'onboarding' ? (
+          <>
+            {(
+              [
+                ['done', 'Complete'],
+                ['partial', 'Partial'],
+                ['gap', 'Not started'],
+                ['na', 'Not in this contract'],
+              ] as const
+            ).map(([state, label]) => (
+              <span key={state} className="inline-flex items-center gap-2">
+                <i className="w-2.5 h-2.5 rounded-full inline-block" style={{ background: MARK[state].fg }} />
+                {label}
+              </span>
+            ))}
+            <span className="text-gray-400">Hover a mark for the evidence. Click a school to open it.</span>
+          </>
+        ) : (
+          <span className="text-gray-400">
+            Counted over the seats that belong to each partnership, excluding anything TDI wrote on their
+            behalf. Click a school for the person by person view.
           </span>
-        ))}
-        <span className="text-gray-400">Hover a mark for the evidence. Click a school to open it.</span>
+        )}
       </div>
     </div>
   );

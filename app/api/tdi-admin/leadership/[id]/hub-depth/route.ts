@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminAuth } from '@/lib/tdi-admin/auth';
-import { getHubServiceClient, resolvePartnershipMembers } from '@/lib/hub/partnership-members';
+import { getHubServiceClient, resolvePartnershipMembers, isEngagementAction } from '@/lib/hub/partnership-members';
 
 /**
  * What a partnership's educators are actually doing in the Hub.
@@ -28,19 +28,6 @@ import { getHubServiceClient, resolvePartnershipMembers } from '@/lib/hub/partne
 
 export const dynamic = 'force-dynamic';
 
-const ENGAGEMENT_ACTIONS = [
-  'hub_login',
-  'lesson_viewed',
-  'quick_win_viewed',
-  'quick_win_saved',
-  'checkin_completed',
-  'practice_tool_completed',
-  'course_completed',
-  'resource_downloaded',
-  'transcript_downloaded',
-  'share_used',
-  'tour_completed',
-];
 
 export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -67,7 +54,7 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
 
     const [activityRes, enrolRes, lessonRes, qaRes, recogRes, quizRes, vibeRes, certRes, favRes, profileRes] =
       await Promise.all([
-        hub.from('hub_activity_log').select('user_id, action, created_at').in('user_id', userIds).neq('action', 'account_provisioned'),
+        hub.from('hub_activity_log').select('user_id, action, created_at').in('user_id', userIds),
         hub.from('hub_enrollments').select('user_id, course_id').in('user_id', userIds),
         hub.from('hub_lesson_progress').select('user_id').in('user_id', userIds),
         hub.from('hub_qa_posts').select('user_id, parent_id').in('user_id', userIds),
@@ -94,7 +81,7 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
     }
 
     const activity = activityRes.data ?? [];
-    const engaged = activity.filter((a) => ENGAGEMENT_ACTIONS.includes(a.action as string));
+    const engaged = activity.filter((a) => isEngagementAction(a.action as string | null));
 
     const courseIds = [...new Set((enrolRes.data ?? []).map((e) => e.course_id as string))];
     let courseTitles = new Map<string, string>();

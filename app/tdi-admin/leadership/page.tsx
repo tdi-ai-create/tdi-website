@@ -16,7 +16,6 @@ import {
   Filter,
   Users,
   Check,
-  Clock,
   Mail,
   Loader2,
   ChevronRight,
@@ -69,11 +68,22 @@ interface Partnership {
   website?: string | null;
 }
 
+// Reads as "invited 29 days ago" rather than a bare date, because the point of
+// the never-signed-in card is how long someone has been sitting on an invite.
+function formatDaysAgo(iso: string): string {
+  const then = new Date(iso).getTime();
+  if (Number.isNaN(then)) return 'at an unknown date';
+  const days = Math.floor((Date.now() - then) / 86400000);
+  if (days <= 0) return 'today';
+  if (days === 1) return 'yesterday';
+  return `${days} days ago`;
+}
+
 interface Stats {
   activeCount: number;
   totalEducators: number;
-  pendingSetup: number;
   awaitingAccept: number;
+  neverSignedIn: { id: string; orgName: string; contactName: string | null; invitedAt: string | null }[];
 }
 
 interface ActionItem {
@@ -95,8 +105,6 @@ interface ActionItem {
 // Tab configuration
 const TABS = [
   { id: 'partnerships', label: 'Partnerships' },
-  { id: 'dashboards', label: 'School Dashboards' },
-  { id: 'reports', label: 'School Reports' },
   { id: 'actions', label: 'Action Items' },
 ] as const;
 
@@ -260,7 +268,6 @@ export default function LeadershipDashboardPage() {
   const [partnerships, setPartnerships] = useState<Partnership[]>([]);
   const [filteredPartnerships, setFilteredPartnerships] = useState<Partnership[]>([]);
   const [stats, setStats] = useState<Stats | null>(null);
-  const [contractValues, setContractValues] = useState<{ directPay: number; grantFunded: number; total: number } | null>(null);
   const [actionItems, setActionItems] = useState<ActionItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -305,7 +312,6 @@ export default function LeadershipDashboardPage() {
           setPartnerships(data.partnerships);
           setFilteredPartnerships(data.partnerships);
           setStats(data.stats);
-          if (data.contractValues) setContractValues(data.contractValues);
         }
       }
     } catch (error) {
@@ -520,7 +526,7 @@ export default function LeadershipDashboardPage() {
 
       {/* Stats Cards - White bg with accent top bar */}
       {stats && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           <div
             className="bg-white rounded-xl border border-gray-100 transition-all duration-200 group relative overflow-hidden"
             style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}
@@ -574,93 +580,67 @@ export default function LeadershipDashboardPage() {
           </div>
 
           <div
-            className="bg-white rounded-xl border border-gray-100 transition-all duration-200 group relative overflow-hidden"
-            style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}
+            className="bg-white rounded-xl border overflow-hidden"
+            style={{
+              boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+              borderColor: stats.neverSignedIn.length > 0 ? '#FCA5A5' : '#F3F4F6',
+            }}
           >
-            <div className="h-0.5 w-full" style={{ background: theme.accent }} />
-            <div className="p-5 flex items-center justify-between">
-              <div>
-                <p
-                  className="font-bold mb-1 transition-transform duration-200 group-hover:-translate-y-0.5"
-                  style={{ ...TYPE_STAT_VALUE, color: theme.accent }}
+            <div
+              className="h-0.5 w-full"
+              style={{ background: stats.neverSignedIn.length > 0 ? '#DC2626' : theme.accent }}
+            />
+            <div className="p-5">
+              <div className="flex items-start justify-between">
+                <div>
+                  <p
+                    className="font-bold mb-1"
+                    style={{
+                      ...TYPE_STAT_VALUE,
+                      color: stats.neverSignedIn.length > 0 ? '#DC2626' : theme.accent,
+                    }}
+                  >
+                    {stats.awaitingAccept}
+                  </p>
+                  <p className="text-sm text-gray-500 font-medium" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+                    {stats.awaitingAccept === 1 ? 'Leader has never signed in' : 'Leaders have never signed in'}
+                  </p>
+                </div>
+                <div
+                  className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
+                  style={{
+                    backgroundColor: stats.neverSignedIn.length > 0 ? '#FEE2E2' : `${theme.accent}15`,
+                  }}
                 >
-                  {stats.pendingSetup}
-                </p>
-                <p className="text-sm text-gray-500 font-medium" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-                  Pending Setup
-                </p>
+                  <Mail
+                    className="w-6 h-6"
+                    style={{ color: stats.neverSignedIn.length > 0 ? '#DC2626' : theme.accent }}
+                  />
+                </div>
               </div>
-              <div
-                className="w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-200 group-hover:scale-110"
-                style={{ backgroundColor: `${theme.accent}15` }}
-              >
-                <Clock className="w-6 h-6" style={{ color: theme.accent }} />
-              </div>
-            </div>
-          </div>
 
-          <div
-            className="bg-white rounded-xl border border-gray-100 transition-all duration-200 group relative overflow-hidden"
-            style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}
-          >
-            <div className="h-0.5 w-full" style={{ background: theme.accent }} />
-            <div className="p-5 flex items-center justify-between">
-              <div>
-                <p
-                  className="font-bold mb-1 transition-transform duration-200 group-hover:-translate-y-0.5"
-                  style={{ ...TYPE_STAT_VALUE, color: theme.accent }}
-                >
-                  {stats.awaitingAccept}
-                </p>
-                <p className="text-sm text-gray-500 font-medium" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-                  Awaiting Accept
-                </p>
-              </div>
-              <div
-                className="w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-200 group-hover:scale-110"
-                style={{ backgroundColor: `${theme.accent}15` }}
-              >
-                <Mail className="w-6 h-6" style={{ color: theme.accent }} />
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Contract Value Cards */}
-      {contractValues && (
-        <div className="grid grid-cols-3 gap-4 mb-6">
-          <div className="bg-white rounded-xl border border-gray-100 overflow-hidden" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-            <div className="h-0.5 w-full" style={{ background: '#10B981' }} />
-            <div className="p-5">
-              <p className="font-bold mb-1" style={{ ...TYPE_STAT_VALUE, color: '#10B981' }}>
-                ${contractValues.directPay.toLocaleString()}
-              </p>
-              <p className="text-sm text-gray-500 font-medium" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-                Direct Pay Contracts
-              </p>
-            </div>
-          </div>
-          <div className="bg-white rounded-xl border border-gray-100 overflow-hidden" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-            <div className="h-0.5 w-full" style={{ background: '#8B5CF6' }} />
-            <div className="p-5">
-              <p className="font-bold mb-1" style={{ ...TYPE_STAT_VALUE, color: '#8B5CF6' }}>
-                ${contractValues.grantFunded.toLocaleString()}
-              </p>
-              <p className="text-sm text-gray-500 font-medium" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-                Grant-Funded Contracts
-              </p>
-            </div>
-          </div>
-          <div className="bg-white rounded-xl border border-gray-100 overflow-hidden" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-            <div className="h-0.5 w-full" style={{ background: theme.accent }} />
-            <div className="p-5">
-              <p className="font-bold mb-1" style={{ ...TYPE_STAT_VALUE, color: theme.accent }}>
-                ${contractValues.total.toLocaleString()}
-              </p>
-              <p className="text-sm text-gray-500 font-medium" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-                Total Contract Value
-              </p>
+              {stats.neverSignedIn.length > 0 && (
+                <div className="mt-3 pt-3 border-t border-gray-100 space-y-1.5">
+                  {stats.neverSignedIn.map((leader) => (
+                    <Link
+                      key={leader.id}
+                      href={`/tdi-admin/leadership/${leader.id}`}
+                      className="block text-xs text-gray-600 hover:text-[#1e2749]"
+                      style={{ fontFamily: "'DM Sans', sans-serif" }}
+                    >
+                      <span className="font-semibold">{leader.contactName || 'Contact not recorded'}</span>
+                      <span className="text-gray-400"> at </span>
+                      <span>{leader.orgName}</span>
+                      {leader.invitedAt && (
+                        <span className="text-gray-400">
+                          {' '}
+                          &middot; invited {formatDaysAgo(leader.invitedAt)}
+                        </span>
+                      )}
+                    </Link>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -681,8 +661,11 @@ export default function LeadershipDashboardPage() {
                 field an auth check stamps automatically. It read as accepted
                 for two schools that have never logged in. */}
             <div className="p-4 pb-0">
+              {/* Not headed "Onboarding" any more: the same table now toggles to
+                  an Engagement view, and the toggle bar inside carries the
+                  per-view explanation, so a subtitle here would repeat it. */}
               <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 mb-3">
-                <h2 style={TYPE_SECTION_HEADER}>Onboarding</h2>
+                <h2 style={TYPE_SECTION_HEADER}>Where every partnership stands</h2>
                 <span className="text-[13px] text-gray-500">
                   One definition, computed from both databases.
                 </span>
@@ -1044,341 +1027,6 @@ export default function LeadershipDashboardPage() {
         )}
 
         {/* =========== SCHOOL DASHBOARDS TAB =========== */}
-        {activeTab === 'dashboards' && (
-          <div className="p-6">
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h2
-                  style={TYPE_SECTION_HEADER}
-                >
-                  Active Partner Dashboards
-                </h2>
-                <p className="text-sm text-gray-500">
-                  Quick access to all active partner dashboards
-                </p>
-              </div>
-              <button
-                onClick={loadPartnerships}
-                className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700"
-              >
-                <RefreshCw className="w-4 h-4" />
-                Refresh
-              </button>
-            </div>
-
-            {isLoading ? (
-              <div className="flex items-center justify-center py-16">
-                <Loader2 className="w-8 h-8 animate-spin text-amber-500" />
-              </div>
-            ) : activePartnerships.length === 0 ? (
-              <div className="text-center py-16 text-gray-500">
-                <ExternalLink className="w-12 h-12 mx-auto mb-4 text-gray-300" />
-                <p>No active partnerships with dashboards yet.</p>
-              </div>
-            ) : (
-              <div className="grid md:grid-cols-2 gap-4">
-                {activePartnerships.map((partnership) => {
-                  // Prefer slug-based dynamic dashboard, fall back to legacy_dashboard_url
-                  const dashboardUrl = partnership.slug ? `/partners/${partnership.slug}` : (partnership.legacy_dashboard_url || '#');
-
-                  return (
-                    <div
-                      key={partnership.id}
-                      className="p-5 rounded-xl border border-gray-200 bg-white transition-all hover:shadow-md"
-                      style={{
-                        boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
-                      }}
-                    >
-                      {/* Badges Row */}
-                      <div className="flex items-center gap-2 mb-3">
-                        <span
-                          className={`text-xs px-2 py-1 rounded-full font-medium ${
-                            phaseColors[partnership.contract_phase]
-                          }`}
-                        >
-                          {partnership.contract_phase}
-                        </span>
-                        <span
-                          className={`text-xs px-2 py-1 rounded-full font-medium ${
-                            partnership.partnership_type === 'district'
-                              ? 'bg-purple-100 text-purple-700'
-                              : 'bg-gray-100 text-gray-600'
-                          }`}
-                        >
-                          {partnership.partnership_type === 'district' ? 'District' : 'School'}
-                        </span>
-                      </div>
-
-                      {/* School/District Name */}
-                      <h3
-                        className="font-semibold text-lg mb-1 truncate"
-                        style={{ color: '#2B3A67', fontFamily: "'DM Sans', sans-serif" }}
-                      >
-                        {partnership.org_name || partnership.contact_name}
-                      </h3>
-
-                      {/* Contact */}
-                      <p className="text-sm text-gray-500 mb-4">
-                        Contact: {partnership.primary_contact_name || partnership.contact_name}
-                      </p>
-
-                      {/* Action Buttons */}
-                      <div className="flex items-center gap-3">
-                        <Link
-                          href={dashboardUrl}
-                          target="_blank"
-                          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-white transition-all hover:opacity-90"
-                          style={{ backgroundColor: theme.accent }}
-                        >
-                          Open Dashboard
-                          <ExternalLink className="w-4 h-4" />
-                        </Link>
-                        <Link
-                          href={`/tdi-admin/leadership/${partnership.id}`}
-                          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium border border-gray-200 text-gray-700 hover:bg-gray-50 transition-colors"
-                        >
-                          View Details
-                          <ChevronRight className="w-4 h-4" />
-                        </Link>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* =========== SCHOOL REPORTS TAB =========== */}
-        {activeTab === 'reports' && (
-          <div className="p-6">
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h2 style={TYPE_SECTION_HEADER}>School Reports</h2>
-                <p className="text-sm text-gray-500">
-                  Live Hub engagement and progress data by school
-                </p>
-              </div>
-              <button
-                onClick={loadHubData}
-                className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700"
-              >
-                <RefreshCw className={`w-4 h-4 ${hubLoading ? 'animate-spin' : ''}`} />
-                Refresh
-              </button>
-            </div>
-
-            {/* Partnership contract table */}
-            {isLoading ? (
-              <div className="flex items-center justify-center py-16">
-                <Loader2 className="w-8 h-8 animate-spin text-amber-500" />
-              </div>
-            ) : activePartnerships.length === 0 ? (
-              <div className="text-center py-16 text-gray-500">
-                <BarChart3 className="w-12 h-12 mx-auto mb-4 text-gray-300" />
-                <p>No active partnerships to report on yet.</p>
-              </div>
-            ) : (
-              <div className="overflow-x-auto mb-8">
-                <h3 className="text-sm font-bold uppercase tracking-wider text-gray-400 mb-3">Contract Usage</h3>
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b border-gray-100">
-                      <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3">Organization</th>
-                      <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3">Educators</th>
-                      <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3">Sessions Used</th>
-                      <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3">Contract Period</th>
-                      <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-50">
-                    {activePartnerships.map((partnership) => {
-                      const totalSessions = (partnership.virtual_sessions_total || 0) + (partnership.observation_days_total || 0) + (partnership.executive_sessions_total || 0);
-                      const usedSessions = (partnership.virtual_sessions_used || 0) + (partnership.observation_days_used || 0) + (partnership.executive_sessions_used || 0);
-                      const usagePercent = totalSessions > 0 ? Math.round((usedSessions / totalSessions) * 100) : 0;
-
-                      return (
-                        <tr key={partnership.id} className="hover:bg-gray-50">
-                          <td className="px-4 py-3">
-                            <div className="flex items-center gap-3">
-                              <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${partnership.partnership_type === 'district' ? 'bg-purple-100 text-purple-600' : 'bg-blue-100 text-blue-600'}`}>
-                                {partnership.partnership_type === 'district' ? <Building2 className="w-4 h-4" /> : <School className="w-4 h-4" />}
-                              </div>
-                              <span className="font-medium" style={{ color: '#2B3A67' }}>{partnership.org_name || partnership.contact_name}</span>
-                            </div>
-                          </td>
-                          <td className="px-4 py-3 text-gray-600">{partnership.staff_count ?? 0}</td>
-                          <td className="px-4 py-3">
-                            <div className="flex items-center gap-2">
-                              <div className="w-16 h-2 bg-gray-200 rounded-full overflow-hidden">
-                                <div className="h-full bg-amber-500 rounded-full" style={{ width: `${usagePercent}%` }} />
-                              </div>
-                              <span className="text-sm text-gray-500">{usedSessions}/{totalSessions}</span>
-                            </div>
-                          </td>
-                          <td className="px-4 py-3 text-sm text-gray-600">
-                            {partnership.contract_start ? new Date(partnership.contract_start).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : '--'} - {partnership.contract_end ? new Date(partnership.contract_end).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : '--'}
-                          </td>
-                          <td className="px-4 py-3">
-                            <Link href={`/tdi-admin/leadership/${partnership.id}`} className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors">
-                              Full Report <ChevronRight className="w-3 h-3" />
-                            </Link>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            )}
-
-            {/* Hub Engagement Data - Live from Learning Hub */}
-            <div className="border-t border-gray-100 pt-6">
-              <LiveSectionHeader title="Hub Engagement by School" subtitle="Active engagement rates, tools explored, and educator wellness by building" />
-
-              {hubLoading ? (
-                <div className="flex items-center justify-center py-12">
-                  <Loader2 className="w-6 h-6 animate-spin text-amber-500" />
-                  <span className="ml-2 text-sm text-gray-500">Loading Hub data...</span>
-                </div>
-              ) : hubSchools.length === 0 ? (
-                <div className="text-center py-12 text-gray-500">
-                  <Users className="w-10 h-10 mx-auto mb-3 text-gray-300" />
-                  <p className="text-sm">No school data available yet. Educators need to add their school name in their Hub profile.</p>
-                </div>
-              ) : (
-                <>
-                  {/* Visual overview: active rate bar chart + aggregate donut */}
-                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-                    {/* Active rate by school - horizontal bar chart */}
-                    <div className="lg:col-span-2 bg-white rounded-xl border border-gray-100 p-5" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-                      <p className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-3">Active Rate by School (30 days)</p>
-                      <HorizontalBarChart
-                        data={hubSchools.slice(0, 12).map(s => ({
-                          label: s.name.length > 22 ? s.name.slice(0, 22) + '...' : s.name,
-                          value: s.activeRate,
-                          color: s.activeRate >= 60 ? '#2A9D8F' : s.activeRate >= 30 ? '#EAB308' : '#EF4444',
-                        }))}
-                        valueFormatter={(v) => `${v}%`}
-                      />
-                    </div>
-
-                    {/* Aggregate engagement donut */}
-                    <div className="bg-white rounded-xl border border-gray-100 p-5" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-                      <p className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-3">Aggregate Engagement</p>
-                      {(() => {
-                        const totalEds = hubSchools.reduce((s, h) => s + h.totalEducators, 0);
-                        const activeEds = hubSchools.reduce((s, h) => s + h.activeEducators, 0);
-                        const inactiveEds = totalEds - activeEds;
-                        return (
-                          <div className="flex flex-col items-center">
-                            <DonutChart
-                              data={[
-                                { name: 'Active (30d)', value: activeEds, color: '#2A9D8F' },
-                                { name: 'Inactive', value: inactiveEds, color: '#E5E7EB' },
-                              ]}
-                              size={160}
-                              innerRadius={48}
-                              outerRadius={68}
-                              centerValue={totalEds > 0 ? `${Math.round((activeEds / totalEds) * 100)}%` : '0%'}
-                              centerLabel="active"
-                            />
-                            <div className="mt-3 w-full">
-                              <DonutLegend data={[
-                                { name: 'Active (30d)', value: activeEds, color: '#2A9D8F' },
-                                { name: 'Inactive', value: inactiveEds, color: '#E5E7EB' },
-                              ]} />
-                            </div>
-                          </div>
-                        );
-                      })()}
-                    </div>
-                  </div>
-
-                  {/* Metrics row: PD Hours, Tools Explored, Vibe Scores, Completions */}
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                    {(() => {
-                      const totalPd = hubSchools.reduce((s, h) => s + h.totalPdHours, 0);
-                      const totalTools = hubSchools.reduce((s, h) => s + h.totalToolsViewed, 0);
-                      const totalComps = hubSchools.reduce((s, h) => s + h.totalCompletions, 0);
-                      const vibeScores = hubSchools.filter(h => h.avgVibeScore !== null).map(h => h.avgVibeScore as number);
-                      const avgVibe = vibeScores.length > 0 ? +(vibeScores.reduce((s, v) => s + v, 0) / vibeScores.length).toFixed(1) : null;
-                      return (
-                        <>
-                          <div className="bg-white rounded-xl border border-gray-100 p-4 flex items-center gap-3" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-                            <ProgressRing value={totalPd} max={Math.max(totalPd * 1.5, 100)} size={44} color="#8B5CF6" />
-                            <div>
-                              <p className="text-lg font-bold" style={{ color: '#1e2749' }}>{totalPd.toFixed(0)}</p>
-                              <p className="text-[10px] text-gray-500">PD Hours Earned</p>
-                            </div>
-                          </div>
-                          <div className="bg-white rounded-xl border border-gray-100 p-4 flex items-center gap-3" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-                            <ProgressRing value={totalTools} max={Math.max(totalTools * 1.5, 100)} size={44} color="#EAB308" />
-                            <div>
-                              <p className="text-lg font-bold" style={{ color: '#1e2749' }}>{totalTools}</p>
-                              <p className="text-[10px] text-gray-500">Tools Explored</p>
-                            </div>
-                          </div>
-                          <div className="bg-white rounded-xl border border-gray-100 p-4 flex items-center gap-3" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-                            <ProgressRing value={totalComps} max={Math.max(totalComps * 1.5, 20)} size={44} color="#2563EB" />
-                            <div>
-                              <p className="text-lg font-bold" style={{ color: '#1e2749' }}>{totalComps}</p>
-                              <p className="text-[10px] text-gray-500">Completions</p>
-                            </div>
-                          </div>
-                          <div className="bg-white rounded-xl border border-gray-100 p-4 flex items-center gap-3" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-                            <ProgressRing value={avgVibe || 0} max={5} size={44} color={avgVibe && avgVibe >= 4 ? '#2A9D8F' : avgVibe && avgVibe >= 3 ? '#EAB308' : '#EF4444'} />
-                            <div>
-                              <p className="text-lg font-bold" style={{ color: '#1e2749' }}>{avgVibe !== null ? `${avgVibe}/5` : '--'}</p>
-                              <p className="text-[10px] text-gray-500">Avg Vibe Score</p>
-                            </div>
-                          </div>
-                        </>
-                      );
-                    })()}
-                  </div>
-
-                  {/* School detail table (collapsible) */}
-                  <details className="bg-white rounded-xl border border-gray-100" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-                    <summary className="px-5 py-3 cursor-pointer text-xs font-bold uppercase tracking-wider text-gray-400 hover:text-gray-600">
-                      View School Detail Table ({hubSchools.length} schools)
-                    </summary>
-                    <div className="overflow-x-auto px-2 pb-3">
-                      <table className="w-full">
-                        <thead>
-                          <tr className="border-b border-gray-100">
-                            <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-2">School</th>
-                            <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-2">District</th>
-                            <th className="text-center text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-2">Educators</th>
-                            <th className="text-center text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-2">Active %</th>
-                            <th className="text-center text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-2">Tools</th>
-                            <th className="text-center text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-2">PD Hrs</th>
-                            <th className="text-center text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-2">Vibe</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-50">
-                          {hubSchools.map((school, idx) => (
-                            <tr key={idx} className="hover:bg-gray-50 text-sm">
-                              <td className="px-4 py-2 font-medium" style={{ color: '#2B3A67' }}>{school.name}</td>
-                              <td className="px-4 py-2 text-gray-500">{school.district || '--'}</td>
-                              <td className="px-4 py-2 text-center text-gray-700">{school.totalEducators}</td>
-                              <td className="px-4 py-2 text-center font-medium" style={{ color: school.activeRate >= 60 ? '#2A9D8F' : school.activeRate >= 30 ? '#EAB308' : '#EF4444' }}>{school.activeRate}%</td>
-                              <td className="px-4 py-2 text-center text-gray-700">{school.totalToolsViewed}</td>
-                              <td className="px-4 py-2 text-center text-gray-700">{school.totalPdHours > 0 ? school.totalPdHours.toFixed(1) : '--'}</td>
-                              <td className="px-4 py-2 text-center" style={{ color: school.avgVibeScore && school.avgVibeScore >= 4 ? '#2A9D8F' : school.avgVibeScore && school.avgVibeScore >= 3 ? '#EAB308' : '#9CA3AF' }}>{school.avgVibeScore !== null ? `${school.avgVibeScore}/5` : '--'}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </details>
-                </>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* =========== ACTION ITEMS TAB =========== */}
         {activeTab === 'actions' && (
           <div className="p-6">
             <div className="flex items-center justify-between mb-6">

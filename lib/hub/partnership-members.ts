@@ -161,11 +161,42 @@ export async function resolvePartnershipMembers(
 }
 
 /**
- * Activity that represents a person choosing to do something.
+ * Activity that counts as an educator using the Hub.
  *
- * `account_provisioned` is written when TDI creates the seat, not when the
- * educator turns up. Counting it made Roosevelt read as sixteen active
- * educators when the true number was one, so every engagement figure has to
- * exclude it.
+ * An allowlist rather than a denylist, because a new system-written action
+ * added later would silently inflate every engagement figure on the site,
+ * whereas a new genuine action merely goes uncounted until it is added here.
+ *
+ * The matrix route used to use the opposite rule and exclude only
+ * `account_provisioned`, so on 27 Aug 2026 656 people counted as active while
+ * only 627 had ever taken an action of their own. The other 29 were "engaged"
+ * on the strength of a welcome email, a granted perk, or an outage notice that
+ * we sent them.
+ *
+ * `wellbeing_check` is deliberately absent. The Vibe Check tells educators the
+ * answers are theirs and will never be shared, and this list feeds screens a
+ * principal reads.
+ *
+ * This used to exist only inside the hub-depth route while the matrix route
+ * used a denylist, so the same school could be active on one screen and idle on
+ * the other. One definition, used by both.
  */
-export const PROVISIONING_ACTIONS = ['account_provisioned'] as const;
+const ENGAGEMENT_ACTIONS = [
+  'hub_login',
+  'lesson_viewed',
+  'quick_win_viewed',
+  'quick_win_saved',
+  'checkin_completed',
+  'practice_tool_completed',
+  'course_completed',
+  'resource_downloaded',
+  'transcript_downloaded',
+  'share_used',
+  'tour_completed',
+] as const;
+
+/** True when this activity row is something the educator chose to do. */
+export function isEngagementAction(action: string | null | undefined): boolean {
+  if (!action) return false;
+  return (ENGAGEMENT_ACTIONS as readonly string[]).includes(action);
+}
