@@ -6080,7 +6080,7 @@ export default function CreatorStudioPage() {
 
       {/* ═══════ RECRUITMENT TAB ═══════ */}
       {activeTab === 'recruitment' && (
-        <RecruitmentTab hasAccess={hasAccess} showToast={showToast} />
+        <RecruitmentTab hasAccess={hasAccess} showToast={showToast} adminEmail={adminEmail} />
       )}
       {/* Toast notification */}
       {toast && (

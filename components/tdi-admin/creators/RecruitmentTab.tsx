@@ -35,7 +35,23 @@ const theme = PORTAL_THEMES.creators;
 
 type ShowToast = (message: string, type?: 'success' | 'error') => void;
 
-export function RecruitmentTab({ hasAccess, showToast }: { hasAccess: boolean; showToast: ShowToast }) {
+export function RecruitmentTab({
+  hasAccess,
+  showToast,
+  adminEmail,
+}: {
+  hasAccess: boolean;
+  showToast: ShowToast;
+  /**
+   * The signed-in address, from the Supabase session.
+   *
+   * Both approve buttons used to send the literal string 'admin', so nine of
+   * the ten approvals on record read "Outreach approved by admin" and cannot
+   * be attributed to anyone. The rest of this page already sends
+   * adminEmail || 'admin'; recruitment was the one place that did not.
+   */
+  adminEmail: string;
+}) {
   // ── Recruitment tab state ──
   const [recruitmentStats, setRecruitmentStats] = useState<{
     critical_gaps_without_candidates: number;
@@ -149,7 +165,7 @@ export function RecruitmentTab({ hasAccess, showToast }: { hasAccess: boolean; s
       const res = await fetch('/api/admin/creator-recruitment', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'nominate', ...nominateForm, nominated_by: 'admin' }),
+        body: JSON.stringify({ action: 'nominate', ...nominateForm, nominated_by: adminEmail || 'admin' }),
       });
       const data = await res.json();
       if (data.success) {
@@ -688,7 +704,7 @@ export function RecruitmentTab({ hasAccess, showToast }: { hasAccess: boolean; s
                                         showToast('Outreach cannot be empty.', 'error');
                                         return;
                                       }
-                                      handleRecruitmentAction('approve_outreach', { candidate_id: candidate.id, approved_by: 'admin', edited_outreach: recruitmentEditedDraft });
+                                      handleRecruitmentAction('approve_outreach', { candidate_id: candidate.id, approved_by: adminEmail || 'admin', edited_outreach: recruitmentEditedDraft });
                                     }}
                                     disabled={isActionLoading || !recruitmentEditedDraft.trim()}
                                     className="px-3 py-1.5 text-xs font-medium text-white rounded-lg disabled:opacity-50"
@@ -755,7 +771,7 @@ export function RecruitmentTab({ hasAccess, showToast }: { hasAccess: boolean; s
                                 />
                                 <div className="flex gap-2">
                                   <button
-                                    onClick={() => { handleRecruitmentAction('add_note', { candidate_id: candidate.id, content: recruitmentNoteForm!.content, author: 'admin' }); }}
+                                    onClick={() => { handleRecruitmentAction('add_note', { candidate_id: candidate.id, content: recruitmentNoteForm!.content, author: adminEmail || 'admin' }); }}
                                     disabled={isActionLoading}
                                     className="px-3 py-1.5 text-xs font-medium text-white rounded-lg disabled:opacity-50"
                                     style={{ backgroundColor: theme.accent }}
@@ -857,7 +873,7 @@ export function RecruitmentTab({ hasAccess, showToast }: { hasAccess: boolean; s
                                           return;
                                         }
                                         navigator.clipboard.writeText(candidate.outreach_draft);
-                                        await handleRecruitmentAction('approve_outreach', { candidate_id: candidate.id, approved_by: 'admin' });
+                                        await handleRecruitmentAction('approve_outreach', { candidate_id: candidate.id, approved_by: adminEmail || 'admin' });
                                         if (candidate.email) {
                                           const mailtoUrl = `mailto:${candidate.email}?subject=Quick question about creating with TDI&body=${encodeURIComponent(candidate.outreach_draft || '')}`;
                                           window.open(mailtoUrl);
@@ -1017,7 +1033,7 @@ export function RecruitmentTab({ hasAccess, showToast }: { hasAccess: boolean; s
                                 className="flex-1 border border-gray-200 rounded-lg px-2.5 py-1.5 text-xs focus:ring-1 focus:ring-indigo-200 focus:border-indigo-300"
                                 onKeyDown={e => {
                                   if (e.key === 'Enter' && recruitmentQuickNotes[candidate.id]?.trim()) {
-                                    handleRecruitmentAction('add_note', { candidate_id: candidate.id, content: recruitmentQuickNotes[candidate.id].trim(), author: 'admin' });
+                                    handleRecruitmentAction('add_note', { candidate_id: candidate.id, content: recruitmentQuickNotes[candidate.id].trim(), author: adminEmail || 'admin' });
                                     setRecruitmentQuickNotes(prev => ({ ...prev, [candidate.id]: '' }));
                                   }
                                 }}
@@ -1025,7 +1041,7 @@ export function RecruitmentTab({ hasAccess, showToast }: { hasAccess: boolean; s
                               <button
                                 onClick={() => {
                                   if (recruitmentQuickNotes[candidate.id]?.trim()) {
-                                    handleRecruitmentAction('add_note', { candidate_id: candidate.id, content: recruitmentQuickNotes[candidate.id].trim(), author: 'admin' });
+                                    handleRecruitmentAction('add_note', { candidate_id: candidate.id, content: recruitmentQuickNotes[candidate.id].trim(), author: adminEmail || 'admin' });
                                     setRecruitmentQuickNotes(prev => ({ ...prev, [candidate.id]: '' }));
                                   }
                                 }}
