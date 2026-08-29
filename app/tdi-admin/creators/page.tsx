@@ -73,6 +73,7 @@ import { PORTAL_THEMES } from '@/lib/tdi-admin/theme';
 import { copyToClipboard, formatEmailsForCopy } from '@/lib/tdi-admin/clipboard';
 import { Toast, useToast } from '@/components/tdi-admin/Toast';
 import { RecruitmentTab } from '@/components/tdi-admin/creators/RecruitmentTab';
+import { CreatorQueue } from '@/components/tdi-admin/creators/CreatorQueue';
 import {
   DraftNoteCard,
   type DraftNote,
@@ -110,10 +111,15 @@ const USMapChart = dynamic(() => import('@/components/tdi-admin/USMapChart'), {
 });
 
 // Tab types
-type TabId = 'dashboard' | 'creators' | 'reengagement' | 'analytics' | 'affiliate' | 'recruitment';
+type TabId = 'queue' | 'dashboard' | 'creators' | 'reengagement' | 'analytics' | 'affiliate' | 'recruitment';
 
 // Tab configuration
 const TABS: { id: TabId; label: string; icon: React.ElementType }[] = [
+  // Needs You lands first because it is the only tab that answers "what do I
+  // do now". Action Center stays for the moment rather than being replaced in
+  // the same change, so the new screen can be checked against the old one
+  // before anything is removed.
+  { id: 'queue', label: 'Needs You', icon: Bell },
   { id: 'dashboard', label: 'Action Center', icon: LayoutGrid },
   { id: 'creators', label: 'Creators', icon: Users },
   { id: 'reengagement', label: 'Re-engagement', icon: Mail },
@@ -1697,7 +1703,7 @@ export default function CreatorStudioPage() {
   const hasAccess = isOwner || hasAnySectionPermission(permissions, 'creator_studio');
 
   // Tab state
-  const [activeTab, setActiveTab] = useState<TabId>('dashboard');
+  const [activeTab, setActiveTab] = useState<TabId>('queue');
 
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
   const [filteredCreators, setFilteredCreators] = useState<EnrichedCreator[]>([]);
@@ -6077,6 +6083,9 @@ export default function CreatorStudioPage() {
           </div>
         </div>
       )}
+
+      {/* ═══════ NEEDS YOU ═══════ */}
+      {activeTab === 'queue' && <CreatorQueue />}
 
       {/* ═══════ RECRUITMENT TAB ═══════ */}
       {activeTab === 'recruitment' && (
