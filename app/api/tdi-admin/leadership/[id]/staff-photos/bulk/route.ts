@@ -6,6 +6,10 @@ import sharp from 'sharp'
 const THUMB_SIZE = 64
 const FULL_SIZE = 400
 
+function isTDIAdmin(email: string) {
+  return email.toLowerCase().endsWith('@teachersdeserveit.com')
+}
+
 interface BulkResult {
   matched: number
   uploaded: number
@@ -69,6 +73,10 @@ export async function POST(
     const auth = await requireAdminAuth();
     if (auth instanceof NextResponse) return auth;
     const userEmail = auth.member.email;
+
+    if (!isTDIAdmin(userEmail)) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
 
     const formData = await request.formData()
     const consentChecked = formData.get('consentChecked') === 'true'
