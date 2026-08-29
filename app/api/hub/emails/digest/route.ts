@@ -12,7 +12,6 @@ import type { DigestEmailData } from '@/lib/hub/emails';
  *     displayName: string,
  *     coursesInProgress: number,
  *     lessonsCompletedThisMonth: number,
- *     pdHoursEarned: number,
  *     stressTrend: 'up' | 'down' | 'stable',
  *     recommendedCourses: { title: string, reason: string, url: string }[],
  *     newCourses: { title: string, url: string }[]
@@ -59,7 +58,6 @@ export async function POST(request: NextRequest) {
       displayName: data.displayName,
       coursesInProgress: data.coursesInProgress || 0,
       lessonsCompletedThisMonth: data.lessonsCompletedThisMonth || 0,
-      pdHoursEarned: data.pdHoursEarned || 0,
       stressTrend: data.stressTrend || 'stable',
       recommendedCourses: data.recommendedCourses || [],
       newCourses: data.newCourses || [],

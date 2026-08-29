@@ -22,7 +22,7 @@ const COACHING_PROMPTS = [
   },
   {
     category: 'Board Presentation',
-    prompt: 'For your next board update: "Our partnership with TDI has resulted in X PD hours earned, Y tools explored, and a team wellness score of Z out of 5. This is professional development that teachers are choosing to engage with -- not being required to sit through."',
+    prompt: 'For your next board update: "Our partnership with TDI has resulted in X courses completed, Y tools explored, and a Vibe Check score of Z out of 5. This is professional development that teachers are choosing to engage with, not being required to sit through."',
   },
   {
     category: 'Wellness Check-In',
