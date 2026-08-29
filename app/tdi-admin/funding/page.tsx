@@ -98,7 +98,7 @@ export default function FundingPage() {
             fetch(`/api/funding/pursuits/${p.id}/actions`).then(r => r.json()).catch(() => []),
           ]).then(([od, actionsData]) => {
             const actions = (Array.isArray(actionsData) ? actionsData : actionsData.actions || [])
-              .filter((a: any) => a.status === 'pending')
+              .filter((a: any) => a.status === 'pending' || a.status === 'blocked')
             return {
               id: p.id,
               name: p.pursuit_name || p.district_name,
