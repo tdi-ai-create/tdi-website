@@ -1248,69 +1248,78 @@ export default function CreatorStudioPage() {
       {/* Page Content */}
       <div className="px-6 py-6">
         {/* Page Header */}
-        <div className="flex items-center justify-between mb-6">
-          <h1 style={TYPE_PAGE_TITLE}>Creator Studio</h1>
-          <div className="flex items-center gap-3">
-            <Link
-              href="/tdi-admin/creators/applications"
-              className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all duration-200 border ${
-                waitingApplications > 0
-                  ? 'border-amber-300 bg-amber-50 text-amber-800 hover:bg-amber-100'
-                  : 'border-gray-200 text-gray-600 hover:bg-gray-50'
-              }`}
-            >
-              <Inbox className="w-4 h-4" />
-              Applications
-              {waitingApplications > 0 && (
-                <span className="ml-1 px-2 py-0.5 rounded-full bg-amber-600 text-white text-xs font-bold">
-                  {waitingApplications}
-                </span>
-              )}
-            </Link>
-            <Link
-              href="/tdi-admin/creators/access"
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all duration-200 border border-gray-200 text-gray-600 hover:bg-gray-50"
-            >
-              <KeyRound className="w-4 h-4" />
-              Who can get in
-            </Link>
-            <Link
-              href="/tdi-admin/creator-updates"
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all duration-200 border border-violet-200 text-violet-600 hover:bg-violet-50"
-            >
-              <Sparkles className="w-4 h-4" />
-              Updates & Guide
-            </Link>
-            <Link
-              href="/tdi-admin/creator-email-audit"
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all duration-200 border border-gray-200 text-gray-600 hover:bg-gray-50"
-            >
-              <Mail className="w-4 h-4" />
-              Email Audit
-            </Link>
-            {/* The three former tabs. They are places you go and come back
-                from, not things you switch between while working, so they sit
-                beside the other destinations instead of crowding the tab bar. */}
-            {SIDE_PAGES.map(page => (
-              <Link
-                key={page.href}
-                href={page.href}
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all duration-200 border border-gray-200 text-gray-600 hover:bg-gray-50"
-              >
-                <page.icon className="w-4 h-4" />
-                {page.label}
-              </Link>
-            ))}
+        <div className="mb-6">
+          {/* Title and the one control that creates something. Everything else
+              is a destination and belongs on its own line: eight buttons in one
+              row squashed each other, wrapping "Who can get in" over three
+              lines and pushing Add Creator off the edge. */}
+          <div className="flex items-center justify-between gap-4 mb-3">
+            <h1 style={TYPE_PAGE_TITLE}>Creator Studio</h1>
             {canEdit && (
               <button
                 onClick={() => setShowAddModal(true)}
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all duration-200 text-white shadow-sm hover:shadow-md hover:opacity-90"
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all duration-200 text-white shadow-sm hover:shadow-md hover:opacity-90 shrink-0 whitespace-nowrap"
                 style={{ backgroundColor: '#1e2749' }}
               >
                 <Plus className="w-4 h-4" />
                 Add Creator
               </button>
             )}
+          </div>
+
+          <div className="flex items-center gap-2 flex-wrap">
+            <Link
+              href="/tdi-admin/creators/applications"
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors border whitespace-nowrap ${
+                waitingApplications > 0
+                  ? 'border-amber-300 bg-amber-50 text-amber-800 hover:bg-amber-100'
+                  : 'border-gray-200 text-gray-600 hover:bg-gray-50'
+              }`}
+            >
+              <Inbox className="w-3.5 h-3.5" />
+              Applications
+              {waitingApplications > 0 && (
+                <span className="ml-0.5 px-1.5 rounded-full bg-amber-200 text-amber-900 text-xs font-semibold">
+                  {waitingApplications}
+                </span>
+              )}
+            </Link>
+            <Link
+              href="/tdi-admin/creators/access"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors border border-gray-200 text-gray-600 hover:bg-gray-50 whitespace-nowrap"
+            >
+              <KeyRound className="w-3.5 h-3.5" />
+              Who can get in
+            </Link>
+            <Link
+              href="/tdi-admin/creator-updates"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors border border-violet-200 text-violet-600 hover:bg-violet-50 whitespace-nowrap"
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              Updates & Guide
+            </Link>
+            <Link
+              href="/tdi-admin/creator-email-audit"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors border border-gray-200 text-gray-600 hover:bg-gray-50 whitespace-nowrap"
+            >
+              <Mail className="w-3.5 h-3.5" />
+              Email Audit
+            </Link>
+
+            <span className="w-px h-5 bg-gray-200 mx-1" aria-hidden />
+
+            {/* The three former tabs. Places you go and come back from, not
+                things you switch between while working. */}
+            {SIDE_PAGES.map(page => (
+              <Link
+                key={page.href}
+                href={page.href}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors border border-gray-200 text-gray-600 hover:bg-gray-50 whitespace-nowrap"
+              >
+                <page.icon className="w-3.5 h-3.5" />
+                {page.label}
+              </Link>
+            ))}
           </div>
         </div>
 
