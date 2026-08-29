@@ -13,6 +13,7 @@
 
 import tsParser from '@typescript-eslint/parser';
 import tsPlugin from '@typescript-eslint/eslint-plugin';
+import reactHooksPlugin from 'eslint-plugin-react-hooks';
 import noUncheckedDbWrite from './eslint-rules/no-unchecked-db-write.mjs';
 
 export default [
@@ -47,6 +48,11 @@ export default [
       // about a file whose writes are all checked. A gate that cries wolf is
       // one people learn to skip.
       '@typescript-eslint': tsPlugin,
+      // Same reason. app/partners/[dashboardSlug]/page.tsx carries an
+      // eslint-disable for react-hooks/exhaustive-deps, so before this was
+      // registered, any edit to that file failed the gate with "rule not
+      // found" while reporting it as an unchecked database write.
+      'react-hooks': reactHooksPlugin,
     },
     rules: {
       'tdi/no-unchecked-db-write': 'error',
