@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServiceSupabase } from '@/lib/supabase'
 import { postFundingEvent } from '@/lib/funding-slack'
 import { isGateOpen } from '@/lib/funding-gate-gaps'
+import { callTriggerFor } from '@/lib/funding/call-escalation'
 
 // ══════════════════════════════════════════════════════════════
 // DRY_RUN — flip to false ONLY after verifying logic against
@@ -603,6 +604,8 @@ export async function GET(request: NextRequest) {
 
     const summary = {
       items_processed: 0,
+      /** Items that stopped being an email problem and became a phone call. */
+      call_rung: 0,
       colors: { green: 0, yellow: 0, red: 0 },
       reminders_fired: 0,
       nudges_fired: 0,
@@ -635,10 +638,18 @@ export async function GET(request: NextRequest) {
 
     // ── 1. Fetch pending action items ──
 
+    // Blocked items are included, and the call rung below is why that is safe.
+    //
+    // They were excluded, and so was every other reader, which is how five
+    // tasks worth ten thousand dollars went silent on 17 August: they stopped
+    // being chased and stopped being visible in the same moment. Simply adding
+    // them back here would restart the emailing that caused the problem, so
+    // the call rung has to catch them first. The two changes only make sense
+    // together.
     const { data: items, error: itemsErr } = await supabase
       .from('funding_action_items')
       .select('*')
-      .eq('status', 'pending')
+      .in('status', ['pending', 'blocked'])
 
     if (itemsErr) {
       console.error(LOG, 'Failed to fetch action items:', itemsErr)
@@ -646,7 +657,7 @@ export async function GET(request: NextRequest) {
     }
 
     if (!items || items.length === 0) {
-      return NextResponse.json({ success: true, message: 'No pending items', ...summary })
+      return NextResponse.json({ success: true, message: 'No open items', ...summary })
     }
 
     // ── 2. Batch-fetch pursuit gates for escalation contacts ──
@@ -673,12 +684,13 @@ export async function GET(request: NextRequest) {
       district_name: string | null
       current_phase: string | null
       archived: boolean | null
+      client_contact_name: string | null
     }
 
     const { data: pursuits } = pursuitIds.length > 0
       ? await supabase
           .from('funding_pursuits')
-          .select('id, next_action_owner_email, pursuit_name, district_name, current_phase, archived')
+          .select('id, next_action_owner_email, pursuit_name, district_name, current_phase, archived, client_contact_name')
           .in('id', pursuitIds)
       : { data: [] as Pursuit[] }
 
@@ -807,6 +819,35 @@ export async function GET(request: NextRequest) {
       const itemPhase = categoryToPhase[item.category || ''] || 'intake'
       const itemPhaseIdx = PHASE_ORDER.indexOf(itemPhase)
       if (itemPhaseIdx > currentPhaseIdx + 1) continue // allow one phase ahead but not more
+
+      // ── The call rung. Checked before any email path. ──
+      //
+      // The ladder below escalates by emailing a different person. When
+      // somebody has ignored eleven emails that is not an escalation, it is
+      // the same failed action aimed elsewhere. Past the thresholds in
+      // call-escalation, this item stops being an email problem.
+      //
+      // The same function draws the call card on the board, so the cron and
+      // the portal cannot disagree about whether something needs a phone call.
+      const callTrigger = callTriggerFor(item, {
+        today,
+        contactName: pursuit?.client_contact_name || 'the school contact',
+        schoolName: pursuit?.district_name || pursuit?.pursuit_name || 'this school',
+        closingSoon: null,
+      })
+      if (callTrigger) {
+        summary.call_rung++
+        if (!DRY_RUN && item.escalation_rung !== 'call') {
+          const { error: rungErr } = await supabase
+            .from('funding_action_items')
+            .update({ escalation_rung: 'call', last_escalated_at: new Date().toISOString() })
+            .eq('id', item.id)
+          if (rungErr) console.error(LOG, 'Could not set call rung:', rungErr.message)
+        } else if (DRY_RUN) {
+          console.log(LOG, `[DRY RUN] Would move "${item.title}" to the call rung (${callTrigger.reason})`)
+        }
+        continue // no email, at any rung, for this item
+      }
 
       const dueDate = new Date(item.due_date + 'T00:00:00')
       const actionSize: string = item.action_size || 'standard'
