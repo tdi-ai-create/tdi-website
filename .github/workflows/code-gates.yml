@@ -43,7 +43,13 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          # 22, not 20. @supabase/supabase-js constructs a RealtimeClient
+          # inside createClient, and on Node 20 that throws "Node.js 20
+          # detected without native WebSocket support" before a single query
+          # runs. It took down the seat check the first time it ran in CI while
+          # passing locally on Node 24. Production is on Node 24, so 20 was
+          # testing something we do not ship.
+          node-version: '22'
           cache: 'npm'
 
       - name: Install dependencies

@@ -56,7 +56,20 @@ if (declared.includes('wellbeing_check')) {
   process.exit(1);
 }
 
-const hub = createClient(HUB_URL, HUB_KEY, { auth: { autoRefreshToken: false, persistSession: false } });
+// createClient constructs a RealtimeClient eagerly, which throws on a Node
+// without native WebSocket. That surfaced as a stack trace from inside
+// supabase-js rather than anything a person could act on, so say what it is.
+function client(url, key, label) {
+  try {
+    return createClient(url, key, { auth: { autoRefreshToken: false, persistSession: false } });
+  } catch (err) {
+    console.error(`Could not create the ${label} client: ${err.message}`);
+    console.error(`Node ${process.version}. supabase-js needs native WebSocket, which arrived in Node 22.`);
+    process.exit(1);
+  }
+}
+
+const hub = client(HUB_URL, HUB_KEY, 'Learning Hub');
 
 const die = (label, error) => {
   if (!error) return;
