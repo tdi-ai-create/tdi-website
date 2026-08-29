@@ -520,13 +520,13 @@ export default function LeadershipDashboardPage() {
         <div className="mb-6">
           <h1 style={TYPE_PAGE_TITLE}>Lead Dashboard</h1>
           <p className="text-sm text-gray-500 mt-1">
-            Manage school partnerships, reports, action items, and billing.
+            Every school partnership, and what needs attention.
           </p>
         </div>
 
       {/* Stats Cards - White bg with accent top bar */}
       {stats && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 items-start">
           <div
             className="bg-white rounded-xl border border-gray-100 transition-all duration-200 group relative overflow-hidden"
             style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}
