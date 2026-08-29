@@ -42,6 +42,7 @@ export async function GET(request: NextRequest) {
     }
 
     let sent = 0;
+    const failures: string[] = [];
 
     for (const p of partnerships) {
       if (!p.contact_email) continue;
@@ -78,19 +79,41 @@ export async function GET(request: NextRequest) {
       });
 
       if (resp.ok) {
-        await supabase
+        // The email has already gone. If this stamp fails, the same partnership
+        // is picked up again tomorrow and the leader gets a second welcome, so
+        // a silent failure here is a duplicate send rather than a missing row.
+        const { error: stampError } = await supabase
           .from('partnerships')
           .update({ invite_sent_at: new Date().toISOString(), updated_at: new Date().toISOString() })
           .eq('id', p.id);
 
-        await supabase.from('activity_log').insert({
+        if (stampError) {
+          console.error(`[send-scheduled-onboarding] welcome sent to ${p.contact_email} but invite_sent_at not stamped, so it will send again tomorrow:`, stampError.message);
+          failures.push(`${p.id}: ${stampError.message}`);
+        }
+
+        const { error: logError } = await supabase.from('activity_log').insert({
           partnership_id: p.id,
           action: 'onboarding_welcome_sent',
           details: { to: p.contact_email, automated: true },
         });
 
+        if (logError) {
+          console.error('[send-scheduled-onboarding] activity_log insert failed:', logError.message);
+        }
+
         sent++;
       }
+    }
+
+    // A cron that emails people and reports success while failing to record it
+    // is how the same school gets welcomed twice. Surface it in the response so
+    // the run shows as failed rather than green.
+    if (failures.length > 0) {
+      return NextResponse.json(
+        { success: false, sent, failures, error: `${failures.length} welcome(s) sent but not recorded` },
+        { status: 500 }
+      );
     }
 
     return NextResponse.json({ success: true, sent });

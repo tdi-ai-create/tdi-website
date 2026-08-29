@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
 
     // Log activity
     if (userId) {
-      await supabase.from('activity_log').insert({
+      const { error: logError } = await supabase.from('activity_log').insert({
         partnership_id: partnershipId,
         user_id: userId,
         action: 'file_uploaded',
@@ -86,6 +86,10 @@ export async function POST(request: NextRequest) {
           file_path: filePath,
         },
       });
+
+      if (logError) {
+        console.error('[partners/upload-evidence] activity_log insert failed:', logError.message);
+      }
     }
 
     return NextResponse.json({

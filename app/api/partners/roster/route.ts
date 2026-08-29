@@ -114,34 +114,57 @@ export async function POST(request: NextRequest) {
     const buildingIdMap = new Map<string, string>();
 
     if (buildingNames.length > 0) {
-      // Get org_id for this partnership
-      const { data: org } = await supabase
-        .from('partnerships')
-        .select('organization_id')
-        .eq('id', partnershipId)
-        .single();
+      // The link runs the other way. partnerships has no organization_id
+      // column, so this used to select a column that does not exist, discard
+      // the error, and leave orgId undefined. Every building lookup then
+      // missed and the create branch was guarded by `else if (orgId)`, so no
+      // building was ever created. That is why the buildings table is empty
+      // and every district partner's Schools tab is blank.
+      const { data: org, error: orgError } = await supabase
+        .from('organizations')
+        .select('id')
+        .eq('partnership_id', partnershipId)
+        .maybeSingle();
 
-      const orgId = org?.organization_id;
+      if (orgError) {
+        console.error('[partners/roster] organization lookup failed:', orgError.message);
+      }
+
+      const orgId = org?.id;
+
+      // Two active partnerships have no organizations row at all, so buildings
+      // genuinely cannot be created for them. Say so rather than silently
+      // dropping the building names the school typed in.
+      if (!orgId) {
+        console.warn(
+          `[partners/roster] partnership ${partnershipId} has no organizations row, so ${buildingNames.length} building name(s) were not created.`
+        );
+      }
 
       for (const bName of buildingNames) {
-        // Check if building exists
+        // maybeSingle, not single. single() returns an error when no row
+        // matches, which is the normal case the first time a building is
+        // named, and that error was being read as "lookup failed".
         const { data: existing } = await supabase
           .from('buildings')
           .select('id')
           .eq('organization_id', orgId)
           .ilike('name', bName)
           .limit(1)
-          .single();
+          .maybeSingle();
 
         if (existing) {
           buildingIdMap.set(bName.toLowerCase(), existing.id);
         } else if (orgId) {
           // Create the building
-          const { data: created } = await supabase
+          const { data: created, error: createError } = await supabase
             .from('buildings')
             .insert({ organization_id: orgId, name: bName })
             .select('id')
             .single();
+          if (createError) {
+            console.error(`[partners/roster] could not create building "${bName}":`, createError.message);
+          }
           if (created) buildingIdMap.set(bName.toLowerCase(), created.id);
         }
       }
@@ -169,12 +192,18 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to add staff: ' + insertError.message }, { status: 500 });
     }
 
-    // Update staff_enrolled count on partnership
+    // Update staff_enrolled count on partnership. The staff rows are already
+    // in, so this does not fail the request, but a silent failure here leaves
+    // the seat count disagreeing with the roster it was just built from.
     const totalCount = (existingStaff?.length || 0) + newStaff.length;
-    await supabase
+    const { error: countError } = await supabase
       .from('partnerships')
       .update({ staff_enrolled: totalCount, updated_at: new Date().toISOString() })
       .eq('id', partnershipId);
+
+    if (countError) {
+      console.error('[partners/roster] staff_enrolled not updated:', countError.message);
+    }
 
     // Flag if roster exceeds contracted seats
     if (partnership.base_staff_enrolled && totalCount > partnership.base_staff_enrolled) {
@@ -182,7 +211,7 @@ export async function POST(request: NextRequest) {
       const schoolName = partnership.org_name || partnership.contact_name || 'A partnership';
 
       // Create internal action item for trainer follow-up
-      await supabase.from('action_items').insert({
+      const { error: itemError } = await supabase.from('action_items').insert({
         partnership_id: partnershipId,
         title: `Roster exceeds contract: ${totalCount} staff vs ${partnership.base_staff_enrolled} contracted seats (+${overCount})`,
         description: `${schoolName} added ${overCount} staff beyond their ${partnership.base_staff_enrolled}-seat contract. Follow up to determine if this is a replacement, expansion, or grant opportunity.`,
@@ -191,6 +220,10 @@ export async function POST(request: NextRequest) {
         status: 'pending',
         visible_to_partner: false,
       });
+
+      if (itemError) {
+        console.error('[partners/roster] action item not completed:', itemError.message);
+      }
 
       // Notify Rae via email
       if (process.env.RESEND_API_KEY) {
@@ -216,15 +249,19 @@ export async function POST(request: NextRequest) {
       }
 
       // Log it
-      await supabase.from('activity_log').insert({
+      const { error: logError } = await supabase.from('activity_log').insert({
         partnership_id: partnershipId,
         action: 'roster_over_contract',
         details: { total: totalCount, contracted: partnership.base_staff_enrolled, over: overCount },
       });
+
+      if (logError) {
+        console.error('[partners/roster] activity_log insert failed:', logError.message);
+      }
     }
 
     // Mark the "Upload staff roster" action item as completed if it exists
-    await supabase
+    const { error: flagError } = await supabase
       .from('action_items')
       .update({
         status: 'completed',
@@ -235,6 +272,10 @@ export async function POST(request: NextRequest) {
       .eq('partnership_id', partnershipId)
       .ilike('title', '%staff roster%')
       .eq('status', 'pending');
+
+    if (flagError) {
+      console.error('[partners/roster] over-seat flag not written:', flagError.message);
+    }
 
     // Auto-provision Hub accounts for each new staff member
     let provisioned = 0;
@@ -256,11 +297,15 @@ export async function POST(request: NextRequest) {
         if (provResp.ok) {
           provisioned++;
           // Mark as hub_enrolled in staff_members
-          await supabase
+          const { error: logError3 } = await supabase
             .from('staff_members')
             .update({ hub_enrolled: true })
             .eq('partnership_id', partnershipId)
             .eq('email', s.email);
+
+          if (logError3) {
+            console.error('[partners/roster] activity_log insert failed:', logError3.message);
+          }
           // Send staff welcome email
           fetch(`${baseUrl}/api/hub/emails/staff-welcome`, {
             method: 'POST',
@@ -281,11 +326,15 @@ export async function POST(request: NextRequest) {
     }
 
     // Log activity
-    await supabase.from('activity_log').insert({
+    const { error: logError1 } = await supabase.from('activity_log').insert({
       partnership_id: partnershipId,
       action: 'roster_uploaded',
       details: { count: newStaff.length, skipped, total: totalCount, hub_provisioned: provisioned, hub_failed: provisionFailed },
     });
+
+    if (logError1) {
+      console.error('[partners/roster] activity_log insert failed:', logError1.message);
+    }
 
     // Notify admin team
     const notifyUrl = process.env.NEXT_PUBLIC_BASE_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');

@@ -38,19 +38,29 @@ export async function POST(request: NextRequest) {
 
     const supabase = getServiceSupabase();
 
-    // Insert dashboard view record
-    await supabase.from('dashboard_views').insert({
+    // There is no viewed_at column on this table. Writing one made every
+    // insert fail with 42703, the error was discarded, and the route returned
+    // success, so dashboard_views held zero rows for every partnership since
+    // it was written. The column that records when is created_at, and it
+    // defaults to now(), so it does not need to be sent at all.
+    const { error } = await supabase.from('dashboard_views').insert({
       partnership_id,
       user_id: user_id || null,
       tab_name,
       duration_seconds: Math.min(duration_seconds, 3600), // Cap at 1 hour to handle edge cases
-      viewed_at: new Date().toISOString(),
     });
 
-    return NextResponse.json({ success: true });
+    // Still a 200, because a partner reading their dashboard must not see an
+    // error over analytics. But it says tracked: false and it is logged, so
+    // the next silent failure is visible instead of invisible.
+    if (error) {
+      console.error('[partners/track-view] dashboard_views insert failed:', error.message);
+      return NextResponse.json({ success: true, tracked: false, error: error.message });
+    }
+
+    return NextResponse.json({ success: true, tracked: true });
   } catch (error) {
-    console.error('Error tracking view:', error);
-    // Don't fail the request for tracking errors
-    return NextResponse.json({ success: true, error: 'Tracking failed silently' });
+    console.error('[partners/track-view] unexpected failure:', error);
+    return NextResponse.json({ success: true, tracked: false, error: String(error) });
   }
 }

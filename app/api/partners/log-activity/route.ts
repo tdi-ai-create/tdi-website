@@ -48,12 +48,16 @@ export async function POST(request: NextRequest) {
     }
 
     // Log activity
-    await supabase.from('activity_log').insert({
+    const { error: logError } = await supabase.from('activity_log').insert({
       partnership_id: partnershipUser.partnership_id,
       user_id,
       action,
       details: details || {},
     });
+
+    if (logError) {
+      console.error('[partners/log-activity] activity_log insert failed:', logError.message);
+    }
 
     return NextResponse.json({ success: true });
   } catch (error) {
