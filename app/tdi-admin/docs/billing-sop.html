@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Billing</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'DM Sans', -apple-system, sans-serif; color: #1e2749; background: #F8F9FA; line-height: 1.6; }
+  .page { max-width: 900px; margin: 0 auto; padding: 32px 24px 80px; }
+  h1 { font-size: 28px; font-weight: 700; margin-bottom: 4px; }
+  h2 { font-size: 20px; font-weight: 700; margin: 40px 0 16px; padding-bottom: 8px; border-bottom: 2px solid #E5E7EB; }
+  h3 { font-size: 16px; font-weight: 700; margin: 20px 0 8px; }
+  .subtitle { color: #6B7280; font-size: 14px; margin-bottom: 8px; }
+  .updated { color: #9CA3AF; font-size: 12px; margin-bottom: 32px; }
+  p, li { font-size: 14px; margin-bottom: 8px; }
+  ul, ol { margin: 8px 0 16px 24px; }
+  .card { background: white; border-radius: 12px; padding: 20px; margin-bottom: 16px; border: 1px solid #E5E7EB; }
+  .card-navy { background: #1e2749; color: white; border: none; }
+  .card-navy p, .card-navy li { color: #E5E7EB; }
+  .card-teal { background: #F0FDFA; border-color: #99F6E4; }
+  .card-amber { background: #FFFBEB; border-color: #FDE68A; }
+  .card-red { background: #FEF2F2; border-color: #FECACA; }
+  .card-green { background: #F0FDF4; border-color: #BBF7D0; }
+  .flow { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin: 16px 0; }
+  .flow-step { background: white; border: 1px solid #E5E7EB; border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; }
+  .flow-arrow { color: #E8B84B; font-weight: 700; font-size: 16px; }
+  table { width: 100%; border-collapse: collapse; margin: 12px 0 20px; font-size: 13px; }
+  th { text-align: left; padding: 10px 12px; background: #1e2749; color: white; font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; }
+  td { padding: 10px 12px; border-bottom: 1px solid #F3F4F6; vertical-align: top; }
+  code { background: #F3F4F6; padding: 1px 5px; border-radius: 3px; font-size: 12px; }
+  .btn { display: inline-block; background: #B45309; color: white; border-radius: 6px; padding: 3px 9px; font-size: 12px; font-weight: 600; }
+  .btn-green { background: #059669; }
+  .btn-dark { background: #0B1120; }
+  .btn-red { background: #DC2626; }
+  .lede { font-size: 15px; color: #4B5563; margin-bottom: 20px; }
+</style>
+</head>
+<body>
+<div class="page">
+<h1>Billing</h1>
+<p class="subtitle">Contracts, invoices, payments and documents, in one place</p>
+<p class="updated">Last updated: 29 August 2026</p>
+
+<div class="card card-navy">
+  <p style="font-weight:600;color:white;margin-bottom:8px;">The whole loop is three buttons</p>
+  <div class="flow">
+    <span class="flow-step" style="color:#1e2749;">Contract signs in Sales</span><span class="flow-arrow">&rarr;</span>
+    <span class="flow-step" style="color:#1e2749;">Mark delivered</span><span class="flow-arrow">&rarr;</span>
+    <span class="flow-step" style="color:#1e2749;">Create invoice</span><span class="flow-arrow">&rarr;</span>
+    <span class="flow-step" style="color:#1e2749;">Send invoice</span><span class="flow-arrow">&rarr;</span>
+    <span class="flow-step" style="color:#1e2749;">Record payment</span>
+  </div>
+  <p style="margin-bottom:0;">The first step happens on its own. The rest are clicks, in that order.</p>
+</div>
+
+<h2>Why this exists</h2>
+
+<p>One database column used to hold two different facts: whether we had done the work, and whether we had been paid for it. That meant <strong>"we delivered this and have not billed it yet" was not something the system could record.</strong> It is why nobody could answer where a client stood.</p>
+
+<p>Splitting those apart is the whole point. Delivery and billing are now tracked separately, so neither can hide the other.</p>
+
+<div class="card card-amber">
+  <p style="font-weight:600;margin-bottom:8px;">What it found when we turned it on</p>
+  <ul style="margin-bottom:0;">
+    <li>Oak Grove was <strong>$4,400 out of balance</strong>: a line said it had been invoiced for $8,000 while the invoice said $3,600 and had never been sent</li>
+    <li>Allenwood <strong>never received a $2,332.20 invoice</strong>. It bounced on 4 August and so did the reminder, while the clock kept running</li>
+    <li>A <strong>$600 payment was recorded twice</strong>, which would have overstated collected</li>
+    <li>An invoice was <strong>marked paid with no payment behind it</strong></li>
+    <li>Two contracts <strong>shared the same number</strong>, so two districts could have been invoiced citing one contract</li>
+  </ul>
+</div>
+
+<h2>The five pages</h2>
+
+<table>
+  <thead><tr><th>Page</th><th>What it is for</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Contracts</strong></td><td>Every signed contract. Open one to see its line items, open a line to see the whole story behind it. This is where the three buttons live.</td></tr>
+    <tr><td><strong>Money</strong></td><td>Every invoice and every payment in one list. Open a row for the document, what was sent, and the notes.</td></tr>
+    <tr><td><strong>Documents</strong></td><td>What each district needs before they will pay, and what we hold. Missing items are called out.</td></tr>
+    <tr><td><strong>Outbox</strong></td><td>Messages drafted and waiting for a person to send. Nothing goes to a client on its own.</td></tr>
+    <tr><td><strong>Guardrails</strong></td><td>Continuous checks reconciling contracts against invoices against payments.</td></tr>
+  </tbody>
+</table>
+
+<h2>The three buttons, in order</h2>
+
+<h3><span class="btn btn-green">Mark delivered</span></h3>
+<p>Click it the day the work actually happens. Records the date, who delivered it, and evidence such as a sign-in sheet.</p>
+<p><strong>It does not bill anyone.</strong> That is deliberate. Delivery and money are separate facts.</p>
+<p>Complimentary lines still get a delivery record, so at renewal you can prove what was given away.</p>
+
+<h3><span class="btn">Create invoice</span></h3>
+<p>Turns delivered work into a <strong>draft</strong> invoice. Nothing is emailed by this step.</p>
+<p>You cannot invoice a line with no delivery record. That is the rule that stops us billing for work nobody has confirmed happened.</p>
+
+<h3><span class="btn btn-dark">Record payment</span></h3>
+<p>Log money when it arrives. Method, date received, reference, and evidence such as a cheque photo.</p>
+<p><strong>The date is when the money arrived, not when you typed it in.</strong> Using a deposit date as a receipt date is how one payment became unverifiable.</p>
+<p>One payment can settle several invoices. A single cheque covering two invoices is recorded once and applied twice, which is what stops the collected figure double counting.</p>
+
+<h2>What the system refuses to do</h2>
+
+<div class="card card-red">
+  <ul style="margin-bottom:0;">
+    <li><strong>Invoice work with no delivery record.</strong> Mark it delivered first.</li>
+    <li><strong>Record a payment against a draft.</strong> The client has never received it.</li>
+    <li><strong>Save a payment with money unapplied.</strong> Every pound has to land somewhere.</li>
+    <li><strong>Delete an invoice that has been sent.</strong> The client holds a document with that number. Void it instead; the record stays.</li>
+    <li><strong>Void an invoice that is already paid.</strong> That needs a credit note, so the payment stays on the record.</li>
+    <li><strong>Chase an invoice that was never sent.</strong> This is exactly what went wrong in August.</li>
+  </ul>
+</div>
+
+<h2>Getting something wrong</h2>
+
+<table>
+  <thead><tr><th>Situation</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td>Draft, never sent</td><td><strong>Delete it.</strong> Nothing left the building. The number is retired rather than reused, so the sequence stays auditable.</td></tr>
+    <tr><td>Sent</td><td><strong>Void it.</strong> Never delete. The client is holding a document with that number on it.</td></tr>
+    <tr><td>Sent and paid</td><td><strong>Issue a credit note.</strong> The invoice, the payment and the credit all stay.</td></tr>
+    <tr><td>Wrong amount on a sent invoice</td><td><strong>Void and reissue.</strong> Do not edit it. Editing quietly changes a number the client already has.</td></tr>
+    <tr><td>A line and its invoice disagree</td><td><strong>Fix mismatch.</strong> Shows both figures and asks which is right. Requires a written reason, recorded on both records.</td></tr>
+  </tbody>
+</table>
+
+<p>Voided invoices stay in the Money list behind a filter. There is no archive page and no deleted page.</p>
+
+<h2>Email</h2>
+
+<div class="card card-teal">
+  <p style="font-weight:600;margin-bottom:8px;">Everything comes from Billing@teachersdeserveit.com</p>
+  <p>Signed <strong>Billing, TDI Team</strong>. Never an individual's name. That address forwards to Bella, so replies reach her without her name being on collections work.</p>
+  <p style="margin-bottom:0;">If a client wants to talk, offer a call with a team member rather than naming yourself.</p>
+</div>
+
+<h3>Nothing sends itself</h3>
+<p>Messages are drafted into the <strong>Outbox</strong>. A person opens each one, reads it, edits anything that does not sound right, and presses send. Sending asks for confirmation and names the recipient, because it cannot be undone.</p>
+<p>Sent copies are read only. They are the record of what the client actually received.</p>
+
+<h3>Knowing it arrived</h3>
+<p>The Outbox distinguishes states that used to look the same:</p>
+<ul>
+  <li><strong>Sent, unconfirmed</strong> — handed to the provider, no delivery receipt yet</li>
+  <li><strong>Delivered</strong> — confirmed, with the time</li>
+  <li><strong>Opened</strong> — first open only</li>
+  <li><strong>Bounced</strong> — never arrived, with the reason, flipped back to failed</li>
+</ul>
+<p>A bounce posts to <code>#financials</code> saying plainly that the client has not seen it and should not be chased for it. <strong>That is the sentence nobody had when Allenwood's invoice vanished for three weeks.</strong></p>
+
+<h2>Purchase orders and district requirements</h2>
+
+<p>Every district is different. We are the vendor and each district is the customer, so their vendor approval and invoicing rules vary, sometimes by state. There is no master list that applies everywhere.</p>
+
+<p>Requirements are therefore recorded <strong>per district</strong>, and only once that district has told us. When a district says what it needs, record it in Documents, and the send checks will enforce it from then on.</p>
+
+<div class="card card-amber">
+  <p style="font-weight:600;margin-bottom:8px;">PGCPS, worked example</p>
+  <p>They pay against a purchase order and match on invoice number. They also told us in writing:</p>
+  <ul>
+    <li>Invoices must list <strong>actual dates of service</strong></li>
+    <li>We may only bill for work <strong>already completed</strong>, never in advance</li>
+    <li>Fiscal year invoices must reach them by <strong>30 June</strong>, hard stop 15 July</li>
+    <li>Our vendor address must match their system exactly. A cheque was once lost to a mistyped address</li>
+  </ul>
+  <p style="margin-bottom:0;">They also assign accounts payable specialists <strong>by the vendor's first letter</strong>. We are registered as "Rachel A. Hughart dba Teachers Deserve It, LLC", so ours is Allison Chung. Invoices sent to the school principal were never going to be paid.</p>
+</div>
+
+<h2>Guardrails</h2>
+
+<p>Thirteen checks run continuously, reconciling the contract side against the invoice side against the payment side. They exist because Oak Grove drifted $4,400 for three weeks and nothing compared the three.</p>
+
+<p>A failure shows the rows that failed, not just a count, so it is actionable rather than merely alarming. Failures also post to <code>#financials</code>.</p>
+
+<p>Among them: contract lines must match the invoice they sit on; a paid invoice must have a payment behind it; payments cannot exceed the invoice; no money left unapplied; contract numbers must be unique; nothing billed while a grant is holding it; no invoice outstanding on a message that bounced.</p>
+
+<h2>Slack</h2>
+
+<p>Every action that moves money or delivery posts to <code>#financials</code>, so Omar and Bella do not have to open the portal to know what happened. Dry runs never post. Each message names who did it.</p>
+
+<h2>Who does what</h2>
+
+<table>
+  <thead><tr><th>Person</th><th>Role</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Bella</strong></td><td>Day to day. Sends from the Outbox, records payments, chases. Works under Billing, TDI Team, never her own name.</td></tr>
+    <tr><td><strong>Omar</strong></td><td>CFO oversight. Owns the insurance renewal and certificate. Watches #financials.</td></tr>
+    <tr><td><strong>Rae</strong></td><td>Decisions on scope, write offs, and anything that changes a contract figure.</td></tr>
+  </tbody>
+</table>
+
+<h2>Where Leadership fits</h2>
+
+<p>The Leadership Dashboard shows a <strong>read only</strong> strip on each school: contracted, collected, outstanding, not billed, anything overdue, and anything ready to bill, with a link into Billing.</p>
+
+<p>You can see where a school stands mid-conversation. You cannot change it from there. <strong>Billing is the only place that writes.</strong> Three writers is how Oak Grove drifted.</p>
+
+<h2>Still to switch on</h2>
+
+<div class="card card-green">
+  <p style="font-weight:600;margin-bottom:8px;">Delivery tracking needs one setup step</p>
+  <p>The webhook is built and live, but Resend is not yet pointed at it. Until that is done, invoices send normally, you simply do not get delivery confirmations.</p>
+  <ol style="margin-bottom:0;">
+    <li>In Resend, add a webhook endpoint at <code>https://www.teachersdeserveit.com/api/webhooks/resend</code></li>
+    <li>Subscribe it to <code>email.delivered</code>, <code>email.bounced</code>, <code>email.opened</code>, <code>email.complained</code>, <code>email.delivery_delayed</code></li>
+    <li>Copy the signing secret Resend gives you into Vercel as <code>RESEND_WEBHOOK_SECRET</code> for Production, then redeploy</li>
+  </ol>
+</div>
+
+<p style="color:#6B7280;font-size:13px;margin-top:32px;">Until a secret is configured the webhook refuses all events rather than trusting unsigned ones, so nothing can post a fake delivery confirmation to hide a bounce.</p>
+
+</div>
+</body>
+</html>

@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
               </td>
               <td style="vertical-align:top;padding-left:12px;">
                 <p style="margin:0 0 2px;font-size:15px;font-weight:700;">Watch your team grow</p>
-                <p style="margin:0;font-size:14px;color:#64748B;">As your educators explore the Hub, your dashboard fills with real data: who is active, what tools they love, PD hours earned, and how your team is feeling. It all happens automatically.</p>
+                <p style="margin:0;font-size:14px;color:#64748B;">As your educators explore the Hub, your dashboard fills with real data: who is active, what tools they love, what they are completing, and how your team is feeling. It all happens automatically.</p>
               </td>
             </tr>
           </table>

@@ -26,6 +26,18 @@ interface Funder {
   apply_url: string | null
   source_url: string | null
   last_researched_on: string | null
+  eligibility_rules: Record<string, unknown> | null
+}
+
+/**
+ * The rules, in the words a person would use. These three are the blockers we
+ * keep running into, so naming them plainly on the row is the whole value of
+ * this tab today.
+ */
+const RULE_LABELS: Record<string, string> = {
+  requires_named_member: 'Needs a named member',
+  requires_accountability_identification: 'Needs state accountability ID',
+  requires_tdi_state_authorization: 'Needs TDI vendor approval',
 }
 
 const C = {
@@ -77,11 +89,12 @@ export default function FundersTab() {
         }}
       >
         <strong style={{ color: C.ink }}>
-          {funders.length} funder{funders.length === 1 ? '' : 's'}, {researched.length} researched.
+          {funders.length} funder{funders.length === 1 ? '' : 's'}
+          {researched.length === 0 ? ', none researched.' : `, ${researched.length} researched.`}
         </strong>{' '}
         {researched.length === 0
-          ? 'None has been checked against a school yet. Discovery adds to this list monthly; research is the step between a funder existing here and a grant being written.'
-          : 'Research goes stale, so a date that is old is a prompt to look again.'}
+          ? 'We hold names and a few eligibility rules. Geography, award size, deadlines and application links are empty on every row, so a badge below means something rather than nothing.'
+          : 'Research goes stale, so an old date is a prompt to look again.'}
       </div>
 
       {funders.length === 0 && (
@@ -104,31 +117,21 @@ export default function FundersTab() {
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ display: 'flex', gap: 8, alignItems: 'baseline', flexWrap: 'wrap' }}>
               <span style={{ fontWeight: 700, fontSize: 15, color: C.ink }}>{f.name}</span>
-              {f.typical_award && (
-                <span style={{ fontSize: 13, color: C.faint, fontVariantNumeric: 'tabular-nums' }}>
-                  {f.typical_award}
-                </span>
+              {f.tier && <Chip text={f.tier} bg={C.okBg} fg={C.ok} />}
+              {Object.keys(f.eligibility_rules ?? {}).map(k => (
+                <Chip key={k} text={RULE_LABELS[k] ?? k.replace(/_/g, ' ')} bg={C.warnBg} fg={C.warn} />
+              ))}
+              {f.last_researched_on && (
+                <Chip text={`Checked ${f.last_researched_on}`} bg={C.okBg} fg={C.ok} />
               )}
-              <span
-                style={{
-                  fontSize: 10,
-                  fontWeight: 800,
-                  letterSpacing: '.07em',
-                  textTransform: 'uppercase',
-                  padding: '3px 8px',
-                  borderRadius: 999,
-                  whiteSpace: 'nowrap',
-                  background: f.last_researched_on ? C.okBg : C.warnBg,
-                  color: f.last_researched_on ? C.ok : C.warn,
-                }}
-              >
-                {f.last_researched_on ? `Checked ${f.last_researched_on}` : 'Never researched'}
-              </span>
             </div>
-            <div style={{ fontSize: 13.5, color: C.soft, marginTop: 3 }}>
-              {[f.geography || f.state_code, f.focus].filter(Boolean).join('. ') ||
-                'No geography or focus recorded.'}
-            </div>
+            {/* No detail line when there is no detail. Eighteen identical
+                "nothing recorded" sentences is noise pretending to be data. */}
+            {(f.geography || f.state_code || f.focus) && (
+              <div style={{ fontSize: 13.5, color: C.soft, marginTop: 3 }}>
+                {[f.geography || f.state_code, f.focus].filter(Boolean).join('. ')}
+              </div>
+            )}
           </div>
           {f.apply_url && (
             <a
@@ -155,5 +158,25 @@ export default function FundersTab() {
         </div>
       ))}
     </div>
+  )
+}
+
+function Chip({ text, bg, fg }: { text: string; bg: string; fg: string }) {
+  return (
+    <span
+      style={{
+        fontSize: 10,
+        fontWeight: 800,
+        letterSpacing: '.07em',
+        textTransform: 'uppercase',
+        padding: '3px 8px',
+        borderRadius: 999,
+        whiteSpace: 'nowrap',
+        background: bg,
+        color: fg,
+      }}
+    >
+      {text}
+    </span>
   )
 }

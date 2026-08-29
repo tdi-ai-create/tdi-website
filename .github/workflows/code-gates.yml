@@ -43,7 +43,13 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          # 22, not 20. @supabase/supabase-js constructs a RealtimeClient
+          # inside createClient, and on Node 20 that throws "Node.js 20
+          # detected without native WebSocket support" before a single query
+          # runs. It took down the seat check the first time it ran in CI while
+          # passing locally on Node 24. Production is on Node 24, so 20 was
+          # testing something we do not ship.
+          node-version: '22'
           cache: 'npm'
 
       - name: Install dependencies
@@ -80,6 +86,26 @@ jobs:
           fi
 
           exit $status
+
+      - name: Seats belong to a partnership
+        # A live all-access seat whose partnership was deleted, or which was
+        # hand-provisioned without a link, belongs to a real educator who shows
+        # up on no leadership screen. Thirty-eight were found that way on
+        # 29 Aug 2026, thirteen of them actively using the Hub. Baselined, so
+        # this fails on a newly broken link rather than on the known backlog.
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          NEXT_PUBLIC_LEARNING_HUB_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_LEARNING_HUB_SUPABASE_URL }}
+          LEARNING_HUB_SUPABASE_SERVICE_KEY: ${{ secrets.LEARNING_HUB_SUPABASE_SERVICE_KEY }}
+        # Skipped rather than failed when the keys are absent, because a fork
+        # PR has no secrets and this must not block it. Says so out loud.
+        run: |
+          if [ -z "$SUPABASE_SERVICE_ROLE_KEY" ] || [ -z "$LEARNING_HUB_SUPABASE_SERVICE_KEY" ]; then
+            echo "::warning::Service keys unavailable, so seat attribution was NOT checked."
+            exit 0
+          fi
+          npm run check:seats
 
       - name: Admin API auth
         # Every /api/admin route must establish who is calling. 60 do not today,
