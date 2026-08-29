@@ -29,7 +29,7 @@ export async function GET() {
 
     const { data, error } = await supabase
       .from('funders')
-      .select('id, name, tier, state_code, geography, focus, typical_award, apply_url, source_url, last_researched_on')
+      .select('id, name, tier, state_code, geography, focus, typical_award, apply_url, source_url, last_researched_on, eligibility_rules')
       .order('name')
 
     if (error) {

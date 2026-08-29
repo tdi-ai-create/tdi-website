@@ -288,6 +288,80 @@ export async function GET(_request: NextRequest) {
       }
     }
 
+    // Seats nobody can see.
+    //
+    // The matrix can only report on partnerships that exist. A live all_access
+    // seat whose partnership_id names a record that was deleted, or that has no
+    // partnership_id and no slug, belongs to a real educator who is paying us
+    // attention while appearing on no leadership screen at all.
+    //
+    // On 29 Aug 2026 there were three such groups. Twenty seats at d94.org
+    // pointed at a partnership row that does not exist. Fifteen at morenci.org
+    // had neither id nor slug, and eight of those educators were signed in and
+    // working, a better rate than any partnership we do track. One more at
+    // St. Mary sat outside the slug that rescues the other ten.
+    //
+    // Grouped by email domain because that is what identifies the school when
+    // the partnership link is the thing that is broken.
+    const { data: allSeats, error: allSeatsError } = await hub
+      .from('hub_memberships')
+      .select('user_id, partnership_id')
+      .eq('tier', 'all_access')
+      .eq('status', 'active');
+
+    if (allSeatsError) {
+      console.error('[onboarding-matrix] unattributed seat sweep failed:', allSeatsError.message);
+      return NextResponse.json({ error: `hub_memberships sweep: ${allSeatsError.message}` }, { status: 500 });
+    }
+
+    const knownIds = new Set(ids.map(String));
+    const attributed = new Set<string>();
+    for (const set of seatUserIds.values()) for (const u of set) attributed.add(u);
+
+    const orphanUserIds = (allSeats ?? [])
+      .filter((s) => !knownIds.has(String(s.partnership_id)))
+      .map((s) => s.user_id as string)
+      .filter((u) => !attributed.has(u));
+
+    const unattributed: { domain: string; seats: number; signedIn: number }[] = [];
+
+    if (orphanUserIds.length > 0) {
+      const unique = [...new Set(orphanUserIds)];
+      const [orphanProfiles, orphanActivity] = await Promise.all([
+        hub.from('hub_profiles').select('id, email').in('id', unique),
+        hub.from('hub_activity_log').select('user_id, action').in('user_id', unique),
+      ]);
+
+      for (const [name, res] of [
+        ['hub_profiles orphans', orphanProfiles],
+        ['hub_activity_log orphans', orphanActivity],
+      ] as const) {
+        if (res.error) {
+          console.error(`[onboarding-matrix] ${name} read failed:`, res.error.message);
+          return NextResponse.json({ error: `${name}: ${res.error.message}` }, { status: 500 });
+        }
+      }
+
+      const activeOrphans = new Set(
+        (orphanActivity.data ?? [])
+          .filter((a) => isEngagementAction(a.action as string | null))
+          .map((a) => a.user_id as string)
+      );
+
+      const byDomain = new Map<string, { seats: number; signedIn: number }>();
+      for (const pr of orphanProfiles.data ?? []) {
+        const email = String(pr.email ?? '');
+        const domain = email.includes('@') ? email.split('@')[1].toLowerCase() : 'unknown';
+        if (!byDomain.has(domain)) byDomain.set(domain, { seats: 0, signedIn: 0 });
+        const bucket = byDomain.get(domain)!;
+        bucket.seats += 1;
+        if (activeOrphans.has(pr.id as string)) bucket.signedIn += 1;
+      }
+
+      for (const [domain, v] of byDomain) unattributed.push({ domain, ...v });
+      unattributed.sort((a, b) => b.seats - a.seats);
+    }
+
     const engagementFor = (pid: string) => {
       const bucket = actionCounts.get(pid);
       if (!bucket) return emptyEngagement();
@@ -447,6 +521,7 @@ export async function GET(_request: NextRequest) {
       partnerships: result,
       stepLabels: STEP_LABELS,
       engagementLabels: ENGAGEMENT_LABELS,
+      unattributed,
       asOf: new Date().toISOString(),
     });
   } catch (error) {

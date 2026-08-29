@@ -52,6 +52,12 @@ interface EngagementColumn {
   label: string;
 }
 
+interface Unattributed {
+  domain: string;
+  seats: number;
+  signedIn: number;
+}
+
 type View = 'onboarding' | 'engagement';
 
 /**
@@ -75,6 +81,7 @@ export default function OnboardingMatrix({ userEmail }: { userEmail: string | nu
   const [rows, setRows] = useState<Row[] | null>(null);
   const [stepLabels, setStepLabels] = useState<string[]>([]);
   const [engagementLabels, setEngagementLabels] = useState<EngagementColumn[]>([]);
+  const [unattributed, setUnattributed] = useState<Unattributed[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   // Onboarding answers where a school is stuck. Engagement answers whether
@@ -99,6 +106,7 @@ export default function OnboardingMatrix({ userEmail }: { userEmail: string | nu
         setRows(body.partnerships ?? []);
         setStepLabels(body.stepLabels ?? []);
         setEngagementLabels(body.engagementLabels ?? []);
+        setUnattributed(body.unattributed ?? []);
       })
       .catch((err) => {
         // Say what went wrong rather than rendering an empty grid, which is
@@ -140,7 +148,53 @@ export default function OnboardingMatrix({ userEmail }: { userEmail: string | nu
     );
   }
 
+  const orphanSeats = unattributed.reduce((n, u) => n + u.seats, 0);
+  const orphanSignedIn = unattributed.reduce((n, u) => n + u.signedIn, 0);
+
   return (
+    <>
+      {orphanSeats > 0 && (
+        // These educators hold live all-access seats and appear on no row of
+        // the table below, because the partnership they belong to was deleted
+        // or was never linked. Shown above the matrix rather than inside it:
+        // the point is that the matrix cannot see them.
+        <div
+          className="bg-white rounded-xl border overflow-hidden mb-4"
+          style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)', borderColor: '#FCA5A5' }}
+        >
+          <div className="h-0.5 w-full" style={{ background: '#DC2626' }} />
+          <div className="px-5 py-4">
+            <div className="flex items-start gap-3">
+              <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" style={{ color: '#DC2626' }} />
+              <div className="min-w-0">
+                <p className="text-[13px] font-bold" style={{ color: '#2B3A67' }}>
+                  {orphanSeats} paid Hub {orphanSeats === 1 ? 'seat is' : 'seats are'} not attached to any
+                  partnership
+                </p>
+                <p className="text-[12px] text-gray-500 mt-0.5">
+                  {orphanSignedIn > 0
+                    ? `${orphanSignedIn} of them have signed in and are using the Hub. None of this appears anywhere below.`
+                    : 'None of this appears anywhere below.'}
+                </p>
+                <div className="flex flex-wrap gap-x-5 gap-y-1.5 mt-3">
+                  {unattributed.map((u) => (
+                    <span key={u.domain} className="text-[12px]" style={{ fontVariantNumeric: 'tabular-nums' }}>
+                      <span className="font-mono text-[11px] text-gray-500">{u.domain}</span>
+                      <span className="font-bold" style={{ color: '#2B3A67' }}>
+                        {' '}
+                        {u.seats}
+                      </span>
+                      <span className="text-gray-400"> {u.seats === 1 ? 'seat' : 'seats'}</span>
+                      {u.signedIn > 0 && <span className="text-gray-400">, {u.signedIn} signed in</span>}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
     <div className="bg-white rounded-xl border border-gray-100 overflow-hidden" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
       <div className="h-0.5 w-full" style={{ background: '#2563EB' }} />
 
@@ -285,5 +339,6 @@ export default function OnboardingMatrix({ userEmail }: { userEmail: string | nu
         )}
       </div>
     </div>
+    </>
   );
 }
