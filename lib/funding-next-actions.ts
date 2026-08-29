@@ -23,6 +23,7 @@
  * ours, the agents', and the school's.
  */
 import { readSchoolProfile } from '@/lib/funding/school-profile'
+import { callTriggerFor } from '@/lib/funding/call-escalation'
 
 export type ActionOwner = 'team' | 'agent' | 'school' | 'auto'
 export type ActionUrgency = 'critical' | 'high' | 'normal' | 'low'
@@ -96,10 +97,122 @@ export function computeNextActions(
     a.status === 'pending' || a.status === 'in_progress' || a.status === 'blocked'
   )
 
+  // ── The call rung ──
+  //
+  // Before any overdue or upcoming row is emitted, work out which tasks have
+  // stopped being an email problem. Those become a single call item and are
+  // suppressed below, so the board shows "call Teri" rather than the same
+  // nagging row it has shown for a month.
+  //
+  // A grant closing soon overrides everything: it is the trigger that would
+  // have caught Walmart Spark Good on 24 August instead of never.
+  // Minimal shapes for the call rung. The surrounding function takes `any[]`
+  // for historical reasons; these keep the new code honest without a wider
+  // refactor that would touch every branch in this file.
+  type ActionRow = {
+    id: string
+    title?: string | null
+    due_date?: string | null
+    status?: string | null
+    nudge_count?: number | null
+    opportunity_id?: string | null
+  }
+  type OppRow = {
+    id: string
+    name: string
+    status: string
+    amount?: number | null
+    application_closes?: string | null
+  }
+
+  const calledTaskIds = new Set<string>()
+  const candidateCalls: {
+    task: ActionRow
+    trigger: NonNullable<ReturnType<typeof callTriggerFor>>
+  }[] = []
+  const contactName = pursuit.client_contact_name || 'the school contact'
+  const contactPhone = pursuit.client_contact_phone || null
+  const schoolName = pursuit.district_name || pursuit.pursuit_name || 'this school'
+
+  for (const a of pendingActions) {
+    const opp = a.opportunity_id
+      ? (opportunities as OppRow[]).find(o => o.id === a.opportunity_id)
+      : null
+
+    let closingSoon: { grantName: string; daysLeft: number; amount: number; blockedBy: string | null } | null = null
+    if (opp && opp.application_closes && !['applied', 'awarded', 'denied', 'closed'].includes(opp.status)) {
+      const closes = new Date(opp.application_closes + 'T00:00:00')
+      const daysLeft = Math.ceil((closes.getTime() - today.getTime()) / 86400000)
+      if (daysLeft <= 7) {
+        // A sibling task on the same grant that fell due earlier is a
+        // prerequisite. Paula was reminded five times to submit an
+        // application she could not submit, because the account it goes
+        // through was never set up, and that task was due three days sooner.
+        //
+        // Matching is deliberately narrow. A first attempt treated any
+        // earlier-due sibling as a blocker, which made the board claim that
+        // "Remind Teri: time to submit" was what stopped Teri submitting.
+        // That is the chase itself, not a prerequisite, and it would have put
+        // a false sentence in Bella's mouth on a live call.
+        //
+        // So a prerequisite has to look like set-up work. When nothing
+        // matches, the plain deadline script is used, which is always true.
+        const PREREQUISITE = /\b(set ?up|account|register|sign ?up|create|provide|obtain|EIN|credential)\b/i
+        const prereq = (pendingActions as ActionRow[])
+          .filter(o2 => o2.opportunity_id === a.opportunity_id && o2.id !== a.id && o2.due_date)
+          .filter(o2 => a.due_date && String(o2.due_date) < String(a.due_date))
+          .filter(o2 => PREREQUISITE.test(String(o2.title || '')))
+          .sort((x, y) => String(x.due_date).localeCompare(String(y.due_date)))[0]
+        closingSoon = {
+          grantName: opp.name,
+          daysLeft,
+          amount: opp.amount || 0,
+          blockedBy: prereq ? (prereq.title ?? null) : null,
+        }
+      }
+    }
+
+    const trigger = callTriggerFor(a, { today, contactName, schoolName, closingSoon })
+    if (!trigger) continue
+
+    calledTaskIds.add(a.id)
+    candidateCalls.push({ task: a, trigger })
+  }
+
+  // One call per school, not one per task. Bella rings Teri once and covers
+  // everything; three rows saying "call Paula" is a worse board, not a more
+  // urgent one. The most severe reason wins, and it is the one that decides
+  // what she opens with.
+  const SEVERITY: Record<string, number> = { deadline: 0, silence: 1, blocked: 2, stale: 3 }
+  candidateCalls.sort((x, y) => SEVERITY[x.trigger.reason] - SEVERITY[y.trigger.reason])
+  const chosen = candidateCalls[0]
+  if (chosen) {
+    const others = candidateCalls.length - 1
+    const a = chosen.task
+    const trigger = chosen.trigger
+    result.push({
+      id: `call-${a.id}`,
+      label: contactPhone ? `Call ${contactName} on ${contactPhone}` : `Call ${contactName}`,
+      why:
+        `${schoolName}. ${trigger.headline}` +
+        (others > 0 ? ` ${others} other open item${others !== 1 ? 's' : ''} to cover on the same call.` : '') +
+        (contactPhone
+          ? ` What to say: "${trigger.script[0]}" ${trigger.note}`
+          : ' No phone number on file, so the first job is getting one.'),
+      owner: 'team',
+      urgency: trigger.reason === 'deadline' ? 'critical' : 'high',
+      dueDate: a.due_date,
+      actionType: 'call_school',
+      targetId: a.id,
+      tab: 'actions',
+    })
+  }
+
   // ── CRITICAL ──
 
   // Overdue action items
   for (const a of pendingActions) {
+    if (calledTaskIds.has(a.id)) continue // superseded by a call
     if (!a.due_date) continue
     const due = new Date(a.due_date + 'T00:00:00')
     if (due >= today) continue
@@ -129,6 +242,7 @@ export function computeNextActions(
 
   // Upcoming (non-overdue) pending action items from DB
   for (const a of pendingActions) {
+    if (calledTaskIds.has(a.id)) continue // superseded by a call
     if (!a.due_date) continue
     const due = new Date(a.due_date + 'T00:00:00')
     if (due < today) continue // already handled above as overdue
