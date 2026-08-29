@@ -26,6 +26,8 @@ type Row = {
   contentPath: string | null;
   step: string;
   ours: boolean;
+  submitted: boolean;
+  stepStatus: string;
   days: number | null;
   dueOn: string | null;
   href: string;
@@ -52,7 +54,7 @@ const GROUPS: {
   {
     key: 'blocked_on_us',
     title: 'Blocked on us',
-    why: 'They cannot move until we do something',
+    why: 'They cannot move until we do something, including work they handed in',
     dot: '#80a4ed',
     chip: 'bg-blue-50 text-blue-800 border-blue-200',
   },
@@ -191,6 +193,9 @@ export function CreatorQueue() {
                   <span className="text-sm font-semibold text-gray-900 truncate">{r.name}</span>
                   <span className="hidden sm:block text-xs text-gray-500 truncate">
                     {r.step}
+                    {(r.submitted || r.stepStatus === 'waiting_approval') && (
+                      <span className="text-blue-700 font-medium"> &middot; they submitted, waiting on our answer</span>
+                    )}
                     {group.key === 'data_issue' && r.status && (
                       <span className="text-red-700 font-medium"> &middot; {r.status}</span>
                     )}

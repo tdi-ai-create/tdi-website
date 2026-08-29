@@ -26,12 +26,14 @@ export const dynamic = 'force-dynamic';
 type Row = {
   creatorId: string;
   recordId: string;
+  stepStatus: string;
   name: string;
   status: string | null;
   contentPath: string | null;
   step: string;
   ours: boolean;
   reviewStatus: string | null;
+  submitted: boolean;
   days: number | null;
   dueOn: string | null;
   href: string;
@@ -51,8 +53,14 @@ export async function GET() {
     supabase.from('creators').select('id, name, status, content_path'),
     supabase
       .from('creator_milestones')
-      .select('id, creator_id, review_status, opened_at, due_on, milestones(name, requires_team_action)')
-      .eq('status', 'available'),
+      .select('id, creator_id, status, review_status, opened_at, due_on, milestones(name, requires_team_action)')
+      // Both statuses, not just available. waiting_approval means they have
+      // handed something in and are waiting on us, which is the most blocked a
+      // creator can be. Querying only available hid Amy Storer and Catherine
+      // Dorian, three and eight days in, while the Action Center listed both.
+      // Two screens disagreeing about what needs us is the exact failure this
+      // queue exists to end.
+      .in('status', ['available', 'waiting_approval']),
   ]);
 
   if (creatorsRes.error) {
@@ -75,14 +83,20 @@ export async function GET() {
     const m = (Array.isArray(s.milestones) ? s.milestones[0] : s.milestones) as
       | { name?: string; requires_team_action?: boolean }
       | undefined;
+    const submitted = s.review_status === 'submitted';
     return {
       creatorId: s.creator_id,
       recordId: s.id,
+      stepStatus: s.status,
       name: c?.name || 'Unknown creator',
       status: c?.status ?? null,
       contentPath: c?.content_path ?? null,
       step: m?.name || 'Unnamed step',
-      ours: Boolean(m?.requires_team_action),
+      // Ours if the step is one we own, or if they have handed something in
+      // and are waiting to hear back. The second half is the case the first
+      // version missed.
+      ours: Boolean(m?.requires_team_action) || s.status === 'waiting_approval' || submitted,
+      submitted,
       reviewStatus: s.review_status ?? null,
       days: s.opened_at ? Math.floor((now - new Date(s.opened_at).getTime()) / 86400000) : null,
       dueOn: s.due_on ?? null,
