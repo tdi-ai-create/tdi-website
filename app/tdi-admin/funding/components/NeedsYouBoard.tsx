@@ -140,12 +140,21 @@ function CardView({ c }: { c: Card }) {
         opacity: c.tone === 'dead' ? 0.72 : 1,
       }}
     >
+      {/* Titles clamp to two lines. Some task titles are a full instruction,
+          not a name: one runs to sixty words explaining what to ask Gary and
+          what to do with each possible answer. As a card heading that buries
+          every other card in the column. The full text is on the school card
+          behind the button. */}
       <div
         style={{
           fontWeight: c.tone === 'dead' ? 600 : 700,
           fontSize: 13,
           lineHeight: 1.3,
           color: c.tone === 'dead' ? C.dead : C.ink,
+          display: '-webkit-box',
+          WebkitLineClamp: 2,
+          WebkitBoxOrient: 'vertical',
+          overflow: 'hidden',
         }}
       >
         {c.name}
