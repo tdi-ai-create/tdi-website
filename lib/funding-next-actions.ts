@@ -78,8 +78,22 @@ export function computeNextActions(
   // Detect whether pursuit is in-flight (has opportunities or gate) for profile noise gating
   const isInFlight = opportunities.length > 0 || !!gate
 
+  // 'blocked' is included deliberately.
+  //
+  // It was excluded, and nothing else reads it either: the follow-up cron
+  // only processes 'pending'. So on 17 August five tasks were set to blocked
+  // and in the same moment stopped being chased and stopped being visible.
+  // Ten thousand dollars of Walmart Spark Good sat inside that gap for twelve
+  // days, with a window closing on the 31st.
+  //
+  // A blocked task is not a finished task. It is a task someone judged stuck,
+  // which is the single strongest reason to put it in front of a person. The
+  // status is kept so the row can say it is blocked rather than pretending it
+  // is ordinary work.
+  //
+  // 'in_progress' is kept although no row currently holds it.
   const pendingActions = actions.filter((a: any) =>
-    a.status === 'pending' || a.status === 'in_progress'
+    a.status === 'pending' || a.status === 'in_progress' || a.status === 'blocked'
   )
 
   // ── CRITICAL ──
@@ -97,7 +111,12 @@ export function computeNextActions(
     result.push({
       id: `overdue-${a.id}`,
       label: a.client_label || a.title,
-      why: `${daysOverdue} day${daysOverdue !== 1 ? 's' : ''} overdue${isClientOwned && alreadyNudged ? ' — nudged, waiting on school' : ''}`,
+      why:
+        a.status === 'blocked'
+          ? `Blocked, and ${daysOverdue} day${daysOverdue !== 1 ? 's' : ''} past due.` +
+            (a.nudge_count ? ` Chased ${a.nudge_count} time${a.nudge_count !== 1 ? 's' : ''} with no reply.` : '') +
+            ' Email is not working here, so this needs a call.'
+          : `${daysOverdue} day${daysOverdue !== 1 ? 's' : ''} overdue${isClientOwned && alreadyNudged ? ', nudged, waiting on school' : ''}`,
       owner: isClientOwned && alreadyNudged ? 'school' : isClientOwned ? 'team' : ('team'),
       urgency: 'critical',
       dueDate: a.due_date,
