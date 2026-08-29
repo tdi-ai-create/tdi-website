@@ -1,0 +1,731 @@
+{
+ "_comment": "Unique, non-partial indexes per table. A PostgREST onConflict target must match one of these exactly. Regenerate with the SQL in scripts/integrity/verify-upsert-targets.mjs.",
+ "partnerships": {
+  "action_items": [
+   "id"
+  ],
+  "activity_log": [
+   "id"
+  ],
+  "admin_users": [
+   "email",
+   "id"
+  ],
+  "affiliate_clicks": [
+   "id"
+  ],
+  "affiliate_conversions": [
+   "id"
+  ],
+  "affiliate_payouts": [
+   "id"
+  ],
+  "affiliate_signups": [
+   "id"
+  ],
+  "asd4_survey_responses": [
+   "id"
+  ],
+  "award_allocations": [
+   "id"
+  ],
+  "billing_delivery_events": [
+   "id"
+  ],
+  "billing_documents": [
+   "id"
+  ],
+  "billing_outbox": [
+   "id"
+  ],
+  "billing_payment_applications": [
+   "id",
+   "invoice_id,payment_id"
+  ],
+  "billing_payments": [
+   "id"
+  ],
+  "billing_requirements": [
+   "district_id,requirement",
+   "id"
+  ],
+  "buildings": [
+   "id"
+  ],
+  "calculator_submissions": [
+   "id"
+  ],
+  "cmo_paid_arr": [
+   "id",
+   "month"
+  ],
+  "cmo_rae_brief": [
+   "column_type,week_start",
+   "id"
+  ],
+  "cmo_subscriber_sources": [
+   "id",
+   "month,source"
+  ],
+  "cmo_substack_posts": [
+   "id"
+  ],
+  "cmo_tiktok_posts": [
+   "id"
+  ],
+  "cmo_utm_tracking": [
+   "id",
+   "source,week_start"
+  ],
+  "cmo_weekly_metrics": [
+   "id",
+   "week_start"
+  ],
+  "collections_workflow": [
+   "id"
+  ],
+  "contract_amendments": [
+   "id"
+  ],
+  "contract_deliverables": [
+   "id"
+  ],
+  "creator_config": [
+   "key"
+  ],
+  "creator_content_gaps": [
+   "id"
+  ],
+  "creator_email_log": [
+   "id"
+  ],
+  "creator_milestone_feedback": [
+   "id"
+  ],
+  "creator_milestones": [
+   "creator_id,milestone_id,project_id",
+   "id"
+  ],
+  "creator_notes": [
+   "id"
+  ],
+  "creator_pause_history": [
+   "id"
+  ],
+  "creator_projects": [
+   "creator_id,project_number",
+   "id"
+  ],
+  "creator_recruitment_candidates": [
+   "id"
+  ],
+  "creator_recruitment_notes": [
+   "id"
+  ],
+  "creator_reengagement_sequences": [
+   "id"
+  ],
+  "creator_reminder_log": [
+   "creator_id,reminder_type,target_date",
+   "id"
+  ],
+  "creator_stages": [
+   "path,stage_key"
+  ],
+  "creator_survey_responses": [
+   "id"
+  ],
+  "creators": [
+   "affiliate_slug",
+   "email",
+   "id",
+   "unpause_token"
+  ],
+  "dashboard_defaults": [
+   "id",
+   "metric_name"
+  ],
+  "dashboard_views": [
+   "id"
+  ],
+  "decision_log": [
+   "id"
+  ],
+  "deleted_opportunities": [
+   "id"
+  ],
+  "district_contacts": [
+   "id"
+  ],
+  "district_decision_log": [
+   "id"
+  ],
+  "district_meetings": [
+   "id"
+  ],
+  "districts": [
+   "id"
+  ],
+  "educator_goals": [
+   "id"
+  ],
+  "email_log": [
+   "id"
+  ],
+  "funders": [
+   "id",
+   "name"
+  ],
+  "funding_action_items": [
+   "id"
+  ],
+  "funding_email_log": [
+   "id"
+  ],
+  "funding_narrative_qa_reviews": [
+   "id"
+  ],
+  "funding_notification_settings": [
+   "id"
+  ],
+  "funding_opportunities": [
+   "id"
+  ],
+  "funding_opportunity_notes": [
+   "id"
+  ],
+  "funding_pursuit_timeline": [
+   "id"
+  ],
+  "funding_pursuit_touchpoints_v1": [
+   "id"
+  ],
+  "funding_pursuits": [
+   "id"
+  ],
+  "funding_records": [
+   "id"
+  ],
+  "hub_activity_log": [
+   "id"
+  ],
+  "hub_assessments": [
+   "id"
+  ],
+  "hub_certificates": [
+   "id",
+   "verification_code"
+  ],
+  "hub_champion_messages": [
+   "id"
+  ],
+  "hub_content_approvals": [
+   "id"
+  ],
+  "hub_course_assignments": [
+   "id"
+  ],
+  "hub_course_tags": [
+   "id"
+  ],
+  "hub_courses": [
+   "id",
+   "slug"
+  ],
+  "hub_enrollments": [
+   "course_id,user_id",
+   "id"
+  ],
+  "hub_favorites": [
+   "content_id,content_type,user_id",
+   "id"
+  ],
+  "hub_feedback": [
+   "id"
+  ],
+  "hub_feedback_log": [
+   "id"
+  ],
+  "hub_hard_day_aggregate": [
+   "date",
+   "id"
+  ],
+  "hub_learning_path_courses": [
+   "id"
+  ],
+  "hub_learning_paths": [
+   "id"
+  ],
+  "hub_lesson_progress": [
+   "id",
+   "lesson_id,user_id"
+  ],
+  "hub_lessons": [
+   "id"
+  ],
+  "hub_memberships": [
+   "id",
+   "user_id"
+  ],
+  "hub_modules": [
+   "id"
+  ],
+  "hub_notification_preferences": [
+   "id",
+   "user_id"
+  ],
+  "hub_org_analytics_cache": [
+   "id"
+  ],
+  "hub_org_members": [
+   "id",
+   "org_id,user_id"
+  ],
+  "hub_organizations": [
+   "id"
+  ],
+  "hub_partners": [
+   "id"
+  ],
+  "hub_profiles": [
+   "id"
+  ],
+  "hub_purchases": [
+   "id",
+   "stripe_session_id",
+   "stripe_subscription_id"
+  ],
+  "hub_quick_wins": [
+   "id",
+   "slug"
+  ],
+  "hub_quiz_attempts": [
+   "id"
+  ],
+  "hub_quiz_questions": [
+   "id"
+  ],
+  "hub_quiz_responses": [
+   "id",
+   "question_id,user_id"
+  ],
+  "hub_recommendations": [
+   "id"
+  ],
+  "hub_resources": [
+   "id"
+  ],
+  "hub_social_shares": [
+   "id"
+  ],
+  "hub_tdi_tips": [
+   "id"
+  ],
+  "hub_ui_translations": [
+   "id",
+   "source_text,target_lang"
+  ],
+  "hub_user_goals": [
+   "id"
+  ],
+  "hub_waitlist": [
+   "id"
+  ],
+  "intelligence_contracts": [
+   "id"
+  ],
+  "intelligence_invoices": [
+   "id",
+   "invoice_number"
+  ],
+  "intelligence_tasks": [
+   "id"
+  ],
+  "lesson_response_helpfuls": [
+   "id",
+   "response_id,user_id"
+  ],
+  "lesson_responses": [
+   "id"
+  ],
+  "meeting_evaluations": [
+   "id"
+  ],
+  "metric_snapshots": [
+   "id"
+  ],
+  "milestone_stages": [
+   "milestone_id,path"
+  ],
+  "milestones": [
+   "id"
+  ],
+  "observation_notes": [
+   "id"
+  ],
+  "observation_summaries": [
+   "id"
+  ],
+  "observation_visits": [
+   "id"
+  ],
+  "olivia_oauth_credentials": [
+   "credential_key",
+   "id"
+  ],
+  "opportunity_activity": [
+   "id"
+  ],
+  "opportunity_notes": [
+   "id"
+  ],
+  "opportunity_notes_legacy_ghl": [
+   "id"
+  ],
+  "organizations": [
+   "id",
+   "partnership_id"
+  ],
+  "partnership_blog_access": [
+   "email,partnership_id",
+   "id"
+  ],
+  "partnership_files": [
+   "id"
+  ],
+  "partnership_flags": [
+   "id"
+  ],
+  "partnership_kpis": [
+   "id"
+  ],
+  "partnership_meetings": [
+   "id"
+  ],
+  "partnership_notes": [
+   "id"
+  ],
+  "partnership_semester_data": [
+   "id",
+   "partnership_id,semester"
+  ],
+  "partnership_staff": [
+   "email,partnership_id",
+   "id"
+  ],
+  "partnership_users": [
+   "id"
+  ],
+  "partnership_year_snapshots": [
+   "id"
+  ],
+  "partnerships": [
+   "billing_token",
+   "id",
+   "invite_token",
+   "slug"
+  ],
+  "payment_events": [
+   "id"
+  ],
+  "pending_creators": [
+   "id"
+  ],
+  "petition_school_notifications": [
+   "id",
+   "school_name"
+  ],
+  "petition_signatures": [
+   "id"
+  ],
+  "phases": [
+   "id"
+  ],
+  "projected_date_history": [
+   "id"
+  ],
+  "proof_assets": [
+   "id"
+  ],
+  "pursuit_gate": [
+   "id"
+  ],
+  "quiz_surveys": [
+   "id"
+  ],
+  "quote_invoices": [
+   "id"
+  ],
+  "quote_packages": [
+   "id"
+  ],
+  "quotes": [
+   "id",
+   "quote_number"
+  ],
+  "reminders": [
+   "id"
+  ],
+  "rw_sales_surveys": [
+   "id"
+  ],
+  "sales_audit_log": [
+   "id"
+  ],
+  "sales_contacts": [
+   "id"
+  ],
+  "sales_documents": [
+   "id"
+  ],
+  "sales_opportunities": [
+   "ghl_opportunity_id",
+   "id"
+  ],
+  "sales_opportunity_notes": [
+   "id"
+  ],
+  "sales_pipeline_snapshots": [
+   "id"
+  ],
+  "sales_tasks": [
+   "id"
+  ],
+  "school_facts": [
+   "id"
+  ],
+  "section_highlights": [
+   "highlight_type,partnership_id,section_key",
+   "id"
+  ],
+  "service_sessions": [
+   "id"
+  ],
+  "session_records": [
+   "id"
+  ],
+  "staff_members": [
+   "id"
+  ],
+  "survey_responses": [
+   "id"
+  ],
+  "tdi_team_members": [
+   "email",
+   "id"
+  ],
+  "teacher_quotes": [
+   "id"
+  ],
+  "teacher_session_surveys": [
+   "id"
+  ],
+  "timeline_events": [
+   "id"
+  ],
+  "wego_survey_responses": [
+   "id"
+  ]
+ },
+ "learning-hub": {
+  "active_tier_overrides": [
+   "user_id"
+  ],
+  "capacity_feedback": [
+   "id"
+  ],
+  "comp_mismatch_log": [
+   "id"
+  ],
+  "comped_access_grants": [
+   "id"
+  ],
+  "course_responses": [
+   "id"
+  ],
+  "hub_activity_log": [
+   "id"
+  ],
+  "hub_ai_usage": [
+   "id"
+  ],
+  "hub_alert_state": [
+   "fingerprint"
+  ],
+  "hub_assessments": [
+   "id"
+  ],
+  "hub_bookmarks": [
+   "content_id,content_type,user_id",
+   "id"
+  ],
+  "hub_capacity_feedback": [
+   "id"
+  ],
+  "hub_certificates": [
+   "id",
+   "verification_code"
+  ],
+  "hub_community_reports": [
+   "content_id,content_type,reporter_id",
+   "id"
+  ],
+  "hub_config": [
+   "key"
+  ],
+  "hub_content_promotions": [
+   "id"
+  ],
+  "hub_course_proposals": [
+   "id"
+  ],
+  "hub_courses": [
+   "id",
+   "slug"
+  ],
+  "hub_earned_recognitions": [
+   "id",
+   "recognition_type,user_id"
+  ],
+  "hub_email_sent_log": [
+   "email_type,user_id",
+   "id"
+  ],
+  "hub_enrollments": [
+   "course_id,user_id",
+   "id"
+  ],
+  "hub_favorites": [
+   "content_id,content_type,user_id",
+   "id"
+  ],
+  "hub_game_badges": [
+   "badge_id,user_id",
+   "id"
+  ],
+  "hub_game_responses": [
+   "id"
+  ],
+  "hub_game_sessions": [
+   "id"
+  ],
+  "hub_lesson_progress": [
+   "id",
+   "lesson_id,user_id"
+  ],
+  "hub_lessons": [
+   "id"
+  ],
+  "hub_memberships": [
+   "id",
+   "user_id"
+  ],
+  "hub_migration_log": [
+   "id"
+  ],
+  "hub_modules": [
+   "id"
+  ],
+  "hub_notifications": [
+   "id"
+  ],
+  "hub_org_members": [
+   "id",
+   "org_id,user_id"
+  ],
+  "hub_pathway_courses": [
+   "course_id,pathway_id",
+   "id"
+  ],
+  "hub_pathways": [
+   "id",
+   "slug"
+  ],
+  "hub_polaroids": [
+   "id",
+   "slot,user_id"
+  ],
+  "hub_practice_note_helpful": [
+   "id",
+   "practice_note_id,user_id"
+  ],
+  "hub_practice_notes": [
+   "id"
+  ],
+  "hub_profiles": [
+   "id"
+  ],
+  "hub_qa_post_helpfuls": [
+   "id",
+   "post_id,user_id"
+  ],
+  "hub_qa_posts": [
+   "id"
+  ],
+  "hub_quick_wins": [
+   "id"
+  ],
+  "hub_quiz_questions": [
+   "id"
+  ],
+  "hub_quiz_responses": [
+   "id",
+   "question_id,user_id"
+  ],
+  "hub_quiz_results": [
+   "id",
+   "quiz_type,user_id"
+  ],
+  "hub_recommendations": [
+   "id"
+  ],
+  "hub_resources": [
+   "id"
+  ],
+  "hub_school_recommendations": [
+   "course_id,organization_id",
+   "id"
+  ],
+  "hub_tdi_tips": [
+   "id"
+  ],
+  "hub_tool_request_upvotes": [
+   "id",
+   "request_id,user_id"
+  ],
+  "hub_tool_requests": [
+   "id"
+  ],
+  "hub_user_course_progress": [
+   "course_id,user_id",
+   "id"
+  ],
+  "hub_user_goals": [
+   "id"
+  ],
+  "lesson_response_helpfuls": [
+   "id",
+   "response_id,user_id"
+  ],
+  "lesson_responses": [
+   "id"
+  ],
+  "membership_tiers": [
+   "id",
+   "tier_name"
+  ],
+  "quick_win_responses": [
+   "id"
+  ],
+  "user_subscriptions": [
+   "id",
+   "user_id"
+  ]
+ },
+ "_known_broken_comment": "Call sites that name a conflict target which does not exist. Each one fails with 42P10 every time it runs. Listed so the check can fail on NEW ones rather than on this backlog. Fix a line, delete its entry, and it can never come back quietly. Found 29 Aug 2026 while auditing onboarding; these three are outside that scope and unfixed.",
+ "known_broken": {
+  "app/api/admin/deal-to-partnership/route.ts": "hub_memberships names (email); the table has no email column at all",
+  "app/api/funding/pursuits/[id]/playbook/route.ts": "funding_pursuit_timeline names (pursuit_id,event_title); only (id) is unique",
+  "app/hub/activate/subscriber/page.tsx": "comped_access_grants names (user_id,reason); only (id) is unique. This is the Substack activation path"
+ }
+}

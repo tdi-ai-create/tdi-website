@@ -14,6 +14,7 @@
     "check:adminauth": "node scripts/integrity/admin-api-auth-audit.mjs",
     "check:engagement": "node scripts/integrity/verify-engagement-counts.mjs",
     "check:seats": "node scripts/integrity/verify-seat-attribution.mjs",
+    "check:upserts": "node scripts/integrity/verify-upsert-targets.mjs",
     "check:schema:update": "node scripts/check-schema.mjs --update-baseline",
     "validate:quizzes": "node scripts/validate-quizzes.mjs"
   },

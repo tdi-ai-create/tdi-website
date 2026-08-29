@@ -81,7 +81,7 @@ export async function PATCH(request: NextRequest) {
       else if (status === 'paused') action = 'action_item_paused';
       else if (status === 'pending') action = 'action_item_resumed';
 
-      await supabase.from('activity_log').insert({
+      const { error: logError } = await supabase.from('activity_log').insert({
         partnership_id: partnershipId,
         user_id: userId,
         action,
@@ -94,6 +94,10 @@ export async function PATCH(request: NextRequest) {
           ...(resurfaceAt && { resurface_at: resurfaceAt }),
         },
       });
+
+      if (logError) {
+        console.error('[partners/action-items] activity_log insert failed:', logError.message);
+      }
     }
 
     return NextResponse.json({

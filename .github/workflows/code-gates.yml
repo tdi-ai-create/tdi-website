@@ -87,6 +87,14 @@ jobs:
 
           exit $status
 
+      - name: Upserts name a conflict target that exists
+        # `.upsert(row, { onConflict: 'a,b' })` needs a unique index on exactly
+        # those columns. Five call sites named targets that do not exist, four
+        # of them discarding the error, so a school invited a leader and that
+        # person was never granted access. Reads a committed baseline, so it
+        # needs no credentials and cannot skip.
+        run: npm run check:upserts
+
       - name: Seats belong to a partnership
         # A live all-access seat whose partnership was deleted, or which was
         # hand-provisioned without a link, belongs to a real educator who shows

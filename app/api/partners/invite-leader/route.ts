@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { linkPartnershipUser } from '@/lib/partners/link-user';
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
 
@@ -58,11 +59,21 @@ export async function POST(request: NextRequest) {
         const existingUser = existingUsers?.users?.find(u => u.email === email.toLowerCase());
 
         if (existingUser) {
-          await supabase.from('partnership_users').upsert({
-            partnership_id: partnershipId,
-            user_id: existingUser.id,
-            role: role || 'viewer',
-          }, { onConflict: 'partnership_id,user_id' });
+          const { error: linkError } = await linkPartnershipUser(supabase, {
+            partnershipId,
+            userId: existingUser.id,
+            role,
+          });
+
+          // Without this row the person cannot open the dashboard, so there is
+          // nothing to celebrate if it failed.
+          if (linkError) {
+            console.error('[partners/invite-leader] existing user not linked:', linkError);
+            return NextResponse.json(
+              { error: `${email} already has an account but could not be given access to this partnership. ${linkError}` },
+              { status: 500 }
+            );
+          }
 
           // Notify Rae
           if (RESEND_API_KEY) {
@@ -88,21 +99,35 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to create account. Please contact info@teachersdeserveit.com.' }, { status: 500 });
     }
 
-    // Link new user to partnership
+    // Link new user to partnership. The invitation email has already gone out
+    // at this point, so a failure here is the worst case: they are told to set
+    // a password and then locked out of the dashboard they were invited to.
     if (inviteData?.user) {
-      await supabase.from('partnership_users').upsert({
-        partnership_id: partnershipId,
-        user_id: inviteData.user.id,
-        role: role || 'viewer',
-      }, { onConflict: 'partnership_id,user_id' });
+      const { error: linkError } = await linkPartnershipUser(supabase, {
+        partnershipId,
+        userId: inviteData.user.id,
+        role,
+      });
+
+      if (linkError) {
+        console.error('[partners/invite-leader] new user not linked:', linkError);
+        return NextResponse.json(
+          { error: `${email} was invited but could not be given access to this partnership. Contact info@teachersdeserveit.com and we will fix it. ${linkError}` },
+          { status: 500 }
+        );
+      }
     }
 
     // Log activity
-    await supabase.from('activity_log').insert({
+    const { error: logError } = await supabase.from('activity_log').insert({
       partnership_id: partnershipId,
       action: 'leader_invited',
       details: { name, email, role: role || 'viewer', invited_by: 'partner' },
     });
+
+    if (logError) {
+      console.error('[partners/invite-leader] activity_log insert failed:', logError.message);
+    }
 
     // Notify Rae
     if (RESEND_API_KEY) {

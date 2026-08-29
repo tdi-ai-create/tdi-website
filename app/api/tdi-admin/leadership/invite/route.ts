@@ -2,6 +2,7 @@ import { isTDIAdmin } from '@/lib/tdi-admin/auth-check'
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminAuth } from '@/lib/tdi-admin/auth';
 import { createClient } from '@supabase/supabase-js';
+import { linkPartnershipUser } from '@/lib/partners/link-user';
 
 // Service Supabase client
 function getServiceSupabase() {
@@ -62,15 +63,15 @@ export async function POST(request: NextRequest) {
           // Link to partnership
           // Reporting "linked to partnership" without checking is how a leader
           // ends up believing they have access they were never granted.
-          const { error: linkError } = await supabase.from('partnership_users').upsert({
-            partnership_id: partnershipId,
-            user_id: existingUser.id,
+          const { error: linkError } = await linkPartnershipUser(supabase, {
+            partnershipId,
+            userId: existingUser.id,
             role: 'admin',
-          }, { onConflict: 'partnership_id,user_id' });
+          });
 
           if (linkError) {
-            console.error('[leadership/invite] link failed:', linkError.message);
-            return NextResponse.json({ error: linkError.message }, { status: 500 });
+            console.error('[leadership/invite] link failed:', linkError);
+            return NextResponse.json({ error: linkError }, { status: 500 });
           }
 
           const { error: stampError } = await supabase.from('partnerships').update({
@@ -94,16 +95,16 @@ export async function POST(request: NextRequest) {
 
     // Link new user to partnership
     if (inviteData?.user) {
-      const { error: linkError } = await supabase.from('partnership_users').upsert({
-        partnership_id: partnershipId,
-        user_id: inviteData.user.id,
+      const { error: linkError } = await linkPartnershipUser(supabase, {
+        partnershipId,
+        userId: inviteData.user.id,
         role: 'admin',
-      }, { onConflict: 'partnership_id,user_id' });
+      });
 
       // The invite email has already gone at this point, so this is not fatal,
       // but an unlinked user cannot see the partnership they were invited to.
       if (linkError) {
-        console.error('[leadership/invite] link failed:', linkError.message);
+        console.error('[leadership/invite] link failed:', linkError);
       }
 
       const { error: stampError } = await supabase.from('partnerships').update({

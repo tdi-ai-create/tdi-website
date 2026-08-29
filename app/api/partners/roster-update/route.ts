@@ -137,10 +137,14 @@ export async function POST(request: NextRequest) {
     // 1. Mark removed staff as inactive (soft delete)
     if (toRemove.length > 0) {
       const removeIds = toRemove.map(s => s.id);
-      await supabase
+      const { error: updateError2 } = await supabase
         .from('staff_members')
         .update({ is_active: false, updated_at: new Date().toISOString() })
         .in('id', removeIds);
+
+      if (updateError2) {
+        console.error('[partners/roster-update] staff member not updated:', updateError2.message);
+      }
     }
 
     // 2. Insert new staff
@@ -188,11 +192,15 @@ export async function POST(request: NextRequest) {
 
           if (provResp.ok) {
             provisioned++;
-            await supabase
+            const { error: enrolledError } = await supabase
               .from('staff_members')
               .update({ hub_enrolled: true })
               .eq('partnership_id', partnershipId)
               .eq('email', s.email);
+
+            if (enrolledError) {
+              console.error('[partners/roster-update] Hub seat was created but hub_enrolled was not set, so our roster now disagrees with the Hub:', enrolledError.message);
+            }
 
             fetch(`${baseUrl}/api/hub/emails/staff-welcome`, {
               method: 'POST',
@@ -225,17 +233,21 @@ export async function POST(request: NextRequest) {
 
     const newTotal = activeCount || unchanged.length + toAdd.length;
 
-    await supabase
+    const { error: countError } = await supabase
       .from('partnerships')
       .update({ staff_enrolled: newTotal, updated_at: new Date().toISOString() })
       .eq('id', partnershipId);
+
+    if (countError) {
+      console.error('[partners/roster-update] staff_enrolled not updated:', countError.message);
+    }
 
     // 4. Flag if over contract seat limit
     if (partnership.base_staff_enrolled && newTotal > partnership.base_staff_enrolled) {
       const overCount = newTotal - partnership.base_staff_enrolled;
       const schoolName = partnership.org_name || partnership.contact_name || 'A partnership';
 
-      await supabase.from('action_items').insert({
+      const { error: actionItemError } = await supabase.from('action_items').insert({
         partnership_id: partnershipId,
         title: `Roster update exceeds contract: ${newTotal} active staff vs ${partnership.base_staff_enrolled} contracted seats (+${overCount})`,
         description: `${schoolName} updated their roster. Active staff count (${newTotal}) exceeds the ${partnership.base_staff_enrolled}-seat contract by ${overCount}. Review whether this is a replacement or expansion.`,
@@ -244,6 +256,10 @@ export async function POST(request: NextRequest) {
         status: 'pending',
         visible_to_partner: false,
       });
+
+      if (actionItemError) {
+        console.error('[partners/roster-update] follow-up action item not created:', actionItemError.message);
+      }
 
       if (process.env.RESEND_API_KEY) {
         fetch('https://api.resend.com/emails', {
@@ -267,7 +283,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 5. Log activity
-    await supabase.from('activity_log').insert({
+    const { error: logError } = await supabase.from('activity_log').insert({
       partnership_id: partnershipId,
       action: 'roster_updated',
       details: {
@@ -279,6 +295,10 @@ export async function POST(request: NextRequest) {
         hub_failed: provisionFailed,
       },
     });
+
+    if (logError) {
+      console.error('[partners/roster-update] activity_log insert failed:', logError.message);
+    }
 
     // 6. Notify admin
     const notifyUrl =

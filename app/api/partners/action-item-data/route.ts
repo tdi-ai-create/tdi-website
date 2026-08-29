@@ -68,36 +68,46 @@ export async function POST(request: NextRequest) {
       case 'website': {
         // Save website URL to organizations table
         if (org) {
-          await supabase
+          const { error: dataError } = await supabase
             .from('organizations')
             .update({ website: data.website })
             .eq('id', org.id);
+
+          if (dataError) {
+            console.error('[partners/action-item-data] action item data not saved:', dataError.message);
+          }
         }
         message = 'Website saved!';
         break;
       }
 
       case 'champion': {
-        // Save champion info to partnerships.metadata JSONB or a dedicated column
-        // For now, store in partnerships metadata
-        const { data: currentPartnership } = await supabase
-          .from('partnerships')
-          .select('metadata')
-          .eq('id', partnershipId)
-          .single();
-
-        const metadata = currentPartnership?.metadata || {};
-        metadata.champions = metadata.champions || [];
-        metadata.champions.push({
-          name: data.championName,
-          email: data.championEmail,
-          added_at: new Date().toISOString(),
+        // This used to read and write partnerships.metadata, a column that does
+        // not exist. The select failed, the update failed with 42703, both
+        // errors were discarded, and the school was told "TDI Champion added!".
+        // Every champion named through this route was thrown away.
+        //
+        // It is recorded on the timeline rather than in a new column, because
+        // partnership_users has no email field and inventing a schema for a
+        // product concept is not this change's job. The name and email are
+        // preserved in details, so nothing is lost and it is visible on the
+        // partnership record while the right home is decided.
+        const { error: championError } = await supabase.from('activity_log').insert({
+          partnership_id: partnershipId,
+          action: 'tdi_champion_named',
+          details: {
+            name: data.championName,
+            email: data.championEmail,
+          },
         });
 
-        await supabase
-          .from('partnerships')
-          .update({ metadata })
-          .eq('id', partnershipId);
+        if (championError) {
+          console.error('[partners/action-item-data] champion not recorded:', championError.message);
+          return NextResponse.json(
+            { error: `Could not save ${data.championName} as your TDI Champion: ${championError.message}` },
+            { status: 500 }
+          );
+        }
 
         message = 'TDI Champion added!';
         break;
@@ -118,7 +128,11 @@ export async function POST(request: NextRequest) {
             }));
 
           if (buildingsToInsert.length > 0) {
-            await supabase.from('buildings').insert(buildingsToInsert);
+            const { error: buildingsError } = await supabase.from('buildings').insert(buildingsToInsert);
+
+            if (buildingsError) {
+              console.error('[partners/action-item-data] buildings not saved:', buildingsError.message);
+            }
           }
         }
         message = 'Buildings saved!';
@@ -139,7 +153,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Mark the action item as completed
-    await supabase
+    const { error: itemError } = await supabase
       .from('action_items')
       .update({
         status: 'completed',
@@ -148,13 +162,21 @@ export async function POST(request: NextRequest) {
       })
       .eq('id', actionItemId);
 
+    if (itemError) {
+      console.error('[partners/action-item-data] action item not updated:', itemError.message);
+    }
+
     // Log activity
-    await supabase.from('activity_log').insert({
+    const { error: logError } = await supabase.from('activity_log').insert({
       partnership_id: partnershipId,
       user_id: userId,
       action: 'action_item_completed',
       details: { action_item_id: actionItemId, data_type: dataType },
     });
+
+    if (logError) {
+      console.error('[partners/action-item-data] activity_log insert failed:', logError.message);
+    }
 
     return NextResponse.json({
       success: true,

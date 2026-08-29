@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
     const schoolName = partnership?.org_name || partnership?.contact_name || 'Partnership';
 
     // Create timeline event as "upcoming" with requested date
-    await supabase.from('timeline_events').insert({
+    const { error: reqError } = await supabase.from('timeline_events').insert({
       partnership_id: partnershipId,
       event_title: eventType,
       event_date: preferredDate,
@@ -43,12 +43,20 @@ export async function POST(request: NextRequest) {
       notes: notes || null,
     });
 
+    if (reqError) {
+      console.error('[partners/request-date] date request not saved:', reqError.message);
+    }
+
     // Log activity
-    await supabase.from('activity_log').insert({
+    const { error: logError } = await supabase.from('activity_log').insert({
       partnership_id: partnershipId,
       action: 'date_requested',
       details: { eventType, preferredDate, alternateDate, notes },
     });
+
+    if (logError) {
+      console.error('[partners/request-date] activity_log insert failed:', logError.message);
+    }
 
     // Notify TDI team
     if (RESEND_API_KEY) {

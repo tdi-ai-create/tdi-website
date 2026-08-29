@@ -25,56 +25,58 @@ export async function POST(request: NextRequest) {
     }
 
     // If champion is in the roster, update their record
-    if (championEmail) {
-      const { data: existing } = await supabase
-        .from('staff_members')
-        .select('id')
-        .eq('partnership_id', partnershipId)
-        .ilike('email', championEmail.toLowerCase())
-        .limit(1);
-
-      if (existing && existing.length > 0) {
-        // Mark existing staff member as champion via partnership_users
-        await supabase.from('partnership_users').upsert({
-          partnership_id: partnershipId,
-          user_id: null,
-          role: 'champion',
-          first_name: championName.split(' ')[0],
-          last_name: championName.split(' ').slice(1).join(' ') || '',
-          title: championRole || 'Staff Champion',
-        }, { onConflict: 'partnership_id,role' }).select();
-      }
-    }
-
-    // Store champion info on the partnership (simple approach)
-    // Using partnership_goal or a metadata approach
-    // For now, create/update a partnership_user with role=champion
+    // There used to be a second write above this one, an upsert with
+    // `onConflict: 'partnership_id,role'`. partnership_users has no unique
+    // index on that pair, so PostgREST answered 42P10 every time and the error
+    // was thrown away. It has been removed rather than repaired, because the
+    // write below already does the job.
+    //
+    // That write was an insert with an update fallback "if insert fails, maybe
+    // duplicate". With no unique constraint the insert never conflicts, so it
+    // never failed, so the fallback never ran and naming a second champion
+    // added a second row instead of replacing the first. Look first, then
+    // write, which needs no constraint and is genuinely idempotent.
     const nameParts = championName.trim().split(' ');
-    const { error } = await supabase
-      .from('partnership_users')
-      .insert({
-        partnership_id: partnershipId,
-        role: 'champion',
-        first_name: nameParts[0],
-        last_name: nameParts.slice(1).join(' ') || '',
-        title: championRole || 'Staff Champion',
-      });
+    const championFields = {
+      first_name: nameParts[0],
+      last_name: nameParts.slice(1).join(' ') || '',
+      title: championRole || 'Staff Champion',
+    };
 
-    // If insert fails (maybe duplicate), try update
-    if (error) {
-      await supabase
-        .from('partnership_users')
-        .update({
-          first_name: nameParts[0],
-          last_name: nameParts.slice(1).join(' ') || '',
-          title: championRole || 'Staff Champion',
-        })
-        .eq('partnership_id', partnershipId)
-        .eq('role', 'champion');
+    const { data: currentChampion, error: championLookupError } = await supabase
+      .from('partnership_users')
+      .select('id')
+      .eq('partnership_id', partnershipId)
+      .eq('role', 'champion')
+      .maybeSingle();
+
+    if (championLookupError) {
+      console.error('[partners/champion] lookup failed:', championLookupError.message);
+      return NextResponse.json(
+        { error: `Could not check the current champion: ${championLookupError.message}` },
+        { status: 500 }
+      );
     }
 
-    // Mark the "Identify staff champion" action item as completed
-    await supabase
+    const { error: championWriteError } = currentChampion
+      ? await supabase.from('partnership_users').update(championFields).eq('id', currentChampion.id)
+      : await supabase
+          .from('partnership_users')
+          .insert({ partnership_id: partnershipId, role: 'champion', ...championFields });
+
+    // Naming the champion is the whole point of this request, so say so rather
+    // than reporting success over a write that did not happen.
+    if (championWriteError) {
+      console.error('[partners/champion] write failed:', championWriteError.message);
+      return NextResponse.json(
+        { error: `Could not save ${championName} as your staff champion: ${championWriteError.message}` },
+        { status: 500 }
+      );
+    }
+
+    // Mark the "Identify staff champion" action item as completed. The
+    // champion is already saved, so this logs rather than failing the request.
+    const { error: itemError } = await supabase
       .from('action_items')
       .update({
         status: 'completed',
@@ -86,12 +88,20 @@ export async function POST(request: NextRequest) {
       .ilike('title', '%staff champion%')
       .eq('status', 'pending');
 
+    if (itemError) {
+      console.error('[partners/champion] action item not completed:', itemError.message);
+    }
+
     // Log activity
-    await supabase.from('activity_log').insert({
+    const { error: logError } = await supabase.from('activity_log').insert({
       partnership_id: partnershipId,
       action: 'champion_identified',
       details: { name: championName, email: championEmail, role: championRole },
     });
+
+    if (logError) {
+      console.error('[partners/champion] activity_log insert failed:', logError.message);
+    }
 
     return NextResponse.json({
       success: true,

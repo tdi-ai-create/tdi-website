@@ -91,14 +91,20 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Mark invite as accepted on first successful login.
+    // Mark invite as accepted on first successful login by the partner.
     //
-    // Worth knowing what this field actually means, because a lot of code has
-    // read more into it than it carries: it is stamped here, by an auth check,
-    // the first time anyone passes. It does not mean a leader finished setup,
-    // and it is set for schools that have never opened their dashboard. Nothing
-    // should treat it as a signal of onboarding progress.
-    if (!partnership.invite_accepted_at) {
+    // Not when a TDI admin looks. isAdmin skips the authorisation check above,
+    // and this used to run for admins too, so any of us opening a client's
+    // dashboard to see how it looked permanently marked that client as having
+    // accepted their invite. The Leadership dashboard names the leaders who
+    // have never signed in, and a single staff visit would have erased one of
+    // them with no way to tell afterwards.
+    //
+    // Worth knowing what this field means even so: it is stamped by an auth
+    // check, not by anyone finishing anything. It says a person belonging to
+    // this partnership authenticated at least once. Nothing should read it as
+    // onboarding progress.
+    if (!isAdmin && !partnership.invite_accepted_at) {
       const { error: acceptError } = await supabase
         .from('partnerships')
         .update({
