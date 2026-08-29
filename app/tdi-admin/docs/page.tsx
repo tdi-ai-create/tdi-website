@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useTDIAdmin } from '@/lib/tdi-admin/context';
 import { Search, Download, Printer, ExternalLink } from 'lucide-react';
 
-type DocId = 'admin-guide' | 'data-flow' | 'workflow' | 'service-invoicing' | 'funding' | 'funding-launch' | 'grant-application-spec' | 'hub-engagement' | 'engagement-workflow' | 'hub-content-standards' | 'hub-content-creation' | 'course-upload-sop' | 'course-checkins-sop' | 'creator-feedback-sop' | 'creator-recruitment-sop' | 'creator-dormancy-sop' | 'communication-map' | 'swag-fulfillment' | 'leadership-workflow';
+type DocId = 'admin-guide' | 'data-flow' | 'workflow' | 'billing-sop' | 'funding' | 'funding-launch' | 'grant-application-spec' | 'hub-engagement' | 'engagement-workflow' | 'hub-content-standards' | 'hub-content-creation' | 'course-upload-sop' | 'course-checkins-sop' | 'creator-feedback-sop' | 'creator-recruitment-sop' | 'creator-dormancy-sop' | 'communication-map' | 'swag-fulfillment' | 'leadership-workflow';
 
 interface Doc {
   id: DocId;
@@ -80,12 +80,13 @@ const DOC_GROUPS: DocGroup[] = [
         ],
       },
       {
-        id: 'service-invoicing',
-        label: 'Service Delivery + Invoicing',
-        desc: 'Contract to delivery to invoice workflow',
-        tags: ['service', 'invoicing', 'delivery', 'contract', 'observation', 'virtual session', 'billing', 'invoice'],
+        id: 'billing-sop',
+        label: 'Billing',
+        desc: 'Contracts, invoices, payments and documents. The three-button loop and what the system refuses to do',
+        tags: ['billing', 'invoice', 'invoicing', 'payment', 'contract', 'delivery', 'delivered', 'outbox', 'guardrails', 'purchase order', 'PO', 'collections', 'overdue', 'void', 'credit note', 'documents', 'W-9', 'COI', 'insurance', 'bounce', 'Resend'],
         relatedSections: [
-          { label: 'Leadership Dashboard', href: '/tdi-admin/leadership' },
+          { label: 'Billing', href: '/tdi-admin/billing' },
+          { label: 'Lead Dashboard', href: '/tdi-admin/leadership' },
         ],
       },
     ],

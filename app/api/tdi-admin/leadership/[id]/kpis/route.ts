@@ -64,28 +64,16 @@ export const KPI_MENU = [
     suggestedTarget: 100,
     category: 'implementation',
   },
-  {
-    key: 'pd_hours_completed',
-    label: 'PD hours completed (team total)',
-    unit: ' hours',
-    benchmarkLow: 50,
-    benchmarkHigh: 200,
-    benchmarkLabel: 'Varies by team size. Typical: 2-5 hours per educator per year.',
-    dataSource: 'Hub course completion data (automatic)',
-    howTdiDelivers: 'Full course library with tracked hours. Printable PD certificates. Courses count toward state PD requirements. Board-ready reporting.',
-    suggestedTarget: 100,
-    category: 'implementation',
-  },
   // === WELLNESS KPIs (team health signals) ===
   {
     key: 'team_wellness',
-    label: 'Team wellness score (5 dimensions)',
+    label: 'Vibe Check score (5 dimensions)',
     unit: '/5',
     benchmarkLow: 3.8,
     benchmarkHigh: 4.2,
     benchmarkLabel: 'TDI partners average 3.8-4.2 out of 5',
     dataSource: 'Hub Vibe Check across 5 dimensions: energy, stress, connection, purpose, balance (automatic, private)',
-    howTdiDelivers: 'Daily private wellness check-ins. Personal outreach from Rae when individual scores trend low (names never shared). Moment Mode wellness resets. Community support from 100,000+ educators.',
+    howTdiDelivers: 'Daily private Vibe Checks. Personal outreach from Rae when individual scores trend low (names never shared). Moment Mode resets. Community support from 100,000+ educators.',
     suggestedTarget: 4.0,
     category: 'wellness',
   },
@@ -97,7 +85,7 @@ export const KPI_MENU = [
     benchmarkHigh: 7,
     benchmarkLabel: 'TDI partners average 5-7/10 vs 8-9 industry average (lower is better)',
     dataSource: 'Baseline survey + mid-year survey + Vibe Check trends',
-    howTdiDelivers: 'Wellness tools and Moment Mode. Community support. Admin coaching on workload management. Personal wellness outreach for struggling educators.',
+    howTdiDelivers: 'Vibe Check tools and Moment Mode. Community support. Admin coaching on workload management. Personal outreach for educators who are struggling.',
     suggestedTarget: 6,
     category: 'wellness',
   },
@@ -189,12 +177,20 @@ export async function POST(
 
   const supabase = getSupabaseAdmin();
 
-  // Deactivate existing KPIs
-  await supabase
+  // Deactivate existing KPIs. If this fails and we insert anyway, the school
+  // ends up with two active sets of goals and the dashboard shows both.
+  const { error: pauseError } = await supabase
     .from('partnership_kpis')
     .update({ status: 'paused', updated_at: new Date().toISOString() })
     .eq('partnership_id', id)
     .eq('status', 'active');
+
+  if (pauseError) {
+    return NextResponse.json(
+      { error: `Could not retire the previous goals, so none were saved: ${pauseError.message}` },
+      { status: 500 }
+    );
+  }
 
   // Insert new KPIs
   const records = selectedKpis.map((kpi: { key: string; target: number; targetDate?: string }, index: number) => {
@@ -227,12 +223,17 @@ export async function POST(
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  // Log activity
-  await supabase.from('activity_log').insert({
+  // Log activity. The goals are already saved, so a failure here is not worth
+  // failing the request over, but it must not pass silently either.
+  const { error: logError } = await supabase.from('activity_log').insert({
     partnership_id: id,
     action: 'kpis_set',
     details: { count: records.length, kpis: selectedKpis.map((k: { key: string }) => k.key) },
   });
+
+  if (logError) {
+    console.error('[kpis] goals saved but activity_log insert failed:', logError.message);
+  }
 
   return NextResponse.json({
     success: true,
