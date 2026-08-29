@@ -251,7 +251,6 @@ export interface DigestEmailData {
   displayName: string;
   coursesInProgress: number;
   lessonsCompletedThisMonth: number;
-  pdHoursEarned: number;
   stressTrend: 'up' | 'down' | 'stable';
   recommendedCourses: { title: string; reason: string; url: string }[];
   newCourses: { title: string; url: string }[];
@@ -298,7 +297,6 @@ ${data.newCourses.map((c) => courseCard(c.title, 'Just added to the catalog', c.
 ${statBlock([
   { label: 'Courses in progress', value: data.coursesInProgress },
   { label: 'Lessons completed', value: data.lessonsCompletedThisMonth },
-  { label: 'PD hours earned', value: data.pdHoursEarned },
 ])}
 
 <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin: 16px 0;">
@@ -534,7 +532,6 @@ export const sampleEmailData: Record<EmailType, EmailData> = {
     displayName: 'Sarah',
     coursesInProgress: 2,
     lessonsCompletedThisMonth: 8,
-    pdHoursEarned: 4.5,
     stressTrend: 'down' as const,
     recommendedCourses: [
       {

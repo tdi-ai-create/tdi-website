@@ -17,7 +17,7 @@ export async function GET(
   const allowedDocs: Record<string, string> = {
     'admin-guide': 'admin-guide.html',
     'workflow': 'partnership-workflow.html',
-    'service-invoicing': 'service-invoicing-workflow.html',
+    'billing-sop': 'billing-sop.html',
     'funding': 'funding-workflow.html',
     'funding-launch': 'funding-onboarding.html',
     'hub-engagement': 'learning-hub-engagement.html',

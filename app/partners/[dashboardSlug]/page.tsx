@@ -1544,7 +1544,7 @@ export default function PartnerDashboard() {
               : reportType === 'quarterly'
               ? `Write a quarterly progress report for ${schoolName}'s TDI partnership. Include: this quarter's highlights, metrics vs targets, challenges and solutions, upcoming milestones, and a forward-looking summary. Data: ${JSON.stringify(dataContext)}. Keep it concise but thorough.`
               : reportType === 'teacher'
-              ? `Write a celebratory staff highlights summary for ${schoolName}'s teachers. Include: most popular Hub tools, educator quotes and shout-outs, courses completed, PD hours earned, and fun engagement stats. Tone: warm, encouraging, celebratory. Perfect for a staff newsletter or PLC agenda. Data: ${JSON.stringify(dataContext)}.`
+              ? `Write a celebratory staff highlights summary for ${schoolName}'s teachers. Include: most popular Hub tools, educator quotes and shout-outs, courses completed, and fun engagement stats. Tone: warm, encouraging, celebratory. Perfect for a staff newsletter or PLC agenda. Data: ${JSON.stringify(dataContext)}.`
               : reportType === 'community'
               ? `Write a parent-friendly community update about ${schoolName}'s professional development investment through TDI. Explain in plain language: what teachers are learning, how it benefits students, popular topics (stress management, classroom strategies, communication), and the school's commitment to educator growth. Tone: positive, accessible, no jargon. Suitable for a school newsletter or website. Data: ${JSON.stringify(dataContext)}.`
               : `Write a comprehensive partnership summary for ${schoolName}. Data: ${JSON.stringify(dataContext)}.`,
@@ -1838,7 +1838,7 @@ ${data.popularCourses.slice(0, 4).map((c: string) => `- ${c}`).join('\n')}
 
 Every tool includes a specific action step for your classroom. This is not theory. It is "try this tomorrow" practical.
 
-${data.toolsExplored > 0 ? `YOUR TEAM BY THE NUMBERS\n\n${data.staffLoggedIn} educators have logged in\n${data.toolsExplored} tools explored\n${data.courseCompletions} courses completed` : 'Once your team starts exploring, we will track tools used, courses completed, and PD hours earned right here.'}
+${data.toolsExplored > 0 ? `YOUR TEAM BY THE NUMBERS\n\n${data.staffLoggedIn} educators have logged in\n${data.toolsExplored} tools explored\n${data.courseCompletions} courses completed` : 'Once your team starts exploring, we will track tools used, courses completed, and how your team is engaging right here.'}
 ${quotesBlock}
 
 SHARE THIS WITH YOUR TEAM
@@ -6272,7 +6272,7 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                     <p className="text-xs text-gray-500">For budget justification and grant reporting</p>
                   </div>
                 </div>
-                <p className="text-xs text-gray-600 mb-4 leading-relaxed">Investment analysis, measurable outcomes, wellness improvements, PD hours earned, and projected outcomes. Perfect for budget season and grant applications.</p>
+                <p className="text-xs text-gray-600 mb-4 leading-relaxed">Investment analysis, measurable outcomes, Vibe Check trends, and projected outcomes. Perfect for budget season and grant applications.</p>
                 <button
                   onClick={() => generateAIReport('impact')}
                   disabled={reportGenerating !== null || !reportDataReady}
