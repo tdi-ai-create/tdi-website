@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { formatDateOnly } from '@/lib/format-date';
 
 export default function DeliverablesList({ partnershipId, userEmail }: { partnershipId: string; userEmail: string }) {
   const [deliverables, setDeliverables] = useState<any[]>([])
@@ -61,7 +62,7 @@ export default function DeliverablesList({ partnershipId, userEmail }: { partner
                 <div className="flex-1 min-w-0">
                   <div className="text-xs font-medium text-gray-800 truncate">{d.label}</div>
                   <div className="text-[10px] text-gray-400 mt-0.5">
-                    {d.delivery_date && `Delivered ${new Date(d.delivery_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`}
+                    {d.delivery_date && `Delivered ${formatDateOnly(d.delivery_date, { month: 'short', day: 'numeric' })}`}
                     {d.delivered_by && ` by ${d.delivered_by.split('@')[0]}`}
                     {!d.delivery_date && d.is_complimentary && 'Complimentary'}
                     {!d.delivery_date && !d.is_complimentary && !d.funding_hold && d.delivery_state !== 'delivered' && 'Not yet delivered'}
