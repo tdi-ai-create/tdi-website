@@ -445,6 +445,19 @@ function DashboardRefSection({ children }: { children: React.ReactNode }) {
   );
 }
 
+// The markup assumes these arrays exist. A response missing one used to take
+// the whole page down with "Cannot read properties of undefined", which is how
+// this screen went white in production. Filling the shape on arrival means a
+// missing field empties one section instead of the page.
+const EMPTY_HUB: HubCreatorData = { topContent: [], contentRequests: [], categoryPerformance: {} };
+const EMPTY_ANALYTICS: AnalyticsData = {
+  phaseVelocity: [], topicCoverage: [], publishingTrend: [], activityHeatmap: [],
+  bottleneckReport: [], completionFunnel: [], contentPathBreakdown: [],
+  eventEngagementHeatmap: [], eventFunnelAnalysis: [],
+  geographicDistribution: { states: [] }, journeyTimes: [], publishedPerMonth: [],
+  realtimeActivityFeed: [], selfCompleteRatio: [], stalledCreators: [],
+};
+
 export default function CreatorAnalyticsPage() {
   const router = useRouter();
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
@@ -466,13 +479,17 @@ export default function CreatorAnalyticsPage() {
 
     fetch('/api/admin/analytics')
       .then(r => r.json())
-      .then(d => setAnalyticsData(d))
+      .then(d => setAnalyticsData({ ...EMPTY_ANALYTICS, ...(d || {}) }))
       .catch(err => console.error('[creator analytics] analytics failed:', err))
       .finally(() => setAnalyticsLoading(false));
 
-    fetch('/api/tdi-admin/hub-connections')
+    // ?section=creators matters. Without it the response has no topContent and
+    // the page throws on .slice(). The parameter was on the original call and
+    // was lost when this fetch moved here, which took the page down in
+    // production while a stubbed harness render looked fine.
+    fetch('/api/tdi-admin/hub-connections?section=creators')
       .then(r => r.json())
-      .then(d => setHubCreatorData(d))
+      .then(d => setHubCreatorData({ ...EMPTY_HUB, ...(d || {}) }))
       .catch(err => console.error('[creator analytics] hub connections failed:', err))
       .finally(() => setHubCreatorLoading(false));
 
