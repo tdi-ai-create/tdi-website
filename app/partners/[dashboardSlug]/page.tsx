@@ -379,6 +379,9 @@ export default function PartnerDashboard() {
 
   // Data state
   const [partnership, setPartnership] = useState<Partnership | null>(null);
+  // True when a TDI admin is looking rather than the school. Used to keep
+  // staff visits out of the client's own engagement numbers.
+  const [viewerIsAdmin, setViewerIsAdmin] = useState(false);
   const [organization, setOrganization] = useState<Organization | null>(null);
   const [actionItems, setActionItems] = useState<ActionItem[]>([]);
   const [partnershipKpis, setPartnershipKpis] = useState<{ kpi_key: string; kpi_label: string; target_value: number; target_unit: string; current_value: number; benchmark_low: number; benchmark_high: number; how_tdi_delivers: string; status: string }[]>([]);
@@ -718,6 +721,11 @@ export default function PartnerDashboard() {
   // Track tab view
   const trackTabView = useCallback(async (tabName: string, duration: number) => {
     if (!partnership?.id || !userId) return;
+    // A TDI admin checking the dashboard is not the school using it. This table
+    // was empty until 29 Aug because every insert failed, so getting this right
+    // now is the difference between a clean metric and one that is wrong from
+    // its first row.
+    if (viewerIsAdmin) return;
 
     try {
       await fetch('/api/partners/track-view', {
@@ -733,7 +741,7 @@ export default function PartnerDashboard() {
     } catch (error) {
       console.error('Error tracking view:', error);
     }
-  }, [partnership?.id, userId]);
+  }, [partnership?.id, userId, viewerIsAdmin]);
 
   // Handle tab change with tracking
   const handleTabChange = useCallback((newTab: string) => {
@@ -811,6 +819,7 @@ export default function PartnerDashboard() {
         }
 
         setPartnership(authData.partnership);
+        setViewerIsAdmin(Boolean(authData.isAdmin));
         setIsAuthorized(true);
 
         // Load additional data
