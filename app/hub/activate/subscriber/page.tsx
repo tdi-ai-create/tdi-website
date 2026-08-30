@@ -83,16 +83,41 @@ export default function SubscriberActivatePage() {
         const grantedAt = new Date().toISOString().slice(0, 10);
         const expiresAt = new Date(Date.now() + 35 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
 
-        // Non-critical backup grant. Membership tier is the real source of truth.
-        await supabase
+        // Backup grant. The membership tier written above is the real source of
+        // truth, so this does not block activation.
+        //
+        // It used to upsert on (user_id, reason). comped_access_grants has no
+        // unique index on that pair, so Postgres answered 42P10 every time and
+        // the error was discarded, meaning the backup this exists to be has
+        // never been written once. Look the row up and insert or update it,
+        // which needs no constraint.
+        const { data: existingGrant, error: grantLookupError } = await supabase
           .from('comped_access_grants')
-          .upsert({
-            user_id: user.id,
+          .select('id')
+          .eq('user_id', user.id)
+          .eq('reason', 'substack_paid_subscriber')
+          .maybeSingle();
+
+        if (grantLookupError) {
+          console.error('[activate/subscriber] grant lookup failed:', grantLookupError.message);
+        } else {
+          const grantFields = {
             tier_granted: 'Essentials',
             granted_at: grantedAt,
             expires_at: expiresAt,
-            reason: 'substack_paid_subscriber',
-          }, { onConflict: 'user_id,reason' });
+          };
+          const { error: grantError } = existingGrant
+            ? await supabase.from('comped_access_grants').update(grantFields).eq('id', existingGrant.id)
+            : await supabase.from('comped_access_grants').insert({
+                user_id: user.id,
+                reason: 'substack_paid_subscriber',
+                ...grantFields,
+              });
+
+          if (grantError) {
+            console.error('[activate/subscriber] backup grant not written:', grantError.message);
+          }
+        }
 
         setStatus('success');
       } catch (err) {

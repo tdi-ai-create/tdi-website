@@ -297,44 +297,43 @@ export async function POST(request: NextRequest) {
       .eq('id', dealId);
     if (stageErr) console.error('[deal-to-partnership] partnership created but the deal was not marked signed:', stageErr.message);
 
-    // 8. Provision Hub access for contact
+    // 8. Provision Hub access for contact.
+    //
+    // This used to write hub_memberships directly with { email, is_active } and
+    // onConflict 'email'. That table has no email column, no is_active column,
+    // and no unique index on email, and its user_id is NOT NULL and was never
+    // supplied. Four reasons it could not work, and it never once did. The
+    // check around it also only ran when the person had no Hub profile, while
+    // user_id requires one, so the branch was unreachable in the case it aimed
+    // at.
+    //
+    // api/hub/provision is the route that actually provisions: it creates the
+    // auth user and profile when they are missing, then writes the membership
+    // with the columns that exist. Calling it also means the seat carries its
+    // partnership_id, which is what stops it becoming another unattributed seat.
     let hubProvisioned = false;
     if (deal.contact_email) {
       try {
-        const hubUrl = process.env.LEARNING_HUB_SUPABASE_URL || process.env.NEXT_PUBLIC_LEARNING_HUB_SUPABASE_URL;
-        const hubKey = process.env.LEARNING_HUB_SUPABASE_SERVICE_KEY;
+        const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.teachersdeserveit.com';
+        const provResp = await fetch(`${baseUrl}/api/hub/provision`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: deal.contact_email.toLowerCase(),
+            name: deal.contact_name || undefined,
+            tier: 'all_access',
+            source: 'district_partner',
+            dealId: deal.id,
+            partnershipId,
+          }),
+        });
 
-        if (hubUrl && hubKey) {
-          const hubSupabase = createClient(hubUrl, hubKey, {
-            auth: { autoRefreshToken: false, persistSession: false },
-          });
-
-          // Check if Hub account already exists
-          const { data: existingProfile } = await hubSupabase
-            .from('hub_profiles')
-            .select('id')
-            .eq('email', deal.contact_email.toLowerCase())
-            .limit(1);
-
-          if (!existingProfile || existingProfile.length === 0) {
-            // Create Hub membership with All-Access
-            const { error: membershipError } = await hubSupabase
-              .from('hub_memberships')
-              .upsert({
-                email: deal.contact_email.toLowerCase(),
-                tier: 'all_access',
-                source: 'district_partner',
-                partnership_id: partnershipId,
-                is_active: true,
-              }, { onConflict: 'email' });
-
-            if (!membershipError) {
-              hubProvisioned = true;
-              console.log('[deal-to-partnership] Hub access provisioned for:', deal.contact_email);
-            }
-          } else {
-            hubProvisioned = true; // Already exists
-          }
+        if (provResp.ok) {
+          hubProvisioned = true;
+          console.log('[deal-to-partnership] Hub access provisioned for:', deal.contact_email);
+        } else {
+          const body = await provResp.text();
+          console.error('[deal-to-partnership] Hub provisioning failed:', provResp.status, body.slice(0, 200));
         }
       } catch (hubError) {
         console.error('[deal-to-partnership] Hub provisioning error (non-fatal):', hubError);

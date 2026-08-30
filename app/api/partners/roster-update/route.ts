@@ -187,6 +187,7 @@ export async function POST(request: NextRequest) {
               name: `${s.firstName} ${s.lastName}`.trim() || s.email.split('@')[0],
               tier: 'all_access',
               source: 'partner_roster_update',
+              partnershipId,
             }),
           });
 
