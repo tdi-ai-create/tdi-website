@@ -123,6 +123,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       partnership: enrichedPartnership,
+      // The dashboard uses this to skip view tracking for TDI staff. Without
+      // it, one of us opening a client's dashboard is recorded as the client
+      // opening it, which is the same mistake invite_accepted_at made.
+      isAdmin,
     });
   } catch (error) {
     console.error('Error in auth-check:', error);
