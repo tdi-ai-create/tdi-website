@@ -29,6 +29,7 @@ export function StaffRosterWithPhotos({ partnershipId, userEmail, editMode }: St
   const [loading, setLoading] = useState(true)
   const [selectedStaff, setSelectedStaff] = useState<StaffMember | null>(null)
   const [uploadingFor, setUploadingFor] = useState<string | null>(null)
+  const [photoError, setPhotoError] = useState<string | null>(null)
 
   const fetchStaff = useCallback(async () => {
     try {
@@ -61,10 +62,20 @@ export function StaffRosterWithPhotos({ partnershipId, userEmail, editMode }: St
       })
 
       if (res.ok) {
+        setPhotoError(null)
         fetchStaff()
+      } else {
+        // Silence here meant a photo could be uploaded, stored, and never
+        // appear, with nothing to tell you why. There is currently nowhere on
+        // the staff record to keep the URL, so this is expected to fail until
+        // that column exists. Say so rather than swallowing it.
+        const body = await res.text()
+        console.error('Failed to upload photo:', res.status, body.slice(0, 200))
+        setPhotoError('That photo could not be saved to the staff record. Nothing was changed.')
       }
     } catch (err) {
       console.error('Failed to upload photo:', err)
+      setPhotoError('That photo could not be saved to the staff record. Nothing was changed.')
     } finally {
       setUploadingFor(null)
     }
@@ -117,6 +128,9 @@ export function StaffRosterWithPhotos({ partnershipId, userEmail, editMode }: St
             <span className="text-xs text-gray-400">
               {staff.length} staff {withPhotos.length > 0 && `(${withPhotos.length} with photos)`}
             </span>
+            {photoError && (
+              <span className="text-xs text-red-600 font-medium">{photoError}</span>
+            )}
           </div>
           {withPhotos.length > 0 && (
             <div className="flex items-center gap-1">
