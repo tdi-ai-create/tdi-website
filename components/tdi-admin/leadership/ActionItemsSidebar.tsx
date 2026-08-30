@@ -66,7 +66,11 @@ export default function ActionItemsSidebar({ partnershipId, actionItems, onActio
   const completed = actionItems.filter(a => a.status === 'completed')
 
   const renderItem = (item: any) => {
-    const isOverdue = item.status !== 'completed' && item.due_date && new Date(item.due_date) < new Date()
+    // due_date is a date column, so new Date() parses it as midnight UTC. In
+    // Chicago that made an item overdue from 7pm the evening before it was due.
+    // T23:59:59 local gives it the whole of its due day.
+    const isOverdue =
+      item.status !== 'completed' && item.due_date && new Date(`${item.due_date}T23:59:59`) < new Date()
     return (
       <div key={item.id} className="group flex items-start gap-2 py-1.5 px-1 rounded-lg hover:bg-gray-50 transition" style={{ borderBottom: '1px solid #F9FAFB' }}>
         <button

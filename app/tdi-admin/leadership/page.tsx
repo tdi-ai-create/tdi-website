@@ -25,6 +25,7 @@ import {
   TYPE_SECTION_HEADER,
   TYPE_STAT_VALUE,
 } from '@/components/tdi-admin/ui/design-tokens';
+import { formatDateOnly } from '@/lib/format-date';
 
 // Leadership theme colors
 const theme = PORTAL_THEMES.leadership;
@@ -490,7 +491,7 @@ export default function LeadershipDashboardPage() {
                             <span className="flex items-center gap-1">
                               <Calendar className="w-3 h-3" />
                               Due{' '}
-                              {new Date(item.due_date).toLocaleDateString()}
+                              {formatDateOnly(item.due_date)}
                             </span>
                           </>
                         )}

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { SectionGuide, GUIDE_CONTENT } from '@/components/tdi-admin/InlineGuide'
+import { formatDateOnly } from '@/lib/format-date';
 
 interface ObservationNote {
   id: string
@@ -434,7 +435,7 @@ export default function ObservationPanel({
                       Visit #{visit.visit_number}
                     </span>
                     <span className="text-xs text-gray-500">
-                      {new Date(visit.visit_date + 'T12:00:00').toLocaleDateString('en-US', {
+                      {formatDateOnly(visit.visit_date, {
                         month: 'short',
                         day: 'numeric',
                         year: 'numeric',

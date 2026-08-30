@@ -32,6 +32,7 @@ import ErrorBoundary from '@/components/tdi-admin/leadership/ErrorBoundary'
 import YourPeoplePanel from '@/components/tdi-admin/leadership/YourPeoplePanel'
 import LogSessionPanel from '@/components/tdi-admin/leadership/LogSessionPanel'
 import ObservationPanel from '@/components/tdi-admin/leadership/ObservationPanel'
+import { formatDateOnly } from '@/lib/format-date';
 
 const NOTE_TYPE_COLORS: Record<string, string> = {
   general: 'bg-gray-100 text-gray-700',
@@ -614,7 +615,7 @@ export default function AdminPartnershipDetailPage() {
           variant: daysUntilEnd <= 30 ? 'urgent' : 'secondary',
           onClick: () => {
             setNewNoteType('strategy')
-            setNewNoteContent(`Renewal discussion: contract expires ${new Date(partnership.contract_end).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}. `)
+            setNewNoteContent(`Renewal discussion: contract expires ${formatDateOnly(partnership.contract_end)}. `)
             document.querySelector('textarea')?.focus()
           },
         })
@@ -868,9 +869,9 @@ export default function AdminPartnershipDetailPage() {
                 {location && <>{location} &middot; </>}
                 {partnership.contract_start && (
                   <>
-                    {new Date(partnership.contract_start).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+                    {formatDateOnly(partnership.contract_start, { month: 'short', year: 'numeric' })}
                     {partnership.contract_end && (
-                      <> to {new Date(partnership.contract_end).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}</>
+                      <> to {formatDateOnly(partnership.contract_end, { month: 'short', year: 'numeric' })}</>
                     )}
                   </>
                 )}
@@ -1444,7 +1445,7 @@ export default function AdminPartnershipDetailPage() {
                       <div className="flex items-center justify-between mb-1.5">
                         <span className="text-xs font-medium text-gray-800">{obs.observation_title}</span>
                         <span className="text-[10px] text-gray-400">
-                          {new Date(obs.observation_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                          {formatDateOnly(obs.observation_date, { month: 'short', day: 'numeric' })}
                         </span>
                       </div>
                       <div className="grid grid-cols-3 gap-2 text-center">
