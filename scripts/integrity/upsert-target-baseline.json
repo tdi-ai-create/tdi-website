@@ -722,10 +722,6 @@
    "user_id"
   ]
  },
- "_known_broken_comment": "Call sites that name a conflict target which does not exist. Each one fails with 42P10 every time it runs. Listed so the check can fail on NEW ones rather than on this backlog. Fix a line, delete its entry, and it can never come back quietly. Found 29 Aug 2026 while auditing onboarding; these three are outside that scope and unfixed.",
- "known_broken": {
-  "app/api/admin/deal-to-partnership/route.ts": "hub_memberships names (email); the table has no email column at all",
-  "app/api/funding/pursuits/[id]/playbook/route.ts": "funding_pursuit_timeline names (pursuit_id,event_title); only (id) is unique",
-  "app/hub/activate/subscriber/page.tsx": "comped_access_grants names (user_id,reason); only (id) is unique. This is the Substack activation path"
- }
+ "_known_broken_comment": "Call sites that name a conflict target which does not exist. Empty as of 30 Aug 2026: all three were fixed rather than tolerated. Keep it empty. If you must add an entry, say why it cannot be fixed now, because every entry here is a write that fails every time.",
+ "known_broken": {}
 }

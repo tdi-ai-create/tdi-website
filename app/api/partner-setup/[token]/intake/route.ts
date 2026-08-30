@@ -163,10 +163,14 @@ export async function POST(
         billingUpdate.billing_contact_updated_at = new Date().toISOString();
       }
 
-      await supabase
+      const { error: billingError } = await supabase
         .from('partnerships')
         .update(billingUpdate)
         .eq('id', partnership.id);
+
+      if (billingError) {
+        console.error('[partner-setup/intake] billing details not saved:', billingError.message);
+      }
 
       // Create or update organization (simplified fields)
       const { data: existingOrg } = await supabase
@@ -183,38 +187,76 @@ export async function POST(
       };
 
       if (existingOrg) {
-        await supabase
+        const { error: orgUpdateError } = await supabase
           .from('organizations')
           .update({
             ...orgRecord,
             updated_at: new Date().toISOString(),
           })
           .eq('id', existingOrg.id);
+
+        if (orgUpdateError) {
+          console.error('[partner-setup/intake] organization not updated:', orgUpdateError.message);
+        }
       } else {
-        await supabase.from('organizations').insert({
+        const { error: orgInsertError } = await supabase.from('organizations').insert({
           partnership_id: partnership.id,
           ...orgRecord,
         });
+
+        if (orgInsertError) {
+          console.error('[partner-setup/intake] organization not created:', orgInsertError.message);
+        }
       }
 
       // Log activity
-      await supabase.from('activity_log').insert({
+      const { error: activityError } = await supabase.from('activity_log').insert({
         partnership_id: partnership.id,
         user_id: userId,
         action: 'intake_step1_completed',
         details: { org_name: orgData.name },
       });
 
+      if (activityError) {
+        console.error('[partner-setup/intake] activity log insert failed:', activityError.message);
+      }
+
       return NextResponse.json({ success: true });
     }
 
     // Step 2: Save staff roster (final step)
     if (step === 2 && staff) {
-      // Delete existing staff
-      await supabase
+      // Delete existing staff.
+      //
+      // This is a delete followed by an insert, and neither was checked. If the
+      // delete succeeded and the insert then failed, the school lost its entire
+      // roster and was told the step had saved. Read the current rows first so
+      // they can be put back, and refuse to delete anything if that read fails.
+      const { data: previousStaff, error: readError } = await supabase
+        .from('staff_members')
+        .select('*')
+        .eq('partnership_id', partnership.id);
+
+      if (readError) {
+        console.error('[intake] could not read the existing roster:', readError.message);
+        return NextResponse.json(
+          { error: `Could not read your current roster, so nothing was changed: ${readError.message}` },
+          { status: 500 }
+        );
+      }
+
+      const { error: deleteError } = await supabase
         .from('staff_members')
         .delete()
         .eq('partnership_id', partnership.id);
+
+      if (deleteError) {
+        console.error('[intake] roster delete failed:', deleteError.message);
+        return NextResponse.json(
+          { error: `Could not replace your roster, so nothing was changed: ${deleteError.message}` },
+          { status: 500 }
+        );
+      }
 
       // Insert staff members (no building_id since buildings step removed)
       const staffData = staff.map((s: {
@@ -232,7 +274,33 @@ export async function POST(
         hub_enrolled: false,
       }));
 
-      await supabase.from('staff_members').insert(staffData);
+      const { error: insertError } = await supabase.from('staff_members').insert(staffData);
+
+      if (insertError) {
+        // The old roster is already gone, so put it back rather than leaving
+        // the school with nothing.
+        console.error('[intake] roster insert failed, restoring the previous roster:', insertError.message);
+        let restored = false;
+        if (previousStaff && previousStaff.length > 0) {
+          const { error: restoreError } = await supabase.from('staff_members').insert(previousStaff);
+          restored = !restoreError;
+          if (restoreError) {
+            console.error('[intake] RESTORE FAILED, roster is now empty:', restoreError.message);
+          }
+        } else {
+          restored = true; // there was nothing to lose
+        }
+
+        return NextResponse.json(
+          {
+            error: restored
+              ? `Could not save your roster, and your previous one has been put back: ${insertError.message}`
+              : `Could not save your roster and could not restore the previous one. Contact info@teachersdeserveit.com. ${insertError.message}`,
+            restored,
+          },
+          { status: 500 }
+        );
+      }
 
       // Auto-provision Hub accounts for each staff member
       const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.teachersdeserveit.com';
@@ -247,13 +315,18 @@ export async function POST(
               name: `${s.first_name} ${s.last_name}`.trim() || s.email.split('@')[0],
               tier: 'all_access',
               source: 'partner_intake',
+              partnershipId: partnership.id,
             }),
           });
           if (provResp.ok) {
-            await supabase.from('staff_members')
+            const { error: enrolledError } = await supabase.from('staff_members')
               .update({ hub_enrolled: true })
               .eq('partnership_id', partnership.id)
               .eq('email', s.email);
+
+            if (enrolledError) {
+              console.error('[partner-setup/intake] Hub seat created but hub_enrolled not set:', enrolledError.message);
+            }
             // Send staff welcome email
             fetch(`${baseUrl}/api/hub/emails/staff-welcome`, {
               method: 'POST',
@@ -348,7 +421,11 @@ export async function POST(
         },
       ];
 
-      await supabase.from('action_items').insert(defaultItems);
+      const { error: itemsError } = await supabase.from('action_items').insert(defaultItems);
+
+      if (itemsError) {
+        console.error('[partner-setup/intake] default action items not created:', itemsError.message);
+      }
 
       // Get the slug for redirect
       const { data: updatedPartnership } = await supabase
@@ -358,7 +435,7 @@ export async function POST(
         .single();
 
       // Update partnership status to active
-      await supabase
+      const { error: activateError } = await supabase
         .from('partnerships')
         .update({
           status: 'active',
@@ -366,8 +443,12 @@ export async function POST(
         })
         .eq('id', partnership.id);
 
+      if (activateError) {
+        console.error('[partner-setup/intake] partnership not marked active:', activateError.message);
+      }
+
       // Log activities
-      await supabase.from('activity_log').insert([
+      const { error: activityError2 } = await supabase.from('activity_log').insert([
         {
           partnership_id: partnership.id,
           user_id: userId,
@@ -381,6 +462,10 @@ export async function POST(
           details: {},
         },
       ]);
+
+      if (activityError2) {
+        console.error('[partner-setup/intake] activity log insert failed:', activityError2.message);
+      }
 
       return NextResponse.json({
         success: true,

@@ -16,7 +16,7 @@ function getHubAdmin() {
  */
 export async function POST(request: NextRequest) {
   try {
-    const { email, name, tier, source, dealId } = await request.json();
+    const { email, name, tier, source, dealId, partnershipId } = await request.json();
 
     if (!email || !tier) {
       return NextResponse.json({ error: 'Missing email or tier' }, { status: 400 });
@@ -53,8 +53,10 @@ export async function POST(request: NextRequest) {
 
       userId = authUser.user.id;
 
-      // Create hub_profile
-      await hub.from('hub_profiles').upsert({
+      // Create hub_profile. The auth user already exists at this point, so a
+      // failure here leaves someone who can sign in but has no profile, which
+      // breaks every screen that joins on it. Worth failing the request.
+      const { error: profileError } = await hub.from('hub_profiles').upsert({
         id: userId,
         email,
         display_name: name || email.split('@')[0],
@@ -63,9 +65,21 @@ export async function POST(request: NextRequest) {
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       }, { onConflict: 'id' });
+
+      if (profileError) {
+        console.error('[Provision] Profile error:', profileError);
+        return NextResponse.json({ error: 'Failed to create profile: ' + profileError.message }, { status: 500 });
+      }
     }
 
-    // Create/update membership
+    // Create/update membership.
+    //
+    // partnershipId is the important part. This route did not accept one, and
+    // the roster upload that calls it did not pass one, so every seat a school
+    // provisioned through onboarding was created with partnership_id null. That
+    // is why 38 live all-access seats belonged to no partnership on 29 Aug: not
+    // a broken link, a link that was never made. Fifteen of those educators were
+    // actively using the Hub and appeared on no leadership screen.
     const { error: memberError } = await hub
       .from('hub_memberships')
       .upsert({
@@ -73,6 +87,7 @@ export async function POST(request: NextRequest) {
         tier,
         source: source || 'sales_deal',
         status: 'active',
+        ...(partnershipId ? { partnership_id: partnershipId } : {}),
       }, { onConflict: 'user_id' });
 
     if (memberError) {
@@ -80,18 +95,24 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to create membership' }, { status: 500 });
     }
 
-    // Log the provisioning
-    await hub.from('hub_activity_log').insert({
+    // Log the provisioning. The seat is already live, so a failure here is not
+    // worth failing the request over, but it must not pass silently.
+    const { error: logError } = await hub.from('hub_activity_log').insert({
       user_id: userId,
       action: 'account_provisioned',
-      metadata: { tier, source, deal_id: dealId, provisioned_by: 'sales_panel' },
+      metadata: { tier, source, deal_id: dealId, partnership_id: partnershipId ?? null },
     });
+
+    if (logError) {
+      console.error('[Provision] activity log insert failed:', logError.message);
+    }
 
     return NextResponse.json({
       success: true,
       userId,
       email,
       tier,
+      partnershipId: partnershipId ?? null,
       isNew: !existingProfile,
     });
   } catch (error) {

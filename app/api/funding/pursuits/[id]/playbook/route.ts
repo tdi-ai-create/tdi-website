@@ -122,15 +122,46 @@ export async function POST(
   }
 
   if (action === 'complete') {
-    // Add to timeline as complete
-    await supabase.from('funding_pursuit_timeline').upsert({
-      pursuit_id: pursuitId,
-      event_title: stepId,
+    // Add to timeline as complete.
+    //
+    // This upserted on (pursuit_id, event_title). funding_pursuit_timeline has
+    // no unique index on that pair, only its primary key, so Postgres answered
+    // 42P10 every time and the error was discarded. Marking a playbook step
+    // complete has never written a timeline row. Look it up, then insert or
+    // update, which needs no constraint.
+    const timelineFields = {
       event_date: new Date().toISOString().split('T')[0],
       event_detail: note || `Completed: ${step.title}`,
       status: 'complete',
       display_order: PLAYBOOK_STEPS.indexOf(step),
-    }, { onConflict: 'pursuit_id,event_title' });
+    };
+
+    const { data: existingEvent, error: timelineLookupError } = await supabase
+      .from('funding_pursuit_timeline')
+      .select('id')
+      .eq('pursuit_id', pursuitId)
+      .eq('event_title', stepId)
+      .maybeSingle();
+
+    if (timelineLookupError) {
+      console.error('[playbook] timeline lookup failed:', timelineLookupError.message);
+      return NextResponse.json({ error: timelineLookupError.message }, { status: 500 });
+    }
+
+    const { error: timelineError } = existingEvent
+      ? await supabase.from('funding_pursuit_timeline').update(timelineFields).eq('id', existingEvent.id)
+      : await supabase.from('funding_pursuit_timeline').insert({
+          pursuit_id: pursuitId,
+          event_title: stepId,
+          ...timelineFields,
+        });
+
+    // Recording the step is the point of this request, so do not report success
+    // over a write that did not happen.
+    if (timelineError) {
+      console.error('[playbook] timeline write failed:', timelineError.message);
+      return NextResponse.json({ error: timelineError.message }, { status: 500 });
+    }
 
     // Update pursuit phase based on completed steps
     const phaseMap: Record<string, string> = {
@@ -145,7 +176,7 @@ export async function POST(
 
     const newPhase = phaseMap[step.phase];
     if (newPhase) {
-      await supabase
+      const { error: phaseError } = await supabase
         .from('funding_pursuits')
         .update({
           current_phase: newPhase,
@@ -154,6 +185,12 @@ export async function POST(
           updated_at: new Date().toISOString(),
         })
         .eq('id', pursuitId);
+
+      // The step is recorded either way, but a pursuit stuck in the wrong phase
+      // is the kind of thing that gets noticed weeks later.
+      if (phaseError) {
+        console.error('[playbook] phase not advanced:', phaseError.message);
+      }
     }
 
     // Also add as a note on the linked partnership
@@ -164,13 +201,17 @@ export async function POST(
       .single();
 
     if (pursuit?.partnership_id) {
-      await supabase.from('partnership_notes').insert({
+      const { error: noteError } = await supabase.from('partnership_notes').insert({
         partnership_id: pursuit.partnership_id,
         content: `Grant step completed: ${step.title}${note ? `. ${note}` : ''}`,
         author: auth.member.email || 'TDI System',
         note_type: 'general',
         visible_to_partner: false,
       });
+
+      if (noteError) {
+        console.error('[playbook] partnership note not written:', noteError.message);
+      }
     }
   }
 
@@ -187,20 +228,30 @@ export async function POST(
     const existingNotes = pursuit?.internal_notes || '';
     const updatedNotes = existingNotes ? `${newNote}\n\n${existingNotes}` : newNote;
 
-    await supabase
+    // Saving the note is the whole request, so say so if it did not save.
+    const { error: notesError } = await supabase
       .from('funding_pursuits')
       .update({ internal_notes: updatedNotes, updated_at: new Date().toISOString() })
       .eq('id', pursuitId);
 
+    if (notesError) {
+      console.error('[playbook] internal note not saved:', notesError.message);
+      return NextResponse.json({ error: notesError.message }, { status: 500 });
+    }
+
     // Cross-reference: also add to partnership notes
     if (pursuit?.partnership_id) {
-      await supabase.from('partnership_notes').insert({
+      const { error: crossRefError } = await supabase.from('partnership_notes').insert({
         partnership_id: pursuit.partnership_id,
         content: `Grant note (${step.title}): ${note}`,
         author: auth.member.email || 'TDI System',
         note_type: 'general',
         visible_to_partner: false,
       });
+
+      if (crossRefError) {
+        console.error('[playbook] cross-referenced note not written:', crossRefError.message);
+      }
     }
   }
 
