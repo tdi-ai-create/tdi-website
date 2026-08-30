@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
     const schoolName = partnership?.org_name || partnership?.contact_name || 'Partnership';
 
     // Log the request
-    await supabase.from('activity_log').insert({
+    const { error: logError } = await supabase.from('activity_log').insert({
       partnership_id: partnershipId,
       action: 'team_access_requested',
       details: {
@@ -43,6 +43,10 @@ export async function POST(request: NextRequest) {
         members: newMembers,
       },
     });
+
+    if (logError) {
+      console.error('[partners/request-access] activity_log insert failed:', logError.message);
+    }
 
     // Notify TDI team
     if (RESEND_API_KEY) {

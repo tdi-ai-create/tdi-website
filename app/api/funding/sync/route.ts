@@ -240,7 +240,22 @@ export async function GET(request: NextRequest) {
       .not('status', 'in', '("closed","awarded","denied")')
 
     if (agent) {
-      researchQuery = researchQuery.eq('assigned_agent', agent)
+      // Unassigned research is offered to whoever asks, not hidden from
+      // everyone.
+      //
+      // Drafting is assigned deliberately: a narrative belongs to Vanessa and
+      // filtering it by name is correct. Research is not assigned to anybody,
+      // so applying the same filter meant an agent asking "what is my work"
+      // matched zero rows, while the same call without a name returned nine.
+      //
+      // Amara is the research agent. She has been asking and being told there
+      // is nothing, for ten days, while nine funders discovered on 19 August
+      // sat with research_status 'requested'. That is why the catalogue holds
+      // eighteen funders and not one of them has ever been researched.
+      //
+      // Named assignment still wins where it exists, so work can be pointed at
+      // a specific agent when that matters.
+      researchQuery = researchQuery.or(`assigned_agent.eq.${agent},assigned_agent.is.null`)
     }
 
     const { data: rawResearchWork } = await researchQuery

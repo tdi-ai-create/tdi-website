@@ -130,21 +130,43 @@ export async function POST(request: NextRequest) {
     let created = 0;
     for (const item of plan) {
       const pattern = PATTERNS.find((p) => p.key === item.flagKey)!;
-      const { error: insertError } = await supabase.from('partnership_flags').upsert(
-        {
-          partnership_id: item.partnershipId,
-          flag_key: item.flagKey,
-          severity: pattern.severity,
-          message: pattern.message,
-          detail: { backfilled: true, collapsedFrom: item.collapsedFrom },
-          first_raised_at: item.firstRaisedAt,
-          last_seen_at: item.lastSeenAt,
-        },
-        { onConflict: 'partnership_id,flag_key', ignoreDuplicates: false }
-      );
+      // The unique index on (partnership_id, flag_key) is partial, scoped to
+      // resolved_at is null. PostgREST turns onConflict into ON CONFLICT
+      // (partnership_id, flag_key), which cannot match a partial index, so this
+      // used to answer 42P10 on every row and write nothing. The cron had the
+      // same bug and was fixed the same way: look the open flag up, then insert
+      // or update it. This route has never been run, so nothing was lost.
+      const { data: existing, error: findError } = await supabase
+        .from('partnership_flags')
+        .select('id')
+        .eq('partnership_id', item.partnershipId)
+        .eq('flag_key', item.flagKey)
+        .is('resolved_at', null)
+        .maybeSingle();
 
-      if (insertError) {
-        console.error('[backfill-flags] insert failed:', item.partnershipId, item.flagKey, insertError.message);
+      if (findError) {
+        console.error('[backfill-flags] lookup failed:', item.partnershipId, item.flagKey, findError.message);
+        continue;
+      }
+
+      const payload = {
+        severity: pattern.severity,
+        message: pattern.message,
+        detail: { backfilled: true, collapsedFrom: item.collapsedFrom },
+        first_raised_at: item.firstRaisedAt,
+        last_seen_at: item.lastSeenAt,
+      };
+
+      const { error: writeError } = existing
+        ? await supabase.from('partnership_flags').update(payload).eq('id', existing.id)
+        : await supabase.from('partnership_flags').insert({
+            partnership_id: item.partnershipId,
+            flag_key: item.flagKey,
+            ...payload,
+          });
+
+      if (writeError) {
+        console.error('[backfill-flags] write failed:', item.partnershipId, item.flagKey, writeError.message);
         continue;
       }
       created++;
