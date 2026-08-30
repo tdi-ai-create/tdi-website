@@ -63,7 +63,7 @@ export async function GET(_request: NextRequest) {
     // Fetch partnership info for each
     const { data: partnerships } = await supabase
       .from('partnerships')
-      .select('id, contact_name, slug')
+      .select('id, org_name, contact_name, slug')
       .in('id', partnershipIds);
 
     // Fetch organization names
@@ -77,7 +77,12 @@ export async function GET(_request: NextRequest) {
     partnerships?.forEach((p) => {
       const org = organizations?.find((o) => o.partnership_id === p.id);
       partnershipMap.set(p.id, {
-        org_name: org?.name,
+        // partnerships.org_name first. This read only the organizations table,
+        // and Addison and Tidioute have no row there, so their action items
+        // fell back to the contact and the list showed "Melissa Mahaney" where
+        // every other row showed a school. The detail route was fixed for the
+        // same reason in August; this one was missed.
+        org_name: p.org_name || org?.name,
         contact_name: p.contact_name,
         slug: p.slug,
       });
