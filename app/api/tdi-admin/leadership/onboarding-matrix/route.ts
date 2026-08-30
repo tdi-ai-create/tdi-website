@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminAuth } from '@/lib/tdi-admin/auth';
 import { createClient } from '@supabase/supabase-js';
 import { getHubServiceClient, isEngagementAction } from '@/lib/hub/partnership-members';
+import { getSchoolSignIns } from '@/lib/partners/signed-in';
 
 /**
  * Where every active partnership stands, on one screen.
@@ -139,11 +140,10 @@ export async function GET(_request: NextRequest) {
     // Everything below is fetched once for all partnerships rather than per
     // row. Nine partnerships today, but a per-row loop is how a page like this
     // quietly becomes unusable at forty.
-    const [staffRes, kpiRes, actionRes, activityRes, seatRes, profileRes] = await Promise.all([
+    const [staffRes, kpiRes, actionRes, seatRes, profileRes] = await Promise.all([
       portal.from('staff_members').select('partnership_id, email, is_active').in('partnership_id', ids),
       portal.from('partnership_kpis').select('partnership_id, status').in('partnership_id', ids),
       portal.from('action_items').select('partnership_id, title, category, status').in('partnership_id', ids),
-      portal.from('activity_log').select('partnership_id, action, created_at').in('partnership_id', ids),
       hub
         .from('hub_memberships')
         .select('user_id, partnership_id')
@@ -157,7 +157,6 @@ export async function GET(_request: NextRequest) {
       ['staff_members', staffRes],
       ['partnership_kpis', kpiRes],
       ['action_items', actionRes],
-      ['activity_log', activityRes],
       ['hub_memberships', seatRes],
       ['hub_profiles', profileRes],
     ] as const) {
@@ -394,12 +393,12 @@ export async function GET(_request: NextRequest) {
       actionsByPartnership.get(a.partnership_id)!.push(a as never);
     }
 
-    const loginByPartnership = new Map<string, string>();
-    for (const ev of activityRes.data ?? []) {
-      if (ev.action !== 'login' && ev.action !== 'dashboard_viewed') continue;
-      const prev = loginByPartnership.get(ev.partnership_id);
-      if (!prev || ev.created_at > prev) loginByPartnership.set(ev.partnership_id, ev.created_at);
-    }
+    // Dashboard access comes from auth.users.last_sign_in_at across every
+    // linked user, the same source the never signed in card uses, so the two
+    // cannot disagree on one screen. activity_log used to answer this and has
+    // holes: its login and dashboard_viewed writes were unchecked until 29 Aug,
+    // so it has nothing for Tidioute, who signed in on 29 July.
+    const signIns = await getSchoolSignIns(portal, ids);
 
     const now = Date.now();
 
@@ -410,7 +409,8 @@ export async function GET(_request: NextRequest) {
       const contracted = p.staff_enrolled ?? 0;
       const kpis = kpisByPartnership.get(p.id) ?? 0;
       const actions = actionsByPartnership.get(p.id) ?? [];
-      const lastLogin = loginByPartnership.get(p.id) ?? null;
+      const signIn = signIns.get(p.id);
+      const lastLogin = signIn?.lastSignInAt ?? null;
 
       const services =
         (p.observation_days_total ?? 0) + (p.virtual_sessions_total ?? 0) + (p.executive_sessions_total ?? 0);
@@ -430,10 +430,12 @@ export async function GET(_request: NextRequest) {
         {
           key: 'dashboard_access',
           label: STEP_LABELS[0],
-          state: lastLogin ? 'done' : 'gap',
-          evidence: lastLogin
-            ? `Leader last seen ${new Date(lastLogin).toISOString().slice(0, 10)}.`
-            : 'The leader has never opened their dashboard. Invite acceptance is not counted here because an auth check stamps it automatically.',
+          state: signIn?.unknown ? 'na' : lastLogin ? 'done' : 'gap',
+          evidence: signIn?.unknown
+            ? 'Could not read the sign in records, so this is unknown rather than missing.'
+            : lastLogin
+              ? `${signIn?.signedInEmails.join(', ') || 'Someone'} last signed in ${new Date(lastLogin).toISOString().slice(0, 10)}.`
+              : 'Nobody linked to this partnership has ever signed in. Invite acceptance is not counted, because an auth check stamps it automatically.',
         },
         {
           key: 'roster_loaded',
