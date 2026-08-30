@@ -7,8 +7,8 @@ const HUB_URL = 'https://www.teachersdeserveit.com/hub';
 // Each role gets a specific starting point that matches their daily reality
 const ROLE_RECOMMENDATIONS: Record<string, { title: string; slug: string; why: string }> = {
   para: {
-    title: 'What Should I Be Doing Right Now? A Para Guide for Teacher Support',
-    slug: 'what-should-i-be-doing-right-now-para-guide',
+    title: 'What should I be doing right now? A Para Guide for Teacher Support',
+    slug: 'para-what-to-do-now',
     why: 'It covers exactly what to do during every part of the lesson cycle',
   },
   teacher: {
@@ -18,7 +18,7 @@ const ROLE_RECOMMENDATIONS: Record<string, { title: string; slug: string; why: s
   },
   leader: {
     title: 'The Culture-First Leadership Framework',
-    slug: 'culture-first-leadership-framework',
+    slug: 'culture-first-leadership',
     why: 'It is a practical framework for putting school culture before programs',
   },
   coach: {
