@@ -1,4 +1,5 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { getSchoolSignIns } from '@/lib/partners/signed-in';
 
 // Types
 export interface Partnership {
@@ -723,46 +724,16 @@ export async function getPartnershipStats(): Promise<{
   // can only read otherwise when a partnership is created and left un-invited.
   const pendingSetup = all.filter(p => p.status === 'setup_in_progress' || (p.status === 'active' && !p.invite_sent_at)).length;
 
-  // Who has never signed in, taken from auth.users.last_sign_in_at.
-  //
-  // This used to read `invite_sent_at && !invite_accepted_at`, on the reasoning
-  // that the flag is stamped by an auth check so its absence means nobody ever
-  // authenticated. That was wrong in both directions, and the card named the
-  // wrong people on the Leadership home for a day.
-  //
-  // invite_accepted_at is set by paths other than a sign in, and is missing for
-  // leaders who have signed in. On 30 Aug it claimed Dee Neukirch and Melissa
-  // Mahaney had never signed in when Supabase had them at 12 Aug and 29 Jul,
-  // while missing Addison, Allenwood and St. Mary, who genuinely never have.
-  // Addison is the largest partnership we have.
-  //
-  // last_sign_in_at is Supabase's own record of an actual authentication. It is
-  // the only field here that means what it says, and it is what the Portal
-  // Access column has always used.
+  // Who has never signed in. One definition, shared with the onboarding matrix
+  // so the card and the Dashboard Access column cannot disagree. See
+  // lib/partners/signed-in.ts for why the three earlier answers were all wrong.
   const candidates = all.filter(
     p => p.invite_sent_at && p.status !== 'completed' && p.status !== 'paused'
   );
 
-  const signedInAt = new Map<string, string | null>();
-  await Promise.all(
-    candidates.map(async (p) => {
-      if (!p.portal_user_id) {
-        signedInAt.set(p.id as string, null);
-        return;
-      }
-      const { data, error: userError } = await supabase.auth.admin.getUserById(p.portal_user_id as string);
-      if (userError) {
-        // Do not guess. A lookup failure must not read as "never signed in",
-        // which would put a school on this list on the strength of an outage.
-        console.error(`[stats] could not read auth user for ${p.org_name}:`, userError.message);
-        signedInAt.set(p.id as string, 'unknown');
-        return;
-      }
-      signedInAt.set(p.id as string, data?.user?.last_sign_in_at ?? null);
-    })
-  );
+  const signIns = await getSchoolSignIns(supabase, candidates.map(p => p.id as string));
 
-  const neverSignedInRows = candidates.filter((p) => signedInAt.get(p.id as string) === null);
+  const neverSignedInRows = candidates.filter((p) => signIns.get(p.id as string)?.neverSignedIn);
   const awaitingAccept = neverSignedInRows.length;
   const neverSignedIn = neverSignedInRows
     .sort((a, b) => String(a.invite_sent_at).localeCompare(String(b.invite_sent_at)))
