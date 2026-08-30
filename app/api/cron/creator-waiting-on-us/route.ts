@@ -4,6 +4,7 @@ import { guardCron } from '@/lib/cron-guard';
 import { loadTeamWork, formatTeamWork } from '@/lib/creator-team-work';
 import { postCreatorMessage } from '@/lib/creator-slack';
 import { shouldPostDigest, recordDigestPost, recordDigestSuppressed, heartbeatNote } from '@/lib/digest-state';
+import { loadStaleApprovals, formatStaleApprovals } from '@/lib/stale-approvals';
 
 // ---------------------------------------------------------------------------
 // The daily "waiting on TDI" list
@@ -42,13 +43,27 @@ export async function GET(request: NextRequest) {
     });
 
     const items = await loadTeamWork(supabase);
-    const message = formatTeamWork(items);
+
+    // Approvals nobody has actioned in 48 hours. Both queues notify once when
+    // work arrives and never again, so a missed Slack ping used to mean a
+    // drafted grant email sat until the deadline passed.
+    const staleApprovals = await loadStaleApprovals(supabase);
+
+    const message = [formatTeamWork(items), formatStaleApprovals(staleApprovals)]
+      .filter(Boolean)
+      .join('\n\n');
 
     const result = {
       dryRun,
       waiting: items.length,
       oldestDays: items[0]?.daysWaiting ?? 0,
       unowned: items.filter((i) => i.kind === 'unassigned').length,
+      staleApprovals: staleApprovals.length,
+      staleApprovalDetail: staleApprovals.map((a) => ({
+        queue: a.queue,
+        label: a.label,
+        hours: a.hoursWaiting,
+      })),
       agentWorkNeverAsked: items.filter((i) => i.agentNeverAsked).length,
       items: items.map((i) => ({
         creator: i.creatorName,
@@ -60,7 +75,7 @@ export async function GET(request: NextRequest) {
       posted: false,
     };
 
-    if (items.length === 0) {
+    if (items.length === 0 && staleApprovals.length === 0) {
       console.log('[waiting-on-us] Nothing waiting on TDI, staying quiet');
       return NextResponse.json({ success: true, ...result });
     }
@@ -87,7 +102,7 @@ export async function GET(request: NextRequest) {
     }
 
     console.log(
-      `[waiting-on-us] ${dryRun ? 'DRY RUN ' : ''}${items.length} waiting, oldest ${result.oldestDays} days, ${result.unowned} unowned`
+      `[waiting-on-us] ${dryRun ? 'DRY RUN ' : ''}${items.length} waiting, oldest ${result.oldestDays} days, ${result.unowned} unowned, ${staleApprovals.length} approvals stale`
     );
 
     return NextResponse.json({ success: true, ...result });
