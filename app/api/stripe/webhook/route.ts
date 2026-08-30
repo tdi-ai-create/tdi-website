@@ -87,6 +87,11 @@ export async function POST(req: Request) {
                 tier: tier as 'essentials' | 'professional' | 'all_access',
                 source: 'stripe',
                 status: 'active',
+                // A paid subscription has no end date. If this user was previously on a
+                // comped trial, the old expires_at is still on the row, and getEffectiveTier
+                // checks expires_at before anything else — so a stale date silently drops a
+                // paying member to 'free'. Clear it on every paid upsert.
+                expires_at: null,
                 stripe_customer_id: typeof session.customer === 'string' ? session.customer : null,
                 stripe_subscription_id:
                   typeof session.subscription === 'string' ? session.subscription : null,
