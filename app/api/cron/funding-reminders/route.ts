@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { calculateFundingAlerts } from '@/lib/tdi-admin/funding-alert-rules'
 import { syncGateActionItems } from '@/lib/funding-gate-sync'
 import { loadSettings } from '@/lib/funding-slack'
+import { shouldPostDigest, recordDigestPost, recordDigestSuppressed, heartbeatNote } from '@/lib/digest-state'
 import { guardCron } from '@/lib/cron-guard'
 import { NOT_TERMINAL_FILTER } from '@/lib/funding/task-status'
 
@@ -502,27 +503,46 @@ export async function GET(request: NextRequest) {
     const remaining = Math.max(0, alerts.length - accountedFor)
 
     let digestPosted = false
+    let digestReason = 'no-sections'
     if (sections.length > 0) {
       const settings = await loadSettings()
-      if (settings.slack_enabled && settings.slack_webhook_url && !dryRun) {
+
+      // Post when the situation changes, not because a day has passed. This
+      // digest was byte-identical on three consecutive days in August apart
+      // from a day counter, and nothing moved. See lib/digest-state.
+      const body = sections.join('\n\n')
+      const decision = await shouldPostDigest(supabase, 'funding-daily', body)
+      digestReason = decision.reason
+
+      if (!decision.post) {
+        await recordDigestSuppressed(supabase, 'funding-daily', decision.suppressedRuns)
+        console.log(
+          `[funding-reminders] Unchanged for ${decision.daysSinceLastPost} day(s), staying quiet`
+        )
+      } else if (settings.slack_enabled && settings.slack_webhook_url && !dryRun) {
         const mention = settings.bella_slack_handle ? ` <@${settings.bella_slack_handle}>` : ''
         const portalUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.teachersdeserveit.com'
         const tail = remaining > 0
           ? `\n_${remaining} other open alert${remaining === 1 ? '' : 's'} in the portal, none urgent._`
           : ''
+        const heading = decision.reason === 'heartbeat'
+          ? '*Grant work, still waiting*'
+          : '*Grant work for today*'
         await fetch(settings.slack_webhook_url, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             text:
-              `*Grant work for today*${mention}\n\n` +
-              `${sections.join('\n\n')}\n` +
-              `${tail}\n` +
+              `${heading}${mention}\n\n` +
+              `${body}\n` +
+              `${tail}` +
+              `${decision.reason === 'heartbeat' ? heartbeatNote(decision.daysSinceLastPost) : ''}\n` +
               `<${portalUrl}/tdi-admin/funding|Open the funding portal>`,
           }),
           // Loud on failure. Silence here means she is never told and the work
           // sits unseen, which is the failure this exists to prevent.
         }).catch(err => console.error('[funding-reminders] Daily digest post failed:', err))
+        await recordDigestPost(supabase, 'funding-daily', body)
         digestPosted = true
       } else {
         console.log('[funding-reminders] Slack disabled — would have posted', sections.length, 'section(s)')
@@ -537,6 +557,7 @@ export async function GET(request: NextRequest) {
       drafts_created: draftCount,
       drafts_waiting: draftsWaiting,
       digest_posted: digestPosted,
+      digest_reason: digestReason,
       digest_sections: sections.length,
       unlinked_contracts: unlinkedContracts,
       dryRun,
