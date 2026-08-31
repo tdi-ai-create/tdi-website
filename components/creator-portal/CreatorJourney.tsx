@@ -102,7 +102,26 @@ function StageRow({ stage, expanded, onToggle }: { stage: JourneyStage; expanded
   );
 }
 
-export function CreatorJourney({ journey }: { journey: Journey }) {
+export function CreatorJourney({
+  journey,
+  /**
+   * The rail's heading. Defaults to the creator's own wording; the admin view
+   * passes "Their journey" so the same component reads correctly when someone
+   * is looking at a creator rather than at themselves. A prop rather than a
+   * second copy of the component, because a second copy is exactly how the
+   * admin view fell three months behind the portal in the first place.
+   */
+  heading = 'Your journey',
+  /**
+   * How the legend names the open step. "you are here" is right when a creator
+   * reads their own rail and wrong when an admin reads someone else's.
+   */
+  hereLabel = 'you are here',
+}: {
+  journey: Journey;
+  heading?: string;
+  hereLabel?: string;
+}) {
   const currentKey = journey.stages.find((s) => s.current)?.key ?? null;
   const [openKeys, setOpenKeys] = useState<Set<string>>(new Set(currentKey ? [currentKey] : []));
 
@@ -123,7 +142,7 @@ export function CreatorJourney({ journey }: { journey: Journey }) {
         fontSize: 10.5, letterSpacing: '.11em', textTransform: 'uppercase',
         color: INK_3, fontWeight: 700, margin: '0 0 10px',
       }}>
-        Your journey
+        {heading}
         <span style={{ marginLeft: 8, fontWeight: 400 }}>
           {journey.completedSteps} of {journey.totalSteps} done
         </span>
@@ -141,7 +160,7 @@ export function CreatorJourney({ journey }: { journey: Journey }) {
 
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px 18px', padding: '12px 16px', background: '#f4f6fb', borderTop: `1px solid ${LINE}`, fontSize: 12.5, color: INK_3 }}>
           <span><span aria-hidden style={{ color: PASS, fontSize: 11 }}>{'✓'}</span> done</span>
-          <span><span aria-hidden style={{ color: YELLOW, fontSize: 11 }}>{'●'}</span> you are here</span>
+          <span><span aria-hidden style={{ color: YELLOW, fontSize: 11 }}>{'●'}</span> {hereLabel}</span>
           <span><span aria-hidden style={{ color: BLUE, fontSize: 11 }}>{'▪'}</span> we do this</span>
           <span><span aria-hidden style={{ color: INK_3, fontSize: 11 }}>{'○'}</span> still to come</span>
         </div>

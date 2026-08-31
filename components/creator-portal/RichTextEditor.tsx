@@ -32,6 +32,11 @@ export function RichTextEditor({
   const [showLinkInput, setShowLinkInput] = useState(false);
 
   const editor = useEditor({
+    // Tiptap builds its editor during render, which throws under SSR and takes
+    // the whole page down as a client-side exception. Every admin creator page
+    // was doing this: the server returns 200, then the page blanks in the
+    // browser. Deferring the first render to the client is Tiptap's own fix.
+    immediatelyRender: false,
     extensions: [
       StarterKit.configure({
         // Only enable what we need
