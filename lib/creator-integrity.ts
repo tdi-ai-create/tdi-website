@@ -85,7 +85,9 @@ export async function runIntegrityChecks(
 ): Promise<IntegrityReport> {
   const [{ data: creators }, { data: milestones }, { data: notes }] = await Promise.all([
     supabase.from('creators').select('id, name, email, agreement_signed, published_date'),
-    supabase.from('creator_milestones').select('creator_id, milestone_id, status, completed_at, submitted_value'),
+    supabase
+      .from('creator_milestones')
+      .select('creator_id, milestone_id, status, completed_at, submitted_value'),
     supabase.from('creator_notes').select('creator_id, content'),
   ]);
 
@@ -93,11 +95,26 @@ export async function runIntegrityChecks(
   const milestoneRows: MilestoneRow[] = milestones || [];
   const noteRows: NoteRow[] = notes || [];
 
-  const byCreator = new Map<string, CreatorRow>();
-  for (const c of creatorRows) byCreator.set(c.id, c);
+  // Milestones are per project, and a creator can have several. Katie Welch is
+  // on her second: the first drafted and published, the second is still locked.
+  //
+  // Everything these checks compare against lives at CREATOR level. A note in
+  // creator_notes, a published_date, an agreement_signed flag. So the milestone
+  // side has to be read at creator level too, meaning "has this ever been
+  // completed on any project", not "is it complete on one particular project".
+  //
+  // Reading a single project's row against a creator-level fact reported Katie
+  // as "draft not recorded" on the day this shipped, which was wrong. A checker
+  // that cries wolf gets ignored, which is the failure this exists to prevent.
+  const everCompleted = (creatorId: string, milestoneId: string) =>
+    milestoneRows.some(
+      (m) => m.creator_id === creatorId && m.milestone_id === milestoneId && m.status === 'completed'
+    );
 
-  const milestone = (creatorId: string, id: string) =>
-    milestoneRows.find((m) => m.creator_id === creatorId && m.milestone_id === id);
+  const everCompletedWithDate = (creatorId: string, milestoneId: string) =>
+    milestoneRows.some(
+      (m) => m.creator_id === creatorId && m.milestone_id === milestoneId && !!m.completed_at
+    );
 
   const hasNote = (creatorId: string, marker: string) =>
     noteRows.some((n) => n.creator_id === creatorId && (n.content || '').includes(marker));
@@ -113,14 +130,12 @@ export async function runIntegrityChecks(
     // empty for blog_drafted on nearly every creator, so an empty field there is
     // not evidence that nothing was submitted. This is the check that would have
     // caught Kim Lohse and Dr. Nardi in March.
-    const drafted = milestone(c.id, 'blog_drafted');
-    if (hasNote(c.id, BLOG_SUBMIT_MARKER) && drafted?.status !== 'completed') {
-      push('draft_not_recorded', c, 'Draft link is in their notes but blog_drafted is not complete');
+    if (hasNote(c.id, BLOG_SUBMIT_MARKER) && !everCompleted(c.id, 'blog_drafted')) {
+      push('draft_not_recorded', c, 'Draft link is in their notes but no blog_drafted milestone is complete');
     }
 
     // 2. The two records of "published" disagree.
-    const published = milestone(c.id, 'blog_published');
-    const milestoneSaysPublished = published?.status === 'completed';
+    const milestoneSaysPublished = everCompleted(c.id, 'blog_published');
     const creatorSaysPublished = !!c.published_date;
     if (milestoneSaysPublished !== creatorSaysPublished) {
       push(
@@ -138,8 +153,7 @@ export async function runIntegrityChecks(
     // then completes the milestone, so this combination cannot come from a real
     // signature. It comes from approving the milestone by hand, which makes an
     // unsigned creator look signed.
-    const agreement = milestone(c.id, 'agreement_sign');
-    if (agreement?.completed_at && !c.agreement_signed) {
+    if (everCompletedWithDate(c.id, 'agreement_sign') && !c.agreement_signed) {
       push('agreement_contradiction', c, 'agreement_sign milestone is complete but agreement_signed is false');
     }
 
