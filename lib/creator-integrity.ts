@@ -44,9 +44,27 @@ export interface IntegritySystemFinding {
   creatorsAffected: number;
 }
 
+/** A finding a person has looked at and marked handled. */
+export interface IntegrityDismissal {
+  checkId: string;
+  creatorId: string;
+  name: string | null;
+  reason: string | null;
+  dismissedBy: string;
+  dismissedAt: string;
+}
+
 export interface IntegrityReport {
   findings: IntegrityFinding[];
   system: IntegritySystemFinding[];
+  /**
+   * Findings that fired but have been acknowledged. Surfaced rather than
+   * hidden: some contradictions are permanent history and can never clear on
+   * their own, so without this the panel would carry a row forever and teach
+   * people to skim past it. Showing the count keeps a dismissal reversible and
+   * visible instead of silent.
+   */
+  dismissed: IntegrityDismissal[];
   checkedAt: string;
 }
 
@@ -83,13 +101,30 @@ export async function runIntegrityChecks(
   supabase: any,
   now: Date = new Date()
 ): Promise<IntegrityReport> {
-  const [{ data: creators }, { data: milestones }, { data: notes }] = await Promise.all([
-    supabase.from('creators').select('id, name, email, agreement_signed, published_date'),
-    supabase
-      .from('creator_milestones')
-      .select('creator_id, milestone_id, status, completed_at, submitted_value'),
-    supabase.from('creator_notes').select('creator_id, content'),
-  ]);
+  const [{ data: creators }, { data: milestones }, { data: notes }, dismissalResult] =
+    await Promise.all([
+      supabase.from('creators').select('id, name, email, agreement_signed, published_date'),
+      supabase
+        .from('creator_milestones')
+        .select('creator_id, milestone_id, status, completed_at, submitted_value'),
+      supabase.from('creator_notes').select('creator_id, content'),
+      supabase
+        .from('creator_integrity_dismissals')
+        .select('check_id, creator_id, reason, dismissed_by, dismissed_at'),
+    ]);
+
+  // A missing dismissals table must not take the checks down. If the migration
+  // has not run yet, behave exactly as before: report everything.
+  if (dismissalResult?.error) {
+    console.error('[creator-integrity] dismissals unreadable, reporting everything:', dismissalResult.error.message);
+  }
+  const dismissalRows: {
+    check_id: string;
+    creator_id: string;
+    reason: string | null;
+    dismissed_by: string;
+    dismissed_at: string;
+  }[] = dismissalResult?.data || [];
 
   const creatorRows: CreatorRow[] = creators || [];
   const milestoneRows: MilestoneRow[] = milestones || [];
@@ -179,7 +214,21 @@ export async function runIntegrityChecks(
     });
   }
 
-  return { findings, system, checkedAt: now.toISOString() };
+  // Split acknowledged findings out rather than dropping them.
+  const dismissedKeys = new Set(dismissalRows.map((d) => `${d.check_id}::${d.creator_id}`));
+  const live = findings.filter((f) => !dismissedKeys.has(`${f.checkId}::${f.creatorId}`));
+
+  const nameFor = (id: string) => creatorRows.find((c) => c.id === id)?.name ?? null;
+  const dismissed: IntegrityDismissal[] = dismissalRows.map((d) => ({
+    checkId: d.check_id,
+    creatorId: d.creator_id,
+    name: nameFor(d.creator_id),
+    reason: d.reason,
+    dismissedBy: d.dismissed_by,
+    dismissedAt: d.dismissed_at,
+  }));
+
+  return { findings: live, system, dismissed, checkedAt: now.toISOString() };
 }
 
 /** One line per check, for Slack. Empty string when everything is clean. */
