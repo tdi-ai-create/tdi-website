@@ -515,7 +515,7 @@ export async function GET(request: NextRequest) {
       digestReason = decision.reason
 
       if (!decision.post) {
-        await recordDigestSuppressed(supabase, 'funding-daily', decision.suppressedRuns)
+        await recordDigestSuppressed(supabase, 'funding-daily', decision.suppressedRuns, dryRun)
         console.log(
           `[funding-reminders] Unchanged for ${decision.daysSinceLastPost} day(s), staying quiet`
         )
@@ -542,7 +542,7 @@ export async function GET(request: NextRequest) {
           // Loud on failure. Silence here means she is never told and the work
           // sits unseen, which is the failure this exists to prevent.
         }).catch(err => console.error('[funding-reminders] Daily digest post failed:', err))
-        await recordDigestPost(supabase, 'funding-daily', body)
+        await recordDigestPost(supabase, 'funding-daily', body, dryRun)
         digestPosted = true
       } else {
         console.log('[funding-reminders] Slack disabled — would have posted', sections.length, 'section(s)')
