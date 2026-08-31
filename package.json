@@ -16,7 +16,8 @@
     "check:seats": "node scripts/integrity/verify-seat-attribution.mjs",
     "check:upserts": "node scripts/integrity/verify-upsert-targets.mjs",
     "check:schema:update": "node scripts/check-schema.mjs --update-baseline",
-    "validate:quizzes": "node scripts/validate-quizzes.mjs"
+    "validate:quizzes": "node scripts/validate-quizzes.mjs",
+    "check:labels": "node scripts/integrity/verify-client-labels.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.78.0",

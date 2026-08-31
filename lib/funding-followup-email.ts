@@ -1,3 +1,5 @@
+import { findInternalText } from '@/lib/funding-draft-warnings'
+
 /**
  * Email template + send logic for messages a PERSON chooses to send.
  *
@@ -56,16 +58,72 @@ export function toneForRung(rung: string): EmailTone {
 }
 
 // ── Client-facing task label ──
+//
+// What a school is told an item is about. This is the only place that decides
+// it, for the whole codebase.
+//
+// There used to be two implementations. This one stripped four known prefixes
+// and sent whatever remained. The cron had its own safelist, added 17 Aug after
+// the first leak, which caught three of the four titles that had gone out and
+// missed the worst: a "Re-send..." item carrying our pricing ladder and the
+// words "mark this opportunity not applicable" about a live district. Neither
+// copy knew what the other had learned, so a title blocked in one path sailed
+// through the other on the same day.
+//
+// Three gates now, cheapest first, and a title has to clear all of them:
+//
+//   1. Shape. Does it open like an instruction to a colleague.
+//   2. Content. Does findInternalText spot our pricing, our decision logic, or
+//      the recipient discussed in the third person. Same rules the approval
+//      queue shows the reviewer, so the two can never disagree.
+//   3. Length. A client-facing label is a phrase. Anything past 90 characters
+//      is a sentence someone wrote for themselves.
+//
+// Failing any gate means neutral wording, and a log line, because an item
+// without a client_label is a gap to close rather than something to paper over.
+// Neutral is vague, and vague is survivable. The alternative is not.
+
+export const NEUTRAL_TASK_LABEL = 'this funding step'
+
+/** A client-facing label is a phrase, not a paragraph. */
+const MAX_LABEL_LENGTH = 90
+
+const INTERNAL_TITLE_SHAPES = [
+  /^(check|confirm|verify|review)\b/i,
+  /^(remind|nudge|chase|ping)\b/i,
+  /^(ask|email|call|contact|reach\s+out)\b/i,
+  /^(track|follow\s+up|get|obtain|collect)\b/i,
+  /^(re-?send|re-?ask|send|resend)\b/i,        // missed before, and it mattered
+  /^(determine|find\s+out|decide|escalate)\b/i,
+  /^(draft|write|prepare|set\s+up|update|log|mark|create|add)\b/i,
+  /^(gate|internal|todo)\b/i,
+  /\b(bella|rae|julie|vanessa|amara)\b/i,      // names of ours have no business here
+]
 
 export function clientTaskLabel(rawTitle: string, clientLabel?: string | null): string {
-  if (clientLabel) return clientLabel
-  const stripped = rawTitle
-    .replace(/^(Get\s+\S+\s+to\s+)/i, '')
-    .replace(/^(Confirm:\s*)/i, '')
-    .replace(/^(Follow\s+up\s+(on|with)\s+\S+[:/]?\s*)/i, '')
-    .replace(/^(Track\s+)/i, '')
-    .trim()
-  return stripped.length > 5 ? stripped : 'this funding step'
+  if (clientLabel && clientLabel.trim()) return clientLabel.trim()
+
+  const title = (rawTitle || '').trim()
+  if (!title) return NEUTRAL_TASK_LABEL
+
+  const reason =
+    INTERNAL_TITLE_SHAPES.some(shape => shape.test(title))
+      ? 'reads as an instruction to a colleague'
+      : findInternalText(title, '').length > 0
+        ? 'contains wording meant for us'
+        : title.length > MAX_LABEL_LENGTH
+          ? `is ${title.length} characters, which is a sentence rather than a label`
+          : null
+
+  if (reason) {
+    console.warn(
+      `[funding-label] "${title.slice(0, 80)}" has no client_label and ${reason}. ` +
+        'Using neutral wording. Set a client_label on this item.'
+    )
+    return NEUTRAL_TASK_LABEL
+  }
+
+  return title
 }
 
 export function displayRung(rung: string): string {
