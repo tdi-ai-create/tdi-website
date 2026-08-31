@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js'
 import { requireAdminAuth } from '@/lib/tdi-admin/auth'
 import { isOnAllowlist, ALLOWLIST_ENABLED } from '@/lib/funding-followup-email'
 import { buildFundingEmailHtml } from '@/lib/funding-email-html'
+import { findInternalText } from '@/lib/funding-draft-warnings'
 
 /**
  * Funding outreach approval queue.
@@ -84,10 +85,16 @@ export async function GET() {
         ? `${d.to_email} is not on the send allowlist`
         : null
 
+    // Our own task text leaking into client copy. Fifty two of these reached
+    // four people before anyone noticed, so it is surfaced on the draft rather
+    // than left for the reviewer to spot in a wall of text.
+    const warnings = findInternalText(d.subject, d.body)
+
     return {
       id: d.id,
       subject: d.subject,
       body: d.body,
+      warnings,
       toEmail: d.to_email,
       toName: d.to_name,
       emailType: d.email_type,
@@ -111,6 +118,7 @@ export async function GET() {
       total: rows.length,
       stale: rows.filter(r => r.isStale).length,
       unsendable: rows.filter(r => r.blockedReason).length,
+      needsRewrite: rows.filter(r => r.warnings.length > 0).length,
     },
   })
 }
@@ -185,6 +193,21 @@ export async function POST(request: NextRequest) {
   const finalSubject = (subject ?? draft.subject ?? '').trim()
   const finalBody = (body ?? draft.body ?? '').trim()
   const to = draft.to_email
+
+  // Re-checked here, not just on the way out to the screen. The reviewer can
+  // edit, so the text that matters is the text being sent, and a warning that
+  // only rendered in the browser would be advisory. Editing is the way past
+  // this: rewrite the line in our own words and it clears.
+  const leaks = findInternalText(finalSubject, finalBody)
+  if (leaks.length > 0) {
+    return NextResponse.json(
+      {
+        error: 'This still contains text written for us, not for them. Edit it first.',
+        warnings: leaks,
+      },
+      { status: 400 }
+    )
+  }
 
   if (!to) {
     return NextResponse.json(

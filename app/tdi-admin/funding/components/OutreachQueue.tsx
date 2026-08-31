@@ -30,6 +30,7 @@ type Draft = {
   ageHours: number
   isStale: boolean
   blockedReason: string | null
+  warnings: { phrase: string; explain: string }[]
   school: string | null
   funder: string | null
   grant: string | null
@@ -125,6 +126,7 @@ export default function OutreachQueue() {
   }
 
   const staleCount = drafts.filter(d => d.isStale).length
+  const rewriteCount = drafts.filter(d => d.warnings.length > 0).length
 
   return (
     <div>
@@ -148,6 +150,24 @@ export default function OutreachQueue() {
           >
             <Clock className="w-3 h-3" />
             {staleCount} waiting over 48 hours
+          </span>
+        )}
+        {rewriteCount > 0 && (
+          <span
+            style={{
+              fontSize: 12,
+              fontWeight: 700,
+              color: '#7A4A12',
+              background: '#FDF4E3',
+              padding: '3px 10px',
+              borderRadius: 20,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 5,
+            }}
+          >
+            <AlertTriangle className="w-3 h-3" />
+            {rewriteCount} {rewriteCount === 1 ? 'needs' : 'need'} rewording before sending
           </span>
         )}
       </div>
@@ -256,6 +276,33 @@ export default function OutreachQueue() {
                 </div>
               )}
 
+              {d.warnings.length > 0 && (
+                <div
+                  style={{
+                    marginTop: 12, fontSize: 13, color: '#7A4A12', background: '#FDF4E3',
+                    border: '1px solid #EBD7A8', borderRadius: 8, padding: '11px 13px',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontWeight: 700 }}>
+                    <AlertTriangle className="w-4 h-4" />
+                    This reads like a note we wrote to ourselves
+                  </div>
+                  <p style={{ margin: '7px 0 9px', lineHeight: 1.5 }}>
+                    {d.toName ? d.toName.split(' ')[0] : 'They'} would read the words below as written.
+                    Use Edit first to say it the way you would say it out loud, then send.
+                  </p>
+                  <ul style={{ margin: 0, paddingLeft: 18, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    {d.warnings.map(w => (
+                      <li key={w.phrase}>
+                        <span style={{ fontWeight: 600 }}>&ldquo;{w.phrase}&rdquo;</span>
+                        <br />
+                        <span style={{ color: '#8A6A3A' }}>{w.explain}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
               {rejecting && (
                 <div style={{ marginTop: 12 }}>
                   <label
@@ -297,11 +344,17 @@ export default function OutreachQueue() {
                       onClick={() =>
                         act(d.id, 'approve', editing ? { subject: editSubject, body: editBody } : {})
                       }
-                      disabled={busy || !!d.blockedReason}
-                      style={btn('#2A9D8F', busy || !!d.blockedReason)}
+                      disabled={busy || !!d.blockedReason || (!editing && d.warnings.length > 0)}
+                      style={btn('#2A9D8F', busy || !!d.blockedReason || (!editing && d.warnings.length > 0))}
                     >
                       <Check className="w-4 h-4" />
-                      {busy ? 'Sending…' : editing ? 'Save and send' : 'Approve and send'}
+                      {busy
+                        ? 'Sending…'
+                        : editing
+                          ? 'Save and send'
+                          : d.warnings.length > 0
+                            ? 'Edit before sending'
+                            : 'Approve and send'}
                     </button>
                     {!editing && (
                       <button
