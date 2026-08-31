@@ -2,8 +2,13 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { formatDateOnly } from '@/lib/format-date';
 
 const money = (n: number) => n.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
+// Cents shown where the exact figure is the one being chased. $2,332.20 rounded
+// to $2,332 does not match the invoice the school is holding.
+const exact = (n: number) =>
+  n.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 });
 
 /**
  * Where this school stands financially, read only, with a link into Billing.
@@ -25,7 +30,7 @@ export default function PositionStrip({ partnershipId, userEmail }: { partnershi
   const cells = [
     ['Contracted', money(p.value), '#0B1120'],
     ['Collected', money(p.collected), p.collected > 0 ? '#059669' : '#94A3B8'],
-    ['Outstanding', money(p.outstanding), p.outstanding > 0 ? '#D97706' : '#94A3B8'],
+    ['Outstanding', exact(p.outstanding), p.outstanding > 0 ? '#D97706' : '#94A3B8'],
     ['Not billed', money(p.not_billed), '#64748B'],
   ] as const;
 
@@ -50,14 +55,26 @@ export default function PositionStrip({ partnershipId, userEmail }: { partnershi
 
       {p.overdue_count > 0 && (
         <div className="mt-2 text-[11.5px] font-semibold" style={{ color: '#DC2626' }}>
-          {money(p.overdue_amount)} overdue across {p.overdue_count} invoice{p.overdue_count > 1 ? 's' : ''}
+          {exact(p.overdue_amount)} overdue across {p.overdue_count} invoice{p.overdue_count > 1 ? 's' : ''}
         </div>
       )}
       {p.overdue_count === 0 && p.next_due && (
         <div className="mt-2 text-[11.5px] text-gray-500">
-          Next due {new Date(p.next_due.due_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}, {money(p.next_due.amount)}
+          {/* date column, so formatDateOnly rather than new Date, which renders a day early */}
+          Next due {formatDateOnly(p.next_due.due_date, { day: 'numeric', month: 'short' })}, {exact(p.next_due.amount)}
         </div>
       )}
+
+      {/* A part paid invoice is the one people get wrong. Say both halves so
+          nobody chases the face value of something already half settled, and
+          nobody assumes a payment closed it. */}
+      {(p.part_paid ?? []).map((inv: { invoice_number: string; amount: number; paid: number; outstanding: number }) => (
+        <div key={inv.invoice_number} className="mt-1 text-[11.5px] text-gray-600">
+          <span className="font-semibold">{inv.invoice_number}</span> part paid.{' '}
+          {exact(inv.paid)} of {exact(inv.amount)} received,{' '}
+          <span className="font-semibold" style={{ color: '#B45309' }}>{exact(inv.outstanding)} still owed</span>
+        </div>
+      ))}
       {p.ready_to_bill > 0 && (
         <div className="mt-1 text-[11.5px] font-semibold" style={{ color: '#B45309' }}>
           {money(p.ready_to_bill)} delivered and ready to bill
