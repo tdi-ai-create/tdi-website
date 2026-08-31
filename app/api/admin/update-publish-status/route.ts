@@ -107,12 +107,19 @@ export async function POST(request: NextRequest) {
     // Add a note to creator_notes for audit trail
     const noteContent = getActionNote(action, scheduledDate, publishNotes);
     if (noteContent) {
-      await supabase.from('creator_notes').insert({
+      // `note_type` is not a column on creator_notes, so this insert failed
+      // every time and nothing was ever audited. The categorisation added
+      // nothing the content does not already say, so it is dropped rather than
+      // given a column.
+      const { error: noteError } = await supabase.from('creator_notes').insert({
         creator_id: creatorId,
         content: noteContent,
         author: 'System',
-        note_type: 'status_change',
       });
+
+      if (noteError) {
+        console.error('[update-publish-status] Audit note NOT written:', noteError.message);
+      }
     }
 
     // Sync publish status to Learning Hub (hub_courses table)
@@ -131,13 +138,34 @@ export async function POST(request: NextRequest) {
             .eq('creator_id', creatorId);
 
           if (hubCourses && hubCourses.length > 0) {
+            // Count what actually landed. This used to log
+            // "Hub sync: N course(s) set" unconditionally, so it claimed
+            // success even if every update failed. A portal saying published
+            // while the Hub disagrees is the same split-brain that had two
+            // creators told we were editing posts they never sent.
+            let synced = 0;
+            const failures: string[] = [];
+
             for (const hc of hubCourses) {
-              await hubSupabase
+              const { error: hubUpdateError } = await hubSupabase
                 .from('hub_courses')
                 .update({ is_published: isPublished, updated_at: new Date().toISOString() })
                 .eq('id', hc.id);
+
+              if (hubUpdateError) {
+                failures.push(`${hc.id}: ${hubUpdateError.message}`);
+              } else {
+                synced++;
+              }
             }
-            console.log(`[update-publish-status] Hub sync: ${hubCourses.length} course(s) set is_published=${isPublished}`);
+
+            if (failures.length > 0) {
+              console.error(
+                `[update-publish-status] Hub sync INCOMPLETE: ${synced}/${hubCourses.length} set is_published=${isPublished}. The portal and the Hub now disagree. Failures: ${failures.join('; ')}`
+              );
+            } else {
+              console.log(`[update-publish-status] Hub sync: ${synced} course(s) set is_published=${isPublished}`);
+            }
           }
         } catch (hubErr) {
           console.error('[update-publish-status] Hub sync failed:', hubErr);
