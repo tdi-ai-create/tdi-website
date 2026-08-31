@@ -13,6 +13,21 @@ export interface OppNote {
   note_text: string
   note_type: 'call' | 'email' | 'meeting' | 'demo' | 'update' | 'system'
   created_at: string
+  /**
+   * Set when the note was written somewhere other than this lead: a merged
+   * duplicate, a renewal row, or the client's partnership file. Shown as a
+   * badge so a note's origin is never a guess.
+   */
+  source_label?: string | null
+  /** Only this lead's own rows can be deleted from here. */
+  deletable?: boolean
+}
+
+export interface RelatedRecord {
+  kind: 'opportunity' | 'partnership'
+  id: string
+  label: string
+  note_count: number
 }
 
 export interface OppActivity {
@@ -41,6 +56,7 @@ export interface FullOpportunity {
   created_at: string
   updated_at: string
   notes_list?: OppNote[]
+  related_records?: RelatedRecord[]
   activity?: OppActivity[]
   // Optional fields pending DB migration
   [key: string]: unknown
@@ -174,6 +190,7 @@ export function OpportunityDetailPanel({ opportunityId, onClose, onUpdate, onDel
       setOpp({
         ...data,
         notes_list: data.notes_list ?? [],
+        related_records: data.related_records ?? [],
         activity: data.activity ?? [],
       })
       // Look up any existing linked partnership
@@ -493,12 +510,25 @@ export function OpportunityDetailPanel({ opportunityId, onClose, onUpdate, onDel
                     <p style={{ textAlign: 'center', color: '#9CA3AF', fontSize: 13, paddingTop: 40 }}>No notes yet</p>
                   ) : (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                      {/* Say where a merged timeline came from, so a note from
+                          another record is never a surprise. */}
+                      {(opp.related_records ?? []).length > 0 && (
+                        <div style={{
+                          fontSize: 12, color: '#4B5563', background: '#F3F4F6',
+                          border: '1px solid #E5E7EB', borderRadius: 8, padding: '8px 12px',
+                          lineHeight: 1.5,
+                        }}>
+                          <span style={{ fontWeight: 600 }}>Full client history.</span>{' '}
+                          Includes {(opp.related_records ?? []).reduce((sum, r) => sum + r.note_count, 0)} notes from{' '}
+                          {(opp.related_records ?? []).map(r => `${r.label} (${r.note_count})`).join(', ')}.
+                        </div>
+                      )}
                       {(opp.notes_list ?? []).map(note => (
                           <NoteCardInline
                             key={note.id}
                             note={note}
                             barColor={getNoteBarColor(note)}
-                            onDelete={note.id === 'legacy' ? undefined : () => deleteNote(note.id)}
+                            onDelete={canDeleteNote(note) ? () => deleteNote(note.id) : undefined}
                           />
                       ))}
                     </div>
@@ -987,6 +1017,18 @@ export function OpportunityDetailPanel({ opportunityId, onClose, onUpdate, onDel
 
 // ── Inline note card with colored left border ──
 
+/**
+ * A note can be deleted from this panel only if it is one of this lead's own
+ * rows. Imported text columns have no row, and notes belonging to a merged
+ * record or the partnership file get deleted where they live — the API rejects
+ * those, so offering the button here would only produce an error.
+ */
+function canDeleteNote(note: OppNote): boolean {
+  if (note.deletable === false) return false
+  if (note.id === 'legacy' || note.id.startsWith('legacy:') || note.id.startsWith('pn:')) return false
+  return true
+}
+
 function NoteCardInline({ note, barColor, onDelete }: { note: OppNote; barColor: string; onDelete?: () => void }) {
   const [showAll, setShowAll] = useState(false)
   const isLong = note.note_text.length > 500
@@ -1013,6 +1055,18 @@ function NoteCardInline({ note, barColor, onDelete }: { note: OppNote; barColor:
           }}>
             {note.note_type}
           </span>
+          {note.source_label && (
+            <span
+              title={`Written on ${note.source_label}, shown here because it is the same client`}
+              style={{
+                fontSize: 10, padding: '2px 8px', borderRadius: 20, fontWeight: 600,
+                background: '#EEF2FF', color: '#4338CA', maxWidth: 220,
+                overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+              }}
+            >
+              {note.source_label}
+            </span>
+          )}
           <span style={{ fontSize: 11, color: '#9CA3AF', marginLeft: 'auto' }}>
             {new Date(note.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
           </span>

@@ -18,9 +18,18 @@ export async function DELETE(
 
   // The legacy entry is a synthetic view of sales_opportunities.notes and has
   // no row of its own to delete.
-  if (noteId === 'legacy') {
+  if (noteId === 'legacy' || noteId.startsWith('legacy:')) {
     return NextResponse.json(
       { error: 'This is an imported record and cannot be deleted from here.' },
+      { status: 400 }
+    )
+  }
+
+  // The timeline also shows notes owned by the client's partnership file. They
+  // are not this lead's rows, so they get deleted where they were written.
+  if (noteId.startsWith('pn:')) {
+    return NextResponse.json(
+      { error: 'This note lives on the partnership record. Delete it from the partnership page.' },
       { status: 400 }
     )
   }
