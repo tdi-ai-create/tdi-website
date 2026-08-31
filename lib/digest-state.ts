@@ -76,12 +76,26 @@ export async function shouldPostDigest(
   return { post: false, reason: 'unchanged', suppressedRuns: data.suppressed_runs ?? 0, daysSinceLastPost: days }
 }
 
-/** Record a successful post so tomorrow can compare against it. */
+/**
+ * Record a successful post so tomorrow can compare against it.
+ *
+ * `dryRun` is required rather than optional. The first version left it to the
+ * caller to wrap these in a guard, and two of the three callers did not, so
+ * `?dryRun=1` on those crons wrote a row. A dry run that writes is not a dry
+ * run, and the whole point of building it into the route is that it exercises
+ * the real path. Making the flag part of the signature means a new caller has
+ * to answer the question instead of not noticing it.
+ */
 export async function recordDigestPost(
   supabase: SupabaseClient,
   key: string,
-  content: string
+  content: string,
+  dryRun: boolean
 ): Promise<void> {
+  if (dryRun) {
+    console.log(`[digest-state] DRY RUN, not recording post for ${key}`)
+    return
+  }
   const { error } = await supabase.from('digest_state').upsert(
     {
       key,
@@ -96,12 +110,20 @@ export async function recordDigestPost(
   if (error) console.error('[digest-state] write failed:', error.message)
 }
 
-/** Record that a run was skipped, so the heartbeat can say how long it has been. */
+/**
+ * Record that a run was skipped, so the heartbeat can say how long it has been.
+ * `dryRun` is required for the reason described on recordDigestPost.
+ */
 export async function recordDigestSuppressed(
   supabase: SupabaseClient,
   key: string,
-  suppressedRuns: number
+  suppressedRuns: number,
+  dryRun: boolean
 ): Promise<void> {
+  if (dryRun) {
+    console.log(`[digest-state] DRY RUN, not recording suppression for ${key}`)
+    return
+  }
   const { error } = await supabase
     .from('digest_state')
     .update({ suppressed_runs: suppressedRuns + 1, updated_at: new Date().toISOString() })
