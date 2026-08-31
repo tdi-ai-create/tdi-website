@@ -17,15 +17,67 @@ config({ path: '.env.local' })
 
 const url = process.env.LEARNING_HUB_SUPABASE_URL || process.env.NEXT_PUBLIC_LEARNING_HUB_SUPABASE_URL
 const key = process.env.LEARNING_HUB_SUPABASE_SERVICE_KEY
-if (!url || !key) {
-  console.error('Learning Hub Supabase not configured. Need LEARNING_HUB_SUPABASE_URL and _SERVICE_KEY.')
-  process.exit(1)
-}
 
 const laneArg = process.argv.find(a => a.startsWith('--lane='))?.split('=')[1] as Lane | undefined
 
+/**
+ * Fixture check on the lane rules, run with --selftest.
+ *
+ * scoreItem decides what comes off the live site, so a silent change to it is
+ * expensive in a direction nobody notices. There is no unit test framework in
+ * this repo, so this is the guard.
+ */
+function selftest(): number {
+  const base: ScoredRow = {
+    id: 'x', slug: 's', title: 'T', description: 'D', category: 'c',
+    lift: 'LOW', quick_win_type: 'download',
+    topic_tags: ['a', 'b'], roles: ['teacher'], danielson_domains: ['1-planning'],
+    file_url: 'https://x/g.pdf', tool_file_url: null, tool_type: 'self_contained',
+    objectives: 'O', reviewed_at: '2026-01-01', qa_notes: `reviewed against ${RUBRIC_VERSION}`,
+  }
+
+  const cases: [string, Partial<ScoredRow>, Lane][] = [
+    ['fully clean', {}, 'clean'],
+    ['guide is html', { file_url: 'https://x/g.html?download=g.html' }, 'pull'],
+    ['guide missing', { file_url: null }, 'pull'],
+    ['tool is png', { tool_type: null, tool_file_url: 'https://x/t.png' }, 'pull'],
+    ['no objectives', { objectives: null }, 'stamp'],
+    ['never reviewed', { reviewed_at: null, qa_notes: null }, 'stamp'],
+    ['reviewed, no stamp', { qa_notes: 'looks fine' }, 'stamp'],
+    ['missing role', { roles: [] }, 'stamp'],
+    ['banned phrase', { description: 'In this day and age, teachers cope' }, 'replace'],
+    ['no description', { description: null }, 'replace'],
+    ['bad lift', { lift: 'Low' }, 'replace'],
+    ['broken beats everything', { file_url: null, description: null, objectives: null }, 'pull'],
+    ['substance beats provenance', { description: null, reviewed_at: null, qa_notes: null }, 'replace'],
+    ['pdf with query string is fine', { file_url: 'https://x/g.pdf?download=g.pdf' }, 'clean'],
+  ]
+
+  let failed = 0
+  for (const [name, patch, expected] of cases) {
+    const { lane, defects } = scoreItem({ ...base, ...patch })
+    if (lane === expected) {
+      console.log(`  pass  ${name.padEnd(28)} ${lane}`)
+    } else {
+      failed++
+      console.log(`  FAIL  ${name.padEnd(28)} expected ${expected}, got ${lane}`)
+      console.log(`        defects: ${defects.join(' | ') || 'none'}`)
+    }
+  }
+  console.log(failed === 0 ? `\n${cases.length} lane rules hold.` : `\n${failed} of ${cases.length} failed.`)
+  return failed
+}
+
+if (process.argv.includes('--selftest')) {
+  process.exit(selftest() === 0 ? 0 : 1)
+}
+
 async function main() {
-  const supabase = createClient(url!, key!, { auth: { persistSession: false } })
+  if (!url || !key) {
+    console.error('Learning Hub Supabase not configured. Need LEARNING_HUB_SUPABASE_URL and _SERVICE_KEY.')
+    process.exit(1)
+  }
+  const supabase = createClient(url, key, { auth: { persistSession: false } })
   const { data, error } = await supabase
     .from('hub_quick_wins')
     .select('*')
