@@ -70,7 +70,12 @@ export type QuickWinRow = {
   file_url: string | null
   tool_file_url: string | null
   tool_type: string | null
+  objectives: string | null
 }
+
+// A download has to actually be a document. Query strings are common on these
+// URLs (?download=name.pdf), so match the extension anywhere a real one lands.
+const isPdf = (url: string) => /\.pdf(\?|#|$)/i.test(url)
 
 /**
  * Julie Lynn's mechanical QA checklist, in code.
@@ -99,6 +104,18 @@ export function qaBlockers(qw: QuickWinRow): string[] {
   if (!qw.quick_win_type) out.push('quick_win_type is required')
   if (!nonEmpty(qw.roles)) out.push('at least one role is required')
 
+  // Standard section 1. 173 published items have no objectives because the gate
+  // never asked for one. Blocking here stops the number growing; the existing
+  // 173 are repaired through backfill_published, which does not run this check.
+  if (!qw.objectives?.trim()) out.push('objectives is required')
+
+  // Standard section 2. Boilerplate that signals nobody wrote for a real teacher.
+  const prose = [qw.title, qw.description, qw.objectives].filter(Boolean).join(' ').toLowerCase()
+  const banned = BANNED_PHRASES.filter(p => prose.includes(p))
+  if (banned.length > 0) {
+    out.push(`banned phrase, rewrite it: ${banned.join('; ')}`)
+  }
+
   if (!nonEmpty(qw.topic_tags)) {
     out.push('at least 2 topic_tags are required')
   } else {
@@ -126,11 +143,19 @@ export function qaBlockers(qw: QuickWinRow): string[] {
   // Games and activities are interactive and need neither.
   if (qw.quick_win_type === 'download') {
     if (!qw.file_url) out.push('download type requires a guide PDF (file_url)')
+    // The gate used to check only that file_url was populated, never what it
+    // pointed at. That is how 21 live downloads serve an .html page and how the
+    // four image-only PNGs shipped. Standard section 1.
+    else if (!isPdf(qw.file_url)) {
+      out.push(`guide file is not a PDF: ${qw.file_url.split('/').pop()}`)
+    }
     // Some downloads are a single printable that already IS the tool: a lab card,
     // a quick card, a walkthrough form. Those declare tool_type self_contained
     // and need no second file. Mirrors the database trigger in migration 112.
     if (!qw.tool_file_url && qw.tool_type !== 'self_contained') {
       out.push('download type requires a tool PDF (tool_file_url), run generate_tool, or set tool_type to self_contained if the guide is itself the printable tool')
+    } else if (qw.tool_file_url && !isPdf(qw.tool_file_url)) {
+      out.push(`tool file is not a PDF: ${qw.tool_file_url.split('/').pop()}`)
     }
   } else if (qw.quick_win_type === 'quiz') {
     // A quiz is playable either because a config exists (renders in-app at
@@ -172,44 +197,29 @@ export type Lane = 'pull' | 'replace' | 'stamp' | 'clean'
  * judgment half (is this an article or a tool) stays with QA, which is why a
  * clean lane here still means a human has to have reviewed it.
  */
+// A defect is broken when the download is not a usable document, which is the
+// only thing that earns an immediate unpublish under Rae's tiered policy.
+const BROKEN = /^(guide file is not a PDF|tool file is not a PDF|download type requires a guide PDF)/
+
+// A defect is fixable in place when backfill_published can correct it without
+// changing what the item is. Everything else needs a rebuild, which is different
+// work at a different speed and belongs in a different lane.
+const FIXABLE = /^(at least one role|at least 2 topic_tags|topic_tag "general"|at least one danielson_domain|danielson_domains must use|objectives is required)/
+
 export function scoreItem(qw: ScoredRow): { lane: Lane; defects: string[] } {
   const broken: string[] = []
   const substantive: string[] = []
   const fixable: string[] = []
 
-  // Functional breakage. A download whose file is a PNG or an HTML page is not
-  // a document a teacher can use, which is exactly what the four items pulled
-  // in August turned out to be. The gate never checked what file_url pointed at.
-  const isDownload = qw.quick_win_type === 'download'
-  if (isDownload && !qw.file_url) broken.push('download has no guide file at all')
-  else if (isDownload && !/\.pdf(\?|#|$)/i.test(qw.file_url!)) {
-    broken.push(`guide file is not a PDF: ${qw.file_url!.split('/').pop()}`)
+  for (const d of qaBlockers(qw)) {
+    if (BROKEN.test(d)) broken.push(d)
+    else if (FIXABLE.test(d)) fixable.push(d)
+    else substantive.push(d)
   }
 
-  // Structural debt that survived the old gate. Split by what it takes to fix.
-  // Tags, roles and domains are metadata a backfill can correct in place. A
-  // missing title, file or lift means the item has to be rebuilt, so it is not
-  // the same kind of work and does not belong in the same lane.
-  const BACKFILLABLE_BLOCKERS = /^(at least one role|at least 2 topic_tags|topic_tag "general"|at least one danielson_domain|danielson_domains must use)/
-  for (const blocker of qaBlockers(qw)) {
-    if (BACKFILLABLE_BLOCKERS.test(blocker)) fixable.push(blocker)
-    else substantive.push(blocker)
-  }
-
-  // Objectives is a field, not a rewrite. backfill_published can set it on a
-  // live row without touching what the item is, so this is fast-lane work even
-  // though 173 items carry it.
-  if (!qw.objectives?.trim()) fixable.push('objectives is empty')
-
-  // Boilerplate is a content problem. Fixing it means rewriting copy, which
-  // means the item goes back through the rebuild path.
-  const haystack = [qw.title, qw.description, qw.objectives]
-    .filter(Boolean).join(' ').toLowerCase()
-  const banned = BANNED_PHRASES.filter(p => haystack.includes(p))
-  if (banned.length > 0) substantive.push(`banned phrase: ${banned.join('; ')}`)
-
-  // Provenance says nothing about whether the content is good, only that
-  // nobody checked. Always fast lane.
+  // Provenance says nothing about whether the content is good, only that nobody
+  // checked. Always fast lane. Not part of qaBlockers because the pre-publish
+  // gate runs before there is anything to record.
   if (!qw.reviewed_at) fixable.push('never passed QA')
   else if (!qw.qa_notes?.includes(RUBRIC_VERSION)) {
     fixable.push(`reviewed, but not against ${RUBRIC_VERSION}`)
@@ -627,20 +637,45 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ success: false, blockers }, { status: 400 })
       }
 
+      // Stamp the rubric version. Without it a later audit cannot tell an item
+      // checked against the current standard from one waved through under the
+      // old structural-only gate, and has to guess from dates. Standard section 2.
+      const reviewedAt = new Date().toISOString()
+      const stampLine = `${reviewedAt.slice(0, 10)} reviewed against ${RUBRIC_VERSION} by ${reviewed_by.trim()}` +
+        (notes?.trim() ? `: ${notes.trim()}` : '')
+
       const { error: reviewErr } = await supabase
         .from('hub_quick_wins')
         .update({
           status: 'reviewed',
           reviewed_by: reviewed_by.trim(),
-          reviewed_at: new Date().toISOString(),
-          qa_notes: notes?.trim() || null,
-          updated_at: new Date().toISOString(),
+          reviewed_at: reviewedAt,
+          qa_notes: qw.qa_notes ? `${qw.qa_notes}\n${stampLine}` : stampLine,
+          updated_at: reviewedAt,
         })
         .eq('id', id)
 
       if (reviewErr) return NextResponse.json({ error: reviewErr.message }, { status: 500 })
 
-      return NextResponse.json({ success: true, id, slug: qw.slug, status: 'reviewed' })
+      // Read back. The stamp is the audit trail, and an audit trail that failed
+      // to write is worse than none because it looks fine.
+      const { data: after } = await supabase
+        .from('hub_quick_wins')
+        .select('qa_notes')
+        .eq('id', id)
+        .single()
+
+      if (!after?.qa_notes?.includes(RUBRIC_VERSION)) {
+        return NextResponse.json(
+          { error: `Review did not stick. ${RUBRIC_VERSION} is not in qa_notes after the write.` },
+          { status: 500 },
+        )
+      }
+
+      return NextResponse.json({
+        success: true, verified: true, id, slug: qw.slug,
+        status: 'reviewed', rubric_version: RUBRIC_VERSION,
+      })
     }
 
     // ── publish: validate and publish a Quick Win ──
