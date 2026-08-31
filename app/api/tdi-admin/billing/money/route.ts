@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminAuth } from '@/lib/tdi-admin/auth';
 import { getServiceSupabase } from '@/lib/supabase';
+import { currentSchoolYear } from '@/lib/school-year';
 
 export const dynamic = 'force-dynamic';
 
@@ -53,6 +54,10 @@ export async function GET(_request: NextRequest) {
       ref: i.invoice_number,
       client: dName.get(i.district_id) ?? 'Unknown client',
       contract: qNum.get(i.quote_id) ?? null,
+      // The year the WORK belongs to, which invoice_date can contradict.
+      // ANC-00025 is dated 1 Jul 2026 for observations delivered in 2025-26,
+      // so sorting by date puts a closed year's debt among this year's.
+      school_year: i.school_year ?? null,
       amount: Number(i.amount),
       status: overdue ? 'overdue' : i.status,
       date: i.invoice_date,
@@ -106,6 +111,12 @@ export async function GET(_request: NextRequest) {
     voided: invoiceRows.filter((i) => i.status === 'voided').length,
     unverified_payments: paymentRows.filter((p) => !p.details_verified).length,
     missing_payment_records: live.filter((i) => i.missing_payment_record).length,
+    // Money still owed on a school year that has ended. It is chased on its own
+    // and it is the easiest thing to lose, because everything else on the page
+    // is about the year everyone is currently thinking about.
+    prior_year_outstanding: live
+      .filter((i) => ['sent', 'overdue'].includes(i.status) && i.school_year && i.school_year !== currentSchoolYear())
+      .reduce((s, i) => s + owed(i), 0),
   };
 
   return NextResponse.json({ invoices: invoiceRows, payments: paymentRows, totals });
