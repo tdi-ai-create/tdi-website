@@ -1,12 +1,27 @@
 'use client';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { formatDateOnly } from '@/lib/format-date';
 
 export const ACC = '#B45309';
 export const money = (n: number) => n.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
 export const money2 = (n: number | string) => Number(n).toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 });
+/**
+ * Every date on the Billing pages.
+ *
+ * These are Postgres `date` columns, which arrive as "2026-07-01". new Date()
+ * reads that as midnight UTC and renders it in the viewer's zone, so Chicago
+ * showed the day before. ANC-00025 is dated 1 July and displayed as 30 Jun,
+ * which is the worst possible day to be wrong about: PGCPS close their fiscal
+ * year on 30 June, and the invoice being one day the wrong side of that is the
+ * likeliest reason it has gone unpaid since. The screen said it made the
+ * deadline. It did not.
+ *
+ * received_on and the document dates are date columns too, so they were all a
+ * day early.
+ */
 export const shortDate = (d?: string | null) =>
-  d ? new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : null;
+  d ? formatDateOnly(d, { day: 'numeric', month: 'short' }) : null;
 
 const TABS = [
   ['/tdi-admin/billing', 'Contracts'],
