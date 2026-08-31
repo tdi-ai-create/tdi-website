@@ -52,13 +52,27 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Log the action (internal note only)
-    await supabase.from('creator_notes').insert({
+    // Log the action (internal note only).
+    //
+    // This used to insert `note` and treat `created_by` as the author. Neither
+    // matches creator_notes, whose columns are `content` and `author`, so the
+    // insert failed every time and the return value was never checked. Result:
+    // 278 notes in the table and not one from an admin reopen, ever. Reopening
+    // a milestone is exactly the action you want a trail for, since it changes
+    // what a creator sees.
+    const { error: noteError } = await supabase.from('creator_notes').insert({
       creator_id: creatorId,
-      note: `Milestone reopened by admin for review/revision`,
+      content: `Milestone "${milestoneId}" reopened by admin for review/revision`,
+      author: adminEmail || 'TDI Admin',
       created_by: adminEmail || 'TDI Admin',
       visible_to_creator: false,
     });
+
+    if (noteError) {
+      // The reopen itself succeeded, so do not fail the request. Say so loudly
+      // rather than dropping it, which is how this went unnoticed.
+      console.error('[reopen-milestone] Audit note NOT written:', noteError.message);
+    }
 
     console.log('[reopen-milestone] Success');
     return NextResponse.json({ success: true });

@@ -105,11 +105,26 @@ export async function POST(request: NextRequest) {
 
     if (createError) {
       console.error('Error creating new creator:', createError);
-      // Rollback archive
-      await supabase
+
+      // Rollback the archive. If this fails silently the creator is left
+      // archived with no new project to show for it, which is worse than the
+      // original failure and invisible to everyone.
+      const { error: rollbackError } = await supabase
         .from('creators')
         .update({ status: 'active' })
         .eq('id', creatorId);
+
+      if (rollbackError) {
+        console.error(
+          `[start-new-project] ROLLBACK FAILED for creator ${creatorId}. They are archived with no new project:`,
+          rollbackError.message
+        );
+        return NextResponse.json(
+          { error: 'Failed to create new project, and could not restore the original. This creator needs manual repair.' },
+          { status: 500 }
+        );
+      }
+
       return NextResponse.json(
         { error: 'Failed to create new project' },
         { status: 500 }
@@ -176,21 +191,29 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Add notes to both records
-    await supabase.from('creator_notes').insert([
+    // Add notes to both records.
+    //
+    // `note_type` is not a column on creator_notes, so this insert failed every
+    // time and neither side of a project switch was ever recorded. That trail
+    // matters: a creator with two projects is exactly the case that made the
+    // integrity checks misread milestones, and the only way to tell the
+    // projects apart afterwards is this note.
+    const { error: noteError } = await supabase.from('creator_notes').insert([
       {
         creator_id: creatorId,
         content: `Project archived. Creator started a new project (ID: ${newCreatorId})`,
         author: 'System',
-        note_type: 'status_change',
       },
       {
         creator_id: newCreatorId,
         content: `New project started. Previous project: ${currentCreator.course_title || 'Untitled'} (ID: ${creatorId})`,
         author: 'System',
-        note_type: 'status_change',
       },
     ]);
+
+    if (noteError) {
+      console.error('[start-new-project] Audit notes NOT written:', noteError.message);
+    }
 
     return NextResponse.json({
       success: true,
