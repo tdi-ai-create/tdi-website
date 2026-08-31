@@ -229,3 +229,42 @@ export async function getJourney(supabase: DbClient, projectId: string): Promise
     completedSteps: steps.filter((s) => s.status === 'complete').length,
   };
 }
+
+/**
+ * The journey for a creator, resolving their active project first.
+ *
+ * Both the creator's dashboard and the admin's view of that creator need the
+ * same object, and getJourney takes a project rather than a creator. The
+ * resolution below lived only inside the portal route, so the admin page had no
+ * way to ask the same question and built its own view of progress instead.
+ * That is the drift this function exists to close.
+ *
+ * Never throws. A creator whose journey cannot be built should still get a
+ * page, so every failure degrades to null and the caller falls back.
+ */
+export async function getJourneyForCreator(
+  supabase: DbClient,
+  creatorId: string
+): Promise<Journey | null> {
+  try {
+    const { data: activeProject, error } = await supabase
+      .from('creator_projects')
+      .select('id')
+      .eq('creator_id', creatorId)
+      .eq('status', 'active')
+      .order('project_number', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (error) {
+      console.error('[creator-journey] Could not find the active project:', error.message);
+      return null;
+    }
+    if (!activeProject) return null;
+
+    return await getJourney(supabase, activeProject.id);
+  } catch (e) {
+    console.error('[creator-journey] Journey build failed:', e);
+    return null;
+  }
+}

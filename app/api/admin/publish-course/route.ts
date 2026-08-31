@@ -1,5 +1,10 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import {
+  AGREEMENT_COLUMNS,
+  blocksPublish,
+  PUBLISH_BLOCKED_MESSAGE,
+} from '@/lib/creator-agreement';
 
 /**
  * API endpoint for admins to mark a creator's course as published.
@@ -43,13 +48,25 @@ export async function POST(request: Request) {
     // 1. Get creator info
     const { data: creator, error: creatorError } = await supabase
       .from('creators')
-      .select('id, name, email, content_path')
+      .select(`id, name, email, content_path, ${AGREEMENT_COLUMNS}`)
       .eq('id', creatorId)
       .single();
 
     if (creatorError || !creator) {
       console.error('[publish-course] Creator not found:', creatorError);
       return NextResponse.json({ success: false, error: 'Creator not found' }, { status: 404 });
+    }
+
+    // Rule B, second door. This route sets hub_courses.is_published directly,
+    // which is what the Hub actually reads, so gating only
+    // admin/update-publish-status would have left work able to go live through
+    // here without an agreement. Two admin pages, two publish paths: /admin
+    // calls this one, /tdi-admin calls the other.
+    if (blocksPublish(creator)) {
+      return NextResponse.json(
+        { success: false, error: PUBLISH_BLOCKED_MESSAGE, reason: 'agreement_unsigned' },
+        { status: 409 }
+      );
     }
 
     // Verify this is a course creator
@@ -229,7 +246,7 @@ export async function POST(request: Request) {
       noteLines.push(`Note: ${note}`);
     }
 
-    await supabase
+    const { error: auditNoteError } = await supabase
       .from('creator_notes')
       .insert({
         creator_id: creatorId,
@@ -238,28 +255,33 @@ export async function POST(request: Request) {
         visible_to_creator: false,
       });
 
+    if (auditNoteError) {
+      console.error('[publish-course] Audit note NOT written:', auditNoteError.message);
+    }
+
     // 8. Also add a visible note for the creator
-    await supabase
+    const { error: creatorNoteError } = await supabase
       .from('creator_notes')
       .insert({
         creator_id: creatorId,
-        content: `Congratulations! Your course is now live! 🎉\n\nCourse URL: ${courseUrl}\nDiscount Code: ${discountCode}`,
+        content: `Congratulations, your course is now live.\n\nCourse URL: ${courseUrl}\nDiscount Code: ${discountCode}`,
         author: 'TDI Team',
         visible_to_creator: true,
       });
 
-    // 9. Create admin notification
-    await supabase
-      .from('admin_notifications')
-      .insert({
-        creator_id: creatorId,
-        type: 'course_published',
-        message: `${creator.name}'s course has been marked as published`,
-        link: `/admin/creators/${creatorId}`,
-      });
+    if (creatorNoteError) {
+      console.error('[publish-course] Creator note NOT written:', creatorNoteError.message);
+    }
+
+    // There is no admin_notifications table in this database, confirmed again
+    // 31 August 2026. The insert that stood here wrote into nothing on every
+    // course publish while reading as though the team were being told. The
+    // same dead write was removed from creator-portal/sign-agreement on
+    // 27 August. Putting it back means creating the table first.
 
     // 10. Sync publish status to Learning Hub (hub_courses table)
     // Courses live in a separate Supabase project from the Creator Portal
+    const hubSyncFailures: string[] = [];
     const hubUrl = process.env.LEARNING_HUB_SUPABASE_URL || process.env.NEXT_PUBLIC_LEARNING_HUB_SUPABASE_URL;
     const hubKey = process.env.LEARNING_HUB_SUPABASE_SERVICE_KEY;
     if (hubUrl && hubKey) {
@@ -277,11 +299,21 @@ export async function POST(request: Request) {
         // If we find a matching unpublished course, publish it
         if (hubCourses && hubCourses.length > 0) {
           for (const hc of hubCourses) {
-            await hubSupabase
+            // This is the write that actually puts the course in front of
+            // learners, and it was unchecked. A failure here left the portal
+            // saying published and the Hub still hiding the course, with
+            // nothing but an absent log line to tell anyone.
+            const { error: hubPublishError } = await hubSupabase
               .from('hub_courses')
               .update({ is_published: true })
               .eq('id', hc.id);
-            console.log('[publish-course] Hub course synced:', hc.title);
+
+            if (hubPublishError) {
+              console.error('[publish-course] Hub course NOT published:', hc.title, hubPublishError.message);
+              hubSyncFailures.push(hc.title as string);
+            } else {
+              console.log('[publish-course] Hub course synced:', hc.title);
+            }
           }
         }
       } catch (hubErr) {
@@ -297,6 +329,9 @@ export async function POST(request: Request) {
       completedMilestones: completedCount,
       optionalMilestones: optionalCount,
       creatorName: creator.name,
+      // Surfaced rather than logged only. The portal saying published while
+      // the Hub still hides the course is the failure worth seeing.
+      hubSyncFailures,
     });
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';

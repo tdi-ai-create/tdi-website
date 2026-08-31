@@ -18,6 +18,8 @@ import { CompletionBanner } from '@/components/creator-portal/CompletionBanner';
 import { PastProjects } from '@/components/creator-portal/PastProjects';
 import TDIPortalLoader from '@/components/TDIPortalLoader';
 import LocationPromptModal from '@/components/creator-portal/LocationPromptModal';
+import AgreementReminderModal from '@/components/creator-portal/AgreementReminderModal';
+import { needsAgreementReminder } from '@/lib/creator-agreement';
 import ProjectedDateCountdown from '@/components/creator-portal/ProjectedDateCountdown';
 import { TakeABreakButton } from '@/components/creator-portal/TakeABreak';
 import PausedScreen from '@/components/creator-portal/PausedScreen';
@@ -54,6 +56,9 @@ export default function CreatorDashboardPage() {
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [showLocationModal, setShowLocationModal] = useState(false);
+  // Rule A dismissal. State only, so the reminder returns on the next load
+  // until the agreement is actually signed.
+  const [agreementDismissed, setAgreementDismissed] = useState(false);
 
   // NEW: Three independent gates — ALL must be true to show dashboard
   const [animationComplete, setAnimationComplete] = useState(false);
@@ -331,6 +336,17 @@ export default function CreatorDashboardPage() {
         onSubmit={handleLocationSubmit}
         onSkip={handleLocationSkip}
       />
+
+      {/* Rule A: remind an unsigned creator every time they open the portal.
+          Held back until the loader clears so it does not open behind it, and
+          skipped in admin preview so previewing a creator does not nag us. */}
+      {showDashboard && !isAdminPreview && dashboardData?.creator && (
+        <AgreementReminderModal
+          isOpen={!agreementDismissed && needsAgreementReminder(dashboardData.creator)}
+          alreadyPublished={dashboardData.creator.publish_status === 'published'}
+          onDismiss={() => setAgreementDismissed(true)}
+        />
+      )}
 
       {/* LOADER: shows until animation calls onComplete */}
       {!animationComplete && (

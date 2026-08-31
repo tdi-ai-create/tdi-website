@@ -1,6 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { logCreatorEmail } from '@/lib/creator-email-log';
+import {
+  AGREEMENT_COLUMNS,
+  blocksPublish,
+  PUBLISH_BLOCKED_MESSAGE,
+} from '@/lib/creator-agreement';
+
+/**
+ * Rule B. Actions that put a creator's work in front of the public, or keep it
+ * on a path to being public. `unpublish` is absent on purpose: taking work down
+ * is always allowed, including for someone who never signed.
+ */
+const GOES_LIVE = ['publish_now', 'schedule', 'reschedule', 'mark_published'];
 
 export async function POST(request: NextRequest) {
   try {
@@ -23,6 +35,34 @@ export async function POST(request: NextRequest) {
         { error: 'creatorId and action are required' },
         { status: 400 }
       );
+    }
+
+    // Rule B: an unsigned creator's work does not go live. This is the wall
+    // that was missing. Kimberelle Martin, Stephanie Nardi and Kim Lohse were
+    // all published with no agreement on file because nothing on this route
+    // ever asked.
+    if (GOES_LIVE.includes(action)) {
+      const { data: subject, error: subjectError } = await supabase
+        .from('creators')
+        .select(AGREEMENT_COLUMNS)
+        .eq('id', creatorId)
+        .maybeSingle();
+
+      if (subjectError || !subject) {
+        // Refuse rather than assume. Failing open here is how unsigned work
+        // goes live, which is the exact thing this block exists to stop.
+        return NextResponse.json(
+          { error: 'Could not read this creator to check their agreement' },
+          { status: 500 }
+        );
+      }
+
+      if (blocksPublish(subject)) {
+        return NextResponse.json(
+          { error: PUBLISH_BLOCKED_MESSAGE, reason: 'agreement_unsigned' },
+          { status: 409 }
+        );
+      }
     }
 
     let updateData: Record<string, unknown> = {};
