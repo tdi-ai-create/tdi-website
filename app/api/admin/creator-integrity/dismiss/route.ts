@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { requireAdminAuth } from '@/lib/tdi-admin/auth';
 
 // ---------------------------------------------------------------------------
 // Mark an integrity finding handled, or put it back.
@@ -24,16 +25,20 @@ function admin() {
 
 export async function POST(request: NextRequest) {
   try {
-    const { checkId, creatorId, reason, adminEmail } = await request.json();
+    const auth = await requireAdminAuth();
+    if (auth instanceof NextResponse) return auth;
+
+    const { checkId, creatorId, reason } = await request.json();
 
     if (!checkId || !creatorId) {
       return NextResponse.json({ success: false, error: 'checkId and creatorId are required' }, { status: 400 });
     }
-    // Who cleared it is the whole point of the record. Refuse to write an
-    // anonymous dismissal rather than silently attributing it to nobody.
-    if (!adminEmail) {
-      return NextResponse.json({ success: false, error: 'adminEmail is required' }, { status: 400 });
-    }
+
+    // Who cleared it is the whole point of the record, so it comes from the
+    // session, never from the request body. The client still sends adminEmail
+    // and it is deliberately ignored: a caller must not get to choose the name
+    // that ends up on the audit row.
+    const adminEmail = auth.user.email;
 
     const supabase = admin();
     if (!supabase) {
@@ -71,6 +76,9 @@ export async function POST(request: NextRequest) {
 /** Put a dismissed finding back on the panel. */
 export async function DELETE(request: NextRequest) {
   try {
+    const auth = await requireAdminAuth();
+    if (auth instanceof NextResponse) return auth;
+
     const { checkId, creatorId } = await request.json();
 
     if (!checkId || !creatorId) {
