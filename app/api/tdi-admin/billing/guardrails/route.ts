@@ -23,7 +23,7 @@ export async function GET(_request: NextRequest) {
   const [{ data: lines }, { data: invoices }, { data: payments }, { data: apps }, { data: districts }, { data: quotes }, { data: reqs }, { data: docs }, { data: sends }] =
     await Promise.all([
       sb.from('contract_deliverables').select('id, label, quote_id, district_id, total_amount, delivery_state, billing_state, funding_hold, invoice_id, is_complimentary'),
-      sb.from('intelligence_invoices').select('id, invoice_number, amount, status, due_date, district_id, quote_id, po_number'),
+      sb.from('intelligence_invoices').select('id, invoice_number, amount, status, due_date, district_id, quote_id, po_number, school_year, service_start_date, service_end_date, service_date_exact'),
       sb.from('billing_payments').select('id, amount, reference, method, details_verified'),
       sb.from('billing_payment_applications').select('payment_id, invoice_id, amount'),
       sb.from('districts').select('id, name'),
@@ -116,6 +116,26 @@ export async function GET(_request: NextRequest) {
       const needsPO = q?.po_required || reqByDistrict.get(i.district_id ?? '')?.has('purchase_order');
       return needsPO && !i.po_number;
     }).map((i) => ({ invoice: i.invoice_number, client: dName.get(i.district_id) ?? '?', amount: Number(i.amount) })), 'documents');
+
+  // 8b. Districts that require dates of service on the invoice itself.
+  //
+  // PGCPS told us this on 25 Feb 2026 and it is recorded against Allenwood.
+  // ANC-00025 carries no service dates at all, and it has been unpaid since
+  // July. The PO check above already exists for the same reason: their AP
+  // office rejects quietly, so a missing field on our side looks like a slow
+  // payer on theirs.
+  add('Invoices carry dates of service where the district requires them',
+    'Their accounts payable office rejects it without them, and nobody here learns why the money never came.',
+    (invoices ?? []).filter((i) => {
+      if (!['sent', 'overdue'].includes(i.status)) return false;
+      if (!reqByDistrict.get(i.district_id ?? '')?.has('dates_of_service')) return false;
+      return !i.service_date_exact && !(i.service_start_date && i.service_end_date);
+    }).map((i) => ({
+      invoice: i.invoice_number,
+      client: dName.get(i.district_id ?? '') ?? '?',
+      school_year: i.school_year ?? 'not recorded',
+      amount: Number(i.amount),
+    })), 'documents');
 
   // 9. Documents a district has told us they need.
   add('Required documents are on file',

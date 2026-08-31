@@ -9,7 +9,7 @@ type Invoice = {
   kind: 'invoice'; id: string; ref: string; client: string; contract: string | null;
   amount: number; status: string; date: string | null; due_date: string | null; po_number: string | null;
   days_overdue: number; paid_applied: number; outstanding: number; part_paid: boolean;
-  missing_payment_record: boolean;
+  missing_payment_record: boolean; school_year: string | null;
   voided_at: string | null; void_reason: string | null; sends: Send[];
 };
 type Payment = {
@@ -55,6 +55,9 @@ export default function MoneyPage() {
         { label: 'Out, not due', value: money(t.outstanding), note: 'sent invoices', dot: '#D97706' },
         { label: 'Overdue', value: money(t.overdue), note: 'past due date', dot: '#DC2626' },
         { label: 'Draft', value: money(t.draft), note: 'never sent', dot: '#64748B' },
+        ...(t.prior_year_outstanding > 0
+          ? [{ label: 'Prior year', value: money2(t.prior_year_outstanding), note: 'closed school year, chased on its own', dot: '#7C3AED' }]
+          : []),
       ]} />
 
       {t.missing_payment_records > 0 && (
@@ -90,7 +93,7 @@ export default function MoneyPage() {
                 <span style={{ flex: 1, minWidth: 0, textAlign: 'left' }}>
                   <b style={{ display: 'block', fontSize: 13.5, textDecoration: r.kind === 'invoice' && r.status === 'voided' ? 'line-through' : 'none' }}>{r.ref}</b>
                   <span style={{ display: 'block', color: '#64748B', fontSize: 11.8 }}>
-                    {r.client}{r.kind === 'invoice' && r.contract ? `, ${r.contract}` : ''}{r.kind === 'payment' ? `, ${r.settles.length} invoice${r.settles.length === 1 ? '' : 's'}` : ''}
+                    {r.client}{r.kind === 'invoice' && r.school_year ? `, ${r.school_year}` : ''}{r.kind === 'invoice' && r.contract ? `, ${r.contract}` : ''}{r.kind === 'payment' ? `, ${r.settles.length} invoice${r.settles.length === 1 ? '' : 's'}` : ''}
                   </span>
                 </span>
                 <span style={{ flex: '0 0 150px' }}>
@@ -152,6 +155,7 @@ function InvoiceDetail({ i }: { i: Invoice }) {
           <KV k="Invoice date" v={shortDate(i.date) ?? 'not set'} />
           <KV k="Due" v={shortDate(i.due_date) ?? 'not set'} tone={i.due_date ? undefined : '#DC2626'} />
           <KV k="PO number" v={i.po_number || 'none'} />
+          <KV k="School year" v={i.school_year || 'not recorded'} />
           <KV k="Contract" v={i.contract || 'not linked'} />
         </Pane>
         <Pane title="Payments applied" bad={i.missing_payment_record}>
