@@ -409,3 +409,171 @@ export async function getClientNotes(
 
   return { notes, related }
 }
+
+/** One note in a bulk, all-leads read. */
+export interface BulkClientNote {
+  body: string
+  created_at: string
+  author: string
+  note_type: string
+  /** Where it was written, when that is not the lead it is listed under. */
+  source_label: string | null
+}
+
+export interface BulkNotesOptions {
+  /** Keep only the newest N per lead. Omit for every note. */
+  perOpp?: number
+  /** Truncate each note to N characters. Omit for the full text. */
+  clipChars?: number
+}
+
+/**
+ * Every client's notes in one pass, keyed by opportunity id, using the same
+ * client grouping as the lead panel.
+ *
+ * The list page and the export both need notes for every lead at once, and
+ * calling getClientNotes per lead would be 400 round trips. This reads each
+ * table once and groups in memory.
+ */
+export async function getAllClientNotesByOpp(
+  supabase: SupabaseClient,
+  options: BulkNotesOptions = {}
+): Promise<Record<string, BulkClientNote[]>> {
+  const ROW_CAP = 20000
+
+  const [opps, partnerships, portal, agent] = await Promise.all([
+    supabase.from('sales_opportunities').select(CLIENT_OPP_COLUMNS).limit(ROW_CAP),
+    supabase.from('partnerships').select(CLIENT_PARTNERSHIP_COLUMNS).limit(ROW_CAP),
+    supabase
+      .from('opportunity_notes')
+      .select('opportunity_id, note_text, note_type, author_email, created_at')
+      .order('created_at', { ascending: false })
+      .limit(ROW_CAP),
+    supabase
+      .from('sales_opportunity_notes')
+      .select('opportunity_id, body, created_by, created_at')
+      .order('created_at', { ascending: false })
+      .limit(ROW_CAP),
+  ])
+
+  if (opps.error) console.error('[client-notes] bulk sales_opportunities read failed:', opps.error.message)
+  if (partnerships.error) console.error('[client-notes] bulk partnerships read failed:', partnerships.error.message)
+  if (portal.error) console.error('[client-notes] bulk opportunity_notes read failed:', portal.error.message)
+  if (agent.error) console.error('[client-notes] bulk sales_opportunity_notes read failed:', agent.error.message)
+
+  const partnershipRows = (partnerships.data ?? []) as PartnershipRow[]
+
+  const partnerNotes = partnershipRows.length
+    ? await supabase
+        .from('partnership_notes')
+        .select('partnership_id, content, author, note_type, created_at, archived_at')
+        .order('created_at', { ascending: false })
+        .limit(ROW_CAP)
+    : { data: [], error: null }
+
+  if (partnerNotes.error) {
+    console.error('[client-notes] bulk partnership_notes read failed:', partnerNotes.error.message)
+  }
+
+  const clip = (text: string) =>
+    options.clipChars && text.length > options.clipChars
+      ? `${text.slice(0, options.clipChars)}...`
+      : text
+
+  // Keyed by the record each note was written on, before client grouping.
+  const byOpp = new Map<string, BulkClientNote[]>()
+  const byPartnership = new Map<string, BulkClientNote[]>()
+
+  const add = (map: Map<string, BulkClientNote[]>, key: string | null, note: BulkClientNote) => {
+    if (!key || !note.body) return
+    const list = map.get(key)
+    if (list) list.push(note)
+    else map.set(key, [note])
+  }
+
+  for (const n of portal.data ?? []) {
+    add(byOpp, n.opportunity_id, {
+      body: clip(n.note_text || ''),
+      created_at: n.created_at,
+      author: n.author_email || 'TDI System',
+      note_type: noteType(n.note_type),
+      source_label: null,
+    })
+  }
+
+  for (const n of agent.data ?? []) {
+    add(byOpp, n.opportunity_id, {
+      body: clip(n.body || ''),
+      created_at: n.created_at,
+      author: n.created_by || 'TDI System',
+      note_type: 'system',
+      source_label: null,
+    })
+  }
+
+  for (const n of partnerNotes.data ?? []) {
+    if (n.archived_at) continue
+    add(byPartnership, n.partnership_id, {
+      body: clip(n.content || ''),
+      created_at: n.created_at,
+      author: n.author || 'TDI System',
+      note_type: noteType(n.note_type),
+      source_label: null,
+    })
+  }
+
+  const oppRows = (opps.data ?? []) as OppRow[]
+  const index = buildOppIndex(oppRows)
+  const merged: Record<string, BulkClientNote[]> = {}
+
+  for (const opp of oppRows) {
+    const memberIds = [opp.id, ...siblingIdsFor(opp, index)]
+    const memberIdSet = new Set(memberIds)
+
+    const names = new Set(
+      memberIds.map(id => normalizeClientName(index.byId.get(id)?.name)).filter(n => n.length >= 5)
+    )
+    const emails = new Set(
+      memberIds.map(id => canonicalEmail(index.byId.get(id)?.contact_email)).filter(Boolean)
+    )
+
+    const entries: BulkClientNote[] = []
+
+    for (const id of memberIds) {
+      const row = index.byId.get(id)
+      const label =
+        id === opp.id
+          ? null
+          : row?.deleted_at
+            ? `${row.name || 'Untitled record'} (merged record)`
+            : (row?.name || 'Another record')
+      for (const n of byOpp.get(id) ?? []) entries.push({ ...n, source_label: label })
+    }
+
+    for (const p of partnershipRows) {
+      if (!partnershipMatchesClient(p, memberIdSet, names, emails)) continue
+      const label = `Partnership: ${p.org_name || 'linked partnership'}`
+      for (const n of byPartnership.get(p.id) ?? []) entries.push({ ...n, source_label: label })
+    }
+
+    // The legacy text column is a note store too, and is what the pipeline
+    // export used to show on its own.
+    if (opp.notes && opp.notes.trim().length > 10) {
+      entries.push({
+        body: clip(`[Imported record] ${opp.notes.trim()}`),
+        created_at: opp.created_at,
+        author: 'TDI System',
+        note_type: 'system',
+        source_label: null,
+      })
+    }
+
+    if (entries.length === 0) continue
+
+    // Each source query is ordered, but interleaving them is not.
+    entries.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+    merged[opp.id] = options.perOpp ? entries.slice(0, options.perOpp) : entries
+  }
+
+  return merged
+}

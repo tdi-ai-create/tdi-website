@@ -15,6 +15,7 @@ export function StickyTopBar({
   onAddLead,
   onExport,
   onExportJimsList,
+  exporting = false,
   showCallSheetOnly,
   onToggleCallSheet,
 }: {
@@ -22,6 +23,8 @@ export function StickyTopBar({
   onAddLead: () => void
   onExport?: () => void
   onExportJimsList?: () => void
+  /** The export loads the full note history first, which takes a moment. */
+  exporting?: boolean
   showCallSheetOnly?: boolean
   onToggleCallSheet?: () => void
 }) {
@@ -105,21 +108,23 @@ export function StickyTopBar({
 
       <div style={{ display: 'flex', gap: 8 }}>
         {onExportJimsList && (
-          <button onClick={onExportJimsList} style={{
+          <button onClick={onExportJimsList} disabled={exporting} style={{
             fontSize: 12, padding: '8px 14px', borderRadius: 8,
             border: 'none', background: '#059669', color: 'white',
-            cursor: 'pointer', fontWeight: 600,
+            cursor: exporting ? 'default' : 'pointer', fontWeight: 600,
+            opacity: exporting ? 0.6 : 1,
           }}>
-            Export Jim&apos;s List
+            {exporting ? 'Exporting...' : "Export Jim's List"}
           </button>
         )}
         {onExport && (
-          <button onClick={onExport} style={{
+          <button onClick={onExport} disabled={exporting} style={{
             fontSize: 12, padding: '8px 14px', borderRadius: 8,
             border: '1px solid #D1D5DB', background: 'white', color: '#374151',
-            cursor: 'pointer', fontWeight: 500,
+            cursor: exporting ? 'default' : 'pointer', fontWeight: 500,
+            opacity: exporting ? 0.6 : 1,
           }}>
-            Export All
+            {exporting ? 'Exporting...' : 'Export All'}
           </button>
         )}
         <button onClick={onAddLead} style={{

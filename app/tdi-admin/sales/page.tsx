@@ -12,6 +12,7 @@ import { SalesCard, type SalesCardOpp } from './components/SalesCard'
 import AddLeadModal from '@/components/sales/AddLeadModal'
 import { generateOutreachEmail } from '@/lib/salesEmailTemplates'
 import * as XLSX from 'xlsx'
+import { buildNoteRows, notesToCell, type ExportNote } from '@/lib/sales/export-notes'
 import { OpportunityDetailPanel, type FullOpportunity } from './components/OpportunityDetailPanel'
 import {
   TYPE_PAGE_TITLE,
@@ -250,6 +251,9 @@ export default function SalesPage() {
   const [quickNoteOppId, setQuickNoteOppId] = useState<string | null>(null)
   const [quickNoteText, setQuickNoteText] = useState('')
   const [savingQuickNote, setSavingQuickNote] = useState(false)
+  // The export waits on a notes fetch, so the button has to say so and refuse
+  // a second click rather than downloading a half-built file.
+  const [exporting, setExporting] = useState(false)
 
   // Hub leads data
   const [hubLeads, setHubLeads] = useState<{
@@ -307,7 +311,7 @@ export default function SalesPage() {
 
       if (isEdit) {
         // Update existing quote
-        await supabase.from('quotes').update({
+        const { error: quoteErr } = await supabase.from('quotes').update({
           title: contractForm.title,
           contact_name: contractForm.contact_name,
           contact_email: contractForm.contact_email,
@@ -317,10 +321,13 @@ export default function SalesPage() {
           service_end_date: contractForm.service_end_date,
           payment_instructions: contractForm.payment_instructions,
         }).eq('id', contractForm.id)
+        if (!wroteOk(quoteErr, 'Saving the contract')) return
 
         // Delete old packages and recreate
-        await supabase.from('quote_packages').delete().eq('quote_id', contractForm.id)
-        await supabase.from('quote_packages').insert({
+        const { error: pkgDelErr } = await supabase.from('quote_packages').delete().eq('quote_id', contractForm.id)
+        if (!wroteOk(pkgDelErr, 'Clearing the old contract packages')) return
+
+        const { error: pkgErr } = await supabase.from('quote_packages').insert({
           quote_id: contractForm.id,
           package_index: 0,
           package_name: contractForm.package_name,
@@ -328,20 +335,23 @@ export default function SalesPage() {
           is_recommended: true,
           line_items: contractForm.line_items,
         })
+        if (!wroteOk(pkgErr, 'Saving the contract package')) return
       } else {
         // Create district first
-        const { data: district } = await supabase.from('districts').insert({
+        const { data: district, error: districtErr } = await supabase.from('districts').insert({
           name: contractForm.contact_organization || contractForm.title,
           status: 'prospect',
         }).select().single()
 
-        if (!district) throw new Error('Failed to create district')
+        if (districtErr || !district) {
+          throw new Error(`Failed to create district: ${districtErr?.message ?? 'no row returned'}`)
+        }
 
         // Generate quote number
         const qNum = `TDI-Q-${new Date().getFullYear()}-${String(quotes.length + 1).padStart(3, '0')}`
 
         // Create quote
-        const { data: quote } = await supabase.from('quotes').insert({
+        const { data: quote, error: newQuoteErr } = await supabase.from('quotes').insert({
           district_id: district.id,
           quote_number: qNum,
           title: contractForm.title,
@@ -358,10 +368,12 @@ export default function SalesPage() {
           expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
         }).select().single()
 
-        if (!quote) throw new Error('Failed to create quote')
+        if (newQuoteErr || !quote) {
+          throw new Error(`Failed to create quote: ${newQuoteErr?.message ?? 'no row returned'}`)
+        }
 
         // Create package
-        await supabase.from('quote_packages').insert({
+        const { error: newPkgErr } = await supabase.from('quote_packages').insert({
           quote_id: quote.id,
           package_index: 0,
           package_name: contractForm.package_name,
@@ -369,6 +381,7 @@ export default function SalesPage() {
           is_recommended: true,
           line_items: contractForm.line_items,
         })
+        if (!wroteOk(newPkgErr, 'Saving the contract package')) return
       }
 
       setContractModalOpen(false)
@@ -547,6 +560,17 @@ export default function SalesPage() {
   const [noteText, setNoteText] = useState('')
   const [savingNote, setSavingNote] = useState(false)
 
+  /**
+   * Report a write that failed instead of leaving the UI claiming it worked.
+   * Returns true when the write went through.
+   */
+  function wroteOk(error: { message: string } | null, what: string): boolean {
+    if (!error) return true
+    console.error(`[sales] ${what} failed:`, error.message)
+    showToastMsg(`${what} failed: ${error.message}`, 'error')
+    return false
+  }
+
   function showToastMsg(message: string, type: 'success' | 'error') {
     setToast({ message, type })
     setTimeout(() => setToast(null), 3000)
@@ -679,10 +703,11 @@ export default function SalesPage() {
         ? { ...o, paymentReceived: true }
         : o
     ))
-    await supabase
+    const { error: paidErr } = await supabase
       .from('sales_opportunities')
       .update({ payment_received: true, payment_received_at: new Date().toISOString(), updated_at: new Date().toISOString() })
       .eq('id', opp.supabase_id)
+    if (!wroteOk(paidErr, 'Marking payment received')) return
     showToastMsg(`"${opp.name}" marked as paid`, 'success')
   }
 
@@ -694,10 +719,16 @@ export default function SalesPage() {
     setOpportunities(prev => prev.map(o =>
       o.supabase_id === oppId ? { ...o, onCallSheet: newVal } : o
     ))
-    await supabase
+    const { error: sheetErr } = await supabase
       .from('sales_opportunities')
       .update({ on_jims_call_sheet: newVal, updated_at: new Date().toISOString() })
       .eq('id', oppId)
+    if (!wroteOk(sheetErr, "Updating Jim's call sheet")) {
+      // Put the toggle back rather than showing a state the database rejected.
+      setOpportunities(prev => prev.map(o =>
+        o.supabase_id === oppId ? { ...o, onCallSheet: !newVal } : o
+      ))
+    }
   }
 
   // Quick-add note
@@ -760,7 +791,13 @@ export default function SalesPage() {
 
   // --- Spreadsheet export helpers ---
 
-  function exportToSheet(rows: Opportunity[], filename: string, sheetName: string, isJimsList: boolean) {
+  function exportToSheet(
+    rows: Opportunity[],
+    filename: string,
+    sheetName: string,
+    isJimsList: boolean,
+    notesByOpp: Record<string, ExportNote[]>
+  ) {
     let data: Record<string, string | number | null>[];
     let colWidths: Record<string, number>;
 
@@ -773,7 +810,7 @@ export default function SalesPage() {
         'Phone': o.contactPhone || '',
         'State': o.state || '',
         'Source': o.source || '',
-        'Contact Date &Subject': (o.notes || '').replace(/\n/g, ' '),
+        'Contact Date &Subject': notesToCell(notesByOpp[o.supabase_id] ?? []),
       }))
       colWidths = {
         'District / School': 40,
@@ -800,7 +837,10 @@ export default function SalesPage() {
         'Deal Type': o.type === 'new_business' ? 'New Business' : o.type === 'renewal' ? 'Renewal' : o.type || '',
         'Website': o.website || '',
         'School Year': o.schoolYear || '',
-        'Notes': (o.notes || '').replace(/\n/g, ' '),
+        // Every note we hold on this client, newest first. This used to be the
+        // sales_opportunities.notes text column, an old import that carried
+        // none of the logged calls, emails or meetings.
+        'Notes': notesToCell(notesByOpp[o.supabase_id] ?? []),
       }))
       colWidths = {
         'District / School': 35,
@@ -826,48 +866,143 @@ export default function SalesPage() {
 
     const wb = XLSX.utils.book_new()
     XLSX.utils.book_append_sheet(wb, ws, sheetName)
+
+    // Second tab: every note, one per row.
+    const noteRows = buildNoteRows(
+      rows.map(o => ({ id: o.supabase_id, name: o.name })),
+      notesByOpp
+    )
+
+    if (noteRows.length > 0) {
+      const notesWs = XLSX.utils.json_to_sheet(noteRows)
+      notesWs['!cols'] = [
+        { wch: 35 }, { wch: 14 }, { wch: 18 }, { wch: 10 }, { wch: 32 }, { wch: 120 },
+      ]
+      XLSX.utils.book_append_sheet(wb, notesWs, 'All Notes')
+    }
+
     XLSX.writeFile(wb, filename)
+  }
+
+  /**
+   * The full note history for every lead, for the export.
+   *
+   * The page already holds a five-note preview per lead, which is what the
+   * cards need. An export is the one place that has to carry everything, so it
+   * asks for the unclipped set at the moment of export rather than keeping it
+   * in memory all session.
+   */
+  async function fetchNotesForExport(): Promise<Record<string, ExportNote[]>> {
+    const res = await fetch('/api/sales/notes/export')
+    if (!res.ok) throw new Error(`Notes export request failed (${res.status})`)
+    const { notes } = await res.json()
+    return notes ?? {}
+  }
+
+  async function runExport(
+    rows: Opportunity[],
+    filename: string,
+    sheetName: string,
+    isJimsList: boolean,
+    label: string
+  ) {
+    if (exporting) return
+    setExporting(true)
+    try {
+      const notesByOpp = await fetchNotesForExport()
+      exportToSheet(rows, filename, sheetName, isJimsList, notesByOpp)
+      const noteCount = rows.reduce((sum, o) => sum + (notesByOpp[o.supabase_id]?.length ?? 0), 0)
+      showToastMsg(`Exported ${rows.length} ${label} with ${noteCount} notes`, 'success')
+    } catch (e) {
+      // An export that quietly drops the notes column looks like a working
+      // export, which is the failure this whole change exists to end.
+      console.error('[sales] export failed:', e)
+      showToastMsg('Export failed: could not load notes. Nothing was downloaded.', 'error')
+    } finally {
+      setExporting(false)
+    }
   }
 
   function handleExportJimsList() {
     const rows = activeOpps
       .filter(o => !o.deleted_at && o.onCallSheet)
       .sort((a, b) => (b.value ?? 0) - (a.value ?? 0))
-    exportToSheet(rows, `jims-call-list-${new Date().toISOString().split('T')[0]}.xlsx`, "Jim's Call List", true)
-    showToastMsg(`Exported ${rows.length} Jim's list deals`, 'success')
+    void runExport(
+      rows,
+      `jims-call-list-${new Date().toISOString().split('T')[0]}.xlsx`,
+      "Jim's Call List",
+      true,
+      "Jim's list deals"
+    )
   }
 
   function handleExport() {
     const rows = activeOpps
       .filter(o => !o.deleted_at)
       .sort((a, b) => (b.value ?? 0) - (a.value ?? 0))
-    exportToSheet(rows, `tdi-pipeline-${new Date().toISOString().split('T')[0]}.xlsx`, 'Pipeline', false)
-    showToastMsg(`Exported ${rows.length} deals`, 'success')
+    void runExport(
+      rows,
+      `tdi-pipeline-${new Date().toISOString().split('T')[0]}.xlsx`,
+      'Pipeline',
+      false,
+      'deals'
+    )
   }
 
   // Context menu: add note
+  /**
+   * Add a note from the right-click menu.
+   *
+   * This used to insert into `activity_log` with columns that table does not
+   * have: opportunity_id, activity_type, subject, body, logged_by_email,
+   * activity_date. That table holds partnership_id, user_id, action, details.
+   * Every insert was rejected, the error was never read, and the toast said
+   * "Note saved". Every note added this way was thrown away.
+   *
+   * It now goes through the same API as the quick note, which writes the real
+   * columns, stamps last_activity_at and logs the activity entry.
+   */
   async function handleSaveNote() {
     if (!noteModal || !noteText.trim()) return
     setSavingNote(true)
 
-    await supabase.from('activity_log').insert({
-      opportunity_id: noteModal.supabase_id,
-      activity_type: 'note',
-      subject: 'Note',
-      body: noteText.trim(),
-      logged_by_email: 'admin@teachersdeserveit.com',
-      activity_date: new Date().toISOString(),
-    })
+    const oppId = noteModal.supabase_id
+    const body = noteText.trim()
+    const now = new Date().toISOString()
 
-    await supabase
-      .from('sales_opportunities')
-      .update({ last_activity_at: new Date().toISOString() })
-      .eq('id', noteModal.supabase_id)
+    try {
+      const res = await fetch(`/api/sales/opportunities/${oppId}/notes`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          note_text: body,
+          note_type: 'update',
+          author_email: 'rae@teachersdeserveit.com',
+        }),
+      })
+
+      if (!res.ok) {
+        const { error } = await res.json().catch(() => ({ error: 'Unknown error' }))
+        console.error('[sales] note save failed:', error)
+        showToastMsg(`Note was not saved: ${error}`, 'error')
+        setSavingNote(false)
+        return
+      }
+    } catch (e) {
+      console.error('[sales] note save request failed:', e)
+      showToastMsg('Note was not saved. Check your connection and try again.', 'error')
+      setSavingNote(false)
+      return
+    }
+
+    // Only reflect it locally once the write is known to have succeeded.
+    setOppNotes(prev => ({
+      ...prev,
+      [oppId]: [{ body, created_at: now }, ...(prev[oppId] || [])],
+    }))
 
     setOpportunities(prev => prev.map(o =>
-      o.supabase_id === noteModal.supabase_id
-        ? { ...o, lastActivityAt: new Date().toISOString() }
-        : o
+      o.supabase_id === oppId ? { ...o, lastActivityAt: now } : o
     ))
 
     setSavingNote(false)
@@ -1257,6 +1392,7 @@ export default function SalesPage() {
                 onAddLead={() => setAddLeadModalOpen(true)}
                 onExport={handleExport}
                 onExportJimsList={handleExportJimsList}
+                exporting={exporting}
                 showCallSheetOnly={showCallSheetOnly}
                 onToggleCallSheet={() => setShowCallSheetOnly(!showCallSheetOnly)}
               />
@@ -1513,7 +1649,8 @@ export default function SalesPage() {
                         onBlur={async (e) => {
                           const val = e.target.value.trim() || null
                           if (val === (q.po_number || null)) return
-                          await supabase.from('quotes').update({ po_number: val, updated_at: new Date().toISOString() }).eq('id', q.id)
+                          const { error: poErr } = await supabase.from('quotes').update({ po_number: val, updated_at: new Date().toISOString() }).eq('id', q.id)
+                          if (!wroteOk(poErr, 'Saving the PO number')) return
                           setQuotes(prev => prev.map(qq => qq.id === q.id ? { ...qq, po_number: val } : qq))
                         }}
                         style={{ fontSize: 12, padding: '4px 8px', border: '1px solid #E5E7EB', borderRadius: 6, width: 180, color: '#374151' }}
@@ -1544,7 +1681,8 @@ export default function SalesPage() {
                       {(q.status === 'draft') && (
                         <button
                           onClick={async () => {
-                            await supabase.from('quotes').update({ status: 'sent', sent_at: new Date().toISOString(), expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), updated_at: new Date().toISOString() }).eq('id', q.id)
+                            const { error: sentErr } = await supabase.from('quotes').update({ status: 'sent', sent_at: new Date().toISOString(), expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), updated_at: new Date().toISOString() }).eq('id', q.id)
+                            if (!wroteOk(sentErr, 'Marking the contract as sent')) return
                             setQuotes(prev => prev.map(qq => qq.id === q.id ? { ...qq, status: 'sent', sent_at: new Date().toISOString() } : qq))
                             showToastMsg(`"${q.title}" marked as sent`, 'success')
                             fetch('/api/sales/slack-notify', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ event: 'sent', org: q.contact_organization, title: q.title, amount: q.quote_packages?.[0]?.total_amount || 0, contactName: q.contact_name, quoteNumber: q.quote_number }) }).catch(() => {})
@@ -1558,8 +1696,10 @@ export default function SalesPage() {
                         <button
                           onClick={async () => {
                             if (!confirm(`Delete contract "${q.title}"? This cannot be undone.`)) return
-                            await supabase.from('quote_packages').delete().eq('quote_id', q.id)
-                            await supabase.from('quotes').delete().eq('id', q.id)
+                            const { error: delPkgErr } = await supabase.from('quote_packages').delete().eq('quote_id', q.id)
+                            if (!wroteOk(delPkgErr, 'Deleting the contract packages')) return
+                            const { error: delQuoteErr } = await supabase.from('quotes').delete().eq('id', q.id)
+                            if (!wroteOk(delQuoteErr, 'Deleting the contract')) return
                             setQuotes(prev => prev.filter(qq => qq.id !== q.id))
                             showToastMsg(`Contract "${q.title}" deleted`, 'success')
                           }}
