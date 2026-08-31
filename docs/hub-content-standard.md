@@ -182,6 +182,58 @@ The order that avoids it:
 3. Re-measure. When the counts reach zero, flip the checks to blocking
 4. Stamp `rubric-v2` from step 1 onward, so the audit trail starts before enforcement does
 
+## 8. The remediation workflow
+
+Approved 2026-08-31. The queue lives in the database, scored on demand. It is
+not a ticket per item: 259 items would become 259 Paperclip tickets and no one
+could see the queue.
+
+**Stage 1, score.** `GET /api/hub/content-sync?action=list_published` runs
+`scoreItem()` over every live item and returns a lane and a defect list per
+item, plus the lane counts. Nothing here is a judgment call, so re-running it
+gives the same answer and the count is trustworthy. Locally,
+`npx tsx scripts/score-published-dryrun.ts`.
+
+**Stage 2, three lanes**, which are section 5's policy in code.
+
+| Lane | Meaning | Action |
+|---|---|---|
+| `pull` | The download is not a usable document | `unpublish`, immediately |
+| `replace` | Live and usable, fails on substance | Rebuild, stays live meanwhile |
+| `stamp` | Content is fine, provenance is missing | `backfill_published` then `review_published` |
+| `clean` | Nothing to do | |
+
+**Stage 3, rebuild.** Replace-lane items get rebuilt against sections 1 to 4,
+not patched. The acceptance test is Maya's, and it is the one that decides
+whether the thing is worth downloading: *could a teacher who already knows the
+idea use this cold, mid class, without reading the explanation?* If not, it was
+written as an article and it goes back. Lily's design QA runs before Julie
+Lynn's content QA, so nothing visually flat reaches her desk.
+
+**Stage 4, publish on a verified read back.** `review_published` stamps
+`rubric-v2` and then re-reads the row to confirm the write landed, failing loudly
+if it did not. Writes on this table have silently dropped fields before
+(TEA-236) and a 200 proved nothing.
+
+### What the lane counts do and do not tell you
+
+Measured 2026-08-31: pull 21, replace 1, stamp 241, clean 0.
+
+The 21 are all `.html` files served as downloads. A teacher clicking download
+gets a web page, not a document.
+
+**A stamp lane of 241 does not mean 241 good items.** It means 241 items with no
+defect a machine can see. No machine can tell whether a download equips a
+teacher or just explains at them, so items will move from stamp to replace as
+QA actually reads them. Expect the split to shift. That is the process working,
+not the score being wrong.
+
+### Throughput
+
+Stamp lane at 30 a day, replace lane at 6 to 8. The ceiling is QA, not drafting.
+Drafting faster than review recreates exactly what produced 181 unreviewed live
+items in the first place.
+
 ## Sources
 
 TEA-214 is the parent thread. TEA-215 documented the existing gate. TEA-218
