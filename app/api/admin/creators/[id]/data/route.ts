@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { getJourneyForCreator } from '@/lib/creator-journey';
 
 /**
  * Server-side API route to fetch creator dashboard data using service role.
@@ -109,11 +110,21 @@ export async function GET(
       .eq('creator_id', creatorId)
       .order('project_number', { ascending: false });
 
+    // The same journey object the creator's own dashboard renders from.
+    //
+    // The admin page used to build its own view of progress out of `phases`,
+    // which is why the two drifted: the portal moved to stages with plain
+    // English names and one open step, and this page carried on grouping raw
+    // milestones by database phase. Reading the identical structure from the
+    // identical function is what stops that happening again.
+    const journey = await getJourneyForCreator(supabase, creatorId);
+
     return NextResponse.json({
       creator,
       phases: phasesWithMilestones,
       notes: notes || [],
       projects: projects || [],
+      journey,
     });
   } catch (error) {
     console.error('[admin/creators/data] Error:', error);

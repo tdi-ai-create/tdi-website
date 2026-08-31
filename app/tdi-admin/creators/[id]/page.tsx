@@ -73,6 +73,9 @@ import type {
   PhaseWithMilestones,
   ContentPath,
 } from '@/types/creator-portal';
+import { CreatorMirror } from '@/components/admin/CreatorMirror';
+import type { Journey } from '@/lib/creator-journey';
+import { blocksPublish, PUBLISH_BLOCKED_MESSAGE } from '@/lib/creator-agreement';
 
 const statusConfig: Record<
   MilestoneStatus,
@@ -1432,11 +1435,24 @@ export default function TDIAdminCreatorDetailPage() {
             </a>
           </div>
 
-          {false && (
-            <div className="hidden">
-              {/* Removed Creator View banner */}
-            </div>
-          )}
+          {/* What the creator sees, from the creator's own components.
+              Sits above the milestone list rather than replacing it: the flat
+              list is still how a step gets approved, and removing it in the
+              same change would take away the controls before the replacement
+              exists. */}
+          <CreatorMirror
+            journey={(dashboardData as unknown as { journey?: Journey | null }).journey ?? null}
+            creatorName={creator.name}
+          />
+
+          <div className="pt-2">
+            <h3
+              className="text-sm font-semibold uppercase tracking-wider text-gray-400"
+              style={{ fontFamily: "'DM Sans', sans-serif" }}
+            >
+              Every step, for approving and editing
+            </h3>
+          </div>
 
           {/* Admin Helper Text */}
           {canEdit && (
@@ -1651,7 +1667,9 @@ export default function TDIAdminCreatorDetailPage() {
                   {canEdit && creator.publish_status !== 'published' && (
                     <button
                       onClick={() => setShowPublishModal(true)}
-                      className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium rounded-lg transition-colors"
+                      disabled={blocksPublish(creator)}
+                      title={blocksPublish(creator) ? PUBLISH_BLOCKED_MESSAGE : undefined}
+                      className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                       style={{ backgroundColor: theme.accent, color: '#2B3A67' }}
                     >
                       <Rocket className="w-4 h-4" />
@@ -2120,7 +2138,9 @@ export default function TDIAdminCreatorDetailPage() {
                   {creator.publish_status !== 'published' && (
                     <button
                       onClick={() => setShowPublishModal(true)}
-                      className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors"
+                      disabled={blocksPublish(creator)}
+                      title={blocksPublish(creator) ? PUBLISH_BLOCKED_MESSAGE : undefined}
+                      className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                       style={{ backgroundColor: theme.accent, color: '#2B3A67' }}
                     >
                       <Rocket className="w-4 h-4" />
@@ -2146,6 +2166,16 @@ export default function TDIAdminCreatorDetailPage() {
                       {isPublishing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
                       Mark Published
                     </button>
+                  )}
+
+                  {/* The server refuses this anyway. Saying so here means the
+                      answer arrives before the click rather than as an alert
+                      after it. */}
+                  {creator.publish_status !== 'published' && blocksPublish(creator) && (
+                    <p className="w-full text-xs text-gray-500 leading-snug">
+                      Publishing is off until they sign their agreement. They
+                      are reminded every time they open the portal.
+                    </p>
                   )}
                 </div>
               )}

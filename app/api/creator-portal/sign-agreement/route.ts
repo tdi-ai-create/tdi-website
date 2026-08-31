@@ -83,6 +83,10 @@ export async function POST(request: NextRequest) {
 
     console.log('[sign-agreement] Creator updated successfully:', updateData[0]?.name);
 
+    // Anything the team needs to know about the board, collected rather than
+    // thrown, so it reaches them without reaching the creator.
+    let boardNote: string | null = null;
+
     // Mark the "Sign Agreement" milestone as complete
     // The milestone ID is 'agreement_sign' - we can also try to find by name as fallback
     let milestoneId = 'agreement_sign';
@@ -138,28 +142,38 @@ export async function POST(request: NextRequest) {
         .single();
 
       if (await creatorFlag(supabase, 'step_engine')) {
+        // Rule D. The signature is already saved by this point, so nothing
+        // below may report failure to the creator.
+        //
+        // This used to return a 400 or a 500 here, on the reasoning that
+        // signing gates everything after it so a stalled board should be
+        // reported. That was true when signing was the first step anyone took.
+        // It is wrong now: six creators reached this route having already
+        // completed later steps, and placement only ever moves forward, so
+        // their board legitimately has nothing to open. Those people would
+        // have typed their name, had it saved, and been told it failed.
+        //
+        // The board outcome is real and someone should see it, so it goes to
+        // the team in the notification email instead of to the creator.
         const resolved = await resolveStepRow(supabase, creatorId, milestoneId);
         if (resolved.error || !resolved.recordId) {
           console.error('[sign-agreement] Engine could not find the agreement step:', resolved.error);
-          return NextResponse.json({ success: false, error: resolved.error }, { status: 400 });
+          boardNote = `The board was not updated: ${resolved.error}`;
+        } else {
+          const advanced = await advanceStep(supabase, {
+            milestoneRecordId: resolved.recordId,
+            decision: 'approve',
+            actor: `creator:${signedName || creatorId}`,
+            startClock: creatorRow?.lifecycle_state !== 'paused',
+          });
+
+          if (!advanced.ok) {
+            console.error('[sign-agreement] Engine refused to advance:', advanced.error);
+            boardNote = `The board was not updated: ${advanced.error}`;
+          } else {
+            console.log('[sign-agreement] Engine advanced. Next:', advanced.openStep?.name ?? 'end of path');
+          }
         }
-
-        const advanced = await advanceStep(supabase, {
-          milestoneRecordId: resolved.recordId,
-          decision: 'approve',
-          actor: `creator:${signedName || creatorId}`,
-          startClock: creatorRow?.lifecycle_state !== 'paused',
-        });
-
-        if (!advanced.ok) {
-          // Signing is the gate on everything after it. If the board did not
-          // move, saying the agreement is signed leaves them stuck on a step
-          // they have already completed.
-          console.error('[sign-agreement] Engine refused to advance:', advanced.error);
-          return NextResponse.json({ success: false, error: advanced.error }, { status: 500 });
-        }
-
-        console.log('[sign-agreement] Engine advanced. Next:', advanced.openStep?.name ?? 'end of path');
       } else {
         await progressMilestone(supabase, {
           creatorId,
@@ -197,6 +211,8 @@ export async function POST(request: NextRequest) {
                   <strong style="color: #166534;">Date:</strong> ${new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
                 </div>
 
+                ${boardNote ? `<div style="background: #fef2f2; border-left: 4px solid #ef4444; padding: 16px; margin: 20px 0;"><strong style="color: #991b1b;">Needs a look:</strong> ${boardNote}</div>` : ''}
+
                 <a href="https://www.teachersdeserveit.com/admin/creators/${creatorId}"
                    style="display: inline-block; background: #1e2749; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; margin-top: 16px;">
                   View Creator Profile
@@ -219,7 +235,7 @@ export async function POST(request: NextRequest) {
     // the Waiting on TDI list, so nothing is lost by removing it. Putting the
     // write back means creating the table first.
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, boardAdvanced: boardNote === null, boardNote });
   } catch (error) {
     console.error('[sign-agreement] Unexpected error:', error);
     return NextResponse.json(
