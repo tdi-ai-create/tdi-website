@@ -120,6 +120,12 @@ export async function POST(request: NextRequest) {
   if (auth instanceof NextResponse) return auth
 
   const actor = auth.user?.email || 'unknown'
+
+  // ?dryRun=1 walks every check and reports exactly what would be sent and
+  // written, without calling Resend or touching a row. This is the only way to
+  // exercise the approve path without mailing a real school.
+  const dryRun = request.nextUrl.searchParams.get('dryRun') === '1'
+
   const { action, id, subject, body, reason } = await request.json()
 
   if (!id || !action) {
@@ -149,6 +155,13 @@ export async function POST(request: NextRequest) {
     if (!reason?.trim()) {
       return NextResponse.json({ error: 'A reason is required so the agent can redraft' }, { status: 400 })
     }
+    if (dryRun) {
+      return NextResponse.json({
+        ok: true, dryRun: true, action: 'would reject',
+        wouldWrite: { status: 'rejected', rejected_reason: reason.trim(), rejected_by: actor },
+      })
+    }
+
     const { error } = await supabase
       .from('funding_email_log')
       .update({
@@ -187,6 +200,19 @@ export async function POST(request: NextRequest) {
       { error: `${to} is not on the send allowlist. Contact Rae to add them.` },
       { status: 400 }
     )
+  }
+
+  if (dryRun) {
+    return NextResponse.json({
+      ok: true,
+      dryRun: true,
+      action: 'would send',
+      to,
+      subject: finalSubject,
+      bodyPreview: finalBody.slice(0, 200),
+      htmlBytes: buildFundingEmailHtml(finalBody).length,
+      wouldUpdateOpportunity: draft.opportunity_id ?? null,
+    })
   }
 
   const resendKey = process.env.RESEND_API_KEY
@@ -247,7 +273,10 @@ export async function POST(request: NextRequest) {
   }
 
   if (draft.opportunity_id) {
-    await supabase
+    // Same rule as the log write above: the email is already out, so this
+    // failing cannot undo it. Report it rather than let the grant route keep
+    // reading as 'drafted' and invite a second send.
+    const { error: oppErr } = await supabase
       .from('funding_opportunities')
       .update({
         forwarding_email_status: 'sent',
@@ -256,6 +285,16 @@ export async function POST(request: NextRequest) {
         last_activity_at: new Date().toISOString(),
       })
       .eq('id', draft.opportunity_id)
+
+    if (oppErr) {
+      console.error('[funding/outreach-queue] sent but grant route not updated', oppErr)
+      return NextResponse.json({
+        ok: true,
+        action: 'sent',
+        resendId,
+        warning: `Email sent, but the grant route still reads as drafted: ${oppErr.message}. Do not resend.`,
+      })
+    }
   }
 
   return NextResponse.json({ ok: true, action: 'sent', resendId })
