@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 import { clearFlagForCompletedMilestone } from '@/lib/creator-agent-flags';
 import { creatorFlag } from '@/lib/creator-flags';
 import { advanceStep, resolveStepRow } from '@/lib/creator-step-engine';
+import { AGREEMENT_COLUMNS, blocksPublish } from '@/lib/creator-agreement';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -49,7 +50,7 @@ export async function POST(request: Request) {
     // 1. Get creator info
     const { data: creator, error: creatorError } = await supabase
       .from('creators')
-      .select('name, email, content_path, lifecycle_state')
+      .select(`name, email, content_path, lifecycle_state, ${AGREEMENT_COLUMNS}`)
       .eq('id', creatorId)
       .single();
 
@@ -428,9 +429,17 @@ export async function POST(request: Request) {
           .eq('status', 'completed')
           .in('milestone_id', (launchMilestones || []).map(m => m.id));
 
-        // If all launch milestones are completed, auto-enable website visibility
+        // If all launch milestones are completed, auto-enable website visibility.
+        //
+        // Rule B, third door. This is the quietest of the three: nobody presses
+        // a publish button here, finishing the launch phase simply puts the
+        // creator's name and bio on the public site. Eleven of the twelve
+        // unsigned creators are listed publicly today, so this path is not
+        // hypothetical. An unsigned creator finishes their work and stays off
+        // the site until the agreement is in.
         if (launchMilestones && completedLaunchMilestones &&
-            completedLaunchMilestones.length >= launchMilestones.length) {
+            completedLaunchMilestones.length >= launchMilestones.length &&
+            !blocksPublish(creator || {})) {
           const { error: visibilityError } = await supabase
             .from('creators')
             .update({
@@ -457,6 +466,29 @@ export async function POST(request: Request) {
             if (visibilityNoteError) {
               console.error('[approve-milestone] Website visibility note failed:', visibilityNoteError.message);
             }
+          }
+        } else if (
+          launchMilestones && completedLaunchMilestones &&
+          completedLaunchMilestones.length >= launchMilestones.length
+        ) {
+          // They finished everything and are being held back only by the
+          // agreement. Say so on the record, because a creator who completes
+          // the launch phase and never appears on the site is otherwise a
+          // silent gap somebody has to go looking for.
+          console.log('[approve-milestone] Launch complete but agreement unsigned, holding website visibility:', creator?.name);
+
+          const { error: heldNoteError } = await supabase
+            .from('creator_notes')
+            .insert({
+              creator_id: creatorId,
+              content: '[Auto] Launch phase complete, but the Creator Partnership Agreement is not signed. Website visibility is on hold until it is. They are being reminded every time they open the portal.',
+              author: 'System',
+              visible_to_creator: false,
+              phase_id: milestone.phase_id,
+            });
+
+          if (heldNoteError) {
+            console.error('[approve-milestone] Held-visibility note failed:', heldNoteError.message);
           }
         }
       }
