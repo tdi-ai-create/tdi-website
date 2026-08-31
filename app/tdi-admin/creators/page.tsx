@@ -453,6 +453,38 @@ export default function CreatorStudioPage() {
     }
   }, [hasAccess, loadDashboardData]);
 
+  // Mark an integrity finding handled, or put it back. Never touches the
+  // underlying data: the contradiction stays true, and what is recorded is that
+  // a person looked at it.
+  const handleIntegrityDismiss = async (
+    checkId: string,
+    creatorId: string,
+    name: string | null,
+    restore = false
+  ) => {
+    const reason = restore
+      ? null
+      : window.prompt(`Mark handled for ${name || 'this creator'}. Why? (optional)`);
+    // prompt returns null on Cancel, '' on OK with nothing typed. Only Cancel aborts.
+    if (!restore && reason === null) return;
+
+    try {
+      const res = await fetch('/api/admin/creator-integrity/dismiss', {
+        method: restore ? 'DELETE' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ checkId, creatorId, reason, adminEmail }),
+      });
+      const data = await res.json();
+      if (!data.success) {
+        alert(`Could not ${restore ? 'restore' : 'dismiss'}: ${data.error}`);
+        return;
+      }
+      await loadDashboardData();
+    } catch {
+      alert(`Could not ${restore ? 'restore' : 'dismiss'} that finding.`);
+    }
+  };
+
   // Quick actions from creator list
   const handleQuickAction = async (action: string, creatorId: string, creatorEmail?: string) => {
     setQuickActionLoading(action);
@@ -1140,7 +1172,9 @@ export default function CreatorStudioPage() {
   // waiting on. See lib/creator-integrity.ts for why each check exists.
   const integrityFindings = dashboardData.integrity?.findings ?? [];
   const integritySystem = dashboardData.integrity?.system ?? [];
-  const hasIntegrityIssues = integrityFindings.length > 0 || integritySystem.length > 0;
+  const integrityDismissed = dashboardData.integrity?.dismissed ?? [];
+  const hasIntegrityIssues =
+    integrityFindings.length > 0 || integritySystem.length > 0 || integrityDismissed.length > 0;
 
   const INTEGRITY_LABELS: Record<string, string> = {
     draft_not_recorded: 'Draft not recorded',
@@ -1707,21 +1741,27 @@ export default function CreatorStudioPage() {
               </p>
               <div className="space-y-2">
                 {integrityFindings.map((f) => (
-                  <Link
+                  <div
                     key={`${f.checkId}-${f.creatorId}`}
-                    href={`/tdi-admin/creators/${f.creatorId}`}
                     className="flex items-start gap-3 p-2 -mx-2 rounded-lg hover:bg-rose-50 transition-colors group"
                   >
                     <span className="mt-0.5 text-[10px] font-semibold uppercase tracking-wide text-rose-700 bg-rose-50 rounded px-1.5 py-0.5 flex-shrink-0">
                       {INTEGRITY_LABELS[f.checkId] || f.checkId}
                     </span>
-                    <div className="flex-1 min-w-0">
+                    <Link href={`/tdi-admin/creators/${f.creatorId}`} className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-gray-900 group-hover:text-rose-700 truncate">
                         {f.name || f.email || f.creatorId}
                       </p>
                       <p className="text-xs text-gray-500">{f.detail}</p>
-                    </div>
-                  </Link>
+                    </Link>
+                    <button
+                      onClick={() => handleIntegrityDismiss(f.checkId, f.creatorId, f.name)}
+                      className="flex-shrink-0 text-xs text-gray-400 hover:text-gray-700 px-2 py-1 rounded hover:bg-white transition-colors"
+                      title="A person has dealt with this. The contradiction stays on the record."
+                    >
+                      Mark handled
+                    </button>
+                  </div>
                 ))}
                 {integritySystem.map((s) => (
                   <div key={s.checkId} className="flex items-start gap-3 p-2 -mx-2">
@@ -1736,6 +1776,45 @@ export default function CreatorStudioPage() {
                     </div>
                   </div>
                 ))}
+
+                {integrityFindings.length === 0 && integritySystem.length === 0 && (
+                  <p className="text-sm text-gray-500 py-1">
+                    Nothing outstanding. Everything below has been handled.
+                  </p>
+                )}
+
+                {/* Handled findings stay visible. Some contradictions are
+                    permanent history and can never clear on their own, so
+                    hiding them outright would quietly drop real problems. */}
+                {integrityDismissed.length > 0 && (
+                  <div className="pt-3 mt-2 border-t border-gray-100">
+                    <p className="text-xs text-gray-400 mb-1.5">
+                      Handled ({integrityDismissed.length})
+                    </p>
+                    {integrityDismissed.map((d) => (
+                      <div
+                        key={`${d.checkId}-${d.creatorId}`}
+                        className="flex items-start gap-3 py-1 text-xs text-gray-400"
+                      >
+                        <span className="flex-shrink-0 uppercase tracking-wide">
+                          {INTEGRITY_LABELS[d.checkId] || d.checkId}
+                        </span>
+                        <span className="flex-1 min-w-0 truncate">
+                          {d.name || d.creatorId}
+                          {d.reason ? ` — ${d.reason}` : ''}
+                          <span className="text-gray-300"> · {d.dismissedBy}</span>
+                        </span>
+                        <button
+                          onClick={() => handleIntegrityDismiss(d.checkId, d.creatorId, d.name, true)}
+                          className="flex-shrink-0 hover:text-gray-700 px-1.5 rounded hover:bg-white transition-colors"
+                          title="Put this finding back on the list"
+                        >
+                          Restore
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           )}

@@ -171,6 +171,15 @@ export interface DashboardData {
       count: number;
       creatorsAffected: number;
     }[];
+    /** Acknowledged findings. Shown as a count so a dismissal stays visible and reversible. */
+    dismissed: {
+      checkId: string;
+      creatorId: string;
+      name: string | null;
+      reason: string | null;
+      dismissedBy: string;
+      dismissedAt: string;
+    }[];
     checkedAt: string;
   } | null;
 }
