@@ -78,17 +78,34 @@ const liveIds = new Set((partnerships ?? []).map((p) => String(p.id)));
 const slugToId = new Map();
 for (const p of partnerships ?? []) if (p.slug) slugToId.set(p.slug, String(p.id));
 
+// Someone who bought their own membership has no partnership by design, so
+// counting them as unattributed makes this fail on a new paying customer. It
+// did, on 31 Aug, for one teacher at Unit 5 who subscribed through Stripe.
+// An alarm that fires when somebody gives us money teaches everyone to ignore
+// the alarm.
+//
+// Everything else stays in scope. Measured on 31 Aug: district_partner 250 of
+// 250 attributed, partner_roster_update 16 of 16, admin_assigned 0 of 17,
+// sales_deal 0 of 1. The signal lives in those three.
+const SELF_SERVE_SOURCES = ['stripe'];
+
 const { data: seats, error: sErr } = await hub
   .from('hub_memberships')
-  .select('user_id, partnership_id')
+  .select('user_id, partnership_id, source')
   .eq('tier', 'all_access')
   .eq('status', 'active');
 die('hub_memberships', sErr);
 
-const orphanIds = (seats ?? []).filter((s) => !liveIds.has(String(s.partnership_id))).map((s) => s.user_id);
+const selfServe = (seats ?? []).filter((s) => SELF_SERVE_SOURCES.includes(s.source)).length;
+const districtSeats = (seats ?? []).filter((s) => !SELF_SERVE_SOURCES.includes(s.source));
+
+const orphanIds = districtSeats.filter((s) => !liveIds.has(String(s.partnership_id))).map((s) => s.user_id);
 
 if (orphanIds.length === 0) {
-  console.log(`\nAll ${seats.length} live all-access seats trace to a partnership.\n`);
+  console.log(
+    `\nAll ${districtSeats.length} district all-access seats trace to a partnership` +
+      `${selfServe ? `, and ${selfServe} self-serve seat(s) correctly have none` : ''}.\n`
+  );
   process.exit(0);
 }
 
@@ -104,7 +121,11 @@ die('hub_profiles', prErr);
 const stillOrphaned = (profiles ?? []).filter((p) => !p.partnership_slug || !slugToId.has(p.partnership_slug));
 
 if (stillOrphaned.length === 0) {
-  console.log(`\nAll ${seats.length} live all-access seats trace to a partnership, ${unique.length} via the slug fallback.\n`);
+  console.log(
+    `\nAll ${districtSeats.length} district all-access seats trace to a partnership, ` +
+      `${unique.length} via the slug fallback` +
+      `${selfServe ? `, and ${selfServe} self-serve seat(s) correctly have none` : ''}.\n`
+  );
   process.exit(0);
 }
 
