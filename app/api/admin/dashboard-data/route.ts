@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { getCreatorActivity } from '@/lib/creator-activity';
 import { STEP_INTERVAL_DAYS, FINAL_STEP } from '@/lib/reengagement-config';
+import { runIntegrityChecks } from '@/lib/creator-integrity';
 
 export async function GET(request: NextRequest) {
   try {
@@ -297,6 +298,18 @@ export async function GET(request: NextRequest) {
         phase: c.current_phase,
       }));
 
+    // Records that contradict themselves. Deliberately not folded into stats or
+    // needsAttention: those answer "who is waiting on us", derived from the same
+    // milestone state that can be wrong. This answers "which records disagree",
+    // which is the question that catches a record nobody appears to be waiting on.
+    // Never fatal. A failure here must not take the dashboard down.
+    let integrity = null;
+    try {
+      integrity = await runIntegrityChecks(supabase);
+    } catch (e) {
+      console.error('[dashboard-data] integrity checks failed:', e);
+    }
+
     return NextResponse.json({
       success: true,
       creators: enrichedCreators,
@@ -306,6 +319,7 @@ export async function GET(request: NextRequest) {
       closestToLaunch,
       recentActivity: recentCompletions,
       topics,
+      integrity,
     });
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';

@@ -1135,6 +1135,21 @@ export default function CreatorStudioPage() {
     })
     .slice(0, 8);
 
+  // Records that contradict themselves. A different question from "who is
+  // waiting on us", and the one that catches a record nobody appears to be
+  // waiting on. See lib/creator-integrity.ts for why each check exists.
+  const integrityFindings = dashboardData.integrity?.findings ?? [];
+  const integritySystem = dashboardData.integrity?.system ?? [];
+  const hasIntegrityIssues = integrityFindings.length > 0 || integritySystem.length > 0;
+
+  const INTEGRITY_LABELS: Record<string, string> = {
+    draft_not_recorded: 'Draft not recorded',
+    publish_mismatch: 'Publish records disagree',
+    agreement_contradiction: 'Complete but unsigned',
+    closed_but_submitted: 'Closed despite work',
+    completed_without_date: 'Completed with no date',
+  };
+
   // Count for display - how many need attention
   const needsAttentionCount = dashboardData.creators.filter(
     (c: EnrichedCreator) => {
@@ -1662,6 +1677,64 @@ export default function CreatorStudioPage() {
                     onAction={handleDraftNoteAction}
                     onSaveInternalNote={handleSaveInternalNote}
                   />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Records that disagree with themselves.
+              Deliberately above Needs Your Attention and styled apart, because
+              it is not a queue. Each row means two sources contradict each
+              other, and one of them may be telling a creator something untrue.
+              "Needs Your Attention" cannot catch these: when a record is wrong,
+              nobody appears to be waiting on us. */}
+          {hasIntegrityIssues && (
+            <div
+              className="mb-5 bg-white rounded-2xl p-6 shadow-[0_1px_4px_rgba(0,0,0,0.04)] border-l-4"
+              style={{ borderLeftColor: '#E11D48' }}
+            >
+              <div className="mb-1">
+                <h3 className="flex items-center gap-2" style={TYPE_CARD_TITLE}>
+                  <AlertTriangle className="w-5 h-5 text-rose-600" />
+                  Records that disagree with themselves
+                  <span className="text-xs font-normal text-gray-500">
+                    ({integrityFindings.length + integritySystem.length})
+                  </span>
+                </h3>
+              </div>
+              <p className="text-xs text-gray-500 mb-4">
+                Two sources contradict each other here. Worth opening before anyone contacts these creators.
+              </p>
+              <div className="space-y-2">
+                {integrityFindings.map((f) => (
+                  <Link
+                    key={`${f.checkId}-${f.creatorId}`}
+                    href={`/tdi-admin/creators/${f.creatorId}`}
+                    className="flex items-start gap-3 p-2 -mx-2 rounded-lg hover:bg-rose-50 transition-colors group"
+                  >
+                    <span className="mt-0.5 text-[10px] font-semibold uppercase tracking-wide text-rose-700 bg-rose-50 rounded px-1.5 py-0.5 flex-shrink-0">
+                      {INTEGRITY_LABELS[f.checkId] || f.checkId}
+                    </span>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-gray-900 group-hover:text-rose-700 truncate">
+                        {f.name || f.email || f.creatorId}
+                      </p>
+                      <p className="text-xs text-gray-500">{f.detail}</p>
+                    </div>
+                  </Link>
+                ))}
+                {integritySystem.map((s) => (
+                  <div key={s.checkId} className="flex items-start gap-3 p-2 -mx-2">
+                    <span className="mt-0.5 text-[10px] font-semibold uppercase tracking-wide text-gray-600 bg-gray-100 rounded px-1.5 py-0.5 flex-shrink-0">
+                      {INTEGRITY_LABELS[s.checkId] || s.checkId}
+                    </span>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-gray-900">
+                        {s.count} across {s.creatorsAffected} creators
+                      </p>
+                      <p className="text-xs text-gray-500">{s.detail}</p>
+                    </div>
+                  </div>
                 ))}
               </div>
             </div>

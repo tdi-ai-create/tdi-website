@@ -121,7 +121,7 @@ export async function classifyRoster(
 ): Promise<GateVerdict[]> {
   const { data: creators, error } = await supabase
     .from('creators')
-    .select('id, name, email, created_at, agreement_signed_at, status, lifecycle_state, publish_status, is_test_account');
+    .select('id, name, email, created_at, agreement_signed_at, status, lifecycle_state, publish_status, published_date, is_test_account');
 
   if (error) {
     console.error('[agreement-gate] Failed to load creators:', error);
@@ -133,21 +133,46 @@ export async function classifyRoster(
       c.status === 'active' &&
       (!c.lifecycle_state || c.lifecycle_state === 'active') &&
       c.publish_status !== 'published' &&
+      // Someone whose work we published is never a candidate for closure,
+      // whatever publish_status happens to say. Publishing happens on Substack,
+      // outside this system, so publish_status is only as good as the last
+      // person who remembered to set it. published_date is the second chance.
+      !c.published_date &&
       !c.is_test_account
   );
 
   if (eligible.length === 0) return [];
 
+  // Read every COMPLETED milestone, not just the ones carrying a date.
+  //
+  // This used to filter on `.not('completed_at','is',null)`, which meant a row
+  // marked status='completed' with a null completed_at was invisible here. 39
+  // such rows exist across 18 creators, and the gate read every one of those
+  // creators as having done nothing. On 2026-08-25 that closed Dr. Stephanie
+  // Nardi with the reason "never completed anything" and emailed her a closing
+  // note, five months after we published her work to 22,612 readers.
+  //
+  // completed_at stays the preferred signal. updated_at is the fallback, and it
+  // is the conservative direction to err in: it can only make someone look more
+  // recently active, never less, and the failure mode we are avoiding is closing
+  // an account that should have been protected.
   const { data: milestones } = await supabase
     .from('creator_milestones')
-    .select('creator_id, completed_at')
-    .not('completed_at', 'is', null);
+    .select('creator_id, completed_at, updated_at, status');
 
   const lastMilestone = new Map<string, string>();
-  for (const m of (milestones || []) as { creator_id: string; completed_at: string }[]) {
+  for (const m of (milestones || []) as {
+    creator_id: string;
+    completed_at: string | null;
+    updated_at: string | null;
+    status: string | null;
+  }[]) {
+    if (m.status !== 'completed') continue;
+    const at = m.completed_at ?? m.updated_at;
+    if (!at) continue;
     const cur = lastMilestone.get(m.creator_id);
-    if (!cur || new Date(m.completed_at) > new Date(cur)) {
-      lastMilestone.set(m.creator_id, m.completed_at);
+    if (!cur || new Date(at) > new Date(cur)) {
+      lastMilestone.set(m.creator_id, at);
     }
   }
 

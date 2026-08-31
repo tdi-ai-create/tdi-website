@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { createHash } from 'crypto'
 import { getServiceSupabase } from '@/lib/supabase'
 import { postFundingEvent } from '@/lib/funding-slack'
 import { isGateOpen } from '@/lib/funding-gate-gaps'
@@ -498,20 +499,48 @@ async function sendFollowUpEmail(params: {
   if (!isTdiAddress(to)) {
     const supabase = getServiceSupabase()
 
-    // One draft per item per day, not one per hourly run.
-    const since = new Date()
-    since.setHours(0, 0, 0, 0)
-    const { data: alreadyDrafted } = await supabase
+    // One open draft per underlying task, not one per escalation rung.
+    //
+    // This used to deduplicate on subject, but the subject is rewritten at every
+    // rung ("Heads up on...", "Following up:...", "Can you help with...?"), so a
+    // single unanswered question produced a new draft each time it escalated.
+    // On 30 August the queue read as eight items of work that were really two
+    // questions asked four ways, which makes the backlog look worse than it is
+    // and buries whichever draft is actually current.
+    //
+    // The key is the task itself, which does not change as the wording escalates.
+    // If an open draft already exists for it, the newer rung replaces the wording
+    // rather than adding a row.
+    const sourceItemKey = createHash('sha256')
+      .update(`${to}::${params.itemTitle}`)
+      .digest('hex')
+      .slice(0, 32)
+
+    const { data: openDraft } = await supabase
       .from('funding_email_log')
       .select('id')
-      .eq('to_email', to)
-      .eq('subject', subject)
+      .eq('source_item_key', sourceItemKey)
       .eq('status', 'draft')
-      .gte('created_at', since.toISOString())
       .limit(1)
+      .maybeSingle()
 
-    if (alreadyDrafted && alreadyDrafted.length > 0) {
-      console.log(LOG, `[DRAFT] Already queued today for ${to}: "${subject}"`)
+    if (openDraft) {
+      // Escalating: keep one row, carry the latest wording.
+      const { error: updErr } = await supabase
+        .from('funding_email_log')
+        .update({
+          subject,
+          body: html,
+          email_type: type === 'nudge' || type === 'escalation' ? 'nudge' : 'deadline_reminder',
+        })
+        .eq('id', openDraft.id)
+        .eq('status', 'draft')
+
+      if (updErr) {
+        console.error(LOG, `Failed to update open draft for ${to}:`, updErr)
+        return 'failed'
+      }
+      console.log(LOG, `[DRAFT] Updated existing draft for ${to}: "${subject}"`)
       return 'drafted'
     }
 
@@ -526,6 +555,7 @@ async function sendFollowUpEmail(params: {
       status: 'draft',
       sent_by: 'system (queued for Bella)',
       email_type: type === 'nudge' || type === 'escalation' ? 'nudge' : 'deadline_reminder',
+      source_item_key: sourceItemKey,
     })
     if (draftError) {
       // Loud on purpose. A swallowed failure here means the school is never

@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { slackNotify } from '@/lib/slack-notify';
+import { shouldPostDigest, recordDigestPost, recordDigestSuppressed } from '@/lib/digest-state';
 import { createClient } from '@supabase/supabase-js';
 
 /**
@@ -50,7 +52,7 @@ export async function GET(request: NextRequest) {
     // Get all active partnerships with their contract start dates
     const { data: partnerships } = await supabase
       .from('partnerships')
-      .select('id, contact_name, contact_email, contract_start, staff_enrolled, status')
+      .select('id, org_name, contact_name, contact_email, contract_start, staff_enrolled, status')
       .eq('status', 'active');
 
     if (!partnerships || partnerships.length === 0) {
@@ -60,6 +62,11 @@ export async function GET(request: NextRequest) {
     const now = new Date();
     let flagsCreated = 0;
     let concernsComputed = 0;
+
+    // These flags were written to a table and never told anyone. A partner
+    // whose staff are not logging in is the clearest renewal risk we have, and
+    // it sat in a database nobody opens. Collected here and posted once.
+    const newlyRaised: string[] = [];
 
     for (const p of partnerships) {
       if (!p.contract_start) continue;
@@ -177,6 +184,14 @@ export async function GET(request: NextRequest) {
             console.error('[partner-attention-flags] flag write failed:', p.id, flag.key, writeError.message);
             continue;
           }
+          // Only genuinely new problems are announced. A flag already open is
+          // already known, and repeating it daily is the noise we are removing.
+          if (!existing) {
+            newlyRaised.push(
+              `  • *${p.org_name ?? 'unknown partner'}* — ${flag.message}` +
+              `${flag.severity === 'urgent' ? '  :rotating_light:' : ''}`
+            );
+          }
           flagsCreated++;
         }
 
@@ -232,11 +247,32 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    let slackPosted = false;
+    if (!dryRun && newlyRaised.length > 0) {
+      const body = newlyRaised.join('\n');
+      const decision = await shouldPostDigest(supabase, 'partner-attention', body);
+      if (decision.post) {
+        const portal = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.teachersdeserveit.com';
+        slackNotify(
+          'rae',
+          `*Partners needing attention (${newlyRaised.length})*\n${body}\n` +
+          `  _these are inside the first 90 days, when it is still fixable_\n` +
+          `<${portal}/tdi-admin/intelligence/districts|Open partners>`
+        );
+        await recordDigestPost(supabase, 'partner-attention', body);
+        slackPosted = true;
+      } else {
+        await recordDigestSuppressed(supabase, 'partner-attention', decision.suppressedRuns);
+      }
+    }
+
     return NextResponse.json({
       success: true,
       dryRun,
       concernsComputed,
       flagsCreated,
+      newlyRaised: newlyRaised.length,
+      slackPosted,
       partnershipsChecked: partnerships.length,
       message: dryRun
         ? `Dry run. Would open or refresh ${flagsCreated} flags across ${partnerships.length} partnerships. Nothing written.`

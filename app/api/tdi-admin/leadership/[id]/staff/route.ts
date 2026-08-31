@@ -27,24 +27,75 @@ export async function GET(
 
     const supabase = getServiceSupabase()
 
+    // There are two staff tables and this route read the wrong one.
+    //
+    // Everything that writes a roster writes staff_members: the intake form,
+    // the roster upload, the roster update, provisioning. partnership_staff is
+    // the older table and holds 28 rows nothing has added to in a long time.
+    // So this returned nothing for seven of the nine active partnerships. St.
+    // Peter Chanel has 25 people on its roster and this page said "No staff
+    // members in roster yet".
+    //
+    // It also selected four photo columns that exist on neither table, so the
+    // query failed outright rather than merely returning the wrong rows. Photos
+    // upload to the staff-photos storage bucket and then have nowhere to be
+    // recorded, which is a separate decision rather than something to guess at
+    // here, so they are returned as null until that column exists.
+    //
+    // The fallback to partnership_staff stays because St. Mary's ten and
+    // Roosevelt's eighteen only exist there, and dropping this route back to
+    // the current table must not lose them.
+    const selectCurrent = 'id, first_name, last_name, email, role_title, hub_enrolled'
+
     let query = supabase
-      .from('partnership_staff')
-      .select('id, first_name, last_name, email, role_group, photo_url, photo_thumb_url, photo_uploaded_at, photo_source, hub_enrolled')
+      .from('staff_members')
+      .select(selectCurrent)
       .eq('partnership_id', partnershipId)
       .order('last_name', { ascending: true })
 
     if (search) {
-      query = query.or(`first_name.ilike.%${search}%,last_name.ilike.%${search}%,role_group.ilike.%${search}%,email.ilike.%${search}%`)
+      query = query.or(`first_name.ilike.%${search}%,last_name.ilike.%${search}%,role_title.ilike.%${search}%,email.ilike.%${search}%`)
     }
 
-    const { data: staff, error } = await query
+    const { data: current, error } = await query
 
     if (error) {
-      console.error('Error fetching staff:', error)
-      return NextResponse.json({ error: 'Failed to fetch staff' }, { status: 500 })
+      console.error('[leadership/staff] staff_members read failed:', error.message)
+      return NextResponse.json({ error: `Failed to fetch staff: ${error.message}` }, { status: 500 })
     }
 
-    let filtered = staff || []
+    type StaffRow = { id: string; first_name: string | null; last_name: string | null; email: string | null; role_group: string | null; hub_enrolled: boolean | null; photo_url: null; photo_thumb_url: null; photo_uploaded_at: null; photo_source: null }
+
+    const shape = (r: Record<string, unknown>, roleField: string): StaffRow => ({
+      id: r.id as string,
+      first_name: (r.first_name as string) ?? null,
+      last_name: (r.last_name as string) ?? null,
+      email: (r.email as string) ?? null,
+      role_group: (r[roleField] as string) ?? null,
+      hub_enrolled: (r.hub_enrolled as boolean) ?? null,
+      photo_url: null,
+      photo_thumb_url: null,
+      photo_uploaded_at: null,
+      photo_source: null,
+    })
+
+    let rows: StaffRow[] = (current ?? []).map((r) => shape(r as Record<string, unknown>, 'role_title'))
+
+    if (rows.length === 0) {
+      const { data: legacy, error: legacyError } = await supabase
+        .from('partnership_staff')
+        .select('id, first_name, last_name, email, role_group, hub_enrolled')
+        .eq('partnership_id', partnershipId)
+        .order('last_name', { ascending: true })
+
+      if (legacyError) {
+        console.error('[leadership/staff] partnership_staff fallback failed:', legacyError.message)
+      } else {
+        rows = (legacy ?? []).map((r) => shape(r as Record<string, unknown>, 'role_group'))
+      }
+    }
+
+    let filtered = rows
     if (permanentOnly) {
       filtered = filtered.filter(s => isPermanentStaffRole(s.role_group))
     }
