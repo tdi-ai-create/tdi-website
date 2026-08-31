@@ -259,10 +259,10 @@ export async function GET(request: NextRequest) {
           `  _these are inside the first 90 days, when it is still fixable_\n` +
           `<${portal}/tdi-admin/intelligence/districts|Open partners>`
         );
-        await recordDigestPost(supabase, 'partner-attention', body);
+        await recordDigestPost(supabase, 'partner-attention', body, dryRun);
         slackPosted = true;
       } else {
-        await recordDigestSuppressed(supabase, 'partner-attention', decision.suppressedRuns);
+        await recordDigestSuppressed(supabase, 'partner-attention', decision.suppressedRuns, dryRun);
       }
     }
 

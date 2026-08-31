@@ -53,6 +53,13 @@ export type QuickWinRow = {
  *
  * The judgment half of QA (is the content any good, is the tool actually usable)
  * stays with Julie Lynn. This only covers what a machine can verify.
+ *
+ * This function is the structural half of docs/hub-content-standard.md. Four
+ * approved rules are specified there and deliberately not implemented here yet:
+ * required objectives, file_url extension validation, the banned-phrase list,
+ * and the rubric-v2 stamp. 173 published items would fail the objectives check
+ * today, so section 7 of that document sets the order for turning them on.
+ * Add checks here only in step with that sequence.
  */
 export function qaBlockers(qw: QuickWinRow): string[] {
   const out: string[] = []

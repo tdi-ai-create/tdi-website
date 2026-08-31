@@ -87,7 +87,7 @@ export async function GET(request: NextRequest) {
     (result as Record<string, unknown>).digestReason = decision.reason;
 
     if (!decision.post) {
-      await recordDigestSuppressed(supabase, 'creator-waiting-on-us', decision.suppressedRuns);
+      await recordDigestSuppressed(supabase, 'creator-waiting-on-us', decision.suppressedRuns, dryRun);
       console.log(`[waiting-on-us] Unchanged for ${decision.daysSinceLastPost} day(s), staying quiet`);
       return NextResponse.json({ success: true, ...result });
     }
@@ -97,7 +97,7 @@ export async function GET(request: NextRequest) {
         ? `${message}${heartbeatNote(decision.daysSinceLastPost)}`
         : message;
       await postCreatorMessage(heading);
-      await recordDigestPost(supabase, 'creator-waiting-on-us', message);
+      await recordDigestPost(supabase, 'creator-waiting-on-us', message, dryRun);
       result.posted = true;
     }
 
