@@ -77,6 +77,10 @@
       "schedule": "0 16 * * *"
     },
     {
+      "path": "/api/cron/creator-integrity",
+      "schedule": "0 15 * * 1"
+    },
+    {
       "path": "/api/cron/creator-email-digest",
       "schedule": "0 8 * * 1"
     },
