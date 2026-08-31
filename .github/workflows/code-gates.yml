@@ -130,3 +130,14 @@ jobs:
             exit 1
           fi
           npm run check:adminauth
+
+      - name: Client wording
+        # A school must never read a task title we wrote for ourselves. This
+        # happened 52 times to 4 people between 30 July and 17 August, because
+        # clientTaskLabel existed twice and only one copy was ever fixed.
+        #
+        # Checks the shape of the source, not the behaviour of a function: one
+        # definition, and no client template interpolating a raw itemTitle. A
+        # behavioural test would need a TypeScript runner this repo does not
+        # have, and a check that cannot run is a check that quietly passes.
+        run: npm run check:labels
