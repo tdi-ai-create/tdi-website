@@ -150,4 +150,27 @@ export interface DashboardData {
     title: string;
     phase: string;
   }[];
+  /**
+   * Records that contradict themselves. Separate from stats and needsAttention
+   * on purpose: those answer "who is waiting on us", derived from the same
+   * milestone state that can be wrong. When a record lies, nobody appears to be
+   * waiting, so those lists go quiet exactly when something is broken.
+   * Null when the checks could not run. See lib/creator-integrity.ts.
+   */
+  integrity: {
+    findings: {
+      checkId: string;
+      creatorId: string;
+      name: string | null;
+      email: string | null;
+      detail: string;
+    }[];
+    system: {
+      checkId: string;
+      detail: string;
+      count: number;
+      creatorsAffected: number;
+    }[];
+    checkedAt: string;
+  } | null;
 }
