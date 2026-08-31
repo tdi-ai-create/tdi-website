@@ -95,7 +95,39 @@ export async function creatorApplicationsWaiting(count: number, oldestDays: numb
   )
 }
 
+/**
+ * A creator saving the same step repeatedly is one event, not four.
+ *
+ * On 26 August this fired four times in three hours for one creator on one
+ * milestone, versions 1, 1, 2 and 1, because it posts on every save rather than
+ * on the first submission of a step. The reviewer still has exactly one thing
+ * to look at, so the extra three are pure noise.
+ *
+ * Kept in memory rather than a table on purpose: this only needs to survive the
+ * minutes during which someone is actively editing, and a cold start losing it
+ * costs one duplicate message, which is the thing we already had.
+ */
+const recentSubmissions = new Map<string, number>()
+const SUBMISSION_QUIET_MS = 30 * 60 * 1000
+
 export async function creatorSubmittedDeliverable(creatorName: string, milestoneName: string, submissionVersion: number) {
+  const key = `${creatorName}::${milestoneName}`
+  const now = Date.now()
+  const last = recentSubmissions.get(key)
+
+  if (last && now - last < SUBMISSION_QUIET_MS) {
+    console.log(`[creator-slack] Suppressed repeat submission for ${key}`)
+    return
+  }
+  recentSubmissions.set(key, now)
+
+  // Keep the map from growing forever in a long-lived runtime.
+  if (recentSubmissions.size > 500) {
+    for (const [k, t] of recentSubmissions) {
+      if (now - t > SUBMISSION_QUIET_MS) recentSubmissions.delete(k)
+    }
+  }
+
   await postToSlack(
     `*Deliverable Submitted* | ${creatorName}\nMilestone: ${milestoneName} | Version ${submissionVersion}\nNeeds review in Creator Studio.`
   )

@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 import { guardCron } from '@/lib/cron-guard';
 import { loadTeamWork, formatTeamWork } from '@/lib/creator-team-work';
 import { postCreatorMessage } from '@/lib/creator-slack';
+import { shouldPostDigest, recordDigestPost, recordDigestSuppressed, heartbeatNote } from '@/lib/digest-state';
 
 // ---------------------------------------------------------------------------
 // The daily "waiting on TDI" list
@@ -64,8 +65,24 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ success: true, ...result });
     }
 
+    // Post when the list changes, not because a day has passed. This named the
+    // same creator on seventeen consecutive mornings and nothing moved, which
+    // is how a channel gets muted. See lib/digest-state.
+    const decision = await shouldPostDigest(supabase, 'creator-waiting-on-us', message);
+    (result as Record<string, unknown>).digestReason = decision.reason;
+
+    if (!decision.post) {
+      await recordDigestSuppressed(supabase, 'creator-waiting-on-us', decision.suppressedRuns);
+      console.log(`[waiting-on-us] Unchanged for ${decision.daysSinceLastPost} day(s), staying quiet`);
+      return NextResponse.json({ success: true, ...result });
+    }
+
     if (!dryRun) {
-      await postCreatorMessage(message);
+      const heading = decision.reason === 'heartbeat'
+        ? `${message}${heartbeatNote(decision.daysSinceLastPost)}`
+        : message;
+      await postCreatorMessage(heading);
+      await recordDigestPost(supabase, 'creator-waiting-on-us', message);
       result.posted = true;
     }
 

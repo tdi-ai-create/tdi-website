@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { Resend } from 'resend'
+import { slackNotify } from '@/lib/slack-notify'
 
 function getSupabaseAdmin() {
   return createClient(
@@ -29,7 +30,6 @@ async function sendReminderEmail({
   to,
   contactName,
   districtName,
-  quoteTitle,
   quoteUrl,
   daysOld,
   type,
@@ -37,7 +37,6 @@ async function sendReminderEmail({
   to: string
   contactName: string
   districtName: string
-  quoteTitle: string
   quoteUrl: string
   daysOld: number
   type: '14day' | '21day' | 'expired'
@@ -106,6 +105,13 @@ export async function GET(request: Request) {
   const now = new Date()
   const results = { flagged_at_risk: 0, reminder_14_sent: 0, reminder_21_sent: 0, expired: 0 }
 
+  // A quote reaching day 30 used to end in an email to the client and nothing
+  // to us. Seven proposals expired that way, every one of them opened and read
+  // first, and nobody here knew until someone went looking. These two lists put
+  // it in front of a human while there is still time to do something.
+  const expiringSoon: string[] = []
+  const justExpired: string[] = []
+
   // Get all active sent quotes
   const { data: activeQuotes } = await supabase
     .from('quotes')
@@ -120,38 +126,62 @@ export async function GET(request: Request) {
 
     // Day 30: Expire
     if (daysOld >= 30 && !quote.expiry_notice_sent_at) {
-      await supabase.from('quotes').update({
+      // Write first and check it. If this fails and we email anyway, the client
+      // is told their quote expired while our records still show it live.
+      const { error: expireErr } = await supabase.from('quotes').update({
         status: 'expired',
         expiry_notice_sent_at: now.toISOString(),
       }).eq('id', quote.id)
+
+      if (expireErr) {
+        console.error('[quote-expiry] could not expire', quote.id, expireErr.message)
+        continue
+      }
 
       if (quote.contact_email) {
         await sendReminderEmail({
           to: quote.contact_email,
           contactName: quote.contact_name ?? 'there',
           districtName: quote.title,
-          quoteTitle: quote.title,
           quoteUrl,
           daysOld,
           type: 'expired',
         })
       }
+      justExpired.push(
+        `  • *${quote.contact_name ?? 'unknown'}* — ${quote.title}` +
+        (quote.view_count ? ` · opened ${quote.view_count} time${quote.view_count === 1 ? '' : 's'}` : ' · never opened')
+      )
       results.expired++
       continue
     }
 
+    // Between 23 and 29 days there is still time to save it, so say so once.
+    if (daysOld >= 23 && daysOld < 30) {
+      expiringSoon.push(
+        `  • *${quote.contact_name ?? 'unknown'}* — ${quote.title} · expires in ${30 - daysOld} day${30 - daysOld === 1 ? '' : 's'}` +
+        (quote.view_count ? ` · opened ${quote.view_count} time${quote.view_count === 1 ? '' : 's'}` : ' · never opened')
+      )
+    }
+
     // Day 21: Second reminder
     if (daysOld >= 21 && !quote.reminder_21_sent_at) {
-      await supabase.from('quotes').update({
+      // The stamp is what stops this repeating. If it does not save, the same
+      // reminder goes out again tomorrow, and every day after that.
+      const { error: r21Err } = await supabase.from('quotes').update({
         reminder_21_sent_at: now.toISOString(),
       }).eq('id', quote.id)
+
+      if (r21Err) {
+        console.error('[quote-expiry] could not stamp 21-day reminder', quote.id, r21Err.message)
+        continue
+      }
 
       if (quote.contact_email) {
         await sendReminderEmail({
           to: quote.contact_email,
           contactName: quote.contact_name ?? 'there',
           districtName: quote.title,
-          quoteTitle: quote.title,
           quoteUrl,
           daysOld,
           type: '21day',
@@ -162,17 +192,22 @@ export async function GET(request: Request) {
 
     // Day 14: At-risk flag + first reminder
     if (daysOld >= 14 && !quote.reminder_14_sent_at) {
-      await supabase.from('quotes').update({
+      // Same reasoning as the 21-day stamp: an unsaved flag means a daily repeat.
+      const { error: r14Err } = await supabase.from('quotes').update({
         at_risk_flagged_at: now.toISOString(),
         reminder_14_sent_at: now.toISOString(),
       }).eq('id', quote.id)
+
+      if (r14Err) {
+        console.error('[quote-expiry] could not stamp 14-day reminder', quote.id, r14Err.message)
+        continue
+      }
 
       if (quote.contact_email) {
         await sendReminderEmail({
           to: quote.contact_email,
           contactName: quote.contact_name ?? 'there',
           districtName: quote.title,
-          quoteTitle: quote.title,
           quoteUrl,
           daysOld,
           type: '14day',
@@ -183,5 +218,29 @@ export async function GET(request: Request) {
     }
   }
 
-  return NextResponse.json({ success: true, ...results })
+  // Only speaks when there is something to act on, so it never becomes wallpaper.
+  if (expiringSoon.length || justExpired.length) {
+    const portal = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.teachersdeserveit.com'
+    const parts: string[] = []
+    if (expiringSoon.length) {
+      parts.push(
+        `*Quotes about to expire (${expiringSoon.length})*\n${expiringSoon.join('\n')}\n` +
+        `  _still savable. A quote someone opened and never signed is the strongest signal we get._`
+      )
+    }
+    if (justExpired.length) {
+      parts.push(
+        `*Expired today (${justExpired.length})*\n${justExpired.join('\n')}\n` +
+        `  _Rae has to reissue these. Nobody said no, the clock just ran out._`
+      )
+    }
+    slackNotify('sales', `${parts.join('\n\n')}\n<${portal}/tdi-admin/sales|Open the pipeline>`)
+  }
+
+  return NextResponse.json({
+    success: true,
+    ...results,
+    expiring_soon: expiringSoon.length,
+    slack_posted: expiringSoon.length > 0 || justExpired.length > 0,
+  })
 }
