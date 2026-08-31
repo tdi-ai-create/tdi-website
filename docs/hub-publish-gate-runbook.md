@@ -1,21 +1,25 @@
 # Hub publish gate: rollout runbook
 
-The QA gate is built but deliberately switched **off**. It turns on in a specific
-order. Turning it on early breaks publishing for everyone, which is exactly what
-happened on 2026-08-13 and is why this document exists.
+The QA gate turns on in a specific order. Turning it on early breaks publishing
+for everyone, which is exactly what happened on 2026-08-13 and is why this
+document exists.
 
 ## Current state
 
 | | |
 |---|---|
-| `hub_config.qa_gate_enforced` | `false` |
+| `hub_config.qa_gate_enforced` | `true`, since 2026-08-13 16:54 UTC |
 | Migrations applied to Learning Hub | 108, 109, 110, 111 |
-| Code implementing `mark_reviewed` | committed, **not deployed** |
+| Code implementing `mark_reviewed` | deployed |
 | Updated Jasmine / Julie Lynn skills | committed, **not on Railway** |
 
-While the flag is `false` the database accepts what the currently deployed code
-produces. Publishing works normally. The only always-on behavior is the
-status/`is_published` normalization and the tag checks that predate this work.
+The gate is live. It enforces the structural half of
+`docs/hub-content-standard.md` and none of the quality half. The turn-on
+sequence below is kept as the record of how it was rolled out, and as the
+procedure for the checks that are still unenforced.
+
+Verified against the Learning Hub database on 2026-08-31. The rollout section
+below was written while the flag was still `false`.
 
 ## Turn-on order
 
