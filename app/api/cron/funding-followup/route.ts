@@ -4,6 +4,7 @@ import { getServiceSupabase } from '@/lib/supabase'
 import { postFundingEvent } from '@/lib/funding-slack'
 import { isGateOpen } from '@/lib/funding-gate-gaps'
 import { callTriggerFor } from '@/lib/funding/call-escalation'
+import { clientTaskLabel } from '@/lib/funding-followup-email'
 
 // ══════════════════════════════════════════════════════════════
 // DRY_RUN — flip to false ONLY after verifying logic against
@@ -244,49 +245,10 @@ function toneForRecipient(email: string): EmailTone {
 
 // ── Client-facing task label ──
 //
-// What a school is told an item is about. If client_label is set, that is the
-// wording a person chose and it is used verbatim.
-//
-// Without one, this used to strip four known internal prefixes off the raw
-// title and send whatever remained. A denylist of four patterns is the wrong
-// shape for this: it passes everything it does not recognise, and the titles
-// that caused real damage matched none of them. "Check if Paula set up her Deed
-// account" and "Remind Paula: window is open" both sailed straight through and
-// were mailed to Paula, written about her in the third person.
-//
-// Inverted to a safelist. A title is only shown to a school if it reads like
-// something addressed to them. Anything phrased as an internal instruction
-// falls back to neutral wording, and logs, because an item reaching a school
-// without a client_label is a gap someone should close rather than something to
-// paper over silently.
-
-const INTERNAL_TITLE_SHAPES = [
-  /^(check|confirm|verify)\b/i,   // "Check if X set up their account"
-  /^(remind|nudge|chase)\b/i,     // "Remind X: window is open"
-  /^(ask|email|call|contact)\b/i, // "Ask X if the school has..."
-  /^(track|follow\s+up|get)\b/i,  // "Track X", "Get X to send Y"
-  /^(gate|internal|todo)\b/i,     // machine-generated prefixes
-  /\b(bella|rae|julie|vanessa|amara)\b/i, // names of ours have no business here
-]
-
-function clientTaskLabel(rawTitle: string, clientLabel?: string | null): string {
-  if (clientLabel && clientLabel.trim()) return clientLabel.trim()
-
-  const title = (rawTitle || '').trim()
-  const looksInternal =
-    !title || INTERNAL_TITLE_SHAPES.some(shape => shape.test(title))
-
-  if (looksInternal) {
-    console.warn(
-      LOG,
-      `[LABEL] "${title}" has no client_label and reads as internal — ` +
-        `using neutral wording. Set a client_label on this item.`,
-    )
-    return 'this funding step'
-  }
-
-  return title
-}
+// Moved to lib/funding-followup-email.ts. This file used to carry its own
+// safelist, fixed here on 17 Aug and never mirrored into the lib, so the same
+// title was blocked on this path and mailed on the other. One implementation
+// now, and the approval queue shows the reviewer the same rules.
 
 // Capitalize a rung label for display
 function displayRung(rung: string): string {
