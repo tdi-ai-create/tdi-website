@@ -87,6 +87,11 @@ export async function POST(req: Request) {
                 tier: tier as 'essentials' | 'professional' | 'all_access',
                 source: 'stripe',
                 status: 'active',
+                // A paid subscription has no end date. If this user was previously on a
+                // comped trial, the old expires_at is still on the row, and getEffectiveTier
+                // checks expires_at before anything else — so a stale date silently drops a
+                // paying member to 'free'. Clear it on every paid upsert.
+                expires_at: null,
                 stripe_customer_id: typeof session.customer === 'string' ? session.customer : null,
                 stripe_subscription_id:
                   typeof session.subscription === 'string' ? session.subscription : null,
@@ -138,14 +143,20 @@ export async function POST(req: Request) {
         const sub = event.data.object as Stripe.Subscription;
 
         // Update purchase status
-        await supabase
+        const { error: purchaseErr } = await supabase
           .from('hub_purchases')
           .update({ status: 'canceled', updated_at: new Date().toISOString() })
           .eq('stripe_subscription_id', sub.id);
 
+        if (purchaseErr) {
+          console.error('[stripe/webhook] purchase cancel write failed', purchaseErr);
+        }
+
         // Downgrade Hub membership to free
         if (hubClient) {
-          await hubClient
+          // If this write is lost, someone who cancelled keeps their access and
+          // nothing ever says so. Stripe retries on a non-2xx, so fail loudly.
+          const { error: memErr } = await hubClient
             .from('hub_memberships')
             .update({
               status: 'cancelled',
@@ -153,6 +164,14 @@ export async function POST(req: Request) {
               updated_at: new Date().toISOString(),
             })
             .eq('stripe_subscription_id', sub.id);
+
+          if (memErr) {
+            console.error('[stripe/webhook] membership cancel write failed', memErr);
+            return NextResponse.json(
+              { error: 'Could not cancel membership', detail: memErr.message },
+              { status: 500 }
+            );
+          }
         }
 
         break;
@@ -161,17 +180,31 @@ export async function POST(req: Request) {
       case 'invoice.payment_failed': {
         const invoice = event.data.object as Stripe.Invoice;
         if (typeof invoice.subscription === 'string') {
-          await supabase
+          const { error: purchaseErr } = await supabase
             .from('hub_purchases')
             .update({ status: 'payment_failed', updated_at: new Date().toISOString() })
             .eq('stripe_subscription_id', invoice.subscription);
 
+          if (purchaseErr) {
+            console.error('[stripe/webhook] payment_failed purchase write failed', purchaseErr);
+          }
+
           // Update Hub membership status
           if (hubClient) {
-            await hubClient
+            // Same reasoning as cancellation: a lost write here means someone
+            // whose card failed keeps paid access indefinitely.
+            const { error: memErr } = await hubClient
               .from('hub_memberships')
               .update({ status: 'expired', updated_at: new Date().toISOString() })
               .eq('stripe_subscription_id', invoice.subscription);
+
+            if (memErr) {
+              console.error('[stripe/webhook] membership expire write failed', memErr);
+              return NextResponse.json(
+                { error: 'Could not expire membership', detail: memErr.message },
+                { status: 500 }
+              );
+            }
           }
         }
         break;
