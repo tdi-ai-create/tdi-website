@@ -276,19 +276,3 @@ Bella
 Teachers Deserve It`,
   }
 }
-
-export function followUpEmailDraft(contactName: string, schoolName: string, topic: string): { subject: string; body: string } {
-  const firstName = contactName.split(' ')[0]
-  return {
-    subject: `Following up: ${topic}`,
-    body: `Hi ${firstName},
-
-I wanted to follow up on ${topic} for ${schoolName}.
-
-Is there anything I can help with on this? Happy to jump on a quick call if that's easier.
-
-Best,
-Bella
-Teachers Deserve It`,
-  }
-}
