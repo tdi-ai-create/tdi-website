@@ -7,6 +7,7 @@ import { ImpactEvidence } from './components/ImpactEvidence'
 import NeedsYouBoard from './components/NeedsYouBoard'
 import FundersTab from './components/FundersTab'
 import AwardedTab from './components/AwardedTab'
+import OutreachQueue from './components/OutreachQueue'
 
 /**
  * One next-step item, exactly as computed by lib/funding-next-actions.ts and
@@ -236,6 +237,12 @@ export default function FundingPage() {
           ))}
         </div>
       </div>
+
+      {view === 'board' && (
+        <div style={{ marginBottom: 28 }}>
+          <OutreachQueue />
+        </div>
+      )}
 
       {view === 'board' && (
         <NeedsYouBoard

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { requireAdminAuth } from '@/lib/tdi-admin/auth'
 import { isOnAllowlist, ALLOWLIST_ENABLED } from '@/lib/funding-followup-email'
+import { buildFundingEmailHtml } from '@/lib/funding-email-html'
 
 /**
  * POST /api/funding/send-email
@@ -31,7 +32,7 @@ export async function POST(request: NextRequest) {
   }
 
   // Convert plain text body to styled HTML
-  const htmlBody = buildEmailHtml(body, toName || to.split('@')[0])
+  const htmlBody = buildFundingEmailHtml(body)
 
   // Send via Resend
   const resendKey = process.env.RESEND_API_KEY
@@ -68,13 +69,16 @@ export async function POST(request: NextRequest) {
         process.env.SUPABASE_SERVICE_ROLE_KEY!,
         { auth: { autoRefreshToken: false, persistSession: false } }
       )
-      await supabase
+      // The email is already out by this point, so a failure here cannot undo
+      // it. Report it instead of swallowing it: a send that never reaches the
+      // timeline reads as "we never contacted them" and gets sent twice.
+      const { error: pursuitErr } = await supabase
         .from('funding_pursuits')
         .update({ intro_sent_at: new Date().toISOString() })
         .eq('id', pursuitId)
 
       // Log to email log so it shows in the Emails tab
-      await supabase
+      const { error: logErr } = await supabase
         .from('funding_email_log')
         .insert({
           pursuit_id: pursuitId,
@@ -89,39 +93,21 @@ export async function POST(request: NextRequest) {
           resend_id: resData?.id || null,
           email_type: 'custom',
         })
+
+      if (pursuitErr || logErr) {
+        console.error('[funding/send-email] sent but not recorded', { pursuitErr, logErr })
+        return NextResponse.json({
+          sent: true,
+          warning: `Email sent to ${to}, but it could not be written to the timeline: ${
+            (pursuitErr ?? logErr)?.message
+          }. Do not resend.`,
+        })
+      }
     }
 
     return NextResponse.json({ sent: true })
-  } catch (e: any) {
-    return NextResponse.json({ error: e.message, sent: false })
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : 'Send failed'
+    return NextResponse.json({ error: message, sent: false })
   }
-}
-
-function buildEmailHtml(plainText: string, recipientName: string): string {
-  // Convert plain text to paragraphs
-  const paragraphs = plainText
-    .split('\n\n')
-    .map(p => p.trim())
-    .filter(p => p.length > 0)
-    .map(p => `<p style="color: #374151; font-size: 15px; line-height: 1.7; margin: 0 0 16px;">${p.replace(/\n/g, '<br>')}</p>`)
-    .join('')
-
-  return `
-<!DOCTYPE html>
-<html>
-<head><meta charset="utf-8"></head>
-<body style="font-family: 'Helvetica Neue', Arial, sans-serif; background: #F9FAFB; margin: 0; padding: 0;">
-  <div style="max-width: 580px; margin: 0 auto; padding: 32px 24px;">
-    <div style="background: white; border-radius: 12px; padding: 32px; border: 1px solid #E5E7EB;">
-      <div style="margin-bottom: 24px;">
-        <img src="https://www.teachersdeserveit.com/tdi-logo.png" alt="Teachers Deserve It" style="height: 40px;" />
-      </div>
-      ${paragraphs}
-    </div>
-    <div style="text-align: center; padding: 16px; color: #9CA3AF; font-size: 11px;">
-      Teachers Deserve It | hello@teachersdeserveit.com
-    </div>
-  </div>
-</body>
-</html>`
 }
