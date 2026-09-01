@@ -170,6 +170,61 @@ export function qaBlockers(qw: QuickWinRow): string[] {
   return out
 }
 
+/** Shortest finding that could describe a specific document rather than any document. */
+export const EVIDENCE_MIN_CHARS = 40
+
+/**
+ * Confirm the reviewer actually fetched this item's file.
+ *
+ * This exists because on 2026-09-01 a reasonable-sounding argument, that items
+ * already carrying reviewed_at only needed their objectives field eyeballed,
+ * put the rubric stamp on 58 documents nobody opened. The rule against that was
+ * written in an instruction file, and an instruction is advice. This is a gate.
+ *
+ * What it proves and what it does not, stated plainly so nobody over-trusts it:
+ * passing this means the caller retrieved the exact bytes of the exact file.
+ * It does not prove they understood it. Comprehension is not mechanically
+ * checkable, so the written finding is stored alongside for a person to spot
+ * check. The point is to make the claim cost a real fetch instead of nothing.
+ *
+ * Byte length rather than a quoted passage: these PDFs compress their text
+ * streams and use subset fonts with shifted encodings, so extracted text does
+ * not match what a reader sees. Quote matching would have failed every honest
+ * review. Verified against a live Quick Win before choosing this.
+ */
+async function fetchWasReal(
+  fileUrl: string | null,
+  claimedBytes: unknown,
+): Promise<{ ok: true; bytes: number } | { ok: false; reason: string }> {
+  if (!fileUrl) {
+    return { ok: false, reason: 'This item has no file_url, so a read cannot be evidenced. Fix the file first.' }
+  }
+  if (typeof claimedBytes !== 'number' || !Number.isFinite(claimedBytes) || claimedBytes <= 0) {
+    return { ok: false, reason: 'file_bytes must be the size in bytes of the file you downloaded, as a number.' }
+  }
+
+  let actual: number
+  try {
+    const res = await fetch(fileUrl)
+    if (!res.ok) {
+      return { ok: false, reason: `Could not fetch the file to verify the read (HTTP ${res.status} from ${fileUrl}).` }
+    }
+    actual = (await res.arrayBuffer()).byteLength
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'unknown error'
+    return { ok: false, reason: `Could not fetch the file to verify the read: ${msg}` }
+  }
+
+  if (actual === claimedBytes) return { ok: true, bytes: actual }
+
+  return {
+    ok: false,
+    reason:
+      `file_bytes does not match. You sent ${claimedBytes}, the file is ${actual}. ` +
+      'Download file_url and report its actual size. A guess will not pass.',
+  }
+}
+
 export type ScoredRow = QuickWinRow & {
   id: string
   objectives: string | null
@@ -919,11 +974,18 @@ export async function POST(request: NextRequest) {
     // something through: anything with a substantive defect is refused and has
     // to go through the replace path instead.
     if (action === 'review_published') {
-      const { id, slug, reviewed_by, notes, dryRun } = body
+      const { id, slug, reviewed_by, notes, evidence, file_bytes, dryRun } = body
 
       if (!id && !slug) return NextResponse.json({ error: 'id or slug is required' }, { status: 400 })
       if (!reviewed_by?.trim()) {
         return NextResponse.json({ error: 'reviewed_by is required (who ran QA)' }, { status: 400 })
+      }
+      if (!evidence?.trim() || evidence.trim().length < EVIDENCE_MIN_CHARS) {
+        return NextResponse.json({
+          error: `evidence is required: at least ${EVIDENCE_MIN_CHARS} characters describing what this specific document ` +
+            `contains, in your own words. Not the title, not the description. On 2026-09-01, 58 items were stamped on a ` +
+            `metadata check alone and had to be withdrawn, so the claim is now demonstrated rather than asserted.`,
+        }, { status: 400 })
       }
 
       const lookup = supabase.from('hub_quick_wins').select('*')
@@ -950,12 +1012,24 @@ export async function POST(request: NextRequest) {
         }, { status: 400 })
       }
 
+      // The gate: fetch the document ourselves and confirm the caller has its
+      // exact bytes. Someone who never opened the file cannot know its size.
+      const proof = await fetchWasReal(qw.file_url, file_bytes)
+      if (!proof.ok) {
+        return NextResponse.json({
+          success: false,
+          error: proof.reason,
+          hint: 'Download file_url, read it, and pass back file_bytes as its exact size plus evidence describing what is in it.',
+        }, { status: 400 })
+      }
+
       const stamp = new Date().toISOString()
       const auditLine = `${stamp.slice(0, 10)} reviewed against ${RUBRIC_VERSION} by ${reviewed_by.trim()}` +
+        ` [file verified ${proof.bytes} bytes; reviewer says: ${evidence.trim().slice(0, 140).replace(/\s+/g, ' ')}]` +
         (notes?.trim() ? `: ${notes.trim()}` : '')
 
       if (dryRun) {
-        return NextResponse.json({ dry_run: true, id: qw.id, slug: qw.slug, lane, would_append_to_qa_notes: auditLine })
+        return NextResponse.json({ dry_run: true, id: qw.id, slug: qw.slug, lane, evidence_verified: true, would_append_to_qa_notes: auditLine })
       }
 
       const { error: reviewErr } = await supabase
