@@ -78,7 +78,16 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: guard.error }, { status: guard.status });
     }
     const { dryRun } = guard;
-    const now = new Date();
+
+    // ?asOf=2026-10-01 renders a future issue, dry run only.
+    //
+    // "What will next month's look like" had no answer short of waiting for it
+    // to send. The month name, the rotating tip, and the windows that decide
+    // whether there is a spotlight all read the clock, so rendering today only
+    // ever shows today's issue. A real send ignores this and always uses now.
+    const asOfParam = dryRun ? request.nextUrl.searchParams.get('asOf') : null;
+    const asOfDate = asOfParam ? new Date(`${asOfParam.slice(0, 10)}T12:00:00`) : null;
+    const now = asOfDate && !Number.isNaN(asOfDate.getTime()) ? asOfDate : new Date();
 
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -114,7 +123,7 @@ export async function GET(request: NextRequest) {
     // ---- Gather newsletter content ----
 
     // Recently published creators (last 60 days)
-    const sixtyDaysAgo = new Date();
+    const sixtyDaysAgo = new Date(now);
     sixtyDaysAgo.setDate(sixtyDaysAgo.getDate() - 60);
 
     const { data: recentlyPublished } = await supabase
@@ -126,7 +135,7 @@ export async function GET(request: NextRequest) {
       .limit(3);
 
     // Milestone celebrations this month
-    const thirtyDaysAgo = new Date();
+    const thirtyDaysAgo = new Date(now);
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
     const { data: recentMilestones } = await supabase
@@ -159,7 +168,7 @@ export async function GET(request: NextRequest) {
       .eq('publish_status', 'published');
 
     // Pick this month's tip
-    const monthIndex = new Date().getMonth();
+    const monthIndex = now.getMonth();
     const tip = CREATOR_TIPS[monthIndex % CREATOR_TIPS.length];
 
     // Build the spotlight section
@@ -227,7 +236,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Build the full email
-    const monthName = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    const monthName = now.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
     const subject = hasSpotlight
       ? `Creator Spotlight: ${recentlyPublished![0].name} just launched!`
       : `Your monthly Creator Studio update — ${monthName}`;
@@ -326,6 +335,8 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({
         success: true,
         dryRun: true,
+        renderedAsOf: now.toISOString().slice(0, 10),
+        isFutureIssue: Boolean(asOfDate),
         subject,
         audience: activeCreators.length,
         skippedAlreadySentThisMonth: skipped,
