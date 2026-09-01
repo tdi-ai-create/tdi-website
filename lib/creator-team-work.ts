@@ -16,6 +16,7 @@
 
 import { SITE_URL } from './reengagement-config';
 import { phaseRank } from './creator-phases';
+import { isActionable } from './creator-rules';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 type DbClient = any;
@@ -198,7 +199,7 @@ export async function loadTeamWork(
   for (const r of all) {
     const ms = r.milestones;
     if (!ms || !ms.requires_team_action || ms.is_collapsed_into) continue;
-    if (r.status !== 'available' && r.status !== 'in_progress' && r.status !== 'waiting_approval') continue;
+    if (!isActionable(r.status)) continue;
 
     const creator = byId.get(r.creator_id) as Record<string, any> | undefined;
     if (!creator) continue;
