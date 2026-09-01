@@ -97,6 +97,14 @@ export async function GET(request: NextRequest) {
       .from('creators')
       .select('id, email, name')
       .eq('status', 'active')
+      // status and is_active are different columns and this only ever read the
+      // first. Katie Welch has been paused since 12 May, reason recorded as
+      // "Creator declined to create again at this time", and the September
+      // issue asked her to open her Studio and go recruit other educators.
+      // Holly Stuart was paused on 13 August and got the same. Someone who has
+      // told us they are done should not be receiving a monthly nudge.
+      .eq('is_active', true)
+      .is('paused_at', null)
       .or('lifecycle_state.is.null,lifecycle_state.eq.active');
 
     if (!activeCreators || activeCreators.length === 0) {
@@ -132,7 +140,19 @@ export async function GET(request: NextRequest) {
     const milestonesCompletedCount = recentMilestones?.length || 0;
 
     // Total creators and published count
-    const totalCreators = activeCreators.length;
+    // Whether anyone has published, not how many.
+    //
+    // Absolute counts do not go in creator facing email. Rae, 1 Sep 2026: a
+    // headcount is an internal gauge, and telling an outsider how many of us
+    // there are gives away more than it earns. Percentages are allowed; raw
+    // numbers are not.
+    //
+    // The September issue is why. It opened "13 educators who believe their
+    // experience is worth sharing", and 13 was not a count of anything: it was
+    // the length of the send list, assigned from activeCreators.length. There
+    // are 35 active creators. So the sentence carrying the whole emotional
+    // pitch told thirteen people the community was a third of its real size.
+    // A number that is both revealing and wrong is the worst of both.
     const { count: publishedCount } = await supabase
       .from('creators')
       .select('id', { count: 'exact', head: true })
@@ -168,9 +188,9 @@ export async function GET(request: NextRequest) {
         <div style="background: linear-gradient(135deg, #eff6ff, #dbeafe); border: 1px solid #bfdbfe; border-radius: 12px; padding: 20px; margin: 20px 0;">
           <p style="font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #1e40af; margin: 0 0 8px; font-weight: 600;">From the TDI Team</p>
           <p style="color: #1e3a5f; margin: 0; line-height: 1.6;">
-            We're building something special with this creator community — ${totalCreators} educators
-            who believe their experience is worth sharing. ${publishedCount ? `${publishedCount} have already launched their content, and more are on the way.` : 'The first launches are coming soon, and the work happening behind the scenes is exciting.'}
-            Every one of you is part of something that's making educator-created PD a reality.
+            We're building something special here: a community of educators who believe
+            what they know is worth sharing. ${publishedCount ? 'Some have already launched their content, and more are on the way every month.' : 'The first launches are coming soon, and the work happening behind the scenes is exciting.'}
+            Every one of you is part of making educator-created PD a reality.
           </p>
         </div>
       `;
@@ -187,7 +207,11 @@ export async function GET(request: NextRequest) {
         }
       }
       if (activeCreatorIds.size > 0) {
-        celebrationItems.push(`${activeCreatorIds.size} creator${activeCreatorIds.size > 1 ? 's' : ''} completed milestones this month`);
+        celebrationItems.push(
+          activeCreatorIds.size > 1
+            ? 'Creators across the community hit milestones this month'
+            : 'A creator hit a milestone this month'
+        );
       }
 
       celebrationsHtml = `
