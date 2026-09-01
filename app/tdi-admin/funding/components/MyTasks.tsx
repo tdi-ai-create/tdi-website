@@ -236,10 +236,12 @@ export function MyTasks() {
                         {task.opportunity ? ` / ${task.opportunity.name}` : ''}
                       </div>
 
-                      {/* Prepared materials for client tasks */}
-                      {task.owner_type === 'client' && task.prepared_materials && (
-                        <div style={{ fontSize: 10, color: '#9CA3AF', fontStyle: 'italic', marginTop: 3 }}>
-                          TDI prepared: {task.prepared_materials.length > 100 ? task.prepared_materials.slice(0, 97) + '...' : task.prepared_materials}
+                      {/* Every owner type, not just client. Twenty two of the
+                          twenty eight open tasks are owned by TDI, so gating this
+                          on client hid the draft on the ones Bella actually works. */}
+                      {task.prepared_materials && (
+                        <div style={{ fontSize: 10, color: '#1e2749', marginTop: 3, fontWeight: 600 }}>
+                          Draft ready. Open the task to copy it.
                         </div>
                       )}
                     </div>
