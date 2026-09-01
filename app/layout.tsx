@@ -98,10 +98,20 @@ export default function RootLayout({
           <GoogleAnalytics />
           <MicrosoftClarity />
           <ScrollToTop />
+          {/* Skip link. Every page repeats the same nav before its content, so
+              without this a keyboard or screen-reader user tabs the whole
+              header again on every single page load just to reach what they
+              came for. Visually hidden until focused, then it appears. */}
+          <a
+            href="#main-content"
+            className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded-md focus:bg-white focus:px-4 focus:py-2 focus:text-[#1E2749] focus:shadow-lg focus:outline focus:outline-2 focus:outline-[#1E2749]"
+          >
+            Skip to main content
+          </a>
           <MainSiteWrapper>
             <Header />
           </MainSiteWrapper>
-          <main className="min-h-screen">
+          <main id="main-content" className="min-h-screen">
             {children}
           </main>
           <MainSiteWrapper>
