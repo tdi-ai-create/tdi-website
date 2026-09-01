@@ -30,6 +30,7 @@ export async function GET(
     'hub-content-standards': 'hub-content-standards.html',
     'hub-content-creation': 'hub-content-creation.html',
     'grant-application-spec': 'grant-application-spec.html',
+    'grant-workflow-sop': 'grant-workflow-sop.html',
     'course-upload-sop': 'course-upload-sop.html',
     'course-checkins-sop': 'course-checkins-sop.html',
     'swag-fulfillment': 'swag-fulfillment.html',

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grant Workflow SOP</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'DM Sans', -apple-system, sans-serif; color: #1e2749; background: #F8F9FA; line-height: 1.6; }
+  .page { max-width: 900px; margin: 0 auto; padding: 32px 24px 80px; }
+  h1 { font-size: 28px; font-weight: 700; margin-bottom: 4px; }
+  h2 { font-size: 20px; font-weight: 700; margin: 40px 0 16px; padding-bottom: 8px; border-bottom: 2px solid #E5E7EB; }
+  h3 { font-size: 16px; font-weight: 700; margin: 20px 0 8px; }
+  .subtitle { color: #6B7280; font-size: 14px; margin-bottom: 8px; }
+  .updated { color: #9CA3AF; font-size: 12px; margin-bottom: 32px; }
+  p, li { font-size: 14px; margin-bottom: 8px; }
+  ul, ol { margin: 8px 0 16px 24px; }
+  .card { background: white; border-radius: 12px; padding: 20px; margin-bottom: 16px; border: 1px solid #E5E7EB; }
+  .card-navy { background: #1e2749; color: white; border: none; }
+  .card-navy p, .card-navy li { color: #E5E7EB; }
+  .card-amber { background: #FFFBEB; border-color: #FDE68A; }
+  .card-red { background: #FEF2F2; border-color: #FECACA; }
+  .card-green { background: #F0FDF4; border-color: #BBF7D0; }
+  .flow { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin: 16px 0; }
+  .flow-step { background: white; border: 1px solid #E5E7EB; border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; }
+  .flow-arrow { color: #E8B84B; font-weight: 700; font-size: 16px; }
+  table { width: 100%; border-collapse: collapse; margin: 12px 0 20px; font-size: 13px; }
+  th { text-align: left; padding: 10px 12px; background: #1e2749; color: white; font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; }
+  td { padding: 10px 12px; border-bottom: 1px solid #F3F4F6; vertical-align: top; }
+  code { background: #F3F4F6; padding: 1px 5px; border-radius: 3px; font-size: 12px; }
+  .btn { display: inline-block; background: #B45309; color: white; border-radius: 6px; padding: 3px 9px; font-size: 12px; font-weight: 600; }
+  .btn-green { background: #059669; }
+  .btn-dark { background: #0B1120; }
+  .lede { font-size: 15px; color: #4B5563; margin-bottom: 20px; }
+  .rule { border-left: 3px solid #E8B84B; padding-left: 14px; margin: 14px 0; }
+  .rule .cond { font-weight: 700; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <h1>Grant Workflow</h1>
+  <p class="subtitle">How a grant narrative gets written, checked, approved and submitted, and who owns it at each point.</p>
+  <p class="updated">Updated 1 September 2026. Living document, extended as each phase ships.</p>
+
+  <p class="lede">Every rule below is stated as a condition and a consequence, because the failures we have had were never broken code. They were rules nobody had written down, so each screen and each route invented its own and they quietly disagreed.</p>
+
+  <div class="card card-navy">
+    <h3 style="color:white">Where the rules actually live</h3>
+    <p><code>lib/funding-rules.ts</code>. That file is the source, this page is the explanation. If the two ever disagree, the file is right and this page is stale, so fix the page.</p>
+  </div>
+
+  <h2>The path</h2>
+
+  <div class="flow">
+    <span class="flow-step">not_started</span><span class="flow-arrow">&rarr;</span>
+    <span class="flow-step">requested</span><span class="flow-arrow">&rarr;</span>
+    <span class="flow-step">qa_review</span><span class="flow-arrow">&rarr;</span>
+    <span class="flow-step">approval</span><span class="flow-arrow">&rarr;</span>
+    <span class="flow-step">ready</span>
+  </div>
+
+  <p>With one detour. If QA fails three times the narrative goes to <code>escalated</code> and waits for a person to choose what happens next.</p>
+
+  <h2>Who owns what, and how long they get</h2>
+
+  <table>
+    <thead>
+      <tr><th>State</th><th>Means</th><th>Owner</th><th>Goes loud after</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>not_started</code></td><td>Nobody has asked for a draft yet</td><td>Team</td><td>Never</td></tr>
+      <tr><td><code>requested</code></td><td>A draft was asked for and has not arrived</td><td>Writer</td><td>72 hours</td></tr>
+      <tr><td><code>qa_review</code></td><td>With Julie for a verdict</td><td>Julie</td><td>24 hours</td></tr>
+      <tr><td><code>approval</code></td><td>Passed QA, waiting on a human judgement</td><td>Bella</td><td>48 hours</td></tr>
+      <tr><td><code>escalated</code></td><td>QA ran out of attempts</td><td>Bella</td><td>48 hours</td></tr>
+      <tr><td><code>ready</code></td><td>Approved, somebody has to submit it</td><td>Team</td><td>Never</td></tr>
+    </tbody>
+  </table>
+
+  <div class="card card-amber">
+    <p><strong>Goes loud means</strong> the item stops reading as normal waiting on the Needs You board and becomes high urgency owned by a person. It does not chase anyone automatically. It stops the portal telling you everything is fine.</p>
+    <p><code>not_started</code> and <code>ready</code> have no limit on purpose. Both can legitimately wait on an application window or a school's timing.</p>
+  </div>
+
+  <h2>The rules</h2>
+
+  <div class="rule"><p><span class="cond">If you request a draft,</span> then the narrative becomes <code>requested</code> and the agent you chose is assigned.</p></div>
+
+  <div class="rule"><p><span class="cond">If a narrative is <code>requested</code> and the funding window is open and the school's gate is open and the pursuit is not archived,</span> then it appears in the writer's queue. If any one of those is false it is invisible to every agent, and the board says so rather than pretending someone is working on it.</p></div>
+
+  <div class="rule"><p><span class="cond">If a draft arrives,</span> then it moves to <code>qa_review</code> and a message goes to Slack.</p></div>
+
+  <div class="rule"><p><span class="cond">If QA passes,</span> then it becomes <code>approval</code> and Bella is at-mentioned. A pass never reaches a school on its own.</p></div>
+
+  <div class="rule"><p><span class="cond">If QA fails on the first or second attempt,</span> then it returns to <code>requested</code> and Julie's summary becomes the writer's guidance.</p></div>
+
+  <div class="rule"><p><span class="cond">If QA fails a third time,</span> then it becomes <code>escalated</code> and the reviewer must attach a diagnosis with concrete options. An escalation without options is refused, because Bella is never handed an open problem.</p></div>
+
+  <div class="rule"><p><span class="cond">If a QA failure arrives without an explanation of at least fifteen characters,</span> then the whole review is rejected. A fail nobody can act on is worse than no fail.</p></div>
+
+  <div class="rule"><p><span class="cond">If the QA review row cannot be written,</span> then nothing advances. A narrative never moves on the strength of a review that was not recorded.</p></div>
+
+  <div class="rule"><p><span class="cond">If Bella approves,</span> then it becomes <code>ready</code> and is waiting to be submitted.</p></div>
+
+  <div class="rule"><p><span class="cond">If Bella sends it back from approval,</span> then it returns to <code>requested</code>, her note becomes the writer's guidance, and the QA pass that got it there is retired so the row cannot sit in <code>requested</code> still claiming it passed.</p></div>
+
+  <div class="rule"><p><span class="cond">If Bella sends it back with direction from an escalation,</span> then it returns to <code>requested</code>, her note becomes the guidance, and the attempt count resets so QA reviews the new version fresh.</p></div>
+
+  <h2>What Bella can do, and where</h2>
+
+  <div class="card">
+    <p>All of it is in the funding portal. She should never need to open Paperclip.</p>
+    <table>
+      <thead><tr><th>When</th><th>Control</th><th>Where</th></tr></thead>
+      <tbody>
+        <tr><td>Passed QA</td><td><span class="btn btn-green">Approve</span> or <span class="btn btn-dark">Send it back</span></td><td>Grant paths, on the opportunity</td></tr>
+        <tr><td>Escalated</td><td>Five options, one recommended</td><td>Grant paths, on the opportunity</td></tr>
+        <tr><td>Waiting on the school</td><td>The school replied, resume drafting</td><td>Grant paths, on the opportunity</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card card-red">
+    <h3>She never does QA</h3>
+    <p>Julie owns QA end to end and is the only reviewer. No screen offers Bella a pass or fail control, and no code path creates a QA task owned by her. Her two jobs are approving, meaning is this true about this school and does it sound like us, and choosing between concrete options when something escalates.</p>
+  </div>
+
+  <h2>Notifications</h2>
+
+  <div class="card">
+    <p>Messages go to <strong>#grant-work</strong>. A message names the school, says what happened, at-mentions the person who owes the next move, and links to the pursuit.</p>
+    <p>A state with a human owner should tell that human when it happens. The daily digest is a backstop for things nobody acted on, not the way people are supposed to find out.</p>
+  </div>
+
+  <div class="card card-amber">
+    <h3>Known gaps, being worked</h3>
+    <ul>
+      <li>The link goes to the pursuit page, where the narrative sits inside a collapsed section. It should open the item directly.</li>
+      <li>The 72 hour stall rule appears on the board but sends no message.</li>
+      <li>QA returns one verdict for the whole narrative. It should return a list, with each item tagged as fixable by the writer or needing a human, so that one missing detail stops one item rather than all of them.</li>
+    </ul>
+  </div>
+
+  <h2>The failure this exists to prevent</h2>
+
+  <div class="card card-red">
+    <p>Two St. Peter Chanel narratives failed QA on 24 August with two items that needed a phone call, an EIN and a confirmation of how the parish handles equitable services, and roughly eight items that needed nobody, including a missing client package and a style violation.</p>
+    <p>Both items were marked blocking, the writer read that as stop, and all ten sat untouched for eight days while the board reported it as ordinary waiting.</p>
+    <p>Nothing was broken. The rule for what to do when part of the feedback needs a human had never been written down, so the writer invented the most cautious one available.</p>
+  </div>
+
+  <h2>Changes</h2>
+  <div class="card">
+    <ul>
+      <li><strong>1 Sep 2026</strong>: rules moved into <code>lib/funding-rules.ts</code>. Expiries added for QA, approval and escalation. Bella given a second exit at approval. Draft arrivals now post to Slack, which they never did.</li>
+      <li><strong>31 Aug 2026</strong>: narratives render as prose rather than raw Markdown. Drafts unclaimed past 72 hours surface on the Needs You board.</li>
+    </ul>
+  </div>
+
+</div>
+</body>
+</html>

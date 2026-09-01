@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { ESCALATION_OPTIONS } from '@/lib/funding-qa'
+import { APPROVAL_SEND_BACK_TO } from '@/lib/funding-rules'
 import { NarrativeMarkdown } from '@/components/funding/NarrativeMarkdown'
 
 const PLAN_COLORS: Record<string, string> = { A: '#0F766E', B: '#1B365D', C: '#7C3AED', D: '#B45309' }
@@ -614,6 +615,10 @@ export function OpportunitiesTab({ pursuitId, gateOpen = false, contract2LineIte
               gateOpen={gateOpen}
               onRequestDraft={(agent) => patchOpp(opp.id, { narrative_status: 'requested', assigned_agent: agent })}
               onApprove={() => patchOpp(opp.id, { narrative_status: 'ready' })}
+              onSendBack={(note: string) => patchOpp(opp.id, {
+                narrative_status: APPROVAL_SEND_BACK_TO,
+                redraft_guidance: note,
+              })}
               onPatch={(fields) => patchOpp(opp.id, fields)}
             />
 
@@ -769,11 +774,12 @@ function DiversificationView({ opportunities }: { opportunities: any[] }) {
 
 // ── Narrative draft control ──
 
-function NarrativeControl({ opp, gateOpen, onRequestDraft, onApprove, onPatch }: {
+function NarrativeControl({ opp, gateOpen, onRequestDraft, onApprove, onSendBack, onPatch }: {
   opp: any
   gateOpen: boolean
   onRequestDraft: (agent: string) => void
   onApprove: () => void
+  onSendBack: (note: string) => void
   onPatch: (fields: Record<string, unknown>) => void
 }) {
   const [agentPick, setAgentPick] = useState(defaultAgent(opp.plan_category))
@@ -909,6 +915,21 @@ function NarrativeControl({ opp, gateOpen, onRequestDraft, onApprove, onPatch }:
             )}
             <button onClick={onApprove} style={{ fontSize: 10, fontWeight: 600, padding: '3px 10px', borderRadius: 4, border: 'none', background: '#10B981', color: 'white', cursor: 'pointer' }}>
               Approve
+            </button>
+            {/* The second exit. Approve was the only control here, so a
+                narrative that passed QA but got something wrong about the
+                school left Bella with nothing to click. Her job at this point
+                is exactly that judgement, and a state with one exit is a trap. */}
+            <button
+              onClick={() => {
+                const note = window.prompt(
+                  'What needs changing? This goes back to the writer as their guidance.'
+                )
+                if (note && note.trim().length > 2) onSendBack(note.trim())
+              }}
+              style={{ fontSize: 10, fontWeight: 600, padding: '3px 10px', borderRadius: 4, border: '1px solid #D1D5DB', background: 'white', color: '#374151', cursor: 'pointer' }}
+            >
+              Send it back
             </button>
           </>
         )}
