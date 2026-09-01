@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { ESCALATION_OPTIONS } from '@/lib/funding-qa'
+import { NarrativeMarkdown } from '@/components/funding/NarrativeMarkdown'
 
 const PLAN_COLORS: Record<string, string> = { A: '#0F766E', B: '#1B365D', C: '#7C3AED', D: '#B45309' }
 const PLAN_LABELS: Record<string, string> = {
@@ -1731,9 +1732,9 @@ function NarrativeReader({ content, url }: { content: string; url?: string | nul
       <div style={{
         padding: '12px 14px', background: 'white', border: '1px solid #E5E7EB',
         borderRadius: 8, maxHeight: expanded ? 'none' : 300, overflowY: expanded ? 'visible' : 'auto',
-        fontSize: 13, color: '#374151', lineHeight: 1.7, whiteSpace: 'pre-wrap',
+        fontSize: 13, color: '#374151', lineHeight: 1.7,
       }}>
-        {content}
+        <NarrativeMarkdown content={content} />
       </div>
       <div style={{ display: 'flex', gap: 8, marginTop: 6 }}>
         <button
