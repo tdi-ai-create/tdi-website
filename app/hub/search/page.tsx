@@ -8,6 +8,7 @@ import { getHubSupabase as getSupabase } from '@/lib/supabase-hub';
 import { useTranslation } from '@/lib/hub/useTranslation';
 import { BookOpen, Lightbulb, MessageCircle, Search, ArrowRight } from 'lucide-react';
 
+import { categoryColor } from '@/lib/hub/categoryColors';
 interface SearchResult {
   id: string;
   slug: string;
@@ -18,22 +19,6 @@ interface SearchResult {
   meta?: string;
   roles?: string[];
 }
-
-const CATEGORY_COLORS: Record<string, string> = {
-  'Stress Relief': '#E0F4FF',
-  'Time Savers': '#FEF3C7',
-  'Classroom Tools': '#E8F5E9',
-  'Communication': '#F3E8FF',
-  'Self-Care': '#FCE7F3',
-};
-
-const CATEGORY_ACCENTS: Record<string, string> = {
-  'Stress Relief': '#7C9CBF',
-  'Time Savers': '#D4A843',
-  'Classroom Tools': '#6BA368',
-  'Communication': '#9B7CB8',
-  'Self-Care': '#D4789C',
-};
 
 export default function HubSearchPage() {
   const { user } = useHub();
@@ -268,7 +253,7 @@ export default function HubSearchPage() {
                 </div>
                 <div className="space-y-2">
                   {filteredQuickWins.map((qw) => {
-                    const accent = CATEGORY_ACCENTS[qw.category || ''] || '#7C9CBF';
+                    const accent = categoryColor(qw.category);
                     return (
                       <Link
                         key={qw.id}
@@ -281,7 +266,7 @@ export default function HubSearchPage() {
                           {qw.category && (
                             <span
                               className="inline-block text-xs font-bold px-2 py-0.5 rounded mb-1.5"
-                              style={{ background: CATEGORY_COLORS[qw.category] || '#F3F4F6', color: '#1B2A4A', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}
+                              style={{ background: categoryColor(qw.category), color: '#1B2A4A', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}
                             >
                               {qw.category}
                             </span>

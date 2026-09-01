@@ -60,6 +60,7 @@ import { Gamepad2, Users, Timer, Target, Lock } from 'lucide-react';
 import { useMembership, type MembershipTier, canAccessContent } from '@/lib/hub/use-membership';
 import { PRACTICE_GAME_REGISTRY, type PracticeGameEntry } from '@/lib/hub/practice-games';
 
+import { categoryColor, CATEGORY_FALLBACK } from '@/lib/hub/categoryColors';
 type Bilingual = { en: string; es: string };
 
 interface PracticeGameConfig extends PracticeGameEntry {
@@ -342,18 +343,6 @@ function BreathingExercise() {
 }
 
 // ─── Constants ──────────────────────────────────────────────────────────────
-
-const CATEGORY_COLORS: Record<string, string> = {
-  'Stress Relief': '#7C9CBF',
-  'Time Savers': '#6BA368',
-  'Classroom Tools': '#ffba06',
-  'Communication': '#E8927C',
-  'Self-Care': '#9B7CB8',
-  'Stress & Wellness': '#7C9CBF',
-  'Classroom Management': '#ffba06',
-  'Leadership': '#9B7CB8',
-  'New Teacher': '#5BBEC4',
-};
 
 // Testimonials pool - varied roles across K-12
 const TESTIMONIALS = [
@@ -1021,7 +1010,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
 
   // ─── Derived values ───────────────────────────────────────────────────────
 
-  const categoryColor = quickWin ? CATEGORY_COLORS[quickWin.category || ''] || '#ffba06' : '#ffba06';
+  const catColor = quickWin ? categoryColor(quickWin.category) : CATEGORY_FALLBACK;
 
   // ─── Loading state ────────────────────────────────────────────────────────
 
@@ -1711,7 +1700,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                   </p>
                   <div className="space-y-3">
                     {recommendations.map((rec) => {
-                      const recColor = CATEGORY_COLORS[rec.category || ''] || '#ffba06';
+                      const recColor = categoryColor(rec.category);
                       return (
                         <Link
                           key={rec.id}
@@ -1765,7 +1754,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {moreQuickWins.map((qw) => {
-                const qwColor = CATEGORY_COLORS[qw.category || ''] || '#ffba06';
+                const qwColor = categoryColor(qw.category);
                 return (
                   <Link
                     key={qw.id}
