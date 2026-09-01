@@ -25,13 +25,16 @@ export const metadata: Metadata = {
   authors: [{ name: "Teachers Deserve It" }],
   creator: "Teachers Deserve It",
   metadataBase: new URL("https://teachersdeserveit.com"),
+  // No title or description here on purpose. Next resolves og:title from the
+  // page's own title (template included) and og:description from its
+  // description, but only when they are absent here. Setting them pinned every
+  // page's share card to the homepage: a link to /for-schools/request previewed
+  // as the generic brand blurb, which is the opposite of what a share is for.
   openGraph: {
     type: "website",
     locale: "en_US",
     url: "https://teachersdeserveit.com",
     siteName: "Teachers Deserve It",
-    title: "Teachers Deserve It | Professional Development That Actually Works",
-    description: "Join 100,000+ educators with PD that respects your time. Practical strategies, wellness support, and a community that gets it.",
     images: [
       {
         url: "/og-image.png",
@@ -43,13 +46,13 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Teachers Deserve It | Professional Development That Actually Works",
-    description: "Join 100,000+ educators with PD that respects your time. Practical strategies, wellness support, and a community that gets it.",
     images: ["/og-image.png"],
   },
-  alternates: {
-    canonical: 'https://www.teachersdeserveit.com',
-  },
+  // No canonical here on purpose. A canonical in the root layout is inherited
+  // by every page that does not set its own, so every page declared itself a
+  // duplicate of the homepage and told search engines not to rank it
+  // independently. /funding and /pd-diagnostic are exactly the pages an
+  // educator would search for. Set alternates.canonical per route instead.
   robots: {
     index: true,
     follow: true,

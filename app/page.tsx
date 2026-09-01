@@ -8,7 +8,7 @@ import { AnimatedStatsBar } from '@/components/AnimatedStatsBar';
 import TeamStrip from '@/components/TeamStrip'
 
 export const metadata: Metadata = {
-  title: 'Research-Backed Professional Development for Schools | Teachers Deserve It',
+  title: 'Research-Backed Professional Development for Schools',
   description: 'Join 100,000+ educators with PD that respects your time. Practical strategies, wellness support, and a community that gets it. For teachers and schools across all 50 states.',
 };
 

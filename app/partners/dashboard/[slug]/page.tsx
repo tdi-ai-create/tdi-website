@@ -157,11 +157,11 @@ export async function generateMetadata({ params }: PageProps) {
   const data = await fetchDashboardData(slug)
 
   if (!data) {
-    return { title: 'Partner Dashboard | Teachers Deserve It' }
+    return { title: 'Partner Dashboard' }
   }
 
   return {
-    title: `${data.partnership.name || 'Partner'} Dashboard | Teachers Deserve It`,
+    title: `${data.partnership.name || 'Partner'} Dashboard`,
     description: 'Your partnership progress and impact metrics',
   }
 }

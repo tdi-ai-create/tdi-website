@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'How We Partner With Schools | Teachers Deserve It',
+  title: 'How We Partner With Schools',
   description: 'Discover the TDI Blueprint: a three-phase partnership model (Ignite, Accelerate, Sustain) that delivers measurable PD implementation and teacher retention.',
 };
 
