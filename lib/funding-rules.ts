@@ -246,3 +246,108 @@ export function hoursSince(since: string | null | undefined, now: number = Date.
   if (!since) return Infinity;
   return Math.floor((now - new Date(since).getTime()) / 3600000);
 }
+
+// ── What a QA verdict says, item by item ───────────────────────────────────
+//
+// QA used to return one pass or fail for a whole narrative. That is the wrong
+// shape, because the two kinds of problem it finds have nothing in common.
+//
+// Some findings the writer can fix by writing: a section that opens as a
+// factsheet instead of a story, goals stated as coverage rather than outcomes,
+// a missing piece of the client-facing package, a style violation.
+//
+// Others cannot be fixed by writing at all, because the information does not
+// exist yet and only a person can go and get it. A tax ID. A confirmation of
+// how a funder wants something structured.
+//
+// Collapsing both into one verdict means the second kind stops the first kind.
+// A writer reads "blocking", concludes correctly that they cannot finish, and
+// does none of the work they could have done. Everything waits on the slowest
+// item rather than on itself.
+//
+// So a verdict now carries a list, and each item says which kind it is.
+
+export type QaBlocker =
+  /** The writer can fix this by rewriting. */
+  | 'writer'
+  /** Only a person can clear this. No amount of rewriting will. */
+  | 'human';
+
+export interface QaIssue {
+  /** What is wrong, in a sentence the writer can act on. */
+  text: string;
+  blocker: QaBlocker;
+  /** For human items: what would clear it. Ignored for writer items. */
+  needs?: string;
+}
+
+/**
+ * Reads whatever QA sent and sorts it.
+ *
+ * Deliberately forgiving about shape. Julie's rubric is a skill file in
+ * Paperclip and has not been changed yet, so today's verdicts arrive as free
+ * text or as untagged strings. Anything without a usable `blocker` is treated
+ * as a writer item, which is exactly how the system behaves today: everything
+ * goes back to the writer. That keeps this change invisible until the rubric
+ * starts tagging, and means the portal never has to guess.
+ */
+export function splitQaIssues(raw: unknown): { writer: QaIssue[]; human: QaIssue[] } {
+  const writer: QaIssue[] = [];
+  const human: QaIssue[] = [];
+
+  if (!Array.isArray(raw)) return { writer, human };
+
+  for (const entry of raw) {
+    if (typeof entry === 'string') {
+      writer.push({ text: entry, blocker: 'writer' });
+      continue;
+    }
+    if (!entry || typeof entry !== 'object') continue;
+
+    const e = entry as Record<string, unknown>;
+    const text = typeof e.text === 'string' ? e.text : typeof e.issue === 'string' ? e.issue : null;
+    if (!text) continue;
+
+    const blocker: QaBlocker = e.blocker === 'human' ? 'human' : 'writer';
+    const item: QaIssue = { text, blocker };
+    if (blocker === 'human' && typeof e.needs === 'string') item.needs = e.needs;
+    (blocker === 'human' ? human : writer).push(item);
+  }
+
+  return { writer, human };
+}
+
+/**
+ * What the writer is told to fix.
+ *
+ * Only their own items. Handing a writer a list containing something they
+ * cannot do is how a redraft turns into a refusal to redraft. The summary is
+ * kept as the opening line so nothing Julie wrote is lost.
+ */
+export function writerGuidance(summary: string | null | undefined, issues: QaIssue[]): string {
+  const head = (summary || '').trim();
+  if (issues.length === 0) return head;
+  const body = issues.map((i) => `- ${i.text}`).join('\n');
+  return head ? `${head}\n\n${body}` : body;
+}
+
+/**
+ * What to do with a failed verdict, given how its items split.
+ *
+ * `redraft`   the writer has work; this counts as an attempt.
+ * `park`      nothing left that writing can fix, so it goes to a person with a
+ *             concrete ask. Deliberately does NOT count as an attempt: burning
+ *             the writer's two tries on something they were never able to fix
+ *             is how a narrative reaches escalation with no useful options.
+ * `escalate`  the writer has had their attempts and still has not got there.
+ */
+export type FailDisposition = 'redraft' | 'park' | 'escalate';
+
+export function dispositionForFail(
+  writerItems: QaIssue[],
+  humanItems: QaIssue[],
+  attemptIfCounted: number,
+): FailDisposition {
+  if (writerItems.length === 0 && humanItems.length > 0) return 'park';
+  return attemptIfCounted > MAX_QA_ATTEMPTS ? 'escalate' : 'redraft';
+}

@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
 import { MAX_QA_ATTEMPTS, ESCALATION_OPTIONS, validateEscalation } from '@/lib/funding-qa'
+import { splitQaIssues, dispositionForFail, writerGuidance } from '@/lib/funding-rules'
 import { postFundingEvent, narrativeEvent } from '@/lib/funding-slack'
 import { screenPath } from '@/lib/funding-eligibility'
 
@@ -716,7 +717,18 @@ export async function POST(request: NextRequest) {
       }, { status: 400 })
     }
 
-    const attempt = (opp.qa_attempt_count ?? 0) + 1
+    // Sort the findings before deciding anything. An untagged verdict, which is
+    // what Julie's rubric still sends, comes back entirely as writer items, so
+    // the disposition below is identical to what it has always been.
+    const { writer: writerItems, human: humanItems } = splitQaIssues(issues)
+    const attemptIfCounted = (opp.qa_attempt_count ?? 0) + 1
+    const disposition = passed
+      ? null
+      : dispositionForFail(writerItems, humanItems, attemptIfCounted)
+
+    // Parking does not spend one of the writer's attempts, because they were
+    // never able to fix the thing that stopped them.
+    const attempt = disposition === 'park' ? (opp.qa_attempt_count ?? 0) : attemptIfCounted
     const now = new Date().toISOString()
 
     // Not best effort. This row IS the QA review. If it does not land, the
@@ -757,7 +769,39 @@ export async function POST(request: NextRequest) {
       updates.narrative_status = 'approval'
       updates.redraft_guidance = null
       outcome = 'approval'
-    } else if (attempt > MAX_QA_ATTEMPTS) {
+    } else if (disposition === 'park') {
+      // Nothing left that writing can fix. This goes to a person with the ask
+      // already stated, rather than round the writer loop again to fail the
+      // same way. Reuses the existing request_info path so Bella gets the
+      // controls she already has instead of a new state to learn.
+      const ask = humanItems.map(i => i.needs || i.text).join('; ')
+      const parked = validateEscalation({
+        summary:
+          `Everything the writer can fix has been fixed. ${humanItems.length} item` +
+          `${humanItems.length === 1 ? '' : 's'} cannot be closed by rewriting and need a person: ${ask}`,
+        root_cause:
+          'The narrative is not failing on its writing. It is missing information that does not exist yet, ' +
+          'so every redraft would fail the same way until someone goes and gets it.',
+        recommended_option: 'request_info',
+        recommendation_reason:
+          'The ask is already known and specific, so this needs someone to go and get it rather than a decision about what to try next.',
+        detail: ask,
+      })
+
+      if (!parked.ok) {
+        // Should not happen, the object above is built here. If it ever does,
+        // fall back to the writer loop rather than writing an escalation Bella
+        // cannot act on.
+        console.error('[sync] Parked escalation failed its own validation:', parked.error)
+        updates.narrative_status = 'requested'
+        updates.redraft_guidance = writerGuidance(summary, writerItems)
+        outcome = 'requested'
+      } else {
+        updates.narrative_status = 'escalated'
+        updates.qa_escalation = { ...parked.value, client_ask: ask, blocked_items: humanItems }
+        outcome = 'escalated'
+      }
+    } else if (disposition === 'escalate') {
       // Escalating to someone who is not a grant expert, so it has to arrive as
       // a diagnosis with a recommended path, never as an open problem.
       const check = validateEscalation(escalation)
@@ -774,7 +818,7 @@ export async function POST(request: NextRequest) {
     } else {
       // Back to the writer for another attempt
       updates.narrative_status = 'requested'
-      updates.redraft_guidance = summary
+      updates.redraft_guidance = writerGuidance(summary, writerItems)
       outcome = 'requested'
     }
 
