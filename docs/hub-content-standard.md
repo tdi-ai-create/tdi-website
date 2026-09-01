@@ -5,9 +5,8 @@ The quality bar every Hub Quick Win and lesson guide has to clear before it ship
 This is the canonical version. Before this document existed the standard was
 spread across 25 comments on TEA-214, one document on TEA-219, two comments on
 TEA-220, and a ticket description on TEA-218. Nothing referenced all four, so
-nothing could be checked against it. Rae approved every rule below between
-18 and 24 August 2026. None of it was written down in one place, and none of it
-was implemented.
+nothing could be checked against it and none of it got built. Rae approved every
+rule below between 18 and 24 August 2026.
 
 ## How to read the tables
 
@@ -20,10 +19,11 @@ Each rule carries an enforcement state. Treat these as literal, not aspirational
 | **Not enforced** | Approved, specified, and not built. An item can fail this and still publish today |
 
 The `qa_gate_enforced` flag in `hub_config` has been `true` since
-2026-08-13 16:54 UTC. The gate is live. It enforces the structural half of this
-document and none of the quality half. `docs/hub-publish-gate-runbook.md` still
-describes the flag as `false`; that section is stale and the flag state above is
-correct.
+2026-08-13 16:54 UTC, verified against the Hub database. The gate is live.
+
+Everything in the **Code** rows binds on the pre-publish path, `mark_reviewed`
+and `publish`. It does not bind on the repair path for live items. Section 7
+explains why that split is deliberate rather than an oversight.
 
 ## 1. Structural requirements
 
@@ -40,13 +40,17 @@ What the gate checks today. All of this is live.
 | Type `download` has a guide PDF in `file_url` | Code |
 | Type `download` has a tool PDF in `tool_file_url`, unless `tool_type` is `self_contained` | Code |
 | Type `quiz` has a config in `lib/hub/quizConfigs` or a `file_url` | Code |
-| `objectives` is present and non-empty | **Not enforced** |
-| `file_url` and `tool_file_url` resolve to an actual PDF, not HTML or PNG | **Not enforced** |
+| `objectives` is present and non-empty | Code |
+| `file_url` and `tool_file_url` resolve to an actual PDF, not HTML or PNG | Code |
 
-The last two are why 173 of 263 published items have no objectives and 21 serve
-something other than a PDF. The gate checks that `file_url` is populated, never
-what it points at. That is the exact hole the four image-only downloads went
-through in August.
+The last two rows became blocking on 2026-08-31. Before that the gate checked
+only that `file_url` was populated, never what it pointed at, which is how 173
+published items have no objectives, 21 serve an `.html` page as a download, and
+the four image-only PNGs shipped in August.
+
+Those checks bind on the pre-publish path only. Existing live items are repaired
+through `backfill_published` and `review_published`, which do not run them, so
+turning them on did not jam the remediation queue.
 
 ## 2. Content rubric
 
@@ -57,13 +61,13 @@ came out of Rae's own findings the same day.
 |---|---|
 | **Specificity.** An action step needs a concrete number, name, or timeframe. A verb with no object fails | **Not enforced** |
 | **Outcome-checkable.** An action step states an observable result showing it worked | **Not enforced** |
-| **Banned generic language.** Mechanical phrase ban on boilerplate, for example "in today's fast-paced classroom" | **Not enforced** |
+| **Banned generic language.** Mechanical phrase ban on boilerplate, for example "in today's fast-paced classroom" | Code |
 | **Title-promise match.** If the title says toolkit, more than one tool ships | Human |
 | **Read-through.** Logged yes or no: would a teacher use this at 9pm on a Tuesday | Human |
-| **Rubric version stamp.** Every review records `reviewed_against: rubric-v2` | **Not enforced** |
+| **Rubric version stamp.** Every review records `rubric-v2` in `qa_notes` | Code |
 
-Zero published items currently carry a rubric version stamp, so no audit can
-tell what standard any item was checked against.
+Zero *published* items carry a stamp yet, so no audit can tell what standard any
+live item was checked against. Every review from 2026-08-31 forward records one.
 
 ### The open sixth rule
 
@@ -161,26 +165,84 @@ from hub_quick_wins;
 Ticket status has repeatedly looked healthy while these numbers did not move.
 They are the only trustworthy signal.
 
-## 7. Turning the unenforced rules on
+## 7. Enforcement
 
-Four of the six unenforced rules are mechanical and belong in `qaBlockers()`:
-required `objectives`, `file_url` extension validation, the banned-phrase list,
-and the rubric version stamp. Specificity and outcome-checkable need a definition
-of vague that survives contact with real copy, so they should follow rather than
+Four of the six approved-but-unbuilt rules went blocking on 2026-08-31: required
+`objectives`, PDF extension validation on both files, the banned-phrase list, and
+the `rubric-v2` stamp on every review.
+
+**Enforcement must not outrun the content**, and the reason this was safe to turn
+on in one step is that it binds only where new content passes. `mark_reviewed`
+and `publish` run `qaBlockers()`. The repair path for live items,
+`backfill_published` and `review_published`, does not. So the 173 items missing
+objectives are not failed by their own remediation, and there was exactly one
+draft in flight when the checks landed.
+
+Get this wrong and it is the 2026-08-13 incident again, where a gate turned on
+ahead of the content broke publishing for everyone. The rule that keeps it safe:
+**a check may block the door new work comes through, never the door repairs go
+out of.**
+
+Two rules stay with human judgment on purpose. Specificity and outcome-checkable
+need a definition of vague that survives contact with real copy, and a bad
+mechanical version of either would reject good writing. They follow, they do not
 lead.
 
-**Enforcement must not outrun the content.** 173 published items have no
-objectives. The moment `objectives` becomes a blocker, every one of those items
-fails QA on its next review, which is the whole remediation queue. That is the
-same shape as the 2026-08-13 incident where turning a gate on early broke
-publishing for everyone.
+Changing the lane rules changes what comes off the live site, so
+`npx tsx scripts/score-published-dryrun.ts --selftest` covers all four lanes with
+fixtures. Run it after any edit to `scoreItem` or `qaBlockers`.
 
-The order that avoids it:
+## 8. The remediation workflow
 
-1. Ship the checks reporting-only. Record what would have failed, block nothing
-2. Backfill `objectives` on the 173, and re-file the 21 non-PDF downloads
-3. Re-measure. When the counts reach zero, flip the checks to blocking
-4. Stamp `rubric-v2` from step 1 onward, so the audit trail starts before enforcement does
+Approved 2026-08-31. The queue lives in the database, scored on demand. It is
+not a ticket per item: 259 items would become 259 Paperclip tickets and no one
+could see the queue.
+
+**Stage 1, score.** `GET /api/hub/content-sync?action=list_published` runs
+`scoreItem()` over every live item and returns a lane and a defect list per
+item, plus the lane counts. Nothing here is a judgment call, so re-running it
+gives the same answer and the count is trustworthy. Locally,
+`npx tsx scripts/score-published-dryrun.ts`.
+
+**Stage 2, three lanes**, which are section 5's policy in code.
+
+| Lane | Meaning | Action |
+|---|---|---|
+| `pull` | The download is not a usable document | `unpublish`, immediately |
+| `replace` | Live and usable, fails on substance | Rebuild, stays live meanwhile |
+| `stamp` | Content is fine, provenance is missing | `backfill_published` then `review_published` |
+| `clean` | Nothing to do | |
+
+**Stage 3, rebuild.** Replace-lane items get rebuilt against sections 1 to 4,
+not patched. The acceptance test is Maya's, and it is the one that decides
+whether the thing is worth downloading: *could a teacher who already knows the
+idea use this cold, mid class, without reading the explanation?* If not, it was
+written as an article and it goes back. Lily's design QA runs before Julie
+Lynn's content QA, so nothing visually flat reaches her desk.
+
+**Stage 4, publish on a verified read back.** `review_published` stamps
+`rubric-v2` and then re-reads the row to confirm the write landed, failing loudly
+if it did not. Writes on this table have silently dropped fields before
+(TEA-236) and a 200 proved nothing.
+
+### What the lane counts do and do not tell you
+
+Measured 2026-08-31: pull 21, replace 1, stamp 241, clean 0.
+
+The 21 are all `.html` files served as downloads. A teacher clicking download
+gets a web page, not a document.
+
+**A stamp lane of 241 does not mean 241 good items.** It means 241 items with no
+defect a machine can see. No machine can tell whether a download equips a
+teacher or just explains at them, so items will move from stamp to replace as
+QA actually reads them. Expect the split to shift. That is the process working,
+not the score being wrong.
+
+### Throughput
+
+Stamp lane at 30 a day, replace lane at 6 to 8. The ceiling is QA, not drafting.
+Drafting faster than review recreates exactly what produced 181 unreviewed live
+items in the first place.
 
 ## Sources
 
