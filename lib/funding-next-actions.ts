@@ -24,6 +24,7 @@
  */
 import { readSchoolProfile } from '@/lib/funding/school-profile'
 import { callTriggerFor } from '@/lib/funding/call-escalation'
+import { DRAFT_SILENCE_HOURS } from './funding-rules'
 
 export type ActionOwner = 'team' | 'agent' | 'school' | 'auto'
 export type ActionUrgency = 'critical' | 'high' | 'normal' | 'low'
@@ -69,7 +70,7 @@ export function computeNextActions(
   // is safe to import from client components.
   const qaAgentEnabled = opts.qaAgentEnabled ?? false
   const qaSilenceHours = opts.qaSilenceHours ?? 24
-  const draftSilenceHours = opts.draftSilenceHours ?? 72
+  const draftSilenceHours = opts.draftSilenceHours ?? DRAFT_SILENCE_HOURS
 
   const result: NextAction[] = []
   const today = new Date()
