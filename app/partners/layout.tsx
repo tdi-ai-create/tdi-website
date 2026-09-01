@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Partner Portal | Teachers Deserve It',
+  title: 'Partner Portal',
   description: 'Access your TDI partnership dashboard',
 };
 
