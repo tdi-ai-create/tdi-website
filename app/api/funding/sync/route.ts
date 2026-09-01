@@ -662,6 +662,23 @@ export async function POST(request: NextRequest) {
         status: narrativeStatus === 'ready' ? 'complete' : 'active',
       })
       if (narrTimelineErr) console.error('[sync] Narrative updated but timeline entry failed:', narrTimelineErr)
+
+      // Tell people, not just the timeline.
+      //
+      // This route wrote a timeline row and returned. Nothing reached Slack, so
+      // a draft arriving for QA was invisible outside the portal. The timeline
+      // is a record you go and look at; this is the part that reaches someone.
+      if (narrativeStatus && narrativeStatus !== prior?.narrative_status) {
+        postFundingEvent(
+          narrativeEvent(
+            opp.pursuit_id,
+            '',
+            opp.name,
+            String(prior?.narrative_status ?? 'unknown'),
+            String(narrativeStatus),
+          )
+        ).catch(err => console.error('[sync] non-blocking side effect failed:', err))
+      }
     }
 
     return NextResponse.json({ success: true })

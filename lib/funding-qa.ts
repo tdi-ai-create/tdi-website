@@ -10,7 +10,7 @@
 // The number itself lives in lib/funding-rules.ts with the rest of the state
 // rules. Re-exported here so the existing importers keep working and there is
 // still exactly one declaration.
-export { MAX_QA_ATTEMPTS, DRAFT_SILENCE_HOURS } from './funding-rules'
+export { MAX_QA_ATTEMPTS, DRAFT_SILENCE_HOURS, QA_SILENCE_HOURS } from './funding-rules'
 
 /**
  * Whether automated QA is actually running.
@@ -25,14 +25,6 @@ export { MAX_QA_ATTEMPTS, DRAFT_SILENCE_HOURS } from './funding-rules'
 export function isQaAgentEnabled(): boolean {
   return process.env.FUNDING_QA_AGENT_ENABLED === 'true'
 }
-
-/**
- * How long a narrative may sit awaiting a verdict before a person is told,
- * even when automated QA is switched on. Julie normally answers in minutes, so
- * anything past this means she is not picking it up and silence would otherwise
- * look like progress.
- */
-export const QA_SILENCE_HOURS = 24
 
 
 export type EscalationOptionKey =

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useTDIAdmin } from '@/lib/tdi-admin/context';
 import { Search, Download, Printer, ExternalLink } from 'lucide-react';
 
-type DocId = 'admin-guide' | 'data-flow' | 'workflow' | 'billing-sop' | 'funding' | 'funding-launch' | 'grant-application-spec' | 'hub-engagement' | 'engagement-workflow' | 'hub-content-standards' | 'hub-content-creation' | 'course-upload-sop' | 'course-checkins-sop' | 'creator-feedback-sop' | 'creator-recruitment-sop' | 'creator-dormancy-sop' | 'communication-map' | 'swag-fulfillment' | 'leadership-workflow';
+type DocId = 'admin-guide' | 'data-flow' | 'workflow' | 'billing-sop' | 'funding' | 'funding-launch' | 'grant-application-spec' | 'grant-workflow-sop' | 'hub-engagement' | 'engagement-workflow' | 'hub-content-standards' | 'hub-content-creation' | 'course-upload-sop' | 'course-checkins-sop' | 'creator-feedback-sop' | 'creator-recruitment-sop' | 'creator-dormancy-sop' | 'communication-map' | 'swag-fulfillment' | 'leadership-workflow';
 
 interface Doc {
   id: DocId;
@@ -109,6 +109,15 @@ const DOC_GROUPS: DocGroup[] = [
         label: 'Funding Status',
         desc: 'Current state and next steps for all schools',
         tags: ['funding', 'launch', 'bella', 'deadlines', 'action plan', 'grants', 'status'],
+        relatedSections: [
+          { label: 'Funding Portal', href: '/tdi-admin/funding' },
+        ],
+      },
+      {
+        id: 'grant-workflow-sop',
+        label: 'Grant Workflow SOP',
+        desc: 'Who owns a narrative at each step, how long they get, and what Bella can do',
+        tags: ['grant', 'workflow', 'sop', 'narrative', 'qa', 'approval', 'escalation', 'bella', 'julie', 'rules', 'states', 'notifications'],
         relatedSections: [
           { label: 'Funding Portal', href: '/tdi-admin/funding' },
         ],

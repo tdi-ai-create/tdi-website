@@ -73,6 +73,22 @@ export interface StateRule {
  */
 export const DRAFT_SILENCE_HOURS = 72;
 
+/**
+ * Julie normally answers in minutes, so a day of silence means she is not
+ * picking it up. Was declared in funding-qa.ts; moved here so every expiry in
+ * the system reads from one table.
+ */
+export const QA_SILENCE_HOURS = 24;
+
+/**
+ * How long something may sit on Bella before the portal says so.
+ *
+ * Two days rather than one. She is part time and an approval landing on a
+ * Friday afternoon should not be shouting by Saturday. Past that, a finished
+ * application waiting on one click is the most expensive kind of idle we have.
+ */
+export const BELLA_SILENCE_HOURS = 48;
+
 /** The table. One row per state, and no state may be absent from it. */
 export const STATE_RULES: Record<NarrativeState, StateRule> = {
   not_started: {
@@ -108,21 +124,21 @@ export const STATE_RULES: Record<NarrativeState, StateRule> = {
     owner: 'qa',
     meaning: 'With Julie, who decides whether it passes.',
     observed: false,
-    expiresHours: null,
+    expiresHours: QA_SILENCE_HOURS,
   },
   approval: {
     state: 'approval',
     owner: 'bella',
     meaning: 'Passed QA. Bella decides whether it is true about the school and sounds like us.',
     observed: false,
-    expiresHours: null,
+    expiresHours: BELLA_SILENCE_HOURS,
   },
   escalated: {
     state: 'escalated',
     owner: 'bella',
     meaning: 'QA ran out of attempts. Bella picks from concrete options.',
     observed: true,
-    expiresHours: null,
+    expiresHours: BELLA_SILENCE_HOURS,
   },
   ready: {
     state: 'ready',
@@ -150,12 +166,23 @@ export const STATE_RULES: Record<NarrativeState, StateRule> = {
  *   without calling postFundingEvent. Both are phase two.
  */
 export const TRANSITION_OWNER: Record<string, Owner> = {
+  // The move agents actually make. Absent until now, so a draft arriving for
+  // QA posted as chatter and was filtered out at any verbosity above verbose.
+  // Owner is null on purpose: it is Julie's next, and Julie is not chased.
+  'requested→qa_review': null,
   'drafting→review': 'bella',
   'review→qa_review': null,
   'qa_review→approval': 'bella',
   'qa_review→escalated': 'bella',
   'qa_review→ready': null,
 };
+
+/**
+ * Sending a narrative back from approval returns it to the writer, exactly as
+ * a QA failure does. Declared here so the button, the route and the board all
+ * agree about where it lands.
+ */
+export const APPROVAL_SEND_BACK_TO: NarrativeState = 'requested';
 
 /** Julie gets this many attempts before a narrative escalates to a person. */
 export const MAX_QA_ATTEMPTS = 2;

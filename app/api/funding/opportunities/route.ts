@@ -157,12 +157,14 @@ export async function PATCH(request: NextRequest) {
       },
     );
 
-    await supabase.from('funding_opportunities').update({
+    const { error: verdictErr } = await supabase.from('funding_opportunities').update({
       eligibility_verdict: result.verdict,
       eligibility_reason: result.reason,
       eligibility_rule: result.rule,
       eligibility_checked_at: new Date().toISOString(),
     }).eq('id', body.id);
+
+    if (verdictErr) console.error('[funding/opportunities] Eligibility verdict not saved:', verdictErr.message);
 
     if (result.verdict !== 'clear') {
       return NextResponse.json({
@@ -204,6 +206,10 @@ export async function PATCH(request: NextRequest) {
     'window_status', 'window_opens', 'window_closes',
     'internal_deadline', 'award_needed_by',
     'assigned_agent', 'research_status',
+    // Bella's note when she sends a narrative back from approval. It is
+    // guidance for the writer, not a verdict, so it belongs here rather than
+    // with the QA fields below.
+    'redraft_guidance',
   ];
   fields.forEach(f => { if (body[f] !== undefined) updates[f] = body[f]; });
   if (updatesOverrideFlag) updates.eligibility_overridden = true;
@@ -218,6 +224,14 @@ export async function PATCH(request: NextRequest) {
     // never also be recording a verdict. Without the reset, a redraft returning
     // to QA would carry the previous attempt's stale pass or fail.
     if (body.narrative_status === 'qa_review') {
+      updates.qa_passed = null;
+    }
+
+    // Sending a narrative back from approval retires the pass that got it
+    // there. Done here rather than trusting the caller, because qa_passed is
+    // deliberately not patchable: a verdict is Julie's alone. Without this the
+    // row would sit in 'requested' still claiming it had passed QA.
+    if (before?.narrative_status === 'approval' && body.narrative_status === 'requested') {
       updates.qa_passed = null;
     }
   }
@@ -239,22 +253,31 @@ export async function PATCH(request: NextRequest) {
 
   // If adding a note
   if (body.note) {
-    await supabase.from('funding_opportunity_notes').insert({
+    const { error: noteErr } = await supabase.from('funding_opportunity_notes').insert({
       opportunity_id: body.id,
       content: body.note,
       author: auth.member.email || auth.user.email,
     });
+    if (noteErr) {
+      // The note is the thing the person came here to write. Losing it silently
+      // is the failure this gate exists to stop.
+      return NextResponse.json(
+        { error: `The opportunity was updated but your note was not saved. ${noteErr.message}` },
+        { status: 500 },
+      );
+    }
 
     // Cross-reference to partnership notes if linked
     const { data: opp } = await supabase.from('funding_opportunities').select('partnership_id, name').eq('id', body.id).single();
     if (opp?.partnership_id) {
-      await supabase.from('partnership_notes').insert({
+      const { error: xrefErr } = await supabase.from('partnership_notes').insert({
         partnership_id: opp.partnership_id,
         content: `Funding (${opp.name}): ${body.note}`,
         author: auth.member.email || auth.user.email,
         note_type: 'general',
         visible_to_partner: false,
       });
+      if (xrefErr) console.error('[funding/opportunities] Partnership cross-reference note failed:', xrefErr.message);
     }
   }
 
@@ -266,13 +289,14 @@ export async function PATCH(request: NextRequest) {
       .eq('id', body.id)
       .single();
 
-    await supabase.from('funding_pursuit_timeline').insert({
+    const { error: submitTimelineErr } = await supabase.from('funding_pursuit_timeline').insert({
       pursuit_id: before.pursuit_id,
       event_date: new Date().toISOString().split('T')[0],
       event_title: `Client submitted: ${opp?.name || 'Unknown'}`,
       event_detail: body.client_submitted_proof || 'Submission confirmed',
       status: 'complete',
     });
+    if (submitTimelineErr) console.error('[funding/opportunities] Submission timeline entry failed:', submitTimelineErr.message);
   }
 
   // ── Slack narration for state changes ──
@@ -351,10 +375,11 @@ export async function PATCH(request: NextRequest) {
         else if (hasDrafting) computedPhase = 'writing'
         else computedPhase = 'intake'
 
-        await supabase
+        const { error: phaseUpdErr } = await supabase
           .from('funding_pursuits')
           .update({ current_phase: computedPhase, updated_at: new Date().toISOString() })
           .eq('id', pId)
+        if (phaseUpdErr) console.error('[funding/opportunities] Phase not updated:', phaseUpdErr.message)
       }
     } catch (phaseErr) {
       console.error('[funding-opportunities] Phase auto-update failed:', phaseErr)
@@ -373,8 +398,26 @@ export async function DELETE(request: NextRequest) {
   if (!id) return NextResponse.json({ error: 'id required' }, { status: 400 });
 
   const supabase = db();
-  await supabase.from('funding_opportunity_notes').delete().eq('opportunity_id', id);
-  await supabase.from('funding_opportunities').delete().eq('id', id);
+  // A delete that reports success without deleting is worse than one that
+  // fails loudly: the row stays in every report while the person who removed it
+  // believes it is gone.
+  const { error: notesDelErr } = await supabase
+    .from('funding_opportunity_notes').delete().eq('opportunity_id', id);
+  if (notesDelErr) {
+    return NextResponse.json(
+      { error: `Could not remove this opportunity's notes, so nothing was deleted. ${notesDelErr.message}` },
+      { status: 500 },
+    );
+  }
+
+  const { error: oppDelErr } = await supabase
+    .from('funding_opportunities').delete().eq('id', id);
+  if (oppDelErr) {
+    return NextResponse.json(
+      { error: `Notes were removed but the opportunity was not. ${oppDelErr.message}` },
+      { status: 500 },
+    );
+  }
 
   return NextResponse.json({ success: true });
 }
