@@ -161,7 +161,55 @@ async function sendDraft(sb: any, b: any, email: string, dryRun: boolean) {
   if (o.status !== 'draft') return NextResponse.json({ error: `Already ${o.status}` }, { status: 422 });
 
   if (dryRun) {
-    return NextResponse.json({ dry_run: true, would_send: { from: BILLING_FROM, to: o.to_email, cc: o.cc_email, subject: o.subject } });
+    const wantedDry: { name: string }[] = Array.isArray(o.attachments) ? o.attachments : [];
+    const { data: filesDry } = await sb
+      .from('billing_documents')
+      .select('title, storage_path')
+      .not('storage_path', 'is', null);
+    const haveDry = new Set((filesDry ?? []).map((f: { title: string }) => `${f.title}.pdf`.toLowerCase()));
+    const missingDry = wantedDry.map((a) => a.name).filter((n) => !haveDry.has(n.toLowerCase()));
+    return NextResponse.json({
+      dry_run: true,
+      would_send: { from: BILLING_FROM, to: o.to_email, cc: o.cc_email, subject: o.subject },
+      // A dry run that hides the reason a real send would fail is worth nothing.
+      would_be_blocked: missingDry.length > 0,
+      missing_attachments: missingDry,
+    });
+  }
+
+  // An email that promises an invoice must carry one.
+  //
+  // The draft records what it intends to attach and the outbox shows those
+  // names as pills, but the send below has never had an attachments field, so
+  // nothing has ever gone with any of these. Allenwood's balance reminder
+  // listed ANC-00025.pdf and the W-9 and would have reached PGCPS accounts
+  // payable with neither, referring to an invoice they cannot open. Their AP
+  // office rejects quietly, so it would have read as another slow payment.
+  //
+  // Every billing_documents row currently has a null storage_path: the records
+  // exist, the files do not. Rather than send a promise we cannot keep, refuse
+  // and say which file is missing. Uploading it is the fix, and until then a
+  // person can still delete the attachment line and send the text alone
+  // deliberately.
+  const wanted: { name: string }[] = Array.isArray(o.attachments) ? o.attachments : [];
+  if (wanted.length > 0) {
+    const { data: files, error: filesError } = await sb
+      .from('billing_documents')
+      .select('title, storage_path')
+      .not('storage_path', 'is', null);
+    if (filesError) {
+      return NextResponse.json({ error: `Could not check attachments: ${filesError.message}` }, { status: 500 });
+    }
+    const have = new Set((files ?? []).map((f: { title: string }) => `${f.title}.pdf`.toLowerCase()));
+    const missing = wanted.map((a) => a.name).filter((n) => !have.has(n.toLowerCase()));
+    if (missing.length > 0) {
+      return NextResponse.json({
+        error:
+          `This draft says it attaches ${missing.join(' and ')}, and ${missing.length === 1 ? 'that file is' : 'those files are'} not stored, ` +
+          'so the email would arrive with nothing attached. Upload it under Documents, or remove the attachment from this draft to send the text on its own.',
+        missing_attachments: missing,
+      }, { status: 422 });
+    }
   }
 
   const key = process.env.RESEND_API_KEY;
