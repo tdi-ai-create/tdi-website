@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import { PhaseChain } from '../components/PhaseChain'
@@ -31,6 +31,33 @@ import { C, Panel, KV, TheOneThing, WorkGroup, TaskRow, AgentRow, PathRow } from
  * timeline and the emails and everything else, so keeping a Timeline section
  * beside it offered a strict subset under its own heading.
  */
+/**
+ * Scrolls an element into view in a page whose document does not scroll.
+ *
+ * The admin shell puts everything inside an overflow container, so
+ * documentElement never scrolls and both scrollIntoView and window.scrollTo do
+ * nothing. This walks up to the real scrolling ancestor and sets scrollTop.
+ *
+ * Extracted because the deep link needed the same thing and reached for
+ * scrollIntoView instead. It ran, reported no error, and moved nothing, which
+ * is exactly the failure the comment inside reveal was written to prevent.
+ */
+function scrollToElementId(elementId: string, gap: number) {
+  const el = document.getElementById(elementId)
+  if (!el) return
+
+  let box: HTMLElement | null = el.parentElement
+  while (box) {
+    const overflow = getComputedStyle(box).overflowY
+    if (/(auto|scroll|overlay)/.test(overflow) && box.scrollHeight > box.clientHeight + 4) break
+    box = box.parentElement
+  }
+
+  const top = el.getBoundingClientRect().top
+  if (box) box.scrollTop += top - box.getBoundingClientRect().top - gap
+  else window.scrollBy(0, top - gap)
+}
+
 export default function PursuitPage() {
   const params = useParams()
   const pursuitId = params.pursuitId as string
@@ -38,6 +65,7 @@ export default function PursuitPage() {
   const [data, setData] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [open, setOpen] = useState<string | null>(null)
+  const [highlightOpp, setHighlightOpp] = useState<string | null>(null)
 
   // Opening a section from a button has to move you to it.
   //
@@ -68,21 +96,7 @@ export default function PursuitPage() {
     // happened for anyone whose tab was in the background, and it could not be
     // exercised in automation either. A timeout still fires, so the behaviour
     // is the same for a person and finally observable in a test.
-    setTimeout(() => {
-      const el = document.getElementById(`section-${id}`)
-      if (!el) return
-
-      let box: HTMLElement | null = el.parentElement
-      while (box) {
-        const overflow = getComputedStyle(box).overflowY
-        if (/(auto|scroll|overlay)/.test(overflow) && box.scrollHeight > box.clientHeight + 4) break
-        box = box.parentElement
-      }
-
-      const top = el.getBoundingClientRect().top
-      if (box) box.scrollTop += top - box.getBoundingClientRect().top - 12
-      else window.scrollBy(0, top - 12)
-    }, 0)
+    setTimeout(() => scrollToElementId(`section-${id}`, 12), 0)
   }
   const [editingName, setEditingName] = useState(false)
   const [nameDraft, setNameDraft] = useState('')
@@ -94,6 +108,36 @@ export default function PursuitPage() {
       .catch(() => setLoading(false))
   }
   useEffect(load, [pursuitId])
+
+  // A link from Slack opens the thing it is about.
+  //
+  // Strictly opt-in. Without ?open= this does nothing at all, so arriving by
+  // clicking through the portal still lands with every section collapsed, which
+  // is what people who navigate here normally expect.
+  //
+  // It waits for the data because reveal measures the section body to work out
+  // where to scroll, and before the fetch resolves that body is empty. Reusing
+  // reveal rather than writing a second scroll: it already handles the fact
+  // that the document does not scroll and that rAF never fires in a background
+  // tab, and neither of those was obvious.
+  const deepLinked = useRef(false)
+  useEffect(() => {
+    if (loading || deepLinked.current) return
+    const params = new URLSearchParams(window.location.search)
+    const wanted = params.get('open')
+    if (!wanted) return
+
+    deepLinked.current = true
+    reveal(wanted)
+
+    const opp = params.get('opp')
+    if (!opp) return
+    setHighlightOpp(opp)
+    // After reveal's own scroll has settled, move to the specific row. Ten
+    // opportunities in one section is not "opening the thing".
+    // Same helper reveal uses. scrollIntoView does nothing on this page.
+    setTimeout(() => scrollToElementId(`opp-${opp}`, 80), 400)
+  }, [loading])
 
   const patchPursuit = async (fields: Record<string, unknown>) => {
     setData((prev: any) => prev ? { ...prev, pursuit: { ...prev.pursuit, ...fields } } : prev)
@@ -242,6 +286,7 @@ export default function PursuitPage() {
 
           {section('paths', `Grant paths (${opportunities.length})`,
             <OpportunitiesTab
+              highlightId={highlightOpp}
               pursuitId={pursuitId}
               gateOpen={gate?.gate_open === true}
               contract2LineItems={data.contract2LineItems}
