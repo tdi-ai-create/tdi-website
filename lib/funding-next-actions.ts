@@ -42,18 +42,34 @@ export interface NextAction {
   inProgress?: boolean // visually mute — no human action needed
 }
 
+/** Hours since anything last happened to this opportunity. */
+function quietHours(opp: { narrative_status_changed_at?: string | null; updated_at?: string | null }): number {
+  const since = opp.narrative_status_changed_at || opp.updated_at
+  if (!since) return Infinity
+  return Math.floor((Date.now() - new Date(since).getTime()) / 3600000)
+}
+
+/** A requested draft nobody has started, past the point where waiting is normal. */
+function stalledDraft(
+  opp: { narrative_status_changed_at?: string | null; updated_at?: string | null },
+  thresholdHours: number,
+): boolean {
+  return quietHours(opp) >= thresholdHours
+}
+
 export function computeNextActions(
   pursuit: any,
   opportunities: any[],
   actions: any[],
   gate: any,
   allocations: any[],
-  opts: { qaAgentEnabled?: boolean; qaSilenceHours?: number } = {},
+  opts: { qaAgentEnabled?: boolean; qaSilenceHours?: number; draftSilenceHours?: number } = {},
 ): NextAction[] {
   // Passed in rather than read from env here, so this stays a pure function and
   // is safe to import from client components.
   const qaAgentEnabled = opts.qaAgentEnabled ?? false
   const qaSilenceHours = opts.qaSilenceHours ?? 24
+  const draftSilenceHours = opts.draftSilenceHours ?? 72
 
   const result: NextAction[] = []
   const today = new Date()
@@ -701,6 +717,16 @@ export function computeNextActions(
         actionType: 'unblock_draft',
         targetId: opp.id,
         tab: 'overview',
+      } : stalledDraft(opp, draftSilenceHours) ? {
+        // Nothing is coming. Say so, and put it on a person.
+        id: `drafting-stalled-${opp.id}`,
+        label: `"${opp.name}" — nobody has picked this draft up`,
+        why: `Requested ${Math.floor(quietHours(opp) / 24)} days ago and ${opp.assigned_agent || 'the agent'} has not started. The portal is offering it correctly, so this is on our side to chase.`,
+        owner: 'team',
+        urgency: 'high',
+        actionType: 'unblock_draft',
+        targetId: opp.id,
+        tab: 'opportunities',
       } : {
         id: `drafting-wait-${opp.id}`,
         label: `"${opp.name}" — draft requested`,

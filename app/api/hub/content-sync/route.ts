@@ -19,6 +19,12 @@ export const maxDuration = 60
  * - Publish a Quick Win (publish)
  * - Repair metadata on an already-published Quick Win (backfill_published)
  *
+ * And to run the remediation program over live content (docs/hub-content-standard.md):
+ * - See the scored queue of published items (list_published)
+ * - Read one live item in full, by id or slug (get_published)
+ * - Take a functionally broken item down (unpublish)
+ * - Record a real QA pass on a live item (review_published)
+ *
  * Auth: Bearer token via PAPERCLIP_SYNC_KEY env var
  */
 
@@ -28,6 +34,28 @@ export const maxDuration = 60
 // which is how 21 Quick Wins shipped with a blank lift badge.
 const VALID_LIFT = ['LOW', 'MED', 'HIGH'] as const
 const VALID_DOMAINS = ['1-planning', '2-environment', '3-instruction', '4-professional'] as const
+
+// The standard an item was checked against, stamped into qa_notes on every
+// review. Without it an audit cannot tell a properly reviewed item from one
+// waved through under the old structural-only gate, and has to guess from dates.
+// Bump this when docs/hub-content-standard.md changes what QA has to check.
+export const RUBRIC_VERSION = 'rubric-v2'
+
+// Boilerplate that signals nobody wrote for a real teacher. A starter list, not
+// a finished one: add phrases as remediation surfaces them. Matched
+// case-insensitively against title, description and objectives.
+const BANNED_PHRASES = [
+  "in today's fast-paced classroom",
+  'in todays fast-paced classroom',
+  "in today's ever-changing",
+  'now more than ever',
+  'in this day and age',
+  'it is important to note that',
+  'at the end of the day',
+  'a game changer',
+  'take it to the next level',
+  'unlock the power of',
+]
 
 export type QuickWinRow = {
   slug: string | null
@@ -42,7 +70,12 @@ export type QuickWinRow = {
   file_url: string | null
   tool_file_url: string | null
   tool_type: string | null
+  objectives: string | null
 }
+
+// A download has to actually be a document. Query strings are common on these
+// URLs (?download=name.pdf), so match the extension anywhere a real one lands.
+const isPdf = (url: string) => /\.pdf(\?|#|$)/i.test(url)
 
 /**
  * Julie Lynn's mechanical QA checklist, in code.
@@ -71,6 +104,18 @@ export function qaBlockers(qw: QuickWinRow): string[] {
   if (!qw.quick_win_type) out.push('quick_win_type is required')
   if (!nonEmpty(qw.roles)) out.push('at least one role is required')
 
+  // Standard section 1. 173 published items have no objectives because the gate
+  // never asked for one. Blocking here stops the number growing; the existing
+  // 173 are repaired through backfill_published, which does not run this check.
+  if (!qw.objectives?.trim()) out.push('objectives is required')
+
+  // Standard section 2. Boilerplate that signals nobody wrote for a real teacher.
+  const prose = [qw.title, qw.description, qw.objectives].filter(Boolean).join(' ').toLowerCase()
+  const banned = BANNED_PHRASES.filter(p => prose.includes(p))
+  if (banned.length > 0) {
+    out.push(`banned phrase, rewrite it: ${banned.join('; ')}`)
+  }
+
   if (!nonEmpty(qw.topic_tags)) {
     out.push('at least 2 topic_tags are required')
   } else {
@@ -98,11 +143,19 @@ export function qaBlockers(qw: QuickWinRow): string[] {
   // Games and activities are interactive and need neither.
   if (qw.quick_win_type === 'download') {
     if (!qw.file_url) out.push('download type requires a guide PDF (file_url)')
+    // The gate used to check only that file_url was populated, never what it
+    // pointed at. That is how 21 live downloads serve an .html page and how the
+    // four image-only PNGs shipped. Standard section 1.
+    else if (!isPdf(qw.file_url)) {
+      out.push(`guide file is not a PDF: ${qw.file_url.split('/').pop()}`)
+    }
     // Some downloads are a single printable that already IS the tool: a lab card,
     // a quick card, a walkthrough form. Those declare tool_type self_contained
     // and need no second file. Mirrors the database trigger in migration 112.
     if (!qw.tool_file_url && qw.tool_type !== 'self_contained') {
       out.push('download type requires a tool PDF (tool_file_url), run generate_tool, or set tool_type to self_contained if the guide is itself the printable tool')
+    } else if (qw.tool_file_url && !isPdf(qw.tool_file_url)) {
+      out.push(`tool file is not a PDF: ${qw.tool_file_url.split('/').pop()}`)
     }
   } else if (qw.quick_win_type === 'quiz') {
     // A quiz is playable either because a config exists (renders in-app at
@@ -115,6 +168,69 @@ export function qaBlockers(qw: QuickWinRow): string[] {
   }
 
   return out
+}
+
+export type ScoredRow = QuickWinRow & {
+  id: string
+  objectives: string | null
+  reviewed_at: string | null
+  qa_notes: string | null
+}
+
+export type Lane = 'pull' | 'replace' | 'stamp' | 'clean'
+
+/**
+ * Score one published Quick Win against docs/hub-content-standard.md and put it
+ * in a lane.
+ *
+ * The lanes are Rae's tiered retroactive policy in code (standard section 5).
+ * The split is functional, never aesthetic:
+ *
+ *   pull     the download is not a usable document. Comes down now
+ *   replace  it is live and usable but fails the bar on substance. Stays live
+ *            while it waits, gets rebuilt rather than patched
+ *   stamp    the content is fine, the provenance is missing
+ *   clean    nothing to do
+ *
+ * Deliberately mechanical. Nothing here is a judgment call, so re-running it
+ * gives the same answer and the queue count is a number you can trust. The
+ * judgment half (is this an article or a tool) stays with QA, which is why a
+ * clean lane here still means a human has to have reviewed it.
+ */
+// A defect is broken when the download is not a usable document, which is the
+// only thing that earns an immediate unpublish under Rae's tiered policy.
+const BROKEN = /^(guide file is not a PDF|tool file is not a PDF|download type requires a guide PDF)/
+
+// A defect is fixable in place when backfill_published can correct it without
+// changing what the item is. Everything else needs a rebuild, which is different
+// work at a different speed and belongs in a different lane.
+const FIXABLE = /^(at least one role|at least 2 topic_tags|topic_tag "general"|at least one danielson_domain|danielson_domains must use|objectives is required)/
+
+export function scoreItem(qw: ScoredRow): { lane: Lane; defects: string[] } {
+  const broken: string[] = []
+  const substantive: string[] = []
+  const fixable: string[] = []
+
+  for (const d of qaBlockers(qw)) {
+    if (BROKEN.test(d)) broken.push(d)
+    else if (FIXABLE.test(d)) fixable.push(d)
+    else substantive.push(d)
+  }
+
+  // Provenance says nothing about whether the content is good, only that nobody
+  // checked. Always fast lane. Not part of qaBlockers because the pre-publish
+  // gate runs before there is anything to record.
+  if (!qw.reviewed_at) fixable.push('never passed QA')
+  else if (!qw.qa_notes?.includes(RUBRIC_VERSION)) {
+    fixable.push(`reviewed, but not against ${RUBRIC_VERSION}`)
+  }
+
+  const defects = [...broken, ...substantive, ...fixable]
+
+  if (broken.length > 0) return { lane: 'pull', defects }
+  if (substantive.length > 0) return { lane: 'replace', defects }
+  if (fixable.length > 0) return { lane: 'stamp', defects }
+  return { lane: 'clean', defects }
 }
 
 function db() {
@@ -183,6 +299,89 @@ export async function GET(request: NextRequest) {
       drafts_missing_pdf: draftItems.filter(d => d.file_url == null).length,
       drafts_missing_description: draftItems.filter(d => d.description == null || d.description === '').length,
     })
+  }
+
+  // ── list_published: the remediation queue, scored and laned ──
+  //
+  // Until this existed there was no way for an agent to see a published Quick
+  // Win at all. list_drafts covered unpublished rows, get_status returned
+  // counts. Every write action needs an id, and there was no action that
+  // returned one for a live item, so the entire 245-item remediation program
+  // could not start. That is TEA-230, open since 2026-08-18.
+  //
+  // Filter with ?lane=pull|replace|stamp|clean to work one lane at a time, and
+  // ?limit / ?offset to page. Returns the full scored count regardless of page
+  // so a caller always knows how much is left.
+  if (action === 'list_published') {
+    const lane = searchParams.get('lane')
+    const limit = Math.min(Number(searchParams.get('limit')) || 50, 250)
+    const offset = Number(searchParams.get('offset')) || 0
+
+    if (lane && !['pull', 'replace', 'stamp', 'clean'].includes(lane)) {
+      return NextResponse.json({ error: `lane must be pull, replace, stamp or clean (got "${lane}")` }, { status: 400 })
+    }
+
+    const { data, error } = await supabase
+      .from('hub_quick_wins')
+      .select('*')
+      .eq('is_published', true)
+      .order('created_at', { ascending: true })
+
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+    const scored = (data || []).map(qw => {
+      const { lane: itemLane, defects } = scoreItem(qw as ScoredRow)
+      return {
+        id: qw.id,
+        slug: qw.slug,
+        title: qw.title,
+        quick_win_type: qw.quick_win_type,
+        category: qw.category,
+        objectives: qw.objectives,
+        file_url: qw.file_url,
+        tool_file_url: qw.tool_file_url,
+        reviewed_at: qw.reviewed_at,
+        reviewed_by: qw.reviewed_by,
+        lane: itemLane,
+        defects,
+      }
+    })
+
+    const filtered = lane ? scored.filter(i => i.lane === lane) : scored
+    const counts = scored.reduce<Record<string, number>>((acc, i) => {
+      acc[i.lane] = (acc[i.lane] || 0) + 1
+      return acc
+    }, {})
+
+    return NextResponse.json({
+      rubric_version: RUBRIC_VERSION,
+      total_published: scored.length,
+      lane_counts: counts,
+      matching: filtered.length,
+      returned: filtered.slice(offset, offset + limit).length,
+      offset,
+      items: filtered.slice(offset, offset + limit),
+    })
+  }
+
+  // ── get_published: one live item in full, by id or slug ──
+  //
+  // Agents were resolving slugs by guessing ids, which the id check rejected
+  // outright. Accepting either is the difference between a workable loop and
+  // a dead end.
+  if (action === 'get_published') {
+    const id = searchParams.get('id')
+    const slug = searchParams.get('slug')
+    if (!id && !slug) return NextResponse.json({ error: 'id or slug is required' }, { status: 400 })
+
+    const query = supabase.from('hub_quick_wins').select('*').eq('is_published', true)
+    const { data, error } = await (id ? query.eq('id', id) : query.eq('slug', slug!)).maybeSingle()
+
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+    if (!data) return NextResponse.json({ error: 'No published Quick Win with that id or slug' }, { status: 404 })
+
+    const { lane, defects } = scoreItem(data as ScoredRow)
+    return NextResponse.json({ rubric_version: RUBRIC_VERSION, lane, defects, quick_win: data })
   }
 
   return NextResponse.json({ error: `Unknown action: ${action}` }, { status: 400 })
@@ -438,20 +637,45 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ success: false, blockers }, { status: 400 })
       }
 
+      // Stamp the rubric version. Without it a later audit cannot tell an item
+      // checked against the current standard from one waved through under the
+      // old structural-only gate, and has to guess from dates. Standard section 2.
+      const reviewedAt = new Date().toISOString()
+      const stampLine = `${reviewedAt.slice(0, 10)} reviewed against ${RUBRIC_VERSION} by ${reviewed_by.trim()}` +
+        (notes?.trim() ? `: ${notes.trim()}` : '')
+
       const { error: reviewErr } = await supabase
         .from('hub_quick_wins')
         .update({
           status: 'reviewed',
           reviewed_by: reviewed_by.trim(),
-          reviewed_at: new Date().toISOString(),
-          qa_notes: notes?.trim() || null,
-          updated_at: new Date().toISOString(),
+          reviewed_at: reviewedAt,
+          qa_notes: qw.qa_notes ? `${qw.qa_notes}\n${stampLine}` : stampLine,
+          updated_at: reviewedAt,
         })
         .eq('id', id)
 
       if (reviewErr) return NextResponse.json({ error: reviewErr.message }, { status: 500 })
 
-      return NextResponse.json({ success: true, id, slug: qw.slug, status: 'reviewed' })
+      // Read back. The stamp is the audit trail, and an audit trail that failed
+      // to write is worse than none because it looks fine.
+      const { data: after } = await supabase
+        .from('hub_quick_wins')
+        .select('qa_notes')
+        .eq('id', id)
+        .single()
+
+      if (!after?.qa_notes?.includes(RUBRIC_VERSION)) {
+        return NextResponse.json(
+          { error: `Review did not stick. ${RUBRIC_VERSION} is not in qa_notes after the write.` },
+          { status: 500 },
+        )
+      }
+
+      return NextResponse.json({
+        success: true, verified: true, id, slug: qw.slug,
+        status: 'reviewed', rubric_version: RUBRIC_VERSION,
+      })
     }
 
     // ── publish: validate and publish a Quick Win ──
@@ -610,6 +834,163 @@ export async function POST(request: NextRequest) {
       if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
       return NextResponse.json({ success: true, updated_fields: Object.keys(updates), quick_win: data })
+    }
+
+    // ── unpublish: the pull lane ──
+    //
+    // Rae's tiered policy (standard section 5) needs a way to take a broken item
+    // down. There was none, so in August she had to run the unpublishes by hand
+    // in the database while the agent that found them watched. The reason is
+    // required and lands in qa_notes, because an item that comes down silently
+    // is indistinguishable from one that was never published.
+    if (action === 'unpublish') {
+      const { id, slug, reason, unpublished_by, dryRun } = body
+
+      if (!id && !slug) return NextResponse.json({ error: 'id or slug is required' }, { status: 400 })
+      if (!reason?.trim()) {
+        return NextResponse.json(
+          { error: 'reason is required and is written to qa_notes, so every unpublish says why it happened' },
+          { status: 400 },
+        )
+      }
+      if (!unpublished_by?.trim()) {
+        return NextResponse.json({ error: 'unpublished_by is required (who pulled it)' }, { status: 400 })
+      }
+
+      const lookup = supabase.from('hub_quick_wins').select('*')
+      const { data: qw, error: fetchErr } = await (id ? lookup.eq('id', id) : lookup.eq('slug', slug)).maybeSingle()
+
+      if (fetchErr) return NextResponse.json({ error: fetchErr.message }, { status: 500 })
+      if (!qw) return NextResponse.json({ error: 'Quick Win not found' }, { status: 404 })
+      if (!qw.is_published) {
+        return NextResponse.json({ error: 'Quick Win is already unpublished' }, { status: 400 })
+      }
+
+      const stamp = new Date().toISOString()
+      const auditLine = `${stamp.slice(0, 10)} UNPUBLISHED by ${unpublished_by.trim()}: ${reason.trim()}`
+
+      if (dryRun) {
+        return NextResponse.json({
+          dry_run: true, id: qw.id, slug: qw.slug, title: qw.title,
+          current_lane: scoreItem(qw as ScoredRow).lane,
+          would_append_to_qa_notes: auditLine,
+        })
+      }
+
+      const { error: pullErr } = await supabase
+        .from('hub_quick_wins')
+        .update({
+          is_published: false,
+          status: 'pending_review',
+          qa_notes: qw.qa_notes ? `${qw.qa_notes}\n${auditLine}` : auditLine,
+          updated_at: stamp,
+        })
+        .eq('id', qw.id)
+
+      if (pullErr) return NextResponse.json({ error: pullErr.message }, { status: 500 })
+
+      // Read back rather than trusting the update. Writes on this table have
+      // silently dropped fields before (TEA-236), and a 200 proved nothing.
+      const { data: after } = await supabase
+        .from('hub_quick_wins')
+        .select('id, slug, is_published, status')
+        .eq('id', qw.id)
+        .single()
+
+      if (after?.is_published !== false) {
+        return NextResponse.json(
+          { error: 'Unpublish did not stick. The row still reads is_published true after the write.' },
+          { status: 500 },
+        )
+      }
+
+      return NextResponse.json({ success: true, verified: true, ...after })
+    }
+
+    // ── review_published: the stamp lane ──
+    //
+    // mark_reviewed refuses live rows, which is right for the normal flow: QA
+    // happens before publish. But 181 of 263 live items were published without
+    // ever passing QA, and there was no way to record a review on them without
+    // taking them down first. That turned a provenance gap into a content
+    // outage, so nobody did it and the number never moved.
+    //
+    // This records a real review on a live item. It cannot be used to wave
+    // something through: anything with a substantive defect is refused and has
+    // to go through the replace path instead.
+    if (action === 'review_published') {
+      const { id, slug, reviewed_by, notes, dryRun } = body
+
+      if (!id && !slug) return NextResponse.json({ error: 'id or slug is required' }, { status: 400 })
+      if (!reviewed_by?.trim()) {
+        return NextResponse.json({ error: 'reviewed_by is required (who ran QA)' }, { status: 400 })
+      }
+
+      const lookup = supabase.from('hub_quick_wins').select('*')
+      const { data: qw, error: fetchErr } = await (id ? lookup.eq('id', id) : lookup.eq('slug', slug)).maybeSingle()
+
+      if (fetchErr) return NextResponse.json({ error: fetchErr.message }, { status: 500 })
+      if (!qw) return NextResponse.json({ error: 'Quick Win not found' }, { status: 404 })
+      if (!qw.is_published) {
+        return NextResponse.json(
+          { error: 'This Quick Win is a draft. Use mark_reviewed, which is the pre-publish gate.' },
+          { status: 400 },
+        )
+      }
+
+      const { lane, defects } = scoreItem(qw as ScoredRow)
+      if (lane === 'pull' || lane === 'replace') {
+        return NextResponse.json({
+          success: false,
+          lane,
+          defects,
+          error: lane === 'pull'
+            ? 'This item is functionally broken. Unpublish it, do not review it.'
+            : 'This item has substantive defects. Rebuild it to the standard, do not stamp it as reviewed.',
+        }, { status: 400 })
+      }
+
+      const stamp = new Date().toISOString()
+      const auditLine = `${stamp.slice(0, 10)} reviewed against ${RUBRIC_VERSION} by ${reviewed_by.trim()}` +
+        (notes?.trim() ? `: ${notes.trim()}` : '')
+
+      if (dryRun) {
+        return NextResponse.json({ dry_run: true, id: qw.id, slug: qw.slug, lane, would_append_to_qa_notes: auditLine })
+      }
+
+      const { error: reviewErr } = await supabase
+        .from('hub_quick_wins')
+        .update({
+          reviewed_by: reviewed_by.trim(),
+          reviewed_at: stamp,
+          qa_notes: qw.qa_notes ? `${qw.qa_notes}\n${auditLine}` : auditLine,
+          updated_at: stamp,
+        })
+        .eq('id', qw.id)
+
+      if (reviewErr) return NextResponse.json({ error: reviewErr.message }, { status: 500 })
+
+      const { data: after } = await supabase
+        .from('hub_quick_wins')
+        .select('id, slug, reviewed_at, reviewed_by, qa_notes')
+        .eq('id', qw.id)
+        .single()
+
+      // The stamp is the whole point of this action. If it did not land, the
+      // audit trail is wrong in the direction that looks fine, so say so.
+      if (!after?.qa_notes?.includes(RUBRIC_VERSION)) {
+        return NextResponse.json(
+          { error: `Review did not stick. ${RUBRIC_VERSION} is not in qa_notes after the write.` },
+          { status: 500 },
+        )
+      }
+
+      return NextResponse.json({
+        success: true, verified: true,
+        id: after.id, slug: after.slug,
+        reviewed_at: after.reviewed_at, reviewed_by: after.reviewed_by,
+        rubric_version: RUBRIC_VERSION,
+      })
     }
 
     return NextResponse.json({ error: `Unknown action: ${action}` }, { status: 400 })
