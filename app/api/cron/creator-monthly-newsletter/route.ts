@@ -167,6 +167,81 @@ export async function GET(request: NextRequest) {
       .select('id', { count: 'exact', head: true })
       .eq('publish_status', 'published');
 
+    // What each creator's next step actually is.
+    //
+    // The issue that went out said "Hey there" and then told everyone the same
+    // thing about the community. Meanwhile four of the eleven were already
+    // overdue on Confirm Your Path from 26 August, and two were waiting on US
+    // to review something. We hold every one of those facts. Sending a warm
+    // generality to someone whose step has been sitting open for a month is
+    // how a newsletter teaches people it is safe to ignore.
+    //
+    // "Locked" steps are excluded: a creator cannot act on those, and naming
+    // one would be asking for something the portal will not let them do.
+    const { data: openSteps } = await supabase
+      .from('creator_milestones')
+      .select('creator_id, status, due_on, opened_at, milestones(name)')
+      .not('status', 'in', '(completed,locked)');
+
+    type NextStep = { milestone: string; dueOn: string | null; withUs: boolean };
+    const nextStepFor = new Map<string, NextStep>();
+    for (const row of (openSteps ?? []) as any[]) {
+      const name = row.milestones?.name;
+      if (!name) continue;
+      const existing = nextStepFor.get(row.creator_id);
+      // Soonest due date wins, undated last, so the email names the thing with
+      // a clock on it rather than whatever the database returned first.
+      const better =
+        !existing ||
+        (row.due_on && !existing.dueOn) ||
+        (row.due_on && existing.dueOn && row.due_on < existing.dueOn);
+      if (better) {
+        nextStepFor.set(row.creator_id, {
+          milestone: name,
+          dueOn: row.due_on ?? null,
+          withUs: row.status === 'waiting_approval',
+        });
+      }
+    }
+
+    const todayIso = now.toISOString().slice(0, 10);
+    const prettyDate = (iso: string) =>
+      new Date(`${iso}T12:00:00`).toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
+
+    /** The one paragraph that is about the reader rather than about us. */
+    const yourStepHtml = (creatorId: string): string => {
+      const step = nextStepFor.get(creatorId);
+      if (!step) return '';
+
+      // Waiting on us. Never ask someone to act when we are the holdup.
+      if (step.withUs) {
+        return `
+        <div style="background: #E8F0FD; border: 1px solid #bfdbfe; border-radius: 12px; padding: 18px 20px; margin: 20px 0;">
+          <p style="font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #1e40af; margin: 0 0 8px; font-weight: 600;">Where you are</p>
+          <p style="color: #1e3a5f; margin: 0; line-height: 1.6;">
+            <strong>${step.milestone}</strong> is with our team, not with you. Nothing is needed from
+            your side. If it has been sitting longer than feels right, reply here and Bella will chase it.
+          </p>
+        </div>`;
+      }
+
+      const overdue = step.dueOn && step.dueOn < todayIso;
+      const timing = !step.dueOn
+        ? 'whenever you have a clear hour'
+        : overdue
+          ? `set for ${prettyDate(step.dueOn)}, so it is sitting open`
+          : `due ${prettyDate(step.dueOn)}`;
+
+      return `
+        <div style="background: #E8F0FD; border: 1px solid #bfdbfe; border-radius: 12px; padding: 18px 20px; margin: 20px 0;">
+          <p style="font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #1e40af; margin: 0 0 8px; font-weight: 600;">Your next step</p>
+          <p style="color: #1e3a5f; margin: 0; line-height: 1.6;">
+            <strong>${step.milestone}</strong>, ${timing}.
+            ${overdue ? 'No judgement, September is brutal. If something is in the way, reply and tell us what it is.' : 'It is the only thing standing between you and the next one.'}
+          </p>
+        </div>`;
+    };
+
     // Pick this month's tip
     const monthIndex = now.getMonth();
     const tip = CREATOR_TIPS[monthIndex % CREATOR_TIPS.length];
@@ -241,7 +316,11 @@ export async function GET(request: NextRequest) {
       ? `Creator Spotlight: ${recentlyPublished![0].name} just launched!`
       : `Your monthly Creator Studio update — ${monthName}`;
 
-    const html = `
+    // One email per creator now, because two of the three things worth saying
+    // are about them: their name, and the step they are actually on.
+    const buildHtml = (creator: { id: string; name?: string | null }) => {
+      const firstName = (creator.name ?? '').trim().split(/\s+/)[0] || 'there';
+      return `
       <div style="font-family: 'Segoe UI', sans-serif; max-width: 600px; margin: 0 auto; color: #374151;">
         <!-- Header -->
         <div style="background: #1e2749; color: white; padding: 24px 28px; border-radius: 12px 12px 0 0;">
@@ -251,8 +330,11 @@ export async function GET(request: NextRequest) {
         </div>
 
         <div style="background: white; border: 1px solid #e5e7eb; border-top: none; padding: 28px; border-radius: 0 0 12px 12px;">
-          <p style="font-size: 15px; line-height: 1.7;">Hey there,</p>
-          <p style="font-size: 15px; line-height: 1.7;">Here's what's happening in the Creator Studio this month.</p>
+          <p style="font-size: 15px; line-height: 1.7;">Hi ${firstName},</p>
+          <p style="font-size: 15px; line-height: 1.7;">Here's where you are, and what's happening in the Creator Studio this month.</p>
+
+          <!-- The part that is about them -->
+          ${yourStepHtml(creator.id)}
 
           <!-- Spotlight or Team Update -->
           ${spotlightHtml}
@@ -300,6 +382,7 @@ export async function GET(request: NextRequest) {
         </div>
       </div>
     `;
+    };
 
     // Dedupe guard.
     //
@@ -350,7 +433,11 @@ export async function GET(request: NextRequest) {
         // and there was no way to have caught that short of reading the
         // template source. A preview that shows everything except the message
         // is not a preview.
-        html,
+        //
+        // Rendered for the first recipient rather than a blank template, so the
+        // personalised block is visible. Every issue differs per reader now.
+        previewFor: recipients[0]?.name ?? activeCreators[0]?.name ?? null,
+        html: buildHtml(recipients[0] ?? activeCreators[0] ?? { id: '', name: null }),
       });
     }
 
@@ -369,7 +456,7 @@ export async function GET(request: NextRequest) {
             to: [creator.email],
             bcc: ['bella@teachersdeserveit.com', 'rae@teachersdeserveit.com'],
             subject,
-            html,
+            html: buildHtml(creator),
             reply_to: 'bella@teachersdeserveit.com',
           }),
         });
