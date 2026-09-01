@@ -209,10 +209,15 @@ export function Header() {
           </nav>
 
           {/* Mobile Menu Button */}
+          {/* aria-expanded and aria-controls are what tell a screen reader the
+              menu opened at all. Without them the button announces the same way
+              in both states and the nav that appears below is unannounced. */}
           <button
             className="md:hidden p-2"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            aria-label="Toggle menu"
+            aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={mobileMenuOpen}
+            aria-controls="mobile-nav"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -232,7 +237,7 @@ export function Header() {
 
         {/* Mobile Nav */}
         {mobileMenuOpen && (
-          <nav className="md:hidden py-4 border-t border-gray-100">
+          <nav id="mobile-nav" aria-label="Mobile" className="md:hidden py-4 border-t border-gray-100">
             <div className="flex flex-col gap-4">
               {/* Login button - first in mobile menu */}
               <Link

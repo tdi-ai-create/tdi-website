@@ -47,7 +47,11 @@ const resources = [
   {
     title: 'See Pricing & Funding Options',
     description: 'Explore partnership models and learn how 80% of schools secure external funding.',
-    href: '/for-schools/pricing?utm_source=framework&utm_medium=page&utm_campaign=pricing',
+    // Pointed at /for-schools/pricing, which 404s and is linked from nowhere
+    // else. The UTM tags say it was meant to be a tracked destination, so this
+    // was a page that either moved or never shipped. /funding covers the same
+    // question for the same audience, so the card leads somewhere again.
+    href: '/funding?utm_source=framework&utm_medium=page&utm_campaign=pricing',
     icon: DollarSign,
     iconBg: '#8b5cf6',
     iconColor: '#ffffff',
