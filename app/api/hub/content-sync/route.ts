@@ -1,4 +1,4 @@
-import { createClient } from '@supabase/supabase-js'
+import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
 import { getQuizBySlug } from '@/lib/hub/quizConfigs'
 
@@ -193,11 +193,28 @@ export const EVIDENCE_MIN_CHARS = 40
  * review. Verified against a live Quick Win before choosing this.
  */
 async function fetchWasReal(
-  fileUrl: string | null,
+  supabase: SupabaseClient,
+  qw: { file_url: string | null; storage_path: string | null },
   claimedBytes: unknown,
 ): Promise<{ ok: true; bytes: number } | { ok: false; reason: string }> {
+  // Quizzes, games and the older quick_win type keep their content at
+  // storage_path with file_url null. Gating on file_url alone silently locked
+  // every one of them out of review no matter how good they were, which is
+  // exactly the shape of failure this gate exists to prevent. Found by Julie
+  // Lynn on TEA-373 while working the first gated batch.
+  const fileUrl =
+    qw.file_url ||
+    (qw.storage_path
+      ? supabase.storage.from('resource-files').getPublicUrl(qw.storage_path).data?.publicUrl || null
+      : null)
+
   if (!fileUrl) {
-    return { ok: false, reason: 'This item has no file_url, so a read cannot be evidenced. Fix the file first.' }
+    return {
+      ok: false,
+      reason:
+        'This item has neither file_url nor storage_path, so there is nothing to read. ' +
+        'That is a pull-lane problem, not a review problem: flag it rather than reviewing around it.',
+    }
   }
   if (typeof claimedBytes !== 'number' || !Number.isFinite(claimedBytes) || claimedBytes <= 0) {
     return { ok: false, reason: 'file_bytes must be the size in bytes of the file you downloaded, as a number.' }
@@ -1014,7 +1031,7 @@ export async function POST(request: NextRequest) {
 
       // The gate: fetch the document ourselves and confirm the caller has its
       // exact bytes. Someone who never opened the file cannot know its size.
-      const proof = await fetchWasReal(qw.file_url, file_bytes)
+      const proof = await fetchWasReal(supabase, qw, file_bytes)
       if (!proof.ok) {
         return NextResponse.json({
           success: false,
