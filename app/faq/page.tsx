@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import TeamStrip from '@/components/TeamStrip';
 
 export const metadata: Metadata = {
-  title: 'FAQ | Teachers Deserve It',
+  title: 'FAQ',
   description: 'Frequently asked questions about Teachers Deserve It professional development.',
 };
 
