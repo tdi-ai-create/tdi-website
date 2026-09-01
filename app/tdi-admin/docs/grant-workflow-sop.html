@@ -107,6 +107,21 @@
 
   <div class="rule"><p><span class="cond">If Bella sends it back with direction from an escalation,</span> then it returns to <code>requested</code>, her note becomes the guidance, and the attempt count resets so QA reviews the new version fresh.</p></div>
 
+  <h2>When QA finds something a writer cannot fix</h2>
+
+  <p>A review returns a list, and every item says who can close it. Some are things the writer fixes by rewriting. Others cannot be fixed by writing at all, because the information does not exist yet and a person has to go and get it.</p>
+
+  <div class="rule"><p><span class="cond">If every item can be fixed by rewriting,</span> then the narrative goes back to the writer with those items as their guidance, and it counts as one of their two attempts.</p></div>
+
+  <div class="rule"><p><span class="cond">If some items need a person and some do not,</span> then the writer still gets everything they can fix, and their guidance contains only those items. They are never handed something they cannot do.</p></div>
+
+  <div class="rule"><p><span class="cond">If nothing is left that rewriting can fix,</span> then it parks with the ask already written out and a recommendation to go and get it. <strong>This does not spend one of the writer's attempts</strong>, because they were never able to fix it. Burning their attempts on something impossible is how a narrative reaches escalation with no useful options.</p></div>
+
+  <div class="card card-amber">
+    <p><strong>Why this matters more than it sounds.</strong> Before this, one verdict covered the whole narrative. A single item needing a person marked the whole thing blocked, the writer read that as stop, and every item they could have fixed waited on the slowest one. Everything waited on the hardest thing rather than on itself.</p>
+    <p>Until the QA rubric starts tagging its findings, reviews arrive untagged and every item is treated as the writer's, which is exactly how the system behaved before. Nothing changes until the tagging starts.</p>
+  </div>
+
   <h2>What Bella can do, and where</h2>
 
   <div class="card">
@@ -138,7 +153,6 @@
     <ul>
       <li>The link goes to the pursuit page, where the narrative sits inside a collapsed section. It should open the item directly.</li>
       <li>The 72 hour stall rule appears on the board but sends no message.</li>
-      <li>QA returns one verdict for the whole narrative. It should return a list, with each item tagged as fixable by the writer or needing a human, so that one missing detail stops one item rather than all of them.</li>
     </ul>
   </div>
 
@@ -153,6 +167,7 @@
   <h2>Changes</h2>
   <div class="card">
     <ul>
+      <li><strong>1 Sep 2026</strong>: QA verdicts split by who can fix each item, so a missing detail stops one item rather than all of them.</li>
       <li><strong>1 Sep 2026</strong>: rules moved into <code>lib/funding-rules.ts</code>. Expiries added for QA, approval and escalation. Bella given a second exit at approval. Draft arrivals now post to Slack, which they never did.</li>
       <li><strong>31 Aug 2026</strong>: narratives render as prose rather than raw Markdown. Drafts unclaimed past 72 hours surface on the Needs You board.</li>
     </ul>
