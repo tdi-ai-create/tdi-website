@@ -331,6 +331,15 @@ export async function GET(request: NextRequest) {
         skippedAlreadySentThisMonth: skipped,
         wouldSend: recipients.length,
         plan: recipients.map((c) => ({ creator: c.name, to: c.email })),
+        // The email itself, so it can be read before it goes.
+        //
+        // The dry run used to return only the plan: who, how many, what
+        // subject. Nobody could see the words. The September issue went to
+        // thirteen creators carrying our own headcount and an incorrect one,
+        // and there was no way to have caught that short of reading the
+        // template source. A preview that shows everything except the message
+        // is not a preview.
+        html,
       });
     }
 
