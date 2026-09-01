@@ -7,8 +7,10 @@
  * them recommended. She picks. She is never asked to work out what to do.
  */
 
-/** Julie gets two attempts to get a narrative through before a person steps in. */
-export const MAX_QA_ATTEMPTS = 2
+// The number itself lives in lib/funding-rules.ts with the rest of the state
+// rules. Re-exported here so the existing importers keep working and there is
+// still exactly one declaration.
+export { MAX_QA_ATTEMPTS, DRAFT_SILENCE_HOURS } from './funding-rules'
 
 /**
  * Whether automated QA is actually running.
@@ -32,19 +34,6 @@ export function isQaAgentEnabled(): boolean {
  */
 export const QA_SILENCE_HOURS = 24
 
-/**
- * How long a requested draft may sit unclaimed before the portal stops calling
- * it "waiting" and starts calling it stuck.
- *
- * Three days rather than one, because a grant narrative is a long piece of work
- * and an agent that starts on day two has not failed. Past that, nobody has
- * picked it up.
- *
- * This exists because "waiting for the agent" was reported at low urgency with
- * no expiry, so three narratives sat unclaimed for 7 and 14 days and the board
- * showed the same calm sentence the whole time. Silence read as progress.
- */
-export const DRAFT_SILENCE_HOURS = 72
 
 export type EscalationOptionKey =
   | 'approve_anyway'

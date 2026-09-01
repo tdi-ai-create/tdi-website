@@ -5,6 +5,7 @@
  */
 
 import { createClient } from '@supabase/supabase-js'
+import { isHandoff as isHandoffTransition, transitionOwner } from './funding-rules'
 
 const LOG = '[funding-slack]'
 
@@ -148,30 +149,21 @@ export function narrativeEvent(pursuitId: string, pursuitName: string, oppName: 
   const key = `${fromStatus}→${toStatus}`
   const message = labels[key] || `${oppName} narrative: ${fromStatus} → ${toStatus}`
 
-  // Which transitions hand work to a named person, and to whom.
+  // Which transitions hand work to a named person, and to whom, now read from
+  // lib/funding-rules.ts rather than kept here. Being in that map at all makes
+  // the event a handoff rather than chatter, so it survives a verbosity setting
+  // of 'handoffs'. null means a real handoff owed to nobody.
   //
-  // Being in this map at all makes the event a handoff rather than chatter, so
-  // it survives a verbosity setting of 'handoffs'. The value is who gets an
-  // @mention. null means the transition is a real handoff but there is nobody
-  // waiting on it.
-  //
-  // The two that matter most were missing entirely. A narrative that passes QA
-  // and one that exhausts its QA attempts both stop dead until Bella acts, and
-  // both were posting as untagged chatter, so nothing told her. Two finished
-  // applications sat unapproved for a day because of it.
-  const HANDOFF_OWNER: Record<string, 'bella' | null> = {
-    'drafting→review': 'bella',     // a draft exists and needs moving to QA
-    'review→qa_review': null,       // now Julie's; nobody to chase
-    'qa_review→approval': 'bella',  // passed, waiting on her approval
-    'qa_review→escalated': 'bella', // QA is out of attempts, she decides
-    'qa_review→ready': null,        // already approved; nothing owed
-  }
-  const isHandoff = key in HANDOFF_OWNER
-  const owner = HANDOFF_OWNER[key] ?? null
+  // Moved rather than rewritten: the values are identical to what stood here.
+  // The map's own problems, that it describes a `drafting→review` path agents
+  // never take and omits the `requested→qa_review` one they do, are recorded
+  // alongside it and fixed in the next pass, not this one.
+  const handoff = isHandoffTransition(fromStatus, toStatus)
+  const owner = transitionOwner(fromStatus, toStatus)
 
   return {
     pursuitId, pursuitName, message,
-    level: isHandoff ? 'handoffs' : 'verbose',
+    level: handoff ? 'handoffs' : 'verbose',
     owner: owner as any,
     timelineTitle: message,
   }
