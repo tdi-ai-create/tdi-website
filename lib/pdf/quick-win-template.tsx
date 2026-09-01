@@ -243,7 +243,7 @@ export function QuickWinPDF({ data }: { data: QuickWinPDFData }) {
   const { title, category, roles, lift, duration_minutes, sections } = data
 
   return (
-    <Document>
+    <Document title={data.title} author="Teachers Deserve It">
       <Page size="LETTER" style={s.page}>
 
         {/* Navy header banner */}
