@@ -78,7 +78,16 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: guard.error }, { status: guard.status });
     }
     const { dryRun } = guard;
-    const now = new Date();
+
+    // ?asOf=2026-10-01 renders a future issue, dry run only.
+    //
+    // "What will next month's look like" had no answer short of waiting for it
+    // to send. The month name, the rotating tip, and the windows that decide
+    // whether there is a spotlight all read the clock, so rendering today only
+    // ever shows today's issue. A real send ignores this and always uses now.
+    const asOfParam = dryRun ? request.nextUrl.searchParams.get('asOf') : null;
+    const asOfDate = asOfParam ? new Date(`${asOfParam.slice(0, 10)}T12:00:00`) : null;
+    const now = asOfDate && !Number.isNaN(asOfDate.getTime()) ? asOfDate : new Date();
 
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -97,6 +106,14 @@ export async function GET(request: NextRequest) {
       .from('creators')
       .select('id, email, name')
       .eq('status', 'active')
+      // status and is_active are different columns and this only ever read the
+      // first. Katie Welch has been paused since 12 May, reason recorded as
+      // "Creator declined to create again at this time", and the September
+      // issue asked her to open her Studio and go recruit other educators.
+      // Holly Stuart was paused on 13 August and got the same. Someone who has
+      // told us they are done should not be receiving a monthly nudge.
+      .eq('is_active', true)
+      .is('paused_at', null)
       .or('lifecycle_state.is.null,lifecycle_state.eq.active');
 
     if (!activeCreators || activeCreators.length === 0) {
@@ -106,7 +123,7 @@ export async function GET(request: NextRequest) {
     // ---- Gather newsletter content ----
 
     // Recently published creators (last 60 days)
-    const sixtyDaysAgo = new Date();
+    const sixtyDaysAgo = new Date(now);
     sixtyDaysAgo.setDate(sixtyDaysAgo.getDate() - 60);
 
     const { data: recentlyPublished } = await supabase
@@ -118,7 +135,7 @@ export async function GET(request: NextRequest) {
       .limit(3);
 
     // Milestone celebrations this month
-    const thirtyDaysAgo = new Date();
+    const thirtyDaysAgo = new Date(now);
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
     const { data: recentMilestones } = await supabase
@@ -132,14 +149,101 @@ export async function GET(request: NextRequest) {
     const milestonesCompletedCount = recentMilestones?.length || 0;
 
     // Total creators and published count
-    const totalCreators = activeCreators.length;
+    // Whether anyone has published, not how many.
+    //
+    // Absolute counts do not go in creator facing email. Rae, 1 Sep 2026: a
+    // headcount is an internal gauge, and telling an outsider how many of us
+    // there are gives away more than it earns. Percentages are allowed; raw
+    // numbers are not.
+    //
+    // The September issue is why. It opened "13 educators who believe their
+    // experience is worth sharing", and 13 was not a count of anything: it was
+    // the length of the send list, assigned from activeCreators.length. There
+    // are 35 active creators. So the sentence carrying the whole emotional
+    // pitch told thirteen people the community was a third of its real size.
+    // A number that is both revealing and wrong is the worst of both.
     const { count: publishedCount } = await supabase
       .from('creators')
       .select('id', { count: 'exact', head: true })
       .eq('publish_status', 'published');
 
+    // What each creator's next step actually is.
+    //
+    // The issue that went out said "Hey there" and then told everyone the same
+    // thing about the community. Meanwhile four of the eleven were already
+    // overdue on Confirm Your Path from 26 August, and two were waiting on US
+    // to review something. We hold every one of those facts. Sending a warm
+    // generality to someone whose step has been sitting open for a month is
+    // how a newsletter teaches people it is safe to ignore.
+    //
+    // "Locked" steps are excluded: a creator cannot act on those, and naming
+    // one would be asking for something the portal will not let them do.
+    const { data: openSteps } = await supabase
+      .from('creator_milestones')
+      .select('creator_id, status, due_on, opened_at, milestones(name)')
+      .not('status', 'in', '(completed,locked)');
+
+    type NextStep = { milestone: string; dueOn: string | null; withUs: boolean };
+    const nextStepFor = new Map<string, NextStep>();
+    for (const row of (openSteps ?? []) as any[]) {
+      const name = row.milestones?.name;
+      if (!name) continue;
+      const existing = nextStepFor.get(row.creator_id);
+      // Soonest due date wins, undated last, so the email names the thing with
+      // a clock on it rather than whatever the database returned first.
+      const better =
+        !existing ||
+        (row.due_on && !existing.dueOn) ||
+        (row.due_on && existing.dueOn && row.due_on < existing.dueOn);
+      if (better) {
+        nextStepFor.set(row.creator_id, {
+          milestone: name,
+          dueOn: row.due_on ?? null,
+          withUs: row.status === 'waiting_approval',
+        });
+      }
+    }
+
+    const todayIso = now.toISOString().slice(0, 10);
+    const prettyDate = (iso: string) =>
+      new Date(`${iso}T12:00:00`).toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
+
+    /** The one paragraph that is about the reader rather than about us. */
+    const yourStepHtml = (creatorId: string): string => {
+      const step = nextStepFor.get(creatorId);
+      if (!step) return '';
+
+      // Waiting on us. Never ask someone to act when we are the holdup.
+      if (step.withUs) {
+        return `
+        <div style="background: #E8F0FD; border: 1px solid #bfdbfe; border-radius: 12px; padding: 18px 20px; margin: 20px 0;">
+          <p style="font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #1e40af; margin: 0 0 8px; font-weight: 600;">Where you are</p>
+          <p style="color: #1e3a5f; margin: 0; line-height: 1.6;">
+            <strong>${step.milestone}</strong> is with our team, not with you. Nothing is needed from
+            your side. If it has been sitting longer than feels right, reply here and Bella will chase it.
+          </p>
+        </div>`;
+      }
+
+      const overdue = step.dueOn && step.dueOn < todayIso;
+      const timing = !step.dueOn
+        ? 'whenever you have a clear hour'
+        : overdue
+          ? `set for ${prettyDate(step.dueOn)}, so it is sitting open`
+          : `due ${prettyDate(step.dueOn)}`;
+
+      return `
+        <div style="background: #E8F0FD; border: 1px solid #bfdbfe; border-radius: 12px; padding: 18px 20px; margin: 20px 0;">
+          <p style="font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #1e40af; margin: 0 0 8px; font-weight: 600;">Your next step</p>
+          <p style="color: #1e3a5f; margin: 0; line-height: 1.6;">
+            <strong>${step.milestone}</strong>, ${timing}.
+            ${overdue ? 'No judgement, this time of year eats everyone. If something is in the way, reply and tell us what it is.' : 'It is the only thing standing between you and the next one.'}
+          </p>
+        </div>`;
+    };
+
     // Pick this month's tip
-    const monthIndex = new Date().getMonth();
+    const monthIndex = now.getMonth();
     const tip = CREATOR_TIPS[monthIndex % CREATOR_TIPS.length];
 
     // Build the spotlight section
@@ -168,9 +272,9 @@ export async function GET(request: NextRequest) {
         <div style="background: linear-gradient(135deg, #eff6ff, #dbeafe); border: 1px solid #bfdbfe; border-radius: 12px; padding: 20px; margin: 20px 0;">
           <p style="font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #1e40af; margin: 0 0 8px; font-weight: 600;">From the TDI Team</p>
           <p style="color: #1e3a5f; margin: 0; line-height: 1.6;">
-            We're building something special with this creator community — ${totalCreators} educators
-            who believe their experience is worth sharing. ${publishedCount ? `${publishedCount} have already launched their content, and more are on the way.` : 'The first launches are coming soon, and the work happening behind the scenes is exciting.'}
-            Every one of you is part of something that's making educator-created PD a reality.
+            We're building something special here: a community of educators who believe
+            what they know is worth sharing. ${publishedCount ? 'Some have already launched their content, and more are on the way every month.' : 'The first launches are coming soon, and the work happening behind the scenes is exciting.'}
+            Every one of you is part of making educator-created PD a reality.
           </p>
         </div>
       `;
@@ -187,7 +291,11 @@ export async function GET(request: NextRequest) {
         }
       }
       if (activeCreatorIds.size > 0) {
-        celebrationItems.push(`${activeCreatorIds.size} creator${activeCreatorIds.size > 1 ? 's' : ''} completed milestones this month`);
+        celebrationItems.push(
+          activeCreatorIds.size > 1
+            ? 'Creators across the community hit milestones this month'
+            : 'A creator hit a milestone this month'
+        );
       }
 
       celebrationsHtml = `
@@ -203,12 +311,16 @@ export async function GET(request: NextRequest) {
     }
 
     // Build the full email
-    const monthName = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    const monthName = now.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
     const subject = hasSpotlight
       ? `Creator Spotlight: ${recentlyPublished![0].name} just launched!`
       : `Your monthly Creator Studio update — ${monthName}`;
 
-    const html = `
+    // One email per creator now, because two of the three things worth saying
+    // are about them: their name, and the step they are actually on.
+    const buildHtml = (creator: { id: string; name?: string | null }) => {
+      const firstName = (creator.name ?? '').trim().split(/\s+/)[0] || 'there';
+      return `
       <div style="font-family: 'Segoe UI', sans-serif; max-width: 600px; margin: 0 auto; color: #374151;">
         <!-- Header -->
         <div style="background: #1e2749; color: white; padding: 24px 28px; border-radius: 12px 12px 0 0;">
@@ -218,8 +330,11 @@ export async function GET(request: NextRequest) {
         </div>
 
         <div style="background: white; border: 1px solid #e5e7eb; border-top: none; padding: 28px; border-radius: 0 0 12px 12px;">
-          <p style="font-size: 15px; line-height: 1.7;">Hey there,</p>
-          <p style="font-size: 15px; line-height: 1.7;">Here's what's happening in the Creator Studio this month.</p>
+          <p style="font-size: 15px; line-height: 1.7;">Hi ${firstName},</p>
+          <p style="font-size: 15px; line-height: 1.7;">Here's where you are, and what's happening in the Creator Studio this month.</p>
+
+          <!-- The part that is about them -->
+          ${yourStepHtml(creator.id)}
 
           <!-- Spotlight or Team Update -->
           ${spotlightHtml}
@@ -267,6 +382,7 @@ export async function GET(request: NextRequest) {
         </div>
       </div>
     `;
+    };
 
     // Dedupe guard.
     //
@@ -298,15 +414,42 @@ export async function GET(request: NextRequest) {
     const recipients = activeCreators.filter((c) => !alreadySent.has(c.id));
     const skipped = activeCreators.length - recipients.length;
 
+    const previewAs = request.nextUrl.searchParams.get('previewAs')?.toLowerCase() ?? null;
+    const previewSubject = previewAs
+      ? activeCreators.find(
+          (c: any) =>
+            c.email?.toLowerCase() === previewAs ||
+            (c.name ?? '').toLowerCase().includes(previewAs)
+        ) ?? recipients[0] ?? activeCreators[0]
+      : recipients[0] ?? activeCreators[0];
+
     if (dryRun) {
       return NextResponse.json({
         success: true,
         dryRun: true,
+        renderedAsOf: now.toISOString().slice(0, 10),
+        isFutureIssue: Boolean(asOfDate),
         subject,
         audience: activeCreators.length,
         skippedAlreadySentThisMonth: skipped,
         wouldSend: recipients.length,
         plan: recipients.map((c) => ({ creator: c.name, to: c.email })),
+        // The email itself, so it can be read before it goes.
+        //
+        // The dry run used to return only the plan: who, how many, what
+        // subject. Nobody could see the words. The September issue went to
+        // thirteen creators carrying our own headcount and an incorrect one,
+        // and there was no way to have caught that short of reading the
+        // template source. A preview that shows everything except the message
+        // is not a preview.
+        //
+        // Rendered for the first recipient rather than a blank template, so the
+        // personalised block is visible. Every issue differs per reader now.
+        // ?previewAs=<name or email> renders that creator's copy. Every issue
+        // now differs per reader, so "show me the email" needs to ask "whose".
+        previewFor: previewSubject?.name ?? null,
+        previewNextStep: previewSubject ? (nextStepFor.get(previewSubject.id) ?? null) : null,
+        html: buildHtml(previewSubject ?? { id: '', name: null }),
       });
     }
 
@@ -325,7 +468,7 @@ export async function GET(request: NextRequest) {
             to: [creator.email],
             bcc: ['bella@teachersdeserveit.com', 'rae@teachersdeserveit.com'],
             subject,
-            html,
+            html: buildHtml(creator),
             reply_to: 'bella@teachersdeserveit.com',
           }),
         });
