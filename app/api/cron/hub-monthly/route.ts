@@ -62,25 +62,44 @@ export async function GET(request: NextRequest) {
   // default the Substack import wrote, while only 705 people have ever done a
   // single thing. Mailing on that flag would be mailing a hundred thousand
   // strangers from the domain we also send invoices from.
-  const { data: recentActivity, error: activityError } = await hub
-    .from('hub_activity_log')
-    .select('user_id')
-    .gte('created_at', windowStart)
-  if (activityError) {
-    return NextResponse.json({ error: `Could not read activity: ${activityError.message}` }, { status: 500 })
+  // Paged, because a plain select stops at a thousand rows and says nothing.
+  //
+  // It did exactly that on the first dry run: the route reported 256 people
+  // active while the database says 296. Forty people would have been dropped
+  // from every send, silently and consistently, and the log would have looked
+  // healthy. Activity rows outnumber people heavily, so this cap is hit long
+  // before the audience is complete.
+  const activeIdSet = new Set<string>()
+  const PAGE = 1000
+  for (let from = 0; ; from += PAGE) {
+    const { data: page, error: activityError } = await hub
+      .from('hub_activity_log')
+      .select('user_id')
+      .gte('created_at', windowStart)
+      .range(from, from + PAGE - 1)
+    if (activityError) {
+      return NextResponse.json({ error: `Could not read activity: ${activityError.message}` }, { status: 500 })
+    }
+    for (const row of page ?? []) if (row.user_id) activeIdSet.add(row.user_id)
+    if (!page || page.length < PAGE) break
   }
 
-  const activeIds = [...new Set((recentActivity ?? []).map((r) => r.user_id).filter(Boolean))]
+  const activeIds = [...activeIdSet]
   if (activeIds.length === 0) {
     return NextResponse.json({ success: true, sent: 0, message: 'Nobody has been active in the window' })
   }
 
-  const { data: profiles, error: profileError } = await hub
-    .from('hub_profiles')
-    .select('id, email, first_name, display_name, is_test_account')
-    .in('id', activeIds)
-  if (profileError) {
-    return NextResponse.json({ error: `Could not read profiles: ${profileError.message}` }, { status: 500 })
+  // Same cap applies here, and an `in` list this long is worth chunking anyway.
+  const profiles: any[] = []
+  for (let i = 0; i < activeIds.length; i += 500) {
+    const { data: chunk, error: profileError } = await hub
+      .from('hub_profiles')
+      .select('id, email, first_name, display_name, is_test_account')
+      .in('id', activeIds.slice(i, i + 500))
+    if (profileError) {
+      return NextResponse.json({ error: `Could not read profiles: ${profileError.message}` }, { status: 500 })
+    }
+    profiles.push(...(chunk ?? []))
   }
 
   // Already had this month's issue. The Creator newsletter shipped without this
@@ -101,7 +120,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Could not read opt outs, refusing to send' }, { status: 500 })
   }
 
-  const recipients = (profiles ?? []).filter(
+  const recipients = profiles.filter(
     (p) =>
       p.email &&
       !p.is_test_account &&
@@ -183,8 +202,8 @@ export async function GET(request: NextRequest) {
       subject,
       activeInWindow: activeIds.length,
       wouldSend: recipients.length,
-      skippedAlreadyThisMonth: (profiles ?? []).filter((p) => had.has(p.id)).length,
-      skippedOptedOut: (profiles ?? []).filter((p) => optedOut.has(String(p.email ?? '').trim().toLowerCase())).length,
+      skippedAlreadyThisMonth: profiles.filter((p) => had.has(p.id)).length,
+      skippedOptedOut: profiles.filter((p) => optedOut.has(String(p.email ?? '').trim().toLowerCase())).length,
       featured: featured ? { title: featured.title, slug: featured.slug } : null,
       previewFor: subjectPerson?.email ?? null,
       html: subjectPerson ? buildHtml(subjectPerson as any) : null,
