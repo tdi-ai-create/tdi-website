@@ -311,7 +311,7 @@ export async function PATCH(request: NextRequest) {
     // Narrative status change
     if (body.narrative_status && body.narrative_status !== before.narrative_status) {
       const fromNs = before.narrative_status || 'not_started'
-      postFundingEvent(narrativeEvent(pId, pName, oName, fromNs, body.narrative_status, oppNow?.assigned_agent)).catch(err => console.error('[opportunities] non-blocking side effect failed:', err))
+      postFundingEvent(narrativeEvent(pId, pName, oName, fromNs, body.narrative_status, oppNow?.assigned_agent, body.id)).catch(err => console.error('[opportunities] non-blocking side effect failed:', err))
 
       // Push notification to agents when a draft is requested
       if (body.narrative_status === 'requested') {

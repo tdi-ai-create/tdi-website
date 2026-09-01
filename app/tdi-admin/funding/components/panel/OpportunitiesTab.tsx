@@ -60,13 +60,15 @@ function emptyForm() {
 }
 
 interface OpportunitiesTabProps {
+  /** Opportunity a notification link asked for, marked so it is obvious which row. */
+  highlightId?: string | null
   pursuitId: string
   gateOpen?: boolean
   contract2LineItems?: any[]
   contract2QuotePackageId?: string
 }
 
-export function OpportunitiesTab({ pursuitId, gateOpen = false, contract2LineItems, contract2QuotePackageId }: OpportunitiesTabProps) {
+export function OpportunitiesTab({ pursuitId, gateOpen = false, contract2LineItems, contract2QuotePackageId, highlightId }: OpportunitiesTabProps) {
   const [opportunities, setOpportunities] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [formMode, setFormMode] = useState<'closed' | 'add' | 'edit'>('closed')
@@ -399,7 +401,8 @@ export function OpportunitiesTab({ pursuitId, gateOpen = false, contract2LineIte
         const narrativeColor = NARRATIVE_COLORS[opp.status] || '#6B7280'
 
         return (
-          <div key={opp.id} style={{
+          <div key={opp.id} id={`opp-${opp.id}`} style={{
+            ...(highlightId === opp.id ? { outline: '2px solid #ffba06', outlineOffset: 2 } : {}),
             padding: '12px 16px', background: '#F9FAFB', borderRadius: 10,
             borderLeft: `4px solid ${borderColor}`,
           }}>

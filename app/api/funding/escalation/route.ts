@@ -137,7 +137,7 @@ export async function POST(request: NextRequest) {
       const infoDue = new Date()
       infoDue.setDate(infoDue.getDate() + 7)
 
-      await supabase.from('funding_action_items').insert({
+      const { error: askErr } = await supabase.from('funding_action_items').insert({
         pursuit_id: opp.pursuit_id,
         opportunity_id: opp.id,
         owner_type: 'client',
@@ -154,6 +154,16 @@ export async function POST(request: NextRequest) {
         // whether this path continues.
         requires_answer: true,
       })
+
+      if (askErr) {
+        // This row is the ask. Without it Bella believes she has requested
+        // something from the school and no task exists anywhere, which is the
+        // shape of failure this whole file is written to avoid.
+        return NextResponse.json(
+          { error: `The narrative was not changed because the information request could not be created. ${askErr.message}` },
+          { status: 500 },
+        )
+      }
 
       emailDraft = { ask: askText, contactName: opp.contact_name ?? null }
       message = 'Action item created for the school. Review and send the email, and the narrative resumes when they reply.'
@@ -189,16 +199,17 @@ export async function POST(request: NextRequest) {
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-  await supabase.from('funding_pursuit_timeline').insert({
+  const { error: escTimelineErr } = await supabase.from('funding_pursuit_timeline').insert({
     pursuit_id: opp.pursuit_id,
     event_date: now.split('T')[0],
-    event_title: `Escalation resolved (${chosen?.label ?? 'Resume drafting'}): ${opp.name}`,
+    event_title: `Escalation resolved (${chosen?.label ?? 'Resume drafting'})
+  if (escTimelineErr) console.error('[funding/escalation] Timeline entry failed:', escTimelineErr.message): ${opp.name}`,
     event_detail: `${actor}${detail ? ` — ${detail}` : ''}`,
     status: 'complete',
   })
 
   postFundingEvent(
-    narrativeEvent(opp.pursuit_id, '', opp.name, 'escalated', String(updates.narrative_status ?? 'escalated'), actor)
+    narrativeEvent(opp.pursuit_id, '', opp.name, 'escalated', String(updates.narrative_status ?? 'escalated'), actor, opp.id)
   ).catch(err => console.error('[escalation] non-blocking side effect failed:', err))
 
   return NextResponse.json({ success: true, message, emailDraft })

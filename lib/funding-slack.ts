@@ -68,6 +68,13 @@ export interface SlackEvent {
   owner?: 'bella' | 'rae' | null  // who to @mention
   timelineTitle?: string  // for the timeline record
   timelineDetail?: string
+  /**
+   * What the message is actually about, so the link can open it rather than
+   * dropping the reader on a page with every section collapsed.
+   */
+  opportunityId?: string
+  /** Which collapsible section holds it. Defaults to the grant paths list. */
+  section?: string
 }
 
 export async function postFundingEvent(event: SlackEvent): Promise<void> {
@@ -75,7 +82,14 @@ export async function postFundingEvent(event: SlackEvent): Promise<void> {
 
   // Build the full Slack message
   const portalUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.teachersdeserveit.com'
-  const pursuitLink = `<${portalUrl}/tdi-admin/funding/${event.pursuitId}|View pursuit>`
+  // A link has to land on the thing, not near it. Every section on the pursuit
+  // page starts collapsed, so "View pursuit" delivered someone to a page where
+  // the item they were sent for was hidden behind a click they had to guess at.
+  const deepParams = event.opportunityId
+    ? `?open=${encodeURIComponent(event.section || 'paths')}&opp=${encodeURIComponent(event.opportunityId)}`
+    : ''
+  const linkLabel = event.opportunityId ? 'Open it' : 'View pursuit'
+  const pursuitLink = `<${portalUrl}/tdi-admin/funding/${event.pursuitId}${deepParams}|${linkLabel}>`
 
   let mention = ''
   if (event.owner === 'bella' && settings.bella_slack_handle) {
@@ -136,7 +150,7 @@ export async function postFundingEvent(event: SlackEvent): Promise<void> {
 
 // ── Pre-built event helpers ──
 
-export function narrativeEvent(pursuitId: string, pursuitName: string, oppName: string, fromStatus: string, toStatus: string, agent?: string): SlackEvent {
+export function narrativeEvent(pursuitId: string, pursuitName: string, oppName: string, fromStatus: string, toStatus: string, agent?: string, opportunityId?: string): SlackEvent {
   const labels: Record<string, string> = {
     'not_started→requested': `Narrative draft requested for ${oppName}${agent ? ` → assigned to ${agent}` : ''}`,
     'requested→drafting': `${agent || 'Agent'} started drafting ${oppName} narrative`,
@@ -166,6 +180,8 @@ export function narrativeEvent(pursuitId: string, pursuitName: string, oppName: 
     level: handoff ? 'handoffs' : 'verbose',
     owner: owner as any,
     timelineTitle: message,
+    opportunityId,
+    section: 'paths',
   }
 }
 

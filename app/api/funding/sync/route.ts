@@ -677,6 +677,8 @@ export async function POST(request: NextRequest) {
             opp.name,
             String(prior?.narrative_status ?? 'unknown'),
             String(narrativeStatus),
+            undefined,
+            opportunityId,
           )
         ).catch(err => console.error('[sync] non-blocking side effect failed:', err))
       }
@@ -844,7 +846,7 @@ export async function POST(request: NextRequest) {
     if (qaTimelineErr) console.error('[sync] QA recorded but timeline entry failed:', qaTimelineErr)
 
     postFundingEvent(
-      narrativeEvent(opp.pursuit_id, '', opp.name, 'qa_review', outcome, reviewer)
+      narrativeEvent(opp.pursuit_id, '', opp.name, 'qa_review', outcome, reviewer, opportunityId)
     ).catch(err => console.error('[sync] non-blocking side effect failed:', err))
 
     return NextResponse.json({
