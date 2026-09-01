@@ -1,5 +1,5 @@
 export const metadata = {
-  title: 'Free PD Diagnostic for Schools | Teachers Deserve It',
+  title: 'Free PD Diagnostic for Schools',
   description: 'Discover which of the 4 PD types your school is running. 8 questions, instant results, and a clear roadmap for improvement. Used by 500+ schools.',
   openGraph: {
     title: 'The 4 Types of PD | Free Diagnostic for School Leaders',

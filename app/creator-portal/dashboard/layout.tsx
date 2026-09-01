@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Creator Studio | Teachers Deserve It",
+  title: "Creator Studio",
   description: "TDI Creator Studio - Track your course progress and connect with the TDI team.",
 };
 
