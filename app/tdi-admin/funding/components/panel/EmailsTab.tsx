@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { findInternalText } from '@/lib/funding-draft-warnings'
 
 const EMAIL_TYPE_OPTIONS = ['nudge', 'submission_instructions', 'deadline_reminder', 'status_update', 'follow_up', 'custom']
 
@@ -80,7 +81,14 @@ export function EmailsTab({ pursuitId, pursuit }: EmailsTabProps) {
     }
   }
 
-  const handleSendExisting = async (emailId: string) => {
+  const handleSendExisting = async (emailId: string, to?: string | null, subject?: string | null) => {
+    // Same confirm as the composer. Sending is the one action on this page that
+    // reaches a person outside TDI and cannot be taken back.
+    const ok = window.confirm(
+      `Send this to ${to || 'the saved recipient'}?\n\nSubject: ${subject || '(no subject)'}\n\nThis cannot be undone.`
+    )
+    if (!ok) return
+
     await fetch(`/api/funding/pursuits/${pursuitId}/emails`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
@@ -94,6 +102,13 @@ export function EmailsTab({ pursuitId, pursuit }: EmailsTabProps) {
     if (status === 'failed') return { background: '#FEE2E2', color: '#991B1B', padding: '2px 8px', borderRadius: 4, fontSize: 10, fontWeight: 600 }
     return { background: '#F3F4F6', color: '#6B7280', padding: '2px 8px', borderRadius: 4, fontSize: 10, fontWeight: 600 }
   }
+
+  // The same check the outreach board runs, on the same function the server
+  // uses. It existed there and not here, so whether our pricing language was
+  // caught before reaching a funder depended on which screen you happened to
+  // start from. Same recipient, same kind of email, no check.
+  const warnings = findInternalText(draft.subject, draft.body)
+  const blockedByWording = warnings.length > 0
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -126,6 +141,23 @@ export function EmailsTab({ pursuitId, pursuit }: EmailsTabProps) {
             rows={8}
             style={{ fontSize: 13, padding: '8px 12px', border: '1px solid #E5E7EB', borderRadius: 6, width: '100%', boxSizing: 'border-box', resize: 'vertical', fontFamily: 'inherit' }}
           />
+          {blockedByWording && (
+            <div style={{ padding: '12px 14px', background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 8 }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: '#92400E', marginBottom: 4 }}>
+                This reads like a note we wrote to ourselves
+              </div>
+              <div style={{ fontSize: 12, color: '#6B7280', marginBottom: 8 }}>
+                They would read the words below as written. Reword them, then send.
+              </div>
+              {warnings.map(w => (
+                <div key={w.phrase} style={{ marginBottom: 6 }}>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: '#1e2749' }}>&ldquo;{w.phrase}&rdquo;</div>
+                  <div style={{ fontSize: 12, color: '#6B7280' }}>{w.explain}</div>
+                </div>
+              ))}
+            </div>
+          )}
+
           <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
             <button
               onClick={handleSaveDraft}
@@ -137,13 +169,27 @@ export function EmailsTab({ pursuitId, pursuit }: EmailsTabProps) {
               Save Draft
             </button>
             <button
-              onClick={handleSendNow}
+              onClick={() => {
+                // Sending an email cannot be undone, and this button had less
+                // friction than Mark submitted, which only changes a database
+                // field. Name the recipient, because that is the part a person
+                // gets wrong.
+                const ok = window.confirm(
+                  `Send this to ${draft.toEmail}?\n\nSubject: ${draft.subject}\n\nThis cannot be undone.`
+                )
+                if (ok) handleSendNow()
+              }}
+              disabled={blockedByWording}
+              title={blockedByWording ? 'Reword the flagged phrases first' : undefined}
               style={{
                 fontSize: 12, fontWeight: 600, padding: '8px 16px', borderRadius: 6,
-                border: 'none', background: '#8B5CF6', color: 'white', cursor: 'pointer',
+                border: 'none',
+                background: blockedByWording ? '#C7C9D1' : '#8B5CF6',
+                color: 'white',
+                cursor: blockedByWording ? 'not-allowed' : 'pointer',
               }}
             >
-              Send Now
+              {blockedByWording ? 'Reword before sending' : 'Send Now'}
             </button>
             <button
               onClick={() => setComposing(false)}
@@ -210,7 +256,7 @@ export function EmailsTab({ pursuitId, pursuit }: EmailsTabProps) {
                 )}
                 {(email.status === 'draft' || !email.status) && (
                   <button
-                    onClick={() => handleSendExisting(email.id)}
+                    onClick={() => handleSendExisting(email.id, email.to_email || email.toEmail, email.subject)}
                     style={{
                       fontSize: 11, fontWeight: 600, padding: '4px 10px', borderRadius: 6,
                       border: '1px solid #D1D5DB', background: 'white', color: '#374151',
