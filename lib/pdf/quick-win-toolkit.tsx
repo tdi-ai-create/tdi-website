@@ -43,7 +43,7 @@ export interface ToolkitData {
 export function ToolkitPDF({ data }: { data: ToolkitData }) {
   let globalNum = 0
   return (
-    <Document>
+    <Document title={data.title} author="Teachers Deserve It">
       <Page size="LETTER" style={s.page}>
         <View style={s.banner}>
           <Text style={s.brandLabel}>Teachers Deserve It</Text>

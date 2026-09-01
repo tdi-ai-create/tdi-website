@@ -44,7 +44,7 @@ export interface FormData {
 
 export function FormPDF({ data }: { data: FormData }) {
   return (
-    <Document>
+    <Document title={data.title} author="Teachers Deserve It">
       <Page size="LETTER" style={s.page}>
         <View style={s.banner}>
           <Text style={s.brandLabel}>Teachers Deserve It</Text>
