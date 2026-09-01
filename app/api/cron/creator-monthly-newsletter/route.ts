@@ -237,7 +237,7 @@ export async function GET(request: NextRequest) {
           <p style="font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #1e40af; margin: 0 0 8px; font-weight: 600;">Your next step</p>
           <p style="color: #1e3a5f; margin: 0; line-height: 1.6;">
             <strong>${step.milestone}</strong>, ${timing}.
-            ${overdue ? 'No judgement, September is brutal. If something is in the way, reply and tell us what it is.' : 'It is the only thing standing between you and the next one.'}
+            ${overdue ? 'No judgement, this time of year eats everyone. If something is in the way, reply and tell us what it is.' : 'It is the only thing standing between you and the next one.'}
           </p>
         </div>`;
     };
@@ -414,6 +414,15 @@ export async function GET(request: NextRequest) {
     const recipients = activeCreators.filter((c) => !alreadySent.has(c.id));
     const skipped = activeCreators.length - recipients.length;
 
+    const previewAs = request.nextUrl.searchParams.get('previewAs')?.toLowerCase() ?? null;
+    const previewSubject = previewAs
+      ? activeCreators.find(
+          (c: any) =>
+            c.email?.toLowerCase() === previewAs ||
+            (c.name ?? '').toLowerCase().includes(previewAs)
+        ) ?? recipients[0] ?? activeCreators[0]
+      : recipients[0] ?? activeCreators[0];
+
     if (dryRun) {
       return NextResponse.json({
         success: true,
@@ -436,8 +445,11 @@ export async function GET(request: NextRequest) {
         //
         // Rendered for the first recipient rather than a blank template, so the
         // personalised block is visible. Every issue differs per reader now.
-        previewFor: recipients[0]?.name ?? activeCreators[0]?.name ?? null,
-        html: buildHtml(recipients[0] ?? activeCreators[0] ?? { id: '', name: null }),
+        // ?previewAs=<name or email> renders that creator's copy. Every issue
+        // now differs per reader, so "show me the email" needs to ask "whose".
+        previewFor: previewSubject?.name ?? null,
+        previewNextStep: previewSubject ? (nextStepFor.get(previewSubject.id) ?? null) : null,
+        html: buildHtml(previewSubject ?? { id: '', name: null }),
       });
     }
 
