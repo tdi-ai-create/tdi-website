@@ -41,6 +41,21 @@ const VALID_DOMAINS = ['1-planning', '2-environment', '3-instruction', '4-profes
 // Bump this when docs/hub-content-standard.md changes what QA has to check.
 export const RUBRIC_VERSION = 'rubric-v2'
 
+// The rubric was written for printable downloads and only makes sense for them.
+// Sections 3 and 4 of docs/hub-content-standard.md ask about gold callout boxes,
+// one page, print-first versus fillable, and staying legible through a school
+// photocopier. None of that means anything for a quiz that renders in a browser
+// and is never printed.
+//
+// On 2026-09-01 three quizzes were stamped against it before anyone noticed the
+// mismatch, and the stamps had to be withdrawn. Rae's call the same day: games,
+// quizzes and activities are out of scope. Courses live in another table and
+// were never in it.
+//
+// The queue filters on this rather than relying on everyone remembering, because
+// they all sit in one table and the lanes look identical from the outside.
+export const RUBRIC_TYPES = ['download'] as const
+
 // Boilerplate that signals nobody wrote for a real teacher. A starter list, not
 // a finished one: add phrases as remediation surfaces them. Matched
 // case-insensitively against title, description and objectives.
@@ -398,6 +413,7 @@ export async function GET(request: NextRequest) {
       .from('hub_quick_wins')
       .select('*')
       .eq('is_published', true)
+      .in('quick_win_type', RUBRIC_TYPES)
       .order('created_at', { ascending: true })
 
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
@@ -1016,6 +1032,18 @@ export async function POST(request: NextRequest) {
           { error: 'This Quick Win is a draft. Use mark_reviewed, which is the pre-publish gate.' },
           { status: 400 },
         )
+      }
+
+      // Scope guard. list_published already filters these out, but a caller can
+      // name any slug directly, which is exactly how three quizzes got stamped.
+      if (!RUBRIC_TYPES.includes(qw.quick_win_type as typeof RUBRIC_TYPES[number])) {
+        return NextResponse.json({
+          success: false,
+          error:
+            `${qw.quick_win_type} is out of scope for ${RUBRIC_VERSION}. The standard was written for printable ` +
+            `downloads: half of it asks about page layout and photocopier legibility, which means nothing here. ` +
+            `Games, quizzes and activities need their own bar and do not have one yet.`,
+        }, { status: 400 })
       }
 
       const { lane, defects } = scoreItem(qw as ScoredRow)
