@@ -196,6 +196,7 @@ async function fetchWasReal(
   supabase: SupabaseClient,
   qw: { file_url: string | null; storage_path: string | null },
   claimedBytes: unknown,
+  label = 'file_bytes',
 ): Promise<{ ok: true; bytes: number } | { ok: false; reason: string }> {
   // Quizzes, games and the older quick_win type keep their content at
   // storage_path with file_url null. Gating on file_url alone silently locked
@@ -217,7 +218,7 @@ async function fetchWasReal(
     }
   }
   if (typeof claimedBytes !== 'number' || !Number.isFinite(claimedBytes) || claimedBytes <= 0) {
-    return { ok: false, reason: 'file_bytes must be the size in bytes of the file you downloaded, as a number.' }
+    return { ok: false, reason: `${label} must be the size in bytes of the file you downloaded, as a number.` }
   }
 
   let actual: number
@@ -237,7 +238,7 @@ async function fetchWasReal(
   return {
     ok: false,
     reason:
-      `file_bytes does not match. You sent ${claimedBytes}, the file is ${actual}. ` +
+      `${label} does not match. You sent ${claimedBytes}, the file is ${actual}. ` +
       'Download file_url and report its actual size. A guess will not pass.',
   }
 }
@@ -991,7 +992,7 @@ export async function POST(request: NextRequest) {
     // something through: anything with a substantive defect is refused and has
     // to go through the replace path instead.
     if (action === 'review_published') {
-      const { id, slug, reviewed_by, notes, evidence, file_bytes, dryRun } = body
+      const { id, slug, reviewed_by, notes, evidence, file_bytes, tool_file_bytes, dryRun } = body
 
       if (!id && !slug) return NextResponse.json({ error: 'id or slug is required' }, { status: 400 })
       if (!reviewed_by?.trim()) {
@@ -1040,9 +1041,36 @@ export async function POST(request: NextRequest) {
         }, { status: 400 })
       }
 
+      // A download ships two things: file_url is the guide that explains, and
+      // tool_file_url is the artifact a teacher actually prints and uses. On
+      // 2026-09-01 a whole review batch judged twelve items as "an article, not
+      // a tool" because the brief pointed only at the guide. The guide is meant
+      // to read like an article. The tool was there the entire time and nobody
+      // opened it. So when a tool file exists, reading it is not optional.
+      let toolProof: { ok: true; bytes: number } | null = null
+      if (qw.tool_file_url) {
+        const r = await fetchWasReal(
+          supabase,
+          { file_url: qw.tool_file_url, storage_path: null },
+          tool_file_bytes,
+          'tool_file_bytes',
+        )
+        if (!r.ok) {
+          return NextResponse.json({
+            success: false,
+            error: r.reason,
+            hint:
+              'This item has a separate tool file. Judge the guide on whether it is short and skippable, ' +
+              'and judge tool_file_url on whether it is usable cold. Pass back tool_file_bytes for it.',
+          }, { status: 400 })
+        }
+        toolProof = r
+      }
+
       const stamp = new Date().toISOString()
       const auditLine = `${stamp.slice(0, 10)} reviewed against ${RUBRIC_VERSION} by ${reviewed_by.trim()}` +
-        ` [file verified ${proof.bytes} bytes; reviewer says: ${evidence.trim().slice(0, 140).replace(/\s+/g, ' ')}]` +
+        ` [guide verified ${proof.bytes} bytes${toolProof ? `, tool verified ${toolProof.bytes} bytes` : ''};` +
+        ` reviewer says: ${evidence.trim().slice(0, 140).replace(/\s+/g, ' ')}]` +
         (notes?.trim() ? `: ${notes.trim()}` : '')
 
       if (dryRun) {
