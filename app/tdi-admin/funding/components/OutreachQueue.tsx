@@ -18,6 +18,7 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import { Check, X, Pencil, AlertTriangle, Clock, Inbox } from 'lucide-react'
+import { findInternalText } from '@/lib/funding-draft-warnings'
 
 type Draft = {
   id: string
@@ -193,6 +194,21 @@ export default function OutreachQueue() {
         {drafts.map(d => {
           const busy = busyId === d.id
           const editing = editingId === d.id
+
+          // Re-run the check against what is in the box right now.
+          //
+          // The guard used to disable sending only while `!editing`, so
+          // clicking Edit first enabled the button whether or not anything had
+          // actually changed. A person could open the editor, touch nothing,
+          // and send our pricing ladder to a district contact. The warning list
+          // stayed on screen the whole time saying not to.
+          //
+          // Same function the server uses, so the two cannot disagree about
+          // what counts as internal.
+          const liveWarnings = editing
+            ? findInternalText(editSubject, editBody)
+            : d.warnings
+          const blockedByWording = liveWarnings.length > 0
           const rejecting = rejectingId === d.id
           return (
             <article
@@ -276,7 +292,7 @@ export default function OutreachQueue() {
                 </div>
               )}
 
-              {d.warnings.length > 0 && (
+              {liveWarnings.length > 0 && (
                 <div
                   style={{
                     marginTop: 12, fontSize: 13, color: '#7A4A12', background: '#FDF4E3',
@@ -292,7 +308,7 @@ export default function OutreachQueue() {
                     Use Edit first to say it the way you would say it out loud, then send.
                   </p>
                   <ul style={{ margin: 0, paddingLeft: 18, display: 'flex', flexDirection: 'column', gap: 6 }}>
-                    {d.warnings.map(w => (
+                    {liveWarnings.map(w => (
                       <li key={w.phrase}>
                         <span style={{ fontWeight: 600 }}>&ldquo;{w.phrase}&rdquo;</span>
                         <br />
@@ -344,16 +360,16 @@ export default function OutreachQueue() {
                       onClick={() =>
                         act(d.id, 'approve', editing ? { subject: editSubject, body: editBody } : {})
                       }
-                      disabled={busy || !!d.blockedReason || (!editing && d.warnings.length > 0)}
-                      style={btn('#2A9D8F', busy || !!d.blockedReason || (!editing && d.warnings.length > 0))}
+                      disabled={busy || !!d.blockedReason || blockedByWording}
+                      style={btn('#2A9D8F', busy || !!d.blockedReason || blockedByWording)}
                     >
                       <Check className="w-4 h-4" />
                       {busy
                         ? 'Sending…'
-                        : editing
-                          ? 'Save and send'
-                          : d.warnings.length > 0
-                            ? 'Edit before sending'
+                        : blockedByWording
+                          ? 'Reword before sending'
+                          : editing
+                            ? 'Save and send'
                             : 'Approve and send'}
                     </button>
                     {!editing && (

@@ -82,8 +82,12 @@ function parseBlocks(lines: string[], idPrefix: string): React.ReactNode[] {
     ));
     blocks.push(
       ordered
-        ? <ol key={`${idPrefix}b${k++}`} style={{ margin: '6px 0 10px', paddingLeft: 22 }}>{items}</ol>
-        : <ul key={`${idPrefix}b${k++}`} style={{ margin: '6px 0 10px', paddingLeft: 22 }}>{items}</ul>
+        // listStyleType is set explicitly. Tailwind's preflight sets
+        // list-style: none on ol and ul, so a numbered list rendered here came
+        // out as indented lines with no numbers, which is worse than no list at
+        // all in a document where step order matters.
+        ? <ol key={`${idPrefix}b${k++}`} style={{ margin: '6px 0 10px', paddingLeft: 22, listStyleType: 'decimal', listStylePosition: 'outside' }}>{items}</ol>
+        : <ul key={`${idPrefix}b${k++}`} style={{ margin: '6px 0 10px', paddingLeft: 22, listStyleType: 'disc', listStylePosition: 'outside' }}>{items}</ul>
     );
     listItems = [];
   };
