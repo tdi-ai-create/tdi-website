@@ -1,6 +1,25 @@
 # Hub content standard (rubric v2)
 
-The quality bar every Hub Quick Win and lesson guide has to clear before it ships.
+The quality bar every printable Hub download has to clear before it ships.
+
+## Scope
+
+**This applies to `quick_win_type = 'download'` only.** 223 of the 269 published
+items.
+
+**Games, quizzes and activities are out**, decided by Rae on 2026-09-01. Half of
+this document asks about gold callout boxes, fitting one page, print-first
+versus fillable, and staying legible through a school photocopier. None of that
+means anything for something that renders in a browser and is never printed.
+
+Three quizzes were stamped against this standard before the mismatch was
+noticed. The stamps were withdrawn. Interactive items need their own bar and do
+not have one yet.
+
+**Courses are a separate table** and were never in scope.
+
+`list_published` filters to downloads and `review_published` refuses anything
+else, so the boundary does not depend on anyone remembering it.
 
 This is the canonical version. Before this document existed the standard was
 spread across 25 comments on TEA-214, one document on TEA-219, two comments on
