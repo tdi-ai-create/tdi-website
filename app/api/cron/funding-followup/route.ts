@@ -4,7 +4,7 @@ import { getServiceSupabase } from '@/lib/supabase'
 import { postFundingEvent } from '@/lib/funding-slack'
 import { isGateOpen } from '@/lib/funding-gate-gaps'
 import { callTriggerFor } from '@/lib/funding/call-escalation'
-import { clientTaskLabel } from '@/lib/funding-followup-email'
+import { generateFollowUpEmail } from '@/lib/funding-followup-email'
 
 // ══════════════════════════════════════════════════════════════
 // DRY_RUN — flip to false ONLY after verifying logic against
@@ -250,13 +250,6 @@ function toneForRecipient(email: string): EmailTone {
 // title was blocked on this path and mailed on the other. One implementation
 // now, and the approval queue shows the reviewer the same rules.
 
-// Capitalize a rung label for display
-function displayRung(rung: string): string {
-  if (rung === 'rae') return 'Rae'
-  if (rung === 'admin_sponsor') return 'Admin Sponsor'
-  return rung.charAt(0).toUpperCase() + rung.slice(1)
-}
-
 /**
  * Resolve the best contact name for an escalation email greeting.
  * For backup/admin_sponsor: use full stored name (e.g. "Dr. Porter") — formal.
@@ -314,125 +307,25 @@ async function sendFollowUpEmail(params: {
     submitterName = 'unknown', nextRung = 'none',
   } = params
 
-  const friendlyTask = clientTaskLabel(itemTitle, clientLabel)
-  const displayRungLabel = displayRung(rungLabel)
 
   // ── Subject lines ──
 
-  let subject: string
-  if (tone === 'client') {
-    subject =
-      type === 'reminder'
-        ? `Heads up on ${friendlyTask} for ${schoolName}`
-        : type === 'nudge'
-          ? `Following up: ${friendlyTask}`
-          : `Can you help with ${friendlyTask} for ${schoolName}?`
-  } else {
-    subject =
-      type === 'reminder'
-        ? `UPCOMING — "${itemTitle}" due ${dueDate}`
-        : type === 'nudge'
-          ? `OVERDUE (${bizDaysOverdue} biz days) — "${itemTitle}"`
-          : `ESCALATED to ${displayRungLabel} — "${itemTitle}" ${bizDaysOverdue} days overdue`
-  }
-
-  // ── HTML body ──
-
-  let html: string
-  if (tone === 'client') {
-    // Soft badge colors + warm labels for client emails
-    const badgeColor =
-      type === 'escalation' ? '#D4A843' : type === 'nudge' ? '#5B8FA8' : '#1B365D'
-    const badgeText =
-      type === 'escalation' ? 'Quick favor' : type === 'nudge' ? 'Checking in' : 'Friendly reminder'
-
-    let bodyParagraphs: string
-    if (type === 'reminder') {
-      bodyParagraphs = `
-        <p style="color: #374151; font-size: 15px; line-height: 1.7;">Hi ${contactName},</p>
-        <p style="color: #374151; font-size: 15px; line-height: 1.7;">Just a friendly heads-up — <strong>${friendlyTask}</strong> is coming up around <strong>${dueDate}</strong>. No rush at all, I just want to make sure you have everything you need from us to get it out the door.</p>
-        <p style="color: #374151; font-size: 15px; line-height: 1.7;">Everything's prepared on our end — if anything's unclear or you'd like me to hop on a quick call to walk through it, I'm here.</p>
-        <p style="color: #374151; font-size: 15px; line-height: 1.7;">Rooting for you and ${schoolName},</p>
-        <p style="color: #1e2749; font-size: 15px; font-weight: 600; margin-bottom: 0;">Bella</p>
-        <p style="color: #6B7280; font-size: 13px; margin-top: 2px;">Teachers Deserve It</p>`
-    } else if (type === 'nudge') {
-      bodyParagraphs = `
-        <p style="color: #374151; font-size: 15px; line-height: 1.7;">Hi ${contactName},</p>
-        <p style="color: #374151; font-size: 15px; line-height: 1.7;">I wanted to follow up on <strong>${friendlyTask}</strong> — it was on the calendar for <strong>${dueDate}</strong>, and I know how full your plate is this time of year.</p>
-        <p style="color: #374151; font-size: 15px; line-height: 1.7;">Is there anything holding it up that I can help with? A question, a quick call, or me sitting on Zoom while you send it — just say the word.</p>
-        <p style="color: #374151; font-size: 15px; line-height: 1.7;">We really want to land this funding for your teachers, and you're not doing it alone.</p>
-        <p style="color: #374151; font-size: 15px; line-height: 1.7;">Here for you,</p>
-        <p style="color: #1e2749; font-size: 15px; font-weight: 600; margin-bottom: 0;">Bella</p>
-        <p style="color: #6B7280; font-size: 13px; margin-top: 2px;">Teachers Deserve It</p>`
-    } else {
-      bodyParagraphs = `
-        <p style="color: #374151; font-size: 15px; line-height: 1.7;">Hi ${contactName},</p>
-        <p style="color: #374151; font-size: 15px; line-height: 1.7;">I'm reaching out because <strong>${friendlyTask}</strong> is a key piece of the funding we're working to secure for <strong>${schoolName}</strong>, and we want to make sure it doesn't slip through the cracks during a busy stretch.</p>
-        <p style="color: #374151; font-size: 15px; line-height: 1.7;">Everything's prepared and ready — it just needs a few minutes from your side. Could you help us get it across the line, or point me to the best person to work with?</p>
-        <p style="color: #374151; font-size: 15px; line-height: 1.7;">Thank you for championing this for your teachers,</p>
-        <p style="color: #1e2749; font-size: 15px; font-weight: 600; margin-bottom: 0;">Bella</p>
-        <p style="color: #6B7280; font-size: 13px; margin-top: 2px;">Teachers Deserve It</p>`
-    }
-
-    html = `
-    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 560px; margin: 0 auto; padding: 24px;">
-      <img src="https://www.teachersdeserveit.com/images/logo.webp" alt="TDI" style="height: 36px; margin-bottom: 20px;" />
-      <div style="background: ${badgeColor}; color: white; padding: 8px 14px; border-radius: 6px; font-size: 12px; font-weight: 700; display: inline-block; margin-bottom: 16px;">
-        ${badgeText}
-      </div>
-      ${bodyParagraphs}
-    </div>`
-  } else {
-    // Internal tone — crisp, scannable, sharp badges unchanged
-    const urgencyColor =
-      type === 'escalation' ? '#DC2626' : type === 'nudge' ? '#D97706' : '#2563EB'
-    const urgencyLabel =
-      type === 'escalation' ? 'ESCALATED' : type === 'nudge' ? 'OVERDUE' : 'UPCOMING'
-
-    // Format "Next:" line — replace bare "none" with a human-readable final-rung message
-    const nextDisplay = (!nextRung || nextRung === 'none')
-      ? 'Final rung (escalated to Rae for resolution)'
-      : displayRung(nextRung)
-
-    let internalBody: string
-    if (type === 'reminder') {
-      internalBody = `
-        <h2 style="color: #1e2749; font-size: 18px; margin: 0 0 8px;">${itemTitle}</h2>
-        <p style="color: #6B7280; font-size: 14px; margin: 0 0 16px;">
-          Due: <strong>${dueDate}</strong>. On track?
-        </p>`
-    } else if (type === 'nudge') {
-      internalBody = `
-        <h2 style="color: #1e2749; font-size: 18px; margin: 0 0 8px;">${itemTitle}</h2>
-        <p style="color: #6B7280; font-size: 14px; margin: 0 0 4px;">
-          <strong>${bizDaysOverdue} business days overdue</strong> (due ${dueDate})
-        </p>
-        <p style="color: #6B7280; font-size: 14px; margin: 0 0 16px;">
-          Submitter: ${submitterName}. No response yet.
-        </p>`
-    } else {
-      internalBody = `
-        <h2 style="color: #1e2749; font-size: 18px; margin: 0 0 8px;">${itemTitle}</h2>
-        <p style="color: #6B7280; font-size: 14px; margin: 0 0 4px;">
-          Escalated to <strong>${displayRungLabel}</strong> rung. ${bizDaysOverdue} business days overdue.
-        </p>
-        <p style="color: #6B7280; font-size: 14px; margin: 0 0 16px;">
-          Next: ${nextDisplay}.
-        </p>`
-    }
-
-    html = `
-    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 560px; margin: 0 auto; padding: 24px;">
-      <img src="https://www.teachersdeserveit.com/images/logo.webp" alt="TDI" style="height: 36px; margin-bottom: 20px;" />
-      <div style="background: ${urgencyColor}; color: white; padding: 8px 14px; border-radius: 6px; font-size: 12px; font-weight: 700; display: inline-block; margin-bottom: 16px;">
-        ${urgencyLabel}
-      </div>
-      ${internalBody}
-      <p style="color: #9CA3AF; font-size: 12px; margin-top: 24px;">
-        TDI Funding Follow-Up System
-      </p>
-    </div>`
-  }
+  // The wording lives in lib/funding-followup-email.ts, not here.
+  //
+  // This route carried its own copy of the whole template. The two drifted the
+  // way two copies always do: the library was changed to store plain words and
+  // this one kept writing HTML into the same column, so 64 drafts arrived on
+  // the board as markup and the send route wrapped an already-wrapped email.
+  //
+  // One generator now, so the message a person reads on the board is the
+  // message that goes out.
+  const generated = generateFollowUpEmail({
+    to, itemTitle, dueDate, bizDaysOverdue, rungLabel, type, tone,
+    contactName, schoolName, clientLabel, submitterName, nextRung,
+  })
+  const subject = generated.subject
+  const text = generated.text
+  const html = generated.html
 
   // ── Send via Resend ──
 
@@ -492,7 +385,8 @@ async function sendFollowUpEmail(params: {
         .from('funding_email_log')
         .update({
           subject,
-          body: html,
+          // The words, not the markup. See the note on the draft insert below.
+          body: text,
           email_type: type === 'nudge' || type === 'escalation' ? 'nudge' : 'deadline_reminder',
         })
         .eq('id', openDraft.id)
@@ -510,7 +404,9 @@ async function sendFollowUpEmail(params: {
       pursuit_id: params.pursuitId || null,
       opportunity_id: params.opportunityId || null,
       subject,
-      body: html,
+      // The words, not the markup. This column is read by the board, edited by
+      // a person, and re-wrapped by the send route, and all three want text.
+      body: text,
       to_email: to,
       to_name: params.contactName || null,
       from_email: 'noreply@teachersdeserveit.com',
@@ -562,7 +458,9 @@ async function sendFollowUpEmail(params: {
       pursuit_id: params.pursuitId,
       opportunity_id: params.opportunityId || null,
       subject,
-      body: html,
+      // The words, not the markup. This column is read by the board, edited by
+      // a person, and re-wrapped by the send route, and all three want text.
+      body: text,
       to_email: to,
       to_name: params.contactName || null,
       from_email: 'noreply@teachersdeserveit.com',

@@ -154,8 +154,53 @@ export interface GeneratedEmail {
   from: string
   replyTo?: string
   subject: string
+  /** Ready to send. Built from `text`, never written by hand. */
   html: string
+  /**
+   * The same message as words.
+   *
+   * This is what gets stored on a draft and shown to whoever reads it before
+   * sending, and it is what the send route expects: that route's own comment
+   * says it converts a plain text body into styled HTML, and it wraps whatever
+   * it is given. Storing HTML here meant the board printed markup at a person
+   * and the send route wrapped an already-wrapped email a second time.
+   *
+   * Bold is marked with **asterisks**, which buildEmailHtml turns into real
+   * bold. Two characters a person can read past, rather than a tag they cannot.
+   */
+  text: string
   tone: EmailTone
+}
+
+/**
+ * Words to email. The only place this file turns text into markup.
+ *
+ * Paragraphs are separated by a blank line and **bold** becomes real bold,
+ * which is the same contract buildEmailHtml in the send route uses, so a draft
+ * a person edits by hand renders the same way as one we generate.
+ */
+function renderFollowUpHtml(text: string, badge: { color: string; label: string }): string {
+  const escapeHtml = (v: string) =>
+    v.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+
+  const body = text
+    .split('\n\n')
+    .map(p => p.trim())
+    .filter(Boolean)
+    .map(p => {
+      const safe = escapeHtml(p).replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+      return `<p style="color: #374151; font-size: 15px; line-height: 1.7; margin: 0 0 16px;">${safe}</p>`
+    })
+    .join('')
+
+  return `
+    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 560px; margin: 0 auto; padding: 24px;">
+      <img src="https://www.teachersdeserveit.com/images/logo.webp" alt="TDI" style="height: 36px; margin-bottom: 20px;" />
+      <div style="background: ${badge.color}; color: white; padding: 8px 14px; border-radius: 6px; font-size: 12px; font-weight: 700; display: inline-block; margin-bottom: 16px;">
+        ${badge.label}
+      </div>
+      ${body}
+    </div>`
 }
 
 export function generateFollowUpEmail(params: FollowUpEmailParams): GeneratedEmail {
@@ -186,92 +231,91 @@ export function generateFollowUpEmail(params: FollowUpEmailParams): GeneratedEma
           : `ESCALATED to ${displayRungLabel} — "${itemTitle}" ${bizDaysOverdue} days overdue`
   }
 
-  // HTML body
-  let html: string
+  // The words, once.
+  //
+  // Written as plain paragraphs with **bold** for emphasis, then rendered into
+  // HTML below. Previously the paragraphs only existed inside a template
+  // literal full of inline styles, so the only way to read what we say to a
+  // school was to read markup, and the only way to change a sentence was to
+  // edit it inside a style attribute.
+  let paragraphs: string[]
+
   if (tone === 'client') {
-    const badgeColor =
-      type === 'escalation' ? '#D4A843' : type === 'nudge' ? '#5B8FA8' : '#1B365D'
-    const badgeText =
-      type === 'escalation' ? 'Quick favor' : type === 'nudge' ? 'Checking in' : 'Friendly reminder'
-
-    let bodyParagraphs: string
     if (type === 'reminder') {
-      bodyParagraphs = `
-        <p style="color: #374151; font-size: 15px; line-height: 1.7;">Hi ${contactName},</p>
-        <p style="color: #374151; font-size: 15px; line-height: 1.7;">Just a friendly heads-up — <strong>${friendlyTask}</strong> is coming up around <strong>${dueDate}</strong>. No rush at all, I just want to make sure you have everything you need from us to get it out the door.</p>
-        <p style="color: #374151; font-size: 15px; line-height: 1.7;">Everything's prepared on our end — if anything's unclear or you'd like me to hop on a quick call to walk through it, I'm here.</p>
-        <p style="color: #374151; font-size: 15px; line-height: 1.7;">Rooting for you and ${schoolName},</p>
-        <p style="color: #1e2749; font-size: 15px; font-weight: 600; margin-bottom: 0;">Bella</p>
-        <p style="color: #6B7280; font-size: 13px; margin-top: 2px;">Teachers Deserve It</p>`
+      paragraphs = [
+        `Hi ${contactName},`,
+        `Just a friendly heads-up, **${friendlyTask}** is coming up around **${dueDate}**. No rush at all, I just want to make sure you have everything you need from us to get it out the door.`,
+        `Everything's prepared on our end. If anything's unclear or you'd like me to hop on a quick call to walk through it, I'm here.`,
+        `Rooting for you and ${schoolName},`,
+        `Bella`,
+        `Teachers Deserve It`,
+      ]
     } else if (type === 'nudge') {
-      bodyParagraphs = `
-        <p style="color: #374151; font-size: 15px; line-height: 1.7;">Hi ${contactName},</p>
-        <p style="color: #374151; font-size: 15px; line-height: 1.7;">I wanted to follow up on <strong>${friendlyTask}</strong> — it was on the calendar for <strong>${dueDate}</strong>, and I know how full your plate is this time of year.</p>
-        <p style="color: #374151; font-size: 15px; line-height: 1.7;">Is there anything holding it up that I can help with? A question, a quick call, or me sitting on Zoom while you send it — just say the word.</p>
-        <p style="color: #374151; font-size: 15px; line-height: 1.7;">We really want to land this funding for your teachers, and you're not doing it alone.</p>
-        <p style="color: #374151; font-size: 15px; line-height: 1.7;">Here for you,</p>
-        <p style="color: #1e2749; font-size: 15px; font-weight: 600; margin-bottom: 0;">Bella</p>
-        <p style="color: #6B7280; font-size: 13px; margin-top: 2px;">Teachers Deserve It</p>`
+      paragraphs = [
+        `Hi ${contactName},`,
+        `I wanted to follow up on **${friendlyTask}**. It was on the calendar for **${dueDate}**, and I know how full your plate is this time of year.`,
+        `Is there anything holding it up that I can help with? A question, a quick call, or me sitting on Zoom while you send it. Just say the word.`,
+        `We really want to land this funding for your teachers, and you're not doing it alone.`,
+        `Here for you,`,
+        `Bella`,
+        `Teachers Deserve It`,
+      ]
     } else {
-      bodyParagraphs = `
-        <p style="color: #374151; font-size: 15px; line-height: 1.7;">Hi ${contactName},</p>
-        <p style="color: #374151; font-size: 15px; line-height: 1.7;">I'm reaching out because <strong>${friendlyTask}</strong> is a key piece of the funding we're working to secure for <strong>${schoolName}</strong>, and we want to make sure it doesn't slip through the cracks during a busy stretch.</p>
-        <p style="color: #374151; font-size: 15px; line-height: 1.7;">Everything's prepared and ready — it just needs a few minutes from your side. Could you help us get it across the line, or point me to the best person to work with?</p>
-        <p style="color: #374151; font-size: 15px; line-height: 1.7;">Thank you for championing this for your teachers,</p>
-        <p style="color: #1e2749; font-size: 15px; font-weight: 600; margin-bottom: 0;">Bella</p>
-        <p style="color: #6B7280; font-size: 13px; margin-top: 2px;">Teachers Deserve It</p>`
+      paragraphs = [
+        `Hi ${contactName},`,
+        `I'm reaching out because **${friendlyTask}** is a key piece of the funding we're working to secure for **${schoolName}**, and we want to make sure it doesn't slip through the cracks during a busy stretch.`,
+        `Everything's prepared and ready, it just needs a few minutes from your side. Could you help us get it across the line, or point me to the best person to work with?`,
+        `Thank you for championing this for your teachers,`,
+        `Bella`,
+        `Teachers Deserve It`,
+      ]
     }
-
-    html = `
-    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 560px; margin: 0 auto; padding: 24px;">
-      <img src="https://www.teachersdeserveit.com/images/logo.webp" alt="TDI" style="height: 36px; margin-bottom: 20px;" />
-      <div style="background: ${badgeColor}; color: white; padding: 8px 14px; border-radius: 6px; font-size: 12px; font-weight: 700; display: inline-block; margin-bottom: 16px;">
-        ${badgeText}
-      </div>
-      ${bodyParagraphs}
-    </div>`
   } else {
-    const urgencyColor =
-      type === 'escalation' ? '#DC2626' : type === 'nudge' ? '#D97706' : '#2563EB'
-    const urgencyLabel =
-      type === 'escalation' ? 'ESCALATED' : type === 'nudge' ? 'OVERDUE' : 'UPCOMING'
-
     const nextDisplay = (!nextRung || nextRung === 'none')
       ? 'Final rung (Rae is the last stop)'
       : displayRung(nextRung)
 
-    let internalBody: string
     if (type === 'reminder') {
-      internalBody = `
-        <h2 style="color: #1e2749; font-size: 18px; margin: 0 0 8px;">${itemTitle}</h2>
-        <p style="color: #6B7280; font-size: 14px; margin: 0 0 16px;">Due: <strong>${dueDate}</strong>. On track?</p>`
+      paragraphs = [
+        `**${itemTitle}**`,
+        `Due: **${dueDate}**. On track?`,
+      ]
     } else if (type === 'nudge') {
-      internalBody = `
-        <h2 style="color: #1e2749; font-size: 18px; margin: 0 0 8px;">${itemTitle}</h2>
-        <p style="color: #6B7280; font-size: 14px; margin: 0 0 4px;"><strong>${bizDaysOverdue} business days overdue</strong> (due ${dueDate})</p>
-        <p style="color: #6B7280; font-size: 14px; margin: 0 0 16px;">Submitter: ${submitterName}. No response yet.</p>`
+      paragraphs = [
+        `**${itemTitle}**`,
+        `**${bizDaysOverdue} business days overdue** (due ${dueDate})`,
+        `Submitter: ${submitterName}. No response yet.`,
+      ]
     } else {
-      internalBody = `
-        <h2 style="color: #1e2749; font-size: 18px; margin: 0 0 8px;">${itemTitle}</h2>
-        <p style="color: #6B7280; font-size: 14px; margin: 0 0 4px;">Escalated to <strong>${displayRungLabel}</strong> rung. ${bizDaysOverdue} business days overdue.</p>
-        <p style="color: #6B7280; font-size: 14px; margin: 0 0 16px;">Next: ${nextDisplay}.</p>`
+      paragraphs = [
+        `**${itemTitle}**`,
+        `Escalated to **${displayRungLabel}** rung. ${bizDaysOverdue} business days overdue.`,
+        `Next: ${nextDisplay}.`,
+      ]
     }
-
-    html = `
-    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 560px; margin: 0 auto; padding: 24px;">
-      <img src="https://www.teachersdeserveit.com/images/logo.webp" alt="TDI" style="height: 36px; margin-bottom: 20px;" />
-      <div style="background: ${urgencyColor}; color: white; padding: 8px 14px; border-radius: 6px; font-size: 12px; font-weight: 700; display: inline-block; margin-bottom: 16px;">
-        ${urgencyLabel}
-      </div>
-      ${internalBody}
-      <p style="color: #9CA3AF; font-size: 12px; margin-top: 24px;">TDI Funding Follow-Up System</p>
-    </div>`
+    paragraphs.push('TDI Funding Follow-Up System')
   }
+
+  const text = paragraphs.join('\n\n')
+
+  // The badge the client emails have always carried, kept rather than dropped.
+  const badge =
+    tone === 'client'
+      ? {
+          color: type === 'escalation' ? '#D4A843' : type === 'nudge' ? '#5B8FA8' : '#1B365D',
+          label: type === 'escalation' ? 'Quick favor' : type === 'nudge' ? 'Checking in' : 'Friendly reminder',
+        }
+      : {
+          color: type === 'escalation' ? '#DC2626' : type === 'nudge' ? '#D97706' : '#2563EB',
+          label: type === 'escalation' ? 'ESCALATED' : type === 'nudge' ? 'OVERDUE' : 'UPCOMING',
+        }
+
+  const html = renderFollowUpHtml(text, badge)
 
   const fromName = tone === 'client' ? 'Bella — Teachers Deserve It' : 'TDI Funding'
   const replyTo = tone === 'client' ? 'hello@teachersdeserveit.com' : undefined
 
-  return { to, from: `${fromName} <noreply@teachersdeserveit.com>`, replyTo, subject, html, tone }
+  return { to, from: `${fromName} <noreply@teachersdeserveit.com>`, replyTo, subject, html, text, tone }
 }
 
 // ── Send via Resend ──
