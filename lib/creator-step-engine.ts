@@ -32,8 +32,11 @@ import { phaseRank } from './creator-phases';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 type DbClient = any;
 
-/** Two rounds of feedback, then it approves. No step may open a third. */
-export const MAX_FEEDBACK_ROUNDS = 2;
+// The number lives in lib/creator-rules.ts with the rest of the step rules.
+// Imported for use here and re-exported so existing importers keep working,
+// leaving exactly one declaration.
+import { MAX_FEEDBACK_ROUNDS } from './creator-rules';
+export { MAX_FEEDBACK_ROUNDS };
 
 /**
  * Steps retired in the 26 August review, kept only as a floor.
