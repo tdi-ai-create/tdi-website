@@ -157,9 +157,18 @@ export function Footer() {
                 <input type="hidden" name="_template" value="table" />
                 <input type="hidden" name="_next" value="https://www.teachersdeserveit.com/?signup=success" />
 
+                {/* This widget is on 16 of 17 public pages, so one missing
+                    label was a site-wide failure. A placeholder is not a label:
+                    it disappears the moment someone starts typing, which is
+                    exactly when a tired person on a phone needs it most. */}
+                <label htmlFor="footer-signup-email" className="sr-only">
+                  Your email address
+                </label>
                 <input
+                  id="footer-signup-email"
                   type="email"
                   name="email"
+                  autoComplete="email"
                   placeholder="Your email"
                   required
                   className="w-full px-4 py-3 rounded-lg text-gray-900"
