@@ -464,8 +464,11 @@ export default function ForSchoolsPage() {
             <p className="fs-lede">No email required. Built to be printed, forwarded, or dropped into a board packet as-is.</p>
           </div>
           <div className="fs-dl-grid">
+            <a className="fs-dl" href="/downloads/the-pulse.pdf" style={{"--c":"var(--pulse)"} as React.CSSProperties}><b>The Pulse</b><span>Three pages &middot; what staff get, what you see, and the twenty questions</span></a>
+            <a className="fs-dl" href="/downloads/the-focus.pdf" style={{"--c":"var(--focus)"} as React.CSSProperties}><b>The Focus</b><span>Three pages &middot; the thirteen dates, the three answers, and how it runs</span></a>
+            <a className="fs-dl" href="/downloads/the-cohort.pdf" style={{"--c":"var(--cohort)"} as React.CSSProperties}><b>The Cohort</b><span>Two pages &middot; the year, baseline against March, and how it runs</span></a>
+            <a className="fs-dl" href="/downloads/the-blueprint.pdf" style={{"--c":"var(--blueprint)"} as React.CSSProperties}><b>The Blueprint</b><span>Two pages &middot; what a school achieves, and what it is made of</span></a>
             <a className="fs-dl" href="/district-summary.pdf" style={{"--c":"var(--gold)"} as React.CSSProperties}><b>TDI district summary</b><span>One page &middot; 100,000+ educators, all 50 states, 94% would recommend</span></a>
-            <a className="fs-dl" href="/get-started" style={{"--c":"var(--navy)"} as React.CSSProperties}><b>The four one-pagers</b><span>Two pages each &middot; ask and we&apos;ll send them the same day</span></a>
           </div>
         </div>
       </section>
