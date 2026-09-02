@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { findInternalText } from '@/lib/funding-draft-warnings'
 import { createClient } from '@supabase/supabase-js'
 import { requireAdminAuth } from '@/lib/tdi-admin/auth'
 import { getEscalationOption, ESCALATION_OPTIONS } from '@/lib/funding-qa'
@@ -120,13 +121,44 @@ export async function POST(request: NextRequest) {
       // phrased for her. prepared_materials exists on this table for exactly
       // this and was left empty.
       const askText = String(detail).trim()
+
+      // The ask is written by whoever escalated, and on this path that is
+      // usually an agent. It lands in two places a school can read: the
+      // client_label on the action item, and the pre-drafted email below.
+      //
+      // This is where the poisoned labels came from. On 18 August an agent
+      // escalated with "...does the school have staff who are current NEA
+      // members? If 3+, proceed with the $5,000 group tier as drafted. If 1-2,
+      // rescope to the $2,000 individual tier. If zero, mark this opportunity
+      // not applicable." That sentence became the client_label verbatim and
+      // reached three drafts addressed to the school it describes.
+      //
+      // #325 stopped it being *read* into an email. It never stopped it being
+      // *written*, so the ask still arrives carrying our pricing and Bella
+      // still has to rewrite it. Guard both ends: the internal record keeps
+      // the full ask because the detail is genuinely useful to us, and the two
+      // client-facing fields only get it if it is fit to send.
+      const askWarnings = findInternalText('', askText)
+      const askIsClientSafe = askWarnings.length === 0
+      const clientSafeAsk = askIsClientSafe
+        ? askText
+        : `the information we need to finish the ${opp.name} application`
+
+      if (!askIsClientSafe) {
+        console.warn(
+          `[escalation] Ask for ${opp.id} carries internal wording ` +
+            `(${askWarnings.map(w => w.phrase).join(', ')}). ` +
+            'Stored on the item for us, replaced with neutral wording for the school.',
+        )
+      }
+
       const greeting = opp.contact_name ? `Hi ${String(opp.contact_name).split(' ')[0]},` : 'Hi,'
       const preparedEmail = [
         greeting,
         '',
         `We are finishing the ${opp.name} application for you and there is one thing we need from your side before we can complete it:`,
         '',
-        askText,
+        clientSafeAsk,
         '',
         'As soon as we have that we will pick it straight back up. Happy to jump on a quick call if that is easier than writing it out.',
         '',
@@ -142,8 +174,13 @@ export async function POST(request: NextRequest) {
         opportunity_id: opp.id,
         owner_type: 'client',
         title: `Information needed for ${opp.name}`,
-        client_label: askText,
-        description: `We need this to finish the ${opp.name} application.`,
+        client_label: clientSafeAsk,
+        // The full ask, unedited, on the internal side. Losing the detail
+        // would be worse than carrying wording we cannot send: this is what
+        // tells a person what actually has to be obtained.
+        description: askIsClientSafe
+          ? `We need this to finish the ${opp.name} application.`
+          : `We need this to finish the ${opp.name} application.\n\nWhat was asked for: ${askText}`,
         status: 'pending',
         due_date: infoDue.toISOString().split('T')[0],
         category: 'documentation',
@@ -165,7 +202,7 @@ export async function POST(request: NextRequest) {
         )
       }
 
-      emailDraft = { ask: askText, contactName: opp.contact_name ?? null }
+      emailDraft = { ask: clientSafeAsk, contactName: opp.contact_name ?? null }
       message = 'Action item created for the school. Review and send the email, and the narrative resumes when they reply.'
       break
     }
