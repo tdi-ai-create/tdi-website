@@ -397,3 +397,65 @@ export const NARRATIVE_STATES: NarrativeState[] = [
 export function isNarrativeState(v: unknown): v is NarrativeState {
   return typeof v === 'string' && (NARRATIVE_STATES as string[]).includes(v);
 }
+
+// ── Voice rules for a funder-facing narrative ──
+
+export interface VoiceProblem {
+  /** 1-indexed line the problem sits on. */
+  line: number
+  /** The character or sequence that is not allowed. */
+  found: string
+  /** Enough of the line to recognise it, trimmed. */
+  context: string
+  /** What to write instead. */
+  fix: string
+}
+
+/**
+ * Punctuation a grant narrative may not carry.
+ *
+ * The standing rule is that an em dash reads as a giveaway that something was
+ * written by a machine. That matters more in a funder document than anywhere
+ * else, because the reader is deciding whether to give a school money and has
+ * every reason to wonder who actually wrote the application.
+ *
+ * Every one of the nine narratives on file carried between three and fourteen
+ * of them, so this is the normal output of the writing step rather than an
+ * occasional slip, and a rule that is not enforced is a rule that loses.
+ *
+ * An en dash inside a year range is deliberately allowed. "2026-2027" is
+ * ordinary grant typography and reading it as an AI tell would be wrong.
+ */
+const YEAR_RANGE = /\b\d{4}\s*–\s*\d{4}\b/;
+
+export function findVoiceProblems(text: string | null | undefined): VoiceProblem[] {
+  const problems: VoiceProblem[] = [];
+  if (!text) return problems;
+
+  text.split('\n').forEach((raw, i) => {
+    const line = i + 1;
+    const context = raw.trim().slice(0, 120);
+
+    if (raw.includes('—')) {
+      problems.push({
+        line, found: '—', context,
+        fix: 'Use a colon, a comma, or two sentences.',
+      });
+    }
+    if (raw.includes('--')) {
+      problems.push({
+        line, found: '--', context,
+        fix: 'Use a colon, a comma, or two sentences.',
+      });
+    }
+    // An en dash is only acceptable between two years.
+    if (raw.includes('–') && !YEAR_RANGE.test(raw)) {
+      problems.push({
+        line, found: '–', context,
+        fix: 'An en dash is only for a year range such as 2026-2027.',
+      });
+    }
+  });
+
+  return problems;
+}

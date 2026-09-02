@@ -8,6 +8,7 @@ import {
   NARRATIVE_STATES,
   isNarrativeState,
   isWindowOpen,
+  findVoiceProblems,
 } from '@/lib/funding-rules'
 import { postFundingEvent, narrativeEvent } from '@/lib/funding-slack'
 import { screenPath } from '@/lib/funding-eligibility'
@@ -716,6 +717,32 @@ export async function POST(request: NextRequest) {
     }
 
     const submittingForReview = narrativeStatus === 'qa_review'
+
+    // Punctuation, checked before Julie spends an attempt on it.
+    //
+    // Every one of the nine narratives on file carried between three and
+    // fourteen em dashes, so this is what the writing step normally produces
+    // rather than an occasional slip. A funder reading an application is
+    // deciding whether to give a school money, and has every reason to wonder
+    // who wrote it.
+    //
+    // Refused here rather than failed in QA on purpose: this costs a writer one
+    // find-and-replace, and it would otherwise cost one of only two QA attempts
+    // on something no human judgement is needed for.
+    if (submittingForReview) {
+      const text = typeof narrativeContent === 'string' ? narrativeContent : null
+      const voice = findVoiceProblems(text)
+      if (voice.length > 0) {
+        return NextResponse.json({
+          error:
+            `This narrative carries ${voice.length} punctuation problem` +
+            `${voice.length === 1 ? '' : 's'} that cannot go to a funder. ` +
+            'Fix them and resubmit; this does not count as a QA attempt.',
+          problems: voice.slice(0, 12),
+          rule: 'No em dashes and no double hyphens. An en dash is only for a year range such as 2026-2027.',
+        }, { status: 400 })
+      }
+    }
     if (submittingForReview && (!Array.isArray(factsCited) || factsCited.length === 0)) {
       return NextResponse.json({
         error:
