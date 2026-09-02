@@ -259,7 +259,53 @@ export async function GET(request: NextRequest) {
       researchQuery = researchQuery.or(`assigned_agent.eq.${agent},assigned_agent.is.null`)
     }
 
-    const { data: rawResearchWork } = await researchQuery
+    const { data: rawRequestedResearch } = await researchQuery
+
+    // 2b. Funders already found, whose window nobody has established.
+    //
+    // Research finishes at 'found' and stops. The next step is a person
+    // clicking Request draft, and that control only renders when window_status
+    // is 'open'. Five of the nine funders Amara found on 19 August sit at
+    // 'unknown', so there was no control to click and no work to hand back:
+    // stranded between the agent who finished and the human who cannot start.
+    //
+    // 'unknown' is an honest answer to a research question nobody asked yet.
+    // Whether a foundation's window is open, and when it shuts, is exactly the
+    // work this agent does, and she has been polling hourly with nothing to do.
+    // So it becomes work rather than a dead end.
+    //
+    // Kept as a separate query rather than an or() with a nested and(), because
+    // the two halves have genuinely different meanings and a reader should not
+    // have to parse PostgREST grouping to see that.
+    let windowQuery = supabase
+      .from('funding_opportunities')
+      .select(`
+        id, pursuit_id, name, plan_category, amount,
+        research_status, assigned_agent,
+        window_status, contact_name, application_closes,
+        pursuit:funding_pursuits!pursuit_id(id, pursuit_name, district_name)
+      `)
+      .eq('research_status', 'found')
+      .or('window_status.is.null,window_status.eq.unknown')
+      .not('status', 'in', '("closed","awarded","denied")')
+
+    // Same ownership rule as the branch above, and for the same reason. Without
+    // it this hands research to whoever asks first, including the drafting and
+    // QA agents, who would either do it badly or file a ticket asking why they
+    // were sent it.
+    if (agent) {
+      windowQuery = windowQuery.or(`assigned_agent.eq.${agent},assigned_agent.is.null`)
+    }
+
+    const { data: rawWindowWork } = await windowQuery
+
+    const rawResearchWork = [
+      ...(rawRequestedResearch ?? []).map((o: any) => ({ ...o, research_task: 'find_sources' })),
+      ...(rawWindowWork ?? [])
+        // Never hand back the same row twice if it somehow matches both.
+        .filter((w: any) => !(rawRequestedResearch ?? []).some((r: any) => r.id === w.id))
+        .map((o: any) => ({ ...o, research_task: 'confirm_window' })),
+    ]
 
     // Research is deliberately not gate-gated: finding funders for a school
     // costs nothing and touches nobody, so it is allowed to run before the
@@ -315,6 +361,18 @@ export async function GET(request: NextRequest) {
       })),
       ...researchWork.map((item: any) => ({
         request_type: 'research_funders' as const,
+        // Both jobs are research, and the agent already handles this type, so
+        // the instruction rides along rather than inventing a request_type her
+        // skill would not recognise and would silently skip.
+        brief:
+          item.research_task === 'confirm_window'
+            ? `Establish whether ${item.name} is currently open to applications, and when it closes. ` +
+              `Confirm from the funder's own site or published guidelines, not a directory. ` +
+              `Then set window_status to open or closed_missed and fill application_closes. ` +
+              `If it cannot be established, say so and leave it unknown rather than guessing: ` +
+              `a wrong deadline is worse than an absent one, because the portal will chase it.`
+            : `Find local funding sources for this school and create a real opportunity for each ` +
+              `verified candidate. Confirm each is real and currently open before adding it.`,
         ...item,
       })),
       ...qaWork.map((item: any) => ({
@@ -332,6 +390,8 @@ export async function GET(request: NextRequest) {
         agent: agent || 'all',
         draft_narrative_count: narrativeWork.length,
         research_funders_count: researchWork.length,
+        find_sources_count: researchWork.filter((o: any) => o.research_task === 'find_sources').length,
+        confirm_window_count: researchWork.filter((o: any) => o.research_task === 'confirm_window').length,
         qa_narrative_count: qaWork.length,
       },
       // Returned so an agent finding no work can say why, rather than
