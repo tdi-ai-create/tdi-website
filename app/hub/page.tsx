@@ -18,6 +18,7 @@ import DashboardInsight from '@/components/hub/DashboardInsight';
 import AchievementInsights from '@/components/hub/AchievementInsights';
 import { QuizResultBadge } from '@/components/hub/QuizEngine';
 import { ALL_QUIZZES } from '@/lib/hub/quizConfigs';
+import { categoryColor } from '@/lib/hub/categoryColors';
 // PolaroidCard shelved for now
 // import SortableDashboardSection from '@/components/hub/SortableDashboardSection';
 // dnd-kit imports shelved for draggable sections feature
@@ -43,22 +44,6 @@ import {
 } from 'lucide-react';
 
 // Shared category colors -- used across all QW card instances
-const CATEGORY_COLORS: Record<string, string> = {
-  'Stress Relief': '#E0F4FF',
-  'Time Savers': '#FEF3C7',
-  'Classroom Tools': '#E8F5E9',
-  'Communication': '#F3E8FF',
-  'Self-Care': '#FCE7F3',
-};
-
-// Deeper category accent colors for gradient blocks
-const CATEGORY_ACCENTS: Record<string, string> = {
-  'Stress Relief': '#7C9CBF',
-  'Time Savers': '#D4A843',
-  'Classroom Tools': '#6BA368',
-  'Communication': '#9B7CB8',
-  'Self-Care': '#D4789C',
-};
 
 // Daily motivational messages - picks based on day of week
 const DAILY_MESSAGES = [
@@ -399,11 +384,16 @@ export default function HubDashboard() {
         .limit(1)
         .maybeSingle();
       if (!existingLogin) {
-        await supabase.from('hub_activity_log').insert({
+        // A dropped activity row is not a UI failure, so this does not throw. But it
+        // is not nothing either: hub_activity_log is what enrollments, completions
+        // and engagement reporting are counted from, so a silent failure here shows
+        // up later as a funder number that is quietly too low.
+        const { error: logErr1 } = await supabase.from('hub_activity_log').insert({
           user_id: user.id,
           action: 'hub_login',
           metadata: { date: todayStr },
         });
+        if (logErr1) console.error('[hub] hub_login not logged:', logErr1.message);
       }
 
       try {
@@ -979,7 +969,7 @@ export default function HubDashboard() {
         description: `${qw.category} . Download`,
         slug: qw.slug,
         href: `/hub/quick-wins/${qw.slug}`,
-        dot: CATEGORY_ACCENTS[qw.category] || '#7C9CBF',
+        dot: categoryColor(qw.category),
       });
     });
 
