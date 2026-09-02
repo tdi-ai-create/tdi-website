@@ -334,36 +334,7 @@ export default function ForSchoolsPage() {
         </div>
       </section>
 
-      <section className="fs-sec" id="proof">
-        <div className="fs-wrap">
-          <div className="fs-head-narrow">
-            <p className="fs-kicker">The strategic exit</p>
-            <h2>The proof arrives before the budget conversation, not during it.</h2>
-            <p className="fs-lede">Every offering ends the same way on the same calendar, whichever one you start with.</p>
-          </div>
-          <div className="fs-rail">
-            <div className="fs-stop">
-              <div className="fs-when">Early March</div>
-              <p>One page. Where you started against where you are, formatted to be forwarded to a superintendent or dropped into a board packet. It includes one honest line naming what that offering&apos;s data still can&apos;t tell you.</p>
-            </div>
-            <div className="fs-stop">
-              <div className="fs-when">April &amp; May</div>
-              <p>Budget discussions. You walk in already holding the number rather than promising to have one by June.</p>
-            </div>
-            <div className="fs-stop">
-              <div className="fs-when">June</div>
-              <p>The year-end wrap. Full-year trend, what changed, what carries forward if you continue and what resets if you don&apos;t.</p>
-            </div>
-            <div className="fs-stop fs-dim">
-              <div className="fs-when">Year two</div>
-              <p>Where the trend becomes worth something. Stopping means losing your own longitudinal data. We say that plainly rather than burying it.</p>
-            </div>
-          </div>
-          <p style={{"fontSize": ".9rem", "color": "var(--muted)", "marginTop": "36px", "maxWidth": "76ch"}}>Contracts run January–December or August–July, with two summer months turned off to match your calendar. A contract signed in August yields roughly seven months of data by early March. That is enough for a real trend on weekly measures, thinner on year-long outcomes like cohort retention.</p>
-        </div>
-      </section>
-
-      <section className="fs-sec fs-sec-white" id="dashboard">
+      <section className="fs-sec" id="dashboard">
         <div className="fs-wrap">
           <div className="fs-head-narrow">
             <p className="fs-kicker">Your leadership dashboard</p>
@@ -381,7 +352,7 @@ export default function ForSchoolsPage() {
         </div>
       </section>
 
-      <section className="fs-sec">
+      <section className="fs-sec fs-sec-white">
         <div className="fs-wrap">
           <div className="fs-head-narrow">
             <p className="fs-kicker">Verified results from partner schools</p>
@@ -401,7 +372,7 @@ export default function ForSchoolsPage() {
         </div>
       </section>
 
-      <section className="fs-sec fs-sec-white" id="funding">
+      <section className="fs-sec" id="funding">
         <div className="fs-wrap fs-fundband">
           <div>
             <h2>Most of our schools don&apos;t pay the full cost of this themselves.</h2>
@@ -413,7 +384,7 @@ export default function ForSchoolsPage() {
         </div>
       </section>
 
-      <section className="fs-sec" id="questions">
+      <section className="fs-sec fs-sec-white" id="questions">
         <div className="fs-wrap">
           <div className="fs-head-narrow">
             <p className="fs-kicker">What other leaders asked first</p>
@@ -456,7 +427,7 @@ export default function ForSchoolsPage() {
         </div>
       </section>
 
-      <section className="fs-sec fs-sec-white" id="downloads">
+      <section className="fs-sec" id="downloads">
         <div className="fs-wrap">
           <div className="fs-head-narrow">
             <p className="fs-kicker">Take it to your team</p>
