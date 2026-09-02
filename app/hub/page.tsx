@@ -384,11 +384,16 @@ export default function HubDashboard() {
         .limit(1)
         .maybeSingle();
       if (!existingLogin) {
-        await supabase.from('hub_activity_log').insert({
+        // A dropped activity row is not a UI failure, so this does not throw. But it
+        // is not nothing either: hub_activity_log is what enrollments, completions
+        // and engagement reporting are counted from, so a silent failure here shows
+        // up later as a funder number that is quietly too low.
+        const { error: logErr1 } = await supabase.from('hub_activity_log').insert({
           user_id: user.id,
           action: 'hub_login',
           metadata: { date: todayStr },
         });
+        if (logErr1) console.error('[hub] hub_login not logged:', logErr1.message);
       }
 
       try {

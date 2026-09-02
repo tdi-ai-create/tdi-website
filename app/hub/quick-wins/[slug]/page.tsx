@@ -868,7 +868,11 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
   const handleSaveToLibrary = async () => {
     if (!quickWin || !user) return;
     const supabase = getSupabase();
-    await supabase.from('hub_activity_log').insert({
+    // A dropped activity row is not a UI failure, so this does not throw. But it
+    // is not nothing either: hub_activity_log is what enrollments, completions
+    // and engagement reporting are counted from, so a silent failure here shows
+    // up later as a funder number that is quietly too low.
+    const { error: logErr1 } = await supabase.from('hub_activity_log').insert({
       user_id: user.id,
       action: 'quick_win_saved',
       metadata: {
@@ -877,6 +881,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
         saved_at: new Date().toISOString(),
       },
     });
+    if (logErr1) console.error('[hub] quick_win_saved not logged:', logErr1.message);
     setIsSaved(true);
   };
 
@@ -950,7 +955,11 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
       : quickWin.estimated_minutes;
 
     // Log completion to activity log
-    await supabase.from('hub_activity_log').insert({
+    // A dropped activity row is not a UI failure, so this does not throw. But it
+    // is not nothing either: hub_activity_log is what enrollments, completions
+    // and engagement reporting are counted from, so a silent failure here shows
+    // up later as a funder number that is quietly too low.
+    const { error: logErr2 } = await supabase.from('hub_activity_log').insert({
       user_id: user.id,
       action: 'quick_win_completed',
       metadata: {
@@ -961,6 +970,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
         completed_at: endTime.toISOString(),
       },
     });
+    if (logErr2) console.error('[hub] quick_win_completed not logged:', logErr2.message);
 
     setIsCompleted(true);
 
@@ -975,7 +985,11 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
     setIsSaving(true);
     const supabase = getSupabase();
 
-    await supabase.from('hub_activity_log').insert({
+    // A dropped activity row is not a UI failure, so this does not throw. But it
+    // is not nothing either: hub_activity_log is what enrollments, completions
+    // and engagement reporting are counted from, so a silent failure here shows
+    // up later as a funder number that is quietly too low.
+    const { error: logErr3 } = await supabase.from('hub_activity_log').insert({
       user_id: user.id,
       action: 'quick_win_reflection',
       metadata: {
@@ -985,6 +999,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
         saved_at: new Date().toISOString(),
       },
     });
+    if (logErr3) console.error('[hub] quick_win_reflection not logged:', logErr3.message);
 
     setReflectionSaved(true);
     setIsSaving(false);
