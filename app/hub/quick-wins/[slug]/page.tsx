@@ -668,6 +668,12 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
   const [linkCopied, setLinkCopied] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
   const [recommendations, setRecommendations] = useState<QuickWin[]>([]);
+  // Reporting a Quick Win. Until 2026-09-01 a teacher who opened one and found
+  // it broken had nowhere to say so: reporting existed only for things other
+  // teachers had written, not for what we published.
+  const [reportOpen, setReportOpen] = useState(false);
+  const [reportReason, setReportReason] = useState('');
+  const [reportState, setReportState] = useState<'idle' | 'sending' | 'sent'>('idle');
   const [moreQuickWins, setMoreQuickWins] = useState<QuickWin[]>([]);
 
 
@@ -864,6 +870,31 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
 
 
   // ─── Handlers ─────────────────────────────────────────────────────────────
+
+  const handleReport = async () => {
+    if (!quickWin || !user || reportState !== 'idle') return;
+    setReportState('sending');
+    try {
+      const res = await fetch('/api/hub/community/report', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          content_type: 'quick_win',
+          content_id: quickWin.id,
+          reporter_id: user.id,
+          reason: reportReason.trim() || null,
+        }),
+      });
+      if (!res.ok) throw new Error(String(res.status));
+      setReportState('sent');
+    } catch (err) {
+      // Say so rather than showing a success state for something that did not
+      // send. A report a teacher believes they filed is worse than no button.
+      console.error('[hub] quick win report failed:', err);
+      setReportState('idle');
+      alert('That did not send. Please email hello@teachersdeserveit.com.');
+    }
+  };
 
   const handleSaveToLibrary = async () => {
     if (!quickWin || !user) return;
@@ -1698,6 +1729,62 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                       </div>
                     ))}
                   </div>
+                </div>
+              )}
+
+              {/* Report this. Deliberately quiet: a teacher looking for it will
+                  find it, and it does not compete with the download. */}
+              {user && (
+                <div className="text-center py-2">
+                  {reportState === 'sent' ? (
+                    <p style={{ fontSize: '12px', color: '#6B7280' }}>
+                      {tUI('Thank you. We will look at this.')}
+                    </p>
+                  ) : reportOpen ? (
+                    <div className="max-w-md mx-auto text-left">
+                      <label
+                        htmlFor="qw-report-reason"
+                        className="block mb-2"
+                        style={{ fontSize: '12px', color: '#6B7280' }}
+                      >
+                        {tUI('What is wrong with it?')}
+                      </label>
+                      <textarea
+                        id="qw-report-reason"
+                        value={reportReason}
+                        onChange={(e) => setReportReason(e.target.value)}
+                        rows={3}
+                        className="w-full p-3 mb-2"
+                        style={{ fontSize: '13px', border: '1px solid #D1D5DB', borderRadius: '8px', color: '#1e2749' }}
+                        placeholder={tUI('The file will not open, it is out of date, something in it is wrong...')}
+                      />
+                      <div className="flex gap-2">
+                        <button
+                          onClick={handleReport}
+                          disabled={reportState === 'sending'}
+                          className="px-4 py-2"
+                          style={{ fontSize: '13px', background: '#1e2749', color: '#ffffff', borderRadius: '8px' }}
+                        >
+                          {reportState === 'sending' ? tUI('Sending...') : tUI('Send')}
+                        </button>
+                        <button
+                          onClick={() => { setReportOpen(false); setReportReason(''); }}
+                          className="px-4 py-2"
+                          style={{ fontSize: '13px', color: '#6B7280', borderRadius: '8px' }}
+                        >
+                          {tUI('Cancel')}
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => setReportOpen(true)}
+                      className="underline"
+                      style={{ fontSize: '12px', color: '#6B7280' }}
+                    >
+                      {tUI('Something wrong with this one?')}
+                    </button>
+                  )}
                 </div>
               )}
 

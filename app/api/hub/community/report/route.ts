@@ -10,8 +10,15 @@ const supabase = createClient(
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null
 
 // POST /api/hub/community/report
-// Report a Q&A or conversation post
-// Body: { content_type: 'qa_post' | 'conversation_post', content_id: string, reporter_id: string, reason?: string }
+// Report a Q&A post, a conversation post, or a published Quick Win.
+// Body: { content_type: 'qa_post' | 'conversation_post' | 'quick_win', content_id: string, reporter_id: string, reason?: string }
+//
+// Quick Wins were added on 2026-09-01. Until then a teacher who opened a Quick
+// Win and found something wrong with it had no way to say so: reporting existed
+// only for things other teachers had written. Twenty-one downloads served raw
+// source code for months and the first anyone heard of it was an internal audit.
+// hub_community_reports was already generic on content_type, so this needed no
+// schema change.
 export async function POST(request: NextRequest) {
   try {
     const { content_type, content_id, reporter_id, reason } = await request.json()
@@ -20,7 +27,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'content_type, content_id, and reporter_id are required' }, { status: 400 })
     }
 
-    if (!['qa_post', 'conversation_post'].includes(content_type)) {
+    if (!['qa_post', 'conversation_post', 'quick_win'].includes(content_type)) {
       return NextResponse.json({ error: 'Invalid content_type' }, { status: 400 })
     }
 
@@ -54,7 +61,20 @@ export async function POST(request: NextRequest) {
     let postAuthor = ''
     let contentLabel = ''
 
-    if (content_type === 'qa_post') {
+    if (content_type === 'quick_win') {
+      // A Quick Win has no author in the sense a post does, and its body is a
+      // PDF. What a reviewer needs is which item, and a link to open it.
+      const { data: qw } = await supabase
+        .from('hub_quick_wins')
+        .select('title, slug, category, file_url')
+        .eq('id', content_id)
+        .single()
+      if (qw) {
+        postBody = `${qw.title}\n\nhttps://www.teachersdeserveit.com/hub/quick-wins/${qw.slug}\n\nFile: ${qw.file_url || 'none'}`
+        postAuthor = qw.category || 'Quick Win'
+      }
+      contentLabel = 'Quick Win'
+    } else if (content_type === 'qa_post') {
       const { data: post } = await supabase
         .from('hub_qa_posts')
         .select('body, user_id')
@@ -109,7 +129,7 @@ export async function POST(request: NextRequest) {
               </div>
               <div style="padding: 24px; border: 1px solid #E5E7EB; border-top: 0; border-radius: 0 0 8px 8px;">
                 <p style="margin: 0 0 12px; color: #6B7280; font-size: 14px;"><strong>Type:</strong> ${contentLabel}</p>
-                <p style="margin: 0 0 12px; color: #6B7280; font-size: 14px;"><strong>Author:</strong> ${postAuthor}</p>
+                <p style="margin: 0 0 12px; color: #6B7280; font-size: 14px;"><strong>${content_type === 'quick_win' ? 'Category' : 'Author'}:</strong> ${postAuthor}</p>
                 <p style="margin: 0 0 12px; color: #6B7280; font-size: 14px;"><strong>Reported by:</strong> ${reporter?.display_name || 'Unknown'}</p>
                 ${reason ? `<p style="margin: 0 0 12px; color: #6B7280; font-size: 14px;"><strong>Reason:</strong> ${reason}</p>` : ''}
                 <div style="background: #F9FAFB; padding: 16px; border-radius: 8px; margin: 16px 0; border: 1px solid #E5E7EB;">
