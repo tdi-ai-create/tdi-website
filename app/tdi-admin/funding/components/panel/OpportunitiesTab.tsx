@@ -764,7 +764,7 @@ function DiversificationView({ opportunities }: { opportunities: any[] }) {
           borderRadius: 6, fontSize: 11, color: '#92400E', lineHeight: 1.5,
         }}>
           {hasSlow && !hasFast && (
-            <>No fast funding sources (Plan C/D). Consider adding a quick local or foundation source to protect the timeline — a $2-5K grant that lands fast beats a large federal path that decides too late.</>
+            <>No fast funding sources (Plan C/D). Consider adding a quick local or foundation source to protect the timeline. A $2-5K grant that lands fast beats a large federal path that decides too late.</>
           )}
           {!hasSlow && hasFast && (
             <>No federal/state sources (Plan A/B). Consider pairing with a formula path (Title II-A, IDEA) for larger sustained funding alongside the quick wins.</>
@@ -840,7 +840,7 @@ function NarrativeControl({ opp, gateOpen, onRequestDraft, onApprove, onSendBack
         {ns === 'requested' && (
           <>
             <span style={{ fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 4, background: '#FEF3C7', color: '#92400E' }}>
-              Draft requested — waiting for {agent || 'agent'}
+              Draft requested, waiting for {agent || 'agent'}
             </span>
             {hasUrl && (
               <a href={opp.narrative_url} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} style={{ fontSize: 10, color: '#8B5CF6', textDecoration: 'underline' }}>
@@ -882,7 +882,7 @@ function NarrativeControl({ opp, gateOpen, onRequestDraft, onApprove, onSendBack
         {ns === 'review' && (
           <>
             <span style={{ fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 4, background: '#FEF3C7', color: '#92400E' }}>
-              Draft ready — needs QA
+              Draft ready, needs QA
             </span>
             {hasUrl && (
               <a href={opp.narrative_url} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} style={{ fontSize: 10, color: '#8B5CF6', textDecoration: 'underline' }}>
@@ -897,6 +897,24 @@ function NarrativeControl({ opp, gateOpen, onRequestDraft, onApprove, onSendBack
             <button onClick={() => onPatch({ narrative_status: 'qa_review' })} style={{ fontSize: 10, fontWeight: 600, padding: '3px 10px', borderRadius: 4, border: 'none', background: '#F59E0B', color: 'white', cursor: 'pointer' }}>
               Send to QA
             </button>
+            {/* The same trap we closed at `approval`, one state earlier and
+                worse. This is the first time a person sees the draft. If it is
+                obviously wrong, the only button pushed it into QA anyway, which
+                spends one of two attempts on something the reader already knew
+                was wrong. Julie then fails it, it returns to the writer, and it
+                gets one attempt instead of two. Reading a draft and sending it
+                back is the whole point of this stage. */}
+            <button
+              onClick={() => {
+                const note = window.prompt(
+                  'What needs changing? This goes back to the writer as their guidance.'
+                )
+                if (note && note.trim().length > 2) onSendBack(note.trim())
+              }}
+              style={{ fontSize: 10, fontWeight: 600, padding: '3px 10px', borderRadius: 4, border: '1px solid #D1D5DB', background: 'white', color: '#374151', cursor: 'pointer' }}
+            >
+              Send it back
+            </button>
           </>
         )}
 
@@ -904,7 +922,7 @@ function NarrativeControl({ opp, gateOpen, onRequestDraft, onApprove, onSendBack
         {ns === 'approval' && (
           <>
             <span style={{ fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 4, background: '#D1FAE5', color: '#065F46' }}>
-              QA passed{opp.qa_reviewer ? ` by ${opp.qa_reviewer}` : ''} — your approval
+              QA passed{opp.qa_reviewer ? ` by ${opp.qa_reviewer}` : ''}. Your approval
             </span>
             {hasUrl && (
               <a href={opp.narrative_url} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} style={{ fontSize: 10, color: '#8B5CF6', textDecoration: 'underline' }}>
@@ -955,7 +973,7 @@ function NarrativeControl({ opp, gateOpen, onRequestDraft, onApprove, onSendBack
         {ns === 'qa_review' && (
           <>
             <span style={{ fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 4, background: '#EDE9FE', color: '#6D28D9' }}>
-              In QA review{(opp.qa_attempt_count ?? 0) > 0 ? ` — attempt ${(opp.qa_attempt_count ?? 0) + 1}` : ''}
+              In QA review{(opp.qa_attempt_count ?? 0) > 0 ? `, attempt ${(opp.qa_attempt_count ?? 0) + 1}` : ''}
             </span>
             {hasUrl && (
               <a href={opp.narrative_url} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} style={{ fontSize: 10, color: '#8B5CF6', textDecoration: 'underline' }}>
@@ -984,7 +1002,7 @@ function NarrativeControl({ opp, gateOpen, onRequestDraft, onApprove, onSendBack
       {/* ── Inline reader fallback: URL only ── */}
       {['review', 'qa_review', 'ready'].includes(ns) && !hasContent && hasUrl && !showContent && (
         <div style={{ fontSize: 11, color: '#9CA3AF', fontStyle: 'italic' }}>
-          No inline content — <a href={opp.narrative_url} target="_blank" rel="noopener noreferrer" style={{ color: '#8B5CF6' }}>open external document</a>
+          No inline content. <a href={opp.narrative_url} target="_blank" rel="noopener noreferrer" style={{ color: '#8B5CF6' }}>open external document</a>
         </div>
       )}
 
@@ -1021,7 +1039,7 @@ function NarrativeControl({ opp, gateOpen, onRequestDraft, onApprove, onSendBack
       {/* QA passed confirmation */}
       {(ns === 'approval' || (ns === 'qa_review' && opp.qa_passed === true)) && (
         <div style={{ fontSize: 11, color: '#065F46', background: '#D1FAE5', padding: '6px 10px', borderRadius: 6 }}>
-          QA passed{opp.qa_reviewer ? ` by ${opp.qa_reviewer}` : ''}{opp.qa_notes ? ` — ${opp.qa_notes}` : ''}. Ready for final approval.
+          QA passed{opp.qa_reviewer ? ` by ${opp.qa_reviewer}` : ''}{opp.qa_notes ? `, ${opp.qa_notes}` : ''}. Ready for final approval.
         </div>
       )}
     </div>
@@ -1088,7 +1106,7 @@ function EscalationPanel({ opp }: { opp: any }) {
             color: 'white', cursor: busy ? 'default' : 'pointer',
           }}
         >
-          {busy ? 'Working...' : 'The school replied — resume drafting'}
+          {busy ? 'Working...' : 'The school replied, resume drafting'}
         </button>
         {error && <div style={{ fontSize: 11, color: '#B91C1C' }}>{error}</div>}
       </div>
@@ -1215,7 +1233,7 @@ function ResearchControl({ opp, onRequest }: {
           fontSize: 9, fontWeight: 600, padding: '2px 8px', borderRadius: 4,
           background: '#F3F4F6', color: '#6B7280',
         }}>
-          Research requested — {agent || 'amara'}
+          Research requested, {agent || 'amara'}
         </span>
       )}
 
@@ -1358,7 +1376,7 @@ function SubmissionPanel({ opp, gateOpen, onPatch }: {
           padding: '8px 12px', background: '#FEF3C7', border: '1px solid #FDE68A',
           borderRadius: 6, fontSize: 11, color: '#92400E', lineHeight: 1.5,
         }}>
-          This path routes through the district office. Confirm it advanced past district routing to the funder before marking submitted — an email to a district inbox is not a submission to the funder (the Title II-A lesson).
+          This path routes through the district office. Confirm it advanced past district routing to the funder before marking submitted. An email to a district inbox is not a submission to the funder (the Title II-A lesson).
         </div>
       )}
 
@@ -1415,7 +1433,7 @@ function SubmissionPanel({ opp, gateOpen, onPatch }: {
           borderRadius: 6, fontSize: 10, color: '#374151',
         }}>
           <div style={{ fontWeight: 700, marginBottom: 4, color: daysLeft <= 2 ? '#DC2626' : daysLeft <= 7 ? '#92400E' : '#374151' }}>
-            {daysLeft === 0 ? 'DEADLINE TODAY' : `${daysLeft} day${daysLeft !== 1 ? 's' : ''} to deadline`} — readiness check
+            {daysLeft === 0 ? 'DEADLINE TODAY' : `${daysLeft} day${daysLeft !== 1 ? 's' : ''} to deadline`}, readiness check
           </div>
           <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
             <span style={{ color: narrativeReady ? '#065F46' : '#9CA3AF' }}>
@@ -1743,7 +1761,7 @@ function AllocationPanel({ opp, pursuitId, contract2LineItems, contract2QuotePac
       })}
 
       {allocations.length === 0 && !showAdd && (
-        <div style={{ fontSize: 11, color: '#9CA3AF', fontStyle: 'italic' }}>No allocations yet — click "+ Allocate" to map award to line items</div>
+        <div style={{ fontSize: 11, color: '#9CA3AF', fontStyle: 'italic' }}>No allocations yet. Click "+ Allocate" to map award to line items</div>
       )}
     </div>
   )
