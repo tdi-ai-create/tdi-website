@@ -44,10 +44,17 @@ export const STEP_ENGINE_FLAG = 'step_engine' as const;
 /**
  * Every value `creator_milestones.status` can hold.
  *
- * There is no check constraint on this column, unlike `review_status`, so the
- * database will accept anything. This list is the vocabulary the application
- * actually understands, and a value outside it would be stored happily and
- * understood by nothing.
+ * Constrained in the database as of 2 September 2026, matching the constraint
+ * `review_status` has carried all along. Before that the column accepted
+ * anything, which mattered because twenty-two files write this table directly
+ * and the step engine that would centralise them is switched off.
+ *
+ * A wrong value never errored. It stored, and was then understood by nothing:
+ * the step would disappear from the creator's journey, from the team queue and
+ * from every progress count, while still sitting in the table.
+ *
+ * Keep this list and the constraint in step. Adding a value here without adding
+ * it there produces a write that fails in production and passes every test.
  */
 export type StepStatus =
   | 'locked'
@@ -71,6 +78,10 @@ export interface StepRule {
    * forever. Every value here is null today, which is the same gap the funding
    * side had before it was closed, and is why a creator can sit untouched for
    * months without anything saying so.
+   *
+   * Still true on 2 September 2026. The funding equivalent now expires drafts
+   * at 72 hours, QA at 24 and a person's decision at 48; nothing here expires
+   * at all, so no clock anywhere says a step has gone quiet.
    */
   expiresHours: number | null;
 }
