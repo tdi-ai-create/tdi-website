@@ -351,3 +351,47 @@ export function dispositionForFail(
   if (writerItems.length === 0 && humanItems.length > 0) return 'park';
   return attemptIfCounted > MAX_QA_ATTEMPTS ? 'escalate' : 'redraft';
 }
+
+// ── Is this grant still applicable for ──
+
+export interface WindowSubject {
+  window_status?: string | null;
+  application_closes?: string | null;
+}
+
+/**
+ * Whether a school can still apply.
+ *
+ * `window_status` is a stored field, and the only value anything ever writes to
+ * it is 'open'. Nothing closes it when the date passes, so on its own it is a
+ * flag that can only ever say yes. It gates the Request draft control, which
+ * meant the portal kept offering to commission a narrative for a grant whose
+ * window had already shut.
+ *
+ * The close date is the fact; the stored status is an intention about it. Both
+ * have to agree, and a date in the past wins over any stored value.
+ *
+ * Dates are compared as calendar days, never as timestamps. `application_closes`
+ * is a Postgres date column, and parsing one as a UTC instant is how the rest of
+ * this codebase learned to render deadlines a day early.
+ */
+export function isWindowOpen(opp: WindowSubject, today: Date = new Date()): boolean {
+  if (opp.window_status && opp.window_status !== 'open') return false;
+  if (!opp.application_closes) return opp.window_status === 'open';
+
+  const closes = String(opp.application_closes).slice(0, 10);
+  const y = today.getFullYear();
+  const m = String(today.getMonth() + 1).padStart(2, '0');
+  const d = String(today.getDate()).padStart(2, '0');
+  const todayStr = `${y}-${m}-${d}`;
+
+  return closes >= todayStr;
+}
+
+/** Days until the window shuts. Negative once it has. Null with no date. */
+export function daysUntilClose(opp: WindowSubject, today: Date = new Date()): number | null {
+  if (!opp.application_closes) return null;
+  const closes = new Date(String(opp.application_closes).slice(0, 10) + 'T00:00:00');
+  const ref = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  return Math.round((closes.getTime() - ref.getTime()) / 86400000);
+}

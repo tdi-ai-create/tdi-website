@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { ESCALATION_OPTIONS } from '@/lib/funding-qa'
-import { APPROVAL_SEND_BACK_TO } from '@/lib/funding-rules'
+import { APPROVAL_SEND_BACK_TO, isWindowOpen } from '@/lib/funding-rules'
 import { NarrativeMarkdown } from '@/components/funding/NarrativeMarkdown'
 
 const PLAN_COLORS: Record<string, string> = { A: '#0F766E', B: '#1B365D', C: '#7C3AED', D: '#B45309' }
@@ -789,7 +789,9 @@ function NarrativeControl({ opp, gateOpen, onRequestDraft, onApprove, onSendBack
   const [showContent, setShowContent] = useState(false)
   const ns = opp.narrative_status || 'not_started'
   const agent = opp.assigned_agent || ''
-  const windowOpen = opp.window_status === 'open'
+  // The stored status alone said open forever, because nothing ever closes it.
+  // A grant whose window shut two days ago was still offering Request draft.
+  const windowOpen = isWindowOpen(opp)
   const hasContent = !!opp.narrative_content
   const hasUrl = !!opp.narrative_url
   const showReader = ['review', 'qa_review', 'approval', 'escalated', 'ready'].includes(ns) && hasContent
@@ -815,7 +817,7 @@ function NarrativeControl({ opp, gateOpen, onRequestDraft, onApprove, onSendBack
         </span>
 
         {/* ── not_started / ready: request draft ── */}
-        {(ns === 'not_started' || ns === 'ready') && opp.window_status === 'open' && (
+        {(ns === 'not_started' || ns === 'ready') && windowOpen && (
           <>
             <select
               value={agentPick}
@@ -830,7 +832,7 @@ function NarrativeControl({ opp, gateOpen, onRequestDraft, onApprove, onSendBack
             {ns === 'ready' && <span style={{ fontSize: 10, fontWeight: 600, color: '#10B981' }}>Approved</span>}
           </>
         )}
-        {(ns === 'not_started') && opp.window_status !== 'open' && (
+        {(ns === 'not_started') && !windowOpen && (
           <span style={{ fontSize: 10, color: '#DC2626', fontWeight: 600 }}>
             Window must be verified open before requesting a draft
           </span>
