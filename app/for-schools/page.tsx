@@ -1,957 +1,491 @@
-'use client';
-
-import { useEffect, useRef, useState } from 'react';
-import CertifiedStatesMap from '@/components/learning/CertifiedStatesMap';
-import Link from 'next/link';
-import Image from 'next/image';
-import TeamStrip from '@/components/TeamStrip'
-import { CompactAdmin } from '@/components/calculators/v2/compact/CompactAdmin';
-
-// GA4 scroll tracking hook
-function useScrollTracking() {
-  const sectionsRef = useRef<Map<string, boolean>>(new Map());
-
-  useEffect(() => {
-    const sections = [
-      { id: 'section-hero', name: 'Hero Pain' },
-      { id: 'section-feature', name: 'Feature Blueprint' },
-      { id: 'section-advantage', name: 'Advantage Changes' },
-      { id: 'section-benefit', name: 'Benefit Math' },
-      { id: 'section-midcta', name: 'Mid-Page CTA' },
-      { id: 'section-proof', name: 'Proof Results' },
-      { id: 'section-funding', name: 'Funding' },
-      { id: 'section-faq', name: 'Objections FAQ' },
-      { id: 'section-finalcta', name: 'Final CTA' },
-    ];
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const sectionId = entry.target.id;
-            const sectionName = sections.find((s) => s.id === sectionId)?.name;
-
-            // Only fire once per section per session
-            if (sectionName && !sectionsRef.current.get(sectionId)) {
-              sectionsRef.current.set(sectionId, true);
-
-              // Fire GA4 event
-              if (typeof window !== 'undefined' && (window as unknown as { gtag?: (...args: unknown[]) => void }).gtag) {
-                (window as unknown as { gtag: (...args: unknown[]) => void }).gtag('event', 'scroll_depth', {
-                  page_location: window.location.href,
-                  page_title: 'For Schools',
-                  section_name: sectionName,
-                  section_id: sectionId,
-                });
-              }
-            }
-          }
-        });
-      },
-      { threshold: 0.3 }
-    );
-
-    sections.forEach(({ id }) => {
-      const element = document.getElementById(id);
-      if (element) observer.observe(element);
-    });
-
-    return () => observer.disconnect();
-  }, []);
-}
-
-// FAQ Accordion Component
-function FAQAccordion({ items }: { items: { question: string; answer: React.ReactNode }[] }) {
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
-
-  return (
-    <div className="max-w-3xl mx-auto space-y-4">
-      {items.map((item, index) => (
-        <div
-          key={index}
-          className="rounded-xl overflow-hidden"
-          style={{ backgroundColor: '#ffffff', border: '1px solid #e5e7eb' }}
-        >
-          <button
-            onClick={() => setOpenIndex(openIndex === index ? null : index)}
-            className="w-full px-6 py-5 text-left flex items-start justify-between gap-4"
-          >
-            <span className="font-semibold" style={{ color: '#1e2749' }}>
-              {item.question}
-            </span>
-            <svg
-              className={`w-5 h-5 flex-shrink-0 transition-transform ${openIndex === index ? 'rotate-180' : ''}`}
-              fill="none"
-              stroke="#1e2749"
-              viewBox="0 0 24 24"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
-          </button>
-          {openIndex === index && (
-            <div className="px-6 pb-5">
-              <div className="text-sm leading-relaxed" style={{ color: '#1e2749', opacity: 0.8 }}>
-                {item.answer}
-              </div>
-            </div>
-          )}
-        </div>
-      ))}
-    </div>
-  );
-}
+import './for-schools.css';
 
 export default function ForSchoolsPage() {
-  useScrollTracking();
-
-  const faqItems = [
-    {
-      question: 'We have tried coaching partnerships before and they did not stick.',
-      answer: (
-        <>
-          Traditional PD produces 5-10% implementation because it is event-based, not sustained. TDI&apos;s phased model (Ignite, Accelerate, Sustain) builds habits over months with embedded coaching, real-time analytics, and between-visit virtual support. Our 74% implementation rate is anchored in Joyce & Showers&apos; foundational research on sustained coaching and validated by our partner data.
-        </>
-      ),
-    },
-    {
-      question: 'We do not have the budget for this.',
-      answer: (
-        <>
-          Most districts are already spending $15-20K annually on PD that produces 10% implementation - that means a significant portion is effectively lost. TDI partnerships start at $6,600 and deliver 7.4x the classroom impact. And 80% of our partner schools secure external funding through Title II-A, Title IV-A, or state PD grants.{' '}
-          <a
-            href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="font-semibold underline"
-            style={{ color: '#35A7FF' }}
-          >
-            Schedule a 15-minute funding consultation
-          </a>{' '}
-          and we will identify which sources apply to your school.
-        </>
-      ),
-    },
-    {
-      question: 'Our union will not support observation-based PD.',
-      answer: (
-        <>
-          TDI observations are growth-focused, not evaluative. Teachers receive Love Notes - personalized feedback highlighting what they are doing well. 94% of our partners would recommend TDI to a colleague. The concern typically dissolves once teachers experience the first visit and realize this is support, not surveillance.
-        </>
-      ),
-    },
-    {
-      question: 'We need to see results before committing to a full partnership.',
-      answer: (
-        <>
-          That is exactly what Ignite is designed for. It starts with a pilot group of 10-25 educators and your leadership team. You see early wins within the first semester before expanding to full staff. The dashboard shows your board real data, not promises.{' '}
-          <Link href="/Example-Dashboard" className="font-semibold underline" style={{ color: '#35A7FF' }}>
-            See a live dashboard example
-          </Link>.
-        </>
-      ),
-    },
-    {
-      question: 'We already have an instructional coach on staff.',
-      answer: (
-        <>
-          TDI does not replace your coach - we amplify them. A full-time coach costs $60-80K+ and is one person. TDI provides external perspective, research-backed strategies, and a support infrastructure (Hub + Dashboard + Observations) that makes your existing coach more effective.
-        </>
-      ),
-    },
-    {
-      question: 'How do we know this will work for our specific context?',
-      answer: (
-        <>
-          TDI serves 100,000+ educators across all 50 states in schools ranging from rural single-building districts to multi-school urban systems. Every partnership is customized - your dashboard, your goals, your pace. Start with the{' '}
-          <Link href="/pd-diagnostic" className="font-semibold underline" style={{ color: '#35A7FF' }}>
-            free PD Diagnostic
-          </Link>{' '}
-          or{' '}
-          <Link href="/calculator" className="font-semibold underline" style={{ color: '#35A7FF' }}>
-            Impact Calculator
-          </Link>{' '}
-          to see what is possible for your school.
-        </>
-      ),
-    },
-  ];
-
   return (
-    <main>
-      {/* SECTION 1: Hero (Pain) */}
-      <section
-        id="section-hero"
-        className="relative py-20 md:py-32 overflow-hidden"
-      >
-        {/* Background Image */}
-        <div
-          className="absolute inset-0"
-          style={{
-            backgroundImage: "url('/images/hero-for-schools.webp')",
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat',
-          }}
-        />
-        {/* Gradient Overlay */}
-        <div
-          className="absolute inset-0"
-          style={{
-            background: 'linear-gradient(180deg, rgba(30, 39, 73, 0.92) 0%, rgba(30, 39, 73, 0.85) 50%, rgba(30, 39, 73, 0.95) 100%)',
-          }}
-        />
-        {/* Subtle texture overlay */}
-        <div
-          className="absolute inset-0 opacity-5"
-          style={{
-            backgroundImage: 'radial-gradient(circle at 25% 25%, #ffffff 1px, transparent 1px)',
-            backgroundSize: '50px 50px',
-          }}
-        />
-        <div className="container-default relative z-10">
-          <div className="max-w-3xl mx-auto text-center">
-            <span
-              className="inline-block text-xs font-semibold uppercase tracking-wide px-3 py-1 rounded-full mb-6"
-              style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)', color: 'rgba(255, 255, 255, 0.7)' }}
-            >
-              For School Leaders
-            </span>
-            <h1
-              className="text-3xl md:text-4xl lg:text-5xl font-bold mb-8"
-              style={{ color: '#ffffff' }}
-            >
-              Your PD Budget Deserves Better Results
-            </h1>
-            <div className="flex flex-col md:flex-row gap-4 justify-center mb-10">
-              <div className="px-6 py-4 rounded-lg text-center" style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)', backdropFilter: 'blur(4px)' }}>
-                <div className="text-2xl md:text-3xl font-bold" style={{ color: '#ffba06' }}>$15-20K</div>
-                <div className="text-sm" style={{ color: '#ffffff', opacity: 0.9 }}>spent on PD yearly</div>
-              </div>
-              <div className="px-6 py-4 rounded-lg text-center" style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)', backdropFilter: 'blur(4px)' }}>
-                <div className="text-2xl md:text-3xl font-bold" style={{ color: '#ef4444' }}>10%</div>
-                <div className="text-sm" style={{ color: '#ffffff', opacity: 0.9 }}>implementation rate</div>
-              </div>
-              <div className="px-6 py-4 rounded-lg text-center" style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)', backdropFilter: 'blur(4px)' }}>
-                <div className="text-2xl md:text-3xl font-bold" style={{ color: '#ef4444' }}>90%</div>
-                <div className="text-sm" style={{ color: '#ffffff', opacity: 0.9 }}>not reaching classrooms</div>
-              </div>
+    <div className="fs-page">
+      {/* HERO */}
+      <header className="fs-hero">
+        <div className="fs-wrap fs-hero-grid">
+          <div>
+            <h1>PD you can still defend in April.</h1>
+            <p className="fs-sub">Four ways to work with TDI, from a single building to a full district partnership. Every one hands you a one-page result before the budget conversation, not a promise that one is coming.</p>
+            <div className="fs-btnrow">
+              <a className="fs-btn fs-btn-gold" href="#achieves">What a school gets out of this</a>
+              <a className="fs-btn fs-btn-ghost" href="/get-started">Request a quote</a>
             </div>
-            <p className="text-xl md:text-2xl font-semibold mb-10" style={{ color: '#ffba06' }}>
-              It is not your teachers. It is the model.
-            </p>
-            <Link
-              href="/get-started"
-              className="inline-flex items-center gap-2 px-8 py-4 rounded-lg font-bold text-lg transition-all hover:scale-105"
-              style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
-            >
-              See what is possible for your school
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            <p className="fs-hero-note">Working with us starts at $2,500 a year.</p>
+          </div>
+          <div className="fs-yearcard">
+            <h4>The four ways</h4>
+            <p className="fs-cap">Each one stands alone. None is a trial run for another.</p>
+            <div className="fs-fourlist">
+              <div className="fs-frow" style={{"--a": "#5FBDB8"} as React.CSSProperties}><b>The Pulse</b><span>A weekly three-second check on how staff are actually doing.</span></div>
+              <div className="fs-frow" style={{"--a": "#E9A96A"} as React.CSSProperties}><b>The Focus</b><span>Thirteen ready-built tools for the initiative you already chose.</span></div>
+              <div className="fs-frow" style={{"--a": "#A99AD8"} as React.CSSProperties}><b>The Cohort</b><span>Ten people, four sessions, measured before session one.</span></div>
+              <div className="fs-frow" style={{"--a": "#F9B91B"} as React.CSSProperties}><b>The Blueprint</b><span>All of it, working as one system across the district.</span></div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* THE PROBLEM */}
+      <section className="fs-sec fs-sec-white">
+        <div className="fs-wrap">
+          <div className="fs-head-narrow">
+            <p className="fs-kicker">Why every one of these is built the same way</p>
+            <h2>Most PD gets dropped in year two because nobody can prove it worked.</h2>
+            <p className="fs-lede">Not because it failed. Because when the line item comes up in April, the only evidence is a survey nobody trusts and a memory of a good PD day in October. Every TDI offering is built backwards from that meeting.</p>
+          </div>
+          <div className="fs-stats">
+            <div className="fs-stat"><b>$15–20K</b><span>Typical annual school PD spend</span></div>
+            <div className="fs-stat"><b>10%</b><span>Industry implementation rate</span></div>
+            <div className="fs-stat"><b>74%</b><span>Implementation rate across TDI partners</span></div>
+            <div className="fs-stat"><b>94%</b><span>Of teachers would recommend TDI</span></div>
+          </div>
+          <p style={{"fontSize": ".85rem", "color": "var(--muted)", "marginTop": "26px", "maxWidth": "76ch"}}>Implementation baseline: Joyce &amp; Showers (1980, 2002) found traditional sit-and-get PD produces 5–10% classroom transfer, and sustained coaching models produce 80–90%. TDI’s 74% reflects real partner data inside that range.</p>
+        </div>
+      </section>
+
+      {/* WHAT A SCHOOL ACHIEVES */}
+      <section className="fs-sec" id="achieves">
+        <div className="fs-wrap">
+          <div className="fs-head-narrow">
+            <p className="fs-kicker">What this is for</p>
+            <h2>Ten things a school gets out of working with us.</h2>
+            <p className="fs-lede">Sorted by what your building achieves rather than by what we deliver. The four offerings below are different routes into this list. The Blueprint is all of it at once.</p>
+          </div>
+          <div className="fs-ocgrid">
+            <div className="fs-oc">
+              <h4>Teacher time back</h4>
+              <p>Find a resource at the moment of need instead of waiting for the next PD day. Borrow a colleague&apos;s work instead of building from scratch. Stop rebuilding what another teacher in the district already made.</p>
+              <span className="fs-via">Cohort, Blueprint</span>
+            </div>
+            <div className="fs-oc">
+              <h4>Stress relief</h4>
+              <p>Lighten the daily load with small practical changes rather than new initiatives. Support between formal PD days, not only on the calendar. An end to being the only person in your role in the building.</p>
+              <span className="fs-via">Pulse, Cohort, Blueprint</span>
+            </div>
+            <div className="fs-oc">
+              <h4>Staff culture monitoring</h4>
+              <p>Take the pulse of staff across five areas in under two minutes per person. Watch culture trend across a year instead of guessing. Surface honest input without asking staff to say it to a leader&apos;s face.</p>
+              <span className="fs-via">Pulse, Blueprint</span>
+            </div>
+            <div className="fs-oc">
+              <h4>Retention and staff investment</h4>
+              <p>Identify what is driving staff to stay or leave, area by area. Show staff that their input produced visible change. Track retention risk with data rather than instinct.</p>
+              <span className="fs-via">Pulse, Cohort, Blueprint</span>
+            </div>
+            <div className="fs-oc">
+              <h4>Instructional growth</h4>
+              <p>See what is actually happening in classrooms instead of assuming. Name what is already working before naming what is not. Set goals staff believe are achievable.</p>
+              <span className="fs-via">Focus, Cohort, Blueprint</span>
+            </div>
+            <div className="fs-oc">
+              <h4>New teacher support</h4>
+              <p>Ramp new hires without pulling veteran staff off their own work. Give first-year teachers on-demand answers at the moment of confusion. Provide feedback that is not attached to evaluation.</p>
+              <span className="fs-via">Cohort, Blueprint</span>
+            </div>
+            <div className="fs-oc">
+              <h4>Leadership capacity</h4>
+              <p>Think through decisions with someone outside the building. Prepare for the conversations that keep getting postponed. Decide which PD to say no to.</p>
+              <span className="fs-via">Cohort, Blueprint</span>
+            </div>
+            <div className="fs-oc">
+              <h4>PD coherence</h4>
+              <p>Map the PD already in place and see where it overlaps. Identify the real gaps instead of stacking on another initiative. Fit development into the existing calendar rather than on top of it.</p>
+              <span className="fs-via">Focus, Blueprint</span>
+            </div>
+            <div className="fs-oc">
+              <h4>Collaboration and shared practice</h4>
+              <p>Share materials across grades, buildings and roles without adding a meeting. Keep staff work in the system when people leave the district. Build a shared library that grows every year instead of resetting.</p>
+              <span className="fs-via">Cohort, Blueprint</span>
+            </div>
+            <div className="fs-oc">
+              <h4>Proof and budget defense</h4>
+              <p>Turn qualitative work into numbers. Show a superintendent or board what changed and by how much. Defend the line item with evidence when budget season arrives.</p>
+              <span className="fs-via">All four</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* FOUR WAYS TO GET THERE */}
+      <section className="fs-sec fs-sec-white" id="offerings">
+        <div className="fs-wrap">
+          <div className="fs-head-narrow">
+            <p className="fs-kicker">Four ways to get there</p>
+            <h2>Pick the one that matches the problem you would name first.</h2>
+            <p className="fs-lede">Each one stands alone. A school with a culture problem and a school losing new teachers need different things, and neither has to buy the other first. Every card below is written as what a leader can say by March.</p>
+          </div>
+          <div className="fs-offer-grid">
+
+            <article className="fs-offer" style={{"--c": "var(--pulse)"} as React.CSSProperties}>
+              <h3>The Pulse</h3>
+              <p className="fs-who">For the leader who cannot tell how staff are actually doing until someone resigns.</p>
+              <p className="fs-ican-h">What a leader can say by March</p>
+              <ul className="fs-ican"><li>I can see where my staff are struggling, dimension by dimension, and whether it is improving or sliding week to week</li><li>I can find out what my staff are actually asking for, ranked</li><li>I can find out which grade levels or roles are carrying the problem</li><li>I can know whether my numbers are normal for a school like mine</li><li>I can close the loop with staff without writing it myself, and show leadership something quantitative</li></ul>
+              <div className="fs-mech">
+                <b>How it runs.</b> One question every Tuesday, three seconds to answer, rotating through Mood, Energy, Belonging, Purpose and Needs. Delivered by email, outside the hub, so no account is required.
+                <br /><b>How it is measured.</b> Movement across the five areas, what staff ask for under Needs ranked month to month, and weekly response rate.
+              </div>
+              <div className="fs-foot"><a className="fs-go" href="/get-started">Request a quote</a></div>
+            </article>
+
+            <article className="fs-offer" style={{"--c": "var(--focus)"} as React.CSSProperties}>
+              <h3>The Focus</h3>
+              <p className="fs-who">For the district already committed to an initiative with nothing practical behind it.</p>
+              <p className="fs-ican-h">What a leader can say by March</p>
+              <ul className="fs-ican"><li>I can put real tools behind the initiative I already committed to</li><li>I can see whether my staff are actually using what we send</li><li>I can find out which parts of our focus staff are struggling with most</li><li>I can catch a focus that is not working in November instead of June</li><li>I can add support without adding a meeting, a PD day, or a new priority</li><li>I can get told what to do next instead of handed another dashboard to interpret</li><li>I can sit down twice a year with someone outside the building and decide what to change</li></ul>
+              <div className="fs-mech">
+                <b>How it runs.</b> You name the area your district is already working on. Thirteen tools across the year, one every three weeks, built for it and sent inside the email with a printable version underneath. All thirteen dates are set when you sign. One tap back: planning it, skipping it, or want help. Two 45-minute sessions with your leadership team, mid-November and early March, both booked at signing. Those two conversations are your whole time commitment for the year.
+                <br /><b>How it is measured.</b> Planned-use rate across the year, skip rate by tool and by group, and the volume and clustering of help requests.
+              </div>
+              <div className="fs-foot"><a className="fs-go" href="/get-started">Request a quote</a></div>
+            </article>
+
+            <article className="fs-offer" style={{"--c": "var(--cohort)"} as React.CSSProperties}>
+              <h3>The Cohort</h3>
+              <p className="fs-who">For the group carrying the most and getting the least. Paras, new teachers, whoever you would name.</p>
+              <p className="fs-ican-h">What a leader can say by March</p>
+              <ul className="fs-ican"><li>I can give a specific group real support instead of hoping they figure it out</li><li>I can see whether that group moved from where they started</li><li>I can tell whether the people I invested in actually stayed</li><li>I can support paras or new teachers without building a program myself</li><li>I can point to a number when someone asks whether it worked</li></ul>
+              <div className="fs-mech">
+                <b>How it runs.</b> You choose who is in it. Ten standard, fifteen maximum, from one building or across a district. Four virtual sessions shaped to that group, full hub and paid blog access all year, optional office hours, and a named team member they can email directly.
+                <br /><b>How it is measured.</b> Retention within the cohort, stress and feeling of support measured at baseline and again in March, hub implementation rate, and session attendance.
+              </div>
+              <div className="fs-foot"><a className="fs-go" href="/get-started">Request a quote</a></div>
+            </article>
+          </div>
+
+          <div className="fs-blueprint-band">
+            <div>
+              <h3>The Blueprint</h3>
+              <p className="fs-per" style={{"margin": "6px 0 14px"}}>Scoped to your district</p>
+              <p style={{"color": "var(--muted)", "fontSize": ".98rem"}}>The hub, leadership coaching, classroom observations, the vibe check, the dashboard and the blog, working as one system. It is the only one that reaches all ten outcomes above, because it is the only one with people in your buildings.</p>
+              <div className="fs-phases">
+                <div className="fs-phase"><b>Ignite</b><span>Leadership team and a pilot group of 10 to 25 educators. Early wins.</span></div>
+                <div className="fs-phase"><b>Accelerate</b><span>Full staff. Strategies get implemented school-wide.</span></div>
+                <div className="fs-phase"><b>Sustain</b><span>Systems hold through turnover. You run it yourselves.</span></div>
+              </div>
+              <p style={{"fontSize": ".86rem", "color": "var(--muted)", "marginTop": "16px"}}>The three phases are how a Blueprint partnership unfolds over time. They are not a ladder the other offerings sit on.</p>
+            </div>
+            <div>
+              <a className="fs-btn fs-btn-navy" href="/get-started">Request a quote</a>
+            </div>
+          </div>
+
+          <div className="fs-notladder">These are not steps. The Pulse, The Focus and The Cohort are not smaller versions of the Blueprint or trial runs for it. Schools run one of them for years without ever buying anything else.</div>
+
+          <div className="fs-tablewrap">
+            <table>
+              <caption className="fs-sr">Comparison of the four TDI offerings</caption>
+              <thead><tr><th scope="col">&nbsp;</th><th scope="col">The Pulse</th><th scope="col">The Focus</th><th scope="col">The Cohort</th><th scope="col">The Blueprint</th></tr></thead>
+              <tbody>
+                <tr><th scope="row">Who it reaches</th><td>All staff</td><td>All staff</td><td>10 to 15 named people</td><td>Whole district</td></tr>
+                <tr><th scope="row">Ask of staff</th><td>3 seconds, weekly</td><td>One tap, monthly</td><td>Four sessions a year</td><td>Varies by phase</td></tr>
+                <tr><th scope="row">Live team time</th><td>None</td><td>Two leadership sessions</td><td>Yes, with staff</td><td>Yes</td></tr>
+                <tr><th scope="row">Hub access</th><td>No</td><td>No</td><td>Yes, all members</td><td>Yes, all staff</td></tr>
+                <tr><th scope="row">Outcomes it reaches</th><td>Culture, retention, stress</td><td>Coherence, instructional growth</td><td>New teachers, instructional growth, collaboration, retention</td><td><b>All ten</b></td></tr>
+                <tr><th scope="row">March proof report</th><td>Yes</td><td>Yes</td><td>Yes</td><td>Yes</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style={{"fontSize": ".85rem", "color": "var(--muted)", "marginTop": "14px"}}>The outcomes row maps each offering to the list above. It is our reading of which route reaches which outcome, not a contractual guarantee.</p>
+        </div>
+      </section>
+
+      {/* WHAT WE ACTUALLY DO */}
+      <section className="fs-sec">
+        <div className="fs-wrap">
+          <div className="fs-head-narrow">
+            <p className="fs-kicker">What we actually do</p>
+            <h2>You are not buying software. Somebody reads your data and tells you what to do about it.</h2>
+            <p className="fs-lede">The delivery is automated so it never depends on a facilitator showing up. The thinking is not. Here is the work that happens on our side of it.</p>
+          </div>
+          <div className="fs-grid3">
+            <div className="fs-card">
+              <h4>We read it every month and write the report</h4>
+              <p>Not a dashboard for you to interpret. One suggested move, with alternates underneath, generated from your own response data. Nothing for your team to assemble.</p>
+            </div>
+            <div className="fs-card">
+              <h4>We build the tools for the area you named</h4>
+              <p>You do not pick from a library. The tools are built for your focus, already prepped, print first, with an entry point simple enough that a teacher can use one without planning time.</p>
+            </div>
+            <div className="fs-card">
+              <h4>We write the copy that closes the loop with staff</h4>
+              <p>Monthly newsletter language drawn from what your own people said, so they can see their input went somewhere. Edit it and send it.</p>
+            </div>
+            <div className="fs-card">
+              <h4>We measure before we start</h4>
+              <p>For a cohort, retention, stress and feeling of support are measured before the first session. That is what makes the change across the year proof rather than a claim.</p>
+            </div>
+            <div className="fs-card">
+              <h4>We tell you what it cannot tell you</h4>
+              <p>Every report carries one honest line naming what the data still does not show. Three weeks of a dip is not enough to know whether it is workload or one grade band, and we say so rather than rounding it into a finding.</p>
+            </div>
+            <div className="fs-card">
+              <h4>We go get the money</h4>
+              <p>We find the funding, write the grant, and build the evidence the application needs, so outside money covers what your own budget cannot. Helping you get it costs you nothing.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="fs-sec fs-sec-white">
+        <div className="fs-wrap">
+          <div className="fs-head-narrow">
+            <p className="fs-kicker">What lands on your dashboard</p>
+            <h2>Numbers a board understands, from questions staff answer in seconds.</h2>
+            <p className="fs-lede">Every figure below is example data, shown at the size and shape you&apos;d actually see it.</p>
+          </div>
+
+          <div className="fs-grid2">
+            <div>
+              <h4 style={{"color": "var(--pulse)", "marginBottom": "6px"}}>Mood, week by week (The Pulse)</h4>
+              <p style={{"fontSize": ".95rem", "color": "var(--muted)"}}>The late-October dip and the February slide are exactly what a quarterly survey averages away.</p>
+              <svg viewBox="0 0 520 240" width="100%" role="img" aria-label="Line chart of staff mood across a school year, showing dips in late October and February.">
+                <g stroke="#E2E5EA" strokeWidth="1">
+                  <line x1="44" y1="30" x2="500" y2="30"/><line x1="44" y1="80" x2="500" y2="80"/>
+                  <line x1="44" y1="130" x2="500" y2="130"/><line x1="44" y1="180" x2="500" y2="180"/>
+                </g>
+                <g fill="#5A6273" fontFamily="Inter, sans-serif" fontSize="11">
+                  <text x="14" y="34">8</text><text x="14" y="84">6</text><text x="14" y="134">4</text><text x="14" y="184">2</text>
+                </g>
+                <polyline fill="none" stroke="#1F6F6B" strokeWidth="3" strokeLinejoin="round"
+                  points="60,74 105,68 150,86 195,138 240,120 285,104 330,112 375,158 420,126 465,96 500,88"/>
+                <g fill="#1F6F6B">
+                  <circle cx="195" cy="138" r="5"/><circle cx="375" cy="158" r="5"/>
+                </g>
+                <line x1="44" y1="98" x2="500" y2="98" stroke="#F9B91B" strokeWidth="2" strokeDasharray="6 5"/>
+                <g fill="#5A6273" fontFamily="Inter, sans-serif" fontSize="11.5">
+                  <text x="52" y="212">AUG</text><text x="142" y="212">OCT</text><text x="232" y="212">DEC</text>
+                  <text x="322" y="212">FEB</text><text x="412" y="212">APR</text>
+                </g>
+                <text x="44" y="232" fill="#5A6273" fontFamily="Inter, sans-serif" fontSize="11.5">Teal is your building. Gold dashed line is the benchmark.</text>
               </svg>
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* SECTION 2: Feature (What You Get) */}
-      <section
-        id="section-feature"
-        className="py-20 md:py-28"
-        style={{ backgroundColor: '#ffffff' }}
-      >
-        <div className="container-default">
-          <div className="max-w-4xl mx-auto">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: '#1e2749' }}>
-                The TDI Blueprint
-              </h2>
-              <p className="text-lg" style={{ color: '#1e2749', opacity: 0.8 }}>
-                A three-phase partnership that meets your school where you are and grows with you.
-              </p>
             </div>
 
-            {/* Three Phases */}
-            <div className="grid md:grid-cols-3 gap-6 mb-10">
-              <div className="p-6 rounded-xl bg-white shadow-sm hover:shadow-md transition-shadow" style={{ borderTop: '4px solid #ffba06' }}>
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: '#fef3c7' }}>
-                    <svg className="w-5 h-5" fill="none" stroke="#f59e0b" viewBox="0 0 24 24" strokeWidth={2} aria-hidden="true">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M9.879 16.121A3 3 0 1012.015 11L11 14H9c0 .768.293 1.536.879 2.121z" />
-                    </svg>
-                  </div>
-                  <div
-                    className="px-2 py-0.5 text-xs font-bold rounded"
-                    style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
-                  >
-                    PHASE 1
-                  </div>
-                </div>
-                <h3 className="text-xl font-bold mb-3" style={{ color: '#1e2749' }}>Ignite</h3>
-                <p className="text-sm" style={{ color: '#1e2749', opacity: 0.8 }}>
-                  Build buy-in with your leadership team and a pilot group of 10-25 educators. See early wins. Lay the foundation.
-                </p>
-              </div>
-
-              <div className="p-6 rounded-xl bg-white shadow-sm hover:shadow-md transition-shadow" style={{ borderTop: '4px solid #80a4ed' }}>
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: '#dbeafe' }}>
-                    <svg className="w-5 h-5" fill="none" stroke="#3b82f6" viewBox="0 0 24 24" strokeWidth={2} aria-hidden="true">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                    </svg>
-                  </div>
-                  <div
-                    className="px-2 py-0.5 text-xs font-bold rounded"
-                    style={{ backgroundColor: '#80a4ed', color: '#ffffff' }}
-                  >
-                    PHASE 2
-                  </div>
-                </div>
-                <h3 className="text-xl font-bold mb-3" style={{ color: '#1e2749' }}>Accelerate</h3>
-                <p className="text-sm" style={{ color: '#1e2749', opacity: 0.8 }}>
-                  Expand support to your full staff. Strategies get implemented school-wide, not just talked about.
-                </p>
-              </div>
-
-              <div className="p-6 rounded-xl bg-white shadow-sm hover:shadow-md transition-shadow" style={{ borderTop: '4px solid #38618C' }}>
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: '#e0e7ff' }}>
-                    <svg className="w-5 h-5" fill="none" stroke="#4f46e5" viewBox="0 0 24 24" strokeWidth={2} aria-hidden="true">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                    </svg>
-                  </div>
-                  <div
-                    className="px-2 py-0.5 text-xs font-bold rounded"
-                    style={{ backgroundColor: '#38618C', color: '#ffffff' }}
-                  >
-                    PHASE 3
-                  </div>
-                </div>
-                <h3 className="text-xl font-bold mb-3" style={{ color: '#1e2749' }}>Sustain</h3>
-                <p className="text-sm" style={{ color: '#1e2749', opacity: 0.8 }}>
-                  Systems sustain through staff turnover. Your school becomes a model for others.
-                </p>
-              </div>
-            </div>
-
-            <div className="text-center mb-10">
-              <Link
-                href="/how-we-partner"
-                className="inline-flex items-center gap-2 font-semibold transition-all hover:gap-3"
-                style={{ color: '#35A7FF' }}
-              >
-                See exactly what each phase includes
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </Link>
-            </div>
-
-            <div className="p-6 rounded-xl text-center" style={{ backgroundColor: '#f5f5f5' }}>
-              <p className="text-sm md:text-base" style={{ color: '#1e2749', opacity: 0.85 }}>
-                Every phase includes in-person classroom observations with personalized teacher feedback, virtual coaching sessions, Learning Hub access, a Leadership Dashboard with real-time progress tracking, and Executive Impact Sessions for leadership alignment.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* SECTION: Para PD */}
-      <section className="py-20 md:py-28" style={{ backgroundColor: '#1e2749' }}>
-        <div className="container-default">
-          <div className="max-w-4xl mx-auto">
-            <div className="text-center mb-12">
-              <p className="text-sm font-semibold uppercase tracking-widest mb-4" style={{ color: '#ffba06' }}>
-                Paraprofessional PD
-              </p>
-              <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: '#ffffff' }}>
-                Your Paras Deserve Real Training
-              </h2>
-              <p className="text-lg" style={{ color: '#ffffff', opacity: 0.8 }}>
-                Paraprofessionals make up 30 to 40 percent of the staff in many buildings. They do some of the most intensive one-on-one work with students. But most get zero intentional PD designed for their role. We built something for them.
-              </p>
-            </div>
-
-            <div className="grid md:grid-cols-3 gap-6 mb-12">
-              <div className="p-6 rounded-xl" style={{ backgroundColor: 'rgba(255,255,255,0.08)' }}>
-                <div className="w-10 h-10 rounded-lg flex items-center justify-center mb-4" style={{ backgroundColor: 'rgba(255,186,6,0.2)' }}>
-                  <svg className="w-5 h-5" fill="none" stroke="#ffba06" viewBox="0 0 24 24" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                  </svg>
-                </div>
-                <p className="font-semibold mb-2" style={{ color: '#ffffff' }}>
-                  Courses designed for paras
-                </p>
-                <p className="text-sm" style={{ color: '#ffffff', opacity: 0.7 }}>
-                  Not repackaged teacher PD. Built specifically for the way paras work, the challenges they face, and the skills they need.
-                </p>
-              </div>
-
-              <div className="p-6 rounded-xl" style={{ backgroundColor: 'rgba(255,255,255,0.08)' }}>
-                <div className="w-10 h-10 rounded-lg flex items-center justify-center mb-4" style={{ backgroundColor: 'rgba(255,186,6,0.2)' }}>
-                  <svg className="w-5 h-5" fill="none" stroke="#ffba06" viewBox="0 0 24 24" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                  </svg>
-                </div>
-                <p className="font-semibold mb-2" style={{ color: '#ffffff' }}>
-                  Tools they can use today
-                </p>
-                <p className="text-sm" style={{ color: '#ffffff', opacity: 0.7 }}>
-                  Downloadable quick wins, short courses, and practical strategies. A para with 10 minutes can walk away with something useful.
-                </p>
-              </div>
-
-              <div className="p-6 rounded-xl" style={{ backgroundColor: 'rgba(255,255,255,0.08)' }}>
-                <div className="w-10 h-10 rounded-lg flex items-center justify-center mb-4" style={{ backgroundColor: 'rgba(255,186,6,0.2)' }}>
-                  <svg className="w-5 h-5" fill="none" stroke="#ffba06" viewBox="0 0 24 24" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                  </svg>
-                </div>
-                <p className="font-semibold mb-2" style={{ color: '#ffffff' }}>
-                  Facilitated, not just self-paced
-                </p>
-                <p className="text-sm" style={{ color: '#ffffff', opacity: 0.7 }}>
-                  We know paras need facilitation, not just a login. TDI offers in-person and virtual facilitated sessions alongside the Hub.
-                </p>
-              </div>
-            </div>
-
-            <div className="text-center">
-              <Link
-                href="/get-started"
-                className="inline-flex items-center gap-2 px-8 py-4 rounded-xl font-bold text-lg transition-all duration-300 hover:shadow-lg"
-                style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
-              >
-                Get a Custom Para PD Plan
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                </svg>
-              </Link>
-              <p className="text-sm mt-3" style={{ color: '#ffffff', opacity: 0.5 }}>
-                Most schools fund para PD through existing grants. We can help.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* SECTION: Leadership Dashboard Preview */}
-      <section className="py-20 md:py-28" style={{ backgroundColor: '#ffffff' }}>
-        <div className="container-default">
-          <div className="max-w-4xl mx-auto">
-            <div className="text-center mb-10">
-              <p className="text-sm font-semibold uppercase tracking-widest mb-4" style={{ color: '#2B8C96' }}>
-                Your Leadership Dashboard
-              </p>
-              <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: '#1e2749' }}>
-                See What Your Board Will See
-              </h2>
-              <p className="text-lg" style={{ color: '#1e2749', opacity: 0.7 }}>
-                Every TDI partnership includes a live Leadership Dashboard. Real engagement data, progress tracking, observation reports, certificates, and board-ready materials. No more guessing if PD is working.
-              </p>
-            </div>
-
-            <div className="rounded-2xl overflow-hidden shadow-xl border border-gray-200 mb-8">
-              <div className="bg-gradient-to-r from-[#1e2749] to-[#38618C] p-4 flex items-center gap-3">
-                <div className="flex gap-1.5">
-                  <div className="w-3 h-3 rounded-full bg-red-400" />
-                  <div className="w-3 h-3 rounded-full bg-yellow-400" />
-                  <div className="w-3 h-3 rounded-full bg-green-400" />
-                </div>
-                <p className="text-sm font-medium text-white opacity-70">teachersdeserveit.com/partners/your-school</p>
-              </div>
-              <div className="bg-white p-8 md:p-12 text-center">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
-                  <div>
-                    <p className="text-3xl font-bold" style={{ color: '#1e2749' }}>94%</p>
-                    <p className="text-xs" style={{ color: '#6b7280' }}>Staff Logged In</p>
-                  </div>
-                  <div>
-                    <p className="text-3xl font-bold" style={{ color: '#2B8C96' }}>847</p>
-                    <p className="text-xs" style={{ color: '#6b7280' }}>Resources Downloaded</p>
-                  </div>
-                  <div>
-                    <p className="text-3xl font-bold" style={{ color: '#38618C' }}>74%</p>
-                    <p className="text-xs" style={{ color: '#6b7280' }}>Implementation Rate</p>
-                  </div>
-                  <div>
-                    <p className="text-3xl font-bold" style={{ color: '#ffba06' }}>4.8</p>
-                    <p className="text-xs" style={{ color: '#6b7280' }}>Educator Satisfaction</p>
-                  </div>
-                </div>
-                <div className="rounded-2xl overflow-hidden shadow-xl border border-gray-200 mb-6">
-                  <Image src="/hub-welcome/hub-admin-dashboard.png" alt="TDI admin analytics dashboard with real-time data" width={800} height={600} style={{ width: '100%', height: 'auto', display: 'block' }} />
-                </div>
-                <p className="text-center text-xs mb-4" style={{ color: '#9ca3af' }}>Real admin analytics from the TDI Leadership Dashboard</p>
-                <p className="text-sm mb-6" style={{ color: '#6b7280' }}>
-                  Live engagement tracking, observation reports, trend data, certificates, and board materials. All in one place.
-                </p>
-                <Link
-                  href="/Example-Dashboard"
-                  className="inline-flex items-center gap-2 px-8 py-4 rounded-xl font-bold text-lg transition-all duration-300 hover:shadow-lg"
-                  style={{ backgroundColor: '#1e2749', color: '#ffffff' }}
-                >
-                  Explore the Full Dashboard
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                  </svg>
-                </Link>
-              </div>
-            </div>
-
-            <div className="grid md:grid-cols-3 gap-4 text-center">
-              <div className="p-4">
-                <p className="font-semibold text-sm mb-1" style={{ color: '#1e2749' }}>For Your Board</p>
-                <p className="text-xs" style={{ color: '#6b7280' }}>Generate board-ready reports with one click. Real data, not promises.</p>
-              </div>
-              <div className="p-4">
-                <p className="font-semibold text-sm mb-1" style={{ color: '#1e2749' }}>For Your Coaches</p>
-                <p className="text-xs" style={{ color: '#6b7280' }}>Observation reports, implementation tracking, and role-based breakdowns.</p>
-              </div>
-              <div className="p-4">
-                <p className="font-semibold text-sm mb-1" style={{ color: '#1e2749' }}>For Your Team</p>
-                <p className="text-xs" style={{ color: '#6b7280' }}>Certificates, celebration tools, and automated check-ins that keep momentum going.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* SECTION 3: Advantage (What Changes) */}
-      <section
-        id="section-advantage"
-        className="py-20 md:py-28"
-        style={{ backgroundColor: '#f8f9fa' }}
-      >
-        <div className="container-default">
-          <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ color: '#1e2749' }}>
-              What Changes in Your Building
-            </h2>
-            <p className="text-center text-lg mb-12" style={{ color: '#1e2749', opacity: 0.7 }}>
-              This is not about checking boxes. Here is what partner schools report within the first year:
-            </p>
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {/* Card 1 */}
-              <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow flex flex-col">
-                <div className="w-12 h-12 rounded-full flex items-center justify-center mb-4" style={{ backgroundColor: '#f0f9ff' }}>
-                  <svg className="w-6 h-6" fill="none" stroke="#38618C" viewBox="0 0 24 24" strokeWidth={2} aria-hidden="true">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                  </svg>
-                </div>
-                <p className="font-semibold mb-2" style={{ color: '#1e2749' }}>
-                  Habits over months, not inspiration for a day
-                </p>
-                <p className="text-sm mb-3" style={{ color: '#1e2749', opacity: 0.7 }}>
-                  Phased coaching embeds strategies into daily practice through sustained support.
-                </p>
-                <Link href="/how-we-partner" className="text-sm font-medium mt-auto inline-flex items-center gap-1 hover:gap-2 transition-all" style={{ color: '#35A7FF' }}>
-                  See the phases <span aria-hidden="true">→</span>
-                </Link>
-              </div>
-
-              {/* Card 2 */}
-              <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow flex flex-col">
-                <div className="w-12 h-12 rounded-full flex items-center justify-center mb-4" style={{ backgroundColor: '#f0f9ff' }}>
-                  <svg className="w-6 h-6" fill="none" stroke="#38618C" viewBox="0 0 24 24" strokeWidth={2} aria-hidden="true">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                  </svg>
-                </div>
-                <p className="font-semibold mb-2" style={{ color: '#1e2749' }}>
-                  Dashboard builds compliance data automatically
-                </p>
-                <p className="text-sm mb-3" style={{ color: '#1e2749', opacity: 0.7 }}>
-                  Real-time analytics generate board-ready reports without extra admin work.
-                </p>
-                <Link href="/how-we-partner" className="text-sm font-medium mt-auto inline-flex items-center gap-1 hover:gap-2 transition-all" style={{ color: '#35A7FF' }}>
-                  How it works <span aria-hidden="true">→</span>
-                </Link>
-              </div>
-
-              {/* Card 3 */}
-              <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow flex flex-col">
-                <div className="w-12 h-12 rounded-full flex items-center justify-center mb-4" style={{ backgroundColor: '#f0f9ff' }}>
-                  <svg className="w-6 h-6" fill="none" stroke="#38618C" viewBox="0 0 24 24" strokeWidth={2} aria-hidden="true">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                  </svg>
-                </div>
-                <p className="font-semibold mb-2" style={{ color: '#1e2749' }}>
-                  Observations teachers look forward to
-                </p>
-                <p className="text-sm mb-3" style={{ color: '#1e2749', opacity: 0.7 }}>
-                  Love Notes highlight strengths - 94% of teachers recommend TDI to colleagues.
-                </p>
-                <Link href="/how-we-partner" className="text-sm font-medium mt-auto inline-flex items-center gap-1 hover:gap-2 transition-all" style={{ color: '#35A7FF' }}>
-                  About Love Notes <span aria-hidden="true">→</span>
-                </Link>
-              </div>
-
-              {/* Card 4 */}
-              <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow flex flex-col">
-                <div className="w-12 h-12 rounded-full flex items-center justify-center mb-4" style={{ backgroundColor: '#f0f9ff' }}>
-                  <svg className="w-6 h-6" fill="none" stroke="#38618C" viewBox="0 0 24 24" strokeWidth={2} aria-hidden="true">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                  </svg>
-                </div>
-                <p className="font-semibold mb-2" style={{ color: '#1e2749' }}>
-                  One aligned playbook, not random resources
-                </p>
-                <p className="text-sm mb-3" style={{ color: '#1e2749', opacity: 0.7 }}>
-                  The Hub gives every teacher the same strategies, language, and tools.
-                </p>
-                <Link href="/how-we-partner" className="text-sm font-medium mt-auto inline-flex items-center gap-1 hover:gap-2 transition-all" style={{ color: '#35A7FF' }}>
-                  Explore The Hub <span aria-hidden="true">→</span>
-                </Link>
-              </div>
-
-              {/* Card 5 */}
-              <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow flex flex-col">
-                <div className="w-12 h-12 rounded-full flex items-center justify-center mb-4" style={{ backgroundColor: '#f0f9ff' }}>
-                  <svg className="w-6 h-6" fill="none" stroke="#38618C" viewBox="0 0 24 24" strokeWidth={2} aria-hidden="true">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                  </svg>
-                </div>
-                <p className="font-semibold mb-2" style={{ color: '#1e2749' }}>
-                  Leadership aligned before spending begins
-                </p>
-                <p className="text-sm mb-3" style={{ color: '#1e2749', opacity: 0.7 }}>
-                  Kickoff sessions ensure admin and teachers share the same goals from day one.
-                </p>
-                <Link href="/how-we-partner" className="text-sm font-medium mt-auto inline-flex items-center gap-1 hover:gap-2 transition-all" style={{ color: '#35A7FF' }}>
-                  See the process <span aria-hidden="true">→</span>
-                </Link>
-              </div>
-
-              {/* Card 6 */}
-              <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow flex flex-col">
-                <div className="w-12 h-12 rounded-full flex items-center justify-center mb-4" style={{ backgroundColor: '#f0f9ff' }}>
-                  <svg className="w-6 h-6" fill="none" stroke="#38618C" viewBox="0 0 24 24" strokeWidth={2} aria-hidden="true">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                  </svg>
-                </div>
-                <p className="font-semibold mb-2" style={{ color: '#1e2749' }}>
-                  Stress and burnout data you can track
-                </p>
-                <p className="text-sm mb-3" style={{ color: '#1e2749', opacity: 0.7 }}>
-                  Measure wellbeing over time and see the direct impact on retention.
-                </p>
-                <a href="#section-proof" className="text-sm font-medium mt-auto inline-flex items-center gap-1 hover:gap-2 transition-all" style={{ color: '#35A7FF' }}>
-                  See the results <span aria-hidden="true">→</span>
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* SECTION 4: Benefit (The Math) */}
-      <section
-        id="section-benefit"
-        className="py-16 md:py-20 px-6"
-        style={{ backgroundColor: '#f5f5f5' }}
-      >
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-12">
-            <div className="text-xs uppercase tracking-widest font-bold mb-3" style={{ color: '#F96767' }}>
-              The Math
-            </div>
-            <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: '#1e2749', fontFamily: 'serif' }}>
-              Where does your PD budget actually go?
-            </h2>
-            <p className="text-lg max-w-2xl mx-auto" style={{ color: '#4b5563' }}>
-              Most schools spend $15-20K a year on PD that produces a 10% implementation rate. TDI delivers 74%. 7.4x the classroom impact - and most schools already have the funding.
-            </p>
-          </div>
-          <CompactAdmin />
-        </div>
-      </section>
-
-      {/* SECTION 5: Mid-Page CTA */}
-      <section
-        id="section-midcta"
-        className="py-16 md:py-20 relative overflow-hidden"
-        style={{ background: 'linear-gradient(135deg, #38618C 0%, #80a4ed 100%)' }}
-      >
-        {/* Subtle pattern overlay */}
-        <div
-          className="absolute inset-0 opacity-10"
-          style={{
-            backgroundImage: 'radial-gradient(circle at 50% 50%, #ffffff 1px, transparent 1px)',
-            backgroundSize: '30px 30px',
-          }}
-        />
-        <div className="container-default text-center relative z-10">
-          <h2 className="text-2xl md:text-3xl font-bold mb-6" style={{ color: '#ffffff' }}>
-            Ready to see the numbers for your school?
-          </h2>
-          <Link
-            href="/get-started"
-            className="inline-block px-8 py-4 rounded-lg font-bold text-lg transition-all hover:scale-105 hover:shadow-lg"
-            style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
-          >
-            Get Your Free PD Plan
-          </Link>
-        </div>
-      </section>
-
-      {/* SECTION 6: Proof (Verified Results) */}
-      <section
-        id="section-proof"
-        className="py-20 md:py-28"
-        style={{ backgroundColor: '#f8f9fa' }}
-      >
-        <div className="container-default">
-          <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-bold text-center mb-12" style={{ color: '#1e2749' }}>
-              Verified Results from Partner Schools
-            </h2>
-
-            {/* Results Table */}
-            <div className="rounded-xl overflow-hidden mb-4 shadow-sm" style={{ border: '1px solid #e5e7eb' }}>
-              <div className="grid grid-cols-3 text-sm font-bold" style={{ backgroundColor: '#1e2749', color: '#ffffff' }}>
-                <div className="p-3 border-r border-white/20">Before TDI</div>
-                <div className="p-3 border-r border-white/20">After TDI</div>
-                <div className="p-3">What Changed</div>
-              </div>
-              <div className="grid grid-cols-3 text-sm border-b" style={{ borderColor: '#e5e7eb' }}>
-                <div className="p-3 border-r" style={{ borderColor: '#e5e7eb', color: '#ef4444' }}>12 hours/week</div>
-                <div className="p-3 border-r" style={{ borderColor: '#e5e7eb', color: '#22c55e' }}>6-8 hours/week</div>
-                <div className="p-3" style={{ color: '#1e2749' }}>Weekly planning time</div>
-              </div>
-              <div className="grid grid-cols-3 text-sm border-b" style={{ borderColor: '#e5e7eb', backgroundColor: '#f5f5f5' }}>
-                <div className="p-3 border-r" style={{ borderColor: '#e5e7eb', color: '#ef4444' }}>9 out of 10</div>
-                <div className="p-3 border-r" style={{ borderColor: '#e5e7eb', color: '#22c55e' }}>5-7 out of 10</div>
-                <div className="p-3" style={{ color: '#1e2749' }}>Staff stress levels</div>
-              </div>
-              <div className="grid grid-cols-3 text-sm border-b" style={{ borderColor: '#e5e7eb' }}>
-                <div className="p-3 border-r" style={{ borderColor: '#e5e7eb', color: '#ef4444' }}>2-4 out of 10</div>
-                <div className="p-3 border-r" style={{ borderColor: '#e5e7eb', color: '#22c55e' }}>5-7 out of 10</div>
-                <div className="p-3" style={{ color: '#1e2749' }}>Teacher retention intent</div>
-              </div>
-              <div className="grid grid-cols-3 text-sm" style={{ backgroundColor: '#f5f5f5' }}>
-                <div className="p-3 border-r" style={{ borderColor: '#e5e7eb', color: '#ef4444' }}>10% industry average</div>
-                <div className="p-3 border-r" style={{ borderColor: '#e5e7eb', color: '#22c55e' }}>74% with TDI</div>
-                <div className="p-3" style={{ color: '#1e2749' }}>Strategy implementation rate</div>
-              </div>
-            </div>
-
-            {/* Research Footnote */}
-            <p className="text-xs mb-10" style={{ color: '#1e2749', opacity: 0.5 }}>
-              Implementation baseline: Joyce & Showers (1980, 2002) found that traditional &quot;sit-and-get&quot; PD produces 5-10% classroom transfer. Sustained coaching models produce 80-90%. TDI&apos;s 74% reflects real partner data within this research-backed range.
-            </p>
-
-          </div>
-        </div>
-      </section>
-
-      {/* SECTION 7: Funding */}
-      <section
-        id="section-funding"
-        className="py-20 md:py-28"
-        style={{ backgroundColor: '#ffffff' }}
-      >
-        <div className="container-default">
-          <div className="max-w-3xl mx-auto">
-            {/* Heading with icon */}
-            <div className="flex items-center justify-center gap-3 mb-8">
-              <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ backgroundColor: '#f0fdf4' }}>
-                <svg className="w-6 h-6" fill="none" stroke="#22c55e" viewBox="0 0 24 24" strokeWidth={2} aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <h2 className="text-3xl md:text-4xl font-bold" style={{ color: '#1e2749' }}>
-                80% of Partner Schools Secure External Funding
-              </h2>
-            </div>
-
-            {/* Content with checkmarks */}
-            <div className="space-y-4 mb-8">
-              <div className="flex items-start gap-3">
-                <svg className="w-5 h-5 mt-1 flex-shrink-0" fill="#22c55e" viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                </svg>
-                <p className="text-lg" style={{ color: '#1e2749', opacity: 0.85 }}>
-                  TDI services qualify under Title II-A, Title IV-A, and most state professional development grants. We help you identify which sources apply and provide alignment language for your application.
-                </p>
-              </div>
-              <div className="flex items-start gap-3">
-                <svg className="w-5 h-5 mt-1 flex-shrink-0" fill="#22c55e" viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                </svg>
-                <p className="text-lg" style={{ color: '#1e2749', opacity: 0.85 }}>
-                  Some districts may still have unspent ESSER funds available through September 2026. Check with your business office.
-                </p>
-              </div>
-              <div className="flex items-start gap-3">
-                <svg className="w-5 h-5 mt-1 flex-shrink-0" fill="#22c55e" viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                </svg>
-                <p className="text-lg" style={{ color: '#1e2749', opacity: 0.85 }}>
-                  We find the funding, write the grant, and build the evidence your application needs. Our team researches federal, state, and local funding sources - including Title II-A, Title IV-A, private foundations, corporate education grants, and community-based funding opportunities most schools never find on their own. We draft the alignment language, assemble your documentation, and walk you through the submission. That is why 80% of our partner schools secure external funding.
-                </p>
-              </div>
-            </div>
-
-            <div className="text-center">
-              <Link
-                href="/funding"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all hover:gap-3"
-                style={{ backgroundColor: '#f0fdf4', color: '#15803d' }}
-              >
-                Explore Funding Options
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* SECTION 7b: District Summary Download */}
-      <section
-        className="py-16 md:py-20"
-        style={{ background: 'linear-gradient(135deg, #1B365D 0%, #2d4a7a 100%)' }}
-      >
-        <div className="container-default">
-          <div className="max-w-3xl mx-auto text-center">
-            <p className="text-sm font-bold tracking-widest uppercase mb-4" style={{ color: '#F4C430' }}>
-              District Leadership Resource
-            </p>
-            <h2 className="text-2xl md:text-3xl font-bold mb-4" style={{ color: '#ffffff' }}>
-              Download the TDI District Summary
-            </h2>
-            <p className="text-lg mb-8 max-w-xl mx-auto" style={{ color: 'rgba(255,255,255,0.8)' }}>
-              One page. Everything your leadership team needs to start the conversation — 100,000+ educators, all 50 states, 94% would recommend.
-            </p>
-            <a
-              href="/district-summary.pdf"
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => {
-                if (typeof window !== 'undefined' && (window as unknown as { gtag?: (...args: unknown[]) => void }).gtag) {
-                  (window as unknown as { gtag: (...args: unknown[]) => void }).gtag('event', 'file_download', {
-                    file_name: 'district-summary.pdf',
-                    file_extension: 'pdf',
-                    link_text: 'Download District Summary PDF',
-                    page_location: window.location.href,
-                  });
-                }
-              }}
-              className="inline-flex items-center gap-3 px-8 py-4 rounded-lg font-bold text-lg transition-all hover:scale-105 hover:shadow-lg"
-              style={{ backgroundColor: '#F4C430', color: '#1B365D' }}
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2} aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            <div>
+              <h4 style={{"color": "var(--focus)", "marginBottom": "6px"}}>Planned use, month by month (The Focus)</h4>
+              <p style={{"fontSize": ".95rem", "color": "var(--muted)"}}>October&apos;s dip is the signal. A tool most of your building skips tells you the focus is wrong, or the tool is.</p>
+              <svg viewBox="0 0 520 240" width="100%" role="img" aria-label="Bar chart of planned-use rate by month, dipping in October and recovering through the spring.">
+                <g stroke="#E2E5EA" strokeWidth="1">
+                  <line x1="44" y1="40" x2="500" y2="40"/><line x1="44" y1="90" x2="500" y2="90"/><line x1="44" y1="140" x2="500" y2="140"/>
+                </g>
+                <g fill="#5A6273" fontFamily="Inter, sans-serif" fontSize="11">
+                  <text x="10" y="44">80%</text><text x="10" y="94">60%</text><text x="10" y="144">40%</text>
+                </g>
+                <g fill="#B0651F">
+                  <rect x="58" y="55" width="38" height="135" rx="3"/>
+                  <rect x="108" y="92" width="38" height="98" rx="3"/>
+                  <rect x="158" y="70" width="38" height="120" rx="3"/>
+                  <rect x="208" y="62" width="38" height="128" rx="3"/>
+                  <rect x="258" y="48" width="38" height="142" rx="3"/>
+                  <rect x="308" y="58" width="38" height="132" rx="3"/>
+                  <rect x="358" y="43" width="38" height="147" rx="3"/>
+                  <rect x="408" y="50" width="38" height="140" rx="3"/>
+                </g>
+                <rect x="108" y="92" width="38" height="98" rx="3" fill="none" stroke="#1E2A4A" strokeWidth="2" strokeDasharray="4 3"/>
+                <g fill="#5A6273" fontFamily="Inter, sans-serif" fontSize="11.5">
+                  <text x="63" y="208">SEP</text><text x="113" y="208">OCT</text><text x="163" y="208">NOV</text><text x="213" y="208">DEC</text>
+                  <text x="263" y="208">JAN</text><text x="313" y="208">FEB</text><text x="363" y="208">MAR</text><text x="413" y="208">APR</text>
+                </g>
+                <text x="44" y="230" fill="#5A6273" fontFamily="Inter, sans-serif" fontSize="11.5">42 of 51 staff responded in November.</text>
               </svg>
-              Download District Summary PDF
-            </a>
-            <p className="mt-4 text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>
-              No email required — free and instant.
-            </p>
+            </div>
+          </div>
+
+          <div className="fs-grid2" style={{"marginTop": "56px"}}>
+            <div>
+              <h4 style={{"color": "var(--cohort)", "marginBottom": "6px"}}>Where they started against March (The Cohort)</h4>
+              <p style={{"fontSize": ".95rem", "color": "var(--muted)"}}>Measured before the first session, so the change across the year is the proof.</p>
+              <svg viewBox="0 0 520 210" width="100%" role="img" aria-label="Bar chart comparing September baseline to March results for feeling of support, stress, and intent to return.">
+                <g fontFamily="Inter, sans-serif" fontSize="12.5" fill="#1E2A4A">
+                  <text x="0" y="34">Feeling of support</text><text x="0" y="94">Stress</text><text x="0" y="154">Intent to return</text>
+                </g>
+                <g fill="#EEF0F3">
+                  <rect x="150" y="20" width="340" height="20" rx="4"/>
+                  <rect x="150" y="80" width="340" height="20" rx="4"/>
+                  <rect x="150" y="140" width="340" height="20" rx="4"/>
+                </g>
+                <g fill="#5A4A87">
+                  <rect x="150" y="20" width="241" height="20" rx="4"/>
+                  <rect x="150" y="80" width="184" height="20" rx="4"/>
+                  <rect x="150" y="140" width="258" height="20" rx="4"/>
+                </g>
+                <g stroke="#F9B91B" strokeWidth="3">
+                  <line x1="279" y1="16" x2="279" y2="44"/>
+                  <line x1="418" y1="76" x2="418" y2="104"/>
+                  <line x1="293" y1="136" x2="293" y2="164"/>
+                </g>
+                <g fontFamily="Inter, sans-serif" fontSize="12.5" fontWeight="700" fill="#1E2A4A">
+                  <text x="400" y="36">3.8 → 7.1</text><text x="343" y="96">7.9 → 5.4</text><text x="417" y="156">4.2 → 7.6</text>
+                </g>
+                <text x="0" y="196" fill="#5A6273" fontFamily="Inter, sans-serif" fontSize="11.5">Plum bar is March. Gold line is where they started in September. Cohort of 10.</text>
+              </svg>
+            </div>
+            <div>
+              <div className="fs-card" style={{"borderLeft": "4px solid var(--cohort)"}}>
+                <h4>What leadership took to the board</h4>
+                <p style={{"color": "var(--ink)", "fontSize": "1.02rem"}}>Ten paras started the year at 4.2 out of 10 on intent to return. By March they were at 7.6. Nine of the ten are coming back next year, and the district knows exactly what that cost.</p>
+                <p style={{"marginTop": "14px", "fontSize": ".9rem"}}>Pulled from the dashboard in one click, formatted to forward.</p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Certified in All 50 States */}
-      <section style={{ padding: '56px 16px', backgroundColor: '#E6F1FB' }}>
-        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: 32 }}>
-            <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: 1.5, textTransform: 'uppercase', color: '#2A9D8F', marginBottom: 12 }}>
-              ADMIN-FRIENDLY APPROVAL
-            </p>
-            <h2 style={{ fontSize: 36, fontWeight: 700, color: '#1e2749', margin: '0 0 16px 0', lineHeight: 1.2 }}>
-              Yes, we're approved in your state
-            </h2>
-            <p style={{ fontSize: 17, color: '#6B7280', maxWidth: 640, margin: '0 auto', lineHeight: 1.5 }}>
-              TDI PD credits are pre-approved in all 50 US states. Hover your state to confirm. Click for your state Department of Education link.
-            </p>
+      <section className="fs-sec" id="proof">
+        <div className="fs-wrap">
+          <div className="fs-head-narrow">
+            <p className="fs-kicker">The strategic exit</p>
+            <h2>The proof arrives before the budget conversation, not during it.</h2>
+            <p className="fs-lede">Every offering ends the same way on the same calendar, whichever one you start with.</p>
           </div>
-          <CertifiedStatesMap />
-        </div>
-      </section>
-
-      {/* SECTION 8: Objections FAQ */}
-      <section
-        id="section-faq"
-        className="py-20 md:py-28"
-        style={{ backgroundColor: '#f8f9fa' }}
-      >
-        <div className="container-default">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ color: '#1e2749' }}>
-            What Other School Leaders Asked<br />Before Partnering
-          </h2>
-          <p className="text-center mb-12 max-w-2xl mx-auto" style={{ color: '#1e2749', opacity: 0.7 }}>
-            Real questions from administrators just like you.
-          </p>
-          <FAQAccordion items={faqItems} />
-        </div>
-      </section>
-
-      {/* SECTION 9: Final CTA */}
-      {/* Team Strip */}
-      <section style={{ backgroundColor: '#F0FAF6', borderTop: '0.5px solid #D4EDE0', borderBottom: '0.5px solid #D4EDE0' }}>
-        <div className="container-default">
-          <TeamStrip
-            members={[
-              { type: 'team', name: 'Jim Ford', imageSlug: 'jim-ford', isHuman: true },
-              { type: 'team', name: 'Holly Scott', imageSlug: 'holly-scott' },
-              { type: 'team', name: 'Olivia Smith', imageSlug: 'olivia-smith' },
-              { type: 'team', name: 'Nora Reeves', imageSlug: 'nora-reeves' },
-              { type: 'team', name: 'Dr. Maya Johnson', imageSlug: 'maya-johnson' },
-              { type: 'team', name: 'Elena Vasquez', imageSlug: 'elena-vasquez' },
-              { type: 'creator', name: 'Dr. Stephanie Nardi', topic: 'Science' },
-              { type: 'creator', name: 'Catherine Dorian', topic: 'Literacy' },
-            ]}
-            copy="When you partner with TDI, you get a team that doesn't disappear after signing."
-          />
-        </div>
-      </section>
-
-      <section
-        id="section-finalcta"
-        className="py-20 md:py-28 relative overflow-hidden"
-        style={{ background: 'linear-gradient(135deg, #1e2749 0%, #2d3a5f 50%, #1e2749 100%)' }}
-      >
-        {/* Subtle animated gradient overlay */}
-        <div
-          className="absolute inset-0 opacity-20"
-          style={{
-            backgroundImage: 'radial-gradient(ellipse at 30% 20%, #38618C 0%, transparent 50%), radial-gradient(ellipse at 70% 80%, #80a4ed 0%, transparent 50%)',
-          }}
-        />
-        <div className="container-default text-center relative z-10">
-          <h2 className="text-2xl md:text-4xl font-bold mb-4" style={{ color: '#ffffff' }}>
-            Ready to Start the Conversation?
-          </h2>
-          <p className="text-lg mb-10 max-w-2xl mx-auto" style={{ color: '#ffffff', opacity: 0.9 }}>
-            No pressure. No pitch. Just a conversation about what is possible for your school.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Link
-              href="/get-started"
-              className="inline-block px-8 py-4 rounded-lg font-bold text-lg transition-all hover:scale-105 hover:shadow-lg"
-              style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
-            >
-              Get Your Free PD Plan
-            </Link>
-            <Link
-              href="/contact"
-              className="inline-block px-8 py-4 rounded-lg font-bold text-lg border-2 transition-all hover:bg-white/10"
-              style={{ borderColor: 'rgba(255, 255, 255, 0.5)', color: '#ffffff' }}
-            >
-              Start the Conversation
-            </Link>
+          <div className="fs-rail">
+            <div className="fs-stop">
+              <div className="fs-when">Early March</div>
+              <p>One page. Where you started against where you are, formatted to be forwarded to a superintendent or dropped into a board packet. It includes one honest line naming what that offering&apos;s data still can&apos;t tell you.</p>
+            </div>
+            <div className="fs-stop">
+              <div className="fs-when">April &amp; May</div>
+              <p>Budget discussions. You walk in already holding the number rather than promising to have one by June.</p>
+            </div>
+            <div className="fs-stop">
+              <div className="fs-when">June</div>
+              <p>The year-end wrap. Full-year trend, what changed, what carries forward if you continue and what resets if you don&apos;t.</p>
+            </div>
+            <div className="fs-stop fs-dim">
+              <div className="fs-when">Year two</div>
+              <p>Where the trend becomes worth something. Stopping means losing your own longitudinal data. We say that plainly rather than burying it.</p>
+            </div>
           </div>
-          <p className="mt-8 text-sm" style={{ color: '#ffffff' }}>
-            Or email us at{' '}
-            <a href="mailto:hello@teachersdeserveit.com" className="underline" style={{ color: '#ffffff' }}>
-              hello@teachersdeserveit.com
-            </a>
-          </p>
+          <p style={{"fontSize": ".9rem", "color": "var(--muted)", "marginTop": "36px", "maxWidth": "76ch"}}>Contracts run January–December or August–July, with two summer months turned off to match your calendar. A contract signed in August yields roughly seven months of data by early March. That is enough for a real trend on weekly measures, thinner on year-long outcomes like cohort retention.</p>
         </div>
       </section>
-    </main>
+
+      <section className="fs-sec fs-sec-white" id="dashboard">
+        <div className="fs-wrap">
+          <div className="fs-head-narrow">
+            <p className="fs-kicker">Your leadership dashboard</p>
+            <h2>One place, populated automatically, whichever offering you bought.</h2>
+            <p className="fs-lede">Live engagement data, trend lines, observation reports where they apply, certificates and board-ready exports. Nothing for your team to assemble.</p>
+          </div>
+          <div className="fs-grid3">
+            <div className="fs-card"><h4>For your board</h4><p>Board-ready reports in one click. Exported in a format that survives being pasted into someone else&apos;s deck.</p></div>
+            <div className="fs-card"><h4>For your coaches</h4><p>Implementation tracking and role-based breakdowns, filtered by grade, role and building.</p></div>
+            <div className="fs-card"><h4>For your team</h4><p>Certificates, PD clock hours, celebration tools and automated check-ins that keep momentum going.</p></div>
+          </div>
+          <div className="fs-btnrow" style={{"marginTop": "36px"}}>
+            <a className="fs-btn fs-btn-navy" href="/Example-Dashboard">Explore a live example dashboard</a>
+          </div>
+        </div>
+      </section>
+
+      <section className="fs-sec">
+        <div className="fs-wrap">
+          <div className="fs-head-narrow">
+            <p className="fs-kicker">Verified results from partner schools</p>
+            <h2>What changed in buildings that stayed a full year.</h2>
+          </div>
+          <div className="fs-tablewrap">
+            <table>
+              <thead><tr><th scope="col">What changed</th><th scope="col">Before TDI</th><th scope="col">After TDI</th></tr></thead>
+              <tbody>
+                <tr><th scope="row">Weekly planning time</th><td>12 hours</td><td><b>6–8 hours</b></td></tr>
+                <tr><th scope="row">Staff stress levels</th><td>9 out of 10</td><td><b>5–7 out of 10</b></td></tr>
+                <tr><th scope="row">Teacher retention intent</th><td>2–4 out of 10</td><td><b>5–7 out of 10</b></td></tr>
+                <tr><th scope="row">Strategy implementation</th><td>10% industry average</td><td><b>74% with TDI</b></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section className="fs-sec fs-sec-white" id="funding">
+        <div className="fs-wrap fs-fundband">
+          <div>
+            <h2>Most of our schools don&apos;t pay the full cost of this themselves.</h2>
+            <p className="fs-lede">We find the funding, write the grant, and build the evidence the application needs, so outside money covers what your own budget can&apos;t. Helping you get it costs you nothing.</p>
+          </div>
+          <div>
+            <a className="fs-btn fs-btn-navy" href="/funding">See how we help you fund it</a>
+          </div>
+        </div>
+      </section>
+
+      <section className="fs-sec fs-sec-white" id="questions">
+        <div className="fs-wrap">
+          <div className="fs-head-narrow">
+            <p className="fs-kicker">What other leaders asked first</p>
+            <h2>The questions administrators actually open with.</h2>
+          </div>
+          <div className="fs-faq">
+            <details>
+              <summary>We don&apos;t have the budget for this.</summary>
+              <div className="fs-ans"><p>Then start with The Pulse. Working with us starts at $2,500 for a year, and most of our schools don&apos;t cover the full cost themselves, because we help them go get outside funding for it. We&apos;ll give you your exact number in a 20-minute call, and if it doesn&apos;t prove itself by March you&apos;ll know before you have to decide about next year.</p></div>
+            </details>
+            <details>
+              <summary>We need to see results before committing to a full partnership.</summary>
+              <div className="fs-ans"><p>That&apos;s how these are designed. The Pulse, The Focus and The Cohort each stand alone at a size a principal can approve, and each one produces a one-page proof report in early March. Nothing about starting small obligates you to anything bigger.</p></div>
+            </details>
+            <details>
+              <summary>We&apos;ve tried coaching partnerships before and they didn&apos;t stick.</summary>
+              <div className="fs-ans"><p>Most of what we do now doesn&apos;t depend on a coach showing up. The Pulse and The Focus run on automated delivery and reporting. No facilitator to lose, no session to reschedule, nothing that stops working when a person leaves.</p></div>
+            </details>
+            <details>
+              <summary>Our staff are already overloaded. This is one more thing.</summary>
+              <div className="fs-ans"><p>Three seconds a week for The Pulse. One tap a month for The Focus. No survey day, no staff meeting, no new login. The Focus specifically is built around the initiative you already chose, so it adds tools rather than priorities.</p></div>
+            </details>
+            <details>
+              <summary>Our union won&apos;t support observation-based PD.</summary>
+              <div className="fs-ans"><p>Observations only exist inside The Blueprint, and they&apos;re separate from evaluation with fixed look-fors and strengths named before gaps. The other three offerings involve no observation at all.</p></div>
+            </details>
+            <details>
+              <summary>Will staff answers be traceable back to individuals?</summary>
+              <div className="fs-ans"><p>No. Staff are told this in the first message and again in the footer of every check-in. Individual answers are never shown to anyone at their school, results roll up as group averages, and non-responders stay invisible. Leaders see a response rate, never a list of who skipped.</p></div>
+            </details>
+            <details>
+              <summary>We already have an instructional coach on staff.</summary>
+              <div className="fs-ans"><p>Good. None of this replaces them. The Pulse gives them culture data they can&apos;t collect themselves, and The Focus gives them ready-built tools so their time goes to the conversations instead of the prep.</p></div>
+            </details>
+            <details>
+              <summary>What happens to our data if we don&apos;t renew?</summary>
+              <div className="fs-ans"><p>We keep it for 12 months, then delete it. If you come back within a year you pick up your own trend line. Anonymized data stays in the benchmark pool either way.</p></div>
+            </details>
+          </div>
+        </div>
+      </section>
+
+      <section className="fs-sec" id="downloads">
+        <div className="fs-wrap">
+          <div className="fs-head-narrow">
+            <p className="fs-kicker">Take it to your team</p>
+            <h2>Everything on this page, on paper.</h2>
+            <p className="fs-lede">No email required. Built to be printed, forwarded, or dropped into a board packet as-is.</p>
+          </div>
+          <div className="fs-dl-grid">
+            <a className="fs-dl" href="/district-summary.pdf" style={{"--c":"var(--gold)"} as React.CSSProperties}><b>TDI district summary</b><span>One page &middot; 100,000+ educators, all 50 states, 94% would recommend</span></a>
+            <a className="fs-dl" href="/get-started" style={{"--c":"var(--navy)"} as React.CSSProperties}><b>The four one-pagers</b><span>Two pages each &middot; ask and we&apos;ll send them the same day</span></a>
+          </div>
+        </div>
+      </section>
+
+      <section className="fs-finale">
+        <div className="fs-wrap">
+          <h2>Ready to start the conversation?</h2>
+          <p>No pressure and no pitch. Tell us the problem you&apos;d name first and we&apos;ll tell you which of the four fits, including when the answer is none of them yet.</p>
+          <div className="fs-btnrow">
+            <a className="fs-btn fs-btn-gold" href="/get-started">Get your free PD plan</a>
+          </div>
+          <p className="fs-hero-note">Or email us at hello@teachersdeserveit.com</p>
+        </div>
+      </section>
+
+
+      <div className="fs-stickybar">
+        <a className="fs-btn fs-btn-outline" href="#achieves">What you get</a>
+        <a className="fs-btn fs-btn-navy" href="/get-started">Request a quote</a>
+      </div>
+    </div>
   );
 }
