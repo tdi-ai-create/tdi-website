@@ -2,6 +2,7 @@
 import React from 'react'
 import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer'
 import { categoryColor, NAVY } from '@/lib/hub/categoryColors'
+import { AlertBlock, SmallPrint, type Alert, type SmallPrintBlock } from './weights'
 
 const navy = '#1E2749'
 const gold = '#E8B84B'
@@ -41,6 +42,10 @@ export interface FormData {
   category?: string
   description?: string
   meta?: { label: string; value: string }[]
+  /** Weight 1. Safety or anything overriding the rest. At most one per form. */
+  alert?: Alert
+  /** Weight 5. Scope notes and citations. */
+  small_print?: SmallPrintBlock[]
   sections: {
     heading?: string
     fields: {
@@ -75,11 +80,14 @@ export function FormPDF({ data }: { data: FormData }) {
           </View>
         ) : null}
         <View style={s.content}>
+          <AlertBlock alert={data.alert} />
           {data.sections.map((section, si) => (
             <View key={si}>
-              {section.heading ? <Text style={s.sectionHeader}>{section.heading}</Text> : null}
+              {section.heading ? (
+                <Text style={s.sectionHeader} minPresenceAhead={44}>{section.heading}</Text>
+              ) : null}
               {section.fields.map((field, fi) => (
-                <View key={fi} style={s.fieldBlock}>
+                <View key={fi} style={s.fieldBlock} wrap={false}>
                   <Text style={s.fieldLabel}>{field.label}</Text>
                   {field.hint ? <Text style={s.fieldHint}>{field.hint}</Text> : null}
                   {field.type === 'line' ? <View style={s.fieldLine} /> : null}
@@ -90,6 +98,7 @@ export function FormPDF({ data }: { data: FormData }) {
               ))}
             </View>
           ))}
+          <SmallPrint blocks={data.small_print} />
         </View>
         <View style={s.footer} fixed>
           <Text style={s.footerText}>Teachers Deserve It</Text>
