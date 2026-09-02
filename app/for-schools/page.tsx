@@ -20,8 +20,8 @@ export default function ForSchoolsPage() {
             <p className="fs-cap">Each one stands alone. None is a trial run for another.</p>
             <div className="fs-fourlist">
               <div className="fs-frow" style={{"--a": "#5FBDB8"} as React.CSSProperties}><b>The Pulse</b><span>A weekly three-second check on how staff are actually doing.</span></div>
-              <div className="fs-frow" style={{"--a": "#E9A96A"} as React.CSSProperties}><b>The Focus</b><span>Thirteen ready-built tools for the initiative you already chose.</span></div>
-              <div className="fs-frow" style={{"--a": "#A99AD8"} as React.CSSProperties}><b>The Cohort</b><span>Ten people, four sessions, measured before session one.</span></div>
+              <div className="fs-frow" style={{"--a": "#E9A96A"} as React.CSSProperties}><b>The Focus</b><span>13 ready-built tools for the initiative you already chose.</span></div>
+              <div className="fs-frow" style={{"--a": "#A99AD8"} as React.CSSProperties}><b>The Cohort</b><span>10 people, four sessions, measured before session one.</span></div>
               <div className="fs-frow" style={{"--a": "#F9B91B"} as React.CSSProperties}><b>The Blueprint</b><span>All of it, working as one system across the district.</span></div>
             </div>
           </div>
@@ -51,7 +51,7 @@ export default function ForSchoolsPage() {
         <div className="fs-wrap">
           <div className="fs-head-narrow">
             <p className="fs-kicker">What this is for</p>
-            <h2>Ten things a school gets out of working with us.</h2>
+            <h2>10 things a school gets out of working with us.</h2>
             <p className="fs-lede">Sorted by what your building achieves rather than by what we deliver. The four offerings below are different routes into this list. The Blueprint is all of it at once.</p>
           </div>
           <div className="fs-ocgrid">
@@ -137,7 +137,7 @@ export default function ForSchoolsPage() {
               <p className="fs-ican-h">What a leader can say by March</p>
               <ul className="fs-ican"><li>I can put real tools behind the initiative I already committed to</li><li>I can see whether my staff are actually using what we send</li><li>I can find out which parts of our focus staff are struggling with most</li><li>I can catch a focus that is not working in November instead of June</li><li>I can add support without adding a meeting, a PD day, or a new priority</li><li>I can get told what to do next instead of handed another dashboard to interpret</li><li>I can sit down twice a year with someone outside the building and decide what to change</li></ul>
               <div className="fs-mech">
-                <b>How it runs.</b> You name the area your district is already working on. Thirteen tools across the year, one every three weeks, built for it and sent inside the email with a printable version underneath. All thirteen dates are set when you sign. One tap back: planning it, skipping it, or want help. Two 45-minute sessions with your leadership team, mid-November and early March, both booked at signing. Those two conversations are your whole time commitment for the year.
+                <b>How it runs.</b> You name the area your district is already working on. 13 tools across the year, one every three weeks, built for it and sent inside the email with a printable version underneath. All 13 dates are set when you sign. One tap back: planning it, skipping it, or want help. Two 45-minute sessions with your leadership team, mid-November and early March, both booked at signing. Those two conversations are your whole time commitment for the year.
                 <br /><b>How it is measured.</b> Planned-use rate across the year, skip rate by tool and by group, and the volume and clustering of help requests.
               </div>
               <div className="fs-foot"><a className="fs-go" href="/get-started">Request a quote</a></div>
@@ -149,7 +149,7 @@ export default function ForSchoolsPage() {
               <p className="fs-ican-h">What a leader can say by March</p>
               <ul className="fs-ican"><li>I can give a specific group real support instead of hoping they figure it out</li><li>I can see whether that group moved from where they started</li><li>I can tell whether the people I invested in actually stayed</li><li>I can support paras or new teachers without building a program myself</li><li>I can point to a number when someone asks whether it worked</li></ul>
               <div className="fs-mech">
-                <b>How it runs.</b> You choose who is in it. Ten standard, fifteen maximum, from one building or across a district. Four virtual sessions shaped to that group, full hub and paid blog access all year, optional office hours, and a named team member they can email directly.
+                <b>How it runs.</b> You choose who is in it. 10 standard, 15 maximum, from one building or across a district. Four virtual sessions shaped to that group, full hub and paid blog access all year, optional office hours, and a named team member they can email directly.
                 <br /><b>How it is measured.</b> Retention within the cohort, stress and feeling of support measured at baseline and again in March, hub implementation rate, and session attendance.
               </div>
               <div className="fs-foot"><a className="fs-go" href="/get-started">Request a quote</a></div>
@@ -160,7 +160,7 @@ export default function ForSchoolsPage() {
             <div>
               <h3>The Blueprint</h3>
               <p className="fs-per" style={{"margin": "6px 0 14px"}}>Scoped to your district</p>
-              <p style={{"color": "var(--muted)", "fontSize": ".98rem"}}>The hub, leadership coaching, classroom observations, the vibe check, the dashboard and the blog, working as one system. It is the only one that reaches all ten outcomes above, because it is the only one with people in your buildings.</p>
+              <p style={{"color": "var(--muted)", "fontSize": ".98rem"}}>The hub, leadership coaching, classroom observations, the vibe check, the dashboard and the blog, working as one system. It is the only one that reaches all 10 outcomes above, because it is the only one with people in your buildings.</p>
               <div className="fs-phases">
                 <div className="fs-phase"><b>Ignite</b><span>Leadership team and a pilot group of 10 to 25 educators. Early wins.</span></div>
                 <div className="fs-phase"><b>Accelerate</b><span>Full staff. Strategies get implemented school-wide.</span></div>
@@ -184,7 +184,7 @@ export default function ForSchoolsPage() {
                 <tr><th scope="row">Ask of staff</th><td>3 seconds, weekly</td><td>One tap, monthly</td><td>Four sessions a year</td><td>Varies by phase</td></tr>
                 <tr><th scope="row">Live team time</th><td>None</td><td>Two leadership sessions</td><td>Yes, with staff</td><td>Yes</td></tr>
                 <tr><th scope="row">Hub access</th><td>No</td><td>No</td><td>Yes, all members</td><td>Yes, all staff</td></tr>
-                <tr><th scope="row">Outcomes it reaches</th><td>Culture, retention, stress</td><td>Coherence, instructional growth</td><td>New teachers, instructional growth, collaboration, retention</td><td><b>All ten</b></td></tr>
+                <tr><th scope="row">Outcomes it reaches</th><td>Culture, retention, stress</td><td>Coherence, instructional growth</td><td>New teachers, instructional growth, collaboration, retention</td><td><b>All 10</b></td></tr>
                 <tr><th scope="row">March proof report</th><td>Yes</td><td>Yes</td><td>Yes</td><td>Yes</td></tr>
               </tbody>
             </table>
@@ -326,7 +326,7 @@ export default function ForSchoolsPage() {
             <div>
               <div className="fs-card" style={{"borderLeft": "4px solid var(--cohort)"}}>
                 <h4>What leadership took to the board</h4>
-                <p style={{"color": "var(--ink)", "fontSize": "1.02rem"}}>Ten paras started the year at 4.2 out of 10 on intent to return. By March they were at 7.6. Nine of the ten are coming back next year, and the district knows exactly what that cost.</p>
+                <p style={{"color": "var(--ink)", "fontSize": "1.02rem"}}>10 paras started the year at 4.2 out of 10 on intent to return. By March they were at 7.6. Nine of the 10 are coming back next year, and the district knows exactly what that cost.</p>
                 <p style={{"marginTop": "14px", "fontSize": ".9rem"}}>Pulled from the dashboard in one click, formatted to forward.</p>
               </div>
             </div>
@@ -465,7 +465,7 @@ export default function ForSchoolsPage() {
           </div>
           <div className="fs-dl-grid">
             <a className="fs-dl" href="/downloads/the-pulse.pdf" target="_blank" rel="noopener noreferrer" style={{"--c":"var(--pulse)"} as React.CSSProperties}><b>The Pulse</b><span>Three pages &middot; what staff get, what you see, and the twenty questions</span></a>
-            <a className="fs-dl" href="/downloads/the-focus.pdf" target="_blank" rel="noopener noreferrer" style={{"--c":"var(--focus)"} as React.CSSProperties}><b>The Focus</b><span>Three pages &middot; the thirteen dates, the three answers, and how it runs</span></a>
+            <a className="fs-dl" href="/downloads/the-focus.pdf" target="_blank" rel="noopener noreferrer" style={{"--c":"var(--focus)"} as React.CSSProperties}><b>The Focus</b><span>Three pages &middot; the 13 dates, the three answers, and how it runs</span></a>
             <a className="fs-dl" href="/downloads/the-cohort.pdf" target="_blank" rel="noopener noreferrer" style={{"--c":"var(--cohort)"} as React.CSSProperties}><b>The Cohort</b><span>Two pages &middot; the year, baseline against March, and how it runs</span></a>
             <a className="fs-dl" href="/downloads/the-blueprint.pdf" target="_blank" rel="noopener noreferrer" style={{"--c":"var(--blueprint)"} as React.CSSProperties}><b>The Blueprint</b><span>Two pages &middot; what a school achieves, and what it is made of</span></a>
           </div>
