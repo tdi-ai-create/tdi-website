@@ -452,7 +452,15 @@ export default function OutreachQueue() {
                     <button
                       onClick={() => {
                         setLabelDraftId(d.id)
-                        setLabelText(d.currentClientLabel ?? '')
+                        // Start empty when the existing label is the problem.
+                        // Prefilling it invites a save of the exact wording we
+                        // are trying to remove, and the save guard then reads
+                        // as the tool being obstructive rather than helpful.
+                        setLabelText(
+                          d.currentClientLabel && findInternalText('', d.currentClientLabel).length === 0
+                            ? d.currentClientLabel
+                            : ''
+                        )
                         setLabelError(null)
                       }}
                       style={btn(NAVY, false)}

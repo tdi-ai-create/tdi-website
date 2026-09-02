@@ -236,22 +236,51 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Rebuild the sentence that names the task. The placeholder case is a
-    // straight substitution. The older case has the raw title sitting in the
-    // body instead, and the same substitution works on that.
-    const newBody = (draft.body ?? '')
-      .split(NEUTRAL_TASK_LABEL).join(label)
-      .split(item.title).join(label)
-    const newSubject = (draft.subject ?? '')
-      .split(NEUTRAL_TASK_LABEL).join(label)
-      .split(item.title).join(label)
+    // Rebuild the sentence that names the task, replacing whichever wording
+    // actually reached this draft.
+    //
+    // Three candidates, and the one that matters most is the easiest to miss:
+    // the OLD client_label. That is what the generator returned unchecked, so
+    // it is what sits in the body of every leaking draft. A first version of
+    // this replaced only the placeholder and the title, which meant a save
+    // reported success, wrote the new label, and left the pricing ladder
+    // sitting in the draft untouched.
+    //
+    // Longest first, so replacing a short string cannot destroy a longer one
+    // that contains it.
+    const replaceable = [item.client_label, item.title, NEUTRAL_TASK_LABEL]
+      .filter((v): v is string => !!v && v.trim().length > 0)
+      .sort((a, b) => b.length - a.length)
+
+    const applyAll = (input: string) =>
+      replaceable.reduce((acc, needle) => acc.split(needle).join(label), input)
+
+    const newBody = applyAll(draft.body ?? '')
+    const newSubject = applyAll(draft.subject ?? '')
 
     const stillLeaking = findInternalText(newSubject, newBody)
+
+    // Every open draft for this task, not just the one being looked at.
+    //
+    // A task can have several drafts waiting, one per escalation rung, and they
+    // all describe it with the same wrong wording. Correcting only the visible
+    // one meant fixing a draft and finding two more identical problems directly
+    // beneath it, which reads as the fix not having worked.
+    const { data: allDrafts, error: siblingErr } = await supabase
+      .from('funding_email_log')
+      .select('id, subject, body, to_email, source_item_key')
+      .eq('status', 'draft')
+    if (siblingErr) return NextResponse.json({ error: siblingErr.message }, { status: 500 })
+
+    const siblings = (allDrafts ?? []).filter(
+      d => matchActionItem(d, (liveItems ?? []) as LabelCandidate[])?.id === item.id
+    )
 
     if (dryRun) {
       return NextResponse.json({
         ok: true, dryRun: true, action: 'would set label',
         wouldWrite: { actionItemId: item.id, client_label: label },
+        wouldRewriteDrafts: siblings.length,
         newSubject, newBody,
         remainingWarnings: stillLeaking,
       })
@@ -263,17 +292,30 @@ export async function POST(request: NextRequest) {
       .eq('id', item.id)
     if (labelErr) return NextResponse.json({ error: labelErr.message }, { status: 500 })
 
-    const { error: draftErr } = await supabase
-      .from('funding_email_log')
-      .update({ subject: newSubject, body: newBody })
-      .eq('id', draft.id)
-      .eq('status', 'draft')
-    if (draftErr) return NextResponse.json({ error: draftErr.message }, { status: 500 })
+    let rewritten = 0
+    for (const sib of siblings) {
+      const { error: sibErr } = await supabase
+        .from('funding_email_log')
+        .update({ subject: applyAll(sib.subject ?? ''), body: applyAll(sib.body ?? '') })
+        .eq('id', sib.id)
+        .eq('status', 'draft')
+      if (sibErr) {
+        // Loud, and reported. A partial rewrite that claims success leaves our
+        // wording in a draft that now looks reviewed.
+        console.error('[outreach-queue] Failed rewriting draft', sib.id, sibErr)
+        return NextResponse.json(
+          { error: `Label saved, but ${siblings.length - rewritten} draft(s) could not be rewritten: ${sibErr.message}` },
+          { status: 500 }
+        )
+      }
+      rewritten++
+    }
 
     return NextResponse.json({
       ok: true,
       action: 'label set',
       actionItemId: item.id,
+      draftsRewritten: rewritten,
       subject: newSubject,
       body: newBody,
       // Honest about the outcome. Replacing the task wording does not
