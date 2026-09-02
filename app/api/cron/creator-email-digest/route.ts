@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { guardCron } from '@/lib/cron-guard';
 import { createClient } from '@supabase/supabase-js';
 
 // ---------------------------------------------------------------------------
@@ -31,14 +32,16 @@ const stepLabels: Record<number, string> = {
 
 export async function GET(request: NextRequest) {
   try {
-    const authHeader = request.headers.get('authorization');
-    const cronSecret = process.env.CRON_SECRET;
-    if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
-      const isVercelCron = request.headers.get('x-vercel-cron') === '1';
-      if (!isVercelCron) {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-      }
+    // guardCron rather than a hand-rolled check. The old one read
+    // `if (cronSecret && ...)`, so with CRON_SECRET unset the whole check was
+    // skipped and anyone could invoke it: fail open, on a job that emails the
+    // team. It also honours the same x-vercel-cron header this used to check by
+    // hand, and returns dryRun for free.
+    const guard = guardCron(request);
+    if (!guard.ok) {
+      return NextResponse.json({ error: guard.error }, { status: guard.status ?? 401 });
     }
+    const dryRun = guard.dryRun;
 
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -69,7 +72,7 @@ export async function GET(request: NextRequest) {
 
     if (!emails || emails.length === 0) {
       // Still send a "nothing went out" email so Bella knows the system is working
-      await sendDigest(resendApiKey, {
+      if (!dryRun) await sendDigest(resendApiKey, {
         totalEmails: 0,
         toCreator: 0,
         toAdmin: 0,
@@ -78,7 +81,7 @@ export async function GET(request: NextRequest) {
         weekEnd: new Date(),
       });
 
-      return NextResponse.json({ success: true, emailsSent: 0, digestSent: true });
+      return NextResponse.json({ success: true, dryRun, emailsSent: 0, digestSent: !dryRun });
     }
 
     // Group by category
@@ -106,7 +109,7 @@ export async function GET(request: NextRequest) {
       })),
     }));
 
-    await sendDigest(resendApiKey, {
+    if (!dryRun) await sendDigest(resendApiKey, {
       totalEmails: emails.length,
       toCreator: toCreator.length,
       toAdmin: toAdmin.length,
@@ -120,7 +123,10 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       success: true,
       totalEmails: emails.length,
-      digestSent: true,
+      // A dry run that reports having sent is worse than no dry run, because
+      // the report is what a person believes.
+      dryRun,
+      digestSent: !dryRun,
     });
   } catch (error) {
     console.error('[email-digest] Error:', error);
