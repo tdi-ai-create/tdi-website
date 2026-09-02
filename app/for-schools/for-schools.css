@@ -230,3 +230,25 @@ ul.fs-ican li:before{content:"";position:absolute;left:0;top:15px;width:8px;heig
 .fs-page thead th{font-family:'Inter',system-ui,sans-serif; font-weight:700}
 /* the table scrolls horizontally on narrow screens, so headers should not wrap */
 .fs-page thead th{white-space:nowrap}
+
+/* --- callout and table formatting --- */
+/* The callout was max-width:70ch while the Blueprint band above it and the
+   table below are full width, so it read as ragged. Match them, and drop the
+   cream fill: it sits on a grey band and yellow reads as a warning, which this
+   is not. White card, gold edge, same shape as its neighbours. */
+.fs-page .fs-notladder{
+  max-width:none;
+  background:#fff;
+  border:1px solid var(--line);
+  border-left:4px solid var(--gold);
+  border-radius:12px;
+  padding:20px 24px;
+  color:var(--ink);
+}
+/* Auto layout let "New teachers, instructional growth, collaboration,
+   retention" widen The Cohort and squeeze The Blueprint into a wrap. Fixed
+   layout keeps the four offerings equal. The wrapper still scrolls below
+   720px, so nothing is clipped. */
+.fs-page .fs-tablewrap table{table-layout:fixed}
+.fs-page .fs-tablewrap thead th:first-child{width:16%}
+.fs-page .fs-tablewrap thead th:not(:first-child){width:21%}
