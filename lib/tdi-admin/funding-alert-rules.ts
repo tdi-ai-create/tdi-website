@@ -46,7 +46,36 @@ export function calculateFundingAlerts(params: {
     const daysUntil = Math.ceil((deadline.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
     const pursuitName = pursuitNames[opp.pursuit_id] || 'Unknown'
 
-    if (daysUntil <= 3 && !opp.client_submitted) {
+    // A closed window is not a deadline alert, and the distinction is not
+    // cosmetic.
+    //
+    // The rule below was `daysUntil <= 3` with no lower bound, so a deadline
+    // stayed critical forever once it passed, and its action stayed "send an
+    // urgent nudge email to client". The reminders cron drafts a client email
+    // for every critical alert in the deadline category, so on 1 September it
+    // wrote two emails telling schools that a Walmart window was "closing
+    // soon". It had closed on 31 August. Telling a school to hurry toward a
+    // door that already shut is worse than saying nothing.
+    //
+    // Once the date passes there is nothing left to ask the school for, so this
+    // becomes internal work: record what actually happened. Filing it under
+    // tdi_action rather than deadline is also what stops the drafting, because
+    // the cron only drafts for the deadline category.
+    if (daysUntil < 0 && !opp.client_submitted) {
+      const closedAgo = Math.abs(daysUntil)
+      alerts.push({
+        id: `deadline-closed-${opp.id}`,
+        severity: 'critical',
+        category: 'tdi_action',
+        pursuit_id: opp.pursuit_id,
+        pursuit_name: pursuitName,
+        opportunity_id: opp.id,
+        opportunity_name: opp.name,
+        title: `${opp.name} closed ${closedAgo} day${closedAgo === 1 ? '' : 's'} ago`,
+        description: `The window closed ${deadline.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} and nothing was submitted. Until the outcome is recorded this keeps being chased.`,
+        action: 'Record the outcome: submitted late, missed, or no longer applicable',
+      })
+    } else if (daysUntil >= 0 && daysUntil <= 3 && !opp.client_submitted) {
       alerts.push({
         id: `deadline-critical-${opp.id}`,
         severity: 'critical',
@@ -55,7 +84,7 @@ export function calculateFundingAlerts(params: {
         pursuit_name: pursuitName,
         opportunity_id: opp.id,
         opportunity_name: opp.name,
-        title: `${opp.name} deadline in ${daysUntil <= 0 ? 'PAST DUE' : `${daysUntil} days`}`,
+        title: `${opp.name} deadline in ${daysUntil === 0 ? 'TODAY' : `${daysUntil} days`}`,
         description: `Client has not submitted. Application closes ${deadline.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}.`,
         action: 'Send urgent nudge email to client',
       })
