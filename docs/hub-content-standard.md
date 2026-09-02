@@ -158,6 +158,14 @@ seconds.
 
 If an item fails this, it is not a rewrite candidate. It comes down.
 
+**A stricter sibling exists.** `docs/pulse-reward-content-standard.md` covers
+Pulse check-in rewards and bans considerably more, including alcohol, burnout
+jokes, teacher-pay jokes and identifiable people in images. That is correct for
+what it governs: a reward appears unannounced on someone's phone, while a Hub
+tool is something a teacher went looking for and chose to open. Different
+consent, different bar. Do not apply the Pulse list here, and do not apply this
+one there.
+
 ### The open sixth rule
 
 Jasmine's read after auditing all 245 items: 216 of them passed specificity and
