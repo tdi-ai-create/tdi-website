@@ -6,6 +6,16 @@ classroom. Approved 2026-09-01.
 **Everything here is teacher-facing. Nothing in this programme is written for
 students**, and nothing is a lesson. The teacher is the reader, always.
 
+## Open item, and it is the only one
+
+**Who is the credentialed reviewer?** A school psychologist, a counsellor, or
+someone on a partner district's staff.
+
+Eleven of these eighteen tools do not need them. Seven do, and cannot publish
+without a signature. Everything else about this schedule is settled; this is not.
+Answer it this week and all eighteen are live in two months. Leave it and eleven
+ship while seven sit finished and waiting.
+
 ## Why this exists
 
 Across 268 published Quick Wins, measured 2026-09-01:
@@ -51,18 +61,30 @@ achievable rather than theoretical.
 
 ## Cadence
 
-**Two per month.** Deliberately modest.
+**All eighteen inside two months.**
 
-The QA bottleneck is one reviewer, and this content needs more review than a
-checklist, not less. Two a month puts the full set inside a school year. Going
-faster than review can verify is what produced 181 unreviewed published items in
-the first place.
+An earlier draft of this document said two a month, paced against QA throughput.
+That was wrong: it sized the programme as though the reviewer were a person.
+Julie Lynn read twenty tools in a single run on 1 September. Review is not the
+bottleneck here and should not set the pace.
+
+The slow part per tool is finding and verifying source material, and that runs in
+parallel across several tools at once.
+
+The genuine constraint is narrower and human: seven Phase 3 items need a
+credentialed signature. Those are drafted, sourced and agent-reviewed in the same
+window, then held. They publish the day the reviewer signs off, not before.
+
+**Contention worth naming.** Both this and the remediation audit run on Jasmine
+and Julie Lynn, and 143 published downloads are still unread. Two months of new
+content will slow the audit. That is a real trade, made deliberately, not an
+oversight.
 
 ## Sequence, and why this order
 
 **Start where the expert is not needed, so the expert does not block the start.**
 
-### Phase 1, months 1 to 3: in the moment
+### Phase 1, weeks 1 to 3: in the moment
 
 No clinical exposure. Practical, high frequency, agent-reviewable under the
 sourcing skill alone. This phase proves the format and builds the pipeline.
@@ -74,7 +96,7 @@ sourcing skill alone. This phase proves the format and builds the pipeline.
 5. Conflict that keeps recurring between the same pair
 6. What to say when a student shuts down
 
-### Phase 2, months 4 to 6: policy-adjacent
+### Phase 2, weeks 4 to 6: policy-adjacent
 
 Safe to write, but each one touches district policy and mandated reporting, so
 each names the policy rather than restating law.
@@ -85,7 +107,7 @@ each names the policy rather than restating law.
 10. Family change, what a teacher can and cannot ask
 11. A student who has just moved schools
 
-### Phase 3, months 7 to 9: needs a credentialed human
+### Phase 3, drafted weeks 5 to 8, published on signature: needs a credentialed human
 
 **These do not publish on agent review alone.** Highest teacher need, highest
 risk, and the only place a person's credentials are genuinely required.
@@ -100,9 +122,14 @@ risk, and the only place a person's credentials are genuinely required.
 
 ## What has to be true before Phase 3 starts
 
-A named credentialed reviewer for those four disclosure and grief topics. Not a
-standing retainer, a sign-off on seven items and the source list. If that person
-does not exist by month 6, Phase 3 waits. It does not ship on agent review.
+A named credentialed reviewer for the disclosure and grief topics. Not a standing
+retainer: a sign-off on seven items and the source list.
+
+Phase 3 is written, sourced and agent-reviewed regardless, so nothing waits on
+drafting. It waits only on the signature. **If that person does not exist, those
+seven do not ship.** They sit finished. They do not go out on agent review
+because the schedule got tight, and that is written here so it is a decision
+already made rather than a judgment call under pressure.
 
 ## How each tool gets built
 
@@ -142,6 +169,19 @@ Not the number shipped. That measure is what produced a library nobody had read.
 - Reports filed against them, now that reporting exists for Quick Wins
 
 Set the baseline before Phase 1 publishes, so the comparison is real.
+
+## Relationship to the remediation audit
+
+These are the same programme, not two.
+
+The audit built the machinery this depends on: `review_published` with verified
+file bytes and evidence, the lane rules, the specificity test, the
+school-appropriate test. **Every tool here goes through that gate from the day it
+is created**, so nothing new ever enters the unreviewed pile.
+
+That is the point of having done the audit first. 181 items were once live and
+unread because there was no gate at creation. There is one now, and this
+programme is the first content built entirely behind it.
 
 ## Where this lives
 
