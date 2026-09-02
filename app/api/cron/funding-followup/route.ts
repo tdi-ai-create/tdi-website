@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { guardCron } from '@/lib/cron-guard'
 import { getServiceSupabase } from '@/lib/supabase'
 import { postFundingEvent } from '@/lib/funding-slack'
 import { isGateOpen } from '@/lib/funding-gate-gaps'
@@ -17,7 +18,17 @@ import {
 // While true: all sends are console.log'd and recorded in DB
 // fields, but no actual emails leave the system.
 // ══════════════════════════════════════════════════════════════
-const DRY_RUN = false
+// DRY_RUN is now decided per request by guardCron, not by editing this file.
+//
+// It was a module constant hardcoded to false, so ?dryRun=1 did nothing at all
+// and every call to this route was a live run whatever the caller believed.
+// That is the opposite of the rule this codebase already has, which is that a
+// dry run must exercise the real code path inside the route rather than a
+// script that only resembles it.
+//
+// Kept as a name rather than inlined because eight call sites read it, and a
+// threaded parameter that shadows a familiar constant is easier to review than
+// eight new arguments.
 
 // ══════════════════════════════════════════════════════════════
 // SEND_ALLOWLIST — which TDI addresses this cron may email.
@@ -299,7 +310,10 @@ async function sendFollowUpEmail(params: {
   // For email log tracking
   pursuitId?: string
   opportunityId?: string | null
+  /** Passed in, never read from module scope. See the note on DRY_RUN above. */
+  dryRun?: boolean
 }): Promise<'sent' | 'drafted' | 'failed'> {
+  const DRY_RUN = params.dryRun === true
   const resendKey = process.env.RESEND_API_KEY
   if (!resendKey) {
     console.warn(LOG, 'RESEND_API_KEY not set — skipping send')
@@ -528,12 +542,15 @@ async function sendFollowUpEmail(params: {
 // ── Route handler ──
 
 export async function GET(request: NextRequest) {
-  // Auth — matches funding-reminders / quote-expiry pattern
-  const authHeader = request.headers.get('authorization')
-  const cronSecret = process.env.CRON_SECRET
-  if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  // guardCron rather than the hand-rolled check this used to carry. That check
+  // read `if (cronSecret && ...)`, so with CRON_SECRET unset it let anyone
+  // through: it failed open, on the cron that drives every piece of grant
+  // outreach. guardCron fails closed and returns ?dryRun=1 for free.
+  const guard = guardCron(request)
+  if (!guard.ok) {
+    return NextResponse.json({ error: guard.error }, { status: guard.status ?? 401 })
   }
+  const DRY_RUN = guard.dryRun
 
   try {
     const supabase = getServiceSupabase()
@@ -860,6 +877,7 @@ export async function GET(request: NextRequest) {
           summary.allowlist_skipped++
         } else if (targetEmail) {
           const outcome = await sendFollowUpEmail({
+                    dryRun: DRY_RUN,
             to: targetEmail,
             itemTitle: item.title,
             dueDate: dueDateStr,
@@ -985,6 +1003,7 @@ export async function GET(request: NextRequest) {
             summary.allowlist_skipped++
           } else if (targetEmail) {
             const outcome = await sendFollowUpEmail({
+                    dryRun: DRY_RUN,
               to: targetEmail,
               itemTitle: item.title,
               dueDate: item.due_date,
@@ -1055,6 +1074,7 @@ export async function GET(request: NextRequest) {
               summary.allowlist_skipped++
             } else {
               const outcome = await sendFollowUpEmail({
+                    dryRun: DRY_RUN,
                 to: nextStep.email,
                 itemTitle: item.title,
                 dueDate: item.due_date,
@@ -1132,6 +1152,7 @@ export async function GET(request: NextRequest) {
                   summary.allowlist_skipped++
                 } else {
                   const outcome = await sendFollowUpEmail({
+                    dryRun: DRY_RUN,
                     to: nextStep.email,
                     itemTitle: item.title,
                     dueDate: item.due_date,
