@@ -100,30 +100,55 @@ const INTERNAL_TITLE_SHAPES = [
   /\b(bella|rae|julie|vanessa|amara)\b/i,      // names of ours have no business here
 ]
 
+/** Why this candidate cannot be shown to a school, or null if it can. */
+function rejectReason(candidate: string): string | null {
+  if (INTERNAL_TITLE_SHAPES.some(shape => shape.test(candidate)))
+    return 'reads as an instruction to a colleague'
+  if (findInternalText(candidate, '').length > 0)
+    return 'contains wording meant for us'
+  if (candidate.length > MAX_LABEL_LENGTH)
+    return `is ${candidate.length} characters, which is a sentence rather than a label`
+  return null
+}
+
+/**
+ * What a school is told this task is about.
+ *
+ * The client_label used to be returned unconditionally, on the reasoning that
+ * a person wrote it deliberately for the client. Every gate below it ran only
+ * on the raw title, so the one field whose entire purpose is client-facing
+ * wording was the one field nothing checked.
+ *
+ * It was not being written by a person. Agents populate it, and on 18 August
+ * one of them filled it with our escalation logic: "If 3+, proceed with the
+ * $5,000 group tier as drafted. If 1-2, rescope to the $2,000 individual
+ * tier. If zero, mark this opportunity not applicable." That went into a draft
+ * addressed to the school it describes. Both populated labels in the system
+ * were this shape, so the trusted field had a zero percent pass rate.
+ *
+ * Now every candidate faces the same gates, best first, and anything that
+ * fails falls through rather than being sent:
+ *
+ *   1. The client_label, which is what someone intended the school to read.
+ *   2. The item title, which is often perfectly clear on its own.
+ *   3. Neutral wording, which says little but cannot do harm.
+ */
 export function clientTaskLabel(rawTitle: string, clientLabel?: string | null): string {
-  if (clientLabel && clientLabel.trim()) return clientLabel.trim()
-
+  const candidates: { value: string; source: string }[] = []
+  if (clientLabel && clientLabel.trim()) candidates.push({ value: clientLabel.trim(), source: 'client_label' })
   const title = (rawTitle || '').trim()
-  if (!title) return NEUTRAL_TASK_LABEL
+  if (title) candidates.push({ value: title, source: 'title' })
 
-  const reason =
-    INTERNAL_TITLE_SHAPES.some(shape => shape.test(title))
-      ? 'reads as an instruction to a colleague'
-      : findInternalText(title, '').length > 0
-        ? 'contains wording meant for us'
-        : title.length > MAX_LABEL_LENGTH
-          ? `is ${title.length} characters, which is a sentence rather than a label`
-          : null
-
-  if (reason) {
+  for (const c of candidates) {
+    const reason = rejectReason(c.value)
+    if (!reason) return c.value
     console.warn(
-      `[funding-label] "${title.slice(0, 80)}" has no client_label and ${reason}. ` +
-        'Using neutral wording. Set a client_label on this item.'
+      `[funding-label] ${c.source} "${c.value.slice(0, 80)}" ${reason}. ` +
+        'Falling through. Set a client_label a school could read.'
     )
-    return NEUTRAL_TASK_LABEL
   }
 
-  return title
+  return NEUTRAL_TASK_LABEL
 }
 
 export function displayRung(rung: string): string {

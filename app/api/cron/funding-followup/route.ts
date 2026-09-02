@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createHash } from 'crypto'
 import { getServiceSupabase } from '@/lib/supabase'
 import { postFundingEvent } from '@/lib/funding-slack'
 import { isGateOpen } from '@/lib/funding-gate-gaps'
 import { callTriggerFor } from '@/lib/funding/call-escalation'
+import { sourceItemKeyFor } from '@/lib/funding-client-label'
 import { generateFollowUpEmail } from '@/lib/funding-followup-email'
 
 // ══════════════════════════════════════════════════════════════
@@ -366,10 +366,7 @@ async function sendFollowUpEmail(params: {
     // The key is the task itself, which does not change as the wording escalates.
     // If an open draft already exists for it, the newer rung replaces the wording
     // rather than adding a row.
-    const sourceItemKey = createHash('sha256')
-      .update(`${to}::${params.itemTitle}`)
-      .digest('hex')
-      .slice(0, 32)
+    const sourceItemKey = sourceItemKeyFor(to, params.itemTitle)
 
     const { data: openDraft } = await supabase
       .from('funding_email_log')

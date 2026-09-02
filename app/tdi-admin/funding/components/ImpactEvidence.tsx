@@ -33,7 +33,15 @@ export function ImpactEvidence() {
   if (loading) return <div style={{ padding: 16, textAlign: 'center', color: '#9CA3AF', fontSize: 13 }}>Loading impact data...</div>
   if (!impact) return null
 
+  // This reads the Hub database, which is a separate Supabase project, so it
+  // fails independently of everything else on this page. `!impact` only catches
+  // a null response: an error payload is a truthy object with no roleBreakdown,
+  // and Object.entries(undefined) throws inside render, which white-screens the
+  // whole funding page rather than this one panel. A grant queue that vanishes
+  // because an unrelated impact widget could not reach another database is not
+  // a trade worth making, so this section hides itself instead.
   const m = impact.impactMetrics
+  if (!m || !impact.roleBreakdown) return null
   const roleEntries = Object.entries(impact.roleBreakdown).sort((a, b) => b[1] - a[1])
 
   return (
