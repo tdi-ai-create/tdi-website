@@ -413,7 +413,7 @@ export default function ForSchoolsPage() {
         </div>
       </section>
 
-      <section className="fs-sec fs-sec-white" id="questions">
+      <section className="fs-sec" id="questions">
         <div className="fs-wrap">
           <div className="fs-head-narrow">
             <p className="fs-kicker">What other leaders asked first</p>
@@ -456,7 +456,7 @@ export default function ForSchoolsPage() {
         </div>
       </section>
 
-      <section className="fs-sec" id="downloads">
+      <section className="fs-sec fs-sec-white" id="downloads">
         <div className="fs-wrap">
           <div className="fs-head-narrow">
             <p className="fs-kicker">Take it to your team</p>
