@@ -2,6 +2,7 @@
 import React from 'react'
 import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer'
 import { categoryColor, NAVY } from '@/lib/hub/categoryColors'
+import { w, AlertBlock, SayBlock, SmallPrint, SectionHeading, type Alert, type SmallPrintBlock } from './weights'
 
 const navy = '#1E2749'
 const gold = '#E8B84B'
@@ -20,11 +21,10 @@ const s = StyleSheet.create({
   title: { fontSize: 22, fontFamily: 'Helvetica-Bold', color: '#ffffff', lineHeight: 1.3 },
   subtitle: { fontSize: 10, color: '#cbd5e1', lineHeight: 1.5, marginTop: 6, maxWidth: '85%' },
   content: { paddingHorizontal: 44, paddingTop: 20 },
-  sectionHeader: { fontSize: 12, fontFamily: 'Helvetica-Bold', color: navy, marginTop: 18, marginBottom: 8, paddingBottom: 4, borderBottom: `1.5px solid ${gold}` },
   instructions: { fontSize: 9, color: '#6B7280', lineHeight: 1.5, marginBottom: 14 },
   checkRow: { flexDirection: 'row', marginBottom: 10, gap: 10, alignItems: 'flex-start' },
   checkbox: { width: 14, height: 14, border: `1.5px solid ${navy}`, borderRadius: 2, flexShrink: 0, marginTop: 1 },
-  checkText: { fontSize: 10, color: '#1E2749', lineHeight: 1.6, flex: 1 },
+  checkCol: { flex: 1 },
   notesSection: { marginTop: 20, paddingTop: 12, borderTop: `1px solid #E5E7EB` },
   notesLabel: { fontSize: 9, fontFamily: 'Helvetica-Bold', color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 8 },
   notesLine: { height: 1, backgroundColor: '#E5E7EB', marginBottom: 18 },
@@ -38,10 +38,19 @@ export interface ChecklistData {
   category?: string
   description?: string
   instructions?: string
+  /** Weight 1. Safety or anything overriding the rest. At most one per card. */
+  alert?: Alert
   sections: {
     heading?: string
-    items: string[]
+    /**
+     * A bare string is one instruction at weight 2, which is what every existing
+     * checklist passes. The object form splits weight 2 from weight 3 so the
+     * reasoning can sit under the instruction instead of inside it.
+     */
+    items: (string | { text: string; detail?: string; say?: string })[]
   }[]
+  /** Weight 5. Scope notes and citations. */
+  small_print?: SmallPrintBlock[]
   notes_lines?: number
 }
 
@@ -58,18 +67,35 @@ export function ChecklistPDF({ data }: { data: ChecklistData }) {
           <Text style={s.categoryLabel}>{data.category || 'Quick Win'}</Text>
         </View>
         <View style={s.content}>
+          <AlertBlock alert={data.alert} />
           {data.instructions ? <Text style={s.instructions}>{data.instructions}</Text> : null}
           {data.sections.map((section, si) => (
             <View key={si}>
-              {section.heading ? <Text style={s.sectionHeader}>{section.heading}</Text> : null}
-              {section.items.map((item, ii) => (
-                <View key={ii} style={s.checkRow}>
-                  <View style={s.checkbox} />
-                  <Text style={s.checkText}>{item}</Text>
-                </View>
-              ))}
+              <SectionHeading heading={section.heading} />
+              {section.items.map((rawItem, ii) => {
+                const item = typeof rawItem === 'string' ? { text: rawItem } : rawItem
+                return (
+                  <View key={ii} wrap={false}>
+                    <View style={s.checkRow}>
+                      <View style={s.checkbox} />
+                      <View style={s.checkCol}>
+                        {item.detail ? (
+                          <>
+                            <Text style={w.do}>{item.text}</Text>
+                            <Text style={w.why}>{item.detail}</Text>
+                          </>
+                        ) : (
+                          <Text style={w.solo}>{item.text}</Text>
+                        )}
+                      </View>
+                    </View>
+                    <SayBlock say={item.say} />
+                  </View>
+                )
+              })}
             </View>
           ))}
+          <SmallPrint blocks={data.small_print} />
           <View style={s.notesSection}>
             <Text style={s.notesLabel}>Notes</Text>
             {Array.from({ length: data.notes_lines || 5 }).map((_, i) => (

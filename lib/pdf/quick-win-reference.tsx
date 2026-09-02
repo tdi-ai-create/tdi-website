@@ -2,11 +2,11 @@
 import React from 'react'
 import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer'
 import { categoryColor, NAVY } from '@/lib/hub/categoryColors'
+import { w, AlertBlock, SayBlock, SmallPrint, SectionHeading, type Alert, type SmallPrintBlock } from './weights'
 
 const navy = '#1E2749'
 const gold = '#E8B84B'
 const warmBg = '#F8F7F4'
-const alertRed = '#8C2F22'
 
 const s = StyleSheet.create({
   page: { fontFamily: 'Helvetica', backgroundColor: '#ffffff', paddingBottom: 50 },
@@ -26,31 +26,12 @@ const s = StyleSheet.create({
   card: { flex: 1, backgroundColor: warmBg, borderRadius: 4, padding: '10 12', border: '0.5px solid #E5E7EB' },
   cardLabel: { fontSize: 8, fontFamily: 'Helvetica-Bold', color: gold, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 4 },
   cardText: { fontSize: 9, color: navy, lineHeight: 1.5 },
-  // Weights, per section 3a of docs/hub-content-standard.md. The sizes are the
-  // rule: an instruction and its reasoning at the same size is the failure this
-  // replaced. Cover every grey line below and the page must still be actionable.
-  sectionHeader: { fontSize: 7.5, fontFamily: 'Helvetica-Bold', color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: 1.4, marginTop: 9, marginBottom: 6, paddingBottom: 3, borderBottom: '1px solid #EEF0F3' },
 
-  // Weight 1, stop. Overrides everything, at most one per page.
-  alertBox: { backgroundColor: '#FBF1EF', borderLeft: `4px solid ${alertRed}`, padding: '9 12', marginBottom: 10, borderRadius: 2 },
-  alertLabel: { fontSize: 7, fontFamily: 'Helvetica-Bold', color: alertRed, textTransform: 'uppercase', letterSpacing: 1.4, marginBottom: 3 },
-  alertHead: { fontSize: 11.5, fontFamily: 'Helvetica-Bold', color: navy, marginBottom: 3 },
-  alertText: { fontSize: 8.5, color: '#4B5563', lineHeight: 1.45 },
 
-  // Weight 2, do. Its own line, never inline with weight 3.
   itemRow: { flexDirection: 'row', marginBottom: 7 },
   itemBullet: { width: 14, fontSize: 10.5, fontFamily: 'Helvetica-Bold', color: gold },
   itemCol: { flex: 1 },
-  itemLabel: { fontSize: 11, fontFamily: 'Helvetica-Bold', color: navy, marginBottom: 2 },
-  // Weight 3, why. Small and grey, under the instruction it belongs to.
-  itemText: { fontSize: 8.5, color: '#6B7280', lineHeight: 1.45 },
-  // An unlabelled item carries no weight 3 to sit under, so it holds weight 2.
-  itemSolo: { fontSize: 9.5, color: navy, lineHeight: 1.5 },
 
-  // Weight 4, say. Words spoken aloud, set apart and larger than body.
-  sayBox: { backgroundColor: '#F6F7FA', borderLeft: `3px solid ${navy}`, padding: '7 11', marginTop: 2, marginBottom: 5 },
-  sayLabel: { fontSize: 6.5, fontFamily: 'Helvetica-Bold', color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: 1.2, marginBottom: 3 },
-  sayText: { fontSize: 11.5, fontFamily: 'Helvetica-Bold', color: navy, lineHeight: 1.3 },
 
   highlightBox: { backgroundColor: '#FEF9EE', borderLeft: `3px solid ${gold}`, padding: '8 12', marginBottom: 8, borderRadius: 2 },
   highlightLabel: { fontSize: 8, fontFamily: 'Helvetica-Bold', color: '#92400E', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 3 },
@@ -58,10 +39,6 @@ const s = StyleSheet.create({
   tipBox: { backgroundColor: '#F0F2F7', borderLeft: `3px solid ${navy}`, padding: '8 12', marginBottom: 8, borderRadius: 2 },
   tipLabel: { fontSize: 8, fontFamily: 'Helvetica-Bold', color: navy, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 3 },
 
-  // Weight 5, small print. Present, not competing.
-  smallPrint: { marginTop: 8, paddingTop: 5, borderTop: '1px solid #E5E7EB' },
-  smallPrintHead: { fontSize: 7, fontFamily: 'Helvetica-Bold', color: navy, marginBottom: 2 },
-  smallPrintText: { fontSize: 7, color: '#9CA3AF', lineHeight: 1.45 },
   footer: { position: 'absolute', bottom: 18, left: 40, right: 40, flexDirection: 'row', justifyContent: 'space-between', borderTop: '1px solid #E5E7EB', paddingTop: 8 },
   footerText: { fontSize: 7, color: '#9CA3AF' },
 })
@@ -73,7 +50,7 @@ export interface ReferenceData {
   description?: string
   quick_facts?: { label: string; value: string }[]
   /** Weight 1. Safety or anything that overrides the rest. At most one per card. */
-  alert?: { label?: string; heading: string; text?: string }
+  alert?: Alert
   sections: {
     heading?: string
     items: {
@@ -88,7 +65,7 @@ export interface ReferenceData {
     tip?: string
   }[]
   /** Weight 5. Scope notes and citations. Present, not competing. */
-  small_print?: { heading?: string; text: string }[]
+  small_print?: SmallPrintBlock[]
 }
 
 export function ReferencePDF({ data }: { data: ReferenceData }) {
@@ -104,13 +81,7 @@ export function ReferencePDF({ data }: { data: ReferenceData }) {
           <Text style={s.categoryLabel}>{data.category || 'Quick Win'}</Text>
         </View>
         <View style={s.content}>
-          {data.alert ? (
-            <View style={s.alertBox} wrap={false}>
-              <Text style={s.alertLabel}>{data.alert.label || 'Before anything else'}</Text>
-              <Text style={s.alertHead}>{data.alert.heading}</Text>
-              {data.alert.text ? <Text style={s.alertText}>{data.alert.text}</Text> : null}
-            </View>
-          ) : null}
+          <AlertBlock alert={data.alert} />
           {data.quick_facts && data.quick_facts.length > 0 ? (
             <View style={s.cardRow}>
               {data.quick_facts.map((fact, i) => (
@@ -123,11 +94,7 @@ export function ReferencePDF({ data }: { data: ReferenceData }) {
           ) : null}
           {data.sections.map((section, si) => (
             <View key={si}>
-              {section.heading ? (
-                <Text style={s.sectionHeader} minPresenceAhead={44}>
-                  {section.heading}
-                </Text>
-              ) : null}
+              <SectionHeading heading={section.heading} />
               {section.items.map((item, ii) => (
                 <View key={ii} wrap={false}>
                   <View style={s.itemRow}>
@@ -135,20 +102,15 @@ export function ReferencePDF({ data }: { data: ReferenceData }) {
                     <View style={s.itemCol}>
                       {item.label ? (
                         <>
-                          <Text style={s.itemLabel}>{item.label}</Text>
-                          <Text style={s.itemText}>{item.text}</Text>
+                          <Text style={w.do}>{item.label}</Text>
+                          <Text style={w.why}>{item.text}</Text>
                         </>
                       ) : (
-                        <Text style={s.itemSolo}>{item.text}</Text>
+                        <Text style={w.solo}>{item.text}</Text>
                       )}
                     </View>
                   </View>
-                  {item.say ? (
-                    <View style={s.sayBox} wrap={false}>
-                      <Text style={s.sayLabel}>Say</Text>
-                      <Text style={s.sayText}>{item.say}</Text>
-                    </View>
-                  ) : null}
+                  <SayBlock say={item.say} />
                 </View>
               ))}
               {section.highlight ? (
@@ -165,16 +127,7 @@ export function ReferencePDF({ data }: { data: ReferenceData }) {
               ) : null}
             </View>
           ))}
-          {data.small_print && data.small_print.length > 0 ? (
-            <View style={s.smallPrint} wrap={false}>
-              {data.small_print.map((block, i) => (
-                <View key={i} style={i > 0 ? { marginTop: 5 } : undefined} wrap={false}>
-                  {block.heading ? <Text style={s.smallPrintHead}>{block.heading}</Text> : null}
-                  <Text style={s.smallPrintText}>{block.text}</Text>
-                </View>
-              ))}
-            </View>
-          ) : null}
+          <SmallPrint blocks={data.small_print} />
         </View>
         <View style={s.footer} fixed>
           <Text style={s.footerText}>Teachers Deserve It</Text>
