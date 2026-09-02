@@ -525,6 +525,16 @@ export async function POST(request: NextRequest) {
       }, { status: 409 })
     }
 
+    // Same rule as update_narrative. #336 guarded the update door and left
+    // this one open, which is the shape of the original problem: several
+    // writers, one of them checked.
+    if (narrativeStatus && !isNarrativeState(narrativeStatus)) {
+      return NextResponse.json(
+        { error: `'${narrativeStatus}' is not a narrative state.`, valid: NARRATIVE_STATES },
+        { status: 400 },
+      )
+    }
+
     const { data, error } = await supabase
       .from('funding_opportunities')
       .insert({
