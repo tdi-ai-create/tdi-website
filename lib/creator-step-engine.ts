@@ -28,6 +28,7 @@
 // ---------------------------------------------------------------------------
 
 import { phaseRank } from './creator-phases';
+import { AGREEMENT_COLUMNS, hasSignedAgreement, type AgreementSubject } from './creator-agreement';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 type DbClient = any;
@@ -161,6 +162,17 @@ interface MilestoneRow {
   position: number;
 }
 
+/**
+ * Whether a step is the agreement.
+ *
+ * Matched on the name because that is what the milestones table carries and
+ * there is no flag for it. Kept in one function so a rename shows up here
+ * rather than in whichever call site was forgotten.
+ */
+function isAgreementStep(name: string | null | undefined): boolean {
+  return (name ?? '').trim().toLowerCase() === 'sign agreement';
+}
+
 function position(phaseId: string, sortOrder: number): number {
   // Phase first, then order within the phase. phaseRank sends an unknown phase
   // to the end rather than returning NaN, which is what silently corrupted the
@@ -204,7 +216,7 @@ function isOpenable(m: MilestoneRow, contentPath: string | null): boolean {
 async function loadProject(
   supabase: DbClient,
   projectId: string
-): Promise<{ creatorId: string; contentPath: string | null; finished: boolean } | null> {
+): Promise<{ creatorId: string; contentPath: string | null; finished: boolean; signed: boolean } | null> {
   const { data, error } = await supabase
     .from('creator_projects')
     .select('id, creator_id, content_path, status, completed_at')
@@ -213,12 +225,24 @@ async function loadProject(
 
   if (error || !data) return null;
 
+  // Read separately rather than embedded, because two foreign keys join these
+  // tables and an unqualified embed is ambiguous.
+  const { data: creator } = await supabase
+    .from('creators')
+    .select(AGREEMENT_COLUMNS)
+    .eq('id', data.creator_id)
+    .maybeSingle();
+
   return {
     creatorId: data.creator_id,
     contentPath: data.content_path ?? null,
     // A project that has already shipped is not placed anywhere. Without this
     // the engine puts Sue Thompson, who is published, back onto Launch Date Set.
     finished: data.status === 'completed' || data.completed_at !== null,
+    // Unknown counts as signed. If the creator cannot be read, holding somebody
+    // on an agreement step forever is a worse failure than placing them
+    // normally, and blocksPublish still stops anything actually shipping.
+    signed: creator ? hasSignedAgreement(creator as unknown as AgreementSubject) : true,
   };
 }
 
@@ -284,7 +308,13 @@ export async function placeProject(
   // A finished project closes rather than being placed. Everything still hanging
   // open gets locked and nothing new is offered.
   if (project.finished) {
-    const stale = board.filter((m) => m.status !== 'completed' && m.status !== 'locked');
+    const stale = board.filter(
+      (m) =>
+        m.status !== 'completed' &&
+        m.status !== 'locked' &&
+        // Same exemption as below. A finished board still owes us a signature.
+        !(!project.signed && isAgreementStep(m.name))
+    );
     if (dryRun) return { ok: true, openStep: null, locked: stale.length };
     if (stale.length > 0) {
       const { error } = await supabase
@@ -329,8 +359,33 @@ export async function placeProject(
   // Everything unfinished on this project that is not the chosen step gets
   // locked, including steps this path does not use and steps that were retired.
   // Scoped to project_id, which is the bug both previous engines had.
+  //
+  // An unsigned agreement is never locked, whatever else happens.
+  //
+  // Placement is forward only, so nothing behind the furthest completed work
+  // opens again. That is right for ordinary steps and wrong for this one. The
+  // agreement phase ranks second of seven, so a creator who reached the
+  // marketing blog without signing has left it four phases behind, and no sort
+  // order inside that phase can reach back. Kim Lohse and Dr. Stephanie Nardi
+  // are both there today: switching the engine on would close the step where
+  // they would sign and move them to Content Launched, unsigned.
+  //
+  // Left open rather than made the next step, which is the distinction that
+  // matters. An unsigned creator is allowed to carry on working; they are not
+  // allowed to publish, and blocksPublish already enforces that. Forcing them
+  // back to the agreement was tried first and pulled seven creators off work
+  // they were part way through, which is a different and worse failure.
+  //
+  // So the board may show two open steps for an unsigned creator: whatever they
+  // are actually doing, and the agreement waiting for them.
   const toLock = board
-    .filter((m) => m.status !== 'completed' && m.recordId !== next.recordId && m.status !== 'locked')
+    .filter(
+      (m) =>
+        m.status !== 'completed' &&
+        m.recordId !== next.recordId &&
+        m.status !== 'locked' &&
+        !(!project.signed && isAgreementStep(m.name))
+    )
     .map((m) => m.recordId);
 
   // The dry run computes the full decision and reports it, skipping every write.
