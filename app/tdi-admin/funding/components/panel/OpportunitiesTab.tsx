@@ -794,7 +794,7 @@ function NarrativeControl({ opp, gateOpen, onRequestDraft, onApprove, onSendBack
   const windowOpen = isWindowOpen(opp)
   const hasContent = !!opp.narrative_content
   const hasUrl = !!opp.narrative_url
-  const showReader = ['review', 'qa_review', 'approval', 'escalated', 'ready'].includes(ns) && hasContent
+  const showReader = ['qa_review', 'approval', 'escalated', 'ready'].includes(ns) && hasContent
 
   // There is deliberately no manual pass/fail here. QA is Julie's job and
   // nobody else's: Bella is a final eye at the approval step, not a reviewer.
@@ -942,7 +942,7 @@ function NarrativeControl({ opp, gateOpen, onRequestDraft, onApprove, onSendBack
       )}
 
       {/* ── Inline reader fallback: URL only ── */}
-      {['review', 'qa_review', 'ready'].includes(ns) && !hasContent && hasUrl && !showContent && (
+      {['qa_review', 'ready'].includes(ns) && !hasContent && hasUrl && !showContent && (
         <div style={{ fontSize: 11, color: '#9CA3AF', fontStyle: 'italic' }}>
           No inline content. <a href={opp.narrative_url} target="_blank" rel="noopener noreferrer" style={{ color: '#8B5CF6' }}>open external document</a>
         </div>

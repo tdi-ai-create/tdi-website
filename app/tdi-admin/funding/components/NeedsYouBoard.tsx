@@ -89,7 +89,6 @@ const shortName = (s: string) =>
 const VERBS: Record<string, string> = {
   send_nudge: 'Nudge',
   send_to_client: 'Review and send',
-  send_to_qa: 'Send to Julie',
   resolve_escalation: 'Decide',
   request_draft: 'Request draft',
   approve_draft: 'Approve',
