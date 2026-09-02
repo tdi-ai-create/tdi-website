@@ -113,7 +113,7 @@ export function TaskRow({ item, onOpen }: { item: any; onOpen: () => void }) {
 
 export function AgentRow({ opp }: { opp: any }) {
   const label: Record<string, string> = {
-    requested: 'queued for a writer', drafting: 'being written', qa_review: 'with Julie for review',
+    requested: 'queued for a writer', qa_review: 'with Julie for review',
   }
   const since = daysSince(opp.narrative_status_changed_at)
   return (

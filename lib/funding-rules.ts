@@ -25,18 +25,23 @@
 /**
  * Every value narrative_status can hold.
  *
- * Four of these occur in production. `drafting` and `review` appear in the
- * status labels and in the Slack handoff map but no code in this repository
- * ever sets them: an agent would have to send them through the sync API, and
- * the path agents actually take is `requested` straight to `qa_review`. They
- * are kept because the sync API still accepts them, and flagged below so the
- * next person does not build on a state that never arrives.
+ * `drafting` and `review` were removed on 2 September 2026. Flagging them as
+ * never-arriving was not enough: this file said so plainly, and a control for
+ * Bella was still added to `review` in #322 by someone who had read this
+ * comment. A state you can name is a state someone will build on, so the only
+ * reliable way to stop that is to take the name away.
+ *
+ * What they described was real but is not what happens. `review` was Bella
+ * reading a draft before it went to Julie. Agents write `qa_review` straight
+ * through the sync API, so Julie is the first reader, and Bella's judgement
+ * lands at `approval` where she has both an Approve and a Send it back.
+ *
+ * If a human gate before QA is ever wanted, add it deliberately with a writer,
+ * a control and a test, rather than reviving a name.
  */
 export type NarrativeState =
   | 'not_started'
   | 'requested'
-  | 'drafting'
-  | 'review'
   | 'qa_review'
   | 'approval'
   | 'escalated'
@@ -105,20 +110,6 @@ export const STATE_RULES: Record<NarrativeState, StateRule> = {
     observed: true,
     expiresHours: DRAFT_SILENCE_HOURS,
   },
-  drafting: {
-    state: 'drafting',
-    owner: 'writer',
-    meaning: 'The writer says they have started.',
-    observed: false,
-    expiresHours: null,
-  },
-  review: {
-    state: 'review',
-    owner: 'bella',
-    meaning: 'A draft exists and needs moving into QA.',
-    observed: false,
-    expiresHours: null,
-  },
   qa_review: {
     state: 'qa_review',
     owner: 'qa',
@@ -159,19 +150,15 @@ export const STATE_RULES: Record<NarrativeState, StateRule> = {
  *   Being present here at all is what makes a transition a handoff rather than
  *   chatter, which is what survives a verbosity setting of 'handoffs'.
  *
- *   `drafting→review` and `review→qa_review` describe a path no agent takes.
- *   The move agents actually make, `requested→qa_review`, is absent, so a draft
- *   arriving for QA is chatter. It is also never posted at all, because
- *   update_narrative in the sync route writes a timeline row and returns
- *   without calling postFundingEvent. Both are phase two.
+ *   It used to carry `drafting→review` and `review→qa_review`, a path no agent
+ *   takes, while the move agents actually make was missing. Both dead entries
+ *   went with the states themselves on 2 Sep 2026.
  */
 export const TRANSITION_OWNER: Record<string, Owner> = {
   // The move agents actually make. Absent until now, so a draft arriving for
   // QA posted as chatter and was filtered out at any verbosity above verbose.
   // Owner is null on purpose: it is Julie's next, and Julie is not chased.
   'requested→qa_review': null,
-  'drafting→review': 'bella',
-  'review→qa_review': null,
   'qa_review→approval': 'bella',
   'qa_review→escalated': 'bella',
   'qa_review→ready': null,
@@ -394,4 +381,19 @@ export function daysUntilClose(opp: WindowSubject, today: Date = new Date()): nu
   const closes = new Date(String(opp.application_closes).slice(0, 10) + 'T00:00:00');
   const ref = new Date(today.getFullYear(), today.getMonth(), today.getDate());
   return Math.round((closes.getTime() - ref.getTime()) / 86400000);
+}
+
+// ── Guarding the state field ──
+
+/**
+ * The states, as data. Needed because the sync API takes a state off the wire
+ * and TypeScript cannot check a value that arrives at runtime.
+ */
+export const NARRATIVE_STATES: NarrativeState[] = [
+  'not_started', 'requested', 'qa_review', 'approval', 'escalated', 'ready',
+];
+
+/** Whether something an agent sent is a state this system actually has. */
+export function isNarrativeState(v: unknown): v is NarrativeState {
+  return typeof v === 'string' && (NARRATIVE_STATES as string[]).includes(v);
 }
