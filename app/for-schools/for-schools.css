@@ -252,3 +252,7 @@ ul.fs-ican li:before{content:"";position:absolute;left:0;top:15px;width:8px;heig
 .fs-page .fs-tablewrap table{table-layout:fixed}
 .fs-page .fs-tablewrap thead th:first-child{width:16%}
 .fs-page .fs-tablewrap thead th:not(:first-child){width:21%}
+
+/* four one-pagers in a two by two, not a three-across with an orphan */
+.fs-page .fs-dl-grid{grid-template-columns:repeat(2,1fr); gap:20px}
+@media(max-width:880px){.fs-page .fs-dl-grid{grid-template-columns:1fr}}
