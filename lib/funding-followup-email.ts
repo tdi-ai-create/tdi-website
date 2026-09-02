@@ -377,3 +377,87 @@ export async function sendFollowUpEmail(email: GeneratedEmail): Promise<{ ok: bo
   const data = await res.json().catch(() => ({}))
   return { ok: true, id: data?.id || null }
 }
+
+// ── One email per person ──
+
+export interface OutstandingAsk {
+  /** Client-facing wording. Already gated by clientTaskLabel. */
+  label: string
+  /** Why it matters to them, one clause. Optional. */
+  because?: string | null
+}
+
+/**
+ * Everything currently outstanding for one person, as one message.
+ *
+ * A person receives one email. Not one per task, not one per escalation rung.
+ * Gary Doughan had six drafts waiting on 2 September: two real questions, each
+ * drafted three ways, every one individually correct and individually
+ * sendable. Working that queue top to bottom would have sent one man six
+ * emails, which is the fastest way to be ignored by someone whose help we need.
+ *
+ * The asks are passed in rather than parsed back out of a previous draft.
+ * Reading prose to work out what it already asked is guesswork; the open items
+ * are a fact the database holds.
+ */
+export function buildConsolidatedEmail(params: {
+  contactName?: string | null
+  schoolName?: string | null
+  asks: OutstandingAsk[]
+}): { subject: string; text: string } {
+  const name = params.contactName?.split(' ')[0] || 'there'
+  const school = params.schoolName || 'your school'
+  const asks = params.asks.filter(a => a.label && a.label.trim())
+
+  const count = numberWord(asks.length)
+  const subject =
+    asks.length === 1
+      ? `Quick question to keep ${school} funding moving`
+      : `${count} quick questions to keep ${school} funding moving`
+
+  const opener =
+    asks.length === 1
+      ? `One quick thing I need from you, and it should take less than a minute.`
+      : `${count} quick things I need from you, and ${asks.length === 2 ? 'neither' : 'none'} should take more than a minute.`
+
+  const lines = asks.map(a =>
+    a.because ? `**${askPhrase(a.label)}.** ${a.because}` : `**${askPhrase(a.label)}.**`
+  )
+
+  const text = [
+    `Hi ${name},`,
+    opener,
+    ...lines,
+    asks.length === 1
+      ? `A no is just as useful to me as a yes. It tells me where to put the effort instead.`
+      : `A no on ${asks.length === 2 ? 'either' : 'any'} of these is just as useful to me as a yes. It tells me where to put the effort instead.`,
+    `Happy to jump on a quick call if that is faster than typing.`,
+    `Thanks ${name},`,
+    `Bella`,
+    `Teachers Deserve It`,
+  ].join('\n\n')
+
+  return { subject, text }
+}
+
+/** Small counts read as words in a sentence, not as digits. */
+function numberWord(n: number): string {
+  return ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine'][n] ?? String(n)
+}
+
+/**
+ * A client_label into a line that can stand on its own.
+ *
+ * Labels are written to sit mid-sentence, as in "I'm reaching out because
+ * confirming whether your staff hold NEA membership is a key piece of...".
+ * Lifted out and given a question mark they read as broken English:
+ * "Confirming whether any of your staff are current NEA members?"
+ *
+ * Stripping the leading verb leaves the thing itself, which reads correctly
+ * under an opener that already says these are what is needed.
+ */
+function askPhrase(v: string): string {
+  const t = v.trim().replace(/[.?!]+$/, '')
+  const stripped = t.replace(/^(confirming|confirm|checking|check|getting|get)\s+/i, '')
+  return stripped.charAt(0).toUpperCase() + stripped.slice(1)
+}

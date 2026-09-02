@@ -4,7 +4,12 @@ import { postFundingEvent } from '@/lib/funding-slack'
 import { isGateOpen } from '@/lib/funding-gate-gaps'
 import { callTriggerFor } from '@/lib/funding/call-escalation'
 import { sourceItemKeyFor } from '@/lib/funding-client-label'
-import { generateFollowUpEmail } from '@/lib/funding-followup-email'
+import {
+  generateFollowUpEmail,
+  buildConsolidatedEmail,
+  clientTaskLabel,
+  NEUTRAL_TASK_LABEL,
+} from '@/lib/funding-followup-email'
 
 // ══════════════════════════════════════════════════════════════
 // DRY_RUN — flip to false ONLY after verifying logic against
@@ -354,36 +359,83 @@ async function sendFollowUpEmail(params: {
   if (!isTdiAddress(to)) {
     const supabase = getServiceSupabase()
 
-    // One open draft per underlying task, not one per escalation rung.
+    // One open draft per PERSON. Not per task, and not per escalation rung.
     //
-    // This used to deduplicate on subject, but the subject is rewritten at every
-    // rung ("Heads up on...", "Following up:...", "Can you help with...?"), so a
-    // single unanswered question produced a new draft each time it escalated.
-    // On 30 August the queue read as eight items of work that were really two
-    // questions asked four ways, which makes the backlog look worse than it is
-    // and buries whichever draft is actually current.
+    // This deduplicated on subject first, which failed because the subject is
+    // rewritten at every rung ("Heads up on...", "Following up:...", "Can you
+    // help with...?"), so one unanswered question produced a fresh draft each
+    // time it escalated. Keying on the task fixed that.
     //
-    // The key is the task itself, which does not change as the wording escalates.
-    // If an open draft already exists for it, the newer rung replaces the wording
-    // rather than adding a row.
+    // Keying on the task was still wrong, one level up. Gary Doughan had six
+    // drafts waiting on 2 September: two genuine questions, each drafted three
+    // ways. Every one of them was individually correct and would have been
+    // individually sendable, and working that queue top to bottom would have
+    // sent one man six emails.
+    //
+    // The rule is that a person receives one email. If they already have
+    // something waiting, a second ask joins it rather than starting another
+    // thread, and the draft always describes everything currently outstanding
+    // for that recipient. Nothing is dropped: appendAsk keeps every ask that is
+    // still open, so a second question makes the existing draft more complete
+    // instead of making a new one.
     const sourceItemKey = sourceItemKeyFor(to, params.itemTitle)
 
     const { data: openDraft } = await supabase
       .from('funding_email_log')
-      .select('id')
-      .eq('source_item_key', sourceItemKey)
+      .select('id, subject, body, source_item_key')
+      .eq('to_email', to)
       .eq('status', 'draft')
+      .order('created_at', { ascending: true })
       .limit(1)
       .maybeSingle()
+
+    // What this person still owes us, from the database rather than from
+    // reading the previous draft's prose. Parsing an email to work out what it
+    // already asked is guesswork; the open items are a fact.
+    //
+    // Only items with client wording are included. clientTaskLabel decides
+    // that, and an item whose wording would fail its gates is left out of the
+    // email entirely rather than described as "this funding step", because a
+    // consolidated ask is exactly where vagueness is most expensive.
+    const { data: ownedItems } = await supabase
+      .from('funding_action_items')
+      .select('id, title, client_label, status, owner_email')
+      .in('status', ['pending', 'blocked'])
+
+    const asks = (ownedItems ?? [])
+      .filter(i => (i.client_label ?? '').trim().length > 0)
+      .map(i => ({ item: i, label: clientTaskLabel(i.title ?? '', i.client_label) }))
+      .filter(a => a.label !== NEUTRAL_TASK_LABEL)
+      // Belonging is decided by the item's own owner address, not by guessing
+      // from the pursuit. Two items on the same school can route to two
+      // different people, and merging those into one email would tell each of
+      // them about the other's business.
+      .filter(a => (a.item.owner_email ?? '').toLowerCase() === to.toLowerCase())
+      .map(a => ({ label: a.label }))
+
+    // Always include the ask that triggered this run, even if the join above
+    // missed it. Silence is the failure mode that matters here.
+    const triggerLabel = clientTaskLabel(params.itemTitle, params.clientLabel)
+    if (triggerLabel !== NEUTRAL_TASK_LABEL && !asks.some(a => a.label === triggerLabel)) {
+      asks.push({ label: triggerLabel })
+    }
+
+    const consolidated = buildConsolidatedEmail({
+      contactName: params.contactName,
+      schoolName: params.schoolName,
+      asks,
+    })
 
     if (openDraft) {
       // Escalating: keep one row, carry the latest wording.
       const { error: updErr } = await supabase
         .from('funding_email_log')
         .update({
-          subject,
-          // The words, not the markup. See the note on the draft insert below.
-          body: text,
+          // Everything outstanding for this person, rebuilt. A second question
+          // makes the waiting draft more complete rather than starting a
+          // second thread.
+          subject: consolidated.subject,
+          body: consolidated.text,
           email_type: type === 'nudge' || type === 'escalation' ? 'nudge' : 'deadline_reminder',
         })
         .eq('id', openDraft.id)
@@ -400,10 +452,10 @@ async function sendFollowUpEmail(params: {
     const { error: draftError } = await supabase.from('funding_email_log').insert({
       pursuit_id: params.pursuitId || null,
       opportunity_id: params.opportunityId || null,
-      subject,
+      subject: consolidated.subject,
       // The words, not the markup. This column is read by the board, edited by
       // a person, and re-wrapped by the send route, and all three want text.
-      body: text,
+      body: consolidated.text,
       to_email: to,
       to_name: params.contactName || null,
       from_email: 'noreply@teachersdeserveit.com',
