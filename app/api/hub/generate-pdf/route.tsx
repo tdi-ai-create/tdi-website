@@ -8,6 +8,7 @@ import { FormPDF, type FormData } from '@/lib/pdf/quick-win-form'
 import { ReferencePDF, type ReferenceData } from '@/lib/pdf/quick-win-reference'
 import { ToolkitPDF, type ToolkitData } from '@/lib/pdf/quick-win-toolkit'
 import React from 'react'
+import { retireReviewStamp } from '@/lib/hub/replace-file'
 
 export const maxDuration = 60
 
@@ -63,7 +64,7 @@ export async function POST(request: NextRequest) {
 
       const { data: qw, error: fetchErr } = await supabase
         .from('hub_quick_wins')
-        .select('id, slug, title')
+        .select('id, slug, title, qa_notes, reviewed_at, reviewed_by')
         .eq('id', id)
         .single()
 
@@ -94,14 +95,47 @@ export async function POST(request: NextRequest) {
       const { data: urlData } = supabase.storage.from('hub-assets').getPublicUrl(storagePath)
       const toolUrl = urlData?.publicUrl
 
+      // The stamp describes the file it was given, so it retires with that file.
+      // Same update as the new URL: a document can never be live under a review
+      // of the document it replaced.
+      const now = new Date().toISOString()
+      const retired = retireReviewStamp(qw, 'tool', body.actor || 'generate_tool', now)
+
       const { error: updateErr } = await supabase
         .from('hub_quick_wins')
-        .update({ tool_file_url: toolUrl, tool_file_path: storagePath, tool_type, updated_at: new Date().toISOString() })
+        .update({
+          tool_file_url: toolUrl,
+          tool_file_path: storagePath,
+          tool_type,
+          updated_at: now,
+          ...retired.patch,
+        })
         .eq('id', qw.id)
 
       if (updateErr) return NextResponse.json({ error: updateErr.message }, { status: 500 })
 
-      return NextResponse.json({ success: true, tool_file_url: toolUrl, storage_path: storagePath, tool_type })
+      // A 200 has proved nothing on this table before (TEA-236), so read it back.
+      const { data: after } = await supabase
+        .from('hub_quick_wins')
+        .select('tool_file_url, reviewed_at')
+        .eq('id', qw.id)
+        .single()
+
+      if (after?.tool_file_url !== toolUrl || after?.reviewed_at !== null) {
+        return NextResponse.json(
+          { error: 'Tool replacement did not stick. The file or the cleared review stamp is not what was written.' },
+          { status: 500 },
+        )
+      }
+
+      return NextResponse.json({
+        success: true,
+        tool_file_url: toolUrl,
+        storage_path: storagePath,
+        tool_type,
+        review_stamp_cleared: retired.hadStamp,
+        needs_qa: true,
+      })
     }
 
     // Default: generate_pdf (guide)
