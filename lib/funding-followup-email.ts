@@ -231,10 +231,13 @@ function renderFollowUpHtml(text: string, badge: { color: string; label: string 
 export function generateFollowUpEmail(params: FollowUpEmailParams): GeneratedEmail {
   const {
     to, itemTitle, dueDate, bizDaysOverdue, rungLabel, type, tone,
-    contactName = 'there', schoolName = 'your school', clientLabel,
+    contactName = 'there', schoolName: rawSchoolName = 'your school', clientLabel,
     submitterName = 'unknown', nextRung = 'none',
   } = params
 
+  // Cleaned once here, so every sentence below inherits it rather than each
+  // call site being the one that forgot.
+  const schoolName = schoolDisplayName(rawSchoolName)
   const friendlyTask = clientTaskLabel(itemTitle, clientLabel)
   const displayRungLabel = displayRung(rungLabel)
 
@@ -406,7 +409,7 @@ export function buildConsolidatedEmail(params: {
   asks: OutstandingAsk[]
 }): { subject: string; text: string } {
   const name = params.contactName?.split(' ')[0] || 'there'
-  const school = params.schoolName || 'your school'
+  const school = schoolDisplayName(params.schoolName)
   const asks = params.asks.filter(a => a.label && a.label.trim())
 
   const count = numberWord(asks.length)
@@ -460,4 +463,42 @@ function askPhrase(v: string): string {
   const t = v.trim().replace(/[.?!]+$/, '')
   const stripped = t.replace(/^(confirming|confirm|checking|check|getting|get)\s+/i, '')
   return stripped.charAt(0).toUpperCase() + stripped.slice(1)
+}
+
+// ── What a school is called, to its face ──
+
+/**
+ * The name a school should read, with our filing conventions taken off.
+ *
+ * `pursuit_name` is always "{district} - Grant Funding" and some district
+ * names carry their own decoration, so the two compose into things we actually
+ * sent people. Paula Poche was told we were securing money for "St. Peter
+ * Chanel - Grant Funding". Prince George's County was told it was for
+ * "(RENEWAL) Allenwood Elementary - Grant Funded Funding", which announces both
+ * that they are a renewal and that we keep a record about them.
+ *
+ * Eleven emails to four people carried this between 30 July and 14 August.
+ *
+ * Fixed here rather than at each call site, because there are six places a
+ * school name reaches a client and any of them would have been the one someone
+ * forgot. A caller that passes the raw record still produces clean copy.
+ */
+export function schoolDisplayName(raw: string | null | undefined): string {
+  const start = (raw ?? '').trim()
+  if (!start) return 'your school'
+
+  const cleaned = start
+    // Our own pipeline vocabulary, wherever it sits.
+    .replace(/\((RENEWAL|RENEWED|NEW|PILOT|TEST|REVIEW)\)/gi, ' ')
+    // The suffix the pursuit name always carries, with or without the trailing
+    // word the template then adds after it.
+    .replace(/[\s-]+grant\s+fund(ing|ed)(\s+funding)?\s*$/i, '')
+    .replace(/[\s-]+funding\s*$/i, '')
+    .replace(/\s{2,}/g, ' ')
+    .replace(/^[\s-]+|[\s-]+$/g, '')
+    .trim()
+
+  // Never return nothing. A name made entirely of our own words means we have
+  // no real name for this school, and vague beats wrong in front of a client.
+  return cleaned.length >= 2 ? cleaned : 'your school'
 }
