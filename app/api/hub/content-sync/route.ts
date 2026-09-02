@@ -1,6 +1,7 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
 import { getQuizBySlug } from '@/lib/hub/quizConfigs'
+import { retireReviewStamp } from '@/lib/hub/replace-file'
 
 // PDF upload via base64 can be slow
 export const maxDuration = 60
@@ -614,7 +615,7 @@ export async function POST(request: NextRequest) {
 
       const { data: qw, error: fetchErr } = await supabase
         .from('hub_quick_wins')
-        .select('id, slug')
+        .select('id, slug, qa_notes, reviewed_at, reviewed_by')
         .eq('id', id)
         .single()
 
@@ -637,6 +638,12 @@ export async function POST(request: NextRequest) {
       const { data: urlData } = supabase.storage.from('hub-assets').getPublicUrl(storagePath)
       const publicUrl = urlData?.publicUrl
 
+      // The stamp describes the file it was given, so it retires with that file.
+      // Same update as the new URL: a document can never be live under a review
+      // of the document it replaced.
+      const now = new Date().toISOString()
+      const retired = retireReviewStamp(qw, 'guide', body.actor || 'upload_pdf', now)
+
       const { error: updateErr } = await supabase
         .from('hub_quick_wins')
         .update({
@@ -645,13 +652,34 @@ export async function POST(request: NextRequest) {
           file_type: 'application/pdf',
           content_type: 'pdf',
           storage_path: storagePath,
-          updated_at: new Date().toISOString(),
+          updated_at: now,
+          ...retired.patch,
         })
         .eq('id', qw.id)
 
       if (updateErr) return NextResponse.json({ error: updateErr.message }, { status: 500 })
 
-      return NextResponse.json({ success: true, file_url: publicUrl, storage_path: storagePath })
+      // A 200 has proved nothing on this table before (TEA-236), so read it back.
+      const { data: after } = await supabase
+        .from('hub_quick_wins')
+        .select('file_url, reviewed_at')
+        .eq('id', qw.id)
+        .single()
+
+      if (after?.file_url !== publicUrl || after?.reviewed_at !== null) {
+        return NextResponse.json(
+          { error: 'Guide replacement did not stick. The file or the cleared review stamp is not what was written.' },
+          { status: 500 },
+        )
+      }
+
+      return NextResponse.json({
+        success: true,
+        file_url: publicUrl,
+        storage_path: storagePath,
+        review_stamp_cleared: retired.hadStamp,
+        needs_qa: true,
+      })
     }
 
     // ── upload_thumbnail: store a thumbnail image for a Quick Win ──
