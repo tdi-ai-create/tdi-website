@@ -112,7 +112,7 @@ export function groupWork(actionItems: any[], opportunities: any[]) {
     you: live.filter(a => a.owner_type !== 'client'),
     school: live.filter(a => a.owner_type === 'client'),
     agent: (opportunities ?? []).filter(o =>
-      ['requested', 'drafting', 'qa_review'].includes(o.narrative_status) && isLivePath(o)),
+      ['requested', 'qa_review'].includes(o.narrative_status) && isLivePath(o)),
     finished: (actionItems ?? []).filter(a => !isLiveItem(a)),
   }
 }

@@ -359,7 +359,7 @@ export async function PATCH(request: NextRequest) {
       if (allOpps && allOpps.length > 0) {
         // Allowed phases: intake, researching, strategy, writing, in_review, delivered, submitted, awaiting_decision, awarded, denied, on_hold
         let computedPhase = 'intake'
-        const hasDrafting = allOpps.some((o: { narrative_status: string }) => ['requested', 'drafting'].includes(o.narrative_status))
+        const hasDrafting = allOpps.some((o: { narrative_status: string }) => ['requested'].includes(o.narrative_status))
         const hasReview = allOpps.some((o: { narrative_status: string }) => ['review', 'qa_review'].includes(o.narrative_status))
         const hasReady = allOpps.some((o: { narrative_status: string }) => o.narrative_status === 'ready')
         const hasSent = allOpps.some((o: { forwarding_email_status: string }) => o.forwarding_email_status === 'sent')

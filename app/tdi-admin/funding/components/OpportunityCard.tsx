@@ -52,7 +52,6 @@ const STATUS_OPTIONS = [
 
 const NARRATIVE_DOT_COLORS: Record<string, string> = {
   not_started: '#DC2626',
-  drafting: '#F59E0B',
   review: '#F59E0B',
   ready: '#10B981',
 }

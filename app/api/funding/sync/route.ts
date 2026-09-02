@@ -1,7 +1,13 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
 import { MAX_QA_ATTEMPTS, ESCALATION_OPTIONS, validateEscalation } from '@/lib/funding-qa'
-import { splitQaIssues, dispositionForFail, writerGuidance } from '@/lib/funding-rules'
+import {
+  splitQaIssues,
+  dispositionForFail,
+  writerGuidance,
+  NARRATIVE_STATES,
+  isNarrativeState,
+} from '@/lib/funding-rules'
 import { postFundingEvent, narrativeEvent } from '@/lib/funding-slack'
 import { screenPath } from '@/lib/funding-eligibility'
 
@@ -647,8 +653,27 @@ export async function POST(request: NextRequest) {
     // the three live schools, 9 currently have a source, so this will refuse a
     // lot at first. That refusal is the accurate state of the evidence, not an
     // obstacle to route around.
-    const submittingForReview =
-      narrativeStatus === 'qa_review' || narrativeStatus === 'review'
+    // An agent may not invent a state.
+    //
+    // This wrote whatever it was handed. That is how narratives reach qa_review
+    // while skipping the step that was supposed to precede it, and it is why
+    // two declared states went years without a single row: the sync API was the
+    // only writer that could reach them and nothing asked it to.
+    //
+    // Rejecting loudly beats accepting quietly. A narrative parked in a state
+    // no screen renders is invisible rather than wrong, which is the harder
+    // failure to notice.
+    if (narrativeStatus && !isNarrativeState(narrativeStatus)) {
+      return NextResponse.json(
+        {
+          error: `'${narrativeStatus}' is not a narrative state.`,
+          valid: NARRATIVE_STATES,
+        },
+        { status: 400 },
+      )
+    }
+
+    const submittingForReview = narrativeStatus === 'qa_review'
     if (submittingForReview && (!Array.isArray(factsCited) || factsCited.length === 0)) {
       return NextResponse.json({
         error:
@@ -736,7 +761,6 @@ export async function POST(request: NextRequest) {
 
     if (opp) {
       const statusLabels: Record<string, string> = {
-        drafting: 'Narrative draft started',
         review: 'Narrative ready for review',
         qa_review: 'Narrative in QA review',
         ready: 'Narrative approved and ready',

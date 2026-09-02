@@ -654,7 +654,7 @@ function GrantRow({ grant, school, onDraftEmail, onToast, onRefresh }: {
   const inQa = ns === 'qa_review' && grant.qaPassed !== true
   const isEscalated = ns === 'escalated'
   const isApproved = approved || ns === 'ready'
-  const isDrafting = ns === 'drafting' || ns === 'requested'
+  const isDrafting = ns === 'requested'
 
   return (
     <div style={{
@@ -782,7 +782,7 @@ function GrantStatusBadge({ grant }: { grant: SchoolData['grants'][0] }) {
   if (grant.narrativeStatus === 'ready') {
     return <Badge label="Ready to send" color="#8A5500" bg="#FFF2D4" />
   }
-  if (grant.narrativeStatus === 'drafting' || grant.narrativeStatus === 'requested') {
+  if (grant.narrativeStatus === 'requested') {
     return <Badge label="Agent drafting" color="#1D4ED8" bg="#DBEAFE" />
   }
   if (grant.windowOpen) {

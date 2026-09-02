@@ -311,7 +311,7 @@ export default function NeedsYouBoard({
       g.status !== 'researching' &&
       !IN_PLAY.has(g.status) &&
       !ENDED.has(g.status) &&
-      ['requested', 'drafting', 'qa_review', 'review', 'escalated'].includes(g.narrativeStatus || ''),
+      ['requested', 'qa_review', 'escalated'].includes(g.narrativeStatus || ''),
   )
 
   const readyForYou = steps.filter(i => i.owner === 'team' && !i.inProgress)

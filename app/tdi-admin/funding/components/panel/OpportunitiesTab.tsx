@@ -32,7 +32,7 @@ const WINDOW_STATUS_STYLES: Record<string, { bg: string; color: string }> = {
 
 const NARRATIVE_COLORS: Record<string, string> = {
   not_started: '#EF4444', researching: '#F59E0B', applied: '#F59E0B',
-  waiting: '#F59E0B', drafting: '#F59E0B', review: '#F59E0B',
+  waiting: '#F59E0B',
   ready: '#10B981', awarded: '#10B981', denied: '#6B7280',
   stalled: '#6B7280', backup: '#6B7280',
 }
@@ -857,66 +857,6 @@ function NarrativeControl({ opp, gateOpen, onRequestDraft, onApprove, onSendBack
                   : 'Draft won\'t start until the funding window is verified open'}
               </span>
             )}
-          </>
-        )}
-
-        {/* ── drafting ── */}
-        {ns === 'drafting' && (
-          <>
-            <span style={{ fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 4, background: '#DBEAFE', color: '#1D4ED8' }}>
-              {agent || 'Agent'} is drafting...
-            </span>
-            {hasUrl && (
-              <a href={opp.narrative_url} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} style={{ fontSize: 10, color: '#8B5CF6', textDecoration: 'underline' }}>
-                Open doc
-              </a>
-            )}
-            {/* Show QA feedback if returning from a fail */}
-            {opp.qa_passed === false && opp.qa_notes && (
-              <span style={{ fontSize: 9, color: '#DC2626', fontStyle: 'italic' }}>
-                QA feedback: {opp.qa_notes}
-              </span>
-            )}
-          </>
-        )}
-
-        {/* ── review: send to QA ── */}
-        {ns === 'review' && (
-          <>
-            <span style={{ fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 4, background: '#FEF3C7', color: '#92400E' }}>
-              Draft ready, needs QA
-            </span>
-            {hasUrl && (
-              <a href={opp.narrative_url} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} style={{ fontSize: 10, color: '#8B5CF6', textDecoration: 'underline' }}>
-                Open external
-              </a>
-            )}
-            {hasContent && (
-              <button onClick={() => setShowContent(!showContent)} style={{ fontSize: 9, padding: '1px 6px', borderRadius: 3, border: '1px solid #E5E7EB', background: 'white', color: '#6B7280', cursor: 'pointer' }}>
-                {showContent ? 'Hide' : 'Read inline'}
-              </button>
-            )}
-            <button onClick={() => onPatch({ narrative_status: 'qa_review' })} style={{ fontSize: 10, fontWeight: 600, padding: '3px 10px', borderRadius: 4, border: 'none', background: '#F59E0B', color: 'white', cursor: 'pointer' }}>
-              Send to QA
-            </button>
-            {/* The same trap we closed at `approval`, one state earlier and
-                worse. This is the first time a person sees the draft. If it is
-                obviously wrong, the only button pushed it into QA anyway, which
-                spends one of two attempts on something the reader already knew
-                was wrong. Julie then fails it, it returns to the writer, and it
-                gets one attempt instead of two. Reading a draft and sending it
-                back is the whole point of this stage. */}
-            <button
-              onClick={() => {
-                const note = window.prompt(
-                  'What needs changing? This goes back to the writer as their guidance.'
-                )
-                if (note && note.trim().length > 2) onSendBack(note.trim())
-              }}
-              style={{ fontSize: 10, fontWeight: 600, padding: '3px 10px', borderRadius: 4, border: '1px solid #D1D5DB', background: 'white', color: '#374151', cursor: 'pointer' }}
-            >
-              Send it back
-            </button>
           </>
         )}
 

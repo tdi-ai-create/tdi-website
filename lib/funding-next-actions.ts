@@ -416,25 +416,6 @@ export function computeNextActions(
     })
   }
 
-  // Narrative in 'review' → needs QA
-  for (const opp of opportunities) {
-    if (opp.narrative_status === 'review') {
-      result.push({
-        id: `qa-${opp.id}`,
-        // Worded as a hand-off, not a review. This is the only narrative step
-        // before Julie, and calling it "review" invited Bella to grade the
-        // draft, which is Julie's job.
-        label: `Send "${opp.name}" narrative to Julie for QA`,
-        why: 'Agent finished the draft. Glance at it if you like, then click "Send to QA". Julie does the reviewing. You approve it after she passes it.',
-        owner: 'team',
-        urgency: 'high',
-        actionType: 'send_to_qa',
-        targetId: opp.id,
-        tab: 'opportunities',
-      })
-    }
-  }
-
   // Narrative awaiting a QA verdict.
   //
   // QA is Julie's job and nobody else's. This used to hand the verdict to Bella
@@ -740,20 +721,11 @@ export function computeNextActions(
         inProgress: true,
       })
     }
-    if (opp.narrative_status === 'drafting') {
-      result.push({
-        id: `drafting-${opp.id}`,
-        label: `"${opp.name}" — ${opp.assigned_agent || 'agent'} is drafting`,
-        why: 'No action needed — agent is working',
-        owner: 'agent',
-        urgency: 'low',
-        actionType: 'waiting',
-        targetId: opp.id,
-        tab: 'opportunities',
-        inProgress: true,
-      })
-    }
-    if (opp.research_status === 'requested' || opp.research_status === 'in_progress') {
+    // 'in_progress' is not a legal research_status. The column allows none,
+    // requested, researching and found, so that half of the test could never
+    // be true and research an agent had started looked like research nobody
+    // had picked up.
+    if (opp.research_status === 'requested' || opp.research_status === 'researching') {
       result.push({
         id: `research-${opp.id}`,
         label: `"${opp.name}" — ${opp.assigned_agent || 'agent'} researching funders`,
