@@ -223,12 +223,14 @@ export function generateFollowUpEmail(params: FollowUpEmailParams): GeneratedEma
           ? `Following up: ${friendlyTask}`
           : `Can you help with ${friendlyTask} for ${schoolName}?`
   } else {
+    // Internal inboxes are still TDI inboxes, so the punctuation rules apply
+    // here too. These three carried em dashes into Rae's mail every night.
     subject =
       type === 'reminder'
-        ? `UPCOMING — "${itemTitle}" due ${dueDate}`
+        ? `UPCOMING: "${itemTitle}" due ${dueDate}`
         : type === 'nudge'
-          ? `OVERDUE (${bizDaysOverdue} biz days) — "${itemTitle}"`
-          : `ESCALATED to ${displayRungLabel} — "${itemTitle}" ${bizDaysOverdue} days overdue`
+          ? `OVERDUE (${bizDaysOverdue} biz days): "${itemTitle}"`
+          : `ESCALATED to ${displayRungLabel}: "${itemTitle}", ${bizDaysOverdue} days overdue`
   }
 
   // The words, once.
@@ -312,7 +314,7 @@ export function generateFollowUpEmail(params: FollowUpEmailParams): GeneratedEma
 
   const html = renderFollowUpHtml(text, badge)
 
-  const fromName = tone === 'client' ? 'Bella — Teachers Deserve It' : 'TDI Funding'
+  const fromName = tone === 'client' ? 'Bella at Teachers Deserve It' : 'TDI Funding'
   const replyTo = tone === 'client' ? 'hello@teachersdeserveit.com' : undefined
 
   return { to, from: `${fromName} <noreply@teachersdeserveit.com>`, replyTo, subject, html, text, tone }

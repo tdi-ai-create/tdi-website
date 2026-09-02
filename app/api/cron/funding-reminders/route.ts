@@ -114,19 +114,39 @@ export async function GET(request: NextRequest) {
       const pursuit = pursuits.find(p => p.id === alert.pursuit_id)
       if (!pursuit?.client_contact_email) continue
 
-      // Check if a nudge was already drafted/sent in the last 3 days
-      const threeDaysAgo = new Date()
-      threeDaysAgo.setDate(threeDaysAgo.getDate() - 3)
-
-      const { data: recentEmails } = await supabase
+      // Two separate reasons not to draft, and they need different clocks.
+      //
+      // If a reminder is still sitting unsent, a second one is noise no matter
+      // how old the first is. Whoever works the queue now has two identical
+      // drafts and no way to tell which one to send. That is how four of ten
+      // drafts in the queue on 1 Sep turned out to be second copies: the guard
+      // below only looked back three days, and Aug 28 to Sep 01 is four.
+      //
+      // If one was actually sent, the clock is the right instrument. Three days
+      // is the floor before chasing the same person about the same deadline.
+      const { data: pendingDraft } = await supabase
         .from('funding_email_log')
         .select('id')
         .eq('opportunity_id', alert.opportunity_id)
         .in('email_type', ['nudge', 'deadline_reminder'])
+        .eq('status', 'draft')
+        .limit(1)
+
+      if (pendingDraft && pendingDraft.length > 0) continue
+
+      const threeDaysAgo = new Date()
+      threeDaysAgo.setDate(threeDaysAgo.getDate() - 3)
+
+      const { data: recentlySent } = await supabase
+        .from('funding_email_log')
+        .select('id')
+        .eq('opportunity_id', alert.opportunity_id)
+        .in('email_type', ['nudge', 'deadline_reminder'])
+        .eq('status', 'sent')
         .gte('created_at', threeDaysAgo.toISOString())
         .limit(1)
 
-      if (recentEmails && recentEmails.length > 0) continue
+      if (recentlySent && recentlySent.length > 0) continue
 
       // Auto-draft a nudge. status 'draft', never sent by this cron.
       const { error: draftErr } = dryRun
@@ -274,7 +294,7 @@ export async function GET(request: NextRequest) {
         ? { error: null }
         : await supabase.from('funding_opportunities').insert({
         pursuit_id: p.id,
-        name: `${DISCOVERY_NAME} — ${new Date(nowMs).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`,
+        name: `${DISCOVERY_NAME}, ${new Date(nowMs).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`,
         plan_category: 'C',
         status: 'not_started',
         waiting_on: 'tdi',
