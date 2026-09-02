@@ -19,6 +19,15 @@ import { screenPath } from '@/lib/funding-eligibility'
  * Auth: Bearer token via PAPERCLIP_SYNC_KEY env var
  */
 
+/**
+ * How long to leave an unestablished funding window alone before asking again.
+ *
+ * Long enough that answering "I could not establish this, and here is why" is
+ * a real answer rather than a loop, short enough to catch a funder that opens
+ * a new cycle.
+ */
+const WINDOW_RECHECK_DAYS = 14
+
 function db() {
   return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -288,6 +297,23 @@ export async function GET(request: NextRequest) {
       .eq('research_status', 'found')
       .or('window_status.is.null,window_status.eq.unknown')
       .not('status', 'in', '("closed","awarded","denied")')
+      // Do not ask the same unanswerable question every hour.
+      //
+      // 'unknown' is often the correct final answer, not a gap. On the first
+      // run of this branch all five funders came back still unknown, and
+      // rightly: State Farm is invitation-only with no published deadline, the
+      // Commanders' grant portal login is disabled, and the Catholic Education
+      // Trust Fund blocks fetching. Each got a written note explaining why.
+      //
+      // Without a floor those five requeue on every heartbeat forever, so the
+      // agent redoes the same research hourly and the reward for answering is
+      // being asked again. The row's updated_at moves when she writes her note,
+      // so it doubles as "when did anyone last look at this".
+      //
+      // Fourteen days is a recheck, not a retry: a foundation that publishes
+      // nothing today may open a cycle next month, and the Catholic Education
+      // Trust Fund's own history is a February to April pattern worth catching.
+      .or(`updated_at.is.null,updated_at.lt.${new Date(Date.now() - WINDOW_RECHECK_DAYS * 86400000).toISOString()}`)
 
     // Same ownership rule as the branch above, and for the same reason. Without
     // it this hands research to whoever asks first, including the drafting and
