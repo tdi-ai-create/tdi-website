@@ -78,7 +78,7 @@ came out of Rae's own findings the same day.
 
 | Rule | State |
 |---|---|
-| **Specificity.** An action step needs a concrete number, name, or timeframe. A verb with no object fails | **Not enforced** |
+| **Specificity.** Could this exact sentence appear in a different tool without changing? If yes, cut it. See below | Human |
 | **Outcome-checkable.** An action step states an observable result showing it worked | **Not enforced** |
 | **Banned generic language.** Mechanical phrase ban on boilerplate, for example "in today's fast-paced classroom" | Code |
 | **Title-promise match.** If the title says toolkit, more than one tool ships | Human |
@@ -87,6 +87,34 @@ came out of Rae's own findings the same day.
 
 Zero *published* items carry a stamp yet, so no audit can tell what standard any
 live item was checked against. Every review from 2026-08-31 forward records one.
+
+### The specificity test
+
+Added 2026-09-01. This is the one that catches copy which sounds fine and says
+nothing.
+
+Read each line and ask: **could this exact sentence appear in a different tool
+without changing?**
+
+If yes, cut it. Not soften it, not qualify it. Cut it.
+
+- "Show me you are ready" works in any classroom tool ever written. **Fails.**
+- "Bring it to a two" only works if the five-level volume system is on the wall.
+  **Passes**, because it is load-bearing on this tool and useless without it.
+
+The point is not that generic language is ugly. It is that a sentence which fits
+anywhere teaches nothing here, and a download made of those sentences is an
+article about a subject rather than a tool for a job.
+
+**Why this wording rather than "is it specific".** Vague is not checkable and
+two reviewers will never agree on it. Portability is checkable in about a second
+and two reviewers will agree almost every time. It also survives the case where
+a line is concrete but still filler, because a concrete sentence that would work
+in twenty other tools still fails.
+
+The earlier version of this rule asked for "a concrete number, name, or
+timeframe", which was never enforced because nobody could turn it into something
+a reviewer could apply without arguing. This can be applied.
 
 ### The open sixth rule
 
@@ -202,10 +230,18 @@ ahead of the content broke publishing for everyone. The rule that keeps it safe:
 **a check may block the door new work comes through, never the door repairs go
 out of.**
 
-Two rules stay with human judgment on purpose. Specificity and outcome-checkable
-need a definition of vague that survives contact with real copy, and a bad
-mechanical version of either would reject good writing. They follow, they do not
-lead.
+Outcome-checkable stays with human judgment on purpose: a bad mechanical version
+would reject good writing. Specificity now has a usable test, in section 2, but
+it is a human read rather than a check. No machine can tell whether a sentence
+would work in a different tool.
+
+**A substance floor is deliberately absent.** The obvious next rule is a minimum
+per tool type, so a reference card with one script cannot pass. That is not
+written because the evidence is not there yet. Measuring the 32 tools that have
+passed a real read gives 6 checklists, 8 forms and only 2 reference cards, and
+the 16 self_contained ones could not be measured at all. A floor set on eight
+forms and two cards would be precise about the wrong thing. 160 downloads are
+still unread. Set it when the sample is real.
 
 Changing the lane rules changes what comes off the live site, so
 `npx tsx scripts/score-published-dryrun.ts --selftest` covers all four lanes with

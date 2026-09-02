@@ -60,6 +60,7 @@ import { Gamepad2, Users, Timer, Target, Lock } from 'lucide-react';
 import { useMembership, type MembershipTier, canAccessContent } from '@/lib/hub/use-membership';
 import { PRACTICE_GAME_REGISTRY, type PracticeGameEntry } from '@/lib/hub/practice-games';
 
+import { categoryColor, CATEGORY_FALLBACK } from '@/lib/hub/categoryColors';
 type Bilingual = { en: string; es: string };
 
 interface PracticeGameConfig extends PracticeGameEntry {
@@ -342,18 +343,6 @@ function BreathingExercise() {
 }
 
 // ─── Constants ──────────────────────────────────────────────────────────────
-
-const CATEGORY_COLORS: Record<string, string> = {
-  'Stress Relief': '#7C9CBF',
-  'Time Savers': '#6BA368',
-  'Classroom Tools': '#ffba06',
-  'Communication': '#E8927C',
-  'Self-Care': '#9B7CB8',
-  'Stress & Wellness': '#7C9CBF',
-  'Classroom Management': '#ffba06',
-  'Leadership': '#9B7CB8',
-  'New Teacher': '#5BBEC4',
-};
 
 // Testimonials pool - varied roles across K-12
 const TESTIMONIALS = [
@@ -879,7 +868,11 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
   const handleSaveToLibrary = async () => {
     if (!quickWin || !user) return;
     const supabase = getSupabase();
-    await supabase.from('hub_activity_log').insert({
+    // A dropped activity row is not a UI failure, so this does not throw. But it
+    // is not nothing either: hub_activity_log is what enrollments, completions
+    // and engagement reporting are counted from, so a silent failure here shows
+    // up later as a funder number that is quietly too low.
+    const { error: logErr1 } = await supabase.from('hub_activity_log').insert({
       user_id: user.id,
       action: 'quick_win_saved',
       metadata: {
@@ -888,6 +881,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
         saved_at: new Date().toISOString(),
       },
     });
+    if (logErr1) console.error('[hub] quick_win_saved not logged:', logErr1.message);
     setIsSaved(true);
   };
 
@@ -961,7 +955,11 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
       : quickWin.estimated_minutes;
 
     // Log completion to activity log
-    await supabase.from('hub_activity_log').insert({
+    // A dropped activity row is not a UI failure, so this does not throw. But it
+    // is not nothing either: hub_activity_log is what enrollments, completions
+    // and engagement reporting are counted from, so a silent failure here shows
+    // up later as a funder number that is quietly too low.
+    const { error: logErr2 } = await supabase.from('hub_activity_log').insert({
       user_id: user.id,
       action: 'quick_win_completed',
       metadata: {
@@ -972,6 +970,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
         completed_at: endTime.toISOString(),
       },
     });
+    if (logErr2) console.error('[hub] quick_win_completed not logged:', logErr2.message);
 
     setIsCompleted(true);
 
@@ -986,7 +985,11 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
     setIsSaving(true);
     const supabase = getSupabase();
 
-    await supabase.from('hub_activity_log').insert({
+    // A dropped activity row is not a UI failure, so this does not throw. But it
+    // is not nothing either: hub_activity_log is what enrollments, completions
+    // and engagement reporting are counted from, so a silent failure here shows
+    // up later as a funder number that is quietly too low.
+    const { error: logErr3 } = await supabase.from('hub_activity_log').insert({
       user_id: user.id,
       action: 'quick_win_reflection',
       metadata: {
@@ -996,6 +999,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
         saved_at: new Date().toISOString(),
       },
     });
+    if (logErr3) console.error('[hub] quick_win_reflection not logged:', logErr3.message);
 
     setReflectionSaved(true);
     setIsSaving(false);
@@ -1021,7 +1025,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
 
   // ─── Derived values ───────────────────────────────────────────────────────
 
-  const categoryColor = quickWin ? CATEGORY_COLORS[quickWin.category || ''] || '#ffba06' : '#ffba06';
+  const catColor = quickWin ? categoryColor(quickWin.category) : CATEGORY_FALLBACK;
 
   // ─── Loading state ────────────────────────────────────────────────────────
 
@@ -1711,7 +1715,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                   </p>
                   <div className="space-y-3">
                     {recommendations.map((rec) => {
-                      const recColor = CATEGORY_COLORS[rec.category || ''] || '#ffba06';
+                      const recColor = categoryColor(rec.category);
                       return (
                         <Link
                           key={rec.id}
@@ -1765,7 +1769,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {moreQuickWins.map((qw) => {
-                const qwColor = CATEGORY_COLORS[qw.category || ''] || '#ffba06';
+                const qwColor = categoryColor(qw.category);
                 return (
                   <Link
                     key={qw.id}

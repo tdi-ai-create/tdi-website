@@ -26,15 +26,6 @@ import { computeGatePositions, countCheckIns, describeCheckIn, summarizeCheckIns
 import type { QuizQuestion, QuizOption, QuizResponse } from '@/lib/hub/quiz';
 
 // Category colors
-const CATEGORY_COLORS: Record<string, string> = {
-  'Stress & Wellness': '#7C9CBF',
-  'Classroom Management': '#E8B84B',
-  'Time Savers': '#6BA368',
-  'Leadership': '#9B7CB8',
-  'Communication': '#E8927C',
-  'New Teacher': '#5BBEC4',
-};
-
 // Testimonials pool
 const TESTIMONIALS = [
   { quote: "I printed this out and taped it to my desk. It's the first thing I look at every morning now.", role: "3rd grade teacher", time: "2 days ago" },

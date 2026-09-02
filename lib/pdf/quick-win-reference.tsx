@@ -1,6 +1,7 @@
 /** @jsxImportSource react */
 import React from 'react'
 import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer'
+import { categoryColor, NAVY } from '@/lib/hub/categoryColors'
 
 const navy = '#1E2749'
 const gold = '#E8B84B'
@@ -9,6 +10,13 @@ const warmBg = '#F8F7F4'
 const s = StyleSheet.create({
   page: { fontFamily: 'Helvetica', backgroundColor: '#ffffff', paddingBottom: 50 },
   banner: { backgroundColor: navy, paddingTop: 20, paddingBottom: 16, paddingHorizontal: 44 },
+  // A teacher with six of these open needs to tell them apart at a glance. The
+  // navy banner keeps the brand; this band carries the category, so recognition
+  // comes from meaning rather than decoration. Navy on every category colour
+  // clears 4.5:1, checked rather than eyeballed. Never white here: white fails
+  // on all twelve.
+  categoryBand: { paddingTop: 7, paddingBottom: 7, paddingHorizontal: 44 },
+  categoryLabel: { fontSize: 8, fontFamily: 'Helvetica-Bold', color: NAVY, textTransform: 'uppercase', letterSpacing: 1.5 },
   brandLabel: { fontSize: 7, fontFamily: 'Helvetica-Bold', color: gold, textTransform: 'uppercase', letterSpacing: 2, marginBottom: 6 },
   title: { fontSize: 20, fontFamily: 'Helvetica-Bold', color: '#ffffff', lineHeight: 1.3 },
   subtitle: { fontSize: 9, color: '#cbd5e1', lineHeight: 1.4, marginTop: 4 },
@@ -33,6 +41,8 @@ const s = StyleSheet.create({
 
 export interface ReferenceData {
   title: string
+  /** Drives the header band colour so a teacher can tell tools apart at a glance. */
+  category?: string
   description?: string
   quick_facts?: { label: string; value: string }[]
   sections: {
@@ -54,6 +64,9 @@ export function ReferencePDF({ data }: { data: ReferenceData }) {
           <Text style={s.brandLabel}>Teachers Deserve It</Text>
           <Text style={s.title}>{data.title}</Text>
           {data.description ? <Text style={s.subtitle}>{data.description}</Text> : null}
+        </View>
+        <View style={[s.categoryBand, { backgroundColor: categoryColor(data.category) }]}>
+          <Text style={s.categoryLabel}>{data.category || 'Quick Win'}</Text>
         </View>
         <View style={s.content}>
           {data.quick_facts && data.quick_facts.length > 0 ? (
