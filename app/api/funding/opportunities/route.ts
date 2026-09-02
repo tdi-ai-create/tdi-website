@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { NARRATIVE_STATES, isNarrativeState } from '@/lib/funding-rules'
 import { screenPath } from '@/lib/funding-eligibility';
 import { createClient } from '@supabase/supabase-js';
 import { requireAdminAuth } from '@/lib/tdi-admin/auth';
@@ -49,6 +50,14 @@ export async function POST(request: NextRequest) {
 
   const body = await request.json();
   const supabase = db();
+
+  // A state nobody can render is worse than a rejected request.
+  if (body.narrativeStatus && !isNarrativeState(body.narrativeStatus)) {
+    return NextResponse.json(
+      { error: `'${body.narrativeStatus}' is not a narrative state.`, valid: NARRATIVE_STATES },
+      { status: 400 },
+    );
+  }
 
   const { data, error } = await supabase
     .from('funding_opportunities')
@@ -211,6 +220,17 @@ export async function PATCH(request: NextRequest) {
     // with the QA fields below.
     'redraft_guidance',
   ];
+  // narrative_status rides in this allow-list, so the list decides which
+  // fields may be written and nothing decided what a legal value was. The two
+  // states retired in #336 are still permitted by the column, so a stale
+  // caller could park a row in a state no screen renders any more.
+  if (body.narrative_status !== undefined && !isNarrativeState(body.narrative_status)) {
+    return NextResponse.json(
+      { error: `'${body.narrative_status}' is not a narrative state.`, valid: NARRATIVE_STATES },
+      { status: 400 },
+    );
+  }
+
   fields.forEach(f => { if (body[f] !== undefined) updates[f] = body[f]; });
   if (updatesOverrideFlag) updates.eligibility_overridden = true;
 
