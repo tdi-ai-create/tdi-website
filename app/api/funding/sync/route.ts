@@ -7,6 +7,7 @@ import {
   writerGuidance,
   NARRATIVE_STATES,
   isNarrativeState,
+  isWindowOpen,
 } from '@/lib/funding-rules'
 import { postFundingEvent, narrativeEvent } from '@/lib/funding-slack'
 import { screenPath } from '@/lib/funding-eligibility'
@@ -161,6 +162,29 @@ export async function GET(request: NextRequest) {
       pursuitContext = new Map((pursuitRes.data ?? []).map(p => [p.id, p]))
     }
     let narrativeWork = (rawNarrativeWork ?? []).filter((o: any) => servablePursuitIds.has(o.pursuit_id))
+
+    // A closed window is closed for agents too.
+    //
+    // The query above tests window_status = 'open', which is a stored field
+    // nothing ever moves off 'open' when the date passes. #327 fixed that for
+    // the portal by deriving the answer from the close date, and left this
+    // path on the raw field, so the Request draft button correctly disappeared
+    // while find_work would still have handed the same grant to a writer.
+    //
+    // One rule, one function. Commissioning a narrative for a window that shut
+    // spends a writer on something nobody can submit, and it is the kind of
+    // waste that only shows up weeks later as an unexplained pile of ready
+    // drafts against dead deadlines.
+    const closedByDate: Array<{ id: string; name: string; closedOn: string }> = []
+    narrativeWork = narrativeWork.filter((o: any) => {
+      if (isWindowOpen(o)) return true
+      closedByDate.push({
+        id: o.id,
+        name: o.name,
+        closedOn: String(o.application_closes ?? '').slice(0, 10),
+      })
+      return false
+    })
 
     // The stop rule, enforced where it actually cannot be walked around.
     //
@@ -428,7 +452,15 @@ export async function GET(request: NextRequest) {
       },
       // Returned so an agent finding no work can say why, rather than
       // reporting an empty queue as though nothing had been asked for.
-      withheld: blockedByScreen,
+      withheld: [
+        ...blockedByScreen,
+        ...closedByDate.map(c => ({
+          id: c.id,
+          name: c.name,
+          reason: `The application window closed on ${c.closedOn}.`,
+          rule: 'window-closed-by-date',
+        })),
+      ],
     })
   }
 
