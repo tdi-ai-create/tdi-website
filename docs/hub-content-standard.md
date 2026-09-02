@@ -192,7 +192,9 @@ From Lily on TEA-219. All human-enforced at design handoff.
 1. Colored category dot in the header, matching the Quick Win card convention. No thumbnail image
 2. At least one gold-bordered callout box carrying the single most important takeaway
 3. Numbered or checkbox action steps wherever the content is instructional. Paragraph steps are not acceptable formatting
-4. A visual hierarchy floor: title, one level of subheading, body. One text size top to bottom fails
+4. A visual hierarchy floor: title, one level of subheading, body. One text
+   size top to bottom fails. This is a floor and not the bar. A card can clear
+   it and still be unusable, so section 3a is what actually decides
 5. Fits one page at this bar. If it does not fit, scope it down. Never shrink the font to force-fit
 
 **Multi-page lesson guides**
@@ -204,6 +206,74 @@ common-pitfall callout pattern so educators learn to scan for them.
 **The single test that catches most failures:** a download fails if it would
 look identical exported as a plain text document. No color, no hierarchy beyond
 bold, no callouts, no structural breaks means it goes back before publish.
+
+## 3a. The weight test
+
+Rule 4 above already asks for a visual hierarchy floor. It is not enough on its
+own, and we know that because a card passed it and still failed.
+
+On 1 September a reference card was drafted, sourced and correct, and it was
+unusable. It had a title, subheadings and body, so it cleared rule 4. Every
+instruction on it still rendered at the same weight, so the safety warning about
+restraint looked exactly like the note about scheduling a follow-up conversation.
+A reader had to read all of it to find any of it. It ran to two pages.
+
+Reweighting it fixed both problems at once. **Every instruction survived and
+every source survived.** Sentences were re-cut so the actionable half leads, and
+nothing was dropped to make it fit. See `docs/examples/weight-test/`:
+
+| File | What it shows |
+|---|---|
+| `before-one-weight.pdf` | The original. Two pages, one weight |
+| `after-five-weights.pdf` | Same instructions, weighted. One page |
+| `after-with-scripts.pdf` | The same again, with spoken lines pulled out |
+
+Compare the first two before reviewing anything. It takes about ten seconds and
+it is more use than this section is.
+
+### The test
+
+**Cover every line of small grey text. Can a teacher still act correctly from
+what is left?**
+
+If yes, the weighting is right. If no, something essential is sitting at the
+wrong weight, and the page is asking the reader to read all of it to find any of
+it.
+
+One pass, one yes or no, recorded per item like the other tests here.
+
+### The five weights
+
+Every download places each block at one of these. A page using fewer than three
+of them will usually fail the test.
+
+| Weight | Carries | Looks like |
+|---|---|---|
+| 1. Stop | Safety, danger, anything that overrides the rest | Coloured block above everything else. At most one per page |
+| 2. Do | The instruction itself | Bold, short, imperative. Readable on its own |
+| 3. Why | The sourced reasoning behind the instruction | Small, grey, under the instruction it belongs to |
+| 4. Say | Words the educator speaks aloud | Set apart in its own block, larger than body |
+| 5. Small print | Scope notes, what is deliberately absent, citations | Foot of the page, present but not competing |
+
+Weight 2 is the one that gets missed. An instruction written as a full paragraph
+has no bold half to scan, so it collapses into weight 3 and disappears.
+
+### Why this is a separate test and not a style note
+
+Presentation problems keep arriving disguised as preferences, and we keep
+deferring them because of how they sound. Three from a single fortnight:
+
+- 21 Quick Wins were logged as "wrong file type" on 18 August and left. They were
+  serving raw source code that no browser would render. Not a formatting
+  preference, an unopenable file
+- A review brief pointed reviewers at the guide instead of the tool, and produced
+  twelve failures that were not real
+- This card, described as "a bit text heavy," was a tool a teacher could not use
+  in the moment it was written for
+
+Same shape every time. A format defect that reads as cosmetic and functions as a
+break. The test exists so it gets caught at review rather than argued about after
+publish.
 
 ## 4. Educator usability bar
 
@@ -324,6 +394,11 @@ whether the thing is worth downloading: *could a teacher who already knows the
 idea use this cold, mid class, without reading the explanation?* If not, it was
 written as an article and it goes back. Lily's design QA runs before Julie
 Lynn's content QA, so nothing visually flat reaches her desk.
+
+Design QA runs section 3a first, because it is the cheapest check here and it
+catches the failure that reads as a preference. Cover the small grey text and
+ask whether a teacher could still act. A no sends the item back before anyone
+spends time on its substance.
 
 **Stage 4, publish on a verified read back.** `review_published` stamps
 `rubric-v2` and then re-reads the row to confirm the write landed, failing loudly
