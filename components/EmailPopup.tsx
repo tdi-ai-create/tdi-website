@@ -12,7 +12,7 @@ export function EmailPopup({ delay = 90000 }: EmailPopupProps) {
   const pathname = usePathname();
 
   // Don't show on conversion pages, admin, hub, or partner pages
-  const excludedPaths = ['/get-started', '/tdi-admin', '/hub', '/creator-portal', '/partners', '/swag'];
+  const excludedPaths = ['/get-started', '/tdi-admin', '/hub', '/creator-portal', '/partners', '/swag', '/for-schools'];
   const isExcluded = excludedPaths.some(path => pathname?.startsWith(path));
 
   const showNudge = useCallback(() => {
