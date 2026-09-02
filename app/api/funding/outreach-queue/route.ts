@@ -4,6 +4,8 @@ import { requireAdminAuth } from '@/lib/tdi-admin/auth'
 import { isOnAllowlist, ALLOWLIST_ENABLED } from '@/lib/funding-followup-email'
 import { buildFundingEmailHtml } from '@/lib/funding-email-html'
 import { findInternalText } from '@/lib/funding-draft-warnings'
+import { NEUTRAL_TASK_LABEL } from '@/lib/funding-followup-email'
+import { matchActionItem, usesPlaceholder, type LabelCandidate } from '@/lib/funding-client-label'
 
 /**
  * Funding outreach approval queue.
@@ -38,7 +40,7 @@ export async function GET() {
 
   const { data: drafts, error } = await supabase
     .from('funding_email_log')
-    .select('id, pursuit_id, opportunity_id, subject, body, to_email, to_name, email_type, created_at')
+    .select('id, pursuit_id, opportunity_id, subject, body, to_email, to_name, email_type, created_at, source_item_key')
     .eq('status', 'draft')
     .order('created_at', { ascending: true })
 
@@ -56,7 +58,10 @@ export async function GET() {
   type PursuitRow = { id: string; district_name: string | null; funder_label: string | null }
   type OppRow = { id: string; name: string | null; amount: number | string | null; application_closes: string | null }
 
-  const [{ data: pursuits }, { data: opps }] = await Promise.all([
+  // Live items only. A cancelled item is not work, and the follow-up cron
+  // already refuses to chase one, so offering to rewrite its client wording
+  // here would invite effort on something nobody is going to send.
+  const [{ data: pursuits }, { data: opps }, { data: items }] = await Promise.all([
     pursuitIds.length
       ? supabase.from('funding_pursuits').select('id, district_name, funder_label').in('id', pursuitIds)
       : Promise.resolve({ data: [] as PursuitRow[] }),
@@ -66,7 +71,12 @@ export async function GET() {
           .select('id, name, amount, application_closes')
           .in('id', oppIds)
       : Promise.resolve({ data: [] as OppRow[] }),
+    supabase
+      .from('funding_action_items')
+      .select('id, title, client_label, status')
+      .in('status', ['pending', 'blocked']),
   ])
+  const liveItems = (items ?? []) as LabelCandidate[]
 
   const pursuitById = new Map((pursuits ?? []).map(p => [p.id, p]))
   const oppById = new Map((opps ?? []).map(o => [o.id, o]))
@@ -90,6 +100,25 @@ export async function GET() {
     // than left for the reviewer to spot in a wall of text.
     const warnings = findInternalText(d.subject, d.body)
 
+    // Two different ways a draft fails to describe its task in the school's
+    // language, and they need the same fix, so they are reported as one thing.
+    //
+    //   The placeholder. No client_label exists, so the generator substituted
+    //   neutral filler and the school reads "this funding step".
+    //
+    //   Our own words. The draft predates that substitution and carries the
+    //   raw internal title instead, which is what findInternalText catches.
+    //
+    // Either way the item needs client wording written before this can go, and
+    // writing it is the same action. Older drafts show the second shape and
+    // newer ones the first, so a check for only one of them would sit silent
+    // on exactly the drafts already sitting in the queue.
+    const placeholder = usesPlaceholder(d.body)
+    const item = (placeholder || warnings.length > 0)
+      ? matchActionItem(d, liveItems)
+      : null
+    const needsClientLabel = !!item && (placeholder || warnings.length > 0)
+
     return {
       id: d.id,
       subject: d.subject,
@@ -109,6 +138,12 @@ export async function GET() {
       closesOn: opp?.application_closes ?? null,
       pursuitId: d.pursuit_id,
       opportunityId: d.opportunity_id,
+      needsClientLabel,
+      usesPlaceholder: placeholder,
+      placeholderText: placeholder ? NEUTRAL_TASK_LABEL : null,
+      actionItemId: item?.id ?? null,
+      actionItemTitle: item?.title ?? null,
+      currentClientLabel: item?.client_label ?? null,
     }
   })
 
@@ -119,6 +154,7 @@ export async function GET() {
       stale: rows.filter(r => r.isStale).length,
       unsendable: rows.filter(r => r.blockedReason).length,
       needsRewrite: rows.filter(r => r.warnings.length > 0).length,
+      needsClientLabel: rows.filter(r => r.needsClientLabel).length,
     },
   })
 }
@@ -134,7 +170,7 @@ export async function POST(request: NextRequest) {
   // exercise the approve path without mailing a real school.
   const dryRun = request.nextUrl.searchParams.get('dryRun') === '1'
 
-  const { action, id, subject, body, reason } = await request.json()
+  const { action, id, subject, body, reason, clientLabel } = await request.json()
 
   if (!id || !action) {
     return NextResponse.json({ error: 'id and action are required' }, { status: 400 })
@@ -144,7 +180,7 @@ export async function POST(request: NextRequest) {
 
   const { data: draft, error: readErr } = await supabase
     .from('funding_email_log')
-    .select('id, status, subject, body, to_email, to_name, pursuit_id, opportunity_id')
+    .select('id, status, subject, body, to_email, to_name, pursuit_id, opportunity_id, source_item_key')
     .eq('id', id)
     .maybeSingle()
 
@@ -157,6 +193,94 @@ export async function POST(request: NextRequest) {
       { error: `This draft is already ${draft.status}. Refresh the queue.` },
       { status: 409 }
     )
+  }
+
+  // Write the wording a school should read for this task, then correct the
+  // draft in front of the reviewer rather than making them wait for the next
+  // cron run to see whether it worked.
+  //
+  // The label belongs to the action item, not to this draft, so every future
+  // email about the same task inherits it. That is the point: fixing it here
+  // fixes it once.
+  if (action === 'set_label') {
+    const label = (clientLabel ?? '').trim()
+    if (label.length < 4) {
+      return NextResponse.json(
+        { error: 'Write what the school should read, at least a few words.' },
+        { status: 400 }
+      )
+    }
+
+    // Our own language must not survive being pasted into the label field.
+    // Without this the control would become a new way to do the exact thing
+    // the warnings exist to prevent.
+    const labelWarnings = findInternalText('', label)
+    if (labelWarnings.length > 0) {
+      return NextResponse.json(
+        { error: 'That wording is for us, not for them.', warnings: labelWarnings },
+        { status: 400 }
+      )
+    }
+
+    const { data: liveItems, error: itemsErr } = await supabase
+      .from('funding_action_items')
+      .select('id, title, client_label, status')
+      .in('status', ['pending', 'blocked'])
+    if (itemsErr) return NextResponse.json({ error: itemsErr.message }, { status: 500 })
+
+    const item = matchActionItem(draft, (liveItems ?? []) as LabelCandidate[])
+    if (!item) {
+      return NextResponse.json(
+        { error: 'Could not tell which task this draft belongs to, so there is nothing to label.' },
+        { status: 409 }
+      )
+    }
+
+    // Rebuild the sentence that names the task. The placeholder case is a
+    // straight substitution. The older case has the raw title sitting in the
+    // body instead, and the same substitution works on that.
+    const newBody = (draft.body ?? '')
+      .split(NEUTRAL_TASK_LABEL).join(label)
+      .split(item.title).join(label)
+    const newSubject = (draft.subject ?? '')
+      .split(NEUTRAL_TASK_LABEL).join(label)
+      .split(item.title).join(label)
+
+    const stillLeaking = findInternalText(newSubject, newBody)
+
+    if (dryRun) {
+      return NextResponse.json({
+        ok: true, dryRun: true, action: 'would set label',
+        wouldWrite: { actionItemId: item.id, client_label: label },
+        newSubject, newBody,
+        remainingWarnings: stillLeaking,
+      })
+    }
+
+    const { error: labelErr } = await supabase
+      .from('funding_action_items')
+      .update({ client_label: label })
+      .eq('id', item.id)
+    if (labelErr) return NextResponse.json({ error: labelErr.message }, { status: 500 })
+
+    const { error: draftErr } = await supabase
+      .from('funding_email_log')
+      .update({ subject: newSubject, body: newBody })
+      .eq('id', draft.id)
+      .eq('status', 'draft')
+    if (draftErr) return NextResponse.json({ error: draftErr.message }, { status: 500 })
+
+    return NextResponse.json({
+      ok: true,
+      action: 'label set',
+      actionItemId: item.id,
+      subject: newSubject,
+      body: newBody,
+      // Honest about the outcome. Replacing the task wording does not
+      // guarantee the rest of the draft is clean, and saying "done" when
+      // warnings remain is how a reviewer stops trusting the warnings.
+      remainingWarnings: stillLeaking,
+    })
   }
 
   if (action === 'reject') {

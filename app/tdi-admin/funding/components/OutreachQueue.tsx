@@ -37,6 +37,12 @@ type Draft = {
   grant: string | null
   amount: string | number | null
   closesOn: string | null
+  needsClientLabel: boolean
+  usesPlaceholder: boolean
+  placeholderText: string | null
+  actionItemId: string | null
+  actionItemTitle: string | null
+  currentClientLabel: string | null
 }
 
 const NAVY = '#1e2749'
@@ -57,6 +63,9 @@ export default function OutreachQueue() {
   const [editBody, setEditBody] = useState('')
   const [rejectingId, setRejectingId] = useState<string | null>(null)
   const [rejectReason, setRejectReason] = useState('')
+  const [labelDraftId, setLabelDraftId] = useState<string | null>(null)
+  const [labelText, setLabelText] = useState('')
+  const [labelError, setLabelError] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   const load = useCallback(async () => {
@@ -101,6 +110,47 @@ export default function OutreachQueue() {
     }
   }
 
+  // Write the wording a school should read for this task. The label is stored
+  // on the action item, so every future email about it inherits the fix, and
+  // the draft in front of the reviewer is corrected in place.
+  const saveLabel = async (id: string) => {
+    setBusyId(id)
+    setLabelError(null)
+    try {
+      const res = await fetch('/api/funding/outreach-queue', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'set_label', id, clientLabel: labelText }),
+      })
+      const json = await res.json()
+      if (!res.ok) {
+        setLabelError(json.error || 'That did not save')
+        return
+      }
+      setDrafts(prev =>
+        prev.map(d =>
+          d.id === id
+            ? {
+                ...d,
+                subject: json.subject,
+                body: json.body,
+                warnings: json.remainingWarnings ?? [],
+                needsClientLabel: false,
+                usesPlaceholder: false,
+                currentClientLabel: labelText.trim(),
+              }
+            : d
+        )
+      )
+      setLabelDraftId(null)
+      setLabelText('')
+    } catch (e: unknown) {
+      setLabelError(e instanceof Error ? e.message : 'That did not work')
+    } finally {
+      setBusyId(null)
+    }
+  }
+
   if (loading) {
     return <div style={{ padding: 24, color: '#6B7280', fontSize: 14 }}>Loading outreach queue…</div>
   }
@@ -128,6 +178,7 @@ export default function OutreachQueue() {
 
   const staleCount = drafts.filter(d => d.isStale).length
   const rewriteCount = drafts.filter(d => d.warnings.length > 0).length
+  const labelCount = drafts.filter(d => d.needsClientLabel).length
 
   return (
     <div>
@@ -208,7 +259,12 @@ export default function OutreachQueue() {
           const liveWarnings = editing
             ? findInternalText(editSubject, editBody)
             : d.warnings
-          const blockedByWording = liveWarnings.length > 0
+          // The placeholder raises no warning, because "this funding step" is
+          // perfectly safe wording. It is just meaningless to the person
+          // reading it, which is a different failure and needs its own block.
+          // Without this the safe-but-useless email is the one that sends
+          // easily and the dangerous one gets stopped, which is backwards.
+          const blockedByWording = liveWarnings.length > 0 || (!editing && d.needsClientLabel)
           const rejecting = rejectingId === d.id
           return (
             <article
@@ -319,6 +375,94 @@ export default function OutreachQueue() {
                 </div>
               )}
 
+              {d.needsClientLabel && (
+                <div
+                  style={{
+                    marginTop: 12, fontSize: 13, color: NAVY, background: '#E8F0FD',
+                    border: '1px solid #B9CDF3', borderRadius: 8, padding: '12px 14px',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontWeight: 700 }}>
+                    <AlertTriangle className="w-4 h-4" />
+                    This task needs wording the school can read
+                  </div>
+
+                  <p style={{ margin: '8px 0 0', lineHeight: 1.55 }}>
+                    {d.usesPlaceholder
+                      ? 'Nobody wrote what this is about in their language, so the email calls it:'
+                      : 'This draft describes the task using wording meant for us:'}
+                  </p>
+                  <div
+                    style={{
+                      margin: '7px 0 10px', padding: '8px 11px', background: 'white',
+                      border: '1px solid #C9D8F5', borderRadius: 6, fontStyle: 'italic',
+                      lineHeight: 1.5, color: '#3C4666',
+                    }}
+                  >
+                    {d.usesPlaceholder
+                      ? d.placeholderText
+                      : (d.currentClientLabel ?? d.actionItemTitle)}
+                  </div>
+
+                  {labelDraftId === d.id ? (
+                    <>
+                      <label
+                        htmlFor={`label-${d.id}`}
+                        style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#4B5563', marginBottom: 6 }}
+                      >
+                        What should {d.toName ? d.toName.split(' ')[0] : 'they'} read instead?
+                      </label>
+                      <input
+                        id={`label-${d.id}`}
+                        value={labelText}
+                        onChange={e => setLabelText(e.target.value)}
+                        placeholder="confirming whether any staff hold the membership this grant needs"
+                        style={{
+                          width: '100%', padding: '9px 11px', fontSize: 13, borderRadius: 6,
+                          border: '1px solid #C9D8F5', fontFamily: 'inherit', color: NAVY,
+                        }}
+                      />
+                      <p style={{ margin: '7px 0 0', fontSize: 12, color: '#5B6480', lineHeight: 1.5 }}>
+                        Finish the sentence &ldquo;I&rsquo;m reaching out because ...&rdquo;. Saved on the task,
+                        so every future email about it says the same thing.
+                      </p>
+                      {labelError && (
+                        <p style={{ margin: '7px 0 0', fontSize: 12, color: '#B4231F', fontWeight: 600 }}>
+                          {labelError}
+                        </p>
+                      )}
+                      <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
+                        <button
+                          onClick={() => saveLabel(d.id)}
+                          disabled={busy || labelText.trim().length < 4}
+                          style={btn(NAVY, busy || labelText.trim().length < 4)}
+                        >
+                          {busy ? 'Saving...' : 'Save and use this'}
+                        </button>
+                        <button
+                          onClick={() => { setLabelDraftId(null); setLabelText(''); setLabelError(null) }}
+                          disabled={busy}
+                          style={btn('#9CA3AF', busy)}
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </>
+                  ) : (
+                    <button
+                      onClick={() => {
+                        setLabelDraftId(d.id)
+                        setLabelText(d.currentClientLabel ?? '')
+                        setLabelError(null)
+                      }}
+                      style={btn(NAVY, false)}
+                    >
+                      Write it in their words
+                    </button>
+                  )}
+                </div>
+              )}
+
               {rejecting && (
                 <div style={{ marginTop: 12 }}>
                   <label
@@ -366,11 +510,13 @@ export default function OutreachQueue() {
                       <Check className="w-4 h-4" />
                       {busy
                         ? 'Sending…'
-                        : blockedByWording
-                          ? 'Reword before sending'
-                          : editing
-                            ? 'Save and send'
-                            : 'Approve and send'}
+                        : d.needsClientLabel && liveWarnings.length === 0
+                          ? 'Needs their wording first'
+                            : blockedByWording
+                            ? 'Reword before sending'
+                            : editing
+                              ? 'Save and send'
+                              : 'Approve and send'}
                     </button>
                     {!editing && (
                       <button
