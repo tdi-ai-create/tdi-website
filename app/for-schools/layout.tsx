@@ -1,8 +1,9 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Professional Development for Schools & Districts',
-  description: 'Partner with TDI for research-backed PD that delivers 74% implementation -- 7.4x the industry average. Phased support for teachers, paras, and leadership teams.',
+  title: 'For Schools & Districts',
+  description:
+    'Ten things a school gets out of working with TDI, and four ways to get there. Every one hands you a one-page result before April budget talks, not after.',
 };
 
 export default function ForSchoolsLayout({
