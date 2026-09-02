@@ -82,6 +82,7 @@ came out of Rae's own findings the same day.
 | **Outcome-checkable.** An action step states an observable result showing it worked | **Not enforced** |
 | **Banned generic language.** Mechanical phrase ban on boilerplate, for example "in today's fast-paced classroom" | Code |
 | **Title-promise match.** If the title says toolkit, more than one tool ships | Human |
+| **School appropriate.** Could a principal hand this to any teacher on staff without a conversation first? See below | Human |
 | **Read-through.** Logged yes or no: would a teacher use this at 9pm on a Tuesday | Human |
 | **Rubric version stamp.** Every review records `rubric-v2` in `qa_notes` | Code |
 
@@ -115,6 +116,47 @@ in twenty other tools still fails.
 The earlier version of this rule asked for "a concrete number, name, or
 timeframe", which was never enforced because nobody could turn it into something
 a reviewer could apply without arguing. This can be applied.
+
+### School appropriate
+
+Added 2026-09-01. Applies to everything reviewed from that date. Not applied
+retroactively, by Rae's call, so an older item that has already passed is not
+reopened for it.
+
+The test: **could a principal hand this to any teacher on staff, in any district,
+without having a conversation about it first?**
+
+Fails on:
+
+- **Religious content or endorsement.** The tool assumes, promotes or is written
+  from inside a faith. Note the line: acknowledging that students observe
+  different things is inclusion and passes. "Some students are fasting during
+  Ramadan, so plan the party accordingly" is fine. Opening a wellness tool with a
+  scripture is not. TDI works with parochial schools, so this is about what a
+  general-library tool assumes, not about pretending religion does not exist.
+- **Discriminatory framing.** Treats a group as lesser, or assumes one kind of
+  family, body, income or background is the default and everything else is an
+  exception to accommodate.
+- **Swearing or vulgarity**, including softened versions. A teacher should be
+  able to project this.
+- **Anything commercial.** Named brands, affiliate links, product endorsement.
+  This is the one that has already bitten: `3-tiny-wellness-habits-educators` was
+  pulled by hand in August because it plugged a branded supplement and a sleep
+  mask inside what read as a wellness guide. Nobody caught it at review because
+  there was no rule to catch it against.
+- **Political positioning.** Advocacy for teachers is the whole point and stays.
+  Party or candidate alignment does not.
+- **Clinical advice past our lane.** Diagnosing, prescribing, or anything a
+  teacher could be held responsible for acting on. Notice and refer, do not
+  treat.
+
+**Why a principal rather than a checklist of banned words.** A word list catches
+swearing and nothing else, and it fires on legitimate content. The supplement
+plug contained no banned word. The question of whether it could be handed over
+without a conversation catches all six failures above and is answerable in
+seconds.
+
+If an item fails this, it is not a rewrite candidate. It comes down.
 
 ### The open sixth rule
 
