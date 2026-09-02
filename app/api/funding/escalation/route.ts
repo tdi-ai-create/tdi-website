@@ -173,6 +173,20 @@ export async function POST(request: NextRequest) {
     case 'stop_pursuing':
       updates.status = 'closed'
       updates.waiting_on = 'none'
+      // The narrative has to leave the escalated state too, and this is the
+      // only terminal option that was not doing it.
+      //
+      // Four of the six outcomes already reset narrative_status. request_info
+      // deliberately does not, because that one is parked and still live.
+      // stop_pursuing skipped it by omission, so a decision stayed on the
+      // board as though it had never been made. Bella chose stop_pursuing for
+      // Saunemin's Community Schools Budget on 17 August, and on 2 September
+      // it still read as escalated and awaiting a decision, which is how it
+      // got reported to Rae as needing one.
+      //
+      // The message below promised exactly this and did not deliver it.
+      updates.narrative_status = 'not_started'
+      updates.narrative_status_changed_at = now
       updates.qa_escalation = { ...escalation, resolved_option: option, resolved_reason: detail, resolved_by: actor, resolved_at: now }
       message = 'Closed. It leaves your queue and the school\'s.'
       break
