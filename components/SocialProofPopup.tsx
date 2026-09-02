@@ -74,6 +74,7 @@ export function SocialProofPopup() {
     '/Allenwood-Dashboard',
     '/D41-dashboard',
     '/Example-Dashboard',
+    '/for-schools',
   ];
 
   const isInternalPage = pathname?.includes('dashboard-creation') ||
