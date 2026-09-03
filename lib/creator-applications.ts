@@ -406,6 +406,11 @@ async function acceptApplication(
         unpaused_at: now.toISOString(),
         display_on_website: true,
         recruitment_source: 'reapplied',
+        // Restart the agreement clock with them. Without this the creator
+        // inherits the age of the application they just restarted, and the
+        // gate closes them again within days. That happened to Rebecca Blahus:
+        // re-accepted 1 Sep carrying 132 days, closed 2 Sep.
+        restarted_at: now.toISOString(),
         updated_at: now.toISOString(),
       })
       .eq('id', existing.id);
@@ -460,13 +465,20 @@ async function acceptApplication(
     })
     .eq('id', app.id);
 
-  await supabase.from('creator_notes').insert({
+  // This note is the only durable record that an acceptance happened and who
+  // made it. It is also what a restart is reconstructed from when the column
+  // is missing, which is how Rebecca Blahus's 1 September restart was
+  // recovered. Losing it silently costs the audit trail, so it is logged.
+  const { error: acceptNoteError } = await supabase.from('creator_notes').insert({
     creator_id: creatorId,
     content: `Accepted from an application submitted ${new Date(app.submitted_at).toDateString()}, by ${decidedBy}.`,
     author: 'System',
     visible_to_creator: false,
     phase_id: 'onboarding',
   });
+  if (acceptNoteError) {
+    console.error('[accept] Acceptance note NOT written for', creatorId, acceptNoteError.message);
+  }
 
   if (linkError) {
     // Do not send. An unrecorded acceptance can be accepted a second time, and

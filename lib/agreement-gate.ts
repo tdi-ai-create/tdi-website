@@ -40,6 +40,12 @@ export interface GateInput {
   name: string | null;
   email: string | null;
   created_at: string;
+  /**
+   * When they most recently restarted, if they did. The clock runs from this
+   * rather than created_at, because a creator who restarts has not been sitting
+   * on an unsigned agreement for the whole time since their first application.
+   */
+  restarted_at?: string | null;
   agreement_signed_at: string | null;
   lastMilestoneAt: string | null;
   lastLoginAt: string | null;
@@ -53,8 +59,21 @@ function shortDate(iso: string): string {
   return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
 
+/**
+ * The date the agreement clock runs from.
+ *
+ * Re-accepting a creator resets their status, their pause state and their
+ * steps, and used to leave this alone. Rebecca Blahus was re-accepted on
+ * 1 September carrying 132 days of age from an April application, and the gate
+ * closed her the next day. She had no window in which to sign anything.
+ */
+function clockStart(c: GateInput): string {
+  if (!c.restarted_at) return c.created_at;
+  return new Date(c.restarted_at) > new Date(c.created_at) ? c.restarted_at : c.created_at;
+}
+
 export function classify(c: GateInput, now: Date = new Date()): GateVerdict {
-  const daysSinceJoin = daysSince(c.created_at, now);
+  const daysSinceJoin = daysSince(clockStart(c), now);
 
   const base = {
     creatorId: c.id,
@@ -73,7 +92,7 @@ export function classify(c: GateInput, now: Date = new Date()): GateVerdict {
     return {
       ...base,
       outcome: 'grace',
-      reason: `joined ${daysSinceJoin} days ago, still inside the ${AGREEMENT_GRACE_DAYS} day window`,
+      reason: `${c.restarted_at ? 'restarted' : 'joined'} ${daysSinceJoin} ${daysSinceJoin === 1 ? 'day' : 'days'} ago, still inside the ${AGREEMENT_GRACE_DAYS} day window`,
     };
   }
 
@@ -121,7 +140,7 @@ export async function classifyRoster(
 ): Promise<GateVerdict[]> {
   const { data: creators, error } = await supabase
     .from('creators')
-    .select('id, name, email, created_at, agreement_signed_at, status, lifecycle_state, publish_status, published_date, is_test_account');
+    .select('id, name, email, created_at, restarted_at, agreement_signed_at, status, lifecycle_state, publish_status, published_date, is_test_account');
 
   if (error) {
     console.error('[agreement-gate] Failed to load creators:', error);
@@ -198,6 +217,7 @@ export async function classifyRoster(
         name: c.name,
         email: c.email,
         created_at: c.created_at as string,
+        restarted_at: (c.restarted_at as string | null) ?? null,
         agreement_signed_at: c.agreement_signed_at,
         lastMilestoneAt: lastMilestone.get(c.id as string) || null,
         lastLoginAt: c.email ? lastLogin.get(c.email.trim().toLowerCase()) || null : null,
