@@ -172,10 +172,34 @@ export async function POST(request: NextRequest) {
     if (!found) {
       return NextResponse.json({ error: 'There is no account with that address to repair.' }, { status: 404 });
     }
-    // Going through the admin API rather than SQL is the repair. It rewrites
-    // the row properly, which a direct UPDATE does not.
-    const { error } = await supabase.auth.admin.updateUserById(found.id, { email_confirm: true });
+    // Setting the email back to itself is what actually rebuilds the missing
+    // identity row. This was measured, not reasoned about, on the one genuinely
+    // broken account in the system:
+    //
+    //   identities before        0
+    //   after email_confirm      0
+    //   after setting a password 0
+    //   after re-setting email   1
+    //
+    // The first version of this called email_confirm and reported "Repaired the
+    // account" while changing nothing. Somebody would have pressed it, been
+    // told it was fixed, sent the link, and the person still could not sign in,
+    // with nobody looking any more because the tool said it was handled.
+    const { error } = await supabase.auth.admin.updateUserById(found.id, { email });
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+    // Never report a repair without confirming it. A success message is a
+    // claim about the world, and this one was false for its whole life.
+    const { data: after } = await supabase.auth.admin.getUserById(found.id);
+    if (!after?.user?.identities?.length) {
+      return NextResponse.json(
+        {
+          error:
+            'The repair ran but the account still cannot authenticate. Do not send them a link yet, it will not work. This one needs Rae.',
+        },
+        { status: 500 },
+      );
+    }
     // Then send them a link, below.
   }
 
