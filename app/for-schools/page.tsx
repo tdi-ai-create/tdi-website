@@ -240,8 +240,45 @@ export default function ForSchoolsPage() {
         </div>
       </section>
 
-      {/* SECTION: In your building, Blueprint only */}
+      {/* SECTION: What a leader can prove with it, carried from the retired /learning */}
       <section className="fs-sec fs-sec-white">
+        <div className="fs-wrap">
+          <div className="fs-head-narrow">
+            <p className="fs-kicker">Included with every offering</p>
+            <h2>The evidence assembles itself.</h2>
+            <p className="fs-lede">
+              Everything your staff do in the Hub flows into your dashboard. Popular topics, survey
+              responses, what got submitted. Board-ready and audit-ready, without your team building
+              a spreadsheet the week before a meeting.
+            </p>
+          </div>
+
+          <div className="fs-grid2 fs-align-start" style={{"marginTop": "34px"}}>
+            <div>
+              <h3 style={{"fontSize": "1.15rem", "marginBottom": "14px"}}>What it is built to survive</h3>
+              <ul className="fs-ican" style={{"marginBottom": "0"}}>
+                <li>A board presentation, in a format that pastes into someone else&apos;s deck</li>
+                <li>A grant application, and the renewal evidence a funder asks for</li>
+                <li>State accountability and compliance documentation</li>
+                <li>An accreditation review</li>
+                <li>Year over year continuous improvement documentation</li>
+              </ul>
+            </div>
+            <div>
+              <h3 style={{"fontSize": "1.15rem", "marginBottom": "14px"}}>What you can see</h3>
+              <ul className="fs-ican" style={{"marginBottom": "0"}}>
+                <li>Building-level dashboards with per-school drill-downs</li>
+                <li>Classroom implementation rate tracking</li>
+                <li>Observation timelines, on a Blueprint</li>
+                <li>Leading indicators, before they become a resignation</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* SECTION: In your building, Blueprint only */}
+      <section className="fs-sec">
         <div className="fs-wrap">
           <div className="fs-head-narrow">
             <p className="fs-kicker">Only in a Blueprint</p>
@@ -273,7 +310,7 @@ export default function ForSchoolsPage() {
         </div>
       </section>
 
-      <section className="fs-sec">
+      <section className="fs-sec fs-sec-white">
         <div className="fs-wrap">
           <div className="fs-head-narrow">
             <p className="fs-kicker">What lands on your dashboard</p>
@@ -377,7 +414,7 @@ export default function ForSchoolsPage() {
         </div>
       </section>
 
-      <section className="fs-sec fs-sec-white" id="dashboard">
+      <section className="fs-sec" id="dashboard">
         <div className="fs-wrap">
           <div className="fs-head-narrow">
             <p className="fs-kicker">Your leadership dashboard</p>
@@ -395,7 +432,7 @@ export default function ForSchoolsPage() {
         </div>
       </section>
 
-      <section className="fs-sec">
+      <section className="fs-sec fs-sec-white">
         <div className="fs-wrap">
           <div className="fs-head-narrow">
             <p className="fs-kicker">Verified results from partner schools</p>
@@ -415,7 +452,7 @@ export default function ForSchoolsPage() {
         </div>
       </section>
 
-      <section className="fs-sec fs-sec-white" id="funding">
+      <section className="fs-sec" id="funding">
         <div className="fs-wrap fs-fundband">
           <div>
             <h2>Most of our schools don&apos;t pay the full cost of this themselves.</h2>
@@ -427,7 +464,7 @@ export default function ForSchoolsPage() {
         </div>
       </section>
 
-      <section className="fs-sec" id="questions">
+      <section className="fs-sec fs-sec-white" id="questions">
         <div className="fs-wrap">
           <div className="fs-head-narrow">
             <p className="fs-kicker">What other leaders asked first</p>
@@ -470,7 +507,7 @@ export default function ForSchoolsPage() {
         </div>
       </section>
 
-      <section className="fs-sec fs-sec-white" id="downloads">
+      <section className="fs-sec" id="downloads">
         <div className="fs-wrap">
           <div className="fs-head-narrow">
             <p className="fs-kicker">Take it to your team</p>

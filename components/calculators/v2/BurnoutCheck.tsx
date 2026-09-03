@@ -43,13 +43,18 @@ export function BurnoutCheck() {
     if (!email) return;
     setSubmitting(true);
     try {
-      await fetch('/api/calculator/teacher-capture', {
+      const res = await fetch('/api/calculator/teacher-capture', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, calculator: 'burnout', stressLevel: stress, tier }),
       });
+      if (!res.ok) {
+        // The teacher still gets where they were going, but a dropped capture
+        // is a lost lead and must not look like a success.
+        console.error('[burnout-capture] failed', res.status);
+      }
       setSubmitted(true);
-      window.location.href = `/learning/plans?email=${encodeURIComponent(email)}&role=Teacher`;
+      window.location.href = `/join?email=${encodeURIComponent(email)}&role=Teacher`;
     } catch (err) {
       console.error('[burnout-capture] error', err);
     } finally {

@@ -8,7 +8,7 @@ export function SubstackPopup() {
   const pathname = usePathname();
 
   // Don't show on get-started (they're already converting) or admin/hub pages
-  const excludedPaths = ['/get-started', '/tdi-admin', '/hub', '/creator-portal', '/partners', '/swag', '/for-schools', '/love-notes'];
+  const excludedPaths = ['/get-started', '/tdi-admin', '/hub', '/creator-portal', '/partners', '/swag', '/for-schools', '/love-notes', '/join'];
   const isExcluded = excludedPaths.some(path => pathname?.startsWith(path));
 
   const showPopup = useCallback(() => {

@@ -8,11 +8,11 @@ const C = {
   gray: '#F5F5F5', white: '#FFFFFF', border: '#E5E7EB',
 };
 
-const EXCLUDED_PATHS = ['/swag', '/tdi-admin', '/hub', '/creator-portal', '/partners', '/admin', '/invoice', '/for-schools', '/love-notes'];
+const EXCLUDED_PATHS = ['/swag', '/tdi-admin', '/hub', '/creator-portal', '/partners', '/admin', '/invoice', '/for-schools', '/love-notes', '/join'];
 
 function getPopupImages(pathname: string | null): { src: string; alt: string }[] {
   // Hub / educator pages
-  if (pathname?.startsWith('/learning') || pathname?.startsWith('/for-teachers') || pathname?.startsWith('/pd-diagnostic')) {
+  if (pathname?.startsWith('/join') || pathname?.startsWith('/pd-diagnostic')) {
     return [
       { src: '/images/swag/hard-parts-tote-new-1.webp', alt: 'The Hard Parts tote' },
       { src: '/images/swag/intermission-knit.webp', alt: 'The Needed Intermission tee' },

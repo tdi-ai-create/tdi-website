@@ -3803,7 +3803,7 @@ export default function ExampleDashboard() {
             </a>
           </div>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mt-8 pt-6 border-t border-white/10">
-            <a href="/learning" target="_blank" rel="noopener noreferrer" className="text-sm text-white/60 hover:text-white transition-colors">
+            <a href="/join" target="_blank" rel="noopener noreferrer" className="text-sm text-white/60 hover:text-white transition-colors">
               Explore the Learning Hub
             </a>
             <a href="/for-schools" target="_blank" rel="noopener noreferrer" className="text-sm text-white/60 hover:text-white transition-colors">
