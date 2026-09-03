@@ -967,7 +967,7 @@ export default function CreateWithUsPage() {
               Your content reaches educators in every state
             </h2>
             <p style={{ fontSize: 17, color: '#6B7280', maxWidth: 640, margin: '0 auto', lineHeight: 1.5 }}>
-              When you create with TDI, your work lands in classrooms across all 50 US states and 100+ countries. Hover any state to explore our reach.
+              When you create with TDI, your work lands in classrooms across all 50 US states and 142+ countries. Hover any state to explore our reach.
             </p>
           </div>
           <CertifiedStatesMap />

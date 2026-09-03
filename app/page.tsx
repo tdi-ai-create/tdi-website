@@ -1,7 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import CertifiedStatesMap from '@/components/learning/CertifiedStatesMap';
-import { DualTeaser } from '@/components/calculators/v2/compact/DualTeaser';
 import { FAQ } from '@/components/FAQ';
 import { ParallaxHero } from '@/components/ParallaxHero';
 import { AnimatedStatsBar } from '@/components/AnimatedStatsBar';
@@ -18,7 +17,7 @@ export default function Home() {
       {/* SECTION 1: Hero */}
       <ParallaxHero />
 
-      {/* SECTION 1.5: TDI helps you support your entire team */}
+      {/* SECTION 2: TDI helps you support your entire team */}
       <section className="py-12 md:py-16" style={{ backgroundColor: '#1e2749' }}>
         <div className="container-default">
           <div className="max-w-3xl mx-auto text-center">
@@ -35,7 +34,132 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SECTION 2A: Pain Section (For School Leaders) */}
+      {/* SECTION 3: Which one are you */}
+      <section className="section" style={{ backgroundColor: '#80a4ed' }}>
+        <div className="container-wide">
+          <h2 className="text-center mb-12" style={{ color: '#1e2749' }}>Which one are you?</h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* Teachers Path */}
+            <div className="card" style={{ backgroundColor: '#ffffff', borderTop: '4px solid #1e2749', color: '#1e2749' }}>
+              <h3 className="text-2xl mb-4" style={{ color: '#1e2749' }}>For Teachers</h3>
+              <p className="mb-6" style={{ color: '#1e2749', opacity: 0.8 }}>
+                Action-focused tools to help you be more efficient and effective in your classroom. Access ready-to-use strategies, weekly blog insights, podcast episodes, and downloadable resources.
+              </p>
+              <ul className="space-y-2 mb-6">
+                <li className="flex items-start gap-2">
+                  <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="#ffba06" viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                  </svg>
+                  <span style={{ color: '#1e2749' }}>Classroom tools you can use Monday morning</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="#ffba06" viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                  </svg>
+                  <span style={{ color: '#1e2749' }}>Weekly strategies from our blog</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="#ffba06" viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                  </svg>
+                  <span style={{ color: '#1e2749' }}>Free resources for teachers and paras</span>
+                </li>
+              </ul>
+              <a
+                href="https://raehughart.substack.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block px-6 py-3 rounded-lg font-bold transition-all hover-glow"
+                style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
+              >
+                Join 100,000+ Educators
+              </a>
+              <p className="text-sm mt-4" style={{ color: '#1e2749', opacity: 0.6 }}>
+                Or{' '}
+                <a
+                  href="https://www.teachersdeserveit.com/hub"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline"
+                >
+                  explore the Learning Hub
+                </a>
+              </p>
+            </div>
+
+            {/* Schools Path */}
+            <div className="card" style={{ backgroundColor: '#ffffff', borderTop: '4px solid #1e2749', color: '#1e2749' }}>
+              <h3 className="text-2xl mb-4" style={{ color: '#1e2749' }}>For Schools & Districts</h3>
+              <p className="mb-6" style={{ color: '#1e2749', opacity: 0.8 }}>
+                Four ways to work with us, from a single building to a full district partnership. Every one puts a one-page result in your hands before April budget talks.
+              </p>
+              <ul className="space-y-2 mb-6">
+                <li className="flex items-start gap-2">
+                  <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="#ffba06" viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                  </svg>
+                  <span style={{ color: '#1e2749' }}>PD that actually gets used in classrooms</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="#ffba06" viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                  </svg>
+                  <span style={{ color: '#1e2749' }}>Improved teacher satisfaction and retention</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="#ffba06" viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                  </svg>
+                  <span style={{ color: '#1e2749' }}>Student achievement gains you can report</span>
+                </li>
+              </ul>
+              <p className="text-sm mb-4" style={{ color: '#1e2749', opacity: 0.7 }}>
+                Each one stands alone. None is a trial run for another.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+                <Link
+                  href="/for-schools"
+                  className="inline-block px-6 py-3 rounded-lg font-bold transition-all hover-glow"
+                  style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
+                >
+                  See the four ways
+                </Link>
+              </div>
+              <div className="mt-4 p-3 rounded-lg" style={{ backgroundColor: '#f0f9ff', border: '1px solid #80a4ed' }}>
+                <p className="text-sm font-medium" style={{ color: '#1e2749' }}>
+                  80% of partner schools secure external funding for TDI through Title II-A, Title IV-A, and state PD grants.{' '}
+                  <Link href="/funding" className="underline font-bold" style={{ color: '#38618C' }}>See your options →</Link>
+                </p>
+              </div>
+              <p className="text-sm mt-2" style={{ color: '#1e2749', opacity: 0.6 }}>
+                Your data is protected.{' '}
+                <Link href="/security" className="underline">See our security practices</Link>
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Team Strip */}
+      <section style={{ backgroundColor: '#F0FAF6', borderTop: '0.5px solid #D4EDE0', borderBottom: '0.5px solid #D4EDE0' }}>
+        <div className="container-default">
+          <TeamStrip
+            members={[
+              { type: 'team', name: 'Kristin Williams', imageSlug: 'kristin-williams', isHuman: true },
+              { type: 'team', name: 'Holly Scott', imageSlug: 'holly-scott' },
+              { type: 'team', name: 'Bella Dailey', imageSlug: 'bella-dailey', isHuman: true },
+              { type: 'team', name: 'Mel Martinez', imageSlug: 'mel-martinez', isHuman: true },
+              { type: 'team', name: 'Dr. Maya Johnson', imageSlug: 'maya-johnson' },
+              { type: 'creator', name: 'Dr. Stephanie Nardi', topic: 'Science' },
+              { type: 'creator', name: 'Amy Storer', topic: 'Math' },
+            ]}
+            copy="Teachers Deserve It is built by a team of educators, specialists, and creators making this work possible for schools across all 50 states."
+          />
+        </div>
+      </section>
+
+      {/* SECTION 4: Pain Section (For School Leaders) */}
       <section className="py-16 md:py-20" style={{ backgroundColor: '#f5f5f5' }}>
         <div className="container-default">
           <div className="max-w-3xl mx-auto text-center">
@@ -55,7 +179,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SECTION 2B: Solution Section */}
+      {/* SECTION 5: Solution Section */}
       <section className="py-16 md:py-20" style={{ backgroundColor: '#ffffff' }}>
         <div className="container-default">
           <div className="max-w-3xl mx-auto text-center mb-12">
@@ -123,20 +247,20 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SECTION 4: Stats Bar */}
+      {/* SECTION 6: Stats Bar */}
       <AnimatedStatsBar
         stats={[
           { value: 100000, suffix: '+', label: 'Educators in Our Community', subtext: 'Teachers, Paras, Coaches, Leaders' },
           { value: 74, suffix: '%', label: 'Implementation Rate', subtext: 'vs 10% industry average' },
           { value: 94, suffix: '%', label: 'Would Recommend', subtext: 'to a friend or neighboring school' },
-          { value: 50, label: 'States + 100 Countries', subtext: 'with educators using TDI tools' },
+          { value: 50, label: 'States + 142 Countries', subtext: 'with educators using TDI tools' },
         ]}
       />
       <p className="text-center text-sm py-2" style={{ backgroundColor: '#1e2749', color: '#ffffff', opacity: 0.9 }}>
         80% of partner schools fund this through existing grants.
       </p>
 
-      {/* SECTION 5a: What Admins Are Saying */}
+      {/* SECTION 7: What Admins Are Saying */}
       <section className="py-12 md:py-16" style={{ backgroundColor: '#f5f5f5' }}>
         <div className="container-wide">
           <h2 className="text-center mb-8" style={{ color: '#1e2749' }}>What Admins Are Saying</h2>
@@ -173,7 +297,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SECTION 5b: What Educators Are Saying */}
+      {/* SECTION 8: What Educators Are Saying */}
       <section className="py-12 md:py-16" style={{ backgroundColor: '#ffffff' }}>
         <div className="container-wide">
           <h2 className="text-center mb-8" style={{ color: '#1e2749' }}>What Educators Are Saying</h2>
@@ -210,7 +334,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SECTION 6: How We Build What Teachers Need */}
+      {/* SECTION 9: How We Build What Teachers Need */}
       <section className="py-16 md:py-20" style={{ backgroundColor: '#ffffff' }}>
         <div className="container-default">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ color: '#1e2749' }}>
@@ -318,152 +442,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SECTION 7: Two Ways to Work With Us */}
-      <section className="section" style={{ backgroundColor: '#80a4ed' }}>
-        <div className="container-wide">
-          <h2 className="text-center mb-12" style={{ color: '#1e2749' }}>Two Ways to Work With Us</h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* Teachers Path */}
-            <div className="card" style={{ backgroundColor: '#ffffff', borderTop: '4px solid #1e2749', color: '#1e2749' }}>
-              <h3 className="text-2xl mb-4" style={{ color: '#1e2749' }}>For Teachers</h3>
-              <p className="mb-6" style={{ color: '#1e2749', opacity: 0.8 }}>
-                Action-focused tools to help you be more efficient and effective in your classroom. Access ready-to-use strategies, weekly blog insights, podcast episodes, and downloadable resources.
-              </p>
-              <ul className="space-y-2 mb-6">
-                <li className="flex items-start gap-2">
-                  <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="#ffba06" viewBox="0 0 24 24">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                  </svg>
-                  <span style={{ color: '#1e2749' }}>Classroom tools you can use Monday morning</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="#ffba06" viewBox="0 0 24 24">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                  </svg>
-                  <span style={{ color: '#1e2749' }}>Weekly strategies from our blog</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="#ffba06" viewBox="0 0 24 24">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                  </svg>
-                  <span style={{ color: '#1e2749' }}>Free resources for teachers and paras</span>
-                </li>
-              </ul>
-              <a
-                href="https://raehughart.substack.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-block px-6 py-3 rounded-lg font-bold transition-all hover-glow"
-                style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
-              >
-                Join 100,000+ Educators
-              </a>
-              <p className="text-sm mt-4" style={{ color: '#1e2749', opacity: 0.6 }}>
-                Or{' '}
-                <a
-                  href="https://www.teachersdeserveit.com/hub"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="underline"
-                >
-                  explore the Learning Hub
-                </a>
-              </p>
-            </div>
-
-            {/* Schools Path */}
-            <div className="card" style={{ backgroundColor: '#ffffff', borderTop: '4px solid #1e2749', color: '#1e2749' }}>
-              <h3 className="text-2xl mb-4" style={{ color: '#1e2749' }}>For Schools & Districts</h3>
-              <p className="mb-6" style={{ color: '#1e2749', opacity: 0.8 }}>
-                Use the TDI Blueprint to transform your building. We partner with you to achieve measurable implementation, improved teacher happiness scores, and student growth.
-              </p>
-              <ul className="space-y-2 mb-6">
-                <li className="flex items-start gap-2">
-                  <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="#ffba06" viewBox="0 0 24 24">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                  </svg>
-                  <span style={{ color: '#1e2749' }}>PD that actually gets used in classrooms</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="#ffba06" viewBox="0 0 24 24">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                  </svg>
-                  <span style={{ color: '#1e2749' }}>Improved teacher satisfaction and retention</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="#ffba06" viewBox="0 0 24 24">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                  </svg>
-                  <span style={{ color: '#1e2749' }}>Student achievement gains you can report</span>
-                </li>
-              </ul>
-              <p className="text-sm mb-4" style={{ color: '#1e2749', opacity: 0.7 }}>
-                Most leaders identify their PD type in under 60 seconds.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
-                <Link
-                  href="/pd-diagnostic"
-                  className="inline-block px-6 py-3 rounded-lg font-bold transition-all hover-glow"
-                  style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
-                >
-                  Take the Free Diagnostic
-                </Link>
-                <Link
-                  href="/contact"
-                  className="font-semibold transition-colors hover:opacity-80"
-                  style={{ color: '#1e2749' }}
-                >
-                  Or schedule a call →
-                </Link>
-              </div>
-              <div className="mt-4 p-3 rounded-lg" style={{ backgroundColor: '#f0f9ff', border: '1px solid #80a4ed' }}>
-                <p className="text-sm font-medium" style={{ color: '#1e2749' }}>
-                  80% of partner schools secure external funding for TDI through Title II-A, Title IV-A, and state PD grants.{' '}
-                  <Link href="/funding" className="underline font-bold" style={{ color: '#38618C' }}>See your options →</Link>
-                </p>
-              </div>
-              <p className="text-sm mt-2" style={{ color: '#1e2749', opacity: 0.6 }}>
-                Your data is protected.{' '}
-                <Link href="/security" className="underline">See our security practices</Link>
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Team Strip */}
-      <section style={{ backgroundColor: '#F0FAF6', borderTop: '0.5px solid #D4EDE0', borderBottom: '0.5px solid #D4EDE0' }}>
-        <div className="container-default">
-          <TeamStrip
-            members={[
-              { type: 'team', name: 'Kristin Williams', imageSlug: 'kristin-williams', isHuman: true },
-              { type: 'team', name: 'Holly Scott', imageSlug: 'holly-scott' },
-              { type: 'team', name: 'Bella Dailey', imageSlug: 'bella-dailey', isHuman: true },
-              { type: 'team', name: 'Mel Martinez', imageSlug: 'mel-martinez', isHuman: true },
-              { type: 'team', name: 'Dr. Maya Johnson', imageSlug: 'maya-johnson' },
-              { type: 'creator', name: 'Dr. Stephanie Nardi', topic: 'Science' },
-              { type: 'creator', name: 'Amy Storer', topic: 'Math' },
-            ]}
-            copy="Teachers Deserve It is built by a team of educators, specialists, and creators making this work possible for schools across all 50 states."
-          />
-        </div>
-      </section>
-
-      {/* SECTION 8: Calculator */}
-      <section className="py-16 md:py-20 px-6" style={{ backgroundColor: '#f5f5f5' }}>
-        <div className="max-w-5xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ color: '#1e2749' }}>
-            See What&apos;s Possible
-          </h2>
-          <p className="text-center mb-12 max-w-2xl mx-auto text-lg" style={{ color: '#4b5563' }}>
-            Whether you&apos;re a school leader or a classroom teacher, see how TDI can make a difference.
-          </p>
-          <DualTeaser />
-        </div>
-      </section>
-
-      {/* SECTION 9: A Taste of What's Inside the Hub */}
+      {/* SECTION 10: A Taste of What's Inside the Hub */}
       <section className="py-16 md:py-20" style={{ backgroundColor: '#ffffff' }}>
         <div className="container-default">
           <div className="text-center mb-10">
@@ -548,7 +527,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SECTION 10: Substack/Newsletter Section */}
+      {/* SECTION 11: Substack/Newsletter Section */}
       <section className="section" style={{ backgroundColor: 'var(--tdi-navy)' }}>
         <div className="container-default text-center">
           <h2 className="mb-4" style={{ color: 'white' }}>Practical Strategies, 3x a Week</h2>
@@ -569,7 +548,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SECTION 11: Dashboard Preview */}
+      {/* SECTION 12: Dashboard Preview */}
       <section className="py-16 md:py-20" style={{ backgroundColor: '#f9fafb' }}>
         <div className="container-default">
           <div className="max-w-4xl mx-auto text-center">
@@ -613,7 +592,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SECTION 12: FAQ */}
+      {/* SECTION 13: FAQ */}
       <FAQ limit={6} showSeeAll={true} />
 
       {/* Certified in All 50 States */}
@@ -627,14 +606,14 @@ export default function Home() {
               Trusted by educators in every state
             </h2>
             <p style={{ fontSize: 17, color: '#6B7280', maxWidth: 640, margin: '0 auto', lineHeight: 1.5 }}>
-              Teachers Deserve It serves educators across all 50 US states and 100+ countries. Hover any state to confirm PD credit approval. Click for details.
+              Teachers Deserve It serves educators across all 50 US states and 142+ countries. Hover any state to confirm PD credit approval. Click for details.
             </p>
           </div>
           <CertifiedStatesMap />
         </div>
       </section>
 
-      {/* SECTION 12: Final CTA */}
+      {/* SECTION 14: Final CTA */}
       <section className="section" style={{ backgroundColor: '#80a4ed' }}>
         <div className="container-default text-center">
           <h2 className="mb-4" style={{ color: '#1e2749' }}>Ready to Reimagine PD?</h2>
@@ -651,13 +630,6 @@ export default function Home() {
               style={{ backgroundColor: '#ffffff', color: '#1e2749' }}
             >
               Get Your Free PD Plan
-            </Link>
-            <Link
-              href="/contact"
-              className="inline-block px-8 py-4 rounded-lg font-bold text-lg border-2 transition-all hover-lift"
-              style={{ borderColor: '#1e2749', color: '#1e2749', backgroundColor: 'transparent' }}
-            >
-              Start the Conversation
             </Link>
           </div>
         </div>
