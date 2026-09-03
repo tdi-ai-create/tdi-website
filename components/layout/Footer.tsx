@@ -113,6 +113,11 @@ export function Footer() {
                   </Link>
                 </li>
                 <li>
+                  <Link href="/love-notes" className="text-sm hover:underline hover-color-shift" style={{ color: 'white', opacity: 0.7 }}>
+                    Love Notes
+                  </Link>
+                </li>
+                <li>
                   <Link href="/pd-diagnostic" className="text-sm hover:underline hover-color-shift" style={{ color: 'white', opacity: 0.7 }}>
                     PD Diagnostic
                   </Link>
