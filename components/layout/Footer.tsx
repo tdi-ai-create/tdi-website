@@ -71,11 +71,6 @@ export function Footer() {
                   </Link>
                 </li>
                 <li>
-                  <Link href="/how-we-partner" className="text-sm hover:underline hover-color-shift" style={{ color: 'white', opacity: 0.7 }}>
-                    How We Partner
-                  </Link>
-                </li>
-                <li>
                   <a href="https://www.teachersdeserveit.com/hub" target="_blank" rel="noopener noreferrer" className="text-sm hover:underline hover-color-shift" style={{ color: 'white', opacity: 0.7 }}>
                     Learning Hub
                   </a>

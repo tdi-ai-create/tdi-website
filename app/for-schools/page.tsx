@@ -230,7 +230,39 @@ export default function ForSchoolsPage() {
         </div>
       </section>
 
+      {/* SECTION: In your building, Blueprint only */}
       <section className="fs-sec fs-sec-white">
+        <div className="fs-wrap">
+          <div className="fs-head-narrow">
+            <p className="fs-kicker">Only in a Blueprint</p>
+            <h2>When we are actually in your building.</h2>
+            <p className="fs-lede">The other three offerings reach your staff through their inbox. A Blueprint puts our people in your classrooms while students are in session. This is the part no other offering includes, and the part schools tell us they remember.</p>
+          </div>
+
+          <div className="fs-grid2 fs-align-start">
+            <div>
+              <h3 style={{"fontSize": "1.15rem", "marginBottom": "14px"}}>What a visit day looks like</h3>
+              <ul className="fs-ican" style={{"marginBottom": "0"}}>
+                <li>Up to 15 classrooms observed in a single visit</li>
+                <li>On-campus days happen while students are in session, in real classrooms</li>
+                <li>Observations are growth-focused, not evaluative, and separate from your appraisal process</li>
+                <li>We meet with teachers one-to-one after observing them</li>
+                <li>A leadership debrief at the end of each day</li>
+              </ul>
+            </div>
+            <div>
+              <h3 style={{"fontSize": "1.15rem", "marginBottom": "14px"}}>Love Notes</h3>
+              <p style={{"fontSize": ".95rem", "color": "var(--muted)"}}>Every teacher we observe receives one. Not generic praise. A specific note about something we watched them do well.</p>
+              <blockquote className="fs-lovenote">
+                &ldquo;During your small group rotation today, I noticed how you used proximity and a calm voice to redirect Marcus without stopping instruction. The other students did not even look up. That is classroom management mastery. The way you had materials pre-sorted for each group saved at least 3 minutes of transition time. Your students knew exactly where to go and what to grab. Keep leaning into those systems.&rdquo;
+              </blockquote>
+              <p style={{"fontSize": ".9rem", "color": "var(--muted)", "marginTop": "14px"}}>Love Notes are what teachers tell us they remember months later. Not the PD slides. Not the data. The moment someone noticed what they were doing right.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="fs-sec">
         <div className="fs-wrap">
           <div className="fs-head-narrow">
             <p className="fs-kicker">What lands on your dashboard</p>
@@ -334,7 +366,7 @@ export default function ForSchoolsPage() {
         </div>
       </section>
 
-      <section className="fs-sec" id="dashboard">
+      <section className="fs-sec fs-sec-white" id="dashboard">
         <div className="fs-wrap">
           <div className="fs-head-narrow">
             <p className="fs-kicker">Your leadership dashboard</p>
@@ -352,7 +384,7 @@ export default function ForSchoolsPage() {
         </div>
       </section>
 
-      <section className="fs-sec fs-sec-white">
+      <section className="fs-sec">
         <div className="fs-wrap">
           <div className="fs-head-narrow">
             <p className="fs-kicker">Verified results from partner schools</p>
@@ -372,7 +404,7 @@ export default function ForSchoolsPage() {
         </div>
       </section>
 
-      <section className="fs-sec" id="funding">
+      <section className="fs-sec fs-sec-white" id="funding">
         <div className="fs-wrap fs-fundband">
           <div>
             <h2>Most of our schools don&apos;t pay the full cost of this themselves.</h2>
@@ -384,7 +416,7 @@ export default function ForSchoolsPage() {
         </div>
       </section>
 
-      <section className="fs-sec fs-sec-white" id="questions">
+      <section className="fs-sec" id="questions">
         <div className="fs-wrap">
           <div className="fs-head-narrow">
             <p className="fs-kicker">What other leaders asked first</p>
@@ -427,7 +459,7 @@ export default function ForSchoolsPage() {
         </div>
       </section>
 
-      <section className="fs-sec" id="downloads">
+      <section className="fs-sec fs-sec-white" id="downloads">
         <div className="fs-wrap">
           <div className="fs-head-narrow">
             <p className="fs-kicker">Take it to your team</p>

@@ -256,3 +256,19 @@ ul.fs-ican li:before{content:"";position:absolute;left:0;top:15px;width:8px;heig
 /* four one-pagers in a two by two, not a three-across with an orphan */
 .fs-page .fs-dl-grid{grid-template-columns:repeat(2,1fr); gap:20px}
 @media(max-width:880px){.fs-page .fs-dl-grid{grid-template-columns:1fr}}
+
+/* --- Love Note, carried over from the retired /how-we-partner --- */
+.fs-page .fs-lovenote{
+  background:#FFFDF5;
+  border:1px solid #F0E2B8;
+  border-left:4px solid var(--gold);
+  border-radius:10px;
+  padding:18px 20px;
+  margin:16px 0 0;
+  font-size:.94rem;
+  font-style:italic;
+  color:#5A4A22;
+  line-height:1.6;
+}
+/* the visit column and the Love Note column are different heights; top-align them */
+.fs-page .fs-grid2.fs-align-start{align-items:start}

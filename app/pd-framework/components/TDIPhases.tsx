@@ -205,7 +205,7 @@ export default function TDIPhases({ onCtaClick, onFundingClick }: TDIPhasesProps
           <div className="text-center">
             <p className="text-white/60 text-sm mb-3">Ready for more than a framework?</p>
             <Link
-              href="/how-we-partner"
+              href="/for-schools"
               className="inline-flex items-center gap-2 text-lg font-semibold transition-all hover:gap-3"
               style={{ color: '#ffba06' }}
             >

@@ -54,7 +54,6 @@ export function Header() {
     { href: '/', label: 'Home' },
     { href: '/for-schools', label: 'For Schools' },
     { href: '/join', label: 'For Teachers' },
-    { href: '/how-we-partner', label: 'How We Partner' },
     { href: '/Example-Dashboard', label: 'Your Dashboard', newTab: true },
   ];
 

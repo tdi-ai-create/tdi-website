@@ -199,7 +199,7 @@ function PartnerLoginContent() {
               </div>
 
               <a
-                href="/how-we-partner"
+                href="/for-schools"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-sm font-medium hover:underline"
@@ -235,7 +235,7 @@ function PartnerLoginContent() {
 
               <div className="partner-login-mobile-link">
                 <a
-                  href="/how-we-partner"
+                  href="/for-schools"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-sm font-medium hover:underline"
