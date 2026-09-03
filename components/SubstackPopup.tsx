@@ -2,36 +2,30 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { usePathname } from 'next/navigation';
+import { isPopupBlocked } from '@/lib/popup-policy';
 
 export function SubstackPopup() {
   const [isVisible, setIsVisible] = useState(false);
   const pathname = usePathname();
-
-  // Don't show on get-started (they're already converting) or admin/hub pages
-  const excludedPaths = ['/get-started', '/tdi-admin', '/hub', '/creator-portal', '/partners', '/swag', '/for-schools', '/love-notes', '/join'];
-  const isExcluded = excludedPaths.some(path => pathname?.startsWith(path));
+  const isExcluded = isPopupBlocked(pathname);
 
   const showPopup = useCallback(() => {
-    // Don't show if another popup is active
-    if ((window as any).__tdiPopupActive) return;
-    (window as any).__tdiPopupActive = true;
     setIsVisible(true);
   }, []);
 
   const handleDismiss = useCallback(() => {
     setIsVisible(false);
-    (window as any).__tdiPopupActive = false;
     localStorage.setItem('tdi-substack-popup-dismissed', new Date().toISOString());
   }, []);
 
   useEffect(() => {
     if (isExcluded) return;
 
-    // Check if dismissed within last 7 days
+    // Someone who said no is not asked again next week
     const dismissedAt = localStorage.getItem('tdi-substack-popup-dismissed');
     if (dismissedAt) {
       const daysSince = (Date.now() - new Date(dismissedAt).getTime()) / (1000 * 60 * 60 * 24);
-      if (daysSince < 7) return;
+      if (daysSince < 90) return;
     }
 
     // Check if already shown this session
@@ -39,24 +33,15 @@ export function SubstackPopup() {
 
     let triggered = false;
 
-    // Scroll trigger - 60% scroll
+    // Scroll trigger. 70% means they read most of it, so this is not an interruption.
     const handleScroll = () => {
       const scrollPercent = (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100;
-      if (scrollPercent > 60 && !triggered) {
+      if (scrollPercent > 70 && !triggered) {
         triggered = true;
         showPopup();
         window.removeEventListener('scroll', handleScroll);
       }
     };
-
-    // Time trigger - 45 seconds
-    const timer = setTimeout(() => {
-      if (!triggered) {
-        triggered = true;
-        showPopup();
-        window.removeEventListener('scroll', handleScroll);
-      }
-    }, 45000);
 
     // Exit intent (desktop only)
     const handleMouseLeave = (e: MouseEvent) => {
@@ -76,7 +61,6 @@ export function SubstackPopup() {
     return () => {
       window.removeEventListener('scroll', handleScroll);
       document.removeEventListener('mouseleave', handleMouseLeave);
-      clearTimeout(timer);
     };
   }, [isExcluded, showPopup]);
 
@@ -94,74 +78,96 @@ export function SubstackPopup() {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}
-      onClick={(e) => { if (e.target === e.currentTarget) handleDismiss(); }}
-      role="dialog"
-      aria-modal="true"
+      className="fixed bottom-0 left-0 right-0 z-50 flex justify-center px-4 pb-4 pointer-events-none"
+      role="region"
       aria-label="Join the TDI email list"
     >
       <div
-        className="relative w-full max-w-md bg-white rounded-2xl shadow-2xl p-8 animate-slideUp"
-        onClick={(e) => e.stopPropagation()}
+        className="pointer-events-auto w-full animate-slideUp"
+        style={{
+          maxWidth: 520,
+          position: 'relative',
+          background: '#ffffff',
+          border: '1px solid #E2E5EA',
+          borderTop: '4px solid #ffba06',
+          borderRadius: 14,
+          boxShadow: '0 -6px 34px rgba(30,39,73,0.18)',
+          padding: '18px 20px 16px',
+        }}
       >
-        {/* Close button */}
         <button
           onClick={handleDismiss}
-          className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors"
-          aria-label="Close popup"
+          style={{
+            position: 'absolute',
+            top: 10,
+            right: 12,
+            width: 28,
+            height: 28,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderRadius: 999,
+            background: 'transparent',
+            border: 'none',
+            cursor: 'pointer',
+            color: '#8A93A3',
+          }}
+          aria-label="Dismiss"
         >
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+          <svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
             <line x1="1" y1="1" x2="13" y2="13" />
             <line x1="13" y1="1" x2="1" y2="13" />
           </svg>
         </button>
 
-        {/* Content */}
-        <div className="text-center">
-          <h2 className="text-2xl font-bold mb-2" style={{ color: '#1e2749' }}>
-            Stay in the Loop
-          </h2>
-          <p className="text-gray-500 text-sm mb-6">
-            Join 100,000+ educators getting strategies that actually work - delivered weekly.
-          </p>
+        <p style={{ fontSize: 15, fontWeight: 700, color: '#1e2749', margin: '0 0 3px', paddingRight: 28 }}>
+          Three practical strategies a week.
+        </p>
+        <p style={{ fontSize: 13.5, color: '#6B7280', margin: '0 0 12px', lineHeight: 1.5 }}>
+          No theory, no fluff. Join 100,000+ educators.
+        </p>
 
-          {/* Substack form */}
-          <form
-            action="https://raehughart.substack.com/api/v1/free?nojs=true"
-            method="post"
-            target="_blank"
-            className="flex flex-col gap-3"
-            onSubmit={() => {
-              setTimeout(() => handleDismiss(), 1000);
+        <form
+          action="https://raehughart.substack.com/api/v1/free?nojs=true"
+          method="post"
+          target="_blank"
+          style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}
+          onSubmit={() => {
+            setTimeout(() => handleDismiss(), 1000);
+          }}
+        >
+          <input
+            type="email"
+            name="email"
+            placeholder="Your email address"
+            required
+            style={{
+              flex: '1 1 190px',
+              minWidth: 0,
+              padding: '10px 13px',
+              borderRadius: 9,
+              border: '1px solid #D8DCE3',
+              fontSize: 14,
+              outline: 'none',
+            }}
+          />
+          <button
+            type="submit"
+            style={{
+              flex: '0 0 auto',
+              padding: '10px 20px',
+              borderRadius: 9,
+              fontWeight: 700,
+              fontSize: 14,
+              backgroundColor: '#ffba06',
+              color: '#1e2749',
+              border: 'none',
+              cursor: 'pointer',
             }}
           >
-            <input
-              type="email"
-              name="email"
-              placeholder="Your email address"
-              required
-              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500 text-sm"
-            />
-            <button
-              type="submit"
-              className="w-full py-3 rounded-lg font-semibold text-sm transition-colors"
-              style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
-              onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#e5a805')}
-              onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#ffba06')}
-            >
-              Subscribe
-            </button>
-          </form>
-
-          {/* Dismiss link */}
-          <button
-            onClick={handleDismiss}
-            className="mt-4 text-sm text-gray-400 hover:text-gray-600 hover:underline transition-colors"
-          >
-            No thanks
+            Subscribe
           </button>
-        </div>
+        </form>
       </div>
     </div>
   );
