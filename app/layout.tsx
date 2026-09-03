@@ -6,14 +6,11 @@ import { ScrollToTop } from "@/components/ScrollToTop";
 import { Header } from "@/components/layout/Header";
 import { AnnouncementBanner } from "@/components/layout/AnnouncementBanner";
 import { Footer } from "@/components/layout/Footer";
-import { EmailPopup } from "@/components/EmailPopup";
 import { SubstackPopup } from "@/components/SubstackPopup";
-import { SocialProofPopup } from "@/components/SocialProofPopup";
 import { MainSiteWrapper } from "@/components/layout/MainSiteWrapper";
 import { MomentModeProvider } from "@/components/hub/MomentModeContext";
 import { PostHogProvider } from "@/components/PostHogProvider";
 import DesiWrapper from "@/components/DesiWrapper";
-import { SwagPopup } from "@/components/SwagPopup";
 
 export const metadata: Metadata = {
   title: {
@@ -116,10 +113,7 @@ export default function RootLayout({
           </main>
           <MainSiteWrapper>
             <Footer />
-            <EmailPopup />
             <SubstackPopup />
-            <SocialProofPopup />
-            <SwagPopup />
           </MainSiteWrapper>
           <DesiWrapper />
         </MomentModeProvider>

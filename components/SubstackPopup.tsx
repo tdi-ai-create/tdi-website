@@ -2,14 +2,12 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { usePathname } from 'next/navigation';
+import { isPopupBlocked } from '@/lib/popup-policy';
 
 export function SubstackPopup() {
   const [isVisible, setIsVisible] = useState(false);
   const pathname = usePathname();
-
-  // Don't show on get-started (they're already converting) or admin/hub pages
-  const excludedPaths = ['/get-started', '/tdi-admin', '/hub', '/creator-portal', '/partners', '/swag', '/for-schools', '/love-notes', '/join'];
-  const isExcluded = excludedPaths.some(path => pathname?.startsWith(path));
+  const isExcluded = isPopupBlocked(pathname);
 
   const showPopup = useCallback(() => {
     // Don't show if another popup is active
@@ -27,11 +25,11 @@ export function SubstackPopup() {
   useEffect(() => {
     if (isExcluded) return;
 
-    // Check if dismissed within last 7 days
+    // Someone who said no is not asked again next week
     const dismissedAt = localStorage.getItem('tdi-substack-popup-dismissed');
     if (dismissedAt) {
       const daysSince = (Date.now() - new Date(dismissedAt).getTime()) / (1000 * 60 * 60 * 24);
-      if (daysSince < 7) return;
+      if (daysSince < 90) return;
     }
 
     // Check if already shown this session
@@ -39,24 +37,15 @@ export function SubstackPopup() {
 
     let triggered = false;
 
-    // Scroll trigger - 60% scroll
+    // Scroll trigger. 70% means they read most of it, so this is not an interruption.
     const handleScroll = () => {
       const scrollPercent = (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100;
-      if (scrollPercent > 60 && !triggered) {
+      if (scrollPercent > 70 && !triggered) {
         triggered = true;
         showPopup();
         window.removeEventListener('scroll', handleScroll);
       }
     };
-
-    // Time trigger - 45 seconds
-    const timer = setTimeout(() => {
-      if (!triggered) {
-        triggered = true;
-        showPopup();
-        window.removeEventListener('scroll', handleScroll);
-      }
-    }, 45000);
 
     // Exit intent (desktop only)
     const handleMouseLeave = (e: MouseEvent) => {
@@ -76,7 +65,6 @@ export function SubstackPopup() {
     return () => {
       window.removeEventListener('scroll', handleScroll);
       document.removeEventListener('mouseleave', handleMouseLeave);
-      clearTimeout(timer);
     };
   }, [isExcluded, showPopup]);
 
@@ -123,7 +111,7 @@ export function SubstackPopup() {
             Stay in the Loop
           </h2>
           <p className="text-gray-500 text-sm mb-6">
-            Join 100,000+ educators getting strategies that actually work - delivered weekly.
+            Join 100,000+ educators getting practical strategies three times a week. No theory, no fluff.
           </p>
 
           {/* Substack form */}
