@@ -35,41 +35,43 @@ export default function LoveNotesPage() {
       </header>
 
       {/* SECTION 2: The rules */}
-      <section className="ln-sec">
+      <section className="ln-sec ln-sec-alt">
         <div className="ln-wrap">
           <div className="ln-head">
-              <p className="ln-kicker">What makes it a Love Note</p>
+            <p className="ln-kicker">What makes it a Love Note</p>
               <h2>The same rules, every time.</h2>
               <p className="ln-lede">
                 These are not a description written for a website. They are the rules the notes are
                 actually written to.
               </p>
-              <ul className="ln-rules">
+          </div>
+          <ul className="ln-rules">
                 <li>Addressed to the teacher by first name</li>
                 <li>Everything specific we watched, written down. Usually eight to twelve moments</li>
                 <li>At least three things we actually heard, quoted word for word</li>
                 <li>Warm and personal. Never evaluative, never a rubric, never a score</li>
                 <li>Ends with two Hub resources matched to what they are already doing</li>
               </ul>
-              <p className="ln-note">
-                Observations are separate from evaluation. Nothing in a Love Note reaches an
-                appraisal, and a teacher is never compared to a colleague.
-              </p>
-          </div>
+          <p className="ln-note">
+            Observations are separate from evaluation. Nothing in a Love Note reaches an appraisal,
+            and a teacher is never compared to a colleague.
+          </p>
 
           <div className="ln-mailcol">
               <p className="ln-kicker">What lands in their inbox</p>
               <div className="ln-mail">
                 <div className="ln-mailhead">
-                  <div><b>From</b> Teachers Deserve It &lt;hello@teachersdeserveit.com&gt;</div>
-                  <div><b>To</b> d.reyes@example.k12.us</div>
-                  <div><b>Subject</b> A note from your visit</div>
+                  <div className="ln-avatar" aria-hidden="true">TDI</div>
+                  <div className="ln-mailfrom">
+                    <b>Teachers Deserve It</b>
+                    <span>hello@teachersdeserveit.com</span>
+                  </div>
+                  <div className="ln-mailmeta">Tue 14 Oct, 4:12 PM</div>
+                </div>
+                <div className="ln-mailsubject">
+                  <span>Subject</span>A note from your visit
                 </div>
                 <div className="ln-mailbody">
-                  <div className="ln-mailhdr">
-                    <h3>A note from your visit</h3>
-                    <p>Tuesday, 14 October</p>
-                  </div>
                   <p>Hi Danielle,</p>
                   <p>
                     Thanks for letting me pop in on Tuesday. You are an amazing teacher, and I want
@@ -82,11 +84,6 @@ export default function LoveNotesPage() {
                     <li>Materials were pre-sorted by group before the block started. The whole transition took under ninety seconds.</li>
                     <li>You gave a stuck student the two-choice out, then walked away and let them take it.</li>
                     <li>You asked a student to explain their thinking to the group rather than confirming the answer yourself.</li>
-                    <li>When the timer went, you did not restate the directions. The chart was already on the wall and they used it.</li>
-                    <li>You named the behaviour and not the child. Twice, in twenty minutes.</li>
-                    <li>A student went to the peer-help board before coming to you. That is a routine somebody built on purpose.</li>
-                    <li>You circled back to the one table you had not reached yet, without anyone asking you to.</li>
-                    <li>When the volume climbed, your voice went down rather than up. The room followed you.</li>
                     <li>You thanked a student for waiting. Out loud, in front of everyone.</li>
                   </ul>
 
@@ -126,7 +123,7 @@ export default function LoveNotesPage() {
       </section>
 
       {/* SECTION 3: What the leader sees */}
-      <section className="ln-sec ln-sec-alt">
+      <section className="ln-sec">
         <div className="ln-wrap">
           <div className="ln-head">
             <p className="ln-kicker">What a leader sees</p>
@@ -178,7 +175,7 @@ export default function LoveNotesPage() {
 
 
       {/* SECTION: What changes after a visit */}
-      <section className="ln-sec">
+      <section className="ln-sec ln-sec-alt">
         <div className="ln-wrap">
           <div className="ln-head">
             <p className="ln-kicker">What changes after a visit</p>
@@ -190,7 +187,7 @@ export default function LoveNotesPage() {
             </p>
           </div>
 
-          <div className="ln-grid">
+          <div className="ln-chartgrid">
             <div className="ln-chart">
               <h4>Hub activity, the two weeks either side of a visit</h4>
               <p>A Love Note ends with one or two Hub resources, so the visit tends to pull staff back into the thing they already have.</p>

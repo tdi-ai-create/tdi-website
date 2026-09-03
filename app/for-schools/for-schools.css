@@ -272,3 +272,25 @@ ul.fs-ican li:before{content:"";position:absolute;left:0;top:15px;width:8px;heig
 }
 /* the visit column and the Love Note column are different heights; top-align them */
 .fs-page .fs-grid2.fs-align-start{align-items:start}
+
+/* --- outcome icons: give each of the 10 something to land on --- */
+.fs-page .fs-oc{display:grid; grid-template-columns:auto 1fr; column-gap:14px; row-gap:0}
+.fs-page .fs-ocicon{
+  grid-row:1 / span 3;
+  width:38px; height:38px; border-radius:9px;
+  background:var(--paper);
+  border:1px solid var(--line);
+  display:flex; align-items:center; justify-content:center;
+  margin-top:2px;
+}
+.fs-page .fs-ocicon svg{
+  width:19px; height:19px;
+  stroke:var(--gold); fill:none;
+  stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round;
+}
+.fs-page .fs-sec-white .fs-ocicon{background:#fff}
+.fs-page .fs-oc h4,
+.fs-page .fs-oc p,
+.fs-page .fs-oc .fs-via{grid-column:2}
+/* the grid made the pill fill its cell; keep it hugging its text */
+.fs-page .fs-oc .fs-via{justify-self:start}
