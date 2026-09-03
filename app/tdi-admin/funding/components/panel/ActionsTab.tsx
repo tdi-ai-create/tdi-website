@@ -9,7 +9,24 @@ interface ActionsTabProps {
   pursuitId: string
 }
 
+interface BlockedClose {
+  message: string
+  field: 'answer' | 'outcome'
+  options?: string[]
+  override?: { label: string; note: string }
+}
+
+const OUTCOME_WORDS: Record<string, string> = {
+  proceed: 'We can carry on',
+  stop_path: 'This path is closed',
+  still_blocked: 'Still stuck',
+}
+
 export function ActionsTab({ pursuitId }: ActionsTabProps) {
+  // What the server said when it refused to close an item, keyed by item.
+  const [blocked, setBlocked] = useState<Record<string, BlockedClose>>({})
+  const [answers, setAnswers] = useState<Record<string, { answer: string; outcome: string; skip: string; showSkip: boolean }>>({})
+
   const [actions, setActions] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [showAddForm, setShowAddForm] = useState(false)
@@ -31,31 +48,76 @@ export function ActionsTab({ pursuitId }: ActionsTabProps) {
 
   useEffect(() => { fetchActions() }, [pursuitId])
 
-  const toggleDone = async (actionId: string, currentStatus: string) => {
+  /**
+   * Tick an item, and show what the server says when it will not close.
+   *
+   * This fired the request, ignored the reply and reloaded. The route refuses
+   * to close a question without an answer and returns a sentence written for
+   * the person clicking, and all of it went in the bin. The item came back
+   * unchanged, which reads as "the tick does nothing", which is exactly how
+   * Bella reported it.
+   *
+   * Ten of the seventeen open items are questions, so the silent refusal was
+   * the usual outcome rather than an edge case.
+   */
+  const toggleDone = async (actionId: string, currentStatus: string, extra?: Record<string, unknown>) => {
     const isDone = currentStatus === 'done' || currentStatus === 'completed'
-    await fetch(`/api/funding/pursuits/${pursuitId}/actions`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(isDone ? { actionId, reopen: true } : { actionId, markDone: true }),
-    })
-    fetchActions()
+    setBlocked(b => { const n = { ...b }; delete n[actionId]; return n })
+    try {
+      const res = await fetch(`/api/funding/pursuits/${pursuitId}/actions`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(
+          isDone ? { actionId, reopen: true } : { actionId, markDone: true, ...(extra || {}) },
+        ),
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        setBlocked(b => ({
+          ...b,
+          [actionId]: {
+            message: data.error || 'This could not be closed, and the reason did not come through.',
+            field: data.requires?.field === 'outcome' ? 'outcome' : 'answer',
+            options: data.requires?.options as string[] | undefined,
+            override: data.override ? { label: data.override.label, note: data.override.note } : undefined,
+          },
+        }))
+        return
+      }
+      fetchActions()
+    } catch {
+      setBlocked(b => ({
+        ...b,
+        [actionId]: { message: 'Could not reach the server. Nothing was changed, so try again.', field: 'answer' },
+      }))
+    }
   }
 
   const cancelAction = async (actionId: string, reason: string) => {
-    await fetch(`/api/funding/pursuits/${pursuitId}/actions`, {
+    const res = await fetch(`/api/funding/pursuits/${pursuitId}/actions`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ actionId, cancel: true, cancelReason: reason }),
     })
+    if (!res.ok) {
+      const d = await res.json().catch(() => ({}))
+      setBlocked(b => ({ ...b, [actionId]: { message: d.error || 'That did not cancel. Nothing was changed.', field: 'answer' } }))
+      return
+    }
     fetchActions()
   }
 
   const updateNotes = async (actionId: string, notes: string) => {
-    await fetch(`/api/funding/pursuits/${pursuitId}/actions`, {
+    const res = await fetch(`/api/funding/pursuits/${pursuitId}/actions`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ actionId, notes }),
     })
+    if (!res.ok) {
+      const d = await res.json().catch(() => ({}))
+      setBlocked(b => ({ ...b, [actionId]: { message: d.error || 'Your note was not saved.', field: 'answer' } }))
+      return
+    }
     fetchActions()
   }
 
@@ -230,7 +292,7 @@ export function ActionsTab({ pursuitId }: ActionsTabProps) {
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
             {clientActions.map(action => (
-              <ActionItem key={action.id} action={action} onToggle={toggleDone} onCancel={cancelAction} onUpdateClientLabel={updateClientLabel} onNudge={setNudgeActionId} onUpdateNotes={updateNotes} isOverdue={isOverdue(action)} getDueDateColor={getDueDateColor} />
+              <ActionItem key={action.id} action={action} onToggle={toggleDone} onCancel={cancelAction} onUpdateClientLabel={updateClientLabel} onNudge={setNudgeActionId} onUpdateNotes={updateNotes} blocked={blocked[action.id]} draft={answers[action.id]} onDraft={(patch) => setAnswers(a => ({ ...a, [action.id]: { ...{ answer: '', outcome: '', skip: '', showSkip: false }, ...a[action.id], ...patch } }))} isOverdue={isOverdue(action)} getDueDateColor={getDueDateColor} />
             ))}
           </div>
         )}
@@ -249,7 +311,7 @@ export function ActionsTab({ pursuitId }: ActionsTabProps) {
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
             {tdiActions.map(action => (
-              <ActionItem key={action.id} action={action} onToggle={toggleDone} onCancel={cancelAction} onUpdateClientLabel={updateClientLabel} onNudge={setNudgeActionId} onUpdateNotes={updateNotes} isOverdue={isOverdue(action)} getDueDateColor={getDueDateColor} />
+              <ActionItem key={action.id} action={action} onToggle={toggleDone} onCancel={cancelAction} onUpdateClientLabel={updateClientLabel} onNudge={setNudgeActionId} onUpdateNotes={updateNotes} blocked={blocked[action.id]} draft={answers[action.id]} onDraft={(patch) => setAnswers(a => ({ ...a, [action.id]: { ...{ answer: '', outcome: '', skip: '', showSkip: false }, ...a[action.id], ...patch } }))} isOverdue={isOverdue(action)} getDueDateColor={getDueDateColor} />
             ))}
           </div>
         )}
@@ -259,7 +321,7 @@ export function ActionsTab({ pursuitId }: ActionsTabProps) {
       {cancelledActions.length > 0 && (
         <CancelledSection count={cancelledActions.length}>
           {cancelledActions.map(action => (
-            <ActionItem key={action.id} action={action} onToggle={toggleDone} onCancel={cancelAction} onUpdateClientLabel={updateClientLabel} onNudge={setNudgeActionId} onUpdateNotes={updateNotes} isOverdue={false} getDueDateColor={() => '#9CA3AF'} />
+            <ActionItem key={action.id} action={action} onToggle={toggleDone} onCancel={cancelAction} onUpdateClientLabel={updateClientLabel} onNudge={setNudgeActionId} onUpdateNotes={updateNotes} blocked={blocked[action.id]} draft={answers[action.id]} onDraft={(patch) => setAnswers(a => ({ ...a, [action.id]: { ...{ answer: '', outcome: '', skip: '', showSkip: false }, ...a[action.id], ...patch } }))} isOverdue={false} getDueDateColor={() => '#9CA3AF'} />
           ))}
         </CancelledSection>
       )}
@@ -321,9 +383,12 @@ const RUNG_LABELS: Record<string, { label: string; bg: string; color: string }> 
   rae: { label: 'Rae', bg: '#FEE2E2', color: '#991B1B' },
 }
 
-function ActionItem({ action, onToggle, onCancel, onUpdateClientLabel, onNudge, onUpdateNotes, isOverdue, getDueDateColor }: {
+function ActionItem({ action, onToggle, onCancel, onUpdateClientLabel, onNudge, onUpdateNotes, isOverdue, getDueDateColor, blocked, draft, onDraft }: {
+  blocked?: BlockedClose
+  draft?: { answer: string; outcome: string; skip: string; showSkip: boolean }
+  onDraft?: (patch: Partial<{ answer: string; outcome: string; skip: string; showSkip: boolean }>) => void
   action: any
-  onToggle: (id: string, currentStatus: string) => void
+  onToggle: (id: string, currentStatus: string, extra?: Record<string, unknown>) => void
   onCancel: (id: string, reason: string) => void
   onUpdateClientLabel: (id: string, label: string) => void
   onNudge: (id: string) => void
@@ -356,8 +421,11 @@ function ActionItem({ action, onToggle, onCancel, onUpdateClientLabel, onNudge, 
           ? '#DC2626'
           : '#0a0f1e'
 
+  const d = draft || { answer: '', outcome: '', skip: '', showSkip: false }
+
   return (
-    <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start', padding: '8px 12px', background: isCancelled ? '#FAFAFA' : '#F9FAFB', borderRadius: 8, opacity: isCancelled ? 0.6 : 1 }}>
+    <div>
+    <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start', padding: '8px 12px', background: blocked ? '#FEF2F2' : isCancelled ? '#FAFAFA' : '#F9FAFB', borderRadius: 8, opacity: isCancelled ? 0.6 : 1 }}>
       {/* Color state dot */}
       {colorState && !isInactive && (
         <div
@@ -613,6 +681,78 @@ function ActionItem({ action, onToggle, onCancel, onUpdateClientLabel, onNudge, 
           </div>
         )}
       </div>
+    </div>
+
+    {/* The refusal, shown on the item it belongs to. */}
+    {blocked && (
+      <div style={{ margin: '6px 0 10px 40px', padding: 12, background: 'white', border: '1px solid #FCA5A5', borderRadius: 8 }}>
+        <div style={{ fontSize: 12.5, fontWeight: 600, color: '#991B1B', marginBottom: 9 }}>{blocked.message}</div>
+
+        {blocked.field === 'answer' && (
+          <textarea
+            value={d.answer}
+            onChange={e => onDraft?.({ answer: e.target.value })}
+            placeholder="What were you told?"
+            rows={2}
+            style={{ width: '100%', fontSize: 12.5, padding: '7px 9px', borderRadius: 6, border: '1px solid #D1D5DB', fontFamily: 'inherit', resize: 'vertical', marginBottom: 9 }}
+          />
+        )}
+
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, marginBottom: 10 }}>
+          {(blocked.options || ['proceed', 'stop_path', 'still_blocked']).map(opt => (
+            <button
+              key={opt}
+              onClick={() => onDraft?.({ outcome: opt })}
+              style={{
+                fontSize: 11.5, fontWeight: 600, padding: '5px 9px', borderRadius: 6,
+                border: d.outcome === opt ? '1px solid #1D4ED8' : '1px solid #D1D5DB',
+                background: d.outcome === opt ? '#EFF6FF' : 'white',
+                color: d.outcome === opt ? '#1D4ED8' : '#374151', cursor: 'pointer',
+              }}
+            >{OUTCOME_WORDS[opt] || opt}</button>
+          ))}
+        </div>
+
+        <button
+          onClick={() => onToggle(action.id, action.status, { answer: d.answer, outcome: d.outcome })}
+          disabled={!d.answer.trim() || !d.outcome}
+          style={{
+            fontSize: 12, fontWeight: 700, padding: '6px 12px', borderRadius: 6, border: 'none',
+            color: 'white', marginRight: 10,
+            background: (!d.answer.trim() || !d.outcome) ? '#D1D5DB' : '#059669',
+            cursor: (!d.answer.trim() || !d.outcome) ? 'not-allowed' : 'pointer',
+          }}
+        >Record it and close</button>
+
+        {blocked.override && !d.showSkip && (
+          <button
+            onClick={() => onDraft?.({ showSkip: true })}
+            style={{ fontSize: 11.5, background: 'none', border: 'none', color: '#6B7280', textDecoration: 'underline', cursor: 'pointer', padding: 0 }}
+          >{blocked.override.label}</button>
+        )}
+
+        {d.showSkip && (
+          <div style={{ marginTop: 10, paddingTop: 10, borderTop: '1px solid #F3F4F6' }}>
+            <div style={{ fontSize: 11, color: '#6B7280', marginBottom: 5 }}>{blocked.override?.note}</div>
+            <input
+              value={d.skip}
+              onChange={e => onDraft?.({ skip: e.target.value })}
+              placeholder="Why is no answer coming?"
+              style={{ width: '100%', fontSize: 12.5, padding: '7px 9px', borderRadius: 6, border: '1px solid #D1D5DB', marginBottom: 7 }}
+            />
+            <button
+              onClick={() => onToggle(action.id, action.status, { closeWithoutAnswer: d.skip })}
+              disabled={!d.skip.trim()}
+              style={{
+                fontSize: 12, fontWeight: 600, padding: '6px 12px', borderRadius: 6,
+                border: '1px solid #D1D5DB', background: 'white', color: '#374151',
+                cursor: d.skip.trim() ? 'pointer' : 'not-allowed',
+              }}
+            >Close without an answer</button>
+          </div>
+        )}
+      </div>
+    )}
     </div>
   )
 }
