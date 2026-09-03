@@ -496,7 +496,7 @@ export default function AboutPage() {
               Serving educators in all 50 states
             </h2>
             <p style={{ fontSize: 17, color: '#6B7280', maxWidth: 640, margin: '0 auto', lineHeight: 1.5 }}>
-              From day one, our mission has been to reach every classroom. Today TDI is in all 50 US states and 100+ countries. Hover any state to explore.
+              From day one, our mission has been to reach every classroom. Today TDI is in all 50 US states and 142+ countries. Hover any state to explore.
             </p>
           </div>
           <CertifiedStatesMap />

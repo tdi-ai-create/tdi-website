@@ -79,30 +79,12 @@ export function ParallaxHero() {
               className="text-2xl md:text-3xl lg:text-4xl font-bold mb-4 leading-snug"
               style={{ color: '#ffffff' }}
             >
-              Research-Backed Professional Development for School Leaders
+              PD that actually gets used.
             </h1>
 
-            {/* Value Props - 3 phrases */}
-            <div className="flex flex-col gap-2 mb-4">
-              <div className="flex items-start gap-3">
-                <div className="w-2 h-2 rounded-full mt-2 flex-shrink-0" style={{ backgroundColor: '#ffba06' }} />
-                <p className="text-sm md:text-base" style={{ color: '#ffffff', opacity: 0.95 }}>
-                  Creates a clear path to student and school outcomes admins care about
-                </p>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="w-2 h-2 rounded-full mt-2 flex-shrink-0" style={{ backgroundColor: '#ffba06' }} />
-                <p className="text-sm md:text-base" style={{ color: '#ffffff', opacity: 0.95 }}>
-                  Proven methods designed by education experts across multiple disciplines
-                </p>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="w-2 h-2 rounded-full mt-2 flex-shrink-0" style={{ backgroundColor: '#ffba06' }} />
-                <p className="text-sm md:text-base" style={{ color: '#ffffff', opacity: 0.95 }}>
-                  Instantly applicable learning for teachers, support staff, and specialists
-                </p>
-              </div>
-            </div>
+            <p className="text-base md:text-lg mb-6" style={{ color: '#ffffff', opacity: 0.92 }}>
+              Research-backed professional development for every educator in your building, and proof it worked. All 50 states, 142+ countries.
+            </p>
 
             <div className="flex flex-col sm:flex-row gap-3">
               <a
@@ -114,17 +96,6 @@ export function ParallaxHero() {
                 }}
               >
                 Get Your Free PD Plan
-              </a>
-              <a
-                href="/contact"
-                className="inline-block px-6 py-3 rounded-lg font-bold text-base border-2 transition-all hover-lift"
-                style={{
-                  borderColor: '#ffffff',
-                  color: '#ffffff',
-                  backgroundColor: 'transparent',
-                }}
-              >
-                Start the Conversation
               </a>
             </div>
           </div>
