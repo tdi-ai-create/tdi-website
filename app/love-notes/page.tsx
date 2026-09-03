@@ -10,17 +10,25 @@ export default function LoveNotesPage() {
           <p className="ln-kicker ln-kicker-light">Only in a Blueprint partnership</p>
           <h1>Every teacher we observe gets a Love Note.</h1>
           <p className="ln-sub">
-            Not a score. Not a rubric. A note naming three to five specific things we watched them
-            do well, sent after we have been in their classroom.
+            Not a score. Not a rubric. Everything specific we watched them do well, written down
+            and sent after we have been in their classroom.
           </p>
           <div className="ln-flags">
             <div className="ln-flag">
+              <span className="ln-pill">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11.5 2.5 14 8l6 .8-4.4 4.2 1.1 6-5.2-2.9L6.3 19l1.1-6L3 8.8 9 8z" /></svg>
+                Most requested
+              </span>
               <b>The thing schools ask us for most</b>
-              <span>More districts ask about Love Notes than any other part of a partnership.</span>
+              <span className="ln-flag-body">More districts ask about Love Notes than any other part of a partnership.</span>
             </div>
             <div className="ln-flag">
+              <span className="ln-pill">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m17 2 4 4-4 4" /><path d="M3 11v-1a4 4 0 0 1 4-4h14" /><path d="m7 22-4-4 4-4" /><path d="M21 13v1a4 4 0 0 1-4 4H3" /></svg>
+                Recommended
+              </span>
               <b>Two to three visits a year</b>
-              <span>Enough for staff to feel it as a rhythm rather than a one-off.</span>
+              <span className="ln-flag-body">Enough for staff to feel it as a rhythm rather than a one-off.</span>
             </div>
           </div>
         </div>
@@ -29,28 +37,27 @@ export default function LoveNotesPage() {
       {/* SECTION 2: The rules */}
       <section className="ln-sec">
         <div className="ln-wrap">
-          <div className="ln-grid">
-            <div>
+          <div className="ln-head">
               <p className="ln-kicker">What makes it a Love Note</p>
-              <h2>Five rules, every time.</h2>
+              <h2>The same rules, every time.</h2>
               <p className="ln-lede">
                 These are not a description written for a website. They are the rules the notes are
                 actually written to.
               </p>
               <ul className="ln-rules">
                 <li>Addressed to the teacher by first name</li>
-                <li>Three to five specific moments we watched, never generic praise</li>
-                <li>Warm and personal. Never evaluative, never a rubric</li>
-                <li>Ends with one or two Hub resources for what they are already doing</li>
-                <li>150 to 250 words</li>
+                <li>Everything specific we watched, written down. Usually eight to twelve moments</li>
+                <li>At least three things we actually heard, quoted word for word</li>
+                <li>Warm and personal. Never evaluative, never a rubric, never a score</li>
+                <li>Ends with two Hub resources matched to what they are already doing</li>
               </ul>
               <p className="ln-note">
                 Observations are separate from evaluation. Nothing in a Love Note reaches an
                 appraisal, and a teacher is never compared to a colleague.
               </p>
-            </div>
+          </div>
 
-            <div>
+          <div className="ln-mailcol">
               <p className="ln-kicker">What lands in their inbox</p>
               <div className="ln-mail">
                 <div className="ln-mailhead">
@@ -65,34 +72,48 @@ export default function LoveNotesPage() {
                   </div>
                   <p>Hi Danielle,</p>
                   <p>
-                    I spent about twenty minutes in your room during small group rotations and left
-                    with a full page of notes.
+                    Thanks for letting me pop in on Tuesday. You are an amazing teacher, and I want
+                    you to see what I saw, because you were too busy doing it to notice.
                   </p>
+
+                  <p className="ln-mail-h">Here is what I wrote down</p>
+                  <ul className="ln-mail-list">
+                    <li>You moved beside Marcus and dropped your voice instead of calling across the room. He came back on his own.</li>
+                    <li>Materials were pre-sorted by group before the block started. The whole transition took under ninety seconds.</li>
+                    <li>You gave a stuck student the two-choice out, then walked away and let them take it.</li>
+                    <li>You asked a student to explain their thinking to the group rather than confirming the answer yourself.</li>
+                    <li>When the timer went, you did not restate the directions. The chart was already on the wall and they used it.</li>
+                    <li>You named the behaviour and not the child. Twice, in twenty minutes.</li>
+                    <li>A student went to the peer-help board before coming to you. That is a routine somebody built on purpose.</li>
+                    <li>You circled back to the one table you had not reached yet, without anyone asking you to.</li>
+                    <li>When the volume climbed, your voice went down rather than up. The room followed you.</li>
+                    <li>You thanked a student for waiting. Out loud, in front of everyone.</li>
+                  </ul>
+
+                  <p className="ln-mail-h">Three things I heard</p>
+                  <ul className="ln-mail-quotes">
+                    <li>&ldquo;Can I show you the way I did it?&rdquo;<em>a student, unprompted, mid-rotation</em></li>
+                    <li>&ldquo;I am not going to tell you the answer, but I will sit here while you find it.&rdquo;<em>you, at the red table</em></li>
+                    <li>&ldquo;Just check the chart, that is what it is for.&rdquo;<em>one student to another</em></li>
+                  </ul>
+
+                  <p className="ln-mail-h">Two things in the Hub, if you want them</p>
+                  <ul className="ln-mail-links">
+                    <li>
+                      <Link href="/hub/quick-wins/k-2-station-rotation-routines">K-2 Station Rotation Routines</Link>
+                      <span>Because your transitions are already good and this is the version that survives a sub.</span>
+                    </li>
+                    <li>
+                      <Link href="/hub/practice/question-knockout">Question Knockout</Link>
+                      <span>Ten minutes, and it is built around exactly the move you made at the red table.</span>
+                    </li>
+                  </ul>
+
                   <p>
-                    When Marcus started to drift, you moved beside him and dropped your voice
-                    instead of calling across the room. He came back on his own, and the other
-                    students never looked up. That is not a small thing. Most of us learn to
-                    redirect loudly long before we learn to redirect quietly.
+                    I am here all day if you want to talk any of this through. If today is not the
+                    day, that is completely fine, catch me on the next visit or email whenever.
+                    Either way, I am in your corner.
                   </p>
-                  <p>
-                    Your materials were pre-sorted by group before the block started. Watching the
-                    transition, that saved you close to three minutes, and more than the time, your
-                    students knew exactly where to go without asking you.
-                  </p>
-                  <p>
-                    You gave the two-choice out to a student who was stuck, and then you walked
-                    away. You trusted them to take it. They did.
-                  </p>
-                  <p>
-                    Near the end you asked a student to explain their thinking to the group rather
-                    than confirming the answer yourself. That is the harder version of checking for
-                    understanding, and you made it look ordinary.
-                  </p>
-                  <p>
-                    If you want more in this direction, two things in the Hub are worth your time:
-                    The 2-Minute Reset, and Questioning That Gets Past One-Word Answers.
-                  </p>
-                  <p>Thank you for letting me be in your room.</p>
                   <div className="ln-sig">The team at Teachers Deserve It</div>
                 </div>
               </div>
@@ -100,7 +121,6 @@ export default function LoveNotesPage() {
                 Example note. The teacher, school and date are invented. The format, sender, subject
                 line and signature are exactly what sends.
               </p>
-            </div>
           </div>
         </div>
       </section>

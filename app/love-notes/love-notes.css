@@ -192,3 +192,102 @@
 .ln-page a.ln-btn-navy:hover { background: #2b3760; }
 .ln-page a.ln-btn-gold { background: var(--gold); color: var(--navy); }
 .ln-page a.ln-btn-gold:hover { background: #ffc93c; }
+
+/* --- ribbon badge on the hero flags --- */
+.ln-flag { position: relative; padding-top: 26px; border-left: 1px solid rgba(255,255,255,.18); }
+.ln-pill {
+  position: absolute;
+  top: -11px;
+  left: 17px;
+  background: var(--gold);
+  color: var(--navy);
+  font-size: .7rem;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  padding: 4px 11px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.ln-pill svg {
+  width: 12px;
+  height: 12px;
+  stroke: var(--navy);
+  fill: none;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.ln-flag-body { display: block; }
+
+/* --- richer note body --- */
+.ln-mailbody .ln-mail-h {
+  font-weight: 700;
+  color: var(--navy);
+  font-size: 14px;
+  margin: 20px 0 8px;
+}
+.ln-mailbody .ln-mail-list,
+.ln-mailbody .ln-mail-quotes,
+.ln-mailbody .ln-mail-links {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 4px;
+}
+.ln-mailbody .ln-mail-list li {
+  position: relative;
+  padding: 6px 0 6px 18px;
+  font-size: 14.5px;
+  line-height: 1.55;
+}
+.ln-mailbody .ln-mail-list li:before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 14px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--emailgold);
+}
+.ln-mailbody .ln-mail-quotes li {
+  border-left: 3px solid #E5E7EB;
+  padding: 4px 0 4px 14px;
+  margin-bottom: 12px;
+  font-size: 14.5px;
+  line-height: 1.55;
+  font-style: italic;
+  color: #4B5563;
+}
+.ln-mailbody .ln-mail-quotes li em {
+  display: block;
+  font-style: normal;
+  font-size: 12.5px;
+  color: #9CA3AF;
+  margin-top: 4px;
+}
+.ln-mailbody .ln-mail-links li {
+  padding: 8px 0;
+  border-bottom: 1px solid #F1F2F4;
+  font-size: 14.5px;
+}
+.ln-mailbody .ln-mail-links li:last-child { border-bottom: none; }
+.ln-mailbody .ln-mail-links a,
+.ln-mailbody .ln-mail-links a:visited {
+  font-weight: 700;
+  color: var(--navy);
+  text-decoration: underline;
+}
+.ln-mailbody .ln-mail-links span {
+  display: block;
+  font-size: 13px;
+  color: #6B7280;
+  margin-top: 2px;
+}
+
+/* the email runs much longer than the rules, so stack rather than leave a void column */
+.ln-page .ln-rules { display: grid; grid-template-columns: 1fr 1fr; gap: 0 36px; }
+@media (max-width: 760px) { .ln-page .ln-rules { grid-template-columns: 1fr; } }
+.ln-mailcol { max-width: 660px; margin: 40px auto 0; }
