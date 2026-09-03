@@ -248,7 +248,7 @@ export default function PursuitPage() {
       </div>
 
       <div style={{ margin: '14px 0 18px' }}>
-        <PhaseChain currentPhase={p.current_phase} isStalled={p.is_stalled} />
+        <PhaseChain currentPhase={p.current_phase} isStalled={p.is_stalled} pursuitId={pursuitId} />
       </div>
 
       <div className="wb-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) 320px', gap: 18, alignItems: 'start' }}>
