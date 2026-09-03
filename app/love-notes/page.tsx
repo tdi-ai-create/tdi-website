@@ -80,11 +80,11 @@ export default function LoveNotesPage() {
 
                   <p className="ln-mail-h">Here is what I wrote down</p>
                   <ul className="ln-mail-list">
-                    <li>You moved beside Marcus and dropped your voice instead of calling across the room. He came back on his own.</li>
-                    <li>Materials were pre-sorted by group before the block started. The whole transition took under ninety seconds.</li>
-                    <li>You gave a stuck student the two-choice out, then walked away and let them take it.</li>
-                    <li>You asked a student to explain their thinking to the group rather than confirming the answer yourself.</li>
-                    <li>You thanked a student for waiting. Out loud, in front of everyone.</li>
+                    <li tabIndex={0} data-tags="Proximity, De-escalation">You moved beside Marcus and dropped your voice instead of calling across the room. He came back on his own.<span className="ln-tagtip">Tagged <b>Proximity, De-escalation</b></span></li>
+                    <li tabIndex={0} data-tags="Routine Building">Materials were pre-sorted by group before the block started. The whole transition took under ninety seconds.<span className="ln-tagtip">Tagged <b>Routine Building</b></span></li>
+                    <li tabIndex={0} data-tags="Independent Initiative, Student Engagement">You gave a stuck student the two-choice out, then walked away and let them take it.<span className="ln-tagtip">Tagged <b>Independent Initiative, Student Engagement</b></span></li>
+                    <li tabIndex={0} data-tags="Checking for Understanding, Questioning Techniques">You asked a student to explain their thinking to the group rather than confirming the answer yourself.<span className="ln-tagtip">Tagged <b>Checking for Understanding, Questioning Techniques</b></span></li>
+                    <li tabIndex={0} data-tags="Positive Reinforcement">You thanked a student for waiting. Out loud, in front of everyone.<span className="ln-tagtip">Tagged <b>Positive Reinforcement</b></span></li>
                   </ul>
 
                   <p className="ln-mail-h">Three things I heard</p>
@@ -118,64 +118,17 @@ export default function LoveNotesPage() {
                 Example note. The teacher, school and date are invented. The format, sender, subject
                 line and signature are exactly what sends.
               </p>
+              <p className="ln-caption ln-tagnote">
+                Hover or tab through any moment above to see how it was tagged. Those tags never
+                appear in the teacher&apos;s email. They roll up on your leadership dashboard into
+                coaching themes and key wins, alongside a summary written for a board packet.
+              </p>
           </div>
         </div>
       </section>
-
-      {/* SECTION 3: What the leader sees */}
-      <section className="ln-sec">
-        <div className="ln-wrap">
-          <div className="ln-head">
-            <p className="ln-kicker">What a leader sees</p>
-            <h2>The teacher gets the note. You get the pattern.</h2>
-            <p className="ln-lede">
-              Every observation is tagged as it is written, so a visit produces something a
-              principal can act on rather than an impression. The tags never appear in the
-              teacher&apos;s email.
-            </p>
-          </div>
-
-          <div className="ln-tagblock">
-            <div>
-              <h4>Strategies we look for</h4>
-              <div className="ln-tags">
-                <span>Proximity</span>
-                <span>Small Group Facilitation</span>
-                <span>De-escalation</span>
-                <span>Checking for Understanding</span>
-                <span>Routine Building</span>
-                <span>Communication with Teacher</span>
-                <span>Student Engagement</span>
-                <span>Differentiation</span>
-                <span>Positive Reinforcement</span>
-                <span>Hub Content in Action</span>
-                <span>Independent Initiative</span>
-                <span>Questioning Techniques</span>
-              </div>
-            </div>
-            <div>
-              <h4>Growth we name</h4>
-              <div className="ln-tags ln-tags-alt">
-                <span>Saw Confidence</span>
-                <span>Saw Independence</span>
-                <span>Saw Collaboration</span>
-                <span>Saw Hub Content Applied</span>
-                <span>Saw Student Responsiveness</span>
-                <span>Saw Reflection and Self-Awareness</span>
-              </div>
-            </div>
-          </div>
-
-          <p className="ln-note ln-note-wide">
-            Across a visit these roll up into coaching themes and key wins on your leadership
-            dashboard, alongside a summary written for a board packet.
-          </p>
-        </div>
-      </section>
-
 
       {/* SECTION: What changes after a visit */}
-      <section className="ln-sec ln-sec-alt">
+      <section className="ln-sec">
         <div className="ln-wrap">
           <div className="ln-head">
             <p className="ln-kicker">What changes after a visit</p>
@@ -244,7 +197,7 @@ export default function LoveNotesPage() {
       </section>
 
       {/* SECTION 4: Where it fits */}
-      <section className="ln-sec">
+      <section className="ln-sec ln-sec-alt">
         <div className="ln-wrap">
           <div className="ln-head">
             <p className="ln-kicker">Where this fits</p>

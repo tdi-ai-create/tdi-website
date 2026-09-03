@@ -128,22 +128,6 @@
 .ln-sig { margin-top: 24px; color: #6B7280; font-size: 13px; }
 .ln-caption { font-size: .84rem; color: var(--muted); margin-top: 12px; }
 
-/* tags */
-.ln-tagblock { display: grid; grid-template-columns: 1.4fr 1fr; gap: 40px; margin-top: 36px; align-items: start; }
-@media (max-width: 880px) { .ln-tagblock { grid-template-columns: 1fr; gap: 30px; } }
-.ln-tagblock h4 { margin-bottom: 14px; }
-.ln-tags { display: flex; flex-wrap: wrap; gap: 8px; }
-.ln-tags span {
-  font-size: .85rem;
-  font-weight: 600;
-  background: #fff;
-  border: 1px solid var(--line);
-  border-left: 3px solid var(--blue);
-  border-radius: 6px;
-  padding: 6px 11px;
-  color: var(--ink);
-}
-.ln-tags-alt span { border-left-color: var(--gold); }
 
 /* charts */
 .ln-chart {
@@ -160,9 +144,8 @@
 .ln-visit {
   background: var(--paper);
   border-radius: 12px;
-  padding: 24px 26px;
+  padding: 26px 30px;
   margin-top: 32px;
-  max-width: 70ch;
 }
 .ln-visit h4 { margin-bottom: 4px; }
 .ln-btnrow { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 30px; }
@@ -292,7 +275,7 @@
 .ln-note { max-width: 82ch; }
 
 /* --- make it read as an actual email --- */
-.ln-mailcol { max-width: 640px; margin: 40px auto 0; }
+.ln-mailcol { max-width: 780px; margin: 44px auto 0; }
 .ln-mail {
   border: 1px solid #DDE1E8;
   border-radius: 14px;
@@ -356,3 +339,61 @@
 @media (max-width: 940px) { .ln-tagblock { grid-template-columns: 1fr; gap: 32px; } }
 /* the callout stopped short of the rules grid above it, leaving a ragged edge */
 .ln-page .ln-note { max-width: none; }
+
+/* --- observed moments carry their tag on hover or focus --- */
+.ln-mailbody .ln-mail-list li {
+  position: relative;
+  cursor: default;
+  border-radius: 6px;
+  padding-right: 8px;
+  transition: background-color .12s ease;
+}
+.ln-mailbody .ln-mail-list li:hover,
+.ln-mailbody .ln-mail-list li:focus-visible {
+  background: #FFFBF0;
+  outline: none;
+}
+.ln-mailbody .ln-mail-list li:focus-visible { box-shadow: 0 0 0 2px var(--gold); }
+.ln-tagtip {
+  position: absolute;
+  left: 18px;
+  bottom: calc(100% - 2px);
+  z-index: 5;
+  background: var(--navy);
+  color: #fff;
+  font-size: 12px;
+  line-height: 1.4;
+  padding: 7px 11px;
+  border-radius: 7px;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(4px);
+  transition: opacity .12s ease, transform .12s ease, visibility .12s;
+  pointer-events: none;
+  box-shadow: 0 6px 18px rgba(30, 39, 73, .22);
+}
+.ln-tagtip b { color: var(--gold); font-weight: 700; }
+.ln-tagtip:after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 16px;
+  border: 6px solid transparent;
+  border-top-color: var(--navy);
+}
+.ln-mail-list li:hover .ln-tagtip,
+.ln-mail-list li:focus-visible .ln-tagtip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+@media (max-width: 640px) {
+  .ln-tagtip { white-space: normal; max-width: 240px; }
+}
+.ln-tagnote { max-width: 62ch; }
+
+/* the visit card was 70ch inside a full-width section, leaving a void to its right */
+.ln-page .ln-visit { max-width: none; }
+.ln-page .ln-visit h4 { margin-bottom: 10px; }
+.ln-page .ln-visit .ln-rules { margin-top: 8px; }
