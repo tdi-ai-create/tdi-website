@@ -19,7 +19,8 @@
     "check:schema:update": "node scripts/check-schema.mjs --update-baseline",
     "validate:quizzes": "node scripts/validate-quizzes.mjs",
     "check:labels": "node scripts/integrity/verify-client-labels.mjs",
-    "check:fetch": "node scripts/check-fetch.mjs"
+    "check:fetch": "node scripts/check-fetch.mjs",
+    "check:stepowners": "node scripts/integrity/check-step-owners.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.78.0",

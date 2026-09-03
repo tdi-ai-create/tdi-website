@@ -41,16 +41,20 @@ interface Guidance {
  *
  * A human step here is approval, a decision, or publishing. Bella is never
  * given a quality judgement on content, which is Julie's work.
+ *
+ * 'Test Video Approved' is deliberately Bella's despite being a pass or fail.
+ * It judges whether the microphone and the lighting worked, not whether the
+ * content is any good, and she already holds seven of the nine team steps, so
+ * splitting this one out would put a second person in the middle of a flow for
+ * a two minute clip. Decided by Rae on 3 Sep 2026.
  */
+// Entries for 'Final Outline Approved', 'Course Scripts Approved' and
+// 'Launch Date Set' were removed on 3 Sep 2026. All three steps are retired,
+// so their guidance described work nobody could do. Because this map is keyed
+// by a step's name matched against milestones.name, it drifts silently in both
+// directions: a renamed or retired step loses its owner, and a new team step
+// arrives with none. scripts/integrity/check-step-owners.mjs now says so.
 const TEAM_STEP_GUIDE: Record<string, Guidance> = {
-  'Final Outline Approved': {
-    kind: 'human', who: 'Bella',
-    action: 'Read their outline and approve it, or send it back saying what to change.',
-  },
-  'Course Scripts Approved': {
-    kind: 'human', who: 'Bella',
-    action: 'Read the scripts and approve, or send them back saying what to change.',
-  },
   'Marketing Blog Review & Publishing': {
     kind: 'human', who: 'Bella',
     action: 'Edit and format the post, show the creator the preview, then publish it. Izzy can draft the edit for you to approve.',
@@ -67,6 +71,10 @@ const TEAM_STEP_GUIDE: Record<string, Guidance> = {
     kind: 'agent', who: 'Lily',
     action: 'Lily builds the cover, bio page and promo assets.',
   },
+  'Test Video Approved': {
+    kind: 'human', who: 'Bella',
+    action: 'Watch their test clip. If you can hear them clearly and see their face, pass it. If not, say which of the two to fix.',
+  },
   'Download Review & Handoff': {
     kind: 'human', who: 'Bella',
     action: 'Check the branded version reads right, then send it back to the creator.',
@@ -74,10 +82,6 @@ const TEAM_STEP_GUIDE: Record<string, Guidance> = {
   'Uploaded to Platform': {
     kind: 'human', who: 'Bella',
     action: 'Upload the finished content to the Hub.',
-  },
-  'Launch Date Set': {
-    kind: 'human', who: 'Bella',
-    action: 'Agree a launch date with the creator and set it on their record.',
   },
   'Content Launched': {
     kind: 'human', who: 'Bella',
