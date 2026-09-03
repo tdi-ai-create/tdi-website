@@ -22,7 +22,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
     // Audience pages
     { url: `${baseUrl}/join`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
-    { url: `${baseUrl}/learning`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
     { url: `${baseUrl}/create-with-us`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.6 },
     { url: `${baseUrl}/movement`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.5 },
   ];

@@ -6,6 +6,39 @@ import CertifiedStatesMap from '@/components/learning/CertifiedStatesMap';
 import { CompactBurnout } from '@/components/calculators/v2/compact/CompactBurnout';
 import TeamStrip from '@/components/TeamStrip';
 
+
+
+const SHOTS = [
+  { src: '/hub-welcome/hub-user-dashboard.png', alt: 'Personalized educator dashboard', tilt: '-1.1deg',
+    title: 'Your Hub, your way',
+    body: 'Continue where you left off. Find what fits the hour you actually have.' },
+  { src: '/hub-welcome/hub-conversation.png', alt: 'Community conversation per lesson', tilt: '0.8deg',
+    title: 'A conversation on every lesson',
+    body: 'Real teachers saying what worked and what did not. Not a comment box nobody reads.' },
+  { src: '/hub-welcome/hub-checkin-categories.png', alt: 'Learning Hub check-in categories', tilt: '-0.6deg',
+    title: 'Check-ins that take seconds',
+    body: 'How you are doing, tracked across a year, without a survey day.' },
+];
+
+const TIERS = [
+  { id: 'free', name: 'Free', price: '$0', period: '', accent: '#6B7280', best: false,
+    blurb: 'A handful of rotating tools each week.',
+    cta: 'Start free',
+    features: ['A handful of rotating tools each week', 'Save your favourites, yes even on Free'] },
+  { id: 'essentials', name: 'Essentials', price: '$5', period: '/mo', accent: '#185FA5', best: false,
+    blurb: 'More Quick Wins than your tote bag can hold.',
+    cta: 'Get Essentials',
+    features: ['Everything in Free', 'PDFs and templates you will actually use', 'Community access, your people are here', 'Priority email support'] },
+  { id: 'professional', name: 'Professional', price: '$10', period: '/mo', accent: '#2A9D8F', best: true,
+    blurb: 'The full Quick Win library, always growing.',
+    cta: 'Get Professional',
+    features: ['Everything in Essentials', 'The full Quick Win library, always growing', 'First dibs on new courses', 'Monthly content drops'] },
+  { id: 'all_access', name: 'All-Access', price: '$25', period: '/mo', accent: '#1e2749', best: false,
+    blurb: 'The entire course library, no limits.',
+    cta: 'Get All-Access',
+    features: ['Everything in Professional', 'The entire course library, no limits', 'PD certificates your admin will love', 'Exclusive workshops', 'Direct access to our creators', '1-on-1 coaching when you need a thought partner'] },
+];
+
 export default function JoinPage() {
   return (
     <main className="min-h-screen">
@@ -123,7 +156,7 @@ export default function JoinPage() {
               What is actually inside
             </h2>
             <p style={{ fontSize: 17, color: '#6B7280', maxWidth: 700, margin: '0 auto', lineHeight: 1.5 }}>
-              Not a video library. Not a course catalog. A place built for how educators actually learn -- in short bursts, between classes, when they need it most.
+              Not a video library. Not a course catalog. A place built for how educators actually learn, in short bursts, between classes, when they need it most.
             </p>
           </div>
 
@@ -139,7 +172,7 @@ export default function JoinPage() {
                 <h3 style={{ fontSize: 18, fontWeight: 700, color: '#1e2749', margin: 0 }}>Vibe Checks</h3>
               </div>
               <p style={{ fontSize: 15, color: '#6B7280', margin: 0, lineHeight: 1.6 }}>
-                Quick wellness check-ins that track how you are actually doing -- stress, energy, workload. Your data stays private. Over time, you see patterns and get personalized suggestions.
+                Quick wellness check-ins that track how you are actually doing: stress, energy, workload. Your data stays private. Over time, you see patterns and get personalized suggestions.
               </p>
             </div>
 
@@ -154,7 +187,7 @@ export default function JoinPage() {
                 <h3 style={{ fontSize: 18, fontWeight: 700, color: '#1e2749', margin: 0 }}>Quick Wins</h3>
               </div>
               <p style={{ fontSize: 15, color: '#6B7280', margin: 0, lineHeight: 1.6 }}>
-                Downloadable PDFs you can use the same day. Classroom strategies, planning templates, conversation starters -- no prep required. Many are free.
+                Downloadable PDFs you can use the same day. Classroom strategies, planning templates, conversation starters, no prep required. Many are free.
               </p>
             </div>
 
@@ -169,7 +202,7 @@ export default function JoinPage() {
                 <h3 style={{ fontSize: 18, fontWeight: 700, color: '#1e2749', margin: 0 }}>Short Courses</h3>
               </div>
               <p style={{ fontSize: 15, color: '#6B7280', margin: 0, lineHeight: 1.6 }}>
-                Focused courses built for educators -- teachers, paras, coaches, and leaders. Each one is designed to finish in real time, not aspirational time.
+                Focused courses built for educators: teachers, paras, coaches, and leaders. Each one is designed to finish in real time, not aspirational time.
               </p>
             </div>
 
@@ -233,6 +266,53 @@ export default function JoinPage() {
             >
               Create a Free Account
             </a>
+          </div>
+        </div>
+      </section>
+
+      {/* Hub showcase, screenshots carried from the retired /learning */}
+      <section style={{ padding: '0 16px 64px', backgroundColor: '#f8f9fa' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+          <p style={{ textAlign: 'center', fontSize: 15, color: '#6B7280', margin: '0 0 32px' }}>
+            Not a description of it. This is it.
+          </p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 24 }}>
+            {SHOTS.map((shot) => (
+              <figure key={shot.src} style={{ margin: 0 }}>
+                <div style={{ background: '#ffffff', border: '1px solid #E5E7EB', borderRadius: 14, overflow: 'hidden', boxShadow: '0 14px 34px rgba(30,39,73,0.13)', transform: `rotate(${shot.tilt})` }}>
+                  <div style={{ display: 'flex', gap: 5, padding: '9px 12px', borderBottom: '1px solid #EDEFF3', background: '#FAFBFC' }}>
+                    <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#E2E5EA' }} />
+                    <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#E2E5EA' }} />
+                    <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#E2E5EA' }} />
+                  </div>
+                  <Image src={shot.src} alt={shot.alt} width={640} height={420} style={{ width: '100%', height: 'auto', display: 'block' }} />
+                </div>
+                <figcaption style={{ marginTop: 18 }}>
+                  <p style={{ fontSize: 16, fontWeight: 700, color: '#1e2749', margin: '0 0 4px' }}>{shot.title}</p>
+                  <p style={{ fontSize: 14, color: '#6B7280', margin: 0, lineHeight: 1.55 }}>{shot.body}</p>
+                </figcaption>
+              </figure>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Moment Mode, carried from the retired /learning */}
+      <section style={{ padding: '76px 16px', backgroundColor: '#1e2749' }}>
+        <div style={{ maxWidth: 960, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 48, alignItems: 'center' }}>
+          <div>
+            <p style={{ fontSize: 13, fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase', color: '#ffba06', marginBottom: 14 }}>
+              MOMENT MODE
+            </p>
+            <h2 style={{ fontSize: 32, fontWeight: 700, color: '#ffffff', margin: '0 0 16px', lineHeight: 1.2 }}>
+              A sacred space for the moments you need to pause.
+            </h2>
+            <p style={{ fontSize: 16, color: 'rgba(255,255,255,0.78)', lineHeight: 1.65, margin: 0 }}>
+              Some days you do not need a course. You need ninety seconds and nobody asking anything of you. Moment Mode clears the Hub down to one thing, and nothing you do in it is tracked, scored or reported to anyone.
+            </p>
+          </div>
+          <div style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.16)', borderRadius: 16, padding: 12 }}>
+            <Image src="/hub-welcome/hub-moment-mode.png" alt="Moment Mode pause space" width={620} height={420} style={{ width: '100%', height: 'auto', display: 'block', borderRadius: 10 }} />
           </div>
         </div>
       </section>
@@ -301,75 +381,69 @@ export default function JoinPage() {
           {/* Divider */}
           <div style={{ maxWidth: 1000, margin: '48px auto 40px', borderTop: '1px solid rgba(30, 39, 73, 0.15)' }} />
 
-          {/* Go Deeper */}
-          <div style={{ textAlign: 'center', marginBottom: 32 }}>
-            <p style={{ fontSize: 17, fontWeight: 600, color: '#1e2749', margin: '0 0 8px 0' }}>
-              Ready to go deeper?
+          {/* Membership plans, carried from the retired /learning and /learning/plans */}
+          <div style={{ textAlign: 'center', marginBottom: 34 }}>
+            <p style={{ fontSize: 13, fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase', color: '#2B8C96', marginBottom: 12 }}>
+              WHEN FREE IS NOT ENOUGH
             </p>
-            <p style={{ fontSize: 15, color: '#6B7280' }}>
-              When you are ready for more, here is where to go next.
+            <h3 style={{ fontSize: 30, fontWeight: 700, color: '#1e2749', margin: '0 0 10px 0', lineHeight: 1.2 }}>
+              Membership plans
+            </h3>
+            <p style={{ fontSize: 16, color: '#6B7280', maxWidth: 620, margin: '0 auto', lineHeight: 1.55 }}>
+              Start free and stay free for as long as you like. Everything below is month to month, and you can stop whenever you want.
             </p>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 16, maxWidth: 900, margin: '0 auto' }}>
-            <a
-              href="https://raehughart.substack.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{ display: 'block', padding: 32, background: '#ffffff', borderRadius: 12, border: '1px solid #E5E7EB', textDecoration: 'none', transition: 'transform 0.2s, box-shadow 0.2s, border-color 0.2s' }}
-              onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(30,39,73,0.08)'; e.currentTarget.style.borderColor = '#ffba06'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.borderColor = '#E5E7EB'; }}
-            >
-              <p style={{ fontSize: 12, fontWeight: 600, letterSpacing: 1.2, textTransform: 'uppercase', color: '#ffba06', margin: '0 0 12px 0' }}>
-                Exclusive content
-              </p>
-              <h3 style={{ fontSize: 24, fontWeight: 700, color: '#1e2749', margin: '0 0 12px 0', lineHeight: 1.25 }}>
-                Premium strategies and the inside view
-              </h3>
-              <p style={{ fontSize: 15, color: '#6B7280', margin: '0 0 16px 0', lineHeight: 1.5 }}>
-                Behind-the-scenes access and a community of educators who are done settling for the status quo.
-              </p>
-              <span style={{ fontSize: 15, fontWeight: 600, color: '#1e2749' }}>
-                See premium options →
-              </span>
-            </a>
-
-            <a
-              href="https://www.teachersdeserveit.com/hub"
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{ display: 'block', padding: 32, background: '#ffffff', borderRadius: 12, border: '1px solid #E5E7EB', textDecoration: 'none', transition: 'transform 0.2s, box-shadow 0.2s, border-color 0.2s' }}
-              onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(30,39,73,0.08)'; e.currentTarget.style.borderColor = '#ffba06'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.borderColor = '#E5E7EB'; }}
-            >
-              <p style={{ fontSize: 12, fontWeight: 600, letterSpacing: 1.2, textTransform: 'uppercase', color: '#ffba06', margin: '0 0 12px 0' }}>
-                Learning Hub all-access
-              </p>
-              <h3 style={{ fontSize: 24, fontWeight: 700, color: '#1e2749', margin: '0 0 12px 0', lineHeight: 1.25 }}>
-                100+ hours of on-demand PD
-              </h3>
-              <p style={{ fontSize: 15, color: '#6B7280', margin: '0 0 16px 0', lineHeight: 1.5 }}>
-                Bite-sized videos you can finish in one sitting. Strategies you will actually use Monday morning.
-              </p>
-              <span style={{ fontSize: 15, fontWeight: 600, color: '#1e2749' }}>
-                Explore the Learning Hub →
-              </span>
-            </a>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))', gap: 18, maxWidth: 1040, margin: '0 auto', alignItems: 'start' }}>
+            {TIERS.map((tier) => (
+              <div
+                key={tier.id}
+                style={{
+                  position: 'relative',
+                  background: '#ffffff',
+                  border: tier.best ? '2px solid #ffba06' : '1px solid #E5E7EB',
+                  borderTop: `4px solid ${tier.accent}`,
+                  borderRadius: 14,
+                  padding: tier.best ? '30px 22px 24px' : '24px 22px',
+                  boxShadow: tier.best ? '0 14px 34px rgba(30,39,73,0.13)' : 'none',
+                }}
+              >
+                {tier.best && (
+                  <span style={{ position: 'absolute', top: -11, left: 20, background: '#ffba06', color: '#1e2749', fontSize: 11, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', padding: '4px 11px', borderRadius: 999 }}>
+                    Most popular
+                  </span>
+                )}
+                <p style={{ fontSize: 17, fontWeight: 700, color: '#1e2749', margin: '0 0 6px' }}>{tier.name}</p>
+                <p style={{ margin: '0 0 10px' }}>
+                  <span style={{ fontSize: 30, fontWeight: 800, color: tier.accent, letterSpacing: '-0.02em' }}>{tier.price}</span>
+                  <span style={{ fontSize: 14, color: '#6B7280' }}>{tier.period}</span>
+                </p>
+                <p style={{ fontSize: 14, color: '#6B7280', margin: '0 0 16px', lineHeight: 1.5, minHeight: 42 }}>{tier.blurb}</p>
+                <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 20px' }}>
+                  {tier.features.map((feat) => (
+                    <li key={feat} style={{ position: 'relative', paddingLeft: 20, marginBottom: 9, fontSize: 14, color: '#374151', lineHeight: 1.5 }}>
+                      <span style={{ position: 'absolute', left: 0, top: 8, width: 8, height: 2, background: tier.accent, borderRadius: 2 }} />
+                      {feat}
+                    </li>
+                  ))}
+                </ul>
+                <a
+                  href="https://www.teachersdeserveit.com/hub"
+                  style={{ display: 'block', textAlign: 'center', textDecoration: 'none', padding: '11px 16px', borderRadius: 9, fontWeight: 700, fontSize: 14, background: tier.best ? '#ffba06' : '#ffffff', color: '#1e2749', border: tier.best ? '1px solid #ffba06' : '1px solid #E5E7EB' }}
+                >
+                  {tier.cta}
+                </a>
+              </div>
+            ))}
           </div>
 
-          <div style={{ marginTop: 40, textAlign: 'center' }}>
-            <p style={{ fontSize: 16, color: '#6B7280', margin: '0 0 16px 0' }}>
-              Love what you see? Think your whole school could benefit?
-            </p>
-            <a
-              href="/for-schools/request"
-              style={{ display: 'inline-block', padding: '12px 24px', borderRadius: 8, fontWeight: 600, fontSize: 15, border: '2px solid #1e2749', color: '#1e2749', textDecoration: 'none', transition: 'background-color 0.2s' }}
-              onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#1e2749'; e.currentTarget.style.color = '#ffffff'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = '#1e2749'; }}
-            >
-              Request TDI for your school
-            </a>
-          </div>
+          <p style={{ textAlign: 'center', fontSize: 14, color: '#6B7280', marginTop: 22 }}>
+            Buying for a whole staff?{' '}
+            <Link href="/for-schools" style={{ color: '#1e2749', fontWeight: 700 }}>
+              Schools get Hub access through The Cohort and The Blueprint
+            </Link>
+            .
+          </p>
         </div>
       </section>
 

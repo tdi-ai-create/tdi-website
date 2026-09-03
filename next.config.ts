@@ -28,6 +28,16 @@ const nextConfig: NextConfig = {
         permanent: true,
       },
       {
+        source: '/learning',
+        destination: '/join',
+        permanent: true,
+      },
+      {
+        source: '/learning/plans',
+        destination: '/join',
+        permanent: true,
+      },
+      {
         source: '/hub/subscribe',
         destination: '/hub/membership',
         permanent: true,

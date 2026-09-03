@@ -247,7 +247,7 @@ export default function CertifiedStatesMap() {
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginTop: 8 }}>
                 <a
-                href="/learning/plans"
+                href="/join"
                 style={{
                   textAlign: 'center', padding: '14px 16px', background: '#1e2749',
                   color: 'white', borderRadius: 10, fontWeight: 600, fontSize: 14, textDecoration: 'none',
