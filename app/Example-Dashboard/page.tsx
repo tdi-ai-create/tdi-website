@@ -2576,7 +2576,7 @@ export default function ExampleDashboard() {
             {/* Learn more link */}
             <div className="text-center mt-6">
               <a
-                href="https://teachersdeserveit.com/how-we-partner"
+                href="https://teachersdeserveit.com/for-schools"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-[#38618C] hover:text-[#2d4e73] font-medium underline underline-offset-4 transition-colors"
@@ -3806,7 +3806,7 @@ export default function ExampleDashboard() {
             <a href="/learning" target="_blank" rel="noopener noreferrer" className="text-sm text-white/60 hover:text-white transition-colors">
               Explore the Learning Hub
             </a>
-            <a href="/pd-framework" target="_blank" rel="noopener noreferrer" className="text-sm text-white/60 hover:text-white transition-colors">
+            <a href="/for-schools" target="_blank" rel="noopener noreferrer" className="text-sm text-white/60 hover:text-white transition-colors">
               See our PD Framework
             </a>
             <a href="/funding" target="_blank" rel="noopener noreferrer" className="text-sm text-white/60 hover:text-white transition-colors">

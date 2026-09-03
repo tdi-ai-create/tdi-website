@@ -349,7 +349,7 @@ export default function PDDiagnosticPage() {
     const pdTypeName = resultData[result].name;
 
     try {
-      await fetch('/api/diagnostic-submit', {
+      const submitRes = await fetch('/api/diagnostic-submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -363,6 +363,10 @@ export default function PDDiagnosticPage() {
           isReturningUser,
         }),
       });
+
+      if (!submitRes.ok) {
+        console.error('[Diagnostic] Result submission failed', submitRes.status);
+      }
     } catch (error) {
       console.error('Submission error:', error);
     }
@@ -856,7 +860,7 @@ export default function PDDiagnosticPage() {
                       See the full framework, learn what drives each quadrant,<br />and get a clear roadmap for improvement.
                     </p>
                     <Link
-                      href={`/pd-framework?utm_source=diagnostic&utm_medium=results&utm_campaign=framework_cta#${resultData[resultType].anchorId}`}
+                      href={`/for-schools?utm_source=diagnostic&utm_medium=results&utm_campaign=framework_cta`}
                       onClick={handleFrameworkClick}
                       className="inline-block px-10 py-5 rounded-full font-bold text-lg transition-all hover:shadow-xl hover:-translate-y-1"
                       style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
@@ -976,7 +980,7 @@ export default function PDDiagnosticPage() {
                   See the full framework, learn what drives each quadrant,<br />and get a clear roadmap for improvement.
                 </p>
                 <Link
-                  href={`/pd-framework?utm_source=diagnostic&utm_medium=results&utm_campaign=framework_cta_bottom#${resultData[resultType].anchorId}`}
+                  href={`/for-schools?utm_source=diagnostic&utm_medium=results&utm_campaign=framework_cta_bottom`}
                   onClick={handleFrameworkClick}
                   className="inline-block px-10 py-5 rounded-full font-bold text-lg transition-all hover:shadow-xl hover:-translate-y-1"
                   style={{ backgroundColor: '#ffba06', color: '#1e2749' }}

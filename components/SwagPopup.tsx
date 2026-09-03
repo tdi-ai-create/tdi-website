@@ -8,7 +8,7 @@ const C = {
   gray: '#F5F5F5', white: '#FFFFFF', border: '#E5E7EB',
 };
 
-const EXCLUDED_PATHS = ['/swag', '/tdi-admin', '/hub', '/creator-portal', '/partners', '/admin', '/invoice', '/for-schools'];
+const EXCLUDED_PATHS = ['/swag', '/tdi-admin', '/hub', '/creator-portal', '/partners', '/admin', '/invoice', '/for-schools', '/love-notes'];
 
 function getPopupImages(pathname: string | null): { src: string; alt: string }[] {
   // Hub / educator pages
@@ -19,7 +19,7 @@ function getPopupImages(pathname: string | null): { src: string; alt: string }[]
     ];
   }
   // Schools / partnership pages
-  if (pathname?.startsWith('/for-schools') || pathname?.startsWith('/how-we-partner')) {
+  if (pathname?.startsWith('/for-schools')) {
     return [
       { src: '/images/swag/staff-tee-green-front.webp', alt: 'The Staff tee' },
       { src: '/images/swag/hard-parts-tote-new-2.webp', alt: 'The Hard Parts tote' },

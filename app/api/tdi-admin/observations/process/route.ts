@@ -35,10 +35,18 @@ export async function POST(request: NextRequest) {
     }
 
     // Update status to processing
-    await supabase
+    const { error: processingError } = await supabase
       .from('observation_visits')
       .update({ status: 'processing' })
       .eq('id', visitId)
+
+    if (processingError) {
+      console.error('[Observations] Could not mark visit as processing', processingError)
+      return NextResponse.json(
+        { error: 'Could not start processing this visit' },
+        { status: 500 }
+      )
+    }
 
     // Fetch the partnership staff roster
     const { data: staff } = await supabase
@@ -86,10 +94,13 @@ export async function POST(request: NextRequest) {
     }
 
     if (imageBlocks.length === 0) {
-      await supabase
+      const { error: revertError } = await supabase
         .from('observation_visits')
         .update({ status: 'uploaded' })
         .eq('id', visitId)
+      if (revertError) {
+        console.error('[Observations] Could not revert visit to uploaded', revertError)
+      }
       return NextResponse.json(
         { error: 'Could not load any photos for processing' },
         { status: 400 }
@@ -109,10 +120,12 @@ Your job:
 4. Match educator names to the staff roster (fuzzy match, first name or last name)
 5. Draft a Love Note for each educator. A Love Note is a warm, specific celebration email. It should:
    - Address the educator by first name
-   - List 3-5 specific moments you observed (use the actual notes, not generic praise)
-   - Be warm and personal, never evaluative or rubric-like
-   - End with 1-2 suggested Hub resources related to their practice
-   - Be 150-250 words
+   - Open by thanking them for letting us pop in, and tell them they are an amazing teacher
+   - List every specific moment you observed as a bullet, aiming for 8-12 (use the actual notes, never generic praise)
+   - Include at least 3 things actually said, quoted word for word, attributed to a student or to the teacher
+   - Be warm and personal, never evaluative or rubric-like, and never a score
+   - End with 2 suggested Hub resources related to their practice, one quick win and one game where possible
+   - Close warmly: we are here all day to talk it through, another time is fine, and we are in their corner
 6. For each educator, suggest strategy tags from this list: Proximity, Small Group Facilitation, De-escalation, Checking for Understanding, Routine Building, Communication with Teacher, Student Engagement, Differentiation, Positive Reinforcement, Hub Content in Action, Independent Initiative, Questioning Techniques
 7. For each educator, suggest growth indicators from this list: Saw Confidence, Saw Independence, Saw Collaboration, Saw Hub Content Applied, Saw Student Responsiveness, Saw Reflection/Self-Awareness
 8. Generate a visit summary with coaching themes and key wins
@@ -174,10 +187,13 @@ Return ONLY the JSON. No markdown formatting, no explanation.`
       parsed = JSON.parse(jsonMatch ? jsonMatch[0] : rawResponse)
     } catch {
       console.error('[Observations] Failed to parse AI response:', rawResponse.slice(0, 500))
-      await supabase
+      const { error: revertParseError } = await supabase
         .from('observation_visits')
         .update({ status: 'uploaded' })
         .eq('id', visitId)
+      if (revertParseError) {
+        console.error('[Observations] Could not revert visit to uploaded', revertParseError)
+      }
       return NextResponse.json(
         { error: 'AI response could not be parsed. Please try again.' },
         { status: 500 }
@@ -187,7 +203,7 @@ Return ONLY the JSON. No markdown formatting, no explanation.`
     // Create observation_notes records (one per educator)
     const educators = parsed.educators || []
     for (const edu of educators) {
-      await supabase.from('observation_notes').insert({
+      const { error: noteError } = await supabase.from('observation_notes').insert({
         visit_id: visitId,
         educator_name: edu.name,
         educator_id: edu.matched_roster_id || null,
@@ -197,11 +213,20 @@ Return ONLY the JSON. No markdown formatting, no explanation.`
         growth_indicators: edu.growth_indicators || [],
         hub_resources_spotted: edu.hub_resources || [],
       })
+
+      if (noteError) {
+        // A dropped note means a teacher who was observed never gets one.
+        console.error('[Observations] Could not save Love Note for', edu.name, noteError)
+        return NextResponse.json(
+          { error: `Could not save the note for ${edu.name}. Nothing was sent.` },
+          { status: 500 }
+        )
+      }
     }
 
     // Create observation_summaries record
     const summary = parsed.summary || {}
-    await supabase.from('observation_summaries').insert({
+    const { error: summaryError } = await supabase.from('observation_summaries').insert({
       visit_id: visitId,
       partnership_id: visit.partnership_id,
       coaching_themes: summary.coaching_themes || [],
@@ -210,8 +235,12 @@ Return ONLY the JSON. No markdown formatting, no explanation.`
       board_summary: summary.board_summary || '',
     })
 
+    if (summaryError) {
+      console.error('[Observations] Could not save visit summary', summaryError)
+    }
+
     // Update visit status
-    await supabase
+    const { error: processedError } = await supabase
       .from('observation_visits')
       .update({
         status: 'processed',
@@ -220,8 +249,18 @@ Return ONLY the JSON. No markdown formatting, no explanation.`
       })
       .eq('id', visitId)
 
+    if (processedError) {
+      // The notes are saved. If the visit never reaches processed, nobody can
+      // review or send them, so this has to be visible rather than silent.
+      console.error('[Observations] Notes saved but visit status not updated', processedError)
+      return NextResponse.json(
+        { error: 'Notes were saved but the visit could not be marked processed.' },
+        { status: 500 }
+      )
+    }
+
     // Create timeline event
-    await supabase.from('timeline_events').insert({
+    const { error: timelineError } = await supabase.from('timeline_events').insert({
       partnership_id: visit.partnership_id,
       event_type: 'observation',
       event_title: `Visit #${visit.visit_number} processed (${educators.length} educators)`,
@@ -229,6 +268,10 @@ Return ONLY the JSON. No markdown formatting, no explanation.`
       status: 'completed',
       notes: `Observation visit processed. ${educators.length} Love Notes drafted.`,
     })
+
+    if (timelineError) {
+      console.error('[Observations] Could not write the timeline event', timelineError)
+    }
 
     // Log AI usage
     logAIUsage({

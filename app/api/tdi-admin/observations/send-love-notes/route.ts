@@ -84,23 +84,30 @@ export async function POST(request: NextRequest) {
   ${formattedNote}
 
   <p style="margin-top: 24px; color: #6B7280; font-size: 13px;">
-    Rae Hughart<br/>
-    Founder, Teachers Deserve It
+    The team at Teachers Deserve It
   </p>
 </div>`
 
       try {
         await resend.emails.send({
-          from: 'Rae from Teachers Deserve It <hello@teachersdeserveit.com>',
+          from: 'Teachers Deserve It <hello@teachersdeserveit.com>',
           to: email,
           subject: 'A note from your visit',
           html,
         })
 
-        await supabase
+        const { error: stampError } = await supabase
           .from('observation_notes')
           .update({ email_sent_at: new Date().toISOString() })
           .eq('id', note.id)
+
+        if (stampError) {
+          // The email went out. If we cannot record that, a retry would send it
+          // to the same teacher twice, so surface it rather than counting a win.
+          console.error('[Observations] Sent but could not stamp email_sent_at for', email, stampError)
+          failed++
+          continue
+        }
 
         sent++
       } catch (emailError) {
@@ -117,16 +124,14 @@ export async function POST(request: NextRequest) {
         .eq('visit_id', visitId)
         .is('email_sent_at', null)
 
-      if (!remaining || remaining.length === 0) {
-        await supabase
-          .from('observation_visits')
-          .update({ status: 'sent' })
-          .eq('id', visitId)
-      } else {
-        await supabase
-          .from('observation_visits')
-          .update({ status: 'reviewed' })
-          .eq('id', visitId)
+      const nextStatus = !remaining || remaining.length === 0 ? 'sent' : 'reviewed'
+      const { error: statusError } = await supabase
+        .from('observation_visits')
+        .update({ status: nextStatus })
+        .eq('id', visitId)
+
+      if (statusError) {
+        console.error('[Observations] Could not set visit status to', nextStatus, statusError)
       }
     }
 

@@ -166,7 +166,7 @@ KEY LINKS:
 - Home: teachersdeserveit.com
 - For Schools: teachersdeserveit.com/for-schools
 - For Teachers: teachersdeserveit.com/join
-- How We Partner: teachersdeserveit.com/how-we-partner
+- For Schools: teachersdeserveit.com/for-schools
 - Learning Hub: www.teachersdeserveit.com/hub
 - Free PD Diagnostic: teachersdeserveit.com/pd-diagnostic
 - Free PD Plan: teachersdeserveit.com/get-started

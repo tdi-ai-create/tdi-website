@@ -56,51 +56,61 @@ export default function ForSchoolsPage() {
           </div>
           <div className="fs-ocgrid">
             <div className="fs-oc">
+              <span className="fs-ocicon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>
               <h4>Teacher time back</h4>
               <p>Find a resource at the moment of need instead of waiting for the next PD day. Borrow a colleague&apos;s work instead of building from scratch. Stop rebuilding what another teacher in the district already made.</p>
               <span className="fs-via">Cohort, Blueprint</span>
             </div>
             <div className="fs-oc">
+              <span className="fs-ocicon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/><path d="M3.22 13H9.5l.5-1 2 4.5 2-7 1.5 3.5h5.27"/></svg></span>
               <h4>Stress relief</h4>
               <p>Lighten the daily load with small practical changes rather than new initiatives. Support between formal PD days, not only on the calendar. An end to being the only person in your role in the building.</p>
               <span className="fs-via">Pulse, Cohort, Blueprint</span>
             </div>
             <div className="fs-oc">
+              <span className="fs-ocicon" aria-hidden="true"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span>
               <h4>Staff culture monitoring</h4>
               <p>Take the pulse of staff across five areas in under two minutes per person. Watch culture trend across a year instead of guessing. Surface honest input without asking staff to say it to a leader&apos;s face.</p>
               <span className="fs-via">Pulse, Blueprint</span>
             </div>
             <div className="fs-oc">
+              <span className="fs-ocicon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
               <h4>Retention and staff investment</h4>
               <p>Identify what is driving staff to stay or leave, area by area. Show staff that their input produced visible change. Track retention risk with data rather than instinct.</p>
               <span className="fs-via">Pulse, Cohort, Blueprint</span>
             </div>
             <div className="fs-oc">
+              <span className="fs-ocicon" aria-hidden="true"><svg viewBox="0 0 24 24"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg></span>
               <h4>Instructional growth</h4>
               <p>See what is actually happening in classrooms instead of assuming. Name what is already working before naming what is not. Set goals staff believe are achievable.</p>
               <span className="fs-via">Focus, Cohort, Blueprint</span>
             </div>
             <div className="fs-oc">
+              <span className="fs-ocicon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 20h10"/><path d="M10 20c5.5-2.5.8-6.4 3-10"/><path d="M9.5 9.4c1.1.8 1.8 2.2 2.3 3.7-2 .4-3.5.4-4.8-.3-1.2-.6-2.3-1.9-3-4.2 2.8-.5 4.4 0 5.5.8z"/><path d="M14.1 6a7 7 0 0 0-1.1 4c1.9-.1 3.3-.6 4.3-1.4 1-1 1.6-2.3 1.7-4.6-2.7.1-4 1-4.9 2z"/></svg></span>
               <h4>New teacher support</h4>
               <p>Ramp new hires without pulling veteran staff off their own work. Give first-year teachers on-demand answers at the moment of confusion. Provide feedback that is not attached to evaluation.</p>
               <span className="fs-via">Cohort, Blueprint</span>
             </div>
             <div className="fs-oc">
+              <span className="fs-ocicon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg></span>
               <h4>Leadership capacity</h4>
               <p>Think through decisions with someone outside the building. Prepare for the conversations that keep getting postponed. Decide which PD to say no to.</p>
               <span className="fs-via">Cohort, Blueprint</span>
             </div>
             <div className="fs-oc">
+              <span className="fs-ocicon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/></svg></span>
               <h4>PD coherence</h4>
               <p>Map the PD already in place and see where it overlaps. Identify the real gaps instead of stacking on another initiative. Fit development into the existing calendar rather than on top of it.</p>
               <span className="fs-via">Focus, Blueprint</span>
             </div>
             <div className="fs-oc">
+              <span className="fs-ocicon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></span>
               <h4>Collaboration and shared practice</h4>
               <p>Share materials across grades, buildings and roles without adding a meeting. Keep staff work in the system when people leave the district. Build a shared library that grows every year instead of resetting.</p>
               <span className="fs-via">Cohort, Blueprint</span>
             </div>
             <div className="fs-oc">
+              <span className="fs-ocicon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg></span>
               <h4>Proof and budget defense</h4>
               <p>Turn qualitative work into numbers. Show a superintendent or board what changed and by how much. Defend the line item with evidence when budget season arrives.</p>
               <span className="fs-via">All four</span>
@@ -230,7 +240,40 @@ export default function ForSchoolsPage() {
         </div>
       </section>
 
+      {/* SECTION: In your building, Blueprint only */}
       <section className="fs-sec fs-sec-white">
+        <div className="fs-wrap">
+          <div className="fs-head-narrow">
+            <p className="fs-kicker">Only in a Blueprint</p>
+            <h2>When we are actually in your building.</h2>
+            <p className="fs-lede">The other three offerings reach your staff through their inbox. A Blueprint puts our people in your classrooms while students are in session. This is the part no other offering includes, and the part schools tell us they remember.</p>
+          </div>
+
+          <div className="fs-grid2 fs-align-start">
+            <div>
+              <h3 style={{"fontSize": "1.15rem", "marginBottom": "14px"}}>What a visit day looks like</h3>
+              <ul className="fs-ican" style={{"marginBottom": "0"}}>
+                <li>Up to 15 classrooms observed in a single visit</li>
+                <li>On-campus days happen while students are in session, in real classrooms</li>
+                <li>Observations are growth-focused, not evaluative, and separate from your appraisal process</li>
+                <li>We meet with teachers one-to-one after observing them</li>
+                <li>A leadership debrief at the end of each day</li>
+              </ul>
+            </div>
+            <div>
+              <h3 style={{"fontSize": "1.15rem", "marginBottom": "14px"}}>Love Notes</h3>
+              <p style={{"fontSize": ".95rem", "color": "var(--muted)"}}>Every teacher we observe receives one. Not generic praise. A specific note about something we watched them do well.</p>
+              <blockquote className="fs-lovenote">
+                &ldquo;During your small group rotation today, I noticed how you used proximity and a calm voice to redirect Marcus without stopping instruction. The other students did not even look up. That is classroom management mastery. The way you had materials pre-sorted for each group saved at least 3 minutes of transition time. Your students knew exactly where to go and what to grab. Keep leaning into those systems.&rdquo;
+              </blockquote>
+              <p style={{"fontSize": ".9rem", "color": "var(--muted)", "marginTop": "14px"}}>Love Notes are what teachers tell us they remember months later. Not the PD slides. Not the data. The moment someone noticed what they were doing right.</p>
+              <p style={{"marginTop": "14px"}}><a className="fs-go" href="/love-notes">Click to see how these notes are structured</a></p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="fs-sec">
         <div className="fs-wrap">
           <div className="fs-head-narrow">
             <p className="fs-kicker">What lands on your dashboard</p>
@@ -334,7 +377,7 @@ export default function ForSchoolsPage() {
         </div>
       </section>
 
-      <section className="fs-sec" id="dashboard">
+      <section className="fs-sec fs-sec-white" id="dashboard">
         <div className="fs-wrap">
           <div className="fs-head-narrow">
             <p className="fs-kicker">Your leadership dashboard</p>
@@ -352,7 +395,7 @@ export default function ForSchoolsPage() {
         </div>
       </section>
 
-      <section className="fs-sec fs-sec-white">
+      <section className="fs-sec">
         <div className="fs-wrap">
           <div className="fs-head-narrow">
             <p className="fs-kicker">Verified results from partner schools</p>
@@ -372,7 +415,7 @@ export default function ForSchoolsPage() {
         </div>
       </section>
 
-      <section className="fs-sec" id="funding">
+      <section className="fs-sec fs-sec-white" id="funding">
         <div className="fs-wrap fs-fundband">
           <div>
             <h2>Most of our schools don&apos;t pay the full cost of this themselves.</h2>
@@ -384,7 +427,7 @@ export default function ForSchoolsPage() {
         </div>
       </section>
 
-      <section className="fs-sec fs-sec-white" id="questions">
+      <section className="fs-sec" id="questions">
         <div className="fs-wrap">
           <div className="fs-head-narrow">
             <p className="fs-kicker">What other leaders asked first</p>
@@ -427,7 +470,7 @@ export default function ForSchoolsPage() {
         </div>
       </section>
 
-      <section className="fs-sec" id="downloads">
+      <section className="fs-sec fs-sec-white" id="downloads">
         <div className="fs-wrap">
           <div className="fs-head-narrow">
             <p className="fs-kicker">Take it to your team</p>
