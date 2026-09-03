@@ -147,7 +147,11 @@ export function OpportunityCard({ opportunity, onStatusChange, onWindowStatusCha
             </option>
           ))}
         </select>
-        <WaitingOnBadge waitingOn={waitingOn} />
+        <WaitingOnBadge
+          waitingOn={waitingOn}
+          narrativeStatus={opportunity.narrative_status}
+          status={opportunity.status}
+        />
         <DeadlineCountdown deadline={opportunity.application_closes} />
       </div>
 
