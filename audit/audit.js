@@ -64,6 +64,20 @@ const PAGES = [
 // Thresholds
 const LOAD_TIME_WARNING_MS = 3000;
 const LOAD_TIME_ERROR_MS = 5000;
+const WARMUP_TIMEOUT_MS = 15000;
+
+// Sent on external link checks. A request with no User-Agent is the single
+// strongest bot signal there is, and it was why perfectly good links to
+// LinkedIn, Substack and TikTok came back blocked.
+const AUDIT_USER_AGENT =
+  'Mozilla/5.0 (compatible; TDI-SiteAudit/1.0; +https://www.teachersdeserveit.com)';
+
+// Statuses that mean "a bot guard turned us away", not "this link is broken".
+// 999 is LinkedIn's, and is not a real HTTP status at all. 401/403/429 from a
+// datacenter IP on a third party domain is the same story, and 405 just means
+// the server dislikes HEAD. None of these tell us the link is dead, so they are
+// reported as unverified rather than counted as breakage.
+const BOT_GUARD_STATUSES = new Set([401, 403, 405, 429, 999]);
 const TITLE_MIN_LENGTH = 20;
 const TITLE_MAX_LENGTH = 70;
 const META_DESC_MAX_LENGTH = 160;
@@ -83,6 +97,7 @@ const results = {
   externalLinks: new Map(), // url -> Set of pages where found
   brokenInternalLinks: [],
   brokenExternalLinks: [],
+  unverifiedExternalLinks: [], // blocked by a bot guard, not known to be broken
   summary: {
     total: 0,
     passed: 0,
@@ -117,12 +132,44 @@ function getTimestamp() {
   return new Date().toISOString();
 }
 
-async function checkExternalUrl(url) {
+// The audit runs on deployment_status, which means it hits a site that was
+// deployed seconds ago and whose functions are all cold. The first request pays
+// the cold start, so /contact measured 7.1s against a 5s threshold and failed,
+// while a second run 30 seconds later measured it warm and passed. Two Vercel
+// projects means two runs per commit, so every commit produced one pass and one
+// failure and the check looked random. It was not: it was cold-start latency
+// being reported as a site defect. Same shape as the networkidle bug below.
+//
+// One throwaway request per page, then measure. A page that is genuinely slow
+// is still slow on its second load, so the check keeps its teeth.
+async function warmUrl(url) {
   return new Promise((resolve) => {
     const protocol = url.startsWith('https') ? https : http;
-    const req = protocol.request(url, { method: 'HEAD', timeout: EXTERNAL_LINK_TIMEOUT_MS }, (res) => {
-      resolve({ url, status: res.statusCode, ok: res.statusCode >= 200 && res.statusCode < 400 });
-    });
+    const req = protocol.request(
+      url,
+      { method: 'GET', timeout: WARMUP_TIMEOUT_MS, headers: { 'User-Agent': AUDIT_USER_AGENT } },
+      (res) => {
+        res.resume(); // drain, we only wanted the function booted
+        res.on('end', resolve);
+      }
+    );
+    req.on('error', () => resolve());
+    req.on('timeout', () => { req.destroy(); resolve(); });
+    req.end();
+  });
+}
+
+function requestExternalUrl(url, method) {
+  return new Promise((resolve) => {
+    const protocol = url.startsWith('https') ? https : http;
+    const req = protocol.request(
+      url,
+      { method, timeout: EXTERNAL_LINK_TIMEOUT_MS, headers: { 'User-Agent': AUDIT_USER_AGENT } },
+      (res) => {
+        res.resume();
+        resolve({ url, status: res.statusCode, ok: res.statusCode >= 200 && res.statusCode < 400 });
+      }
+    );
     req.on('error', () => resolve({ url, status: 0, ok: false, error: 'Connection failed' }));
     req.on('timeout', () => {
       req.destroy();
@@ -130,6 +177,21 @@ async function checkExternalUrl(url) {
     });
     req.end();
   });
+}
+
+async function checkExternalUrl(url) {
+  let result = await requestExternalUrl(url, 'HEAD');
+
+  // Plenty of servers answer HEAD with 405 or 403 and answer GET perfectly
+  // well, so a HEAD refusal is not an answer about the link.
+  if (!result.ok && BOT_GUARD_STATUSES.has(result.status)) {
+    result = await requestExternalUrl(url, 'GET');
+  }
+
+  if (!result.ok && BOT_GUARD_STATUSES.has(result.status)) {
+    return { ...result, unverified: true };
+  }
+  return result;
 }
 
 // ============================================================================
@@ -160,6 +222,10 @@ async function auditPage(page, pagePath) {
       }
     }
   });
+
+  // Warm the route first so the measurement below reflects what a visitor
+  // experiences rather than the cold start this audit itself triggered.
+  await warmUrl(url);
 
   // Navigate and measure load time
   const startTime = Date.now();
@@ -491,13 +557,17 @@ async function validateExternalLinks() {
     const checks = await Promise.all(batch.map(checkExternalUrl));
 
     for (const check of checks) {
-      if (!check.ok) {
-        results.brokenExternalLinks.push({
-          url: check.url,
-          status: check.status,
-          error: check.error,
-          foundOn: Array.from(results.externalLinks.get(check.url)),
-        });
+      if (check.ok) continue;
+      const entry = {
+        url: check.url,
+        status: check.status,
+        error: check.error,
+        foundOn: Array.from(results.externalLinks.get(check.url)),
+      };
+      if (check.unverified) {
+        results.unverifiedExternalLinks.push(entry);
+      } else {
+        results.brokenExternalLinks.push(entry);
       }
     }
 
@@ -508,6 +578,9 @@ async function validateExternalLinks() {
 
   if (results.brokenExternalLinks.length > 0) {
     console.log(`    Found ${results.brokenExternalLinks.length} broken external link(s)`);
+  }
+  if (results.unverifiedExternalLinks.length > 0) {
+    console.log(`    ${results.unverifiedExternalLinks.length} external link(s) could not be verified (bot protection)`);
   }
 }
 
@@ -606,6 +679,21 @@ function generateTextReport() {
     report += '\u{1F310} BROKEN EXTERNAL LINKS\n';
     report += '-'.repeat(30) + '\n';
     for (const link of results.brokenExternalLinks) {
+      report += `  [${link.status || link.error}] ${link.url}\n`;
+      report += `           Found on: ${link.foundOn.join(', ')}\n`;
+    }
+    report += '\n';
+  }
+
+  // Unverified External Links. Reported so nobody wonders why a link vanished
+  // from the report, but kept out of the broken list because a bot guard
+  // turning away a datacenter IP says nothing about whether the link works.
+  if (results.unverifiedExternalLinks.length > 0) {
+    report += '\u{1F6E1}\uFE0F  EXTERNAL LINKS THAT COULD NOT BE VERIFIED\n';
+    report += '-'.repeat(30) + '\n';
+    report += '  These answered with a bot protection status. They are very\n';
+    report += '  likely fine. Open one in a browser if you want to be sure.\n';
+    for (const link of results.unverifiedExternalLinks) {
       report += `  [${link.status || link.error}] ${link.url}\n`;
       report += `           Found on: ${link.foundOn.join(', ')}\n`;
     }
@@ -803,6 +891,7 @@ function generateJsonReport() {
     pages: results.pages,
     brokenInternalLinks: results.brokenInternalLinks,
     brokenExternalLinks: results.brokenExternalLinks,
+    unverifiedExternalLinks: results.unverifiedExternalLinks,
   }, null, 2);
 }
 
