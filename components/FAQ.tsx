@@ -19,7 +19,7 @@ const faqs: FAQItem[] = [
   },
   {
     question: "How do I get teacher buy-in for another PD program?",
-    answer: "Teachers resist PD that wastes their time. TDI's 65% implementation rate (vs. 10% industry average) exists because our content is immediately applicable. We also recommend starting with teacher input surveys so staff feel heard from day one."
+    answer: "Teachers resist PD that wastes their time. TDI's 74% implementation rate (vs. 10% industry average) exists because our content is immediately applicable. We also recommend starting with teacher input surveys so staff feel heard from day one."
   },
   {
     question: "What makes TDI different from other PD?",
