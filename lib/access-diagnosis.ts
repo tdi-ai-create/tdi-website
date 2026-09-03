@@ -160,6 +160,20 @@ export function diagnose(f: AccessFacts): Finding[] {
   return findings;
 }
 
+/**
+ * Blockers that belong to the sign in account, not to a particular product.
+ *
+ * Someone who was never sent a link has one problem, not one per surface. The
+ * first version of this listed it once for Creator Studio and again for the
+ * Hub, with two identical buttons, which invites the reasonable question of
+ * whether you have to press both.
+ */
+export const ACCOUNT_LEVEL: Blocker[] = ['no_account', 'auth_row_broken', 'never_invited', 'invite_unused'];
+
+export function isAccountLevel(b: Blocker): boolean {
+  return ACCOUNT_LEVEL.includes(b);
+}
+
 /** True when nothing is standing between this person and the front door. */
 export function canSignIn(f: AccessFacts): boolean {
   return diagnose(f).length === 0;

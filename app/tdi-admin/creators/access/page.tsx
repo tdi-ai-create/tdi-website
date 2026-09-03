@@ -36,6 +36,7 @@ interface Finding {
 interface LookupResult {
   email: string;
   foundAnywhere: boolean;
+  accountFindings: Finding[];
   account: { lastSignInAt: string | null; malformed: boolean } | null;
   creator: { name: string | null; status: string; contentPath: string | null; agreementSigned: boolean } | null;
   hub: { displayName: string | null } | null;
@@ -237,7 +238,27 @@ export default function CreatorAccessPage() {
               {!lookup.hubReadable && <> &middot; the Hub could not be checked from here</>}
             </div>
 
-            {lookup.surfaces.every(s => s.findings.length === 0) ? (
+            {/* One account problem, reported once, however many products it stops
+                them reaching. */}
+            {(lookup.accountFindings || []).map(f => (
+              <div key={f.blocker} style={{ padding: 14, background: '#fff', border: '1px solid #f0d7d7', borderRadius: 8, marginBottom: 8 }}>
+                <div style={{ fontSize: 14, fontWeight: 620, color: '#a32c2c', marginBottom: 5 }}>{f.what}</div>
+                <div style={{ fontSize: 13, color: '#4d587a', lineHeight: 1.55, marginBottom: 12 }}>{f.why}</div>
+                <button
+                  onClick={() => resolve(f.remedy.action, 'creator_studio')}
+                  disabled={acting !== null}
+                  title={f.remedy.effect}
+                  style={{
+                    fontSize: 13, fontWeight: 620, padding: '8px 14px', borderRadius: 7, border: 'none',
+                    background: acting ? '#d3d9e8' : '#1e2749', color: '#fff',
+                    cursor: acting ? 'not-allowed' : 'pointer',
+                  }}
+                >{acting === f.remedy.action ? 'Working...' : f.remedy.label}</button>
+                <div style={{ fontSize: 12, color: '#7e88a6', marginTop: 8 }}>{f.remedy.effect}</div>
+              </div>
+            ))}
+
+            {(lookup.accountFindings || []).length === 0 && lookup.surfaces.every(s => s.findings.length === 0) ? (
               <div style={{ padding: '12px 14px', background: '#eefaf4', border: '1px solid #b6e3ce', borderRadius: 8, fontSize: 13.5, color: '#1f7a5c' }}>
                 Nothing is blocking them. Their account works and their record is active, so if they
                 still cannot get in, it is worth asking exactly what they see and at which address.

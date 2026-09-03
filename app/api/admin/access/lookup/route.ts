@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { getServiceSupabase } from '@/lib/supabase';
 import { requireAdminAuth } from '@/lib/tdi-admin/auth';
-import { diagnose, type AccessFacts, type Surface } from '@/lib/access-diagnosis';
+import { diagnose, isAccountLevel, type AccessFacts, type Surface } from '@/lib/access-diagnosis';
 
 /**
  * GET /api/admin/access/lookup?email=someone@school.org
@@ -152,8 +152,24 @@ export async function GET(request: NextRequest) {
     surfaces.push({ surface: 'hub', present: !!hubProfile, findings: diagnose(facts) });
   }
 
+  // One account problem is one problem, however many products it stops them
+  // reaching. Account level findings are lifted out and reported once; what
+  // stays on a surface is genuinely specific to it.
+  const seenAccountLevel = new Set<string>();
+  const accountFindings: ReturnType<typeof diagnose> = [];
+  for (const s of surfaces) {
+    for (const f of s.findings) {
+      if (isAccountLevel(f.blocker) && !seenAccountLevel.has(f.blocker)) {
+        seenAccountLevel.add(f.blocker);
+        accountFindings.push(f);
+      }
+    }
+    s.findings = s.findings.filter(f => !isAccountLevel(f.blocker));
+  }
+
   return NextResponse.json({
     email,
+    accountFindings,
     account: authUser,
     creator: creator
       ? {
