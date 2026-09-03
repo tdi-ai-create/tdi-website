@@ -24,11 +24,18 @@ function hubAdmin() {
 }
 
 /**
- * Find one auth user by email without listing the whole table.
+ * Find one auth user by email, and establish whether the account can actually
+ * authenticate.
  *
- * The columns that break SQL-created accounts are not exposed by the admin API,
- * so malformed is inferred from what it does return: an account with no
- * identities can never authenticate.
+ * The identities array is the signal, because an account with no identity row
+ * can never sign in no matter what the person tries. That is the shape the
+ * fifteen SQL-created accounts were in.
+ *
+ * It has to come from getUserById. listUsers returns identities as null for
+ * every user without exception, measured across all 98 accounts, so inferring
+ * anything from it there marks healthy accounts as broken. The first version of
+ * this did exactly that and reported every account as needing repair, including
+ * one belonging to somebody who had signed in the day before.
  */
 async function findAuthUser(
   client: ReturnType<typeof getServiceSupabase>,
@@ -42,13 +49,24 @@ async function findAuthUser(
     const hit = data.users.find(u => (u.email || '').toLowerCase() === target);
     if (hit) {
       const u = hit as typeof hit & { recovery_sent_at?: string | null; invited_at?: string | null };
+
+      const { data: full } = await client.auth.admin.getUserById(hit.id);
+      const identities = full?.user?.identities;
+
+      // Only claim malformed when we positively know there are no identities.
+      // An unreadable answer means we do not know, and saying "broken" on a
+      // guess sends someone to repair an account that works. Having signed in
+      // is proof on its own that the row is fine.
+      const malformed =
+        !hit.last_sign_in_at && Array.isArray(identities) && identities.length === 0;
+
       return {
         id: hit.id,
         lastSignInAt: hit.last_sign_in_at ?? null,
         recoverySentAt: u.recovery_sent_at ?? null,
         invitedAt: u.invited_at ?? null,
         emailConfirmedAt: hit.email_confirmed_at ?? null,
-        malformed: !Array.isArray(hit.identities) || hit.identities.length === 0,
+        malformed,
       };
     }
     if (data.users.length < 1000) break;
