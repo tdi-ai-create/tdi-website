@@ -39,11 +39,19 @@ export function EmailsTab({ pursuitId, pursuit }: EmailsTabProps) {
   const handleSaveDraft = async () => {
     setSendStatus('sending...')
     try {
-      await fetch(`/api/funding/pursuits/${pursuitId}/emails`, {
+      // Was reporting "saved!" without reading the reply, so a refused save
+      // looked identical to a successful one and the text was gone either way.
+      const res = await fetch(`/api/funding/pursuits/${pursuitId}/emails`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(draft),
       })
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({}))
+        setSendStatus(`not saved: ${d.error || res.status}`)
+        setTimeout(() => setSendStatus(null), 6000)
+        return
+      }
       setSendStatus('saved!')
       setComposing(false)
       setDraft({ subject: '', body: '', toEmail: pursuit.client_contact_email || '', emailType: 'custom' })
@@ -63,13 +71,30 @@ export function EmailsTab({ pursuitId, pursuit }: EmailsTabProps) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(draft),
       })
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({}))
+        setSendStatus(`not sent: ${d.error || res.status}`)
+        setTimeout(() => setSendStatus(null), 6000)
+        return
+      }
       const created = await res.json()
-      // Now send it
-      await fetch(`/api/funding/pursuits/${pursuitId}/emails`, {
+
+      // Now send it. This leg was also unchecked, so a failed send still
+      // reported "sent!". That is the worst version of this bug on the page:
+      // it claims something reached a school when it may not have left.
+      const sendRes = await fetch(`/api/funding/pursuits/${pursuitId}/emails`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ emailId: created.id || created.emailId, send: true }),
       })
+      if (!sendRes.ok) {
+        const d = await sendRes.json().catch(() => ({}))
+        setSendStatus(`saved as a draft, but NOT sent: ${d.error || sendRes.status}`)
+        setComposing(false)
+        fetchEmails()
+        setTimeout(() => setSendStatus(null), 8000)
+        return
+      }
       setSendStatus('sent!')
       setComposing(false)
       setDraft({ subject: '', body: '', toEmail: pursuit.client_contact_email || '', emailType: 'custom' })
@@ -89,11 +114,16 @@ export function EmailsTab({ pursuitId, pursuit }: EmailsTabProps) {
     )
     if (!ok) return
 
-    await fetch(`/api/funding/pursuits/${pursuitId}/emails`, {
+    const res = await fetch(`/api/funding/pursuits/${pursuitId}/emails`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ emailId, send: true }),
     })
+    if (!res.ok) {
+      const d = await res.json().catch(() => ({}))
+      setSendStatus(`NOT sent: ${d.error || res.status}`)
+      setTimeout(() => setSendStatus(null), 8000)
+    }
     fetchEmails()
   }
 

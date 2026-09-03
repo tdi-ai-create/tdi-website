@@ -17,10 +17,39 @@ interface Task {
   color_state: 'green' | 'yellow' | 'red' | null
   escalation_rung: string | null
   prepared_materials: string | null
+  requires_answer: boolean | null
   is_overdue: boolean
   days_until_due: number | null
   pursuit: { id: string; pursuit_name: string; district_name: string; client_contact_name: string | null; client_contact_email: string | null } | null
   opportunity: { id: string; name: string; status: string; waiting_on: string | null } | null
+}
+
+/**
+ * What the server said when it refused to close an item.
+ *
+ * The refusal is not an error state, it is the system asking a question. Ten of
+ * the seventeen open items are questions that cannot close without an answer,
+ * so this path is the common one, not the exception.
+ */
+interface BlockedClose {
+  message: string
+  field: 'answer' | 'outcome'
+  label: string
+  options?: string[]
+  override?: { field: string; label: string; note: string }
+}
+
+interface AnswerDraft {
+  answer: string
+  outcome: string
+  closeWithoutAnswer: string
+  showOverride: boolean
+}
+
+const OUTCOME_LABELS: Record<string, { label: string; hint: string }> = {
+  proceed: { label: 'We can carry on', hint: 'The answer unblocks the work' },
+  stop_path: { label: 'This path is closed', hint: 'Not viable, stop pursuing it' },
+  still_blocked: { label: 'Still stuck', hint: 'They answered, but it does not unblock us' },
 }
 
 const COLOR_DOT: Record<string, string> = {
@@ -50,6 +79,11 @@ export function MyTasks() {
   const [nudging, setNudging] = useState<string | null>(null)
   const [completing, setCompleting] = useState<string | null>(null)
   const [collapsed, setCollapsed] = useState(false)
+  // Which task is expanded, and any answer the server is holding out for.
+  const [openTask, setOpenTask] = useState<string | null>(null)
+  const [blocked, setBlocked] = useState<Record<string, BlockedClose>>({})
+  const [answerDraft, setAnswerDraft] = useState<Record<string, AnswerDraft>>({})
+  const [justDone, setJustDone] = useState<{ id: string; title: string } | null>(null)
 
   const loadTasks = () => {
     fetch('/api/funding/tasks?status=open')
@@ -71,17 +105,69 @@ export function MyTasks() {
     return true
   })
 
-  const markDone = async (taskId: string, pursuitId: string) => {
+  /**
+   * Close an item, and show what the server says when it will not.
+   *
+   * This used to fire the request, ignore the reply and reload. The route
+   * refuses to close a question without an answer and returns a sentence
+   * written for the person clicking, and all of that went in the bin. The
+   * item then reappeared unchanged, which read as "the tick does nothing".
+   * Ten of seventeen open items are questions, so that was the usual outcome
+   * rather than an edge case.
+   */
+  const markDone = async (taskId: string, pursuitId: string, extra?: Record<string, unknown>) => {
     setCompleting(taskId)
     try {
-      await fetch(`/api/funding/pursuits/${pursuitId}/actions`, {
+      const res = await fetch(`/api/funding/pursuits/${pursuitId}/actions`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ actionId: taskId, markDone: true }),
+        body: JSON.stringify({ actionId: taskId, markDone: true, ...(extra || {}) }),
       })
+      const data = await res.json().catch(() => ({}))
+
+      if (!res.ok) {
+        setBlocked(b => ({
+          ...b,
+          [taskId]: {
+            message: data.error || 'This could not be closed, and the reason did not come through.',
+            field: data.requires?.field === 'outcome' ? 'outcome' : 'answer',
+            label: data.requires?.label || 'What did they say?',
+            options: data.requires?.options,
+            override: data.override,
+          },
+        }))
+        setOpenTask(taskId)
+        return
+      }
+
+      // Closed for real. Say so, because the row is about to vanish and a row
+      // disappearing on its own is indistinguishable from a page refresh.
+      const closed = tasks.find(t => t.id === taskId)
+      setJustDone({ id: taskId, title: closed?.client_label || closed?.title || 'Task' })
+      setTimeout(() => setJustDone(cur => (cur?.id === taskId ? null : cur)), 6000)
+
+      setBlocked(b => { const n = { ...b }; delete n[taskId]; return n })
+      setAnswerDraft(d => { const n = { ...d }; delete n[taskId]; return n })
+      setOpenTask(cur => (cur === taskId ? null : cur))
       loadTasks()
-    } catch {} finally { setCompleting(null) }
+    } catch {
+      setBlocked(b => ({
+        ...b,
+        [taskId]: {
+          message: 'Could not reach the server. Nothing was changed, so try again.',
+          field: 'answer',
+          label: 'What did they say?',
+        },
+      }))
+      setOpenTask(taskId)
+    } finally { setCompleting(null) }
   }
+
+  const draftFor = (id: string): AnswerDraft =>
+    answerDraft[id] || { answer: '', outcome: '', closeWithoutAnswer: '', showOverride: false }
+
+  const setDraftFor = (id: string, patch: Partial<AnswerDraft>) =>
+    setAnswerDraft(d => ({ ...d, [id]: { ...draftFor(id), ...patch } }))
 
   const nudge = async (taskId: string) => {
     setNudging(taskId)
@@ -162,6 +248,18 @@ export function MyTasks() {
             ))}
           </div>
 
+          {/* A closed item leaves the list, and a row vanishing on its own is
+              indistinguishable from a refresh. Say what happened to it. */}
+          {justDone && (
+            <div style={{
+              padding: '10px 20px', background: '#ECFDF5', borderBottom: '1px solid #A7F3D0',
+              fontSize: 12, color: '#065F46', display: 'flex', alignItems: 'center', gap: 8,
+            }}>
+              <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#10B981', flexShrink: 0 }} />
+              <span><strong>{justDone.title}</strong> is closed and has moved out of this list.</span>
+            </div>
+          )}
+
           {/* Task list */}
           <div style={{ maxHeight: 400, overflowY: 'auto' }}>
             {filtered.length === 0 ? (
@@ -178,11 +276,11 @@ export function MyTasks() {
                   : null
 
                 return (
-                  <div key={task.id} style={{
+                  <div key={task.id} style={{ borderBottom: '1px solid #F3F4F6' }}>
+                  <div style={{
                     padding: '12px 20px',
-                    borderBottom: '1px solid #F3F4F6',
                     display: 'flex', gap: 10, alignItems: 'flex-start',
-                    background: isOverdue ? '#FFFBEB' : 'transparent',
+                    background: blocked[task.id] ? '#FEF2F2' : isOverdue ? '#FFFBEB' : 'transparent',
                   }}>
                     {/* Color state dot */}
                     {task.color_state && (
@@ -221,13 +319,32 @@ export function MyTasks() {
                         }}>
                           {task.owner_type === 'client' ? 'School' : 'TDI'}
                         </span>
-                        {/* Title — use client_label if available */}
-                        <span style={{
-                          fontSize: 14, fontWeight: 600,
-                          color: task.color_state === 'red' ? '#DC2626' : task.color_state === 'yellow' ? '#92400E' : isOverdue ? '#DC2626' : '#0a0f1e',
-                        }}>
+                        {/* Title. Opens the detail rather than being inert text,
+                            because "what do I actually do here" was the question. */}
+                        <button
+                          onClick={() => setOpenTask(cur => (cur === task.id ? null : task.id))}
+                          style={{
+                            fontSize: 14, fontWeight: 600, textAlign: 'left',
+                            background: 'none', border: 'none', padding: 0, cursor: 'pointer',
+                            display: 'flex', alignItems: 'center', gap: 5,
+                            color: task.color_state === 'red' ? '#DC2626' : task.color_state === 'yellow' ? '#92400E' : isOverdue ? '#DC2626' : '#0a0f1e',
+                          }}
+                        >
+                          <span style={{
+                            fontSize: 9, color: '#9CA3AF', transition: 'transform .12s',
+                            transform: openTask === task.id ? 'rotate(90deg)' : 'none',
+                          }}>&#9654;</span>
                           {task.client_label || task.title}
-                        </span>
+                        </button>
+                        {task.requires_answer && (
+                          <span
+                            title="This is a question. Closing it needs what you were told."
+                            style={{
+                              fontSize: 9, fontWeight: 700, padding: '2px 6px', borderRadius: 4,
+                              background: '#EFF6FF', color: '#1D4ED8', letterSpacing: 0.4,
+                            }}
+                          >QUESTION</span>
+                        )}
                       </div>
 
                       {/* Pursuit name */}
@@ -301,6 +418,142 @@ export function MyTasks() {
                         </button>
                       )}
                     </div>
+                  </div>
+
+                  {/* Detail. What this is, what TDI already did, and what closing it needs. */}
+                  {openTask === task.id && (
+                    <div style={{ padding: '0 20px 16px 56px', background: blocked[task.id] ? '#FEF2F2' : '#FAFAFA' }}>
+                      {task.description && (
+                        <div style={{ fontSize: 13, color: '#374151', lineHeight: 1.55, marginBottom: 10 }}>
+                          {task.description}
+                        </div>
+                      )}
+
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16, fontSize: 12, color: '#6B7280', marginBottom: 12 }}>
+                        <span><strong style={{ color: '#374151' }}>Owner</strong> {task.owner_name || (task.owner_type === 'client' ? 'The school' : 'TDI')}</span>
+                        {task.owner_email && <span><strong style={{ color: '#374151' }}>Contact</strong> {task.owner_email}</span>}
+                        {task.due_date && <span><strong style={{ color: '#374151' }}>Due</strong> {task.due_date}</span>}
+                        {task.category && <span><strong style={{ color: '#374151' }}>Category</strong> {task.category}</span>}
+                      </div>
+
+                      {task.prepared_materials && (
+                        <div style={{
+                          fontSize: 12, color: '#374151', background: 'white', padding: '10px 12px',
+                          borderRadius: 8, border: '1px solid #E5E7EB', marginBottom: 12,
+                        }}>
+                          <div style={{ fontSize: 10, fontWeight: 700, color: '#6B7280', letterSpacing: 0.5, marginBottom: 4 }}>
+                            WHAT TDI HAS ALREADY PREPARED
+                          </div>
+                          {task.prepared_materials}
+                        </div>
+                      )}
+
+                      {/* The refusal, shown where it happened. */}
+                      {blocked[task.id] && (
+                        <div style={{
+                          background: 'white', border: '1px solid #FCA5A5', borderRadius: 8,
+                          padding: 14, marginBottom: 4,
+                        }}>
+                          <div style={{ fontSize: 13, fontWeight: 600, color: '#991B1B', marginBottom: 10 }}>
+                            {blocked[task.id].message}
+                          </div>
+
+                          <label style={{ fontSize: 11, fontWeight: 700, color: '#374151', display: 'block', marginBottom: 5 }}>
+                            {blocked[task.id].field === 'outcome' ? 'What does this mean for the work?' : blocked[task.id].label}
+                          </label>
+
+                          {blocked[task.id].field === 'answer' && (
+                            <textarea
+                              value={draftFor(task.id).answer}
+                              onChange={e => setDraftFor(task.id, { answer: e.target.value })}
+                              placeholder="What were you told?"
+                              rows={2}
+                              style={{
+                                width: '100%', fontSize: 13, padding: '8px 10px', borderRadius: 6,
+                                border: '1px solid #D1D5DB', fontFamily: 'inherit', resize: 'vertical',
+                                marginBottom: 10,
+                              }}
+                            />
+                          )}
+
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 12 }}>
+                            {(blocked[task.id].options || ['proceed', 'stop_path', 'still_blocked']).map(opt => {
+                              const meta = OUTCOME_LABELS[opt] || { label: opt, hint: '' }
+                              const picked = draftFor(task.id).outcome === opt
+                              return (
+                                <button
+                                  key={opt}
+                                  onClick={() => setDraftFor(task.id, { outcome: opt })}
+                                  title={meta.hint}
+                                  style={{
+                                    fontSize: 12, fontWeight: 600, padding: '6px 10px', borderRadius: 6,
+                                    border: picked ? '1px solid #1D4ED8' : '1px solid #D1D5DB',
+                                    background: picked ? '#EFF6FF' : 'white',
+                                    color: picked ? '#1D4ED8' : '#374151', cursor: 'pointer',
+                                  }}
+                                >{meta.label}</button>
+                              )
+                            })}
+                          </div>
+
+                          <button
+                            onClick={() => task.pursuit && markDone(task.id, task.pursuit.id, {
+                              answer: draftFor(task.id).answer,
+                              outcome: draftFor(task.id).outcome,
+                            })}
+                            disabled={completing === task.id || !draftFor(task.id).answer.trim() || !draftFor(task.id).outcome}
+                            style={{
+                              fontSize: 12, fontWeight: 700, padding: '7px 14px', borderRadius: 6,
+                              border: 'none', color: 'white', marginRight: 10,
+                              background: (!draftFor(task.id).answer.trim() || !draftFor(task.id).outcome) ? '#D1D5DB' : '#059669',
+                              cursor: (!draftFor(task.id).answer.trim() || !draftFor(task.id).outcome) ? 'not-allowed' : 'pointer',
+                            }}
+                          >
+                            {completing === task.id ? 'Closing...' : 'Record it and close'}
+                          </button>
+
+                          {/* The way out, when an answer is never coming. */}
+                          {blocked[task.id].override && !draftFor(task.id).showOverride && (
+                            <button
+                              onClick={() => setDraftFor(task.id, { showOverride: true })}
+                              style={{
+                                fontSize: 12, background: 'none', border: 'none', color: '#6B7280',
+                                textDecoration: 'underline', cursor: 'pointer', padding: 0,
+                              }}
+                            >{blocked[task.id].override!.label}</button>
+                          )}
+
+                          {draftFor(task.id).showOverride && (
+                            <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid #F3F4F6' }}>
+                              <div style={{ fontSize: 11, color: '#6B7280', marginBottom: 6 }}>
+                                {blocked[task.id].override?.note}
+                              </div>
+                              <input
+                                value={draftFor(task.id).closeWithoutAnswer}
+                                onChange={e => setDraftFor(task.id, { closeWithoutAnswer: e.target.value })}
+                                placeholder="Why is no answer coming?"
+                                style={{
+                                  width: '100%', fontSize: 13, padding: '8px 10px', borderRadius: 6,
+                                  border: '1px solid #D1D5DB', marginBottom: 8,
+                                }}
+                              />
+                              <button
+                                onClick={() => task.pursuit && markDone(task.id, task.pursuit.id, {
+                                  closeWithoutAnswer: draftFor(task.id).closeWithoutAnswer,
+                                })}
+                                disabled={completing === task.id || !draftFor(task.id).closeWithoutAnswer.trim()}
+                                style={{
+                                  fontSize: 12, fontWeight: 600, padding: '7px 14px', borderRadius: 6,
+                                  border: '1px solid #D1D5DB', background: 'white', color: '#374151',
+                                  cursor: draftFor(task.id).closeWithoutAnswer.trim() ? 'pointer' : 'not-allowed',
+                                }}
+                              >Close without an answer</button>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  )}
                   </div>
                 )
               })
