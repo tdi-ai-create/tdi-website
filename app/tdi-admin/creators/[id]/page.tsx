@@ -178,6 +178,8 @@ export default function TDIAdminCreatorDetailPage() {
   const [isSavingWebsite, setIsSavingWebsite] = useState(false);
 
   // Publish workflow state
+  const [decidingDraft, setDecidingDraft] = useState<string | null>(null);
+  const [draftError, setDraftError] = useState<Record<string, string>>({});
   const [showPublishModal, setShowPublishModal] = useState(false);
   const [publishAction, setPublishAction] = useState<'publish_now' | 'schedule'>('publish_now');
   const [scheduledDate, setScheduledDate] = useState('');
@@ -259,6 +261,39 @@ export default function TDIAdminCreatorDetailPage() {
   const [isSendingDirectFeedback, setIsSendingDirectFeedback] = useState(false);
 
   const adminEmail = teamMember?.email || '';
+
+  /**
+   * Approve or reject an agent draft.
+   *
+   * These used to post to /api/creator-studio/sync, which authenticates with a
+   * bearer PAPERCLIP_SYNC_KEY. A browser has no such header and should not be
+   * given one, so every click returned 401. The old handler checked res.ok and
+   * did nothing when it was false, which made a hard failure look like a dead
+   * button. Neither control had ever worked from this page.
+   */
+  const handleDraftDecision = async (noteId: string, action: 'approve' | 'reject') => {
+    setDecidingDraft(noteId);
+    setDraftError(e => { const n = { ...e }; delete n[noteId]; return n; });
+    try {
+      const res = await fetch('/api/admin/creators/drafts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ noteId, action }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setDraftError(e => ({ ...e, [noteId]: data.error || 'That did not work, and nothing was changed.' }));
+        return;
+      }
+      setPendingDrafts((prev: { id: string }[]) => prev.filter((d) => d.id !== noteId));
+      setSuccessMessage(data.did || 'Done.');
+      setTimeout(() => setSuccessMessage(null), 6000);
+    } catch {
+      setDraftError(e => ({ ...e, [noteId]: 'Could not reach the server. Nothing was changed.' }));
+    } finally {
+      setDecidingDraft(null);
+    }
+  };
 
   const loadData = useCallback(async () => {
     // Use API route with service role to bypass RLS
@@ -1223,39 +1258,27 @@ export default function TDIAdminCreatorDetailPage() {
               {draft.draft_reason && (
                 <p className="text-xs text-violet-500 mb-3">Reason: {draft.draft_reason}</p>
               )}
-              <div className="flex gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <button
-                  onClick={async () => {
-                    const res = await fetch('/api/creator-studio/sync', {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({ action: 'approve_draft', note_id: draft.id, approved_by: adminEmail }),
-                    });
-                    if (res.ok) {
-                      setPendingDrafts((prev: any[]) => prev.filter((d: any) => d.id !== draft.id));
-                      loadData();
-                    }
-                  }}
-                  className="px-3 py-1.5 bg-green-600 text-white text-xs font-medium rounded-lg hover:bg-green-700 transition-colors"
+                  onClick={() => handleDraftDecision(draft.id, 'approve')}
+                  disabled={decidingDraft === draft.id}
+                  className="px-3 py-1.5 bg-green-600 text-white text-xs font-medium rounded-lg hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
                 >
-                  Approve & Send to Creator
+                  {decidingDraft === draft.id ? 'Working...' : 'Approve & Send to Creator'}
                 </button>
                 <button
-                  onClick={async () => {
-                    const res = await fetch('/api/creator-studio/sync', {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({ action: 'reject_draft', note_id: draft.id }),
-                    });
-                    if (res.ok) {
-                      setPendingDrafts((prev: any[]) => prev.filter((d: any) => d.id !== draft.id));
-                    }
-                  }}
-                  className="px-3 py-1.5 bg-gray-100 text-gray-600 text-xs font-medium rounded-lg hover:bg-gray-200 transition-colors"
+                  onClick={() => handleDraftDecision(draft.id, 'reject')}
+                  disabled={decidingDraft === draft.id}
+                  className="px-3 py-1.5 bg-gray-100 text-gray-600 text-xs font-medium rounded-lg hover:bg-gray-200 disabled:cursor-not-allowed transition-colors"
                 >
                   Reject
                 </button>
               </div>
+              {draftError[draft.id] && (
+                <p className="mt-2 text-xs text-red-700 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+                  {draftError[draft.id]}
+                </p>
+              )}
             </div>
           ))}
         </div>
