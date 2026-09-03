@@ -3,7 +3,6 @@
 import { useState, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { CompactAdmin } from '@/components/calculators/v2/compact/CompactAdmin';
 import TeamStrip from '@/components/TeamStrip'
 
 type TabId = 'approach' | 'in-person' | 'learning-hub' | 'dashboard' | 'book' | 'results' | 'calculator';
@@ -17,7 +16,7 @@ interface Tab {
 const tabs: Tab[] = [
   {
     id: 'approach',
-    name: 'Our Approach',
+    name: 'How a Blueprint Unfolds',
     icon: (
       <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
         <path d="M12 2l-5.5 9h11L12 2zm0 3.84L13.93 9h-3.87L12 5.84zM17.5 13c-2.49 0-4.5 2.01-4.5 4.5s2.01 4.5 4.5 4.5 4.5-2.01 4.5-4.5-2.01-4.5-4.5-4.5zm0 7c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5zM3 21.5h8v-8H3v8zm2-6h4v4H5v-4z" />
@@ -69,15 +68,6 @@ const tabs: Tab[] = [
       </svg>
     ),
   },
-  {
-    id: 'calculator',
-    name: 'See Your Impact',
-    icon: (
-      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-        <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z" />
-      </svg>
-    ),
-  },
 ];
 
 function OurApproachPanel() {
@@ -87,8 +77,11 @@ function OurApproachPanel() {
         <h2 className="text-2xl md:text-3xl font-bold mb-3" style={{ color: '#1e2749' }}>
           A Phased Journey,<br />Not a One-Time Event
         </h2>
-        <p className="text-lg" style={{ color: '#1e2749', opacity: 0.8 }}>
-          Real change takes time. Our three-phase model meets your school where you are and grows with you. Some schools move through quickly. Others stay in one phase for years. There is no single timeline, just the right pace for your team.
+        <p className="text-lg mb-3" style={{ color: '#1e2749', opacity: 0.8 }}>
+          Real change takes time. A Blueprint partnership grows through three phases, meeting your school where you are. Some schools move through quickly. Others stay in one phase for years. There is no single timeline, just the right pace for your team.
+        </p>
+        <p className="text-base" style={{ color: '#1e2749', opacity: 0.65 }}>
+          These phases describe how a Blueprint unfolds over time. They are not a ladder the smaller offerings sit on. The Pulse, The Focus and The Cohort each stand alone, and none is a trial run for another.
         </p>
       </div>
 
@@ -399,6 +392,9 @@ function LearningHubPanel() {
         <p className="text-lg mb-4" style={{ color: '#1e2749', opacity: 0.8 }}>
           Teachers are Googling random strategies, pulling things from Pinterest, and none of it connects to what your school is actually working on. Every classroom ends up doing something different.
         </p>
+        <p className="text-sm mt-4 p-3 rounded-lg" style={{ backgroundColor: '#f0f9ff', border: '1px solid #80a4ed', color: '#1e2749' }}>
+          The Cohort includes full Hub access for every member too, so this is not exclusive to a Blueprint partnership.
+        </p>
         <hr className="my-4 border-gray-200" />
         {/* Feature */}
         <p className="text-lg" style={{ color: '#1e2749', opacity: 0.8 }}>
@@ -522,6 +518,9 @@ function DashboardPanel() {
         {/* Pain */}
         <p className="text-lg mb-4" style={{ color: '#1e2749', opacity: 0.8 }}>
           Right now you are probably pulling PD evidence together manually - spreadsheets, emails, walkthrough notes - spending 20+ hours before every board meeting. And when the state asks for your improvement plan documentation, it is another scramble.
+        </p>
+        <p className="text-sm mt-4 p-3 rounded-lg" style={{ backgroundColor: '#f0f9ff', border: '1px solid #80a4ed', color: '#1e2749' }}>
+          Every offering populates a dashboard, whichever of the four you buy. A Blueprint adds the observation reports.
         </p>
         <hr className="my-4 border-gray-200" />
         {/* Feature */}
@@ -838,7 +837,7 @@ function ResultsPanel() {
       <div className="p-5 rounded-xl" style={{ backgroundColor: '#f0fdf4', border: '1px solid #86efac' }}>
         <h3 className="font-bold mb-2" style={{ color: '#1e2749' }}>What This Means for Your Budget</h3>
         <p className="text-sm" style={{ color: '#1e2749', opacity: 0.85 }}>
-          If your school currently spends $15-20K annually on professional development that produces a 10% implementation rate, a significant portion of that investment is not converting to classroom change. TDI partnerships start at $6,600 and deliver 7.4x the implementation - meaning your PD dollars actually reach students.
+          If your school currently spends $15-20K annually on professional development that produces a 10% implementation rate, a significant portion of that investment is not converting to classroom change. The question is not what PD costs. It is how much of it reaches a classroom.
         </p>
       </div>
 
@@ -936,7 +935,7 @@ function ResultsPanel() {
           Need help writing the grant language? Your TDI partner can provide alignment documentation and evidence summaries for your application.
         </p>
         <p className="text-sm font-medium" style={{ color: '#1e2749' }}>
-          TDI partnerships start at $6,600 depending on school size and scope.
+          What a partnership costs depends on which of the four ways you choose, your phase, and how many buildings you have. We scope it with you before anything is quoted.
         </p>
       </div>
 
@@ -963,43 +962,6 @@ function ResultsPanel() {
             style={{ color: '#1e2749' }}
           >
             Or start the conversation now →
-          </Link>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function CalculatorPanel() {
-  return (
-    <div className="space-y-8">
-      <div>
-        <h2 className="text-2xl md:text-3xl font-bold mb-3" style={{ color: '#1e2749' }}>
-          See What&apos;s Possible<br />for Your School
-        </h2>
-        <p className="text-lg" style={{ color: '#1e2749', opacity: 0.8 }}>
-          Slide the budget to see what reaches the classroom with TDI.
-        </p>
-      </div>
-
-      <CompactAdmin />
-
-      {/* Dual CTA */}
-      <div className="text-center space-y-3">
-        <Link
-          href="/get-started"
-          className="inline-block px-8 py-4 rounded-lg font-bold transition-all hover:-translate-y-0.5 hover:shadow-lg"
-          style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
-        >
-          Get Your Free PD Plan
-        </Link>
-        <div>
-          <Link
-            href="/contact"
-            className="text-sm font-medium hover:underline"
-            style={{ color: '#1e2749' }}
-          >
-            Or start the conversation now &rarr;
           </Link>
         </div>
       </div>
@@ -1046,8 +1008,6 @@ export default function HowWePartnerPage() {
         return <BookPanel />;
       case 'results':
         return <ResultsPanel />;
-      case 'calculator':
-        return <CalculatorPanel />;
     }
   };
 
@@ -1057,11 +1017,27 @@ export default function HowWePartnerPage() {
       <section className="py-8 md:py-12" style={{ backgroundColor: '#1e2749' }}>
         <div className="container-default text-center">
           <h1 className="text-2xl md:text-4xl font-bold mb-3" style={{ color: '#ffffff' }}>
-            We Don't Do Workshops.<br />We Do Partnerships.
+            Inside a Blueprint partnership.
           </h1>
-          <p className="text-base md:text-lg max-w-3xl mx-auto" style={{ color: '#ffffff', opacity: 0.9 }}>
-            This is not about checking boxes or completing modules. It is about seeing and experiencing measurable change in your school.
+          <p className="text-base md:text-lg max-w-3xl mx-auto mb-6" style={{ color: '#ffffff', opacity: 0.9 }}>
+            The deepest of the four ways to work with us. People in your buildings, not just tools in an inbox. If you have not seen the four yet, start there.
           </p>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <Link
+              href="/for-schools"
+              className="inline-block px-6 py-3 rounded-lg font-bold transition-all"
+              style={{ border: '2px solid rgba(255,255,255,0.45)', color: '#ffffff' }}
+            >
+              See all four offerings
+            </Link>
+            <Link
+              href="/get-started"
+              className="inline-block px-6 py-3 rounded-lg font-bold transition-all"
+              style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
+            >
+              Get Your Free PD Plan
+            </Link>
+          </div>
         </div>
       </section>
 
@@ -1252,45 +1228,61 @@ export default function HowWePartnerPage() {
         </div>
       </section>
 
-      {/* Tools to Explore */}
+      {/* Where to go next */}
       <section className="py-16" style={{ backgroundColor: '#f5f5f5' }}>
         <div className="container-default">
           <h2 className="text-2xl md:text-3xl font-bold text-center mb-10" style={{ color: '#1e2749' }}>
-            Tools to Explore
+            Where to go next
           </h2>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
-            <Link
-              href="/calculator"
-              className="block p-6 rounded-xl bg-white transition-all hover:shadow-lg hover:scale-[1.02]"
-            >
-              <div className="w-12 h-12 rounded-full flex items-center justify-center mb-4" style={{ backgroundColor: '#ffba06' }}>
-                <svg className="w-6 h-6" fill="#1e2749" viewBox="0 0 24 24">
-                  <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14h-2v-4H8v-2h4V7h2v4h4v2h-4v4z" />
-                </svg>
-              </div>
-              <h3 className="font-bold mb-2" style={{ color: '#1e2749' }}>Build Your Board Memo</h3>
-              <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
-                Generate a board-ready memo with grant funding pathways in 90 seconds.
-              </p>
-            </Link>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
 
-            <Link
-              href="/pd-diagnostic"
-              className="block p-6 rounded-xl bg-white transition-all hover:shadow-lg hover:scale-[1.02]"
-            >
-              <div className="w-12 h-12 rounded-full flex items-center justify-center mb-4" style={{ backgroundColor: '#ffba06' }}>
-                <svg className="w-6 h-6" fill="#1e2749" viewBox="0 0 24 24">
-                  <path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z" />
-                </svg>
-              </div>
-              <h3 className="font-bold mb-2" style={{ color: '#1e2749' }}>Take the Assessment</h3>
-              <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
-                Find out which support your staff needs most.
-              </p>
-            </Link>
 
-            <Link
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+
+
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+
+
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+<Link
               href="/get-started"
               className="block p-6 rounded-xl bg-white transition-all hover:shadow-lg hover:scale-[1.02]"
             >
@@ -1305,7 +1297,22 @@ export default function HowWePartnerPage() {
               </p>
             </Link>
 
-            <Link
+
+
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+<Link
               href="/funding"
               className="block p-6 rounded-xl bg-white transition-all hover:shadow-lg hover:scale-[1.02]"
             >
