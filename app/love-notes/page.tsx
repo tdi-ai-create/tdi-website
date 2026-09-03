@@ -202,37 +202,6 @@ export default function LoveNotesPage() {
             </p>
           </div>
 
-          <p className="ln-note">
-            Observations are separate from evaluation. Nothing in a Love Note reaches an appraisal,
-            and a teacher is never compared to a colleague.
-          </p>
-
-          <div className="ln-visit">
-            <h4>What a visit day looks like</h4>
-            <div className="ln-visitgrid">
-              <div className="ln-visititem">
-                <span className="ln-vicon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></span>
-                <b>Up to 15 classrooms</b>
-                <span>Observed in a single visit.</span>
-              </div>
-              <div className="ln-visititem">
-                <span className="ln-vicon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>
-                <b>While students are in session</b>
-                <span>Real classrooms, on a normal day.</span>
-              </div>
-              <div className="ln-visititem">
-                <span className="ln-vicon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
-                <b>One to one afterwards</b>
-                <span>We meet every teacher we observe.</span>
-              </div>
-              <div className="ln-visititem">
-                <span className="ln-vicon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
-                <b>Leadership debrief</b>
-                <span>At the end of each day.</span>
-              </div>
-            </div>
-          </div>
-
           <div className="ln-btnrow">
             <Link className="ln-btn ln-btn-navy" href="/for-schools">
               See the four ways to work with us
