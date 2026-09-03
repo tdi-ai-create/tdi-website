@@ -18,6 +18,16 @@ const nextConfig: NextConfig = {
         permanent: true,
       },
       {
+        source: '/pd-framework',
+        destination: '/for-schools',
+        permanent: true,
+      },
+      {
+        source: '/what-we-offer',
+        destination: '/for-schools',
+        permanent: true,
+      },
+      {
         source: '/hub/subscribe',
         destination: '/hub/membership',
         permanent: true,

@@ -3806,7 +3806,7 @@ export default function ExampleDashboard() {
             <a href="/learning" target="_blank" rel="noopener noreferrer" className="text-sm text-white/60 hover:text-white transition-colors">
               Explore the Learning Hub
             </a>
-            <a href="/pd-framework" target="_blank" rel="noopener noreferrer" className="text-sm text-white/60 hover:text-white transition-colors">
+            <a href="/for-schools" target="_blank" rel="noopener noreferrer" className="text-sm text-white/60 hover:text-white transition-colors">
               See our PD Framework
             </a>
             <a href="/funding" target="_blank" rel="noopener noreferrer" className="text-sm text-white/60 hover:text-white transition-colors">
