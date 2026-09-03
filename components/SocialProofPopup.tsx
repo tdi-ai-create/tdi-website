@@ -205,12 +205,14 @@ export function SocialProofPopup() {
             csvText = cachedData;
           } else {
             const response = await fetch(SHEET_URL);
+            if (!response.ok) throw new Error(`Sheet fetch failed: ${response.status}`);
             csvText = await response.text();
             sessionStorage.setItem(CACHE_KEY, csvText);
             sessionStorage.setItem(CACHE_TIMESTAMP_KEY, Date.now().toString());
           }
         } else {
           const response = await fetch(SHEET_URL);
+          if (!response.ok) throw new Error(`Sheet fetch failed: ${response.status}`);
           csvText = await response.text();
           sessionStorage.setItem(CACHE_KEY, csvText);
           sessionStorage.setItem(CACHE_TIMESTAMP_KEY, Date.now().toString());

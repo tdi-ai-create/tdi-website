@@ -22,15 +22,30 @@ function PartnerLoginContent() {
   const showPage = animationComplete && timerDone;
 
   const logActivity = async (userId: string) => {
-    await fetch('/api/partners/log-activity', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ user_id: userId, action: 'login' }),
-    });
+    // Best effort. A failed log must never block a partner signing in,
+    // but it should not be invisible either.
+    try {
+      const res = await fetch('/api/partners/log-activity', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: userId, action: 'login' }),
+      });
+      if (!res.ok) {
+        console.error('[Partners] Could not log login activity', res.status);
+      }
+    } catch (err) {
+      console.error('[Partners] Could not log login activity', err);
+    }
   };
 
   const lookupAndRedirect = async () => {
     const response = await fetch('/api/partners/me');
+    if (!response.ok) {
+      setPartnershipError(
+        'We could not load your partnership just now. Please refresh, or contact Rae@TeachersDeserveIt.com if it keeps happening.'
+      );
+      return;
+    }
     const data = await response.json();
     if (data.redirect) {
       router.push(data.redirect);

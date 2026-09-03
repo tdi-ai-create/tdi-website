@@ -349,7 +349,7 @@ export default function PDDiagnosticPage() {
     const pdTypeName = resultData[result].name;
 
     try {
-      await fetch('/api/diagnostic-submit', {
+      const submitRes = await fetch('/api/diagnostic-submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -363,6 +363,10 @@ export default function PDDiagnosticPage() {
           isReturningUser,
         }),
       });
+
+      if (!submitRes.ok) {
+        console.error('[Diagnostic] Result submission failed', submitRes.status);
+      }
     } catch (error) {
       console.error('Submission error:', error);
     }
