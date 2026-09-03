@@ -71,16 +71,16 @@ export interface AccessFacts {
 
 const REMEDIES: Record<RemedyAction, Omit<Remedy, 'action'>> = {
   create_account: {
-    label: 'Create their account and send a link',
-    effect: 'Creates a sign in account for this address and emails them a link to set a password.',
+    label: 'Create their account and get a link',
+    effect: 'Creates a sign in account for this address, then gives you a link to send them.',
   },
   repair_auth: {
-    label: 'Repair the account, then send a link',
-    effect: 'Fills in the columns the account is missing so sign in can work at all, then emails a fresh link.',
+    label: 'Repair the account and get a link',
+    effect: 'Fills in what the account is missing so sign in can work at all, then gives you a fresh link to send.',
   },
   send_link: {
-    label: 'Send them a sign in link',
-    effect: 'Emails a link that lets them set a password and get straight in. Safe to send more than once.',
+    label: 'Get a sign in link for them',
+    effect: 'Gives you a link that signs them straight in. Nothing is emailed: you send it. Safe to repeat.',
   },
   reactivate: {
     label: 'Reactivate them',
@@ -161,6 +161,11 @@ export function diagnose(f: AccessFacts): Finding[] {
 }
 
 /**
+ * NOTE ON SENDING. Nothing in this module sends anything. The remedies that
+ * involve a sign in link generate it and hand it back on screen for a person to
+ * send. The copy used to say "emails a link", which was untrue and would have
+ * had somebody press a button and then wait for a delivery that never happened.
+ *
  * Blockers that belong to the sign in account, not to a particular product.
  *
  * Someone who was never sent a link has one problem, not one per surface. The
