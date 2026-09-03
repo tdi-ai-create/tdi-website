@@ -18,7 +18,8 @@
     "check:export": "node scripts/integrity/verify-sales-export.mjs",
     "check:schema:update": "node scripts/check-schema.mjs --update-baseline",
     "validate:quizzes": "node scripts/validate-quizzes.mjs",
-    "check:labels": "node scripts/integrity/verify-client-labels.mjs"
+    "check:labels": "node scripts/integrity/verify-client-labels.mjs",
+    "check:fetch": "node scripts/check-fetch.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.78.0",
