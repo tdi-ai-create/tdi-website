@@ -263,6 +263,21 @@ export async function PATCH(request: NextRequest) {
     updates.waiting_on = 'funder';
   }
 
+  // A grant that is over is nobody's next move.
+  //
+  // Closing one left waiting_on untouched, so six dead opportunities sat in the
+  // portal still badged "Waiting on TDI", including two Walmart applications
+  // whose window shut on 31 August. Bella asked why closed grants still look
+  // like they need something from her. This is why.
+  //
+  // Written here rather than guarded in the badge, because every screen that
+  // reads waiting_on would otherwise need to remember, and the read-side
+  // version of this bug is the one we keep fixing.
+  const FINISHED_STATUSES = ['closed', 'denied', 'awarded'];
+  if (body.status && FINISHED_STATUSES.includes(body.status) && body.status !== before?.status) {
+    updates.waiting_on = 'none';
+  }
+
   // Any status change updates last_activity_at
   if (body.status && body.status !== before?.status) {
     updates.last_activity_at = new Date().toISOString();
