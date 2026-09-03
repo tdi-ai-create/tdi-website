@@ -6,11 +6,16 @@ import { isPopupBlocked } from '@/lib/popup-policy';
 
 export function SubstackPopup() {
   const [isVisible, setIsVisible] = useState(false);
+  const [footerSignupOnScreen, setFooterSignupOnScreen] = useState(false);
   const pathname = usePathname();
   const isExcluded = isPopupBlocked(pathname);
 
   const showPopup = useCallback(() => {
     setIsVisible(true);
+    // Marked here, not when the listeners attach. Setting it on attach meant
+    // that loading any page and not scrolling burned the session, so the
+    // popup could only ever fire on the first page of a visit.
+    sessionStorage.setItem('tdi-substack-popup-shown', 'true');
   }, []);
 
   const handleDismiss = useCallback(() => {
@@ -33,10 +38,13 @@ export function SubstackPopup() {
 
     let triggered = false;
 
-    // Scroll trigger. 70% means they read most of it, so this is not an interruption.
+    // Scroll trigger. Past halfway means they read most of it, so this is not
+    // an interruption. It fires earlier than the old 70% so the card appears
+    // while there is still page above the footer, rather than on top of the
+    // footer's own signup.
     const handleScroll = () => {
       const scrollPercent = (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100;
-      if (scrollPercent > 70 && !triggered) {
+      if (scrollPercent > 55 && !triggered) {
         triggered = true;
         showPopup();
         window.removeEventListener('scroll', handleScroll);
@@ -56,13 +64,26 @@ export function SubstackPopup() {
     window.addEventListener('scroll', handleScroll);
     document.addEventListener('mouseleave', handleMouseLeave);
 
-    sessionStorage.setItem('tdi-substack-popup-shown', 'true');
-
     return () => {
       window.removeEventListener('scroll', handleScroll);
       document.removeEventListener('mouseleave', handleMouseLeave);
     };
   }, [isExcluded, showPopup]);
+
+  // The footer carries its own email capture with nearly the same line, so
+  // showing both at once reads as asking twice. Watch the footer's input and
+  // stand down while it is on screen.
+  useEffect(() => {
+    if (!isVisible) return;
+    const target = document.getElementById('footer-signup-email');
+    if (!target) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setFooterSignupOnScreen(entry.isIntersecting),
+      { threshold: 0 }
+    );
+    observer.observe(target);
+    return () => observer.disconnect();
+  }, [isVisible]);
 
   // Close on Escape
   useEffect(() => {
@@ -74,7 +95,7 @@ export function SubstackPopup() {
     return () => document.removeEventListener('keydown', handleEscape);
   }, [isVisible, handleDismiss]);
 
-  if (!isVisible || isExcluded) return null;
+  if (!isVisible || isExcluded || footerSignupOnScreen) return null;
 
   return (
     <div
