@@ -397,3 +397,59 @@
 .ln-page .ln-visit { max-width: none; }
 .ln-page .ln-visit h4 { margin-bottom: 10px; }
 .ln-page .ln-visit .ln-rules { margin-top: 8px; }
+
+/* --- the email was too tall to scroll past; cap it like a real inbox pane --- */
+.ln-mailcol { max-width: 720px; margin: 34px auto 0; }
+.ln-mailscroll {
+  max-height: 560px;
+  overflow-y: auto;
+  overscroll-behavior: auto;
+}
+.ln-mailwrapouter { position: relative; }
+.ln-mailwrapouter:after {
+  content: "";
+  position: absolute;
+  left: 1px; right: 1px; bottom: 1px;
+  height: 54px;
+  border-radius: 0 0 13px 13px;
+  background: linear-gradient(to bottom, rgba(255,255,255,0), #fff 78%);
+  pointer-events: none;
+}
+.ln-mailbody { padding: 20px 24px 30px; }
+.ln-mailbody p { margin: 0 0 10px; }
+.ln-mailbody .ln-mail-h { margin: 16px 0 6px; }
+.ln-mailbody .ln-mail-list li { padding: 5px 8px 5px 18px; }
+.ln-mailbody .ln-mail-list li:before { top: 13px; }
+.ln-mailbody .ln-mail-quotes li { margin-bottom: 9px; padding: 3px 0 3px 13px; }
+.ln-mailbody .ln-mail-links li { padding: 7px 0; }
+.ln-scrollhint {
+  font-size: .8rem;
+  color: var(--muted);
+  text-align: center;
+  margin-top: 10px;
+}
+
+/* --- visit day as cards, not thin ruled rows --- */
+.ln-visit { background: transparent; padding: 0; margin-top: 30px; }
+.ln-visit h4 { margin-bottom: 16px; }
+.ln-visitgrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+@media (max-width: 980px) { .ln-visitgrid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 560px) { .ln-visitgrid { grid-template-columns: 1fr; } }
+.ln-visititem {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 18px 18px 20px;
+}
+.ln-visititem b { display: block; font-size: .98rem; color: var(--ink); margin: 12px 0 4px; }
+.ln-visititem span:not(.ln-vicon) { font-size: .88rem; color: var(--muted); line-height: 1.5; }
+.ln-vicon {
+  width: 36px; height: 36px; border-radius: 9px;
+  background: var(--paper); border: 1px solid var(--line);
+  display: flex; align-items: center; justify-content: center;
+}
+.ln-vicon svg {
+  width: 18px; height: 18px;
+  stroke: var(--gold); fill: none;
+  stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round;
+}

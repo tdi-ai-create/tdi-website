@@ -34,32 +34,21 @@ export default function LoveNotesPage() {
         </div>
       </header>
 
-      {/* SECTION 2: The rules */}
+      {/* SECTION 2: The example note */}
       <section className="ln-sec ln-sec-alt">
         <div className="ln-wrap">
           <div className="ln-head">
-            <p className="ln-kicker">What makes it a Love Note</p>
-              <h2>The same rules, every time.</h2>
-              <p className="ln-lede">
-                These are not a description written for a website. They are the rules the notes are
-                actually written to.
-              </p>
+            <p className="ln-kicker">What lands in their inbox</p>
+            <h2>A real one, start to finish.</h2>
+            <p className="ln-lede">
+              Written after a visit, sent to the teacher, and nobody else. Hover any moment to see
+              how it was tagged.
+            </p>
           </div>
-          <ul className="ln-rules">
-                <li>Addressed to the teacher by first name</li>
-                <li>Everything specific we watched, written down. Usually eight to twelve moments</li>
-                <li>At least three things we actually heard, quoted word for word</li>
-                <li>Warm and personal. Never evaluative, never a rubric, never a score</li>
-                <li>Ends with two Hub resources matched to what they are already doing</li>
-              </ul>
-          <p className="ln-note">
-            Observations are separate from evaluation. Nothing in a Love Note reaches an appraisal,
-            and a teacher is never compared to a colleague.
-          </p>
 
           <div className="ln-mailcol">
-              <p className="ln-kicker">What lands in their inbox</p>
-              <div className="ln-mail">
+              <div className="ln-mailwrapouter">
+                <div className="ln-mail">
                 <div className="ln-mailhead">
                   <div className="ln-avatar" aria-hidden="true">TDI</div>
                   <div className="ln-mailfrom">
@@ -71,6 +60,7 @@ export default function LoveNotesPage() {
                 <div className="ln-mailsubject">
                   <span>Subject</span>A note from your visit
                 </div>
+                <div className="ln-mailscroll">
                 <div className="ln-mailbody">
                   <p>Hi Danielle,</p>
                   <p>
@@ -113,7 +103,10 @@ export default function LoveNotesPage() {
                   </p>
                   <div className="ln-sig">The team at Teachers Deserve It</div>
                 </div>
+                </div>
               </div>
+              </div>
+              <p className="ln-scrollhint">Scroll inside the note to read all of it.</p>
               <p className="ln-caption">
                 Example note. The teacher, school and date are invented. The format, sender, subject
                 line and signature are exactly what sends.
@@ -209,14 +202,35 @@ export default function LoveNotesPage() {
             </p>
           </div>
 
+          <p className="ln-note">
+            Observations are separate from evaluation. Nothing in a Love Note reaches an appraisal,
+            and a teacher is never compared to a colleague.
+          </p>
+
           <div className="ln-visit">
             <h4>What a visit day looks like</h4>
-            <ul className="ln-rules">
-              <li>Up to 15 classrooms observed in a single visit</li>
-              <li>On-campus days happen while students are in session, in real classrooms</li>
-              <li>We meet with teachers one-to-one after observing them</li>
-              <li>A leadership debrief at the end of each day</li>
-            </ul>
+            <div className="ln-visitgrid">
+              <div className="ln-visititem">
+                <span className="ln-vicon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></span>
+                <b>Up to 15 classrooms</b>
+                <span>Observed in a single visit.</span>
+              </div>
+              <div className="ln-visititem">
+                <span className="ln-vicon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>
+                <b>While students are in session</b>
+                <span>Real classrooms, on a normal day.</span>
+              </div>
+              <div className="ln-visititem">
+                <span className="ln-vicon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
+                <b>One to one afterwards</b>
+                <span>We meet every teacher we observe.</span>
+              </div>
+              <div className="ln-visititem">
+                <span className="ln-vicon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+                <b>Leadership debrief</b>
+                <span>At the end of each day.</span>
+              </div>
+            </div>
           </div>
 
           <div className="ln-btnrow">
