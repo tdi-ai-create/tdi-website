@@ -25,6 +25,7 @@ const OUTCOME_WORDS: Record<string, string> = {
 export function ActionsTab({ pursuitId }: ActionsTabProps) {
   // What the server said when it refused to close an item, keyed by item.
   const [blocked, setBlocked] = useState<Record<string, BlockedClose>>({})
+  const [addError, setAddError] = useState<string | null>(null)
   const [answers, setAnswers] = useState<Record<string, { answer: string; outcome: string; skip: string; showSkip: boolean }>>({})
 
   const [actions, setActions] = useState<any[]>([])
@@ -122,22 +123,37 @@ export function ActionsTab({ pursuitId }: ActionsTabProps) {
   }
 
   const updateClientLabel = async (actionId: string, clientLabel: string) => {
-    await fetch(`/api/funding/pursuits/${pursuitId}/actions`, {
+    const res = await fetch(`/api/funding/pursuits/${pursuitId}/actions`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ actionId, client_label: clientLabel }),
     })
+    if (!res.ok) {
+      const d = await res.json().catch(() => ({}))
+      setBlocked(b => ({ ...b, [actionId]: { message: d.error || 'That wording was not saved.', field: 'answer' } }))
+      return
+    }
     fetchActions()
   }
 
   const handleAdd = async () => {
     if (!newAction.title.trim()) return
     setAddingAction(true)
-    await fetch(`/api/funding/pursuits/${pursuitId}/actions`, {
+    setAddError(null)
+    // Was unchecked, so a refused create cleared the form and closed it as if
+    // it had worked. Whoever typed the task would have had no idea it did not
+    // exist. Found by the fetch gate, not by reading.
+    const res = await fetch(`/api/funding/pursuits/${pursuitId}/actions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(newAction),
     })
+    if (!res.ok) {
+      const d = await res.json().catch(() => ({}))
+      setAddError(d.error || 'That task was not created. Nothing was saved, so try again.')
+      setAddingAction(false)
+      return
+    }
     setNewAction({ title: '', ownerType: 'tdi', dueDate: '', category: 'research', actionSize: 'standard', ownerName: '', ownerEmail: '', description: '' })
     setShowAddForm(false)
     setAddingAction(false)
@@ -276,6 +292,11 @@ export function ActionsTab({ pursuitId }: ActionsTabProps) {
           >
             {addingAction ? 'Adding...' : 'Add Action'}
           </button>
+          {addError && (
+            <p style={{ fontSize: 12, color: '#991B1B', background: '#FEF2F2', border: '1px solid #FCA5A5', borderRadius: 6, padding: '7px 9px', margin: '8px 0 0' }}>
+              {addError}
+            </p>
+          )}
         </div>
       )}
 
