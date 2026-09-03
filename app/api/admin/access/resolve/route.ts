@@ -52,10 +52,26 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  // Dry run computes the whole decision and reports what it would do, without
+  // creating an account, writing a status, or generating a link. Built into the
+  // route rather than a separate script, so it exercises this exact code path.
+  const dryRun = body.dryRun === true || request.nextUrl.searchParams.get('dryRun') === '1';
+
   const supabase = getServiceSupabase();
 
   // ---- reactivate -------------------------------------------------------
   if (action === 'reactivate') {
+    if (dryRun) {
+      const { data: who } = await supabase
+        .from('creators').select('id, name, status').ilike('email', email).maybeSingle();
+      return NextResponse.json({
+        ok: true, dryRun: true,
+        would: who
+          ? `Set ${who.name || email} from "${who.status}" to active, restart their agreement clock, and write a note.`
+          : `Nothing to do. No creator with that address.`,
+        wroteAnything: false,
+      });
+    }
     const { data, error } = await supabase
       .from('creators')
       .update({
@@ -92,6 +108,13 @@ export async function POST(request: NextRequest) {
 
   // ---- create the Hub profile ------------------------------------------
   if (action === 'create_profile') {
+    if (dryRun) {
+      return NextResponse.json({
+        ok: true, dryRun: true,
+        would: `Create a hub_profiles row for ${email}, pointed at their sign in account.`,
+        wroteAnything: false,
+      });
+    }
     const hub = hubAdmin();
     if (!hub) {
       return NextResponse.json({ error: 'The Hub is not reachable from this server.' }, { status: 503 });
@@ -111,6 +134,13 @@ export async function POST(request: NextRequest) {
 
   // ---- create the account ----------------------------------------------
   if (action === 'create_account') {
+    if (dryRun) {
+      return NextResponse.json({
+        ok: true, dryRun: true,
+        would: `Create a sign in account for ${email} through the admin API, then generate a link to ${redirectFor(surface)}.`,
+        wroteAnything: false,
+      });
+    }
     // Never with SQL. Accounts inserted directly end up with NULL instance_id,
     // aud and token columns, and every sign in method fails for all of them.
     // Fifteen accounts were in that state in August.
@@ -125,6 +155,17 @@ export async function POST(request: NextRequest) {
 
   // ---- repair a malformed account ---------------------------------------
   if (action === 'repair_auth') {
+    if (dryRun) {
+      const { data: list } = await supabase.auth.admin.listUsers({ page: 1, perPage: 1000 });
+      const found = list?.users.find(u => (u.email || '').toLowerCase() === email);
+      return NextResponse.json({
+        ok: true, dryRun: true,
+        would: found
+          ? `Rewrite the account for ${email} through the admin API, then generate a fresh link.`
+          : `Nothing to do. There is no account with that address to repair.`,
+        wroteAnything: false,
+      });
+    }
     const { data: list, error: listError } = await supabase.auth.admin.listUsers({ page: 1, perPage: 1000 });
     if (listError) return NextResponse.json({ error: listError.message }, { status: 500 });
     const found = list.users.find(u => (u.email || '').toLowerCase() === email);
@@ -139,6 +180,14 @@ export async function POST(request: NextRequest) {
   }
 
   // ---- send the link -----------------------------------------------------
+  if (dryRun) {
+    return NextResponse.json({
+      ok: true, dryRun: true,
+      would: `Generate a magic link for ${email} pointing at ${redirectFor(surface)}. Nothing is emailed either way: the link is handed back for a person to send.`,
+      wroteAnything: false,
+    });
+  }
+
   const { data: linkData, error: linkError } = await supabase.auth.admin.generateLink({
     type: 'magiclink',
     email,
