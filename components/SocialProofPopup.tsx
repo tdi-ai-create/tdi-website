@@ -75,6 +75,7 @@ export function SocialProofPopup() {
     '/D41-dashboard',
     '/Example-Dashboard',
     '/for-schools',
+    '/love-notes',
   ];
 
   const isInternalPage = pathname?.includes('dashboard-creation') ||

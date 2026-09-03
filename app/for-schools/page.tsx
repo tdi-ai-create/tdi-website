@@ -257,6 +257,7 @@ export default function ForSchoolsPage() {
                 &ldquo;During your small group rotation today, I noticed how you used proximity and a calm voice to redirect Marcus without stopping instruction. The other students did not even look up. That is classroom management mastery. The way you had materials pre-sorted for each group saved at least 3 minutes of transition time. Your students knew exactly where to go and what to grab. Keep leaning into those systems.&rdquo;
               </blockquote>
               <p style={{"fontSize": ".9rem", "color": "var(--muted)", "marginTop": "14px"}}>Love Notes are what teachers tell us they remember months later. Not the PD slides. Not the data. The moment someone noticed what they were doing right.</p>
+              <p style={{"marginTop": "14px"}}><a className="fs-go" href="/love-notes">Click to see how these notes are structured</a></p>
             </div>
           </div>
         </div>
