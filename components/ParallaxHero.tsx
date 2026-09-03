@@ -79,7 +79,7 @@ export function ParallaxHero() {
               className="text-2xl md:text-3xl lg:text-4xl font-bold mb-4 leading-snug"
               style={{ color: '#ffffff' }}
             >
-              PD that actually gets used.
+              PD that actually<br />gets used.
             </h1>
 
             <p className="text-base md:text-lg mb-6" style={{ color: '#ffffff', opacity: 0.92 }}>
