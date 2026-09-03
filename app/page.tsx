@@ -17,7 +17,38 @@ export default function Home() {
       {/* SECTION 1: Hero */}
       <ParallaxHero />
 
-      {/* SECTION 2: TDI helps you support your entire team */}
+      {/* SECTION 2: Stats Bar */}
+      <AnimatedStatsBar
+        stats={[
+          { value: 100000, suffix: '+', label: 'Educators in Our Community', subtext: 'Teachers, Paras, Coaches, Leaders' },
+          { value: 74, suffix: '%', label: 'Implementation Rate', subtext: 'vs 10% industry average' },
+          { value: 94, suffix: '%', label: 'Would Recommend', subtext: 'to a friend or neighboring school' },
+          { value: 50, label: 'States + 142 Countries', subtext: 'with educators using TDI tools' },
+        ]}
+      />
+      <p className="text-center text-sm py-2" style={{ backgroundColor: '#1e2749', color: '#ffffff', opacity: 0.9 }}>
+        80% of partner schools fund this through existing grants.
+      </p>
+
+            {/* Certified in All 50 States */}
+      <section style={{ padding: '56px 16px', backgroundColor: '#E6F1FB' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 32 }}>
+            <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: 1.5, textTransform: 'uppercase', color: '#2A9D8F', marginBottom: 12 }}>
+              PD CREDIT APPROVED
+            </p>
+            <h2 style={{ fontSize: 36, fontWeight: 700, color: '#1e2749', margin: '0 0 16px 0', lineHeight: 1.2 }}>
+              Trusted by educators in every state
+            </h2>
+            <p style={{ fontSize: 17, color: '#6B7280', maxWidth: 640, margin: '0 auto', lineHeight: 1.5 }}>
+              Teachers Deserve It serves educators across all 50 US states and 142+ countries. Hover any state to confirm PD credit approval. Click for details.
+            </p>
+          </div>
+          <CertifiedStatesMap />
+        </div>
+      </section>
+
+      {/* SECTION 3: TDI helps you support your entire team */}
       <section className="py-12 md:py-16" style={{ backgroundColor: '#1e2749' }}>
         <div className="container-default">
           <div className="max-w-3xl mx-auto text-center">
@@ -34,7 +65,92 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SECTION 3: Which one are you */}
+      {/* SECTION 4: A Taste of What's Inside the Hub */}
+      <section className="py-16 md:py-20" style={{ backgroundColor: '#ffffff' }}>
+        <div className="container-default">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl md:text-4xl font-bold mb-3" style={{ color: '#1e2749' }}>
+              A Taste of What&apos;s Inside
+            </h2>
+            <p className="text-lg max-w-2xl mx-auto" style={{ color: '#1e2749', opacity: 0.7 }}>
+              Courses, quick wins, and community -- all in one place.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+            {/* Course */}
+            <a
+              href="https://www.teachersdeserveit.com/hub"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all hover:-translate-y-0.5"
+              style={{ textDecoration: 'none', border: '1px solid #e5e7eb' }}
+            >
+              <div style={{ height: 6, background: 'linear-gradient(90deg, #80a4ed, #38618C)' }} />
+              <div className="p-6">
+                <p className="text-xs font-bold uppercase tracking-wider mb-2" style={{ color: '#80a4ed' }}>Course</p>
+                <h3 className="text-lg font-bold mb-2" style={{ color: '#1e2749' }}>Boundaries Without Backlash</h3>
+                <p className="text-sm mb-4" style={{ color: '#1e2749', opacity: 0.7 }}>
+                  Practical scripts, reflection tools, and mindset shifts for setting limits without guilt.
+                </p>
+                <span className="text-sm font-semibold" style={{ color: '#38618C' }}>Start learning →</span>
+              </div>
+            </a>
+
+            {/* Quick Win */}
+            <a
+              href="https://www.teachersdeserveit.com/hub"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all hover:-translate-y-0.5"
+              style={{ textDecoration: 'none', border: '1px solid #e5e7eb' }}
+            >
+              <div style={{ height: 6, background: 'linear-gradient(90deg, #ffba06, #E8A000)' }} />
+              <div className="p-6">
+                <p className="text-xs font-bold uppercase tracking-wider mb-2" style={{ color: '#D4A006' }}>Quick Win</p>
+                <h3 className="text-lg font-bold mb-2" style={{ color: '#1e2749' }}>Para-Teacher Weekly Check In Guide</h3>
+                <p className="text-sm mb-4" style={{ color: '#1e2749', opacity: 0.7 }}>
+                  A one-page PDF to structure your weekly para-teacher communication. Download and use today.
+                </p>
+                <span className="text-sm font-semibold" style={{ color: '#D4A006' }}>Download free →</span>
+              </div>
+            </a>
+
+            {/* Community */}
+            <a
+              href="https://www.teachersdeserveit.com/hub"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all hover:-translate-y-0.5"
+              style={{ textDecoration: 'none', border: '1px solid #e5e7eb' }}
+            >
+              <div style={{ height: 6, background: 'linear-gradient(90deg, #2B8C96, #1B6B73)' }} />
+              <div className="p-6">
+                <p className="text-xs font-bold uppercase tracking-wider mb-2" style={{ color: '#2B8C96' }}>Community Thread</p>
+                <h3 className="text-lg font-bold mb-2" style={{ color: '#1e2749' }}>What worked this week?</h3>
+                <p className="text-sm mb-4" style={{ color: '#1e2749', opacity: 0.7 }}>
+                  Educators share wins, adaptations, and honest reflections after trying new strategies.
+                </p>
+                <span className="text-sm font-semibold" style={{ color: '#2B8C96' }}>Join the conversation →</span>
+              </div>
+            </a>
+          </div>
+
+          <div className="text-center mt-10">
+            <a
+              href="https://www.teachersdeserveit.com/hub"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block px-8 py-4 rounded-lg font-bold text-lg transition-all hover-glow"
+              style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
+            >
+              Explore the Full Hub
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* SECTION 5: Which one are you */}
       <section className="section" style={{ backgroundColor: '#80a4ed' }}>
         <div className="container-wide">
           <h2 className="text-center mb-12" style={{ color: '#1e2749' }}>Which one are you?</h2>
@@ -159,7 +275,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SECTION 4: Pain Section (For School Leaders) */}
+      {/* SECTION 6: Pain Section (For School Leaders) */}
       <section className="py-16 md:py-20" style={{ backgroundColor: '#f5f5f5' }}>
         <div className="container-default">
           <div className="max-w-3xl mx-auto text-center">
@@ -179,7 +295,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SECTION 5: Solution Section */}
+      {/* SECTION 7: Solution Section */}
       <section className="py-16 md:py-20" style={{ backgroundColor: '#ffffff' }}>
         <div className="container-default">
           <div className="max-w-3xl mx-auto text-center mb-12">
@@ -247,94 +363,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SECTION 6: Stats Bar */}
-      <AnimatedStatsBar
-        stats={[
-          { value: 100000, suffix: '+', label: 'Educators in Our Community', subtext: 'Teachers, Paras, Coaches, Leaders' },
-          { value: 74, suffix: '%', label: 'Implementation Rate', subtext: 'vs 10% industry average' },
-          { value: 94, suffix: '%', label: 'Would Recommend', subtext: 'to a friend or neighboring school' },
-          { value: 50, label: 'States + 142 Countries', subtext: 'with educators using TDI tools' },
-        ]}
-      />
-      <p className="text-center text-sm py-2" style={{ backgroundColor: '#1e2749', color: '#ffffff', opacity: 0.9 }}>
-        80% of partner schools fund this through existing grants.
-      </p>
-
-      {/* SECTION 7: What Admins Are Saying */}
-      <section className="py-12 md:py-16" style={{ backgroundColor: '#f5f5f5' }}>
-        <div className="container-wide">
-          <h2 className="text-center mb-8" style={{ color: '#1e2749' }}>What Admins Are Saying</h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="rounded-xl p-6 hover-card" style={{ backgroundColor: '#1e2749' }}>
-              <p className="text-base italic mb-4" style={{ color: '#ffffff' }}>
-                "TDI transformed how our teachers engage with professional development."
-              </p>
-              <p className="text-sm font-semibold" style={{ color: '#ffba06' }}>- Principal, Louisiana</p>
-            </div>
-
-            <div className="rounded-xl p-6 hover-card" style={{ backgroundColor: '#1e2749' }}>
-              <p className="text-base italic mb-4" style={{ color: '#ffffff' }}>
-                "Finally, PD that my staff actually looks forward to."
-              </p>
-              <p className="text-sm font-semibold" style={{ color: '#ffba06' }}>- Assistant Superintendent, Illinois</p>
-            </div>
-
-            <div className="rounded-xl p-6 hover-card" style={{ backgroundColor: '#1e2749' }}>
-              <p className="text-base italic mb-4" style={{ color: '#ffffff' }}>
-                "The implementation support made all the difference."
-              </p>
-              <p className="text-sm font-semibold" style={{ color: '#ffba06' }}>- Curriculum Director, Texas</p>
-            </div>
-
-            <div className="rounded-xl p-6 hover-card" style={{ backgroundColor: '#1e2749' }}>
-              <p className="text-base italic mb-4" style={{ color: '#ffffff' }}>
-                "Our retention improved within the first year."
-              </p>
-              <p className="text-sm font-semibold" style={{ color: '#ffba06' }}>- School Administrator, California</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* SECTION 8: What Educators Are Saying */}
-      <section className="py-12 md:py-16" style={{ backgroundColor: '#ffffff' }}>
-        <div className="container-wide">
-          <h2 className="text-center mb-8" style={{ color: '#1e2749' }}>What Educators Are Saying</h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="rounded-xl p-8 hover-card" style={{ backgroundColor: '#80a4ed' }}>
-              <p className="text-lg italic mb-4" style={{ color: '#ffffff' }}>
-                "I finally feel like I have strategies that work AND time to breathe. TDI changed how I approach my classroom and myself."
-              </p>
-              <p className="text-sm font-semibold" style={{ color: '#ffffff' }}>Sarah K., 5th Grade Teacher</p>
-            </div>
-
-            <div className="rounded-xl p-8 hover-card" style={{ backgroundColor: '#80a4ed' }}>
-              <p className="text-lg italic mb-4" style={{ color: '#ffffff' }}>
-                "Our teachers are actually excited about PD now. I don't have to chase them down or babysit. They're learning because they want to."
-              </p>
-              <p className="text-sm font-semibold" style={{ color: '#ffffff' }}>Michelle M., K-8 School Director</p>
-            </div>
-
-            <div className="rounded-xl p-8 hover-card" style={{ backgroundColor: '#80a4ed' }}>
-              <p className="text-lg italic mb-4" style={{ color: '#ffffff' }}>
-                "This was the first PD I didn't have to apologize for. Our teachers actually thanked me."
-              </p>
-              <p className="text-sm font-semibold" style={{ color: '#ffffff' }}>James T., School Principal</p>
-            </div>
-
-            <div className="rounded-xl p-8 hover-card" style={{ backgroundColor: '#80a4ed' }}>
-              <p className="text-lg italic mb-4" style={{ color: '#ffffff' }}>
-                "TDI helped us unlock funding we didn't even know was possible."
-              </p>
-              <p className="text-sm font-semibold" style={{ color: '#ffffff' }}>Patricia L., District Leader</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* SECTION 9: How We Build What Teachers Need */}
+      {/* SECTION 8: How We Build What Teachers Need */}
       <section className="py-16 md:py-20" style={{ backgroundColor: '#ffffff' }}>
         <div className="container-default">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ color: '#1e2749' }}>
@@ -442,113 +471,44 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SECTION 10: A Taste of What's Inside the Hub */}
-      <section className="py-16 md:py-20" style={{ backgroundColor: '#ffffff' }}>
-        <div className="container-default">
-          <div className="text-center mb-10">
-            <h2 className="text-3xl md:text-4xl font-bold mb-3" style={{ color: '#1e2749' }}>
-              A Taste of What&apos;s Inside
-            </h2>
-            <p className="text-lg max-w-2xl mx-auto" style={{ color: '#1e2749', opacity: 0.7 }}>
-              Courses, quick wins, and community -- all in one place.
-            </p>
-          </div>
+      {/* SECTION 9: What Admins Are Saying */}
+      <section className="py-12 md:py-16" style={{ backgroundColor: '#f5f5f5' }}>
+        <div className="container-wide">
+          <h2 className="text-center mb-8" style={{ color: '#1e2749' }}>What Admins Are Saying</h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-            {/* Course */}
-            <a
-              href="https://www.teachersdeserveit.com/hub"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all hover:-translate-y-0.5"
-              style={{ textDecoration: 'none', border: '1px solid #e5e7eb' }}
-            >
-              <div style={{ height: 6, background: 'linear-gradient(90deg, #80a4ed, #38618C)' }} />
-              <div className="p-6">
-                <p className="text-xs font-bold uppercase tracking-wider mb-2" style={{ color: '#80a4ed' }}>Course</p>
-                <h3 className="text-lg font-bold mb-2" style={{ color: '#1e2749' }}>Boundaries Without Backlash</h3>
-                <p className="text-sm mb-4" style={{ color: '#1e2749', opacity: 0.7 }}>
-                  Practical scripts, reflection tools, and mindset shifts for setting limits without guilt.
-                </p>
-                <span className="text-sm font-semibold" style={{ color: '#38618C' }}>Start learning →</span>
-              </div>
-            </a>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="rounded-xl p-6 hover-card" style={{ backgroundColor: '#1e2749' }}>
+              <p className="text-base italic mb-4" style={{ color: '#ffffff' }}>
+                "TDI transformed how our teachers engage with professional development."
+              </p>
+              <p className="text-sm font-semibold" style={{ color: '#ffba06' }}>- Principal, Louisiana</p>
+            </div>
 
-            {/* Quick Win */}
-            <a
-              href="https://www.teachersdeserveit.com/hub"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all hover:-translate-y-0.5"
-              style={{ textDecoration: 'none', border: '1px solid #e5e7eb' }}
-            >
-              <div style={{ height: 6, background: 'linear-gradient(90deg, #ffba06, #E8A000)' }} />
-              <div className="p-6">
-                <p className="text-xs font-bold uppercase tracking-wider mb-2" style={{ color: '#D4A006' }}>Quick Win</p>
-                <h3 className="text-lg font-bold mb-2" style={{ color: '#1e2749' }}>Para-Teacher Weekly Check In Guide</h3>
-                <p className="text-sm mb-4" style={{ color: '#1e2749', opacity: 0.7 }}>
-                  A one-page PDF to structure your weekly para-teacher communication. Download and use today.
-                </p>
-                <span className="text-sm font-semibold" style={{ color: '#D4A006' }}>Download free →</span>
-              </div>
-            </a>
+            <div className="rounded-xl p-6 hover-card" style={{ backgroundColor: '#1e2749' }}>
+              <p className="text-base italic mb-4" style={{ color: '#ffffff' }}>
+                "Finally, PD that my staff actually looks forward to."
+              </p>
+              <p className="text-sm font-semibold" style={{ color: '#ffba06' }}>- Assistant Superintendent, Illinois</p>
+            </div>
 
-            {/* Community */}
-            <a
-              href="https://www.teachersdeserveit.com/hub"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all hover:-translate-y-0.5"
-              style={{ textDecoration: 'none', border: '1px solid #e5e7eb' }}
-            >
-              <div style={{ height: 6, background: 'linear-gradient(90deg, #2B8C96, #1B6B73)' }} />
-              <div className="p-6">
-                <p className="text-xs font-bold uppercase tracking-wider mb-2" style={{ color: '#2B8C96' }}>Community Thread</p>
-                <h3 className="text-lg font-bold mb-2" style={{ color: '#1e2749' }}>What worked this week?</h3>
-                <p className="text-sm mb-4" style={{ color: '#1e2749', opacity: 0.7 }}>
-                  Educators share wins, adaptations, and honest reflections after trying new strategies.
-                </p>
-                <span className="text-sm font-semibold" style={{ color: '#2B8C96' }}>Join the conversation →</span>
-              </div>
-            </a>
-          </div>
+            <div className="rounded-xl p-6 hover-card" style={{ backgroundColor: '#1e2749' }}>
+              <p className="text-base italic mb-4" style={{ color: '#ffffff' }}>
+                "The implementation support made all the difference."
+              </p>
+              <p className="text-sm font-semibold" style={{ color: '#ffba06' }}>- Curriculum Director, Texas</p>
+            </div>
 
-          <div className="text-center mt-10">
-            <a
-              href="https://www.teachersdeserveit.com/hub"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-block px-8 py-4 rounded-lg font-bold text-lg transition-all hover-glow"
-              style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
-            >
-              Explore the Full Hub
-            </a>
+            <div className="rounded-xl p-6 hover-card" style={{ backgroundColor: '#1e2749' }}>
+              <p className="text-base italic mb-4" style={{ color: '#ffffff' }}>
+                "Our retention improved within the first year."
+              </p>
+              <p className="text-sm font-semibold" style={{ color: '#ffba06' }}>- School Administrator, California</p>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* SECTION 11: Substack/Newsletter Section */}
-      <section className="section" style={{ backgroundColor: 'var(--tdi-navy)' }}>
-        <div className="container-default text-center">
-          <h2 className="mb-4" style={{ color: 'white' }}>Practical Strategies, 3x a Week</h2>
-          <p className="text-lg mb-2 max-w-xl mx-auto" style={{ color: 'white', opacity: 0.8 }}>
-            Join 100,000+ educators getting real strategies delivered to their inbox. Not theory, not fluff, just stuff that works.
-          </p>
-          <p className="text-base mb-6" style={{ color: '#ffba06' }}>
-            Join 100,000+ educators who decided they deserved better.
-          </p>
-          <a
-            href="https://raehughart.substack.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn-primary inline-block"
-          >
-            Join the Movement
-          </a>
-        </div>
-      </section>
-
-      {/* SECTION 12: Dashboard Preview */}
+      {/* SECTION 10: Dashboard Preview */}
       <section className="py-16 md:py-20" style={{ backgroundColor: '#f9fafb' }}>
         <div className="container-default">
           <div className="max-w-4xl mx-auto text-center">
@@ -592,28 +552,68 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SECTION 13: FAQ */}
-      <FAQ limit={6} showSeeAll={true} />
+      {/* SECTION 11: What Educators Are Saying */}
+      <section className="py-12 md:py-16" style={{ backgroundColor: '#ffffff' }}>
+        <div className="container-wide">
+          <h2 className="text-center mb-8" style={{ color: '#1e2749' }}>What Educators Are Saying</h2>
 
-      {/* Certified in All 50 States */}
-      <section style={{ padding: '56px 16px', backgroundColor: '#E6F1FB' }}>
-        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: 32 }}>
-            <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: 1.5, textTransform: 'uppercase', color: '#2A9D8F', marginBottom: 12 }}>
-              PD CREDIT APPROVED
-            </p>
-            <h2 style={{ fontSize: 36, fontWeight: 700, color: '#1e2749', margin: '0 0 16px 0', lineHeight: 1.2 }}>
-              Trusted by educators in every state
-            </h2>
-            <p style={{ fontSize: 17, color: '#6B7280', maxWidth: 640, margin: '0 auto', lineHeight: 1.5 }}>
-              Teachers Deserve It serves educators across all 50 US states and 142+ countries. Hover any state to confirm PD credit approval. Click for details.
-            </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="rounded-xl p-8 hover-card" style={{ backgroundColor: '#80a4ed' }}>
+              <p className="text-lg italic mb-4" style={{ color: '#ffffff' }}>
+                "I finally feel like I have strategies that work AND time to breathe. TDI changed how I approach my classroom and myself."
+              </p>
+              <p className="text-sm font-semibold" style={{ color: '#ffffff' }}>Sarah K., 5th Grade Teacher</p>
+            </div>
+
+            <div className="rounded-xl p-8 hover-card" style={{ backgroundColor: '#80a4ed' }}>
+              <p className="text-lg italic mb-4" style={{ color: '#ffffff' }}>
+                "Our teachers are actually excited about PD now. I don't have to chase them down or babysit. They're learning because they want to."
+              </p>
+              <p className="text-sm font-semibold" style={{ color: '#ffffff' }}>Michelle M., K-8 School Director</p>
+            </div>
+
+            <div className="rounded-xl p-8 hover-card" style={{ backgroundColor: '#80a4ed' }}>
+              <p className="text-lg italic mb-4" style={{ color: '#ffffff' }}>
+                "This was the first PD I didn't have to apologize for. Our teachers actually thanked me."
+              </p>
+              <p className="text-sm font-semibold" style={{ color: '#ffffff' }}>James T., School Principal</p>
+            </div>
+
+            <div className="rounded-xl p-8 hover-card" style={{ backgroundColor: '#80a4ed' }}>
+              <p className="text-lg italic mb-4" style={{ color: '#ffffff' }}>
+                "TDI helped us unlock funding we didn't even know was possible."
+              </p>
+              <p className="text-sm font-semibold" style={{ color: '#ffffff' }}>Patricia L., District Leader</p>
+            </div>
           </div>
-          <CertifiedStatesMap />
         </div>
       </section>
 
-      {/* SECTION 14: Final CTA */}
+      {/* SECTION 12: Substack/Newsletter Section */}
+      <section className="section" style={{ backgroundColor: 'var(--tdi-navy)' }}>
+        <div className="container-default text-center">
+          <h2 className="mb-4" style={{ color: 'white' }}>Practical Strategies, 3x a Week</h2>
+          <p className="text-lg mb-2 max-w-xl mx-auto" style={{ color: 'white', opacity: 0.8 }}>
+            Join 100,000+ educators getting real strategies delivered to their inbox. Not theory, not fluff, just stuff that works.
+          </p>
+          <p className="text-base mb-6" style={{ color: '#ffba06' }}>
+            Join 100,000+ educators who decided they deserved better.
+          </p>
+          <a
+            href="https://raehughart.substack.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-primary inline-block"
+          >
+            Join the Movement
+          </a>
+        </div>
+      </section>
+
+      {/* SECTION 13: FAQ */}
+      <FAQ limit={6} showSeeAll={true} />
+
+{/* SECTION 14: Final CTA */}
       <section className="section" style={{ backgroundColor: '#80a4ed' }}>
         <div className="container-default text-center">
           <h2 className="mb-4" style={{ color: '#1e2749' }}>Ready to Reimagine PD?</h2>
