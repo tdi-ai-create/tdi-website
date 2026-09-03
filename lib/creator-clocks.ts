@@ -39,11 +39,26 @@ const REMINDER_INTERVAL_DAYS = 10;
 const ESCALATE_AFTER_DAYS = 24;
 
 /**
- * Whether reminders actually send. Off until Rae has read the first dry run,
- * because backdating the clock honestly would have made five creators overdue
- * on the day it launched, one of them by 168 days.
+ * Whether reminders actually send.
+ *
+ * Off from the day the clocks were built until 3 September 2026, because
+ * backdating them honestly would have made five creators overdue on launch day,
+ * one of them by 168 days, and a first contact that opens with five months of
+ * lateness is not a nudge.
+ *
+ * That is no longer the case. The dry run on 3 September evaluated twelve open
+ * steps and produced four nudges, every one of them eight days past a
+ * seven day allowance on the same step, and nobody at all needing a person.
+ * Rae read that and turned sends on.
+ *
+ * The protections around it are unchanged and are why this is safe: three days
+ * of grace before anyone hears anything, ten days between reminders so a passed
+ * date can never produce a daily email, and a person rather than another email
+ * once something is 24 days past or has been extended three times.
+ *
+ * Rollback is this constant back to false.
  */
-export const STEP_REMINDERS_ENABLED = false;
+export const STEP_REMINDERS_ENABLED = true;
 
 export function addDays(from: Date, days: number): Date {
   const d = new Date(from);
