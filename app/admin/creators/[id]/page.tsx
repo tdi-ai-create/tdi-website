@@ -48,6 +48,7 @@ import {
   getCreatorNotes,
   getContextAwareMilestoneDescription,
 } from '@/lib/creator-portal-data';
+import { blocksPublish, PUBLISH_BLOCKED_MESSAGE } from '@/lib/creator-agreement';
 import { ProjectArchiveBanner } from '@/components/admin/ProjectArchiveBanner';
 import { AdminPastProjects } from '@/components/admin/AdminPastProjects';
 import type {
@@ -869,6 +870,16 @@ export default function AdminCreatorDetailPage() {
 
   // Handle publish course submission
   const handlePublishCourse = async () => {
+    // Rule B, third door. The button that opens this modal is disabled when
+    // the agreement is unsigned, but the modal can outlive a reload, so the
+    // check runs again here rather than letting the server 409 be the first
+    // thing the admin hears about it.
+    if (dashboardData && blocksPublish(dashboardData.creator)) {
+      alert(PUBLISH_BLOCKED_MESSAGE);
+      setShowPublishModal(false);
+      return;
+    }
+
     if (!publishFormData.courseUrl.trim() || !publishFormData.discountCode.trim()) {
       alert('Course URL and Discount Code are required');
       return;
@@ -1105,11 +1116,18 @@ export default function AdminCreatorDetailPage() {
             <div className="mt-4">
               <button
                 onClick={handleOpenPublishModal}
-                className="inline-flex items-center gap-2 bg-[#ffba06] hover:bg-[#e5a800] text-[#1e2749] px-4 py-2 rounded-lg font-semibold transition-colors shadow-lg"
+                disabled={blocksPublish(creator)}
+                title={blocksPublish(creator) ? PUBLISH_BLOCKED_MESSAGE : undefined}
+                className="inline-flex items-center gap-2 bg-[#ffba06] hover:bg-[#e5a800] text-[#1e2749] px-4 py-2 rounded-lg font-semibold transition-colors shadow-lg disabled:bg-gray-200 disabled:text-gray-500 disabled:shadow-none disabled:cursor-not-allowed disabled:hover:bg-gray-200"
               >
                 <Rocket className="w-5 h-5" />
                 Mark Course as Published
               </button>
+              {blocksPublish(creator) && (
+                <p className="mt-2 max-w-prose text-sm text-amber-800">
+                  {PUBLISH_BLOCKED_MESSAGE}
+                </p>
+              )}
             </div>
           )}
         </div>
