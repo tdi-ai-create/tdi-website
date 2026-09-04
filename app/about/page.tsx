@@ -12,12 +12,20 @@ import AboutCreatorsSection from '@/components/AboutCreatorsSection';
 // Navigation sections
 const navSections = [
   { id: 'our-story', label: 'Our Story' },
+  { id: 'what-we-do', label: 'What We Do' },
   { id: 'our-symbol', label: 'Our Symbol' },
   { id: 'team', label: 'Team' },
   { id: 'creators', label: 'Creators' },
   { id: 'founder', label: 'Founder' },
-  { id: 'blueprint', label: 'Blueprint' },
   { id: 'impact', label: 'Impact' },
+];
+
+// The four offerings, in the order a school grows through them.
+const OFFERINGS = [
+  { name: 'The Pulse', line: 'A steady signal on how your staff are really doing, and what to do about it.' },
+  { name: 'The Focus', line: 'One priority, worked properly, with leadership sessions built in.' },
+  { name: 'The Cohort', line: 'A group of your educators moving through the same work together.' },
+  { name: 'The Blueprint', line: 'The full build. Everything above, across the whole staff, for the year.' },
 ];
 
 export default function AboutPage() {
@@ -180,6 +188,46 @@ export default function AboutPage() {
               </div>
             </div>
 
+          </div>
+        </div>
+      </section>
+
+      {/* What We Actually Do. The offerings, so About is not a dead end for
+          someone who arrived here from a search. */}
+      <section id="what-we-do" className="py-16 md:py-20 scroll-mt-32" style={{ backgroundColor: '#ffffff' }}>
+        <div className="container-default">
+          <h2 className="text-2xl md:text-3xl font-bold text-center mb-3" style={{ color: '#1e2749' }}>
+            What We Actually Do
+          </h2>
+          <p className="text-center max-w-2xl mx-auto mb-10" style={{ color: '#1e2749', opacity: 0.75 }}>
+            Four ways to work with us. Which one fits depends on your staff size and where you are starting.
+          </p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-5xl mx-auto">
+            {OFFERINGS.map(({ name, line }) => (
+              <div
+                key={name}
+                className="rounded-xl p-5 bg-white"
+                style={{ border: '1px solid #E2E5EA', borderTop: '3px solid #ffba06' }}
+              >
+                <p className="font-bold mb-1" style={{ color: '#1e2749' }}>{name}</p>
+                <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7, lineHeight: 1.5 }}>{line}</p>
+              </div>
+            ))}
+          </div>
+
+          <p className="text-center text-sm mt-8" style={{ color: '#1e2749', opacity: 0.8 }}>
+            Partnerships <strong>start at 2.5k</strong>.
+          </p>
+
+          <div className="text-center mt-6">
+            <Link
+              href="/for-schools"
+              className="inline-block px-7 py-3 rounded-full font-semibold transition-all hover:shadow-lg"
+              style={{ backgroundColor: '#1e2749', color: '#ffffff' }}
+            >
+              See How Partnerships Work
+            </Link>
           </div>
         </div>
       </section>
@@ -352,13 +400,14 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* The TDI Blueprint */}
-      <section id="blueprint" className="py-16 md:py-20 scroll-mt-32" style={{ backgroundColor: '#1e2749' }}>
+      {/* What We Believe. Renamed off "The TDI Blueprint" once The Blueprint
+          became one of the four offerings, so the word means one thing. */}
+      <section id="beliefs" className="py-16 md:py-20 scroll-mt-32" style={{ backgroundColor: '#1e2749' }}>
         <div className="container-default">
           <div className="max-w-3xl mx-auto">
             <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8">
               <h3 className="text-xl font-bold mb-6" style={{ color: '#ffba06' }}>
-                The TDI Blueprint
+                What We Believe
               </h3>
               <div className="space-y-4">
                 <div className="flex items-start gap-4">
@@ -448,9 +497,8 @@ export default function AboutPage() {
               <p className="text-sm md:text-base font-medium" style={{ color: '#1e2749' }}>States with Partner Schools</p>
             </div>
             <div>
-              <p className="text-3xl md:text-4xl font-bold" style={{ color: '#1e2749' }}>74%</p>
-              <p className="text-sm md:text-base font-medium" style={{ color: '#1e2749' }}>Implementation Rate</p>
-              <p className="text-xs" style={{ color: '#1e2749', opacity: 0.7 }}>vs. 10% industry average</p>
+              <p className="text-3xl md:text-4xl font-bold" style={{ color: '#1e2749' }}>All 50</p>
+              <p className="text-sm md:text-base font-medium" style={{ color: '#1e2749' }}>States Where We Are Certified</p>
             </div>
             <div>
               <p className="text-3xl md:text-4xl font-bold" style={{ color: '#1e2749' }}>4.8/5</p>
@@ -459,14 +507,14 @@ export default function AboutPage() {
           </div>
 
           <p className="text-center text-sm mt-8 max-w-2xl mx-auto mb-10" style={{ color: '#1e2749', opacity: 0.8 }}>
-            The industry average for PD classroom transfer is just 5-10% (Joyce & Showers, 2002).<br />Our partners average 74% because TDI is built for Monday morning, not &quot;someday.&quot;
+            Most PD is judged on who showed up. We built ours to be judged on what changes in the classroom afterward.
           </p>
 
           <div className="max-w-3xl mx-auto">
             <div className="rounded-2xl overflow-hidden shadow-xl border border-gray-200">
               <Image src="/hub-welcome/hub-admin-dashboard.png" alt="TDI admin analytics dashboard showing real partner data" width={800} height={600} style={{ width: '100%', height: 'auto', display: 'block' }} />
             </div>
-            <p className="text-center text-xs mt-2" style={{ color: '#9ca3af' }}>Real dashboards, real data -- not just promises</p>
+            <p className="text-center text-xs mt-2" style={{ color: '#9ca3af' }}>Real dashboards, real data, not just promises</p>
           </div>
         </div>
       </section>

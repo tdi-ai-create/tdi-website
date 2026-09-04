@@ -45,7 +45,7 @@ export const team: TeamMember[] = [
   { name: 'Sebastian Cole', title: 'Legal', imageSlug: 'sebastian-cole', isHuman: false },
   { name: 'Sandra Reyes', title: 'Accounting', imageSlug: 'sandra-reyes', isHuman: false },
   { name: 'Victor Nash', title: 'Finance', imageSlug: 'victor-nash', isHuman: false },
-  { name: 'Chris Copypaste', title: 'Engineering', imageSlug: 'chris-copypaste', isHuman: false },
+  { name: 'Chris CP', title: 'Engineering', imageSlug: 'chris-copypaste', isHuman: false },
   { name: 'Elena Vasquez', title: 'Sales Ops', imageSlug: 'elena-vasquez', isHuman: false },
   { name: 'Sophia Castillo', title: 'Sales Prep', imageSlug: 'sophia-castillo', isHuman: false },
   { name: 'Nora Reeves', title: 'COO', imageSlug: 'nora-reeves', isHuman: false },
