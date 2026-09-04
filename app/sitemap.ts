@@ -12,8 +12,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${baseUrl}/contact`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.8 },
 
     // Conversion tools
-    { url: `${baseUrl}/pd-diagnostic`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.8 },
-    { url: `${baseUrl}/calculator`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.8 },
     { url: `${baseUrl}/funding`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.8 },
 
     // Content pages

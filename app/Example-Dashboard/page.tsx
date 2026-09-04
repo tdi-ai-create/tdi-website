@@ -2571,7 +2571,7 @@ export default function ExampleDashboard() {
             </div>
 
             {/* Embedded How We Partner Content - excludes Leadership Dashboard tab */}
-            <HowWePartnerTabs excludeTabs={['dashboard', 'calculator']} showCTAs={false} />
+            <HowWePartnerTabs excludeTabs={['dashboard']} showCTAs={false} />
 
             {/* Learn more link */}
             <div className="text-center mt-6">
@@ -3502,17 +3502,6 @@ export default function ExampleDashboard() {
                 </div>
               </div>
 
-              {/* ROI Calculator Link */}
-              <div className="mt-6 text-center">
-                <a
-                  href="/calculator"
-                  className="inline-flex items-center gap-2 bg-white text-[#1B2A4A] px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
-                >
-                  <Calculator className="w-5 h-5" />
-                  See Full ROI Breakdown →
-                </a>
-              </div>
-
             </div>
 
             {/* SECTION: Why Grants Exist for Districts Like Motown */}
@@ -3577,12 +3566,6 @@ export default function ExampleDashboard() {
                     Schedule Renewal Conversation
                     <ArrowRight className="w-5 h-5" />
                   </span>
-                  <a
-                    href="/calculator"
-                    className="text-sm text-white/80 hover:text-white hover:underline transition-colors"
-                  >
-                    See ROI Calculator →
-                  </a>
                 </div>
               </div>
 

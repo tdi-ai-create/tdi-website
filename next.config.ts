@@ -13,6 +13,18 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [
       {
+        // Retired Sept 2026 with the other interactive tools. The questions
+        // are preserved in docs/pd-diagnostic-questions.md.
+        source: '/pd-diagnostic',
+        destination: '/get-started',
+        permanent: true,
+      },
+      {
+        source: '/calculator',
+        destination: '/for-schools',
+        permanent: true,
+      },
+      {
         source: '/how-we-partner',
         destination: '/for-schools',
         permanent: true,

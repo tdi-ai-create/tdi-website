@@ -304,7 +304,7 @@ export default function ContactPage() {
             Explore these resources first.
           </p>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-4xl mx-auto">
             {/* Card 1: See Your School's Impact */}
             <a
               href="/for-schools#section-benefit"
@@ -319,23 +319,6 @@ export default function ContactPage() {
               <h3 className="font-bold mb-2" style={{ color: '#1e2749' }}>See Your School's Impact</h3>
               <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
                 Estimate improvements in teacher retention, stress, and student outcomes.
-              </p>
-            </a>
-
-            {/* Card 2: Find Your Starting Point */}
-            <a
-              href="/pd-diagnostic"
-              className="bg-white rounded-xl p-6 text-center shadow-sm hover:shadow-md transition-shadow border border-gray-100"
-              style={{ textDecoration: 'none' }}
-            >
-              <div className="w-12 h-12 rounded-lg mx-auto mb-4 flex items-center justify-center" style={{ backgroundColor: '#ffba06' }}>
-                <svg className="w-6 h-6" fill="#1e2749" viewBox="0 0 24 24">
-                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-                </svg>
-              </div>
-              <h3 className="font-bold mb-2" style={{ color: '#1e2749' }}>Find Your Starting Point</h3>
-              <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
-                A quick assessment to see which type of support your staff needs most.
               </p>
             </a>
 

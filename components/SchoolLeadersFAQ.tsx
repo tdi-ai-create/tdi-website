@@ -47,13 +47,9 @@ const schoolLeaderFAQs: FAQItem[] = [
     question: "How do we know this will work for our specific context?",
     answer: (
       <>
-        TDI serves 100,000+ educators across all 50 states in schools ranging from rural single-building districts to multi-school urban systems. Every partnership is customized - your dashboard, your goals, your pace. Start with the{' '}
-        <Link href="/pd-diagnostic" className="font-semibold underline" style={{ color: '#35A7FF' }}>
-          free PD Diagnostic
-        </Link>{' '}
-        or{' '}
-        <Link href="/calculator" className="font-semibold underline" style={{ color: '#35A7FF' }}>
-          Impact Calculator
+        TDI serves 100,000+ educators across all 50 states in schools ranging from rural single-building districts to multi-school urban systems. Every partnership is customized - your dashboard, your goals, your pace. Start with a{' '}
+        <Link href="/get-started" className="font-semibold underline" style={{ color: '#35A7FF' }}>
+          free PD plan
         </Link>{' '}
         to see what is possible for your school.
       </>

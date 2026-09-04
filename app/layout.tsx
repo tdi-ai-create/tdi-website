@@ -48,7 +48,7 @@ export const metadata: Metadata = {
   // No canonical here on purpose. A canonical in the root layout is inherited
   // by every page that does not set its own, so every page declared itself a
   // duplicate of the homepage and told search engines not to rank it
-  // independently. /funding and /pd-diagnostic are exactly the pages an
+  // independently. /funding and /for-schools are exactly the pages an
   // educator would search for. Set alternates.canonical per route instead.
   robots: {
     index: true,
