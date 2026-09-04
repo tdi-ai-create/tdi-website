@@ -25,6 +25,27 @@ const faqs = [
     ],
   },
   {
+    category: 'For School Leaders',
+    questions: [
+      {
+        q: 'What are the ways a school can work with TDI?',
+        a: 'Four, and they build on each other. The Pulse is a steady signal on how your staff are really doing, and what to do about it. The Focus takes one priority and works it properly, with leadership sessions built in. The Cohort moves a group of your educators through the same work together. The Blueprint is the full build: everything above, across the whole staff, for the year.',
+      },
+      {
+        q: 'What does a partnership actually include?',
+        a: 'Learning Hub access for the staff you enroll, live sessions with our team, a dashboard showing what your people are actually doing rather than who signed in, and classroom observation notes written back to your teachers by name. How much of each you get is what separates the four.',
+      },
+      {
+        q: 'How much does a partnership cost?',
+        a: 'Partnerships start at 2.5k. Where you land above that depends on how many staff you are bringing in and which of the four fits, so we quote it after one conversation rather than guessing on a webpage.',
+      },
+      {
+        q: 'How do we know which one is right for us?',
+        a: 'It usually comes down to two things: how many people you are trying to reach, and whether you already know what you want to fix. If you know the problem, start at The Focus. If you are still working out where the pressure actually is, start with The Pulse.',
+      },
+    ],
+  },
+  {
     category: 'Time & Energy',
     questions: [
       {
@@ -37,7 +58,7 @@ const faqs = [
       },
       {
         q: 'How much time does this take?',
-        a: 'That\'s up to you. Courses are broken into 3-5 minute sections, with full courses taking 20-45 minutes to explore. Easy to fit into lunch, planning periods, or your commute. Partner schools get structured implementation time built into their PD calendar. No Saturdays required.',
+        a: 'That\'s up to you. Courses are broken into 3-5 minute sections, so you can take one on a lunch break, a planning period, or the drive home and stop whenever you need to. Partner schools get structured implementation time built into their PD calendar. No Saturdays required.',
       },
     ],
   },
@@ -46,7 +67,7 @@ const faqs = [
     questions: [
       {
         q: 'What if my admin won\'t support it?',
-        a: 'We can help with that. TDI provides resources to share with leadership, including ROI data, implementation research, and case studies from partner schools. Many administrators become our biggest advocates once they see teachers actually using what they learn.',
+        a: 'We can help with that. TDI gives you things worth forwarding: the partner dashboard showing what staff are actually doing, observation notes written back to teachers by name, and case studies from schools already doing this. Many administrators become our biggest advocates once they see teachers using what they learn.',
       },
       {
         q: 'Do you offer live workshops or just online content?',
@@ -59,7 +80,7 @@ const faqs = [
     questions: [
       {
         q: 'How much does it cost?',
-        a: 'Individual teachers can access free resources through our blog, plus affordable courses in the Learning Hub. Schools partner with us through customized packages based on their size and needs. We believe cost should never be the reason a school can\'t support its teachers.',
+        a: 'Individual teachers can access free resources through our blog, plus affordable courses in the Learning Hub. For schools, partnerships start at 2.5k, and where you land above that depends on your staff size and which of the four ways of working fits. We believe cost should never be the reason a school can\'t support its teachers.',
       },
       {
         q: 'We don\'t have budget for PD. Can you still help?',
