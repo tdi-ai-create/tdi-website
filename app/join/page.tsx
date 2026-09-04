@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import CertifiedStatesMap from '@/components/learning/CertifiedStatesMap';
-import { CompactBurnout } from '@/components/calculators/v2/compact/CompactBurnout';
 import TeamStrip from '@/components/TeamStrip';
 
 
@@ -632,19 +631,6 @@ export default function JoinPage() {
               </div>
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* Stress Check Section */}
-      <section className="py-16 md:py-20 px-6" style={{ backgroundColor: '#f5f5f5' }}>
-        <div className="max-w-5xl mx-auto">
-          <h2 className="text-2xl md:text-3xl font-bold text-center mb-4" style={{ color: '#1e2749' }}>
-            What Could Change for You?
-          </h2>
-          <p className="text-center mb-10 max-w-2xl mx-auto text-lg" style={{ color: '#4b5563' }}>
-            See the potential impact on your stress, time, and joy in teaching.
-          </p>
-          <CompactBurnout />
         </div>
       </section>
 

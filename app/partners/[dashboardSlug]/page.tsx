@@ -8735,13 +8735,6 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                 We&apos;ll help you build a board presentation with your actual impact data, cost analysis, and recommended next steps. Your success is our pitch.
               </p>
               <div className="flex flex-wrap gap-3">
-                <Link
-                  href="/calculator"
-                  className="px-4 py-2 bg-[#1e2749] text-white rounded-lg text-sm font-medium hover:bg-[#2a3459] transition-colors inline-flex items-center gap-2"
-                >
-                  Explore Our Impact Calculator
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
                 <a
                   href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat"
                   target="_blank"

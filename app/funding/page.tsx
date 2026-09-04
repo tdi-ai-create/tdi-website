@@ -257,15 +257,15 @@ export default function FundingPage() {
             Wondering Which Phase to Fund?
           </h3>
           <p className="text-sm mb-4" style={{ color: '#1e2749', opacity: 0.8 }}>
-            Our free PD Diagnostic helps you identify where your school is today
-            and which TDI phase makes the most sense for your goals and budget.
+            Tell us where your school is today and we will send back a free plan
+            showing which TDI phase fits your goals and your budget.
           </p>
           <a
-            href="/pd-diagnostic"
+            href="/get-started"
             className="inline-block px-6 py-2 rounded-full font-semibold text-sm transition-all hover:shadow-lg"
             style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
           >
-            Take the Diagnostic
+            Get Your Free PD Plan
           </a>
         </div>
       </section>
