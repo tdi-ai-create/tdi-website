@@ -36,6 +36,7 @@ type Package = {
 
 type LineItem = {
   label: string
+  description?: string | null
   quantity: number
   unit_price: number
   total: number
@@ -448,11 +449,14 @@ export default function InvoiceClient({ quote: initialQuote }: { quote: Quote })
                 )}
                 <div className="divide-y divide-gray-100">
                   {(selectedPkg.line_items ?? []).map((item: LineItem, i: number) => (
-                    <div key={i} className="flex items-center justify-between px-5 py-4">
+                    <div key={i} className="flex items-start justify-between gap-4 px-5 py-4">
                       <div className="flex-1">
                         <p className="font-medium text-gray-900">{item.label}</p>
+                        {item.description && (
+                          <p className="text-sm text-gray-500 mt-1 leading-relaxed">{item.description}</p>
+                        )}
                         {item.quantity > 1 && (
-                          <p className="text-xs text-gray-400 mt-0.5">{item.quantity} &times; ${Number(item.unit_price).toLocaleString()}</p>
+                          <p className="text-xs text-gray-400 mt-1">{item.quantity} &times; ${Number(item.unit_price).toLocaleString()}</p>
                         )}
                       </div>
                       <div className="flex items-center gap-3">
