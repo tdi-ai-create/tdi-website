@@ -180,28 +180,72 @@ export async function GET(request: NextRequest) {
     drifted.push(drift);
   }
 
-  // Silent when nothing drifted, and silent in dry run. Only a real repair or a
-  // real failure is worth a person's attention.
-  if (!dryRun && (drifted.length > 0 || failures.length > 0)) {
-    const lines = drifted.map((d) => {
-      const from = d.boardShowsOpen.length ? d.boardShowsOpen.join(', ') : 'nothing open';
-      const to = d.wouldOpen ?? 'board closed';
-      const verb = d.repaired ? 'moved' : 'needs moving';
-      const clock = d.paused ? ', paused so no clock started' : '';
-      return `${d.creator}: ${verb} from ${from} to ${to}${clock}`;
-    });
+  // Two different reporting rules, because a job being watched and a job being
+  // trusted need opposite things.
+  //
+  // While it is not armed it is on trial, and the question being asked is "is
+  // this job right". Silence cannot answer that: a night with nothing to say
+  // and a night where the cron never fired look identical, which is the exact
+  // trap that let the Paperclip health check report Degraded for a month. So a
+  // watch run reports every night, including the nights it found nothing.
+  //
+  // Once armed the question changes to "did anything happen to a creator", and
+  // silence is a real answer to that one. It goes quiet unless a board was
+  // actually repaired or a repair failed.
+  //
+  // Never in an explicit ?dryRun=1, which is somebody at a terminal reading the
+  // response themselves.
+  const watching = !armed;
+  const somethingHappened = drifted.length > 0 || failures.length > 0;
+  const shouldPost = watching || somethingHappened;
 
-    const failLines = failures.map((f) => `${f.creator}: could not be placed, ${f.error}`);
+  const lines = drifted.map((d) => {
+    const from = d.boardShowsOpen.length ? d.boardShowsOpen.join(', ') : 'nothing open';
+    const to = d.wouldOpen ?? 'board closed';
+    const verb = d.repaired ? 'moved' : 'needs moving';
+    const clock = d.paused ? ', paused so no clock started' : '';
+    return `${d.creator}: ${verb} from ${from} to ${to}${clock}`;
+  });
 
-    const headline = willWrite
-      ? `*Creator boards repaired* | ${drifted.filter((d) => d.repaired).length} of ${drifted.length}`
-      : `*Creator boards out of step* | ${drifted.length}, sweep is not armed so nothing was changed`;
+  const failLines = failures.map((f) => `${f.creator}: could not be placed, ${f.error}`);
 
-    await postCreatorMessage(
-      [headline, ...lines, ...failLines, 'https://www.teachersdeserveit.com/tdi-admin/creators']
-        .filter(Boolean)
-        .join('\n')
-    );
+  const headline = willWrite
+    ? `*Creator boards repaired* | ${drifted.filter((d) => d.repaired).length} of ${drifted.length}`
+    : drifted.length === 0
+      ? `*Board sweep, watch run* | ${live.length} boards checked, all agree with the engine. Nothing to repair and nothing was changed.`
+      : `*Board sweep, watch run* | ${live.length} boards checked, ${drifted.length} out of step. Not armed, so nothing was changed.`;
+
+  const arming = willWrite
+    ? []
+    : ["Arm it when you are satisfied: update creator_config set enabled = true where key = 'board_sweep';"];
+
+  const message = [
+    headline,
+    ...lines,
+    ...failLines,
+    ...arming,
+    'https://www.teachersdeserveit.com/tdi-admin/creators',
+  ]
+    .filter(Boolean)
+    .join('\n');
+
+  // Who hears about it depends on whether anything happened to a creator.
+  //
+  // Not armed is a watch run: nothing changed, nobody has to do anything, and
+  // the only open question is whether to arm it. That is Rae's, so it goes to
+  // #rae-actions. Putting a nightly "we are still watching this" into
+  // #bella-actions would be noise in a channel whose whole value is that every
+  // line in it is something to act on.
+  //
+  // Armed means a creator's board moved, which is Bella's to know about, so it
+  // goes to #bella-actions.
+  const channel: 'creator' | 'rae' = willWrite ? 'creator' : 'rae';
+
+  // Composed above whatever happens, posted only on a real run. So ?dryRun=1
+  // can hand back the exact words it would have sent, and the message can be
+  // read and argued with before anyone has to receive one.
+  if (!dryRun && shouldPost) {
+    await postCreatorMessage(message, channel);
   }
 
   return NextResponse.json({
@@ -214,6 +258,12 @@ export async function GET(request: NextRequest) {
     drifted: drifted.length,
     repaired: drifted.filter((d) => d.repaired).length,
     failed: failures.length,
+    slack: {
+      wouldPost: shouldPost,
+      posted: !dryRun && shouldPost,
+      channel: shouldPost ? (channel === 'rae' ? '#rae-actions' : '#bella-actions') : null,
+      message: shouldPost ? message : null,
+    },
     boards: drifted,
     failures,
   });
