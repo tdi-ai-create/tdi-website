@@ -27,7 +27,8 @@ export async function POST(
   if (quote.status === 'expired') return NextResponse.json({ error: 'Quote has expired' }, { status: 400 })
   if (quote.status === 'signed') return NextResponse.json({ error: 'Already signed' }, { status: 400 })
   if (quote.expires_at && new Date(quote.expires_at) < new Date()) {
-    await supabase.from('quotes').update({ status: 'expired' }).eq('id', id)
+    const { error: expireErr } = await supabase.from('quotes').update({ status: 'expired' }).eq('id', id)
+    if (expireErr) console.error('[quote-sign] Failed to stamp quote expired:', expireErr.message)
     return NextResponse.json({ error: 'Quote has expired' }, { status: 400 })
   }
 
@@ -52,9 +53,23 @@ export async function POST(
   // Auto-create deliverables from signed contract
   const { data: fullQuote } = await supabase
     .from('quotes')
-    .select('quote_number, contact_organization, contract_type, district_id, service_start_date, service_end_date, quote_packages(id, total_amount, line_items)')
+    .select('quote_number, contact_organization, contract_type, district_id, service_start_date, service_end_date, quote_packages(id, package_index, offering, total_amount, line_items)')
     .eq('id', id)
     .single()
+
+  // Which package the buyer actually chose. Quotes normally carry one, but the
+  // schema allows several, so resolve by the index they signed against rather
+  // than assuming the first row returned is the right one.
+  type SignedPackage = { package_index: number | null; offering: string | null }
+  const chosenIndex = selectedPackageIndex ?? 0
+  const allPackages: SignedPackage[] =
+    (fullQuote as { quote_packages?: SignedPackage[] } | null)?.quote_packages ?? []
+  const chosenPackage =
+    allPackages.find((p) => p.package_index === chosenIndex) ?? allPackages[0] ?? null
+
+  // Which of the four offerings this partnership bought. Null when the quote
+  // predates the model or the package did not map cleanly, which is honest.
+  const signedOffering: string | null = chosenPackage?.offering ?? null
 
   if (fullQuote) {
     const pkg = (fullQuote as any).quote_packages?.[0]
@@ -85,7 +100,7 @@ export async function POST(
 
         if (isIndividual && qty > 1) {
           for (let i = 1; i <= qty; i++) {
-            await supabase.from('contract_deliverables').insert({
+            const { error: dErr } = await supabase.from('contract_deliverables').insert({
               quote_id: id, quote_package_id: pkg.id, district_id: (fullQuote as any).district_id,
               line_item_index: idx, label: `${item.label} (${i} of ${qty})`,
               service_type: stype, quantity: 1, unit_price: item.unit_price, total_amount: item.unit_price,
@@ -93,9 +108,10 @@ export async function POST(
               funding_type: fundingType, ...asNewLine(deliveryStatus === 'pending_funding'),
               sequence_number: i, sequence_total: qty,
             })
+            if (dErr) console.error(`[quote-sign] Deliverable ${i}/${qty} insert failed for quote ${id}:`, dErr.message)
           }
         } else {
-          await supabase.from('contract_deliverables').insert({
+          const { error: dErr } = await supabase.from('contract_deliverables').insert({
             quote_id: id, quote_package_id: pkg.id, district_id: (fullQuote as any).district_id,
             line_item_index: idx, label: item.label,
             service_type: stype, quantity: qty, unit_price: item.unit_price, total_amount: item.total,
@@ -103,6 +119,7 @@ export async function POST(
             funding_type: fundingType, ...asNewLine(deliveryStatus === 'pending_funding'),
             sequence_number: 1, sequence_total: 1,
           })
+          if (dErr) console.error(`[quote-sign] Deliverable insert failed for quote ${id}:`, dErr.message)
         }
       }
     }
@@ -122,9 +139,10 @@ export async function POST(
         .limit(1)
       if (opps?.[0]) {
         matchedOpportunity = opps[0]
-        await supabase.from('sales_opportunities')
+        const { error: oppErr } = await supabase.from('sales_opportunities')
           .update({ stage: 'signed', heat: 'hot', last_activity_at: new Date().toISOString(), updated_at: new Date().toISOString() })
           .eq('id', matchedOpportunity.id)
+        if (oppErr) console.error('[quote-sign] Failed to move opportunity to signed:', oppErr.message)
       }
     } catch {}
   }
@@ -133,9 +151,10 @@ export async function POST(
   const districtId = (fullQuote as any)?.district_id
   if (districtId) {
     try {
-      await supabase.from('districts')
+      const { error: distErr } = await supabase.from('districts')
         .update({ status: 'active' })
         .eq('id', districtId)
+      if (distErr) console.error('[quote-sign] Failed to activate district:', distErr.message)
     } catch {}
   }
 
@@ -219,7 +238,10 @@ export async function POST(
         contact_email: quoteContactEmail,
         primary_contact_name: signedByName,
         primary_contact_email: quoteContactEmail,
+        // Lifecycle stage. A brand new partnership genuinely starts at the
+        // first stage, which is a different axis from what they bought.
         contract_phase: 'IGNITE',
+        offering: signedOffering,
         status: 'active',
         slug: slug,
         contract_start: contractStart,
@@ -251,18 +273,20 @@ export async function POST(
 
       // Backfill org_name on partnership if it was missing
       if (orgName) {
-        await supabase.from('partnerships')
+        const { error: orgErr } = await supabase.from('partnerships')
           .update({ org_name: orgName })
           .eq('id', partnershipId)
           .is('org_name', null)
+        if (orgErr) console.error('[quote-sign] Failed to backfill org_name:', orgErr.message)
       }
 
       // 4. Link district to partnership (districts.partnership_id)
       if (districtId) {
-        await supabase.from('districts')
+        const { error: dLinkErr } = await supabase.from('districts')
           .update({ partnership_id: partnershipId })
           .eq('id', districtId)
           .is('partnership_id', null)
+        if (dLinkErr) console.error('[quote-sign] Failed to link district to partnership:', dLinkErr.message)
       }
 
       // 5. Sum deliverables into partnership session counts
@@ -279,7 +303,7 @@ export async function POST(
         }
         if (isNewPartnership) {
           // New partnership: set counts directly
-          await supabase.from('partnerships')
+          const { error: countErr } = await supabase.from('partnerships')
             .update({
               observation_days_total: observations,
               base_observation_days: observations,
@@ -291,6 +315,7 @@ export async function POST(
               base_staff_enrolled: staffCount,
             })
             .eq('id', partnershipId)
+          if (countErr) console.error('[quote-sign] Failed to set session counts on new partnership:', countErr.message)
         } else {
           // Existing partnership: add to current counts (handles add-on quotes)
           const { data: current } = await supabase.from('partnerships')
@@ -298,7 +323,7 @@ export async function POST(
             .eq('id', partnershipId)
             .single()
           if (current) {
-            await supabase.from('partnerships')
+            const { error: addErr } = await supabase.from('partnerships')
               .update({
                 observation_days_total: (current.observation_days_total || 0) + observations,
                 virtual_sessions_total: (current.virtual_sessions_total || 0) + virtuals,
@@ -306,6 +331,7 @@ export async function POST(
                 staff_enrolled: (current.staff_enrolled || 0) + staffCount,
               })
               .eq('id', partnershipId)
+            if (addErr) console.error('[quote-sign] Failed to add session counts to existing partnership:', addErr.message)
           }
         }
       }
@@ -317,19 +343,21 @@ export async function POST(
         if (matchedOpportunity.grant_support) updates.has_grant_support = true
         if (matchedOpportunity.website) updates.website = matchedOpportunity.website
         if (Object.keys(updates).length > 0) {
-          await supabase.from('partnerships').update(updates).eq('id', partnershipId)
+          const { error: carryErr } = await supabase.from('partnerships').update(updates).eq('id', partnershipId)
+          if (carryErr) console.error('[quote-sign] Failed to carry sales data onto partnership:', carryErr.message)
         }
       }
 
       // 7. Create initial partnership note with sales context
       if (matchedOpportunity?.notes) {
-        await supabase.from('partnership_notes').insert({
+        const { error: noteErr } = await supabase.from('partnership_notes').insert({
           partnership_id: partnershipId,
           content: `Sales context from initial inquiry:\n\n${matchedOpportunity.notes}`,
           author: 'System',
           note_type: 'internal',
           visible_to_partner: false,
         })
+        if (noteErr) console.error('[quote-sign] Failed to write sales context note:', noteErr.message)
       }
 
       // 8. Auto-create funding pursuit if grant-supported
@@ -342,7 +370,7 @@ export async function POST(
           .maybeSingle()
         if (!existingPursuit) {
           const pkg = (fullQuote as any).quote_packages?.[0]
-          await supabase.from('funding_pursuits').insert({
+          const { error: pursuitErr } = await supabase.from('funding_pursuits').insert({
             pursuit_name: `${orgName || 'New Partnership'} - Grant Funding`,
             district_name: orgName || null,
             partnership_id: partnershipId,
@@ -355,13 +383,14 @@ export async function POST(
             operational_owner_email: 'bella@teachersdeserveit.com',
             internal_notes: `Auto-created from signed quote ${(fullQuote as any).quote_number || id}. Contract type: grant_funded.`,
           })
+          if (pursuitErr) console.error('[quote-sign] Failed to auto-create funding pursuit:', pursuitErr.message)
         }
       }
     } else {
       console.error(`[quote-sign] CRITICAL: Could not find or create partnership for quote ${id} (${orgName || quoteContactEmail}). Deliverables are orphaned.`)
     }
 
-    // Slack notifications -- fired here so we have session counts + partnership info
+    // Slack notifications, fired here so we have session counts and partnership info
     const amount = (fullQuote as any).quote_packages?.[0]?.total_amount || 0
     let partnershipSlug: string | undefined
     if (partnershipId) {

@@ -51,6 +51,11 @@ export interface ChecklistData {
   }[]
   /** Weight 5. Scope notes and citations. */
   small_print?: SmallPrintBlock[]
+  /**
+   * Blank ruled lines under the checklist. Defaults to 5. Pass 0 for none:
+   * the block costs roughly a third of a page, which is often the
+   * difference between one page and two.
+   */
   notes_lines?: number
 }
 
@@ -97,12 +102,16 @@ export function ChecklistPDF({ data }: { data: ChecklistData }) {
             </View>
           ))}
           <SmallPrint blocks={data.small_print} />
-          <View style={s.notesSection}>
-            <Text style={s.notesLabel}>Notes</Text>
-            {Array.from({ length: data.notes_lines || 5 }).map((_, i) => (
-              <View key={i} style={s.notesLine} />
-            ))}
-          </View>
+          {/* `??` not `||`: asking for 0 lines used to give you 5, so the block
+              could not be turned off and quietly pushed cards onto a second page. */}
+          {(data.notes_lines ?? 5) > 0 ? (
+            <View style={s.notesSection} wrap={false}>
+              <Text style={s.notesLabel}>Notes</Text>
+              {Array.from({ length: data.notes_lines ?? 5 }).map((_, i) => (
+                <View key={i} style={s.notesLine} />
+              ))}
+            </View>
+          ) : null}
         </View>
         <View style={s.footer} fixed>
           <Text style={s.footerText}>Teachers Deserve It</Text>
