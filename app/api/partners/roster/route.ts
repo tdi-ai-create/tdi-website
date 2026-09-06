@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { notifyAdmin } from '@/lib/admin-notify';
 import { createClient } from '@supabase/supabase-js';
 
 function getSupabaseAdmin() {
@@ -337,18 +338,17 @@ export async function POST(request: NextRequest) {
       console.error('[partners/roster] activity_log insert failed:', logError1.message);
     }
 
-    // Notify admin team
-    const notifyUrl = process.env.NEXT_PUBLIC_BASE_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');
-    fetch(`${notifyUrl}/api/admin/notify`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        event: 'roster_uploaded',
-        partnershipName: partnership?.contact_name || 'A partnership',
-        urgency: 'action',
-        details: { 'Staff added': newStaff.length, 'Total roster': totalCount, 'Next step': 'Provision Hub accounts from the Internal tab' },
-      }),
-    }).catch(err => console.error('[roster] Admin notification failed:', err));
+    // Notify admin team. Called directly rather than over HTTP: posting to our
+    // own deployment is refused in production, and the rejection was swallowed.
+    const notifyResult = await notifyAdmin({
+      event: 'roster_uploaded',
+      partnershipName: partnership?.org_name || partnership?.contact_name || 'A partnership',
+      urgency: 'action',
+      details: { 'Staff added': newStaff.length, 'Total roster': totalCount, 'Next step': 'Provision Hub accounts from the Internal tab' },
+    });
+    if (!notifyResult.sent) {
+      console.error('[partners/roster] admin notification failed:', notifyResult.reason);
+    }
 
     return NextResponse.json({
       success: true,

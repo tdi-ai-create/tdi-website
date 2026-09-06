@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { slackNotify } from '@/lib/slack-notify';
+import { notifyAdmin } from '@/lib/admin-notify';
 import { shouldPostDigest, recordDigestPost, recordDigestSuppressed } from '@/lib/digest-state';
 import { createClient } from '@supabase/supabase-js';
 
@@ -62,6 +63,9 @@ export async function GET(request: NextRequest) {
     const now = new Date();
     let flagsCreated = 0;
     let concernsComputed = 0;
+    let emailsSent = 0;
+    let emailsFailed = 0;
+    let emailsWouldSend = 0;
 
     // These flags were written to a table and never told anyone. A partner
     // whose staff are not logging in is the clearest renewal risk we have, and
@@ -97,7 +101,11 @@ export async function GET(request: NextRequest) {
       const loggedInStaff = staffStats?.filter(s => s.hub_login_date).length || 0;
       const loginPct = totalStaff > 0 ? Math.round((loggedInStaff / totalStaff) * 100) : 0;
 
-      const flags: { key: string; severity: 'warning' | 'urgent'; message: string }[] = [];
+      type Flag = { key: string; severity: 'warning' | 'urgent'; message: string };
+      const flags: Flag[] = [];
+      // Only flags opened on this run. An already open flag is already known,
+      // and mailing it again every morning is the noise we are removing.
+      const newFlags: Flag[] = [];
 
       // Day 7: Principal not logged in
       if (daysSinceStart >= 7 && daysSinceStart < 21 && (dashViews || 0) === 0) {
@@ -187,6 +195,7 @@ export async function GET(request: NextRequest) {
           // Only genuinely new problems are announced. A flag already open is
           // already known, and repeating it daily is the noise we are removing.
           if (!existing) {
+            newFlags.push(flag);
             newlyRaised.push(
               `  • *${p.org_name ?? 'unknown partner'}* — ${flag.message}` +
               `${flag.severity === 'urgent' ? '  :rotating_light:' : ''}`
@@ -208,23 +217,54 @@ export async function GET(request: NextRequest) {
           console.error('[partner-attention-flags] flag resolve failed:', p.id, resolveError.message);
         }
       } else {
+        // A dry run has to compute the same decision set, or the numbers it
+        // reports are not the numbers the real run will produce. The lookup is
+        // a read, so it is safe here; only the writes and the send are skipped.
+        for (const flag of flags) {
+          const { data: existing, error: findError } = await supabase
+            .from('partnership_flags')
+            .select('id')
+            .eq('partnership_id', p.id)
+            .eq('flag_key', flag.key)
+            .is('resolved_at', null)
+            .maybeSingle();
+
+          if (findError) {
+            console.error('[partner-attention-flags] dry run lookup failed:', p.id, flag.key, findError.message);
+            continue;
+          }
+          if (!existing) newFlags.push(flag);
+        }
         flagsCreated += flags.length;
       }
 
-      // Send admin notification if any flags were created for this partnership
-      if (flags.length > 0 && !dryRun) {
-        const isEscalation = flags.some((f) => f.severity === 'urgent');
-        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');
-        fetch(`${baseUrl}/api/admin/notify`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            event: 'attention_flag',
-            partnershipName: p.contact_name,
-            urgency: isEscalation ? 'urgent' : 'action',
-            details: { 'Flags': flags.length, 'Day': daysSinceStart, 'Summary': flags[0].message },
-          }),
-        }).catch(() => {});
+      // Email on newly opened flags only, and await it so a failure is visible.
+      // This used to fire on every open flag every morning, and it used to post
+      // to this deployment over HTTP, which production refuses. Both are why
+      // eight partnerships carried flags for a month with nothing in the inbox.
+      if (newFlags.length > 0) {
+        if (dryRun) {
+          emailsWouldSend++;
+          continue;
+        }
+        const isEscalation = newFlags.some((f) => f.severity === 'urgent');
+        const result = await notifyAdmin({
+          event: 'attention_flag',
+          partnershipName: p.org_name ?? p.contact_name ?? 'A partnership',
+          urgency: isEscalation ? 'urgent' : 'action',
+          details: {
+            'New flags': newFlags.length,
+            'Open flags': flags.length,
+            Day: daysSinceStart,
+            Summary: newFlags[0].message,
+          },
+        });
+        if (result.sent) {
+          emailsSent++;
+        } else {
+          emailsFailed++;
+          console.error('[partner-attention-flags] notify failed for', p.id, result.reason);
+        }
       }
     }
 
@@ -272,6 +312,9 @@ export async function GET(request: NextRequest) {
       concernsComputed,
       flagsCreated,
       newlyRaised: newlyRaised.length,
+      emailsSent,
+      emailsFailed,
+      emailsWouldSend,
       slackPosted,
       partnershipsChecked: partnerships.length,
       message: dryRun
