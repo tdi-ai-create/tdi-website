@@ -9,6 +9,7 @@ import { ReferencePDF, type ReferenceData } from '@/lib/pdf/quick-win-reference'
 import { ToolkitPDF, type ToolkitData } from '@/lib/pdf/quick-win-toolkit'
 import React from 'react'
 import { retireReviewStamp } from '@/lib/hub/replace-file'
+import { safeContent } from '@/lib/pdf/safe-text'
 
 export const maxDuration = 60
 
@@ -58,7 +59,10 @@ export async function POST(request: NextRequest) {
 
     // Route to generate_tool if action specified
     if (action === 'generate_tool') {
-      const { id, tool_type, tool_content } = body
+      const { id, tool_type } = body
+      // Strip characters Helvetica cannot draw before anything is rendered.
+      // Applied here so it covers every tool_type, including future ones.
+      const tool_content = safeContent(body.tool_content)
       if (!tool_type) return NextResponse.json({ error: 'tool_type is required (checklist | form | reference_card | toolkit)' }, { status: 400 })
       if (!tool_content) return NextResponse.json({ error: 'tool_content is required' }, { status: 400 })
 
@@ -139,7 +143,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Default: generate_pdf (guide)
-    const { id, sections } = body as { id: string; sections: QuickWinSections }
+    const { id } = body as { id: string }
+    const sections = safeContent((body as { sections: QuickWinSections }).sections)
 
     if (!sections) return NextResponse.json({ error: 'sections object is required' }, { status: 400 })
 
