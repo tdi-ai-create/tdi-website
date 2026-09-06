@@ -2,6 +2,7 @@ import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
 import { getQuizBySlug } from '@/lib/hub/quizConfigs'
 import { retireReviewStamp } from '@/lib/hub/replace-file'
+import { HUB_DAILY_CAP, todayCT, addDays, isWeekday, nextOpenSlot } from '@/lib/hub/release-schedule'
 
 // PDF upload via base64 can be slow
 export const maxDuration = 60
@@ -800,6 +801,137 @@ export async function POST(request: NextRequest) {
     // QA is a precondition. The item must have passed mark_reviewed first, or the
     // caller must supply an explicit override reason. Overrides are stored on the
     // row and reported by the daily health check so a bypass is never silent.
+    // ── schedule: take the next open slot instead of publishing now ──
+    //
+    // This is what Julie's publish step calls once the release valve is on. It
+    // runs the same preconditions publish does, deliberately: an item that
+    // cannot publish today cannot publish on Thursday either, and validating
+    // now means the daily job never inherits a doomed row that fails silently
+    // every morning forever.
+    if (action === 'schedule') {
+      const { id, scheduled_by, date } = body
+
+      if (!id) return NextResponse.json({ error: 'id is required' }, { status: 400 })
+
+      const { data: qw, error: fetchErr } = await supabase
+        .from('hub_quick_wins')
+        .select('*')
+        .eq('id', id)
+        .single()
+
+      if (fetchErr || !qw) return NextResponse.json({ error: 'Quick Win not found' }, { status: 404 })
+
+      if (qw.is_published) {
+        return NextResponse.json({ error: 'Quick Win is already published' }, { status: 400 })
+      }
+
+      if (qw.status !== 'reviewed') {
+        return NextResponse.json({
+          success: false,
+          error: `QA has not passed. Status is "${qw.status}", expected "reviewed". ` +
+                 `Call action mark_reviewed first.`,
+        }, { status: 400 })
+      }
+
+      const blockers = qaBlockers(qw as QuickWinRow)
+      if (blockers.length > 0) {
+        return NextResponse.json({ success: false, blockers }, { status: 400 })
+      }
+
+      // Slots open from tomorrow. Today's job has usually already run by the
+      // time anything is approved, so scheduling into today would look done and
+      // publish nothing until the following morning.
+      let slot: string
+      if (date) {
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+          return NextResponse.json({ error: 'date must be YYYY-MM-DD' }, { status: 400 })
+        }
+        if (!isWeekday(date)) {
+          return NextResponse.json({ error: `${date} is a weekend. Slots are weekdays only.` }, { status: 400 })
+        }
+        const { count, error: countErr } = await supabase
+          .from('hub_quick_wins')
+          .select('id', { count: 'exact', head: true })
+          .eq('scheduled_publish_date', date)
+        if (countErr) return NextResponse.json({ error: countErr.message }, { status: 500 })
+        if ((count ?? 0) >= HUB_DAILY_CAP) {
+          return NextResponse.json({
+            error: `${date} already holds ${count} items and the cap is ${HUB_DAILY_CAP}. Pick another day or move something off it.`,
+          }, { status: 409 })
+        }
+        slot = date
+      } else {
+        try {
+          slot = await nextOpenSlot(supabase, addDays(todayCT(), 1))
+        } catch (e) {
+          return NextResponse.json({ error: e instanceof Error ? e.message : 'Could not find a slot' }, { status: 500 })
+        }
+      }
+
+      const { error: schedErr } = await supabase
+        .from('hub_quick_wins')
+        .update({
+          scheduled_publish_date: slot,
+          scheduled_by: scheduled_by?.trim() || qw.reviewed_by || null,
+          scheduled_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', id)
+
+      if (schedErr) return NextResponse.json({ error: schedErr.message }, { status: 500 })
+
+      return NextResponse.json({
+        success: true,
+        id,
+        slug: qw.slug,
+        scheduled_publish_date: slot,
+        cap_per_day: HUB_DAILY_CAP,
+      })
+    }
+
+    // ── unschedule: pull something back off the calendar ──
+    //
+    // Scheduling separates the decision from the act by days, so there has to be
+    // a way to change your mind in between. Without this the only way to stop a
+    // scheduled item is to break it.
+    if (action === 'unschedule') {
+      const { id, reason } = body
+      if (!id) return NextResponse.json({ error: 'id is required' }, { status: 400 })
+
+      const { data: qw, error: fetchErr } = await supabase
+        .from('hub_quick_wins')
+        .select('id, slug, is_published, scheduled_publish_date')
+        .eq('id', id)
+        .single()
+
+      if (fetchErr || !qw) return NextResponse.json({ error: 'Quick Win not found' }, { status: 404 })
+      if (qw.is_published) {
+        return NextResponse.json({
+          error: 'Already published. Use action unpublish to take it down.',
+        }, { status: 400 })
+      }
+
+      const { error: clearErr } = await supabase
+        .from('hub_quick_wins')
+        .update({
+          scheduled_publish_date: null,
+          scheduled_by: null,
+          scheduled_at: null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', id)
+
+      if (clearErr) return NextResponse.json({ error: clearErr.message }, { status: 500 })
+
+      return NextResponse.json({
+        success: true,
+        id,
+        slug: qw.slug,
+        was_scheduled_for: qw.scheduled_publish_date,
+        reason: reason?.trim() || null,
+      })
+    }
+
     if (action === 'publish') {
       const { id, force, reason, published_by } = body
 
