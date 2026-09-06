@@ -422,6 +422,7 @@ function ActionItem({ action, onToggle, onCancel, onUpdateClientLabel, onNudge, 
   const [editingLabel, setEditingLabel] = useState(false)
   const [labelDraft, setLabelDraft] = useState(action.client_label || '')
   const [showNotes, setShowNotes] = useState(false)
+  const [showAnswer, setShowAnswer] = useState(false)
   const [notesDraft, setNotesDraft] = useState(action.notes || '')
   const [notesSaved, setNotesSaved] = useState(false)
 
@@ -431,6 +432,11 @@ function ActionItem({ action, onToggle, onCancel, onUpdateClientLabel, onNudge, 
   const colorState = action.color_state as string | null
   const escalationRung = action.escalation_rung as string | null
   const displayTitle = action.client_label || action.title
+  // Eight of thirteen open TDI tasks close only with a recorded answer, and
+  // nothing on the row said so. Bella had to tick the box and be refused to
+  // find out what the task wanted. requires_answer already arrives with the
+  // row, so the requirement can be stated before the attempt.
+  const needsAnswer = Boolean(action.requires_answer) && !isDone && !isCancelled
 
   const titleColor = isInactive
     ? '#9CA3AF'
@@ -460,8 +466,11 @@ function ActionItem({ action, onToggle, onCancel, onUpdateClientLabel, onNudge, 
 
       {/* Checkbox — toggles done/reopen */}
       <button
-        onClick={() => onToggle(action.id, action.status)}
-        title={isDone ? 'Reopen' : isCancelled ? 'Reopen' : 'Mark done'}
+        onClick={() => {
+          if (needsAnswer && !isInactive) { setShowAnswer(true); return }
+          onToggle(action.id, action.status)
+        }}
+        title={isDone ? 'Reopen' : isCancelled ? 'Reopen' : needsAnswer ? 'Record the answer to close this' : 'Mark done'}
         style={{
           width: 18, height: 18, borderRadius: 4, flexShrink: 0, marginTop: 1,
           border: isInactive ? 'none' : '2px solid #D1D5DB',
@@ -547,6 +556,32 @@ function ActionItem({ action, onToggle, onCancel, onUpdateClientLabel, onNudge, 
         {/* Description */}
         {action.description && !isCancelled && (
           <div style={{ fontSize: 12, color: '#6B7280', marginTop: 4, lineHeight: 1.5 }}>{action.description}</div>
+        )}
+
+        {/* What it takes to close this, stated before the attempt rather than after. */}
+        {needsAnswer && !blocked && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 6, flexWrap: 'wrap' }}>
+            <span style={{
+              fontSize: 11, fontWeight: 700, padding: '2px 7px', borderRadius: 4,
+              background: '#F5F3FF', color: '#6D28D9', letterSpacing: 0.2,
+            }}>
+              Needs an answer to close
+            </span>
+            <span style={{ fontSize: 11.5, color: '#6B7280' }}>
+              Record what you were told and what it means for this grant.
+            </span>
+            {!showAnswer && (
+              <button
+                onClick={() => setShowAnswer(true)}
+                style={{
+                  fontSize: 11.5, fontWeight: 600, padding: '3px 9px', borderRadius: 5,
+                  border: '1px solid #C4B5FD', background: 'white', color: '#6D28D9', cursor: 'pointer',
+                }}
+              >
+                Answer this
+              </button>
+            )}
+          </div>
         )}
 
         {/* Meta row */}
@@ -704,12 +739,22 @@ function ActionItem({ action, onToggle, onCancel, onUpdateClientLabel, onNudge, 
       </div>
     </div>
 
-    {/* The refusal, shown on the item it belongs to. */}
-    {blocked && (
-      <div style={{ margin: '6px 0 10px 40px', padding: 12, background: 'white', border: '1px solid #FCA5A5', borderRadius: 8 }}>
-        <div style={{ fontSize: 12.5, fontWeight: 600, color: '#991B1B', marginBottom: 9 }}>{blocked.message}</div>
+    {/* The same form, reached two ways: opened by the person before they try, or
+        put in front of them by the server when a close is refused. One
+        implementation, so the two cannot drift apart. */}
+    {(blocked || (needsAnswer && showAnswer)) && (
+      <div style={{
+        margin: '6px 0 10px 40px', padding: 12, background: 'white',
+        border: blocked ? '1px solid #FCA5A5' : '1px solid #C4B5FD', borderRadius: 8,
+      }}>
+        <div style={{
+          fontSize: 12.5, fontWeight: 600, marginBottom: 9,
+          color: blocked ? '#991B1B' : '#6D28D9',
+        }}>
+          {blocked ? blocked.message : 'Record what you were told, then say what it means for this grant.'}
+        </div>
 
-        {blocked.field === 'answer' && (
+        {(blocked ? blocked.field === 'answer' : true) && (
           <textarea
             value={d.answer}
             onChange={e => onDraft?.({ answer: e.target.value })}
@@ -720,7 +765,7 @@ function ActionItem({ action, onToggle, onCancel, onUpdateClientLabel, onNudge, 
         )}
 
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, marginBottom: 10 }}>
-          {(blocked.options || ['proceed', 'stop_path', 'still_blocked']).map(opt => (
+          {(blocked?.options || ['proceed', 'stop_path', 'still_blocked']).map(opt => (
             <button
               key={opt}
               onClick={() => onDraft?.({ outcome: opt })}
@@ -735,7 +780,7 @@ function ActionItem({ action, onToggle, onCancel, onUpdateClientLabel, onNudge, 
         </div>
 
         <button
-          onClick={() => onToggle(action.id, action.status, { answer: d.answer, outcome: d.outcome })}
+          onClick={() => { setShowAnswer(false); onToggle(action.id, action.status, { answer: d.answer, outcome: d.outcome }) }}
           disabled={!d.answer.trim() || !d.outcome}
           style={{
             fontSize: 12, fontWeight: 700, padding: '6px 12px', borderRadius: 6, border: 'none',
@@ -745,7 +790,14 @@ function ActionItem({ action, onToggle, onCancel, onUpdateClientLabel, onNudge, 
           }}
         >Record it and close</button>
 
-        {blocked.override && !d.showSkip && (
+        {!blocked && (
+          <button
+            onClick={() => setShowAnswer(false)}
+            style={{ fontSize: 11.5, background: 'none', border: 'none', color: '#6B7280', textDecoration: 'underline', cursor: 'pointer', padding: 0 }}
+          >Not yet</button>
+        )}
+
+        {blocked?.override && !d.showSkip && (
           <button
             onClick={() => onDraft?.({ showSkip: true })}
             style={{ fontSize: 11.5, background: 'none', border: 'none', color: '#6B7280', textDecoration: 'underline', cursor: 'pointer', padding: 0 }}
@@ -754,7 +806,7 @@ function ActionItem({ action, onToggle, onCancel, onUpdateClientLabel, onNudge, 
 
         {d.showSkip && (
           <div style={{ marginTop: 10, paddingTop: 10, borderTop: '1px solid #F3F4F6' }}>
-            <div style={{ fontSize: 11, color: '#6B7280', marginBottom: 5 }}>{blocked.override?.note}</div>
+            <div style={{ fontSize: 11, color: '#6B7280', marginBottom: 5 }}>{blocked?.override?.note}</div>
             <input
               value={d.skip}
               onChange={e => onDraft?.({ skip: e.target.value })}
