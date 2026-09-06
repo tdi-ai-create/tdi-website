@@ -1,7 +1,7 @@
 'use client';
 
 import { CreatorJourney } from '@/components/creator-portal/CreatorJourney';
-import type { Journey } from '@/lib/creator-journey';
+import type { Journey, JourneyStep } from '@/lib/creator-journey';
 
 /**
  * What the creator sees, shown to the admin.
@@ -23,9 +23,21 @@ import type { Journey } from '@/lib/creator-journey';
 export function CreatorMirror({
   journey,
   creatorName,
+  canEdit = false,
+  busyRecordId = null,
+  onApprove,
+  onRequestRevision,
+  onToggleComplete,
 }: {
   journey: Journey | null;
   creatorName: string;
+  /** False hides every control, so a read-only admin sees the rail alone. */
+  canEdit?: boolean;
+  /** The record currently being written, so its buttons can be disabled. */
+  busyRecordId?: string | null;
+  onApprove?: (recordId: string, stepName: string) => void;
+  onRequestRevision?: (recordId: string, stepName: string) => void;
+  onToggleComplete?: (recordId: string, stepName: string, rawStatus: string) => void;
 }) {
   if (!journey || journey.stages.length === 0) {
     return (
@@ -86,8 +98,94 @@ export function CreatorMirror({
         journey={journey}
         heading="Their journey"
         hereLabel="they are here"
+        renderStepControl={
+          canEdit
+            ? (step) => (
+                <StepControls
+                  step={step}
+                  busy={busyRecordId === step.recordId}
+                  onApprove={onApprove}
+                  onRequestRevision={onRequestRevision}
+                  onToggleComplete={onToggleComplete}
+                />
+              )
+            : undefined
+        }
       />
     </div>
+  );
+}
+
+/**
+ * The reviewer's controls, shown inline on the step they belong to.
+ *
+ * These used to live in a second flat list further down the page, which meant
+ * the same sixteen steps were drawn twice under two different sets of names.
+ * Approve and Request changes are reviewer actions, not the creator's own
+ * submit or upload, so putting them here does not let an admin act as the
+ * creator on their step.
+ */
+function StepControls({
+  step,
+  busy,
+  onApprove,
+  onRequestRevision,
+  onToggleComplete,
+}: {
+  step: JourneyStep;
+  busy: boolean;
+  onApprove?: (recordId: string, stepName: string) => void;
+  onRequestRevision?: (recordId: string, stepName: string) => void;
+  onToggleComplete?: (recordId: string, stepName: string, rawStatus: string) => void;
+}) {
+  const awaitingReview = step.rawStatus === 'waiting_approval';
+  const locked = step.rawStatus === 'locked';
+  const done = step.rawStatus === 'completed';
+
+  const base: React.CSSProperties = {
+    fontSize: 11,
+    fontWeight: 600,
+    padding: '2px 8px',
+    marginLeft: 7,
+    borderRadius: 5,
+    cursor: busy ? 'default' : 'pointer',
+    opacity: busy ? 0.5 : 1,
+    verticalAlign: 'middle',
+  };
+
+  return (
+    <span style={{ whiteSpace: 'nowrap' }}>
+      {awaitingReview && onApprove && (
+        <button
+          type="button"
+          disabled={busy}
+          onClick={() => onApprove(step.recordId, step.name)}
+          style={{ ...base, border: '1px solid #86efac', background: '#f0fdf4', color: '#166534' }}
+        >
+          Approve
+        </button>
+      )}
+      {awaitingReview && onRequestRevision && (
+        <button
+          type="button"
+          disabled={busy}
+          onClick={() => onRequestRevision(step.recordId, step.name)}
+          style={{ ...base, border: '1px solid #fcd34d', background: '#fffbeb', color: '#92400e' }}
+        >
+          Request changes
+        </button>
+      )}
+      {!awaitingReview && !locked && onToggleComplete && (
+        <button
+          type="button"
+          disabled={busy}
+          onClick={() => onToggleComplete(step.recordId, step.name, step.rawStatus)}
+          style={{ ...base, border: '1px solid #e5e7eb', background: '#fff', color: '#6b7280' }}
+        >
+          {done ? 'Reopen' : 'Mark complete'}
+        </button>
+      )}
+    </span>
   );
 }
 

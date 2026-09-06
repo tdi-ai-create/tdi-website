@@ -37,7 +37,12 @@ function markFor(step: JourneyStep): { glyph: string; color: string } {
   return step.ours ? { glyph: '▪', color: BLUE } : { glyph: '○', color: INK_3 };
 }
 
-function StageRow({ stage, expanded, onToggle }: { stage: JourneyStage; expanded: boolean; onToggle: () => void }) {
+function StageRow({ stage, expanded, onToggle, renderStepControl }: {
+  stage: JourneyStage;
+  expanded: boolean;
+  onToggle: () => void;
+  renderStepControl?: (step: JourneyStep) => React.ReactNode;
+}) {
   const allDone = stage.done === stage.total;
   const glyph = stage.current ? '●' : allDone ? '✓' : '○';
   const glyphColor = stage.current ? YELLOW : allDone ? PASS : INK_3;
@@ -92,6 +97,7 @@ function StageRow({ stage, expanded, onToggle }: { stage: JourneyStage; expanded
                       round {s.round} of 2
                     </span>
                   )}
+                  {renderStepControl?.(s)}
                 </span>
               </div>
             );
@@ -117,10 +123,18 @@ export function CreatorJourney({
    * reads their own rail and wrong when an admin reads someone else's.
    */
   hereLabel = 'you are here',
+  /**
+   * Optional per-step controls. The creator portal passes nothing, so their rail
+   * is unchanged. The admin mirror passes approve, request changes and mark
+   * complete, which are reviewer controls rather than the creator's own submit
+   * and upload, so an admin still cannot act as the creator on their step.
+   */
+  renderStepControl,
 }: {
   journey: Journey;
   heading?: string;
   hereLabel?: string;
+  renderStepControl?: (step: JourneyStep) => React.ReactNode;
 }) {
   const currentKey = journey.stages.find((s) => s.current)?.key ?? null;
   const [openKeys, setOpenKeys] = useState<Set<string>>(new Set(currentKey ? [currentKey] : []));
@@ -155,6 +169,7 @@ export function CreatorJourney({
             stage={stage}
             expanded={openKeys.has(stage.key)}
             onToggle={() => toggle(stage.key)}
+            renderStepControl={renderStepControl}
           />
         ))}
 
