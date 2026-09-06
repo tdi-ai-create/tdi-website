@@ -1,10 +1,12 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 
 const NAVY = '#1e2749';
 const YELLOW = '#ffba06';
 const LIGHT_BLUE = '#E8F0FD';
+const BLUE = '#80a4ed';
 
 const MOVES = [
   {
@@ -229,6 +231,57 @@ export default function BrccPageClient() {
         </div>
       </section>
 
+      {/* The gap. Navy band, because the brand yellow only clears 3:1 contrast
+          on a dark surface. Both bars carry direct labels, so identity never
+          depends on colour alone. */}
+      <section style={{ backgroundColor: NAVY }} className="py-14 text-white">
+        <div className="max-w-3xl mx-auto px-6">
+          <p className="font-mono text-[11px] uppercase tracking-[0.15em] mb-3" style={{ color: YELLOW }}>
+            Why the five moves and not better content
+          </p>
+          <h2 className="font-serif text-3xl font-semibold mb-4 text-white">
+            How much training actually reaches a classroom
+          </h2>
+          <p className="text-[16px] leading-relaxed text-[#C9CFDE] mb-9 max-w-2xl">
+            Teach somebody a skill in a workshop, then go and measure whether it shows up in
+            their practice. Almost none of it does. Add sustained coaching in the real
+            setting and almost all of it does.
+          </p>
+
+          <div className="space-y-7">
+            <div>
+              <div className="flex items-baseline justify-between mb-2 gap-4">
+                <span className="text-[15px] text-white">Training alone</span>
+                <span className="font-mono text-[20px] font-bold" style={{ color: LIGHT_BLUE }}>
+                  5 to 10%
+                </span>
+              </div>
+              <div className="h-3 rounded-sm" style={{ backgroundColor: 'rgba(255,255,255,0.08)' }}>
+                <div className="h-3 rounded-sm" style={{ width: '8%', backgroundColor: BLUE }} />
+              </div>
+            </div>
+
+            <div>
+              <div className="flex items-baseline justify-between mb-2 gap-4">
+                <span className="text-[15px] text-white">Training plus sustained coaching</span>
+                <span className="font-mono text-[20px] font-bold" style={{ color: YELLOW }}>
+                  Above 90%
+                </span>
+              </div>
+              <div className="h-3 rounded-sm" style={{ backgroundColor: 'rgba(255,255,255,0.08)' }}>
+                <div className="h-3 rounded-sm" style={{ width: '92%', backgroundColor: YELLOW }} />
+              </div>
+            </div>
+          </div>
+
+          <p className="text-[13px] text-[#8892AC] mt-8 pt-4 border-t border-[#38446A]">
+            Joyce, B. and Showers, B. <em>Student Achievement Through Staff Development.</em>{' '}
+            Replicated since the early 1980s. The gap is not about content, budget or the
+            speaker. It is about what happens in the two weeks after.
+          </p>
+        </div>
+      </section>
+
       {/* Five moves */}
       <section className="py-14">
         <div className="max-w-3xl mx-auto px-6">
@@ -306,9 +359,46 @@ export default function BrccPageClient() {
             ))}
           </div>
 
+          {/* 13 of 20, as countable units. Each square carries a navy hairline so
+              the shape reads on a light surface regardless of fill contrast. */}
+          <div className="mt-7 bg-white border border-[#E0E0DA] rounded-md p-6">
+            <div className="sm:flex sm:items-center sm:gap-7">
+              <div className="flex-none mb-4 sm:mb-0">
+                <span className="font-serif text-5xl font-semibold leading-none" style={{ color: NAVY }}>
+                  13
+                </span>
+                <span className="font-serif text-2xl" style={{ color: NAVY, opacity: 0.5 }}>
+                  {' '}of 20
+                </span>
+              </div>
+              <div>
+                <div className="flex flex-wrap gap-1.5 mb-3" role="img" aria-label="Thirteen of the twenty most used tools are built for paraprofessionals and support staff">
+                  {Array.from({ length: 20 }).map((_, i) => (
+                    <span
+                      key={i}
+                      className="w-5 h-5 rounded-sm"
+                      style={{
+                        backgroundColor: i < 13 ? YELLOW : LIGHT_BLUE,
+                        border: `1px solid ${NAVY}22`,
+                      }}
+                    />
+                  ))}
+                </div>
+                <p className="text-[14.5px] text-[#3E4148]">
+                  of the most used tools are built for{' '}
+                  <b style={{ color: NAVY }}>paraprofessionals and support staff</b>. That is
+                  not curation. It is what the usage data says.
+                </p>
+              </div>
+            </div>
+          </div>
+
           <p className="text-[13px] text-[#6B7079] mt-4">
-            Thirteen of the twenty are built for paraprofessionals and support staff. That is
-            not curation, it is what the usage data says.
+            <a href="/hub" className="underline underline-offset-4" style={{ color: NAVY }}>
+              Browse the library
+            </a>
+            . Opening a tool needs a Hub account, so the four page handout above stays the
+            version with nothing in the way.
           </p>
 
           <h3 className="font-serif text-2xl font-semibold mt-10 mb-2" style={{ color: NAVY }}>
@@ -352,19 +442,55 @@ export default function BrccPageClient() {
         </div>
       </section>
 
-      <footer style={{ backgroundColor: NAVY }} className="text-[#98A1B7] py-12">
+      {/* Who this came from */}
+      <section className="pb-16">
         <div className="max-w-3xl mx-auto px-6">
-          <p className="font-serif text-xl text-white mb-3">Thank you for being there.</p>
-          <p className="text-[15px] mb-2">
-            Questions, or want to talk about what this looks like in your building?
-          </p>
-          <p>
-            <a href="mailto:hello@teachersdeserveit.com" className="text-white underline underline-offset-4">
-              hello@teachersdeserveit.com
-            </a>
-          </p>
+          <div className="bg-white border border-[#E0E0DA] rounded-md p-6 sm:flex sm:gap-6 sm:items-start">
+            <Image
+              src="/team/rae-hughart.jpg"
+              alt="Rae Hughart"
+              width={96}
+              height={96}
+              className="rounded-full object-cover w-20 h-20 flex-none mb-4 sm:mb-0"
+            />
+            <div className="min-w-0">
+              <h3 className="font-serif text-xl font-semibold mb-1" style={{ color: NAVY }}>
+                Rae Hughart
+              </h3>
+              <p className="font-mono text-[11px] uppercase tracking-[0.12em] mb-3" style={{ color: NAVY, opacity: 0.55 }}>
+                Founder, Teachers Deserve It
+              </p>
+              <p className="text-[15px] mb-4">
+                Rae grew up on an IEP, and the people who got her through were a special
+                education teacher and a series of paraprofessionals. Nobody had trained
+                them to do the part that mattered most. That is why she spends her time on
+                the adults standing closest to the kids.
+              </p>
+              <div className="flex flex-wrap gap-x-5 gap-y-2 text-[14px]">
+                <a href="https://www.linkedin.com/in/rae-hughart/" target="_blank" rel="noopener noreferrer" className="underline underline-offset-4" style={{ color: NAVY }}>
+                  LinkedIn
+                </a>
+                <a href="https://www.instagram.com/raehughart/" target="_blank" rel="noopener noreferrer" className="underline underline-offset-4" style={{ color: NAVY }}>
+                  Instagram
+                </a>
+                <a href="https://raehughart.substack.com" target="_blank" rel="noopener noreferrer" className="underline underline-offset-4" style={{ color: NAVY }}>
+                  Read the newsletter
+                </a>
+                <a href="/about" className="underline underline-offset-4" style={{ color: NAVY }}>
+                  Meet the rest of the team
+                </a>
+              </div>
+              <p className="text-[14px] text-[#6B7079] mt-4">
+                Questions, or want to talk about what this looks like in your building?{' '}
+                <a href="mailto:hello@teachersdeserveit.com" className="underline underline-offset-4" style={{ color: NAVY }}>
+                  hello@teachersdeserveit.com
+                </a>
+              </p>
+            </div>
+          </div>
         </div>
-      </footer>
+      </section>
+
     </main>
   );
 }
