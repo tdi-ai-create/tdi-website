@@ -122,6 +122,7 @@ export async function POST(request: NextRequest) {
       contact_name,
       contact_email,
       contract_phase,
+      offering,
       contract_start,
       contract_end,
       building_count,
@@ -152,6 +153,9 @@ export async function POST(request: NextRequest) {
         contact_name,
         contact_email,
         contract_phase,
+        // Null when not chosen. The CHECK constraint rejects anything that is
+        // neither null nor one of the four, so junk cannot reach the table.
+        offering: offering || null,
         contract_start: contract_start || null,
         contract_end: contract_end || null,
         building_count: building_count || 1,
@@ -172,13 +176,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Log activity
-    await supabase.from('activity_log').insert({
+    // Log activity. The partnership itself is already created, so a failed log
+    // entry must not fail the request, but it must not vanish either.
+    const { error: logError } = await supabase.from('activity_log').insert({
       partnership_id: partnership.id,
       user_id: null,
       action: 'invite_generated',
       details: { created_by: email },
     });
+
+    if (logError) {
+      console.error('[admin/partnerships] activity_log insert failed:', logError.message);
+    }
 
     return NextResponse.json({
       success: true,
