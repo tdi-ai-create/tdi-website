@@ -2,7 +2,7 @@
 import React from 'react'
 import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer'
 import { categoryColor, NAVY } from '@/lib/hub/categoryColors'
-import { w, AlertBlock, SayBlock, SmallPrint, SectionHeading, type Alert, type SmallPrintBlock } from './weights'
+import { w, AlertBlock, SayBlock, SmallPrint, SectionHeading, resolveWeights, type Alert, type SmallPrintBlock, type WeightedItem } from './weights'
 
 const navy = '#1E2749'
 const gold = '#E8B84B'
@@ -53,14 +53,11 @@ export interface ReferenceData {
   alert?: Alert
   sections: {
     heading?: string
-    items: {
-      /** Weight 2. Short and imperative: this is what a reader scans. */
-      label?: string
-      /** Weight 3. The sourced reasoning behind the instruction above. */
-      text: string
-      /** Weight 4. Words the educator says aloud. */
-      say?: string
-    }[]
+    /**
+     * Prefer the canonical `do` and `why`. `label` and `text` are the original
+     * names for the same two weights and still work.
+     */
+    items: (WeightedItem & { label?: string; text?: string })[]
     highlight?: { label: string; text: string }
     tip?: string
   }[]
@@ -95,24 +92,27 @@ export function ReferencePDF({ data }: { data: ReferenceData }) {
           {data.sections.map((section, si) => (
             <View key={si}>
               <SectionHeading heading={section.heading} />
-              {section.items.map((item, ii) => (
-                <View key={ii} wrap={false}>
-                  <View style={s.itemRow}>
-                    <Text style={s.itemBullet}>{'\u2022'}</Text>
-                    <View style={s.itemCol}>
-                      {item.label ? (
-                        <>
-                          <Text style={w.do}>{item.label}</Text>
-                          <Text style={w.why}>{item.text}</Text>
-                        </>
-                      ) : (
-                        <Text style={w.solo}>{item.text}</Text>
-                      )}
+              {section.items.map((rawItem, ii) => {
+                const { doText, whyText, say } = resolveWeights(rawItem, 'label', 'text')
+                return (
+                  <View key={ii} wrap={false}>
+                    <View style={s.itemRow}>
+                      <Text style={s.itemBullet}>{'\u2022'}</Text>
+                      <View style={s.itemCol}>
+                        {doText && whyText ? (
+                          <>
+                            <Text style={w.do}>{doText}</Text>
+                            <Text style={w.why}>{whyText}</Text>
+                          </>
+                        ) : (
+                          <Text style={w.solo}>{doText || whyText}</Text>
+                        )}
+                      </View>
                     </View>
+                    <SayBlock say={say} />
                   </View>
-                  <SayBlock say={item.say} />
-                </View>
-              ))}
+                )
+              })}
               {section.highlight ? (
                 <View style={s.highlightBox} wrap={false}>
                   <Text style={s.highlightLabel}>{section.highlight.label}</Text>

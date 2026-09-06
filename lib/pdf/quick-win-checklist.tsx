@@ -2,7 +2,7 @@
 import React from 'react'
 import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer'
 import { categoryColor, NAVY } from '@/lib/hub/categoryColors'
-import { w, AlertBlock, SayBlock, SmallPrint, SectionHeading, type Alert, type SmallPrintBlock } from './weights'
+import { w, AlertBlock, SayBlock, SmallPrint, SectionHeading, resolveWeights, type Alert, type SmallPrintBlock, type WeightedItem } from './weights'
 
 const navy = '#1E2749'
 const gold = '#E8B84B'
@@ -47,7 +47,7 @@ export interface ChecklistData {
      * checklist passes. The object form splits weight 2 from weight 3 so the
      * reasoning can sit under the instruction instead of inside it.
      */
-    items: (string | { text: string; detail?: string; say?: string })[]
+    items: (string | (WeightedItem & { text?: string; detail?: string }))[]
   }[]
   /** Weight 5. Scope notes and citations. */
   small_print?: SmallPrintBlock[]
@@ -73,23 +73,24 @@ export function ChecklistPDF({ data }: { data: ChecklistData }) {
             <View key={si}>
               <SectionHeading heading={section.heading} />
               {section.items.map((rawItem, ii) => {
-                const item = typeof rawItem === 'string' ? { text: rawItem } : rawItem
+                const item = typeof rawItem === 'string' ? { do: rawItem } : rawItem
+                const { doText, whyText, say } = resolveWeights(item, 'text', 'detail')
                 return (
                   <View key={ii} wrap={false}>
                     <View style={s.checkRow}>
                       <View style={s.checkbox} />
                       <View style={s.checkCol}>
-                        {item.detail ? (
+                        {doText && whyText ? (
                           <>
-                            <Text style={w.do}>{item.text}</Text>
-                            <Text style={w.why}>{item.detail}</Text>
+                            <Text style={w.do}>{doText}</Text>
+                            <Text style={w.why}>{whyText}</Text>
                           </>
                         ) : (
-                          <Text style={w.solo}>{item.text}</Text>
+                          <Text style={w.solo}>{doText || whyText}</Text>
                         )}
                       </View>
                     </View>
-                    <SayBlock say={item.say} />
+                    <SayBlock say={say} />
                   </View>
                 )
               })}
