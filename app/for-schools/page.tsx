@@ -126,6 +126,7 @@ export default function ForSchoolsPage() {
             <p className="fs-kicker">Four ways to get there</p>
             <h2>Pick the one that matches the problem you would name first.</h2>
             <p className="fs-lede">Each one stands alone. A school with a culture problem and a school losing new teachers need different things, and neither has to buy the other first. Every card below is written as what a leader can say by March.</p>
+            <p className="fs-priceline">Partnerships <b>start at 2.5k</b>.</p>
           </div>
           <div className="fs-offer-grid">
 
