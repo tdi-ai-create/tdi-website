@@ -24,6 +24,13 @@ export interface JourneyStep {
   /** True when TDI does this, not the creator. Shown, never hidden. */
   ours: boolean;
   status: 'complete' | 'open' | 'in_review' | 'changes_requested' | 'todo';
+  /**
+   * The untouched creator_milestones.status. The display status above is lossy
+   * on purpose: it folds waiting_approval and under_review into one word for
+   * the creator. The admin controls branch on the real value, so it is carried
+   * rather than reconstructed.
+   */
+  rawStatus: string;
   dueOn: string | null;
   /** Feedback rounds used. Surfaced so a creator can see revision ends. */
   round: number;
@@ -129,6 +136,7 @@ export async function getJourney(supabase: DbClient, projectId: string): Promise
           name: first.milestones.name,
           ours: Boolean(first.milestones.requires_team_action),
           status: displayStatus(first),
+          rawStatus: first.status,
           dueOn: first.due_on ?? null,
           round: first.round ?? 0,
           extensions: first.extension_count ?? 0,
@@ -176,6 +184,7 @@ export async function getJourney(supabase: DbClient, projectId: string): Promise
     name: r.milestones.name,
     ours: Boolean(r.milestones.requires_team_action),
     status: displayStatus(r as { status: string; review_status: string | null }),
+    rawStatus: r.status,
     dueOn: r.due_on ?? null,
     round: r.round ?? 0,
     extensions: r.extension_count ?? 0,
@@ -195,6 +204,7 @@ export async function getJourney(supabase: DbClient, projectId: string): Promise
     name: s.name,
     ours: s.ours,
     status: s.status,
+    rawStatus: s.rawStatus,
     dueOn: s.dueOn,
     round: s.round,
     extensions: s.extensions,
