@@ -79,7 +79,10 @@ jobs:
             exit 1
           fi
 
-          changed_ts=$(git diff --name-only origin/main...HEAD | grep -cE '^(app|lib|components|scripts)/.*\.(ts|tsx)$' || true)
+          # --diff-filter=d excludes deletions. A PR that only removes files
+          # legitimately leaves check:writes with nothing to inspect, and
+          # without this the guard failed every pure deletion.
+          changed_ts=$(git diff --name-only --diff-filter=d origin/main...HEAD | grep -cE '^(app|lib|components|scripts)/.*\.(ts|tsx)$' || true)
           if [ "$changed_ts" -gt 0 ] && grep -q "Nothing to check" /tmp/writes.log; then
             echo "::error::This PR changed $changed_ts TypeScript files but check:writes examined none of them."
             exit 1
