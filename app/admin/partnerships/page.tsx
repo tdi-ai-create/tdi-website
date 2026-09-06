@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { OFFERINGS, OFFERING_LABELS, OFFERING_COLORS, offeringLabel, isOffering } from '@/lib/partnerships/offerings';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -35,6 +36,7 @@ interface Partnership {
   contact_name: string;
   contact_email: string;
   contract_phase: 'IGNITE' | 'ACCELERATE' | 'SUSTAIN';
+  offering: 'PULSE' | 'FOCUS' | 'COHORT' | 'BLUEPRINT' | null;
   contract_start: string | null;
   contract_end: string | null;
   building_count: number;
@@ -128,6 +130,7 @@ export default function AdminPartnershipsPage() {
   const [filterType, setFilterType] = useState<string>('all');
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [filterPhase, setFilterPhase] = useState<string>('all');
+  const [filterOffering, setFilterOffering] = useState<string>('all');
   const [showFilters, setShowFilters] = useState(false);
 
   const [newPartnership, setNewPartnership] = useState({
@@ -135,6 +138,7 @@ export default function AdminPartnershipsPage() {
     contact_name: '',
     contact_email: '',
     contract_phase: 'IGNITE' as 'IGNITE' | 'ACCELERATE' | 'SUSTAIN',
+    offering: '' as '' | 'PULSE' | 'FOCUS' | 'COHORT' | 'BLUEPRINT',
     contract_start: '',
     contract_end: '',
     building_count: 1,
@@ -234,8 +238,15 @@ export default function AdminPartnershipsPage() {
       filtered = filtered.filter((p) => p.contract_phase === filterPhase);
     }
 
+    if (filterOffering !== 'all') {
+      // 'none' finds the partnerships nobody has recorded an offering for yet
+      filtered = filtered.filter((p) =>
+        filterOffering === 'none' ? !p.offering : p.offering === filterOffering
+      );
+    }
+
     setFilteredPartnerships(filtered);
-  }, [searchQuery, partnerships, filterType, filterStatus, filterPhase]);
+  }, [searchQuery, partnerships, filterType, filterStatus, filterPhase, filterOffering]);
 
   const handleAddPartnership = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -267,6 +278,7 @@ export default function AdminPartnershipsPage() {
           contact_name: '',
           contact_email: '',
           contract_phase: 'IGNITE',
+          offering: '',
           contract_start: '',
           contract_end: '',
           building_count: 1,
@@ -388,7 +400,8 @@ export default function AdminPartnershipsPage() {
   const activeFiltersCount =
     (filterType !== 'all' ? 1 : 0) +
     (filterStatus !== 'all' ? 1 : 0) +
-    (filterPhase !== 'all' ? 1 : 0);
+    (filterPhase !== 'all' ? 1 : 0) +
+    (filterOffering !== 'all' ? 1 : 0);
 
   // Access Denied state (logged in but not TDI email)
   if (accessDenied) {
@@ -662,12 +675,29 @@ export default function AdminPartnershipsPage() {
                     <option value="SUSTAIN">SUSTAIN</option>
                   </select>
                 </div>
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">Offering</label>
+                  <select
+                    value={filterOffering}
+                    onChange={(e) => setFilterOffering(e.target.value)}
+                    className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-[#80a4ed] focus:border-transparent outline-none"
+                  >
+                    <option value="all">All Offerings</option>
+                    {OFFERINGS.map((o) => (
+                      <option key={o} value={o}>
+                        {OFFERING_LABELS[o]}
+                      </option>
+                    ))}
+                    <option value="none">Not recorded</option>
+                  </select>
+                </div>
                 {activeFiltersCount > 0 && (
                   <button
                     onClick={() => {
                       setFilterType('all');
                       setFilterStatus('all');
                       setFilterPhase('all');
+                      setFilterOffering('all');
                     }}
                     className="self-end px-3 py-2 text-sm text-gray-500 hover:text-gray-700"
                   >
@@ -692,6 +722,9 @@ export default function AdminPartnershipsPage() {
                   <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3 hidden lg:table-cell">
                     Phase
                   </th>
+                  <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3 hidden lg:table-cell">
+                    Offering
+                  </th>
                   <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3">
                     Status
                   </th>
@@ -709,7 +742,7 @@ export default function AdminPartnershipsPage() {
               <tbody className="divide-y divide-gray-50">
                 {filteredPartnerships.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="px-4 py-8 text-center text-gray-500">
+                    <td colSpan={8} className="px-4 py-8 text-center text-gray-500">
                       {searchQuery || activeFiltersCount > 0
                         ? 'No partnerships found matching your criteria.'
                         : 'No partnerships yet. Create your first partnership to get started.'}
@@ -760,6 +793,17 @@ export default function AdminPartnershipsPage() {
                           phaseColors[partnership.contract_phase]
                         }`}>
                           {partnership.contract_phase}
+                        </span>
+                      </td>
+
+                      {/* Offering */}
+                      <td className="px-4 py-3 hidden lg:table-cell">
+                        <span className={`inline-flex text-xs px-2 py-1 rounded-full font-medium ${
+                          isOffering(partnership.offering)
+                            ? OFFERING_COLORS[partnership.offering]
+                            : 'bg-gray-100 text-gray-500'
+                        }`}>
+                          {offeringLabel(partnership.offering)}
                         </span>
                       </td>
 
@@ -990,6 +1034,37 @@ export default function AdminPartnershipsPage() {
                     </button>
                   ))}
                 </div>
+              </div>
+
+              {/* Offering. Optional on purpose: better blank than guessed. */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Offering
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  {OFFERINGS.map((o) => (
+                    <button
+                      key={o}
+                      type="button"
+                      onClick={() =>
+                        setNewPartnership({
+                          ...newPartnership,
+                          offering: newPartnership.offering === o ? '' : o,
+                        })
+                      }
+                      className={`px-3 py-2 rounded-lg border text-sm font-medium transition-colors ${
+                        newPartnership.offering === o
+                          ? `${OFFERING_COLORS[o]} border-transparent`
+                          : 'border-gray-200 text-gray-700 hover:border-gray-300'
+                      }`}
+                    >
+                      {OFFERING_LABELS[o]}
+                    </button>
+                  ))}
+                </div>
+                <p className="text-xs text-gray-500 mt-1">
+                  Which of the four they bought. Leave blank if you are not sure, and click again to clear.
+                </p>
               </div>
 
               {/* Contract Dates */}
