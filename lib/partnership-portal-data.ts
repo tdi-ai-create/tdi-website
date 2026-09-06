@@ -9,6 +9,8 @@ export interface Partnership {
   contact_name: string;
   contact_email: string;
   contract_phase: 'IGNITE' | 'ACCELERATE' | 'SUSTAIN';
+  /** Which of the four offerings was bought. Null means not recorded yet. */
+  offering: 'PULSE' | 'FOCUS' | 'COHORT' | 'BLUEPRINT' | null;
   contract_start: string | null;
   contract_end: string | null;
   building_count: number;

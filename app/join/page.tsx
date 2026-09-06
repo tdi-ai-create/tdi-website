@@ -483,7 +483,7 @@ export default function JoinPage() {
             </a>
 
             <a
-              href="/contact"
+              href="/for-schools#offerings"
               style={{ display: 'block', padding: 28, background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 12, textDecoration: 'none', transition: 'background-color 0.2s, border-color 0.2s, transform 0.2s' }}
               onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)'; e.currentTarget.style.borderColor = 'rgba(255,186,6,0.5)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
               onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.06)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; e.currentTarget.style.transform = 'translateY(0)'; }}
@@ -495,10 +495,10 @@ export default function JoinPage() {
                 See the partnership models
               </h3>
               <p style={{ fontSize: 15, color: '#cbd5e1', margin: '0 0 16px 0', lineHeight: 1.5 }}>
-                Ignite, Accelerate, Sustain. Three phases that meet your school where it is and grow from there.
+                The Pulse, The Focus, The Cohort and The Blueprint. Four ways to work with us, and each one stands alone.
               </p>
               <span style={{ fontSize: 15, fontWeight: 600, color: '#ffba06' }}>
-                Get in touch →
+                See the four →
               </span>
             </a>
 

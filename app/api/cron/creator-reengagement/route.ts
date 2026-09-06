@@ -572,7 +572,7 @@ async function sendEmail(
       body: JSON.stringify({
         from: EMAIL_FROM,
         to: [to],
-        bcc: ['bella@teachersdeserveit.com', 'rae@teachersdeserveit.com'],
+        bcc: ['bella@teachersdeserveit.com'],
         subject,
         html,
         reply_to: REPLY_TO,

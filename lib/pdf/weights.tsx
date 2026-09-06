@@ -120,3 +120,54 @@ export function SectionHeading({ heading }: { heading?: string }) {
     </Text>
   )
 }
+
+/**
+ * One item shape for every tool type.
+ *
+ * The three generators grew three different names for the same two weights:
+ * reference used label/text, checklist used text/detail, toolkit used
+ * title/body. Nothing was tagged, so which field you chose silently decided the
+ * weight. On 2026-09-06 an agent tested both `weight:` and `type:` tags, got
+ * flat output from each because neither exists, and reasonably concluded the
+ * generators had no weight support at all. The rebuild queue sat for four days.
+ *
+ * `do` and `why` are now accepted everywhere and mean the same thing everywhere.
+ * The old names still work, so nothing already written has to change.
+ */
+export interface WeightedItem {
+  /** Weight 2. Short, imperative, the line a reader scans. */
+  do?: string
+  /** Weight 3. The reasoning underneath it. */
+  why?: string
+  /** Weight 4. Words the educator speaks aloud. */
+  say?: string
+}
+
+/**
+ * Resolve an item to its two weights, whichever names the caller used.
+ *
+ * @param item      the raw item, in canonical or legacy form
+ * @param legacyDo  this generator's historical weight-2 field name
+ * @param legacyWhy this generator's historical weight-3 field name
+ */
+export function resolveWeights(
+  // `object` rather than a mapped type, because callers pass narrow literal
+  // shapes that TypeScript will not widen to an index signature on their own.
+  item: object,
+  legacyDo: string,
+  legacyWhy: string,
+): { doText?: string; whyText?: string; say?: string } {
+  const bag = item as Record<string, unknown>
+  const pick = (...keys: string[]) => {
+    for (const k of keys) {
+      const v = bag[k]
+      if (typeof v === 'string' && v.trim()) return v
+    }
+    return undefined
+  }
+  return {
+    doText: pick('do', legacyDo),
+    whyText: pick('why', legacyWhy),
+    say: pick('say'),
+  }
+}

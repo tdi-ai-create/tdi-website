@@ -22,6 +22,7 @@ import {
   TYPE_SMALL,
 } from '@/components/tdi-admin/ui/design-tokens'
 import { HorizontalBarChart, DonutChart, DonutLegend, LiveSectionHeader } from '@/components/tdi-admin/hub-charts/HubCharts'
+import { OFFERINGS, OFFERING_LABELS, OFFERING_HINTS, offeringLabel } from '@/lib/partnerships/offerings'
 
 type ViewMode = 'kanban' | 'list'
 type PageTab = 'pipeline' | 'outreach' | 'analytics' | 'contracts' | 'hub-leads' | 'trash' | 'invoices' | 'coaching'
@@ -42,7 +43,7 @@ interface QuoteRow {
   expires_at: string | null
   created_at: string
   po_number: string | null
-  quote_packages: { total_amount: number; package_name: string }[]
+  quote_packages: { total_amount: number; package_name: string; offering?: string | null }[]
 }
 
 interface QuoteLineItem {
@@ -64,6 +65,7 @@ interface QuoteFormData {
   service_end_date: string
   payment_instructions: string
   package_name: string
+  offering: '' | 'PULSE' | 'FOCUS' | 'COHORT' | 'BLUEPRINT'
   line_items: QuoteLineItem[]
 }
 
@@ -289,7 +291,7 @@ export default function SalesPage() {
     title: '', contact_name: '', contact_email: '', contact_organization: '',
     intro_message: '', service_start_date: '2026-08-15', service_end_date: '2027-06-30',
     payment_instructions: 'NO PAYMENT DUE UNLESS GRANT IS AWARDED.\nIf grant funding is secured, TDI will invoice the funding source directly or coordinate payment through the district as appropriate.\nClient owes nothing out of pocket.',
-    package_name: 'Grant-Funded Services', line_items: [{ label: '', quantity: 1, unit_price: 0, total: 0, is_complimentary: false }],
+    package_name: 'Grant-Funded Services', offering: '', line_items: [{ label: '', quantity: 1, unit_price: 0, total: 0, is_complimentary: false }],
   })
   const [savingContract, setSavingContract] = useState(false)
 
@@ -297,7 +299,7 @@ export default function SalesPage() {
     setQuotesLoading(true)
     const { data } = await supabase
       .from('quotes')
-      .select('id, quote_number, title, contact_name, contact_email, contact_organization, status, sent_at, viewed_at, view_count, signed_by_name, signed_at, expires_at, created_at, po_number, quote_packages(total_amount, package_name)')
+      .select('id, quote_number, title, contact_name, contact_email, contact_organization, status, sent_at, viewed_at, view_count, signed_by_name, signed_at, expires_at, created_at, po_number, quote_packages(total_amount, package_name, offering)')
       .order('created_at', { ascending: false })
     setQuotes((data as QuoteRow[]) || [])
     setQuotesLoading(false)
@@ -331,6 +333,7 @@ export default function SalesPage() {
           quote_id: contractForm.id,
           package_index: 0,
           package_name: contractForm.package_name,
+          offering: contractForm.offering || null,
           total_amount: total,
           is_recommended: true,
           line_items: contractForm.line_items,
@@ -377,6 +380,7 @@ export default function SalesPage() {
           quote_id: quote.id,
           package_index: 0,
           package_name: contractForm.package_name,
+          offering: contractForm.offering || null,
           total_amount: total,
           is_recommended: true,
           line_items: contractForm.line_items,
@@ -414,12 +418,13 @@ export default function SalesPage() {
       service_end_date: '2027-06-30',
       payment_instructions: '',
       package_name: pkg?.package_name || 'Grant-Funded Services',
+      offering: (pkg?.offering as QuoteFormData['offering']) || '',
       line_items: [{ label: '', quantity: 1, unit_price: 0, total: 0, is_complimentary: false }],
     })
     // Load full quote + package data including line_items
     Promise.all([
       supabase.from('quotes').select('intro_message, payment_instructions, service_start_date, service_end_date').eq('id', q.id).single(),
-      supabase.from('quote_packages').select('package_name, line_items, total_amount').eq('quote_id', q.id).order('package_index').limit(1).single(),
+      supabase.from('quote_packages').select('package_name, line_items, total_amount, offering').eq('quote_id', q.id).order('package_index').limit(1).single(),
     ]).then(([{ data: quoteData }, { data: pkgData }]) => {
       setContractForm(prev => ({
         ...prev,
@@ -428,6 +433,7 @@ export default function SalesPage() {
         service_start_date: quoteData?.service_start_date || '2026-08-15',
         service_end_date: quoteData?.service_end_date || '2027-06-30',
         package_name: pkgData?.package_name || prev.package_name,
+        offering: (pkgData?.offering as QuoteFormData['offering']) ?? prev.offering,
         line_items: (pkgData?.line_items as QuoteLineItem[] | null)?.length
           ? (pkgData!.line_items as QuoteLineItem[])
           : [{ label: '', quantity: 1, unit_price: 0, total: 0, is_complimentary: false }],
@@ -441,7 +447,7 @@ export default function SalesPage() {
       title: '', contact_name: '', contact_email: '', contact_organization: '',
       intro_message: '', service_start_date: '2026-08-15', service_end_date: '2027-06-30',
       payment_instructions: 'NO PAYMENT DUE UNLESS GRANT IS AWARDED.\nIf grant funding is secured, TDI will invoice the funding source directly or coordinate payment through the district as appropriate.\nClient owes nothing out of pocket.',
-      package_name: 'Grant-Funded Services', line_items: [{ label: '', quantity: 1, unit_price: 0, total: 0, is_complimentary: false }],
+      package_name: 'Grant-Funded Services', offering: '', line_items: [{ label: '', quantity: 1, unit_price: 0, total: 0, is_complimentary: false }],
     })
     setContractModalOpen(true)
   }
@@ -1620,6 +1626,17 @@ export default function SalesPage() {
                           {q.contact_email && <span> · {q.contact_email}</span>}
                         </div>
                         <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 4 }}>
+                          <span style={{
+                            display: 'inline-block',
+                            padding: '1px 7px',
+                            borderRadius: 999,
+                            marginRight: 6,
+                            fontWeight: 700,
+                            background: pkg?.offering ? '#E8F0FD' : '#F3F4F6',
+                            color: pkg?.offering ? '#2C4A7C' : '#9CA3AF',
+                          }}>
+                            {offeringLabel(pkg?.offering)}
+                          </span>
                           {q.quote_number}
                           {q.sent_at && ` · Sent ${new Date(q.sent_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`}
                           {q.view_count > 0 && ` · Viewed ${q.view_count}x`}
@@ -1751,6 +1768,36 @@ export default function SalesPage() {
                 <label style={{ fontSize: 11, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase' }}>Service End</label>
                 <input type="date" value={contractForm.service_end_date} onChange={e => setContractForm(p => ({ ...p, service_end_date: e.target.value }))} style={{ width: '100%', padding: '8px 10px', border: '1px solid #D1D5DB', borderRadius: 6, fontSize: 13, marginTop: 4 }} />
               </div>
+            </div>
+
+            <div style={{ marginBottom: 16 }}>
+              <label style={{ fontSize: 11, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase' }}>Offering</label>
+              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 6 }}>
+                {OFFERINGS.map(o => (
+                  <button
+                    key={o}
+                    type="button"
+                    onClick={() => setContractForm(p => ({ ...p, offering: p.offering === o ? '' : o }))}
+                    style={{
+                      padding: '7px 13px',
+                      borderRadius: 999,
+                      fontSize: 12.5,
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      border: contractForm.offering === o ? '1px solid #1e2749' : '1px solid #D1D5DB',
+                      background: contractForm.offering === o ? '#1e2749' : '#fff',
+                      color: contractForm.offering === o ? '#fff' : '#374151',
+                    }}
+                  >
+                    {OFFERING_LABELS[o]}
+                  </button>
+                ))}
+              </div>
+              <p style={{ fontSize: 11.5, color: '#6B7280', marginTop: 6 }}>
+                {contractForm.offering
+                  ? `${OFFERING_HINTS[contractForm.offering]}. This carries to the partnership when they sign.`
+                  : 'Which of the four this is. Leave blank if it does not map cleanly, and click again to clear.'}
+              </p>
             </div>
 
             <div style={{ marginBottom: 16 }}>

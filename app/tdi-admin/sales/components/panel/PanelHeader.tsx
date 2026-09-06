@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import type { FullOpportunity } from '../OpportunityDetailPanel'
+import { OFFERINGS, OFFERING_LABELS } from '@/lib/partnerships/offerings'
 
 const HEAT_OPTIONS = [
   { id: 'hot', label: 'Hot', color: '#EF4444' },
@@ -158,6 +159,22 @@ export function PanelHeader({ opp, onClose, onPatch }: Props) {
             Hub Data
           </Link>
         </div>
+        {/* Which of the four we are pitching. Set here so the pipeline can
+            answer what we are selling before a quote exists. */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <select
+            value={opp.offering ?? ''}
+            onChange={e => onPatch({ offering: (e.target.value || null) as FullOpportunity['offering'] })}
+            style={{ fontSize: 12, border: '1px solid #E5E7EB', borderRadius: 6, padding: '3px 8px', background: 'white', color: opp.offering ? '#2C4A7C' : '#6B7280', fontWeight: 600, outline: 'none', cursor: 'pointer' }}
+            title="Which of the four offerings we are pitching. Leave blank until it has actually been discussed."
+          >
+            <option value="">Offering</option>
+            {OFFERINGS.map(o => (
+              <option key={o} value={o}>{OFFERING_LABELS[o]}</option>
+            ))}
+          </select>
+        </div>
+
         {/* Heat selector */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           {heat && <span title="How responsive is this lead right now? Hot = replied recently or meeting booked. Warm = engaged but no recent reply. Cold = multiple outreach attempts with no response. Parked = not pursuing right now." style={{ width: 8, height: 8, borderRadius: '50%', background: heat.color, display: 'inline-block' }} />}

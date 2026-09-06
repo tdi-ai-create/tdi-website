@@ -34,6 +34,7 @@ import {
   EyeOff,
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
+import { OFFERINGS, OFFERING_LABELS, OFFERING_COLORS, OFFERING_HINTS, offeringLabel, isOffering } from '@/lib/partnerships/offerings';
 import {
   getMetricStatus,
   statusColors,
@@ -55,6 +56,7 @@ interface Partnership {
   contact_name: string;
   contact_email: string;
   contract_phase: 'IGNITE' | 'ACCELERATE' | 'SUSTAIN';
+  offering: 'PULSE' | 'FOCUS' | 'COHORT' | 'BLUEPRINT' | null;
   contract_start: string | null;
   contract_end: string | null;
   building_count: number;
@@ -815,6 +817,16 @@ export default function PartnershipDetailPage() {
                   >
                     {partnership.contract_phase}
                   </span>
+                  <span
+                    className={`inline-flex text-xs px-2 py-1 rounded-full font-medium ${
+                      isOffering(partnership.offering)
+                        ? OFFERING_COLORS[partnership.offering]
+                        : 'bg-gray-100 text-gray-500'
+                    }`}
+                    title="Which of the four offerings this partnership bought"
+                  >
+                    {offeringLabel(partnership.offering)}
+                  </span>
                   <span className="text-sm text-gray-500">
                     {staffCount} educator{staffCount !== 1 ? 's' : ''}
                   </span>
@@ -1070,6 +1082,32 @@ export default function PartnershipDetailPage() {
                       <option value="ACCELERATE">ACCELERATE</option>
                       <option value="SUSTAIN">SUSTAIN</option>
                     </select>
+                    <p className="text-xs text-gray-500 mt-1">Where they are in the partnership, not what they bought.</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Offering</label>
+                    <select
+                      value={editForm.offering || ''}
+                      onChange={(e) =>
+                        setEditForm({
+                          ...editForm,
+                          offering: (e.target.value || null) as Partnership['offering'],
+                        })
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#80a4ed] focus:border-transparent outline-none"
+                    >
+                      <option value="">Not recorded</option>
+                      {OFFERINGS.map((o) => (
+                        <option key={o} value={o}>
+                          {OFFERING_LABELS[o]}
+                        </option>
+                      ))}
+                    </select>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {isOffering(editForm.offering)
+                        ? OFFERING_HINTS[editForm.offering]
+                        : 'Leave blank rather than guessing. Blank is honest, a wrong answer is not.'}
+                    </p>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
