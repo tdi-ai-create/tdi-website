@@ -24,8 +24,17 @@ import {
 
 const EMAIL_FROM = 'Bella from TDI Creator Studio <creatorstudio@teachersdeserveit.com>'
 const REPLY_TO = 'bella@teachersdeserveit.com'
+// Hoisted out of sendEmail so ?dryRun=1 can report who would be copied. The
+// point of the dry run is to be able to read the recipient list without
+// sending, which is not possible when the list is buried in the request body.
+const CHECK_IN_BCC = ['bella@teachersdeserveit.com']
 
 export async function GET(request: NextRequest) {
+  // A rehearsal that still writes rows is not a rehearsal. ?dryRun=1 runs the
+  // full decision, reports who would be written to and copied, and touches
+  // nothing: no send, no stamp, no history row, no email log.
+  const dryRun = request.nextUrl.searchParams.get('dryRun') === '1'
+
   // Verify cron secret (Vercel cron sends this header)
   const authHeader = request.headers.get('authorization')
   const cronSecret = process.env.CRON_SECRET
@@ -60,6 +69,7 @@ export async function GET(request: NextRequest) {
     const sent: string[] = []
     const suppressed: string[] = []
     const errors: string[] = []
+    const wouldSend: { creator_id: string; to: string; bcc: string[]; subject: string }[] = []
 
     for (const creator of toSend) {
       if (!creator.email) continue
@@ -95,6 +105,11 @@ export async function GET(request: NextRequest) {
         ctaLabel: 'Bring My Account Back',
         ctaUrl: unpauseUrl(token),
       })
+
+      if (dryRun) {
+        wouldSend.push({ creator_id: creator.id, to: creator.email, bcc: CHECK_IN_BCC, subject })
+        continue
+      }
 
       // ---- Rehearsal path: change nothing, stamp nothing ----
       if (!PAUSE_CHECK_IN_SENDS_ENABLED || !resendApiKey) {
@@ -150,8 +165,22 @@ export async function GET(request: NextRequest) {
     }
 
     console.log(
-      `[pause-check-ins] sends ${PAUSE_CHECK_IN_SENDS_ENABLED ? 'ON' : 'OFF'} — sent: ${sent.length}, suppressed: ${suppressed.length}, errors: ${errors.length}`
+      dryRun
+        ? `[pause-check-ins] dry run — would send: ${wouldSend.length}, nothing written`
+        : `[pause-check-ins] sends ${PAUSE_CHECK_IN_SENDS_ENABLED ? 'ON' : 'OFF'} — sent: ${sent.length}, suppressed: ${suppressed.length}, errors: ${errors.length}`
     )
+
+    if (dryRun) {
+      return NextResponse.json({
+        dryRun: true,
+        sendsEnabled: PAUSE_CHECK_IN_SENDS_ENABLED,
+        eligible: toSend.length,
+        wouldSend: wouldSend.length,
+        bcc: CHECK_IN_BCC,
+        recipients: wouldSend,
+        message: `Dry run. Would email ${wouldSend.length} paused creator(s), copying ${CHECK_IN_BCC.join(', ') || 'nobody'}. Nothing sent and nothing written.`,
+      })
+    }
 
     return NextResponse.json({
       sendsEnabled: PAUSE_CHECK_IN_SENDS_ENABLED,
@@ -182,7 +211,7 @@ async function sendEmail(
       body: JSON.stringify({
         from: EMAIL_FROM,
         to: [to],
-        bcc: ['bella@teachersdeserveit.com', 'rae@teachersdeserveit.com'],
+        bcc: CHECK_IN_BCC,
         subject,
         html,
         reply_to: REPLY_TO,

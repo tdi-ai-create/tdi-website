@@ -466,7 +466,7 @@ export async function GET(request: NextRequest) {
           body: JSON.stringify({
             from: 'Bella from TDI Creator Studio <creatorstudio@teachersdeserveit.com>',
             to: [creator.email],
-            bcc: ['bella@teachersdeserveit.com', 'rae@teachersdeserveit.com'],
+            bcc: ['bella@teachersdeserveit.com'],
             subject,
             html: buildHtml(creator),
             reply_to: 'bella@teachersdeserveit.com',
