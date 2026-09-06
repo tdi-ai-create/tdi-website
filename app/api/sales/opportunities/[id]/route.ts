@@ -4,7 +4,7 @@ import { leadStageChanged } from '@/lib/sales-slack'
 import { getClientNotes } from '@/lib/sales/client-notes'
 
 const ALLOWED_PATCH_FIELDS = new Set([
-  'name', 'stage', 'value', 'heat', 'assigned_to_email',
+  'name', 'stage', 'value', 'heat', 'assigned_to_email', 'offering',
   'source', 'type', 'is_contact_only', 'partnership_status',
   'contact_name', 'contact_title', 'contact_email', 'contact_phone',
   'expected_close_date', 'deletion_reason',
