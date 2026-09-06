@@ -7,6 +7,7 @@ import InviteLeader from '@/components/partners/InviteLeader';
 import RosterAccessManager from '@/components/partners/RosterAccessManager';
 import Link from 'next/link';
 import FooterSymbol from '@/components/FooterSymbol';
+import { offeringLabel } from '@/lib/partnerships/offerings';
 import {
   Calendar,
   Users,
@@ -85,6 +86,7 @@ interface Partnership {
   contact_email: string;
   phone?: string | null;
   contract_phase: 'IGNITE' | 'ACCELERATE' | 'SUSTAIN';
+  offering: 'PULSE' | 'FOCUS' | 'COHORT' | 'BLUEPRINT' | null;
   contract_start: string | null;
   contract_end: string | null;
   building_count: number;
@@ -2258,6 +2260,10 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
         <div style="background: #1B2A4A; border-radius: 12px; padding: 24px; margin-top: 24px; color: white;">
           <p style="font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #E8B84B; margin-bottom: 12px;">Your Partnership</p>
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+            <div>
+              <p style="font-size: 11px; color: rgba(255,255,255,0.5);">Your Partnership</p>
+              <p style="font-size: 16px; font-weight: 700;">${offeringLabel(partnership?.offering)}</p>
+            </div>
             <div>
               <p style="font-size: 11px; color: rgba(255,255,255,0.5);">Current Phase</p>
               <p style="font-size: 16px; font-weight: 700;">${partnership?.contract_phase || 'IGNITE'}</p>
@@ -5554,6 +5560,7 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                     value: [organization?.address, organization?.address_city, organization?.address_state, organization?.address_zip]
                       .filter(Boolean).join(', ') || null
                   },
+                  { label: 'Your Partnership', value: offeringLabel(partnership?.offering) },
                   { label: 'Current Phase', value: partnership?.contract_phase },
                   {
                     label: 'Contract Period',
