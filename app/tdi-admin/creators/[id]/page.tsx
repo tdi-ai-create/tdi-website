@@ -8,8 +8,6 @@ import {
   Check,
   Clock,
   AlertCircle,
-  Circle,
-  Lock,
   Loader2,
   Save,
   Plus,
@@ -62,13 +60,10 @@ import { CreatorAccessRow } from '@/components/admin/CreatorAccessRow';
 import {
   getCreatorDashboardData,
   getCreatorNotes,
-  getContextAwareMilestoneDescription,
-  getContextAwareMilestoneTitle,
 } from '@/lib/creator-portal-data';
 import type {
   CreatorDashboardData,
   CreatorNote,
-  MilestoneStatus,
   MilestoneWithStatus,
   PhaseWithMilestones,
   ContentPath,
@@ -76,52 +71,6 @@ import type {
 import { CreatorMirror } from '@/components/admin/CreatorMirror';
 import type { Journey } from '@/lib/creator-journey';
 import { blocksPublish, PUBLISH_BLOCKED_MESSAGE } from '@/lib/creator-agreement';
-
-const statusConfig: Record<
-  MilestoneStatus,
-  { icon: typeof Check; color: string; bg: string; label: string }
-> = {
-  completed: {
-    icon: Check,
-    color: 'text-green-600',
-    bg: 'bg-green-100',
-    label: 'Completed',
-  },
-  in_progress: {
-    icon: Clock,
-    color: 'text-blue-600',
-    bg: 'bg-blue-100',
-    label: 'In Progress',
-  },
-  waiting_approval: {
-    icon: AlertCircle,
-    color: 'text-orange-500',
-    bg: 'bg-orange-100',
-    label: 'Waiting Approval',
-  },
-  available: {
-    icon: Circle,
-    color: 'text-[#8B5CF6]',
-    bg: 'bg-amber-50',
-    label: 'Available',
-  },
-  locked: {
-    icon: Lock,
-    color: 'text-gray-400',
-    bg: 'bg-gray-100',
-    label: 'Locked',
-  },
-};
-
-// Phase descriptions
-const phaseDescriptions: Record<string, string> = {
-  onboarding: 'Getting the creator set up and aligned with TDI\'s process.',
-  agreement: 'Formalizing the partnership with signed agreements.',
-  course_design: 'Collaborating on course structure and content planning.',
-  production: 'Building the course content and media.',
-  marketing_blog: 'Writing and publishing the marketing blog post.',
-  launch: 'Final preparations for publishing.',
-};
 
 export default function TDIAdminCreatorDetailPage() {
   const params = useParams();
@@ -160,8 +109,6 @@ export default function TDIAdminCreatorDetailPage() {
   const [noteVisibleToCreator, setNoteVisibleToCreator] = useState(true);
   const [isAddingNote, setIsAddingNote] = useState(false);
 
-  // Expanded phases
-  const [expandedPhases, setExpandedPhases] = useState<Set<string>>(new Set());
 
   // View mode toggle
   // viewMode removed — admin view is the only view. Use "Open Portal" for creator preview.
@@ -332,27 +279,6 @@ export default function TDIAdminCreatorDetailPage() {
         display_order: data.creator.display_order || 99,
       });
 
-      // Find current phase and expand it
-      let currentPhaseId: string | null = null;
-      for (const phase of data.phases) {
-        const applicableMilestones = phase.milestones.filter((m: MilestoneWithStatus) => m.isApplicable !== false);
-        const hasCurrentStep = applicableMilestones.some(
-          (m: MilestoneWithStatus) => m.status === 'available' || m.status === 'in_progress' || m.status === 'waiting_approval'
-        );
-        if (hasCurrentStep) {
-          currentPhaseId = phase.id;
-          break;
-        }
-      }
-
-      if (currentPhaseId) {
-        setExpandedPhases(new Set([currentPhaseId]));
-      } else {
-        const incompletePhase = data.phases.find((p: PhaseWithMilestones) => !p.isComplete);
-        if (incompletePhase) {
-          setExpandedPhases(new Set([incompletePhase.id]));
-        }
-      }
     }
 
     // Use notes from API response if available, fallback to client-side
@@ -439,6 +365,9 @@ export default function TDIAdminCreatorDetailPage() {
         }),
       });
 
+      if (!response.ok) {
+        throw new Error(`Request failed with status ${response.status}`);
+      }
       const result = await response.json();
 
       if (result.success) {
@@ -479,6 +408,9 @@ export default function TDIAdminCreatorDetailPage() {
         }),
       });
 
+      if (!response.ok) {
+        throw new Error(`Request failed with status ${response.status}`);
+      }
       const result = await response.json();
 
       if (result.success) {
@@ -527,6 +459,9 @@ export default function TDIAdminCreatorDetailPage() {
           }),
         });
 
+        if (!response.ok) {
+          throw new Error(`Request failed with status ${response.status}`);
+        }
         const result = await response.json();
         if (!result.success) {
           setSaveDetailsError(result.error || `Failed to save ${field}`);
@@ -572,6 +507,9 @@ export default function TDIAdminCreatorDetailPage() {
           }),
         });
 
+        if (!response.ok) {
+          throw new Error(`Request failed with status ${response.status}`);
+        }
         const result = await response.json();
         if (!result.success) {
           console.error(`Failed to save ${field}:`, result.error);
@@ -606,6 +544,9 @@ export default function TDIAdminCreatorDetailPage() {
         }),
       });
 
+      if (!response.ok) {
+        throw new Error(`Request failed with status ${response.status}`);
+      }
       const result = await response.json();
 
       if (!result.success) {
@@ -652,6 +593,9 @@ export default function TDIAdminCreatorDetailPage() {
           adminEmail,
         }),
       });
+      if (!response.ok) {
+        throw new Error(`Request failed with status ${response.status}`);
+      }
       const result = await response.json();
       if (result.success) {
         await loadData();
@@ -686,6 +630,9 @@ export default function TDIAdminCreatorDetailPage() {
         }),
       });
 
+      if (!response.ok) {
+        throw new Error(`Request failed with status ${response.status}`);
+      }
       const result = await response.json();
 
       if (result.success) {
@@ -739,6 +686,9 @@ export default function TDIAdminCreatorDetailPage() {
           postLaunchNotes: postLaunchNotes.trim() || null,
         }),
       });
+      if (!response.ok) {
+        throw new Error(`Request failed with status ${response.status}`);
+      }
       const result = await response.json();
       if (result.success) {
         await loadData();
@@ -766,6 +716,9 @@ export default function TDIAdminCreatorDetailPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ creatorId, action }),
       });
+      if (!response.ok) {
+        throw new Error(`Request failed with status ${response.status}`);
+      }
       const result = await response.json();
       if (result.success) {
         await loadData();
@@ -861,6 +814,9 @@ export default function TDIAdminCreatorDetailPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ creatorId }),
       });
+      if (!response.ok) {
+        throw new Error(`Request failed with status ${response.status}`);
+      }
       const result = await response.json();
       if (result.success) {
         setShowStartNewProjectModal(false);
@@ -896,6 +852,9 @@ export default function TDIAdminCreatorDetailPage() {
         }),
       });
 
+      if (!response.ok) {
+        throw new Error(`Request failed with status ${response.status}`);
+      }
       const result = await response.json();
 
       if (result.success) {
@@ -913,16 +872,6 @@ export default function TDIAdminCreatorDetailPage() {
     }
   };
 
-  const togglePhase = (phaseId: string) => {
-    const newExpanded = new Set(expandedPhases);
-    if (newExpanded.has(phaseId)) {
-      newExpanded.delete(phaseId);
-    } else {
-      newExpanded.add(phaseId);
-    }
-    setExpandedPhases(newExpanded);
-  };
-
   const handleToggleMilestone = async (milestoneId: string, milestoneTitle: string, currentStatus: string) => {
     if (!canEdit) return;
 
@@ -935,6 +884,9 @@ export default function TDIAdminCreatorDetailPage() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ milestoneId, creatorId, adminEmail }),
         });
+        if (!response.ok) {
+          throw new Error(`Request failed with status ${response.status}`);
+        }
         const data = await response.json();
         if (!data.success) throw new Error(data.error);
         await loadData();
@@ -1048,7 +1000,7 @@ export default function TDIAdminCreatorDetailPage() {
     );
   }
 
-  const { creator, phases, progressPercentage, completedMilestones, totalMilestones } = dashboardData;
+  const { creator, progressPercentage, completedMilestones, totalMilestones } = dashboardData;
 
   // Get path badge
   const getPathBadge = (path: string | null) => {
@@ -1230,11 +1182,18 @@ export default function TDIAdminCreatorDetailPage() {
           </div>
           <button
             onClick={async () => {
-              await fetch('/api/creator-studio/sync', {
+              // The flag used to disappear from the screen whether or not the
+              // server accepted it, so a failed dismiss looked identical to a
+              // successful one until the next reload brought the flag back.
+              const res = await fetch('/api/creator-studio/sync', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ action: 'clear_flag', creator_id: creatorId }),
               });
+              if (!res.ok) {
+                setSuccessMessage('That flag could not be dismissed. It is still there.');
+                return;
+              }
               setDashboardData((prev: any) => prev ? { ...prev, creator: { ...prev.creator, agent_flag: null, agent_flag_cleared: true } } : prev);
             }}
             className="text-xs text-amber-600 hover:text-amber-800 font-medium px-3 py-1.5 rounded-lg hover:bg-amber-100 transition-colors flex-shrink-0"
@@ -1373,7 +1332,9 @@ export default function TDIAdminCreatorDetailPage() {
                             if (!directFeedbackContent.trim()) return;
                             setIsSendingDirectFeedback(true);
                             try {
-                              await fetch('/api/admin/creator-feedback', {
+                              // Clearing the box before knowing the note landed
+                              // threw away what was typed on any failure.
+                              const res = await fetch('/api/admin/creator-feedback', {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
                                 body: JSON.stringify({
@@ -1384,6 +1345,9 @@ export default function TDIAdminCreatorDetailPage() {
                                   approved_by: adminEmail,
                                 }),
                               });
+                              if (!res.ok) {
+                                throw new Error(`Request failed with status ${res.status}`);
+                              }
                               setDirectFeedbackMilestoneId(null);
                               setDirectFeedbackContent('');
                               loadData();
@@ -1458,29 +1422,25 @@ export default function TDIAdminCreatorDetailPage() {
             </a>
           </div>
 
-          {/* What the creator sees, from the creator's own components.
-              Sits above the milestone list rather than replacing it: the flat
-              list is still how a step gets approved, and removing it in the
-              same change would take away the controls before the replacement
-              exists. */}
+          {/* The creator's own journey, rendered from the creator's own
+              component, now carrying the reviewer's controls.
+
+              There used to be a second flat list below this one, grouped by
+              database phase, so the same steps appeared twice under two sets of
+              names: "We build it" up here and "Production" down there. It read
+              as an old system and a new system running side by side. The list
+              is gone and approve, request changes and mark complete moved onto
+              the step they belong to. */}
           <CreatorMirror
             journey={(dashboardData as unknown as { journey?: Journey | null }).journey ?? null}
             creatorName={creator.name}
+            canEdit={canEdit}
+            busyRecordId={approvingMilestoneId}
+            onApprove={handleApprove}
+            onRequestRevision={handleRequestRevision}
+            onToggleComplete={handleToggleMilestone}
           />
 
-          <div className="pt-2">
-            <h3
-              className="text-sm font-semibold uppercase tracking-wider text-gray-400"
-              style={{ fontFamily: "'DM Sans', sans-serif" }}
-            >
-              Every step, for approving and editing
-            </h3>
-          </div>
-
-          {/* Admin Helper Text */}
-          {canEdit && (
-            <p className="text-sm text-gray-500">Click checkboxes to mark complete during calls</p>
-          )}
 
           {/* Success message */}
           {successMessage && (
@@ -1490,164 +1450,6 @@ export default function TDIAdminCreatorDetailPage() {
             </div>
           )}
 
-          {/* Milestones */}
-          {(() => {
-            // Filter phases based on content path
-            // Blog: only onboarding, agreement, launch
-            // Download: onboarding, agreement, production, launch
-            // Course: all phases
-            const phasesForPath: Record<string, string[]> = {
-              blog: ['onboarding', 'agreement', 'launch'],
-              download: ['onboarding', 'agreement', 'production', 'launch'],
-              course: ['onboarding', 'agreement', 'course_design', 'test_prep', 'production', 'marketing_blog', 'launch'],
-            };
-            const allowedPhases = phasesForPath[creator.content_path || 'course'] || phasesForPath.course;
-            const filteredPhases = phases.filter((phase) => allowedPhases.includes(phase.id));
-
-            return filteredPhases.map((phase) => {
-              const isExpanded = expandedPhases.has(phase.id);
-              const applicableMilestones = phase.milestones.filter((m: MilestoneWithStatus) => m.isApplicable !== false);
-              const completedCount = applicableMilestones.filter((m: MilestoneWithStatus) => m.status === 'completed').length;
-
-              return (
-                <div key={phase.id} className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-                  {/* Phase Header */}
-                  <button
-                    onClick={() => togglePhase(phase.id)}
-                    className="w-full px-5 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div
-                        className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                          phase.isComplete ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'
-                        }`}
-                      >
-                        {phase.isComplete ? <Check className="w-4 h-4" /> : phase.sort_order + 1}
-                      </div>
-                      <div className="text-left">
-                        <h3
-                          className="font-semibold"
-                          style={{ fontFamily: "'DM Sans', sans-serif", color: '#2B3A67' }}
-                        >
-                          {phase.name}
-                        </h3>
-                        <p className="text-sm text-gray-500">
-                          {completedCount}/{applicableMilestones.length} complete
-                        </p>
-                      </div>
-                    </div>
-                    {isExpanded ? (
-                      <ChevronUp className="w-5 h-5 text-gray-400" />
-                    ) : (
-                      <ChevronDown className="w-5 h-5 text-gray-400" />
-                    )}
-                  </button>
-
-                  {/* Milestones */}
-                  {isExpanded && (
-                    <div className="border-t border-gray-100 px-5 py-3 space-y-2">
-                      {phaseDescriptions[phase.id] && (
-                        <p className="text-sm text-gray-500 mb-3 pb-3 border-b border-gray-100">
-                          {phaseDescriptions[phase.id]}
-                        </p>
-                      )}
-                      {applicableMilestones.map((milestone: MilestoneWithStatus) => {
-                        const config = statusConfig[milestone.status];
-                        const Icon = config.icon;
-                        const isProcessing = approvingMilestoneId === milestone.id;
-                        // Use context-aware title for content-path-specific milestones
-                        const displayTitle = getContextAwareMilestoneTitle(milestone.id, creator.content_path) || milestone.title;
-
-                        return (
-                          <div
-                            key={milestone.id}
-                            className={`flex items-start gap-3 p-3 rounded-lg transition-colors ${
-                              milestone.status === 'waiting_approval'
-                                ? 'bg-orange-50 border border-orange-200'
-                                : milestone.status === 'completed'
-                                  ? 'bg-green-50/50'
-                                  : 'hover:bg-gray-50'
-                            }`}
-                          >
-                            {/* Checkbox/Status */}
-                            <button
-                              onClick={() => handleToggleMilestone(milestone.id, displayTitle, milestone.status)}
-                              disabled={isProcessing || milestone.status === 'locked' || !canEdit}
-                              className={`w-6 h-6 rounded-md flex items-center justify-center flex-shrink-0 transition-all ${
-                                milestone.status === 'completed'
-                                  ? 'bg-green-500 text-white'
-                                  : milestone.status === 'locked'
-                                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                                    : 'border-2 border-gray-300 hover:border-green-500'
-                              }`}
-                            >
-                              {isProcessing ? (
-                                <Loader2 className="w-4 h-4 animate-spin" />
-                              ) : milestone.status === 'completed' ? (
-                                <Check className="w-4 h-4" />
-                              ) : milestone.status === 'locked' ? (
-                                <Lock className="w-3 h-3" />
-                              ) : null}
-                            </button>
-
-                            {/* Milestone Info */}
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-2 flex-wrap">
-                                <p
-                                  className={`font-medium ${
-                                    milestone.status === 'completed' ? 'text-gray-500 line-through' : ''
-                                  }`}
-                                  style={{ color: milestone.status !== 'completed' ? '#2B3A67' : undefined }}
-                                >
-                                  {displayTitle}
-                                </p>
-                                <span className={`text-xs px-2 py-0.5 rounded-full ${config.bg} ${config.color}`}>
-                                  {config.label}
-                                </span>
-                              </div>
-                              {milestone.description && (
-                                <p className="text-sm text-gray-500 mt-1">
-                                  {getContextAwareMilestoneDescription(milestone.id, creator.content_path) || milestone.description}
-                                </p>
-                              )}
-                            </div>
-
-                            {/* Actions - Both buttons always appear together for waiting_approval */}
-                            {milestone.status === 'waiting_approval' && canEdit && (
-                              <div className="flex items-center gap-2">
-                                <button
-                                  onClick={() => handleApprove(milestone.id, displayTitle)}
-                                  disabled={isProcessing}
-                                  className="px-3 py-1.5 text-sm font-medium rounded-lg transition-colors flex items-center gap-1.5 bg-green-600 text-white hover:bg-green-700"
-                                >
-                                  {isProcessing ? (
-                                    <Loader2 className="w-4 h-4 animate-spin" />
-                                  ) : (
-                                    <>
-                                      <Check className="w-4 h-4" />
-                                      Approve
-                                    </>
-                                  )}
-                                </button>
-                                <button
-                                  onClick={() => handleRequestRevision(milestone.id, displayTitle)}
-                                  disabled={isProcessing}
-                                  className="px-3 py-1.5 text-sm font-medium rounded-lg transition-colors flex items-center gap-1.5 bg-white border border-amber-500 text-amber-600 hover:bg-amber-50"
-                                >
-                                  <RotateCcw className="w-4 h-4" />
-                                  Request Changes
-                                </button>
-                              </div>
-                            )}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-              );
-            });
-          })()}
         </div>
 
         {/* Sidebar */}
