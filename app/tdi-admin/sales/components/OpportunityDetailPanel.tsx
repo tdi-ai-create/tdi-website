@@ -42,6 +42,8 @@ export interface OppActivity {
 }
 
 export interface FullOpportunity {
+  /** Which of the four offerings is being pitched. Null until decided. */
+  offering?: 'PULSE' | 'FOCUS' | 'COHORT' | 'BLUEPRINT' | null
   id: string
   name: string
   stage: string
