@@ -2,7 +2,7 @@
 import React from 'react'
 import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer'
 import { categoryColor, NAVY } from '@/lib/hub/categoryColors'
-import { w, AlertBlock, SayBlock, SmallPrint, SectionHeading, type Alert, type SmallPrintBlock } from './weights'
+import { w, AlertBlock, SayBlock, SmallPrint, SectionHeading, resolveWeights, type Alert, type SmallPrintBlock, type WeightedItem } from './weights'
 
 const navy = '#1E2749'
 const gold = '#E8B84B'
@@ -40,15 +40,11 @@ export interface ToolkitData {
   count_label?: string
   sections: {
     heading?: string
-    items: {
-      /** Weight 2. Short and scannable. */
-      title: string
-      /** Weight 3. The reasoning beneath it. */
-      body: string
-      /** Weight 4. Words the educator says aloud. */
-      say?: string
-      meta?: string
-    }[]
+    /**
+     * Prefer the canonical `do` and `why`. `title` and `body` are the original
+     * names for the same two weights and still work.
+     */
+    items: (WeightedItem & { title?: string; body?: string; meta?: string })[]
   }[]
   /** Weight 1. At most one per card. */
   alert?: Alert
@@ -79,6 +75,7 @@ export function ToolkitPDF({ data }: { data: ToolkitData }) {
               <SectionHeading heading={section.heading} />
               {section.items.map((item, ii) => {
                 globalNum++
+                const { doText, whyText, say } = resolveWeights(item, 'title', 'body')
                 return (
                   <View key={ii} wrap={false}>
                     <View style={s.itemCard}>
@@ -86,11 +83,11 @@ export function ToolkitPDF({ data }: { data: ToolkitData }) {
                         <View style={s.itemNumber}>
                           <Text style={s.itemNumText}>{globalNum}</Text>
                         </View>
-                        <Text style={[w.do, { flex: 1, marginBottom: 0 }]}>{item.title}</Text>
+                        <Text style={[w.do, { flex: 1, marginBottom: 0 }]}>{doText}</Text>
                       </View>
-                      <Text style={w.why}>{item.body}</Text>
+                      <Text style={w.why}>{whyText}</Text>
                       {item.meta ? <Text style={s.itemMeta}>{item.meta}</Text> : null}
-                      <SayBlock say={item.say} />
+                      <SayBlock say={say} />
                     </View>
                   </View>
                 )
