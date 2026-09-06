@@ -47,6 +47,25 @@ export function CurrentStepCard({
   const step = journey.openStep;
   const action = journey.openStepAction;
 
+  // Nothing drawable is open, but something open is being held off the road.
+  // That is a board we have to fix, not a finished journey, and telling a
+  // creator they are done when they are not is the worst of the two mistakes.
+  // The words stay on our side of the line: no internal vocabulary, no apology.
+  if (!step && journey.strandedOpen > 0) {
+    return (
+      <div style={{ background: '#fff', border: `1px solid ${LINE}`, borderRadius: 12, padding: '26px 24px' }}>
+        <p style={{ margin: 0, fontSize: 18, fontWeight: 650, color: NAVY, letterSpacing: '-.015em' }}>
+          We are sorting out your next step
+        </p>
+        <p style={{ margin: '8px 0 0', fontSize: 14.5, color: INK_2, lineHeight: 1.55, maxWidth: '52ch' }}>
+          Your journey is not finished. One of your steps has moved and we are
+          putting the right one in front of you. Nothing for you to do right now,
+          and nothing you have handed in has been lost.
+        </p>
+      </div>
+    );
+  }
+
   // Everything applicable is finished. Say so plainly rather than showing an
   // empty card where a task used to be.
   if (!step || !action) {
