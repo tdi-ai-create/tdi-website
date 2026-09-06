@@ -13,6 +13,7 @@ import { LoveNotesCallout } from '@/components/dashboard/shared/LoveNotesCallout
 import { LeadingIndicators } from '@/components/dashboard/shared/LeadingIndicators'
 import { ServiceTracker } from '@/components/dashboard/admin/ServiceTracker'
 import { InlineEditField } from '@/components/dashboard/admin/InlineEditField'
+import { OFFERINGS, offeringLabel } from '@/lib/partnerships/offerings'
 import { FileUploadZone } from '@/components/dashboard/admin/FileUploadZone'
 import { AIExtractModal } from '@/components/dashboard/admin/AIExtractModal'
 import { TDISuggestions } from '@/components/dashboard/shared/TDISuggestions'
@@ -2103,6 +2104,14 @@ export default function AdminPartnershipDetailPage() {
                     <InlineEditField partnershipId={partnershipId} field="phone" value={partnership?.phone} type="text" onSaved={(v) => setPartnership((p: any) => ({ ...p, phone: v }))} />
                   ) : (
                     <p className="text-sm text-gray-700">{partnership?.phone || '—'}</p>
+                  )}
+                </div>
+                <div>
+                  <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1 block">Offering</label>
+                  {editMode ? (
+                    <InlineEditField partnershipId={partnershipId} field="offering" value={partnership?.offering} type="select" options={[...OFFERINGS]} onSaved={(v) => setPartnership((prev: typeof partnership) => ({ ...prev, offering: v }))} />
+                  ) : (
+                    <p className="text-sm text-gray-700">{offeringLabel(partnership?.offering)}</p>
                   )}
                 </div>
                 <div>

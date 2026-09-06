@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { notifyAdmin } from '@/lib/admin-notify';
 import { createClient } from '@supabase/supabase-js';
 
 function getSupabaseAdmin() {
@@ -302,26 +303,22 @@ export async function POST(request: NextRequest) {
     }
 
     // 6. Notify admin
-    const notifyUrl =
-      process.env.NEXT_PUBLIC_BASE_URL ||
-      (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');
     const schoolName = partnership.org_name || partnership.contact_name || 'A partnership';
 
-    fetch(`${notifyUrl}/api/admin/notify`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        event: 'roster_updated',
-        partnershipName: schoolName,
-        urgency: 'info',
-        details: {
-          'Staff added': toAdd.length,
-          'Staff removed': toRemove.length,
-          'Unchanged': unchanged.length,
-          'New active total': newTotal,
-        },
-      }),
-    }).catch(() => {});
+    const notifyResult = await notifyAdmin({
+      event: 'roster_updated',
+      partnershipName: schoolName,
+      urgency: 'info',
+      details: {
+        'Staff added': toAdd.length,
+        'Staff removed': toRemove.length,
+        'Unchanged': unchanged.length,
+        'New active total': newTotal,
+      },
+    });
+    if (!notifyResult.sent) {
+      console.error('[partners/roster-update] admin notification failed:', notifyResult.reason);
+    }
 
     return NextResponse.json({
       success: true,

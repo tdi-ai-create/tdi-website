@@ -74,6 +74,7 @@ export async function PATCH(
       'contact_name',
       'contact_email',
       'contract_phase',
+      'offering',
       'contract_start',
       'contract_end',
       'status',
