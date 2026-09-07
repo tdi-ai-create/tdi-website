@@ -450,8 +450,10 @@ function ActionItem({ action, onToggle, onCancel, onUpdateClientLabel, onNudge, 
 
   const d = draft || { answer: '', outcome: '', skip: '', showSkip: false }
 
+  // Anchor for ?action=<id>. A card on the board links straight here, so the
+  // row has to be addressable rather than merely present.
   return (
-    <div>
+    <div id={`action-${action.id}`} style={{ scrollMarginTop: 90 }}>
     <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start', padding: '8px 12px', background: blocked ? '#FEF2F2' : isCancelled ? '#FAFAFA' : '#F9FAFB', borderRadius: 8, opacity: isCancelled ? 0.6 : 1 }}>
       {/* Color state dot */}
       {colorState && !isInactive && (
