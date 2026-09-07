@@ -7,6 +7,8 @@
 // way to tell the page it had changed. One source removes the class of bug
 // rather than patching that instance of it.
 
+import { isPersonOwned, isSchoolOwned } from '@/lib/funding-ownership'
+
 export const CLOSED_STATUSES = ['denied', 'awarded', 'closed', 'cancelled']
 export const DEAD_ITEM_STATUSES = ['done', 'skipped', 'cancelled']
 
@@ -98,7 +100,7 @@ export function pickTheOneThing(opportunities: any[], actionItems: any[]) {
       title: next.client_label || next.title,
       why: next.description || '',
       actionId: next.id,
-      owner: next.owner_type === 'client' ? ('school' as Owner) : ('you' as Owner),
+      owner: isSchoolOwned(next) ? ('school' as Owner) : ('you' as Owner),
     }
   }
 
@@ -109,8 +111,11 @@ export function pickTheOneThing(opportunities: any[], actionItems: any[]) {
 export function groupWork(actionItems: any[], opportunities: any[]) {
   const live = (actionItems ?? []).filter(isLiveItem)
   return {
-    you: live.filter(a => a.owner_type !== 'client'),
-    school: live.filter(a => a.owner_type === 'client'),
+    // This page already had the right rule. The board's school card had a
+    // second one that demoted seven of Bella's items to an agent's. Both now
+    // call the same helper so a third answer cannot appear.
+    you: live.filter(isPersonOwned),
+    school: live.filter(isSchoolOwned),
     agent: (opportunities ?? []).filter(o =>
       ['requested', 'qa_review'].includes(o.narrative_status) && isLivePath(o)),
     finished: (actionItems ?? []).filter(a => !isLiveItem(a)),

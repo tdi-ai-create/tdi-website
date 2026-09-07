@@ -8,6 +8,7 @@ import NeedsYouBoard from './components/NeedsYouBoard'
 import FundersTab from './components/FundersTab'
 import AwardedTab from './components/AwardedTab'
 import OutreachQueue from './components/OutreachQueue'
+import { isPersonOwned, isSchoolOwned } from '@/lib/funding-ownership'
 
 /**
  * One next-step item, exactly as computed by lib/funding-next-actions.ts and
@@ -517,18 +518,18 @@ function SchoolCard({ school, onDraftEmail, onToast }: {
           </div>
         )}
 
-        {/* Pending action items for this school - separated by owner */}
+        {/* Pending action items for this school, split the one agreed way. */}
         {school.actions.length > 0 && (() => {
-          const bellaActions = school.actions.filter(a => a.ownerType === 'tdi' && ['submission', 'follow_up', 'approval'].includes(a.category || ''))
-          const clientActions = school.actions.filter(a => a.ownerType === 'client')
-          const agentActions = school.actions.filter(a => a.ownerType === 'tdi' && !['submission', 'follow_up', 'approval'].includes(a.category || ''))
-          const myActions = [...bellaActions, ...clientActions]
+          // One rule, shared with the board, so the two counts on this screen
+          // can never disagree again. See lib/funding-ownership.ts for why the
+          // old category test was splitting one person's queue in half.
+          const myActions = school.actions.filter(isPersonOwned)
+          const clientActions = school.actions.filter(isSchoolOwned)
 
-          const ownerBadge = (ownerType: string, category?: string) => {
-            if (ownerType === 'client') return { bg: '#FEF3C7', color: '#92400E', label: 'School' }
-            if (['research', 'writing'].includes(category || '')) return { bg: '#DBEAFE', color: '#1E40AF', label: 'Agent' }
-            return { bg: '#F5F3FF', color: '#6D28D9', label: 'You' }
-          }
+          const ownerBadge = (ownerType: string) =>
+            ownerType === 'client'
+              ? { bg: '#FEF3C7', color: '#92400E', label: 'School' }
+              : { bg: '#F5F3FF', color: '#6D28D9', label: 'You' }
 
           return (
             <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid #F3F4F6' }}>
@@ -537,9 +538,11 @@ function SchoolCard({ school, onDraftEmail, onToast }: {
                   <div style={{ fontSize: 11, fontWeight: 700, color: '#059669', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 8 }}>
                     Ready for You ({myActions.length})
                   </div>
-                  {myActions.slice(0, 5).map(action => {
+                  {/* Every one of them. A person's own queue is the last place
+                      to hide rows behind a cap she cannot see. */}
+                  {myActions.map(action => {
                     const daysUntil = action.dueDate ? Math.ceil((new Date(action.dueDate + 'T00:00:00').getTime() - Date.now()) / 86400000) : null
-                    const badge = ownerBadge(action.ownerType, action.category || undefined)
+                    const badge = ownerBadge(action.ownerType)
                     return (
                       <div key={action.id} style={{
                         display: 'flex', justifyContent: 'space-between', alignItems: 'center',
@@ -570,26 +573,25 @@ function SchoolCard({ school, onDraftEmail, onToast }: {
                   })}
                 </>
               )}
-              {agentActions.length > 0 && (
+              {/* What the school owes us. Not hers to do, but hers to chase,
+                  so it sits under her list rather than in a separate place.
+                  Agent work is not here at all: an agent's work is a grant path,
+                  shown above as "Running by itself", never an action item. */}
+              {clientActions.length > 0 && (
                 <>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 8, marginTop: myActions.length > 0 ? 12 : 0 }}>
-                    Agent Pipeline ({agentActions.length})
+                  <div style={{ fontSize: 11, fontWeight: 700, color: '#92400E', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 8, marginTop: myActions.length > 0 ? 12 : 0 }}>
+                    Waiting on the school ({clientActions.length})
                   </div>
-                  {agentActions.slice(0, 3).map(action => (
+                  {clientActions.map(action => (
                     <div key={action.id} style={{
                       display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                      padding: '4px 0', borderBottom: '1px solid #FAFAFA', opacity: 0.6,
+                      padding: '4px 0', borderBottom: '1px solid #FAFAFA',
                     }}>
                       <span style={{ fontSize: 12, color: '#6B7280' }}>{action.title}</span>
-                      <span style={{ fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 4, background: '#DBEAFE', color: '#1E40AF' }}>Agent</span>
+                      <span style={{ fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 4, background: '#FEF3C7', color: '#92400E' }}>School</span>
                     </div>
                   ))}
                 </>
-              )}
-              {school.actions.length > 8 && (
-                <Link href={`/tdi-admin/funding/${school.id}`} style={{ fontSize: 11, color: '#8B5CF6', textDecoration: 'none', marginTop: 4, display: 'block' }}>
-                  +{school.actions.length - 8} more
-                </Link>
               )}
             </div>
           )
