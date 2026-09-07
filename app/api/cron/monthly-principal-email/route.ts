@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { monthlyTools, roleLabel } from '@/lib/hub/monthly-tools';
+import { monthlyTools, roleLabel, leadershipSubject, trim } from '@/lib/hub/monthly-tools';
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
 
@@ -87,7 +87,7 @@ export async function GET(request: NextRequest) {
                 <div style="margin:0 0 12px;padding-left:12px;border-left:3px solid #E5E7EB;">
                   <a href="${site}/hub/quick-wins/${t.slug}" style="font-size:15px;font-weight:600;color:#1e2749;text-decoration:none;">${t.title}</a>
                   ${roleLabel(t.roles) ? `<p style="margin:2px 0 0;font-size:13px;color:#1e6355;font-weight:600;">Good for your ${roleLabel(t.roles)}</p>` : ''}
-                  ${t.description ? `<p style="margin:4px 0 0;font-size:13.5px;color:#6B7280;line-height:1.55;">${t.description}</p>` : ''}
+                  ${t.description ? `<p style="margin:4px 0 0;font-size:13.5px;color:#6B7280;line-height:1.55;">${trim(t.description, 130)}</p>` : ''}
                 </div>`).join('')}`).join('')}
               </div>`;
 
@@ -139,7 +139,7 @@ Your dashboard is always live at teachersdeserveit.com/partners/${p.slug}. Take 
 Rae`;
 
       // Send the email
-      const subject = `${firstName}, a quick update on your team`;
+      const subject = leadershipSubject(firstName, released);
 
       // Built before the dry-run branch so a rehearsal returns exactly the bytes
       // that would have been sent, rather than something assembled a second way.

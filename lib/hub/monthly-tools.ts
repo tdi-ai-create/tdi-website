@@ -132,3 +132,72 @@ export async function monthlyTools(
 
   return { monthISO: month, monthLabel, total: inMonth.length, groups }
 }
+
+
+/**
+ * What the month is about, in a phrase a teacher would recognise.
+ *
+ * Subject lines were leading with a tool's own title, which reads like a filing
+ * label: "In-the-Moment Student Conflict: Quick Reference, and everything else
+ * new this month". Nobody opens that. These say what you get and why you would
+ * want it.
+ *
+ * One phrase per category rather than anything generated, so the tone is fixed
+ * and nothing has to be reviewed before it goes out.
+ */
+const CATEGORY_PHRASES: Record<string, string> = {
+  'Communication':           'for the conversations that are hard to start',
+  'Classroom Management':    'for when the room goes sideways',
+  'Instructional Strategies':'for the lesson that is not landing',
+  'Games':                   'your students will not notice are practice',
+  'Leadership':              'for leading people who are tired',
+  'Classroom Setup':         'for a room that runs without you managing it',
+  'Time Savers':             'to get your evening back',
+  'Assessment':              'for finding out what they actually know',
+  'Lesson Planning':         'for planning that does not eat your weekend',
+  'Vocational':              'for the students headed straight to work',
+  'Self-Care':               'for the weeks that take more than they give',
+  'Stress Relief':           'for the days you are running on nothing',
+}
+
+/**
+ * The educator subject line.
+ *
+ * When one category carries the month, the subject says what that month is
+ * about. When it is mixed, it names the two biggest so the reader still knows
+ * the shape of it before opening.
+ */
+export function educatorSubject(r: MonthlyToolsResult, monthLabel?: string): string {
+  const label = monthLabel ?? r.monthLabel
+  if (r.total === 0) return `This month in the Hub, ${label}`
+
+  const top = r.groups[0]
+  const dominant = top && top.tools.length / r.total >= 0.6
+  const noun = r.total === 1 ? 'A new tool' : `${r.total} new tools`
+
+  if (dominant) {
+    const phrase = CATEGORY_PHRASES[top.category]
+    if (phrase) return `${noun} ${phrase}`
+    return `${noun} for ${top.category.toLowerCase()}`
+  }
+
+  const two = r.groups.slice(0, 2).map(g => g.category.toLowerCase())
+  return `${noun} this month, from ${two[0]} to ${two[1]}`
+}
+
+/** The leadership subject. Says a team update AND tools are inside. */
+export function leadershipSubject(firstName: string, r: MonthlyToolsResult | null): string {
+  const total = r?.total ?? 0
+  if (total === 0) return `${firstName}, a quick update on your team`
+  if (total === 1) return `${firstName}, your team update and a new tool to share`
+  return `${firstName}, your team update and ${total} new tools to share`
+}
+
+/** Descriptions run long. The secondary list only needs enough to decide on. */
+export function trim(text: string | null | undefined, max = 110): string {
+  const t = (text ?? '').trim()
+  if (t.length <= max) return t
+  const cut = t.slice(0, max)
+  const stop = Math.max(cut.lastIndexOf(' '), cut.lastIndexOf(','))
+  return (stop > 60 ? cut.slice(0, stop) : cut).replace(/[,.;:]$/, '') + '...'
+}

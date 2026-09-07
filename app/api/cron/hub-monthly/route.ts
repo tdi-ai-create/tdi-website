@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { guardCron } from '@/lib/cron-guard'
 import { optedOutEmails, unsubscribeUrl } from '@/lib/hub-email-optout'
-import { monthlyTools } from '@/lib/hub/monthly-tools'
+import { monthlyTools, educatorSubject, trim } from '@/lib/hub/monthly-tools'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 300
@@ -159,7 +159,7 @@ export async function GET(request: NextRequest) {
             ${g.tools.map(t => `
             <div style="border-left: 3px solid #e2e8f0; padding: 2px 0 2px 12px; margin: 0 0 10px;">
               <a href="${site}/hub/quick-wins/${t.slug}" style="font-size: 14.5px; font-weight: 600; color: #1e2749; text-decoration: none;">${t.title}</a>
-              ${t.description ? `<p style="color: #64748b; margin: 3px 0 0; font-size: 13px; line-height: 1.5;">${t.description}</p>` : ''}
+              ${t.description ? `<p style="color: #64748b; margin: 3px 0 0; font-size: 13px; line-height: 1.5;">${trim(t.description)}</p>` : ''}
             </div>`).join('')}`).join('')}
           </div>`
 
@@ -210,9 +210,7 @@ export async function GET(request: NextRequest) {
   }
 
   const previewAs = request.nextUrl.searchParams.get('previewAs')?.toLowerCase() ?? null
-  const subject = featured
-    ? `${featured.title}, and everything else new this month`
-    : `This month in the Hub, ${monthName}`
+  const subject = educatorSubject(released, monthName)
 
   if (dryRun) {
     const subjectPerson =
