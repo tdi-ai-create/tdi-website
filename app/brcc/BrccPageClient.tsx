@@ -144,6 +144,55 @@ export default function BrccPageClient() {
         </div>
       </section>
 
+      {/* Who this came from. Directly under the hero, because at the foot of a
+          long page most readers never reach it and the page loses its author. */}
+      <section className="py-10 border-b border-[#E0E0DA]">
+        <div className="max-w-3xl mx-auto px-6">
+          <div className="sm:flex sm:gap-6 sm:items-start">
+            <Image
+              src="/team/rae-hughart.jpg"
+              alt="Rae Hughart"
+              width={112}
+              height={112}
+              className="rounded-full object-cover w-24 h-24 flex-none mb-4 sm:mb-0"
+            />
+            <div className="min-w-0">
+              <h2 className="font-serif text-2xl font-semibold mb-1" style={{ color: NAVY }}>
+                Rae Hughart
+              </h2>
+              <p className="font-mono text-[11px] uppercase tracking-[0.12em] mb-3" style={{ color: NAVY, opacity: 0.55 }}>
+                Founder, Teachers Deserve It
+              </p>
+              <p className="text-[15px] mb-4 max-w-2xl">
+                Rae grew up on an IEP, and the people who got her through were a special
+                education teacher and a series of paraprofessionals. Nobody had trained
+                them to do the part that mattered most. That is why she spends her time on
+                the adults standing closest to the kids.
+              </p>
+
+              <div className="flex flex-wrap items-center gap-3">
+                <a
+                  href="/about"
+                  className="inline-block font-semibold text-[15px] rounded-md px-5 py-2.5 border-2"
+                  style={{ borderColor: NAVY, color: NAVY }}
+                >
+                  Meet the team behind Rae
+                </a>
+                <a href="https://raehughart.substack.com" target="_blank" rel="noopener noreferrer" className="text-[14px] underline underline-offset-4" style={{ color: NAVY }}>
+                  Read the newsletter
+                </a>
+                <a href="https://www.linkedin.com/in/rae-hughart/" target="_blank" rel="noopener noreferrer" className="text-[14px] underline underline-offset-4" style={{ color: NAVY }}>
+                  LinkedIn
+                </a>
+                <a href="https://www.instagram.com/raehughart/" target="_blank" rel="noopener noreferrer" className="text-[14px] underline underline-offset-4" style={{ color: NAVY }}>
+                  Instagram
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Gifts */}
       <section className="py-14" style={{ backgroundColor: '#FFF8E7' }}>
         <div className="max-w-3xl mx-auto px-6">
@@ -171,6 +220,7 @@ export default function BrccPageClient() {
               </div>
               <a
                 href="/downloads/the-five-moves-brcc.pdf"
+                download="The Five Moves - Rae Hughart - BRCC 2026.pdf"
                 className="inline-block mt-4 md:mt-0 font-bold text-[15px] rounded-md px-6 py-3 whitespace-nowrap"
                 style={{ backgroundColor: YELLOW, color: '#241B00' }}
               >
@@ -438,55 +488,12 @@ export default function BrccPageClient() {
               is written for the person in the hallway rather than for a training day. If you
               came looking for a trauma framework, that is not us yet.
             </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Who this came from */}
-      <section className="pb-16">
-        <div className="max-w-3xl mx-auto px-6">
-          <div className="bg-white border border-[#E0E0DA] rounded-md p-6 sm:flex sm:gap-6 sm:items-start">
-            <Image
-              src="/team/rae-hughart.jpg"
-              alt="Rae Hughart"
-              width={96}
-              height={96}
-              className="rounded-full object-cover w-20 h-20 flex-none mb-4 sm:mb-0"
-            />
-            <div className="min-w-0">
-              <h3 className="font-serif text-xl font-semibold mb-1" style={{ color: NAVY }}>
-                Rae Hughart
-              </h3>
-              <p className="font-mono text-[11px] uppercase tracking-[0.12em] mb-3" style={{ color: NAVY, opacity: 0.55 }}>
-                Founder, Teachers Deserve It
-              </p>
-              <p className="text-[15px] mb-4">
-                Rae grew up on an IEP, and the people who got her through were a special
-                education teacher and a series of paraprofessionals. Nobody had trained
-                them to do the part that mattered most. That is why she spends her time on
-                the adults standing closest to the kids.
-              </p>
-              <div className="flex flex-wrap gap-x-5 gap-y-2 text-[14px]">
-                <a href="https://www.linkedin.com/in/rae-hughart/" target="_blank" rel="noopener noreferrer" className="underline underline-offset-4" style={{ color: NAVY }}>
-                  LinkedIn
-                </a>
-                <a href="https://www.instagram.com/raehughart/" target="_blank" rel="noopener noreferrer" className="underline underline-offset-4" style={{ color: NAVY }}>
-                  Instagram
-                </a>
-                <a href="https://raehughart.substack.com" target="_blank" rel="noopener noreferrer" className="underline underline-offset-4" style={{ color: NAVY }}>
-                  Read the newsletter
-                </a>
-                <a href="/about" className="underline underline-offset-4" style={{ color: NAVY }}>
-                  Meet the rest of the team
-                </a>
-              </div>
-              <p className="text-[14px] text-[#6B7079] mt-4">
-                Questions, or want to talk about what this looks like in your building?{' '}
-                <a href="mailto:hello@teachersdeserveit.com" className="underline underline-offset-4" style={{ color: NAVY }}>
-                  hello@teachersdeserveit.com
-                </a>
-              </p>
-            </div>
+            <p className="text-[15px] text-[#6B7079] mt-4">
+              Questions, or want to talk about what this looks like in your building?{' '}
+              <a href="mailto:hello@teachersdeserveit.com" className="underline underline-offset-4" style={{ color: NAVY }}>
+                hello@teachersdeserveit.com
+              </a>
+            </p>
           </div>
         </div>
       </section>
