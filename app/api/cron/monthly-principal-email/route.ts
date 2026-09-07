@@ -23,12 +23,17 @@ export async function GET(request: NextRequest) {
       if (!isVercelCron) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    if (!RESEND_API_KEY) return NextResponse.json({ error: 'Resend not configured' }, { status: 500 });
-
     // A rehearsal that still sends is not a rehearsal. This route had no dry run
     // at all, which meant the only way to see what a partner would receive was
     // to send it to them.
     const dryRun = request.nextUrl.searchParams.get('dryRun') === '1';
+
+    // A dry run never calls Resend, so it must not require the key. Demanding it
+    // would mean the only place you could preview this email is the one place
+    // that can also send it.
+    if (!dryRun && !RESEND_API_KEY) {
+      return NextResponse.json({ error: 'Resend not configured' }, { status: 500 });
+    }
 
     // Quick Wins live in the Learning Hub project, not the one this route reads
     // for partnerships and staff. Two databases, two clients.
@@ -88,6 +93,7 @@ export async function GET(request: NextRequest) {
 
     let sent = 0;
     const wouldSend: Array<{ to: string; subject: string }> = [];
+    let previewHtml: string | null = null;
     // Reported rather than swallowed. A send that failed and a send that was
     // never logged are both invisible otherwise, and this email goes to clients.
     const sendFailures: Array<{ to: string; status: number }> = [];
@@ -135,8 +141,26 @@ Rae`;
       // Send the email
       const subject = `${firstName}, a quick update on your team`;
 
+      // Built before the dry-run branch so a rehearsal returns exactly the bytes
+      // that would have been sent, rather than something assembled a second way.
+      const emailHtml = `
+            <div style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;max-width:560px;margin:0 auto;color:#1e2749;font-size:15px;line-height:1.7;">
+              ${emailBody.split('\n').filter(Boolean).map(para => `<p style="margin:0 0 14px;">${para}</p>`).join('')}
+              ${toolsHtml}
+              <div style="margin-top:24px;">
+                <a href="https://www.teachersdeserveit.com/partners/${p.slug}" style="display:inline-block;padding:12px 24px;background:#1e2749;color:white;text-decoration:none;border-radius:8px;font-size:14px;font-weight:600;">
+                  Open your dashboard
+                </a>
+              </div>
+              <p style="margin-top:24px;font-size:13px;color:#9CA3AF;">
+                This is your monthly partnership update from Teachers Deserve It.
+              </p>
+            </div>
+          `;
+
       if (dryRun) {
         wouldSend.push({ to: p.contact_email.toLowerCase(), subject });
+        if (!previewHtml) previewHtml = emailHtml;
         continue;
       }
 
@@ -151,20 +175,7 @@ Rae`;
           to: [p.contact_email.toLowerCase()],
           cc: ['rae@teachersdeserveit.com'],
           subject,
-          html: `
-            <div style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;max-width:560px;margin:0 auto;color:#1e2749;font-size:15px;line-height:1.7;">
-              ${emailBody.split('\n').filter(Boolean).map(para => `<p style="margin:0 0 14px;">${para}</p>`).join('')}
-              ${toolsHtml}
-              <div style="margin-top:24px;">
-                <a href="https://www.teachersdeserveit.com/partners/${p.slug}" style="display:inline-block;padding:12px 24px;background:#1e2749;color:white;text-decoration:none;border-radius:8px;font-size:14px;font-weight:600;">
-                  Open your dashboard
-                </a>
-              </div>
-              <p style="margin-top:24px;font-size:13px;color:#9CA3AF;">
-                This is your monthly partnership update from Teachers Deserve It.
-              </p>
-            </div>
-          `,
+          html: emailHtml,
         }),
       });
 
@@ -207,6 +218,7 @@ Rae`;
         toolsSectionRendered: toolsHtml.length > 0,
         previewFor: samplePartner?.contact_email ?? null,
         toolsHtml,
+        previewHtml,
       });
     }
 
