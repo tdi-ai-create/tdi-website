@@ -41,36 +41,36 @@ const MOVES = [
   },
 ];
 
-const TOOLS: { title: string; roles: ('PARA' | 'TEACHER')[] }[] = [
-  { title: 'The First 10 Minutes Framework', roles: ['TEACHER'] },
-  { title: 'Calm Response Scripts', roles: ['PARA', 'TEACHER'] },
-  { title: 'The Noise Level System', roles: ['TEACHER'] },
-  { title: 'Lesson Flow Checklist', roles: ['TEACHER'] },
-  { title: '2x10 Strategy, PA Edition', roles: ['PARA'] },
-  { title: 'Strategic Planning: A Teacher-First Tool', roles: ['TEACHER'] },
-  { title: 'Para Quick-Start Confidence Kit', roles: ['PARA'] },
-  { title: 'Classroom Scenario Shuffle', roles: ['PARA', 'TEACHER'] },
-  { title: 'The Shift Kit', roles: ['PARA', 'TEACHER'] },
-  { title: 'Know Your Learners: Student Profile Builder', roles: ['TEACHER'] },
-  { title: 'PA Quick Wins Menu', roles: ['PARA'] },
-  { title: 'Morning Meeting Framework', roles: ['TEACHER'] },
-  { title: '10 Low-Lift Ways to Be Part of the Solution', roles: ['PARA', 'TEACHER'] },
-  { title: 'The Awesome Audit', roles: ['PARA', 'TEACHER'] },
-  { title: 'Burnout Early Warning System', roles: ['PARA', 'TEACHER'] },
-  { title: 'Time-Saving Prompts for Teachers', roles: ['TEACHER'] },
-  { title: 'The Language Playbook', roles: ['PARA', 'TEACHER'] },
-  { title: 'PA Observation Guide', roles: ['PARA'] },
-  { title: 'No-Hands-Up Help Systems', roles: ['PARA', 'TEACHER'] },
-  { title: 'De-Escalation Language Guide', roles: ['PARA', 'TEACHER'] },
+const TOOLS: { title: string; slug: string; roles: ('PARA' | 'TEACHER')[] }[] = [
+  { title: 'The First 10 Minutes Framework', slug: 'first-10-minutes-framework', roles: ['TEACHER'] },
+  { title: 'Calm Response Scripts', slug: 'calm-response-scripts', roles: ['PARA', 'TEACHER'] },
+  { title: 'The Noise Level System', slug: 'noise-level-system', roles: ['TEACHER'] },
+  { title: 'Lesson Flow Checklist', slug: 'lesson-flow-checklist', roles: ['TEACHER'] },
+  { title: '2x10 Strategy PA Edition', slug: '2x10-strategy-pa-edition', roles: ['PARA'] },
+  { title: 'Strategic Planning: A Teacher-First Tool', slug: 'strategic-planning-teacher-first-tool', roles: ['TEACHER'] },
+  { title: 'Para Quick-Start Confidence Kit', slug: 'para-quick-start-confidence-kit', roles: ['PARA'] },
+  { title: 'Classroom Scenario Shuffle', slug: 'classroom-shuffle', roles: ['PARA', 'TEACHER'] },
+  { title: 'The Shift Kit', slug: 'shift-kit', roles: ['PARA', 'TEACHER'] },
+  { title: 'Know Your Learners: A Student Profile Builder', slug: 'know-your-learners-student-profile-builder', roles: ['TEACHER'] },
+  { title: 'PA Quick Wins Menu', slug: 'pa-quick-wins-menu', roles: ['PARA'] },
+  { title: 'Morning Meeting Framework', slug: 'morning-meeting-framework', roles: ['TEACHER'] },
+  { title: '10 Low-Lift Ways to Be Part of the Solution', slug: '10-low-lift-ways-solution', roles: ['PARA', 'TEACHER'] },
+  { title: 'The Awesome Audit', slug: 'awesome-audit', roles: ['PARA', 'TEACHER'] },
+  { title: 'Burnout Early Warning System', slug: 'burnout-early-warning', roles: ['PARA', 'TEACHER'] },
+  { title: 'Time-Saving Prompts for Teachers', slug: 'time-saving-prompts-teachers', roles: ['TEACHER'] },
+  { title: 'The Language Playbook', slug: 'language-playbook', roles: ['PARA', 'TEACHER'] },
+  { title: 'PA Observation Guide', slug: 'pa-observation-guide', roles: ['PARA'] },
+  { title: 'No-Hands-Up Help Systems', slug: 'no-hands-up-help-systems', roles: ['PARA', 'TEACHER'] },
+  { title: 'De-Escalation Language Guide', slug: 'de-escalation-language-guide', roles: ['PARA', 'TEACHER'] },
 ];
 
 const GAMES = [
-  { title: 'Classroom Scenario Shuffle', mins: '10 min' },
-  { title: "What's Your Move?", mins: '10 min' },
-  { title: 'Reset Roulette', mins: '8 min' },
-  { title: 'Conversation Compass', mins: '12 min' },
-  { title: 'Question Knockout', mins: '15 min' },
-  { title: 'Partner Up', mins: '15 min' },
+  { title: 'Classroom Scenario Shuffle', slug: 'classroom-shuffle', mins: '10 min' },
+  { title: "What's Your Move?", slug: 'whats-your-move', mins: '10 min' },
+  { title: 'Reset Roulette', slug: 'reset-roulette', mins: '8 min' },
+  { title: 'Conversation Compass', slug: 'conversation-compass', mins: '12 min' },
+  { title: 'Question Knockout', slug: 'question-knockout', mins: '15 min' },
+  { title: 'Partner Up', slug: 'partner-up', mins: '15 min' },
 ];
 
 export default function BrccPageClient() {
@@ -391,7 +391,13 @@ export default function BrccPageClient() {
                   {String(i + 1).padStart(2, '0')}
                 </span>
                 <p className="text-[14.5px] leading-snug text-[#2D2D2D]">
-                  <b className="font-semibold">{t.title}</b>
+                  <a
+                    href={`/hub/quick-wins/${t.slug}`}
+                    className="font-semibold underline underline-offset-2 decoration-[#C9CDD3] hover:decoration-current"
+                    style={{ color: NAVY }}
+                  >
+                    {t.title}
+                  </a>
                   {t.roles.map((r) => (
                     <span
                       key={r}
@@ -461,9 +467,13 @@ export default function BrccPageClient() {
           <div className="grid sm:grid-cols-3 gap-x-6">
             {GAMES.map((g) => (
               <div key={g.title} className="py-2.5 border-b border-[#E0E0DA]">
-                <b className="block text-[14.5px] font-semibold text-[#2D2D2D] leading-snug">
+                <a
+                  href={`/hub/practice/${g.slug}`}
+                  className="block text-[14.5px] font-semibold leading-snug underline underline-offset-2 decoration-[#C9CDD3] hover:decoration-current"
+                  style={{ color: NAVY }}
+                >
                   {g.title}
-                </b>
+                </a>
                 <em className="not-italic font-mono text-[11px] text-[#99A0A8]">{g.mins}</em>
               </div>
             ))}
