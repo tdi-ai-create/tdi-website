@@ -101,6 +101,7 @@ export async function GET(request: NextRequest) {
         // Distinguishable from a human publish on purpose, so the audit can
         // tell later which items nobody watched go live.
         published_by: `scheduled-publisher (slotted by ${row.scheduled_by || row.reviewed_by || 'unknown'})`,
+        published_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       })
       .eq('id', row.id)
