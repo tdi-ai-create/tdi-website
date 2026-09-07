@@ -17,8 +17,6 @@ import CommunityBookmarks from '@/components/hub/CommunityBookmarks';
 import DashboardInsight from '@/components/hub/DashboardInsight';
 import AchievementInsights from '@/components/hub/AchievementInsights';
 import { QuizResultBadge } from '@/components/hub/QuizEngine';
-import { ALL_QUIZZES } from '@/lib/hub/quizConfigs';
-import { categoryColor } from '@/lib/hub/categoryColors';
 // PolaroidCard shelved for now
 // import SortableDashboardSection from '@/components/hub/SortableDashboardSection';
 // dnd-kit imports shelved for draggable sections feature
@@ -39,8 +37,6 @@ import {
   Check,
   Lightbulb,
   Target,
-  ChevronLeft,
-  ChevronRight,
 } from 'lucide-react';
 
 // Shared category colors -- used across all QW card instances
@@ -272,21 +268,6 @@ interface SavedCourse {
   category: string;
 }
 
-// ── Carousel card type ──
-interface CarouselCard {
-  type: 'course' | 'quick_win' | 'game' | 'quiz' | 'quiz_result';
-  title: string;
-  description: string;
-  slug: string;
-  href: string;
-  gradient?: string;
-  dot?: string;
-  quizIcon?: string;
-  quizIconBg?: string;
-  quizIconColor?: string;
-  titleColor?: string;
-}
-
 // ── Browse topics ──
 const BROWSE_TOPICS = [
   { label: 'Classroom Tools', query: 'Classroom Tools' },
@@ -318,6 +299,20 @@ export default function HubDashboard() {
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
   const [quickWins, setQuickWins] = useState<QuickWin[]>([]);
   const [featuredQuickWins, setFeaturedQuickWins] = useState<QuickWin[]>([]);
+
+  // The three personalised bands. Popularity is banded into words by the API and
+  // never arrives here as a count, because nothing outside TDI shows one.
+  type HomeTool = {
+    id: string; slug: string; title: string; description: string | null;
+    category: string; roles: string[]; lift: string | null;
+    band?: 'most' | 'widely' | null;
+  };
+  const [homeSections, setHomeSections] = useState<{
+    month: string;
+    newThisMonth: HomeTool[];
+    popular: { label: string; note: string; tools: HomeTool[] };
+    newToYou: HomeTool[];
+  } | null>(null);
   const [tip, setTip] = useState<string>(getSeasonalTip());
   const [certificateCount, setCertificateCount] = useState<number>(0);
   const [fieldNotesCount, setFieldNotesCount] = useState<number>(0);
@@ -349,8 +344,6 @@ export default function HubDashboard() {
   const [likeYouCohortSize, setLikeYouCohortSize] = useState(0);
   const [likeYouType, setLikeYouType] = useState<string | null>(null);
 
-  // Carousel state
-  const [carouselIndex, setCarouselIndex] = useState(0);
 
   const firstName = profile?.display_name?.split(' ')[0] || user?.email?.split('@')[0] || 'Teacher';
   const dailyMessage = DAILY_MESSAGES[new Date().getDay()];
@@ -365,6 +358,19 @@ export default function HubDashboard() {
     other: 'Educator',
   };
   const roleLabel = profile?.role ? roleLabels[profile.role] || 'Educator' : 'Educator';
+
+  useEffect(() => {
+    if (!profile) return;
+    const params = new URLSearchParams();
+    if (profile.id) params.set('userId', String(profile.id));
+    if (profile.role) params.set('role', String(profile.role));
+    let cancelled = false;
+    fetch(`/api/hub/home-sections?${params.toString()}`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => { if (!cancelled && d && !d.error) setHomeSections(d); })
+      .catch(() => { /* the bands simply do not render */ });
+    return () => { cancelled = true; };
+  }, [profile]);
 
   useEffect(() => {
     async function loadDashboardData() {
@@ -928,172 +934,6 @@ export default function HubDashboard() {
     }
   }, []);
 
-  // ── Build carousel cards ──
-  const carouselCards: CarouselCard[] = useMemo(() => {
-    const cards: CarouselCard[] = [];
-    let gradientIdx = 0;
-
-    // Add recommended courses
-    if (recommendations.length > 0) {
-      recommendations.slice(0, 3).forEach((course) => {
-        cards.push({
-          type: 'course',
-          title: course.title,
-          description: course.reason || course.category || 'Course',
-          slug: course.slug,
-          href: `/hub/courses/${course.slug}`,
-          gradient: COURSE_GRADIENTS[gradientIdx++ % COURSE_GRADIENTS.length],
-        });
-      });
-    }
-
-    // Add enrolled courses (in progress)
-    enrollments.slice(0, 2).forEach((enrollment) => {
-      // Skip if already in recommendations
-      if (cards.some(c => c.slug === enrollment.course?.slug)) return;
-      cards.push({
-        type: 'course',
-        title: enrollment.course?.title || 'Course',
-        description: `${enrollment.progress_pct || 0}% complete`,
-        slug: enrollment.course?.slug || '',
-        href: `/hub/courses/${enrollment.course?.slug}`,
-        gradient: COURSE_GRADIENTS[gradientIdx++ % COURSE_GRADIENTS.length],
-      });
-    });
-
-    // Add featured quick wins
-    featuredQuickWins.slice(0, 3).forEach((qw) => {
-      cards.push({
-        type: 'quick_win',
-        title: qw.title,
-        description: `${qw.category} . Download`,
-        slug: qw.slug,
-        href: `/hub/quick-wins/${qw.slug}`,
-        dot: categoryColor(qw.category),
-      });
-    });
-
-    // Add games
-    const gameEntries = [
-      { slug: 'tell-or-ask', title: 'Tell or Ask?', desc: 'Communication . Interactive' },
-      { slug: 'feedback-level-up', title: 'Feedback Level Up', desc: 'Communication . Interactive' },
-      { slug: 'whats-your-move', title: "What's Your Move?", desc: 'Management . Interactive' },
-      { slug: 'classroom-shuffle', title: 'Classroom Shuffle', desc: 'Management . Quick play' },
-      { slug: 'first-conversation', title: 'First Conversation', desc: 'Relationships . Interactive' },
-    ];
-    gameEntries.slice(0, 3).forEach((game) => {
-      cards.push({
-        type: 'game',
-        title: game.title,
-        description: game.desc,
-        slug: game.slug,
-        href: `/hub/quick-wins/${game.slug}`,
-      });
-    });
-
-    // Add quiz results (taken quizzes)
-    const takenQuizzes = ALL_QUIZZES.filter(q => dashboardQuizResults[q.id]);
-    takenQuizzes.slice(0, 2).forEach((quiz) => {
-      const resultKey = dashboardQuizResults[quiz.id];
-      const result = quiz.results[resultKey];
-      if (result) {
-        cards.push({
-          type: 'quiz_result',
-          title: result.title,
-          description: result.subtitle,
-          slug: quiz.id,
-          href: `/hub/settings/profile?quiz=${quiz.id}`,
-          quizIcon: result.icon,
-          quizIconBg: result.color,
-          quizIconColor: 'white',
-          titleColor: result.color,
-        });
-      }
-    });
-
-    // Add untaken quizzes
-    const untakenQuizzes = ALL_QUIZZES.filter(q => !dashboardQuizResults[q.id]);
-    untakenQuizzes.slice(0, 3).forEach((quiz) => {
-      cards.push({
-        type: 'quiz',
-        title: quiz.title,
-        description: `${quiz.questionCount} questions. Takes ${quiz.durationLabel}.`,
-        slug: quiz.id,
-        href: `/hub/settings/profile?quiz=${quiz.id}`,
-        quizIcon: '?',
-        quizIconBg: '#F3F4F6',
-        quizIconColor: '#9CA3AF',
-      });
-    });
-
-    // Shuffle the cards for variety (deterministic by day)
-    const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000);
-    const shuffled = [...cards];
-    for (let i = shuffled.length - 1; i > 0; i--) {
-      const j = (dayOfYear * (i + 1) * 7) % (i + 1);
-      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-    }
-
-    return shuffled.length > 0 ? shuffled : [];
-  }, [recommendations, enrollments, featuredQuickWins, dashboardQuizResults]);
-
-  // Carousel helpers
-  const shiftLeft = useCallback(() => {
-    if (carouselCards.length === 0) return;
-    setCarouselIndex((prev) => (prev - 1 + carouselCards.length) % carouselCards.length);
-  }, [carouselCards.length]);
-
-  const shiftRight = useCallback(() => {
-    if (carouselCards.length === 0) return;
-    setCarouselIndex((prev) => (prev + 1) % carouselCards.length);
-  }, [carouselCards.length]);
-
-  // Carousel positions (5 visible cards, center is largest)
-  const carouselPositions = [
-    { offset: -2, left: '2%',  w: 180, h: 260, opacity: 0.35, scale: 0.75, z: 1 },
-    { offset: -1, left: '15%', w: 200, h: 290, opacity: 0.65, scale: 0.88, z: 2 },
-    { offset:  0, left: '50%', w: 240, h: 340, opacity: 1,    scale: 1,    z: 3, translateX: '-50%' },
-    { offset:  1, left: '63%', w: 200, h: 290, opacity: 0.65, scale: 0.88, z: 2 },
-    { offset:  2, left: '82%', w: 180, h: 260, opacity: 0.35, scale: 0.75, z: 1 },
-  ];
-
-  const QUICK_WIN_GRADIENTS: Record<string, string> = {
-    '#7C9CBF': 'linear-gradient(170deg, #374A60 0%, #5A7FA0 40%, #7C9CBF 70%, #B8D0E8 100%)',
-    '#D4A843': 'linear-gradient(170deg, #5C2D06 0%, #92400E 30%, #D97706 70%, #F59E0B 100%)',
-    '#6BA368': 'linear-gradient(170deg, #1B4332 0%, #2D6A4F 40%, #6BA368 70%, #95D5B2 100%)',
-    '#9B7CB8': 'linear-gradient(170deg, #3B0764 0%, #5B21B6 40%, #9B7CB8 70%, #C4B5FD 100%)',
-    '#D4789C': 'linear-gradient(170deg, #4A1942 0%, #831843 30%, #D4789C 70%, #F9A8D4 100%)',
-  };
-  const GAME_GRADIENTS = [
-    'linear-gradient(170deg, #052E16 0%, #166534 40%, #22C55E 80%, #4ADE80 100%)',
-    'linear-gradient(170deg, #0C2D48 0%, #1E5F8C 40%, #2980B9 70%, #5DADE2 100%)',
-    'linear-gradient(170deg, #4A1942 0%, #831843 30%, #DB2777 70%, #F472B6 100%)',
-  ];
-  const QUIZ_GRADIENT = 'linear-gradient(170deg, #3B0764 0%, #5B21B6 40%, #7C3AED 70%, #A78BFA 100%)';
-
-  function getPosterGradient(card: CarouselCard, index: number): string {
-    if (card.type === 'course') return card.gradient || COURSE_GRADIENTS[index % COURSE_GRADIENTS.length];
-    if (card.type === 'quick_win') return QUICK_WIN_GRADIENTS[card.dot || ''] || 'linear-gradient(170deg, #374151 0%, #6B7280 50%, #9CA3AF 100%)';
-    if (card.type === 'game') return GAME_GRADIENTS[index % GAME_GRADIENTS.length];
-    return QUIZ_GRADIENT;
-  }
-
-  function getAccentColor(card: CarouselCard): string {
-    if (card.type === 'course') return '#E8B84B';
-    if (card.type === 'quiz' || card.type === 'quiz_result') return '#A78BFA';
-    if (card.type === 'quick_win') return '#7C9CBF';
-    if (card.type === 'game') return '#22C55E';
-    return '#E8B84B';
-  }
-
-  function getBadgeLabel(card: CarouselCard): string {
-    if (card.type === 'course') return 'Course';
-    if (card.type === 'quick_win') return 'Quick Win';
-    if (card.type === 'game') return 'Game';
-    if (card.type === 'quiz_result') return 'Your Result';
-    return 'Quiz';
-  }
-
   // ── Derive insight card data ──
 
   // Goal text from userGoal
@@ -1350,132 +1190,92 @@ export default function HubDashboard() {
         </div>
       </section>
 
-      {/* ============ SUGGESTIONS (curved carousel with poster cards) ============ */}
-      {carouselCards.length > 0 && (
-        <div style={{ padding: '32px 0 20px' }}>
-          <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 32px', marginBottom: 20 }}>
-            <span style={{ fontFamily: "'Source Serif 4', serif", fontSize: 20, fontWeight: 600, color: '#1E2749' }}>
-              Suggestions for You
-            </span>
-          </div>
+      {/* ============ NEW THIS MONTH, POPULAR, NEW TO YOU ============ */}
+      {/*
+        Replaces the suggestions carousel, whose "featured" pick rotated by day
+        of the year: a lottery rather than a recommendation, and the weakest
+        thing on the page.
 
-          <div style={{ position: 'relative', maxWidth: 1100, margin: '0 auto', padding: '0 32px' }}>
-            {/* Left arrow */}
-            <button
-              onClick={shiftLeft}
-              style={{
-                position: 'absolute', top: '50%', transform: 'translateY(-50%)',
-                left: 8, width: 40, height: 40, borderRadius: '50%',
-                background: 'white', border: '1.5px solid #E5E7EB',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                cursor: 'pointer', color: '#6B7280', fontSize: 18,
-                zIndex: 10, boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-              }}
-              aria-label="Previous"
-            >
-              <ChevronLeft size={18} />
-            </button>
-
-            {/* Right arrow */}
-            <button
-              onClick={shiftRight}
-              style={{
-                position: 'absolute', top: '50%', transform: 'translateY(-50%)',
-                right: 8, width: 40, height: 40, borderRadius: '50%',
-                background: 'white', border: '1.5px solid #E5E7EB',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                cursor: 'pointer', color: '#6B7280', fontSize: 18,
-                zIndex: 10, boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-              }}
-              aria-label="Next"
-            >
-              <ChevronRight size={18} />
-            </button>
-
-            {/* Carousel track */}
-            <div style={{ position: 'relative', minHeight: 380, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-              {carouselPositions.map((pos) => {
-                if (carouselCards.length === 0) return null;
-                const idx = (carouselIndex + pos.offset + carouselCards.length) % carouselCards.length;
-                const card = carouselCards[idx];
-                const isCenter = pos.offset === 0;
-                const titleSize = isCenter ? 17 : (Math.abs(pos.offset) === 1 ? 14 : 12);
-
-                const handleCardClick = () => {
-                  if (pos.offset < 0) shiftLeft();
-                  else if (pos.offset > 0) shiftRight();
-                  else router.push(card.href);
-                };
-
-                return (
-                  <div
-                    key={`pos-${pos.offset}`}
-                    onClick={handleCardClick}
+        No band shows a view count. Popularity is banded into words by the API,
+        and a role only earns a popularity label when enough distinct people who
+        share that role have opened something. Below that it says "written for",
+        which is curation and is labelled as curation.
+      */}
+      {homeSections && (
+        <div style={{ maxWidth: 1100, margin: '0 auto', padding: '28px 32px 0' }}>
+          {(
+            [
+              homeSections.newThisMonth.length > 0 && {
+                key: 'new',
+                title: `New this month`,
+                note: `Tools go up on a schedule now, so there is something new most weekdays.`,
+                aside: homeSections.month,
+                tools: homeSections.newThisMonth,
+                showNew: true,
+              },
+              homeSections.popular.tools.length > 0 && {
+                key: 'popular',
+                title: homeSections.popular.label,
+                note: homeSections.popular.note,
+                aside: '',
+                tools: homeSections.popular.tools,
+                showNew: false,
+              },
+              homeSections.newToYou.length > 0 && {
+                key: 'newToYou',
+                title: 'Widely used, and you have not opened it',
+                note: 'Worth a look before it disappears under everything else.',
+                aside: '',
+                tools: homeSections.newToYou,
+                showNew: false,
+              },
+            ].filter(Boolean) as Array<{
+              key: string; title: string; note: string; aside: string;
+              tools: HomeTool[]; showNew: boolean;
+            }>
+          ).map((band) => (
+            <div key={band.key} style={{ marginBottom: 30 }}>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, flexWrap: 'wrap' }}>
+                <h2 style={{ fontSize: 19, fontWeight: 700, color: '#1e2749', margin: 0 }}>{band.title}</h2>
+                {band.aside && <span style={{ fontSize: 12.5, color: '#6B7684' }}>{band.aside}</span>}
+              </div>
+              <p style={{ fontSize: 13.5, color: '#6B7684', margin: '4px 0 14px' }}>{band.note}</p>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 12 }}>
+                {band.tools.map((t) => (
+                  <Link
+                    key={t.id}
+                    href={`/hub/quick-wins/${t.slug}`}
                     style={{
-                      position: 'absolute',
-                      width: pos.w,
-                      height: pos.h,
-                      left: pos.left,
-                      opacity: pos.opacity,
-                      transform: `${pos.translateX ? `translateX(${pos.translateX})` : ''} scale(${pos.scale})`,
-                      zIndex: pos.z,
-                      borderRadius: 16,
-                      overflow: 'hidden',
-                      background: getPosterGradient(card, idx),
-                      boxShadow: isCenter ? '0 12px 40px rgba(30,39,73,0.2)' : '0 4px 16px rgba(0,0,0,0.08)',
-                      cursor: 'pointer',
+                      background: 'white', border: '1px solid #E3E8EE', borderRadius: 9,
+                      padding: '13px 14px 14px', textDecoration: 'none',
+                      display: 'flex', flexDirection: 'column', gap: 6, minHeight: 108,
                     }}
                   >
-                    {/* Accent bar */}
-                    <div style={{
-                      position: 'absolute', top: 0, left: 0, right: 0, height: 4,
-                      background: getAccentColor(card), zIndex: 3,
-                    }} />
-                    {/* Decorative circles */}
-                    <div className="pointer-events-none" style={{
-                      position: 'absolute', width: 140, height: 140, borderRadius: '50%',
-                      background: 'white', opacity: 0.12, top: -30, right: -30,
-                    }} />
-                    <div className="pointer-events-none" style={{
-                      position: 'absolute', width: 90, height: 90, borderRadius: '50%',
-                      background: '#E8B84B', opacity: 0.12, bottom: 80, left: -25,
-                    }} />
-                    {/* Dark overlay */}
-                    <div className="pointer-events-none" style={{
-                      position: 'absolute', inset: 0,
-                      background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.1) 50%, transparent 70%)',
-                    }} />
-                    {/* Content */}
-                    <div style={{
-                      position: 'absolute', bottom: 0, left: 0, right: 0,
-                      padding: isCenter ? '20px 16px' : '14px 12px', zIndex: 2,
-                    }}>
-                      <span style={{
-                        display: 'inline-block', fontSize: 8, fontWeight: 700,
-                        letterSpacing: '1.5px', textTransform: 'uppercase' as const,
-                        padding: '4px 10px', borderRadius: 20,
-                        border: '1px solid rgba(255,255,255,0.3)',
-                        color: 'rgba(255,255,255,0.85)', marginBottom: 10,
-                      }}>
-                        {getBadgeLabel(card)}
-                      </span>
-                      <div style={{
-                        fontFamily: "'Source Serif 4', serif", fontSize: titleSize,
-                        fontWeight: 700, color: 'white', lineHeight: 1.25, marginBottom: 6,
-                      }}>
-                        {card.title}
-                      </div>
-                      {isCenter && (
-                        <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.55)' }}>
-                          {card.description}
-                        </div>
+                    <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#8A94A2' }}>
+                      {t.category}
+                    </span>
+                    <span style={{ fontSize: 14.5, fontWeight: 700, color: '#1e2749', lineHeight: 1.3 }}>
+                      {t.title}
+                    </span>
+                    <span style={{ marginTop: 'auto', display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                      {band.showNew && (
+                        <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 20, background: '#FFF3D4', color: '#8A5F14' }}>New</span>
                       )}
-                    </div>
-                  </div>
-                );
-              })}
+                      {t.band === 'most' && (
+                        <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 20, background: '#FBE7EF', color: '#8E2F58' }}>Most used</span>
+                      )}
+                      {t.band === 'widely' && (
+                        <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 20, background: '#FBE7EF', color: '#8E2F58' }}>Widely used</span>
+                      )}
+                      {t.lift === 'LOW' && (
+                        <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 20, background: '#E4F1EA', color: '#1F6B4A' }}>Low lift</span>
+                      )}
+                    </span>
+                  </Link>
+                ))}
+              </div>
             </div>
-          </div>
+          ))}
         </div>
       )}
 
