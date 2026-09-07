@@ -15,7 +15,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 type DbClient = any;
 
-export type CreatorFlag = 'step_engine';
+export type CreatorFlag = 'step_engine' | 'board_sweep';
 
 /**
  * Reads a flag. Never throws, and never returns true by accident: an error, a

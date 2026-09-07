@@ -53,13 +53,22 @@ export function CreatorMirror({
   const step = journey.openStep;
   const firstName = creatorName?.trim().split(/\s+/)[0] || 'They';
 
+  // No drawable step open, but something open is being held off the road. That
+  // is a broken board, not a finished one, and it must never be reported as
+  // finished. See Journey.strandedOpen.
+  const stranded = !step && journey.strandedOpen > 0;
+
   return (
     <div className="space-y-4">
       <div className="rounded-xl border border-gray-200 bg-white overflow-hidden">
-        <div className="border-t-4 border-[#ffba06] p-5">
+        <div className={`border-t-4 p-5 ${stranded ? 'border-[#9c1f31]' : 'border-[#ffba06]'}`}>
           <div className="flex items-center gap-2 mb-3">
-            <span className="inline-block rounded bg-[#ffba06] px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-[#1e2749]">
-              {step ? `${firstName}'s turn` : 'Nothing open'}
+            <span
+              className={`inline-block rounded px-2 py-1 text-[10px] font-bold uppercase tracking-wider ${
+                stranded ? 'bg-[#9c1f31] text-white' : 'bg-[#ffba06] text-[#1e2749]'
+              }`}
+            >
+              {step ? `${firstName}'s turn` : stranded ? 'Board needs repair' : 'Nothing open'}
             </span>
             {journey.openStageName && (
               <span className="text-xs text-gray-500">{journey.openStageName}</span>
@@ -84,6 +93,23 @@ export function CreatorMirror({
                   </span>
                 )}
               </div>
+            </>
+          ) : stranded ? (
+            <>
+              <h3 className="mb-1 text-lg font-bold text-[#9c1f31]">
+                {journey.strandedOpen === 1 ? 'A step is open that this journey cannot show' : `${journey.strandedOpen} steps are open that this journey cannot show`}
+              </h3>
+              <p className="mb-2 text-sm text-gray-600">
+                {journey.strandedNames.join(', ')}.{' '}
+                {journey.strandedOpen === 1 ? 'It was' : 'They were'} retired,
+                collapsed, or belong to the other path, so the road above leaves{' '}
+                {journey.strandedOpen === 1 ? 'it' : 'them'} out. This creator is
+                not finished. Their board needs placing.
+              </p>
+              <p className="text-xs text-gray-500">
+                The nightly sweep repairs this. If it is still here tomorrow,
+                check that the sweep ran.
+              </p>
             </>
           ) : (
             <p className="text-sm text-gray-600">

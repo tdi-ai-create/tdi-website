@@ -75,6 +75,23 @@ export interface Journey {
   openStepAction: OpenStepAction | null;
   totalSteps: number;
   completedSteps: number;
+  /**
+   * Open steps the road is not allowed to draw: retired, collapsed into another
+   * step, belonging to the other path, or mapped to no stage at all.
+   *
+   * Hiding these is right, because nobody should be asked to do them. Staying
+   * silent about them is not. A board whose only open step is one of these has
+   * `openStep: null`, and every caller read that as finished. On 2 September a
+   * retired step was opened on Catherine Dorian's project, and from then until
+   * this was written her page and her portal both told her there was nothing
+   * waiting on her or on us, while her submitted video sat unreviewed on the
+   * same screen.
+   *
+   * So: openStep null AND strandedOpen > 0 means the board needs repair. It
+   * never means finished. Callers must check this before saying so.
+   */
+  strandedOpen: number;
+  strandedNames: string[];
 }
 
 /** Packs one raw row into what MilestoneAction expects. */
@@ -151,6 +168,10 @@ export async function getJourney(supabase: DbClient, projectId: string): Promise
       openStepAction: first ? actionFor(first) : null,
       totalSteps: 0,
       completedSteps: 0,
+      // A project with no path draws no road, so nothing can be stranded off it.
+      // The one question that chooses a path is either open or it is not.
+      strandedOpen: 0,
+      strandedNames: [],
     };
   }
 
@@ -169,13 +190,23 @@ export async function getJourney(supabase: DbClient, projectId: string): Promise
     (mapRows as Array<{ milestone_id: string; stage_key: string }>).map((r) => [r.milestone_id, r.stage_key])
   );
 
-  const visible = (stepRows as Array<Record<string, any>>).filter((r) => {
+  const drawable = (r: Record<string, any>): boolean => {
     const m = r.milestones;
     if (m.retired_at) return false;
     if (m.is_collapsed_into) return false;
     const applies = m.applies_to as string[] | null;
     if (applies && applies.length > 0 && !applies.includes(path)) return false;
     return stageOf.has(r.milestone_id);
+  };
+
+  const visible = (stepRows as Array<Record<string, any>>).filter(drawable);
+
+  // Everything the road refuses to draw, that is nonetheless open. See the note
+  // on Journey.strandedOpen for why this is counted rather than dropped.
+  const stranded = (stepRows as Array<Record<string, any>>).filter((r) => {
+    if (drawable(r)) return false;
+    const d = displayStatus(r as { status: string; review_status: string | null });
+    return d !== 'complete' && d !== 'todo';
   });
 
   const steps: Array<JourneyStep & { stageKey: string; sortOrder: number }> = visible.map((r) => ({
@@ -237,6 +268,8 @@ export async function getJourney(supabase: DbClient, projectId: string): Promise
     openStepAction: openRaw ? actionFor(openRaw) : null,
     totalSteps: steps.length,
     completedSteps: steps.filter((s) => s.status === 'complete').length,
+    strandedOpen: stranded.length,
+    strandedNames: stranded.map((r) => r.milestones.name as string),
   };
 }
 
