@@ -114,7 +114,7 @@ export async function GET() {
   try {
     const { data: unpublished, error } = await supabase
       .from('hub_quick_wins')
-      .select('id, slug, title, status, qa_notes, quick_win_type, file_url, tool_file_url, tool_type, description, lift, category, topic_tags, roles, danielson_domains')
+      .select('id, slug, title, status, qa_notes, quick_win_type, file_url, tool_file_url, tool_type, description, lift, category, topic_tags, roles, danielson_domains, scheduled_publish_date')
       .eq('is_published', false)
       .lt('created_at', staleCutoff);
 
@@ -136,6 +136,21 @@ export async function GET() {
       const isWithheld = (q: typeof unpublished[number]) =>
         /QA FAIL|DO NOT PUBLISH/i.test(q.qa_notes ?? '');
 
+      // An item holding a future slot is waiting, not stuck. Since the release
+      // valve caps Hub publishing at three a day, the queue routinely holds
+      // finished work scheduled a week out. Without this every one of those
+      // would age past 48 hours and be reported as CRITICAL, so the alert would
+      // fire every morning for content that is behaving exactly as designed.
+      //
+      // A slot in the PAST is the opposite: it means the scheduled publisher
+      // did not run or could not publish it, which is a real defect and still
+      // reported below.
+      const todayCT = new Intl.DateTimeFormat('en-CA', {
+        timeZone: 'America/Chicago', year: 'numeric', month: '2-digit', day: '2-digit',
+      }).format(new Date());
+      const isScheduledAhead = (q: typeof unpublished[number]) =>
+        !!q.scheduled_publish_date && q.scheduled_publish_date > todayCT;
+
       const isReady = (q: typeof unpublished[number]) => {
         if (isWithheld(q)) return false;
         const tagged =
@@ -150,10 +165,16 @@ export async function GET() {
       };
 
       const withheld = unpublished.filter(isWithheld);
-      const ready = unpublished.filter(isReady);
+      const waiting = unpublished.filter(q => !isWithheld(q) && isScheduledAhead(q));
+      const ready = unpublished.filter(q => isReady(q) && !isScheduledAhead(q));
+      const overdue = unpublished.filter(
+        q => !isWithheld(q) && !!q.scheduled_publish_date && q.scheduled_publish_date <= todayCT
+      );
       // Withheld items are neither ready nor incomplete. Left in `incomplete` they would
       // simply move from a CRITICAL line to a WARNING line and keep the alert firing.
-      const incomplete = unpublished.filter(q => !isReady(q) && !isWithheld(q));
+      const incomplete = unpublished.filter(
+        q => !isReady(q) && !isWithheld(q) && !isScheduledAhead(q)
+      );
 
       // Visible in the cron log without raising an alert, so a deliberate hold stays
       // auditable rather than silently disappearing from the check.
@@ -164,11 +185,30 @@ export async function GET() {
         );
       }
 
+      // Visible without alerting. A growing queue is worth seeing; it is not a fault.
+      if (waiting.length > 0) {
+        console.log(
+          `[hub-content-health] ${waiting.length} item(s) holding a future slot, waiting rather than stuck: ` +
+          waiting.map(q => `${q.slug} (${q.scheduled_publish_date})`).join(', ')
+        );
+      }
+
+      // The scheduled publisher should have taken these already. This is the
+      // signal that it has stopped, which otherwise looks like a quiet week.
+      if (overdue.length > 0) {
+        issues.push(
+          `CRITICAL: ${overdue.length} Quick Win${overdue.length > 1 ? 's are' : ' is'} past a scheduled publish date ` +
+          `and still not live, which usually means the scheduled publisher is not running rather than that the ` +
+          `content is wrong. Check /api/cron/hub-scheduled-publish?dryRun=1. ` +
+          `Titles: ${overdue.slice(0, 8).map(d => d.title).join(', ')}${overdue.length > 8 ? `, and ${overdue.length - 8} more` : ''}`
+        );
+      }
+
       if (ready.length > 0) {
         issues.push(
           `CRITICAL: ${ready.length} Quick Win${ready.length > 1 ? 's are' : ' is'} complete and passing every publish requirement ` +
           `but still not live, so no educator can see ${ready.length > 1 ? 'them' : 'it'}. ` +
-          `Publish via POST /api/hub/content-sync (action: publish). ` +
+          `Schedule via POST /api/hub/content-sync (action: schedule). ` +
           `Titles: ${ready.slice(0, 8).map(d => d.title).join(', ')}${ready.length > 8 ? `, and ${ready.length - 8} more` : ''}`
         );
       }
