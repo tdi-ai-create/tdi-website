@@ -131,12 +131,22 @@ export default function PursuitPage() {
     reveal(wanted)
 
     const opp = params.get('opp')
-    if (!opp) return
-    setHighlightOpp(opp)
-    // After reveal's own scroll has settled, move to the specific row. Ten
-    // opportunities in one section is not "opening the thing".
-    // Same helper reveal uses. scrollIntoView does nothing on this page.
-    setTimeout(() => scrollToElementId(`opp-${opp}`, 80), 400)
+    if (opp) {
+      setHighlightOpp(opp)
+      // After reveal's own scroll has settled, move to the specific row. Ten
+      // opportunities in one section is not "opening the thing".
+      // Same helper reveal uses. scrollIntoView does nothing on this page.
+      setTimeout(() => scrollToElementId(`opp-${opp}`, 80), 400)
+      return
+    }
+
+    // Same idea for an action item, which is what every card on the board is
+    // actually about. Without this a card could open the section holding
+    // fourteen items and leave the reader to find the one they clicked.
+    const action = params.get('action')
+    if (action) {
+      setTimeout(() => scrollToElementId(`action-${action}`, 90), 400)
+    }
   }, [loading])
 
   const patchPursuit = async (fields: Record<string, unknown>) => {

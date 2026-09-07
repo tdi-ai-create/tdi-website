@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { DraftEmailModal, introEmailDraft, gateBlockerEmailDraft } from './components/panel/DraftEmailModal'
 import { ImpactEvidence } from './components/ImpactEvidence'
@@ -23,6 +24,9 @@ interface QueueItem {
   urgency: 'critical' | 'high' | 'normal' | 'low'
   actionType: string
   targetId?: string | null
+  /** The row this card is about, when it is about one. Set by /api/funding/queue. */
+  actionItemId?: string | null
+  opportunityId?: string | null
   inProgress?: boolean
   pursuitId: string
 }
@@ -62,6 +66,7 @@ interface SchoolData {
 }
 
 export default function FundingPage() {
+  const router = useRouter()
   const [schools, setSchools] = useState<SchoolData[]>([])
   // Replaces the Work Queue page. Its only real contribution was letting a
   // person ask "what is waiting on us" without reading every school, and that
@@ -71,7 +76,6 @@ export default function FundingPage() {
   // without opening a single school, which is the question the school-grouped
   // view could never answer directly.
   const [view, setView] = useState<'board' | 'schools' | 'funders' | 'awarded'>('board')
-  const [highlight, setHighlight] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [draftEmail, setDraftEmail] = useState<any & { opportunityId?: string; windowOpens?: string; windowCloses?: string } | null>(null)
   const [toast, setToast] = useState<string | null>(null)
@@ -248,13 +252,24 @@ export default function FundingPage() {
       {view === 'board' && (
         <NeedsYouBoard
           schools={schools}
-          onOpenSchool={id => {
-            setView('schools')
-            setOwnerFilter('all')
-            setHighlight(id)
-            setTimeout(() => {
-              document.getElementById(`school-${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-            }, 60)
+          onOpenItem={item => {
+            // Straight to the row the card is about. The deep link machinery
+            // on the school page already existed for Slack; it just was never
+            // pointed at from inside the portal, so clicking a card here was
+            // the long way round to a page the card could name exactly.
+            const base = `/tdi-admin/funding/${item.pursuitId}`
+            if (item.actionItemId) {
+              router.push(`${base}?open=actions&action=${item.actionItemId}`)
+              return
+            }
+            if (item.opportunityId) {
+              router.push(`${base}?open=paths&opp=${item.opportunityId}`)
+              return
+            }
+            // A card about the school itself rather than one row, such as
+            // "send the intro" or "complete the profile". The school page is
+            // the right destination for those, and it is one click either way.
+            router.push(base)
           }}
         />
       )}
@@ -309,7 +324,6 @@ export default function FundingPage() {
             style={{
               // Arriving here from the board, the row you clicked should be
               // obvious without you having to hunt for it.
-              outline: highlight === school.id ? '2px solid #ffba06' : 'none',
               outlineOffset: 4,
               borderRadius: 12,
               transition: 'outline-color .3s',

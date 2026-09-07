@@ -37,6 +37,9 @@ interface BoardQueueItem {
   actionType: string
   inProgress?: boolean
   pursuitId: string
+  /** The row this card is about, when it is about one. Set by /api/funding/queue. */
+  actionItemId?: string | null
+  opportunityId?: string | null
 }
 
 interface BoardGrant {
@@ -287,10 +290,19 @@ function Stat({ k, v, n, hot }: { k: string; v: string; n: string; hot?: boolean
 
 export default function NeedsYouBoard({
   schools,
-  onOpenSchool,
+  onOpenItem,
 }: {
   schools: BoardSchool[]
-  onOpenSchool: (pursuitId: string) => void
+  /**
+   * Open the thing the card is about, not the school it belongs to.
+   *
+   * Every card used to open the school, which scrolled the Schools list to
+   * that school. From there it was Open School, then the row, then Answer this:
+   * four more clicks to reach the item you had already pointed at, and the
+   * first of them looked like the click had failed. Cards that know their row
+   * now go straight to it.
+   */
+  onOpenItem: (item: BoardQueueItem) => void
 }) {
   const [filter, setFilter] = useState<string>('all')
   const [showClosed, setShowClosed] = useState(false)
@@ -416,7 +428,7 @@ export default function NeedsYouBoard({
                 tone: i.urgency === 'critical' ? 'stuck' : 'you',
                 line: i.why,
                 action: VERBS[i.actionType] ?? 'Open',
-                onAction: () => onOpenSchool(i.pursuitId),
+                onAction: () => onOpenItem(i),
               }}
             />
           ))}
@@ -432,7 +444,7 @@ export default function NeedsYouBoard({
                 tone: 'stuck',
                 line: i.why,
                 action: 'Chase',
-                onAction: () => onOpenSchool(i.pursuitId),
+                onAction: () => onOpenItem(i),
               }}
             />
           ))}

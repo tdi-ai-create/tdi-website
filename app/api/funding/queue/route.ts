@@ -74,6 +74,30 @@ export async function GET() {
         allocsByPursuit.get(p.id) ?? [],
         { qaAgentEnabled: isQaAgentEnabled(), qaSilenceHours: QA_SILENCE_HOURS, draftSilenceHours: DRAFT_SILENCE_HOURS },
       )
+      // Where the card should land you.
+      //
+      // computeNextActions builds its ids as `${verb}-${row.id}`, so the row a
+      // card is about is already in the id, just glued to a prefix. Rather than
+      // teach the board twenty six prefixes and hope none of them changes,
+      // match the tail of the id against the real rows for this pursuit. A
+      // match is proof rather than a guess, because these are uuids: nothing
+      // else in the system ends in that string.
+      //
+      // Before this, every card on the board went to the same place, the school
+      // list, and finding the item it was about took three more clicks.
+      const actionIds = new Set((actionsByPursuit.get(p.id) ?? []).map(a => a.id))
+      const oppIds = new Set((oppsByPursuit.get(p.id) ?? []).map(o => o.id))
+      // endsWith rather than splitting on the first dash: prefixes are not all
+      // one word (`verify-window-`, `waiting-client-`) and uuids contain dashes
+      // of their own, so there is no reliable place to cut. The id sets are a
+      // dozen rows per pursuit, so scanning them is free.
+      const tailOf = (id: string, ids: Set<string>) => {
+        for (const candidate of ids) {
+          if (id.endsWith(candidate)) return candidate
+        }
+        return null
+      }
+
       for (const action of nextActions) {
         allItems.push({
           ...action,
@@ -82,6 +106,8 @@ export async function GET() {
           districtName: p.district_name,
           contactName: p.client_contact_name,
           contactEmail: p.client_contact_email,
+          actionItemId: tailOf(action.id, actionIds),
+          opportunityId: tailOf(action.id, oppIds),
         })
       }
     }
