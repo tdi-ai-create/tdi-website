@@ -18,6 +18,11 @@ const HUB_URL = 'https://www.teachersdeserveit.com/hub';
  *   Day   0: Downgrade to free + confirmation email
  *
  * From: Teachers Deserve It Team <hello@teachersdeserveit.com>
+ *
+ * Pass ?dryRun=1 to walk the whole decision set and report who would be
+ * emailed, which variant they would get, and who would be downgraded, while
+ * sending nothing and writing nothing. It runs the real code path rather than
+ * a copy of it, so the report is evidence about what the cron will actually do.
  */
 export async function GET(request: NextRequest) {
   try {
@@ -28,7 +33,12 @@ export async function GET(request: NextRequest) {
       if (!isVercelCron) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    if (!RESEND_API_KEY) return NextResponse.json({ error: 'Resend not configured' }, { status: 500 });
+    // A dry run sends nothing, so a missing mail key must not stop it. Otherwise
+    // the one environment where you most want to rehearse is the one that cannot.
+    const dryRun = request.nextUrl.searchParams.get('dryRun') === '1';
+    if (!RESEND_API_KEY && !dryRun) {
+      return NextResponse.json({ error: 'Resend not configured' }, { status: 500 });
+    }
 
     const portalSupabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -48,6 +58,7 @@ export async function GET(request: NextRequest) {
     const today = now.toISOString().split('T')[0];
     let emailsSent = 0;
     let downgraded = 0;
+    const planned: { email: string; variant: string; daysLeft: number; source: string; wouldDowngrade: boolean }[] = [];
 
     // Get all active/expiring partnerships with contract_end dates
     const { data: partnerships } = await portalSupabase
@@ -180,7 +191,7 @@ export async function GET(request: NextRequest) {
 
         if (toDowngrade && toDowngrade.length > 0) {
           const userIds = toDowngrade.map(td => td.id);
-          const { count } = await hubSupabase
+          const { count, error: bulkDowngradeError } = await hubSupabase
             .from('hub_memberships')
             .update({
               tier: 'free',
@@ -190,12 +201,17 @@ export async function GET(request: NextRequest) {
             .eq('tier', 'all_access')
             .eq('source', 'district_partner');
 
+          // A failure here leaves people on all_access after they have been told
+          // their access ended, so it must be visible rather than assumed.
+          if (bulkDowngradeError) {
+            console.error('[contract-expiration] bulk downgrade failed for partnership', p.id, bulkDowngradeError.message);
+          }
           downgraded = count || 0;
         }
       }
 
       // Log that we sent this email type
-      await portalSupabase.from('activity_log').insert({
+      const { error: partnerLogError } = await portalSupabase.from('activity_log').insert({
         partnership_id: p.id,
         action: actionKey,
         details: {
@@ -206,13 +222,19 @@ export async function GET(request: NextRequest) {
           downgraded: emailType === 'downgrade' ? downgraded : undefined,
         },
       });
+
+      // This row is what stops the same email going out again tomorrow. If it
+      // does not land, the sequence repeats every day until someone notices.
+      if (partnerLogError) {
+        console.error('[contract-expiration] partnership log insert failed for', p.id, partnerLogError.message);
+      }
     }
 
     // === INDIVIDUAL MEMBERSHIP EXPIRATIONS ===
     // Handle non-partnership all_access members with expires_at set
     const { data: expiringMembers } = await hubSupabase
       .from('hub_memberships')
-      .select('id, user_id, tier, expires_at')
+      .select('id, user_id, tier, expires_at, source')
       .eq('tier', 'all_access')
       .not('expires_at', 'is', null);
 
@@ -245,19 +267,30 @@ export async function GET(request: NextRequest) {
       const expirationDate = expDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
 
       if (daysLeft <= 0) {
-        // Downgrade to free
-        await hubSupabase
+        planned.push({ email: profile.email, variant: mem.source === 'brcc_2026' ? 'brcc/ended' : 'downgrade', daysLeft, source: mem.source || '(null)', wouldDowngrade: true });
+        if (dryRun) continue;
+
+        // Downgrade to free. If this fails we must not then send an email saying
+        // the access has ended, because it has not.
+        const { error: downgradeError } = await hubSupabase
           .from('hub_memberships')
           .update({ tier: 'free', updated_at: new Date().toISOString() })
           .eq('id', mem.id);
+
+        if (downgradeError) {
+          console.error('[contract-expiration] downgrade failed for membership', mem.id, downgradeError.message);
+          continue;
+        }
         downgraded++;
         sendEmail = true;
 
-        const { subject, html } = buildExpirationEmail('downgrade', {
-          schoolName: 'your organization',
-          expirationDate,
-          contactName: '',
-        });
+        const { subject, html } = mem.source === 'brcc_2026'
+          ? buildBrccEndEmail('ended', expirationDate)
+          : buildExpirationEmail('downgrade', {
+              schoolName: 'your organization',
+              expirationDate,
+              contactName: '',
+            });
         await fetch('https://api.resend.com/emails', {
           method: 'POST',
           headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' },
@@ -265,13 +298,18 @@ export async function GET(request: NextRequest) {
         });
         emailsSent++;
       } else if (daysLeft <= 3 || daysLeft <= 14) {
+        planned.push({ email: profile.email, variant: mem.source === 'brcc_2026' ? (daysLeft <= 3 ? 'brcc/final' : 'brcc/heads_up') : (daysLeft <= 3 ? 'final_notice' : 'heads_up'), daysLeft, source: mem.source || '(null)', wouldDowngrade: false });
+        if (dryRun) continue;
+
         // Send heads_up or final notice
         const type = daysLeft <= 3 ? 'final_notice' : 'heads_up';
-        const { subject, html } = buildExpirationEmail(type as 'heads_up' | 'final_notice', {
-          schoolName: 'your organization',
-          expirationDate,
-          contactName: '',
-        });
+        const { subject, html } = mem.source === 'brcc_2026'
+          ? buildBrccEndEmail(daysLeft <= 3 ? 'final' : 'heads_up', expirationDate)
+          : buildExpirationEmail(type as 'heads_up' | 'final_notice', {
+              schoolName: 'your organization',
+              expirationDate,
+              contactName: '',
+            });
         const resp = await fetch('https://api.resend.com/emails', {
           method: 'POST',
           headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' },
@@ -282,12 +320,27 @@ export async function GET(request: NextRequest) {
       }
 
       if (sendEmail) {
-        await hubSupabase.from('hub_activity_log').insert({
+        const { error: logError } = await hubSupabase.from('hub_activity_log').insert({
           user_id: mem.user_id,
           action: expKey,
           metadata: { expires_at: mem.expires_at, days_left: daysLeft },
         });
+
+        // This row is the only thing preventing a repeat send tomorrow.
+        if (logError) {
+          console.error('[contract-expiration] notify log insert failed for membership', mem.id, logError.message);
+        }
       }
+    }
+
+    if (dryRun) {
+      return NextResponse.json({
+        dryRun: true,
+        note: 'Nothing was sent and nothing was written. Individual member decisions only; partnership emails above are not modelled here.',
+        wouldEmail: planned.length,
+        wouldDowngrade: planned.filter((x) => x.wouldDowngrade).length,
+        planned,
+      });
     }
 
     return NextResponse.json({ success: true, emailsSent, downgraded });
@@ -295,6 +348,81 @@ export async function GET(request: NextRequest) {
     console.error('[contract-expiration] Error:', error);
     return NextResponse.json({ error: String(error) }, { status: 500 });
   }
+}
+
+
+/**
+ * Conference attendees are not partner schools, and the standard expiry emails
+ * tell the wrong story to them three times over: they reference a partnership
+ * these people do not have, they ask them to forward the mail to a principal to
+ * get it renewed, and they advertise a full Spanish translation that does not
+ * exist (only the interface is translated, not the content).
+ *
+ * What we actually promised on teachersdeserveit.com/brcc, in the handout and
+ * from the stage was narrow and worth keeping: no card, nothing that turns into
+ * a charge, and access that simply ends. This says that and nothing else.
+ */
+function buildBrccEndEmail(
+  stage: 'heads_up' | 'final' | 'ended',
+  expirationDate: string
+): { subject: string; html: string } {
+  const wrap = (body: string) => `
+    <div style="font-family:Georgia,serif;max-width:560px;margin:0 auto;padding:40px 24px;color:#2d2d2d;font-size:15px;line-height:1.7;">
+      ${body}
+      <p style="font-size:13px;color:#6b7079;line-height:1.6;margin:28px 0 0;border-top:1px solid #e0e0da;padding-top:16px;">
+        Rae Hughart &middot; Teachers Deserve It<br>Reply to this and a person reads it.
+      </p>
+    </div>
+  `;
+
+  const keeps = `
+    <p style="margin:0 0 8px;font-weight:700;">What stays with you</p>
+    <p style="margin:0 0 20px;color:#6b7079;">Your free Hub account, anything you have already downloaded, the free Quick Wins, and the community. None of that goes anywhere.</p>
+  `;
+
+  const noCharge = `
+    <p style="margin:0 0 20px;">Nothing is charging you. We never took a card, so there is nothing to cancel and nothing to decline.</p>
+  `;
+
+  if (stage === 'heads_up') {
+    return {
+      subject: `Your BRCC access ends on ${expirationDate}`,
+      html: wrap(`
+        <p style="margin:0 0 16px;">Hi there,</p>
+        <p style="margin:0 0 16px;">You opened the full Teachers Deserve It library after the BRCC session in September. That access ends on <strong>${expirationDate}</strong>, which is what we said it would do.</p>
+        ${noCharge}
+        <p style="margin:0 0 20px;">If there is a course you have been meaning to finish, the next fortnight is the time.</p>
+        ${keeps}
+        <p style="margin:0 0 8px;">If you want to keep the full library after that, you can, and the details are in the Hub. But I am not going to chase you about it.</p>
+        <p style="margin:20px 0 0;">Rae</p>
+      `),
+    };
+  }
+
+  if (stage === 'final') {
+    return {
+      subject: `A few days left on your BRCC access`,
+      html: wrap(`
+        <p style="margin:0 0 16px;">Hi there,</p>
+        <p style="margin:0 0 16px;">Your full library access from the BRCC session ends on <strong>${expirationDate}</strong>. This is the last note about it.</p>
+        ${noCharge}
+        ${keeps}
+        <p style="margin:20px 0 0;">Rae</p>
+      `),
+    };
+  }
+
+  return {
+    subject: `That is your BRCC access finished`,
+    html: wrap(`
+      <p style="margin:0 0 16px;">Hi there,</p>
+      <p style="margin:0 0 16px;">Your full library access from the BRCC session has ended, exactly as described. Thank you for spending part of that morning with us.</p>
+      ${noCharge}
+      ${keeps}
+      <p style="margin:0 0 8px;">And the thing I actually asked you to do that day still stands. One adult, two questions. What is the part of your job nobody trained you for, and what would help.</p>
+      <p style="margin:20px 0 0;">Rae</p>
+    `),
+  };
 }
 
 function buildExpirationEmail(
