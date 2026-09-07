@@ -78,6 +78,46 @@ export default function BrccPageClient() {
   const [state, setState] = useState<'idle' | 'sending' | 'done' | 'error'>('idle');
   const [message, setMessage] = useState('');
 
+  const [claimEmail, setClaimEmail] = useState('');
+  const [claimState, setClaimState] = useState<'idle' | 'sending' | 'done' | 'error'>('idle');
+  const [claimMessage, setClaimMessage] = useState('');
+
+  async function claim(e: React.FormEvent) {
+    e.preventDefault();
+    if (claimState === 'sending') return;
+
+    setClaimState('sending');
+    setClaimMessage('');
+
+    try {
+      const res = await fetch('/api/brcc/claim', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: claimEmail }),
+      });
+      const data = await res.json().catch(() => ({}));
+
+      // The page promises access three times over. A failure here must say so.
+      if (!res.ok) {
+        setClaimState('error');
+        setClaimMessage(data?.error || 'That did not open. Try again, or email hello@teachersdeserveit.com.');
+        return;
+      }
+
+      setClaimState('done');
+      setClaimMessage(
+        data?.emailed === false
+          ? data.message
+          : data?.alreadyHadAccess
+            ? 'You already had full access. We have sent you a link to sign in.'
+            : 'Open through 30 November. Check your email for the link.'
+      );
+    } catch {
+      setClaimState('error');
+      setClaimMessage('That did not open. Try again, or email hello@teachersdeserveit.com.');
+    }
+  }
+
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (state === 'sending') return;
@@ -226,6 +266,58 @@ export default function BrccPageClient() {
               >
                 Download
               </a>
+            </div>
+
+            <div className="bg-white border border-[#E0E0DA] rounded-md p-6" style={{ borderLeft: `4px solid ${YELLOW}` }}>
+              <h3 className="font-serif text-xl font-semibold mb-2" style={{ color: NAVY }}>
+                The full library, open through 30 November
+              </h3>
+              <p className="text-[15px] mb-4">
+                Every course, every tool, every game. If you work in a school, put your
+                address in and we will open it. No card, and on 1 December it simply ends
+                rather than turning into a charge.
+              </p>
+
+              {claimState === 'done' ? (
+                <p className="text-[15px] font-semibold" style={{ color: '#1F6153' }}>
+                  {claimMessage}
+                </p>
+              ) : (
+                <form onSubmit={claim} className="flex flex-wrap gap-2">
+                  <label htmlFor="brcc-claim" className="sr-only">
+                    Email address
+                  </label>
+                  <input
+                    id="brcc-claim"
+                    type="email"
+                    required
+                    value={claimEmail}
+                    onChange={(e) => setClaimEmail(e.target.value)}
+                    placeholder="you@school.org"
+                    className="flex-1 min-w-[220px] border border-[#CFCFC6] rounded-md px-4 py-3 text-[15px] bg-white text-[#2D2D2D]"
+                  />
+                  <button
+                    type="submit"
+                    disabled={claimState === 'sending'}
+                    className="rounded-md px-6 py-3 font-bold text-[15px] disabled:opacity-60"
+                    style={{ backgroundColor: YELLOW, color: '#241B00' }}
+                  >
+                    {claimState === 'sending' ? 'Opening...' : 'Open my access'}
+                  </button>
+                </form>
+              )}
+
+              {claimState === 'error' && (
+                <p className="text-[14px] mt-3" style={{ color: '#98352C' }} role="alert">
+                  {claimMessage}
+                </p>
+              )}
+
+              {claimState !== 'done' && (
+                <p className="text-[13px] text-[#6B7079] mt-3">
+                  No password to create. We are not holding a card.
+                </p>
+              )}
             </div>
 
             <div className="bg-white border border-[#E0E0DA] rounded-md p-6" style={{ borderLeft: `4px solid ${YELLOW}` }}>
