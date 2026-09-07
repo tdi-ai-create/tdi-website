@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { guardCron } from '@/lib/cron-guard'
 import { optedOutEmails, unsubscribeUrl } from '@/lib/hub-email-optout'
+import { monthlyTools, educatorSubject, trim } from '@/lib/hub/monthly-tools'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 300
@@ -128,18 +129,39 @@ export async function GET(request: NextRequest) {
       !optedOut.has(String(p.email).trim().toLowerCase())
   )
 
-  // Something real to open, chosen from what is published rather than invented.
-  const { data: picks } = await hub
-    .from('hub_quick_wins')
-    .select('title, slug, description, category')
-    .eq('is_published', true)
-    .not('description', 'is', null)
-    .order('created_at', { ascending: false })
-    .limit(40)
+  // Everything released this month, grouped by category, from the one helper the
+  // leadership issue also reads. A month with three tools gets an email about
+  // three tools: a short honest recap beats a padded one, and the thin months
+  // are exactly when people need reminding the Hub is alive.
+  const released = await monthlyTools(hub)
 
-  const featured = (picks ?? []).find((q) => (q.description ?? '').length > 60) ?? (picks ?? [])[0] ?? null
+  // Still one thing pulled to the top, because a list with nothing leading it
+  // asks the reader to choose before they have any reason to.
+  const featured =
+    released.groups.flatMap(g => g.tools).find(t => (t.description ?? '').length > 60) ??
+    released.groups.flatMap(g => g.tools)[0] ??
+    null
   const idea = IDEAS[now.getMonth() % IDEAS.length]
   const site = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.teachersdeserveit.com'
+
+  // The rest of the month, under the featured one. Categories carry the
+  // structure; the role line under each tool answers who it is for without
+  // anyone writing a sentence per item.
+  const restTools = released.groups
+    .map(g => ({ ...g, tools: g.tools.filter(t => t.slug !== featured?.slug) }))
+    .filter(g => g.tools.length > 0)
+
+  const restHtml = restTools.length === 0 ? '' : `
+          <div style="margin: 24px 0 0;">
+            <p style="font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #64748b; margin: 0 0 12px; font-weight: 600;">Also new in ${monthName}</p>
+            ${restTools.map(g => `
+            <p style="font-size: 13px; font-weight: 700; color: #1e2749; margin: 16px 0 6px;">${g.category}</p>
+            ${g.tools.map(t => `
+            <div style="border-left: 3px solid #e2e8f0; padding: 2px 0 2px 12px; margin: 0 0 10px;">
+              <a href="${site}/hub/quick-wins/${t.slug}" style="font-size: 14.5px; font-weight: 600; color: #1e2749; text-decoration: none;">${t.title}</a>
+              ${t.description ? `<p style="color: #64748b; margin: 3px 0 0; font-size: 13px; line-height: 1.5;">${trim(t.description)}</p>` : ''}
+            </div>`).join('')}`).join('')}
+          </div>`
 
   const buildHtml = (person: { email: string; first_name?: string | null; display_name?: string | null }) => {
     const first =
@@ -163,6 +185,7 @@ export async function GET(request: NextRequest) {
             <p style="color: #1e3a5f; margin: 0 0 14px; line-height: 1.6;">${featured.description}</p>
             <a href="${site}/hub/quick-wins/${featured.slug}" style="display: inline-block; background: #1e2749; color: white; padding: 10px 18px; border-radius: 8px; text-decoration: none; font-size: 14px; font-weight: 600;">Open it in the Hub</a>
           </div>` : ''}
+          ${restHtml}
           <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin: 20px 0;">
             <p style="font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #64748b; margin: 0 0 8px; font-weight: 600;">From an educator</p>
             <p style="font-size: 16px; font-weight: 700; color: #1e2749; margin: 0 0 6px;">${idea.title}</p>
@@ -187,9 +210,7 @@ export async function GET(request: NextRequest) {
   }
 
   const previewAs = request.nextUrl.searchParams.get('previewAs')?.toLowerCase() ?? null
-  const subject = featured
-    ? `${featured.title}, and one idea worth stealing`
-    : `This month in the Hub, ${monthName}`
+  const subject = educatorSubject(released, monthName)
 
   if (dryRun) {
     const subjectPerson =
@@ -205,6 +226,9 @@ export async function GET(request: NextRequest) {
       skippedAlreadyThisMonth: profiles.filter((p) => had.has(p.id)).length,
       skippedOptedOut: profiles.filter((p) => optedOut.has(String(p.email ?? '').trim().toLowerCase())).length,
       featured: featured ? { title: featured.title, slug: featured.slug } : null,
+      month: released.monthLabel,
+      toolsThisMonth: released.total,
+      categories: released.groups.map(g => ({ category: g.category, count: g.tools.length })),
       previewFor: subjectPerson?.email ?? null,
       html: subjectPerson ? buildHtml(subjectPerson as any) : null,
     })

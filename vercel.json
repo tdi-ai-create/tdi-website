@@ -46,7 +46,7 @@
     },
     {
       "path": "/api/cron/monthly-principal-email",
-      "schedule": "0 14 1 * *"
+      "schedule": "0 14 26 * *"
     },
     {
       "path": "/api/cron/paperclip-watchdog",
@@ -183,6 +183,10 @@
     {
       "path": "/api/cron/hub-scheduled-publish",
       "schedule": "0 12 * * *"
+    },
+    {
+      "path": "/api/cron/hub-monthly",
+      "schedule": "0 13 26 * *"
     }
   ]
 }

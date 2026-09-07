@@ -975,6 +975,7 @@ export async function POST(request: NextRequest) {
           is_published: true,
           status: 'published',
           published_by: published_by?.trim() || (force ? 'override' : qw.reviewed_by) || null,
+          published_at: new Date().toISOString(),
           qa_override_reason: force ? reason.trim() : null,
           updated_at: new Date().toISOString(),
         })
