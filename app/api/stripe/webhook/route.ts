@@ -110,17 +110,23 @@ export async function POST(req: Request) {
                 incomingSubId
               );
 
-              await hubClient.from('comp_mismatch_log').insert({
-                email: email.toLowerCase(),
-                expected_amount: session.amount_total ? session.amount_total / 100 : null,
-                mismatch_reason: 'duplicate_active_subscription',
-                raw_csv_row: {
-                  existing_subscription: priorMembership.stripe_subscription_id,
-                  incoming_subscription: incomingSubId,
-                  stripe_session_id: session.id,
-                  tier,
-                },
-              });
+              const { error: dupLogError } = await hubClient
+                .from('comp_mismatch_log')
+                .insert({
+                  email: email.toLowerCase(),
+                  expected_amount: session.amount_total ? session.amount_total / 100 : null,
+                  mismatch_reason: 'duplicate_active_subscription',
+                  raw_csv_row: {
+                    existing_subscription: priorMembership.stripe_subscription_id,
+                    incoming_subscription: incomingSubId,
+                    stripe_session_id: session.id,
+                    tier,
+                  },
+                });
+
+              if (dupLogError) {
+                console.error('[stripe/webhook] comp_mismatch_log insert failed', dupLogError);
+              }
             }
 
             const { error: memError } = await hubClient.from('hub_memberships').upsert(
@@ -151,19 +157,28 @@ export async function POST(req: Request) {
             // nobody found out. Record it so it can be reconciled.
             console.error('[stripe/webhook] PAID WITH NO HUB PROFILE', email, session.id);
 
-            await hubClient.from('comp_mismatch_log').insert({
-              email: email.toLowerCase(),
-              expected_amount: session.amount_total ? session.amount_total / 100 : null,
-              mismatch_reason: 'paid_but_no_hub_profile',
-              raw_csv_row: {
-                stripe_session_id: session.id,
-                stripe_customer_id:
-                  typeof session.customer === 'string' ? session.customer : null,
-                stripe_subscription_id:
-                  typeof session.subscription === 'string' ? session.subscription : null,
-                tier,
-              },
-            });
+            const { error: noProfileLogError } = await hubClient
+              .from('comp_mismatch_log')
+              .insert({
+                email: email.toLowerCase(),
+                expected_amount: session.amount_total ? session.amount_total / 100 : null,
+                mismatch_reason: 'paid_but_no_hub_profile',
+                raw_csv_row: {
+                  stripe_session_id: session.id,
+                  stripe_customer_id:
+                    typeof session.customer === 'string' ? session.customer : null,
+                  stripe_subscription_id:
+                    typeof session.subscription === 'string' ? session.subscription : null,
+                  tier,
+                },
+              });
+
+            if (noProfileLogError) {
+              console.error(
+                '[stripe/webhook] comp_mismatch_log insert failed',
+                noProfileLogError
+              );
+            }
           }
         }
 
