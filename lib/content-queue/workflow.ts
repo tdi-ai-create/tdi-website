@@ -72,7 +72,11 @@ export const TRANSITIONS: Record<Action, Rule> = {
 /** Agents allowed to act as each role. An agent may hold more than one. */
 export const ROLE_HOLDERS: Record<string, string[]> = {
   orchestrator: ['nora'],
-  writer:       ['izzy', 'jasmine'],
+  // Izzy and Zara. Izzy's own instructions describe every social post as
+  // co-drafted with Zara, so a gate that refuses Zara refuses the person doing
+  // the work. Jasmine was here by mistake: she is Hub curriculum, and Hub
+  // content moves through content-sync, not this queue.
+  writer:       ['izzy', 'zara'],
   julie:        ['julie-lynn'],
   lily:         ['lily'],
   olivia:       ['olivia'],
