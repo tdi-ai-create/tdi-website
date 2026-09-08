@@ -83,6 +83,18 @@ export function isWaitingOnUs(step: StepTurnInput): boolean {
   return isOursToDo(step) || isInReview(step);
 }
 
+/**
+ * The step is live: somebody could be doing it right now.
+ *
+ * A third question that looked like the other two and is not. It asks whether
+ * the step is in play at all, regardless of whose turn it is, and it was being
+ * written out as a status list in several files with the lists quietly
+ * differing. Kept here so those lists cannot drift apart.
+ */
+export function isLiveStep(step: StepTurnInput): boolean {
+  return step.status === 'available' || step.status === 'in_progress' || step.status === 'waiting_approval';
+}
+
 /** The same answer as a word, for callers that store or display it. */
 export function whoseTurn(step: StepTurnInput): Turn {
   return isWaitingOnUs(step) ? 'tdi' : 'creator';

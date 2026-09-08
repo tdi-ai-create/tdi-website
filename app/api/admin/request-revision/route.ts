@@ -5,7 +5,7 @@ import { advanceStep, resolveStepRow } from '@/lib/creator-step-engine';
 
 export async function POST(request: NextRequest) {
   try {
-    const { milestoneId, creatorId, adminEmail, note } = await request.json();
+    const { milestoneId, creatorId, adminEmail, note, milestoneRecordId } = await request.json();
 
     console.log('[request-revision] Request:', { milestoneId, creatorId, adminEmail });
 
@@ -113,7 +113,9 @@ export async function POST(request: NextRequest) {
     let cappedOut = false;
 
     if (useEngine) {
-      const resolved = await resolveStepRow(supabase, creatorId, milestoneId);
+      // Explicit row id when the caller knows it, so a creator with the same
+      // step on two projects is not refused as ambiguous.
+      const resolved = await resolveStepRow(supabase, creatorId, milestoneId, milestoneRecordId);
       if (resolved.error || !resolved.recordId) {
         return NextResponse.json({ success: false, error: resolved.error }, { status: 400 });
       }
