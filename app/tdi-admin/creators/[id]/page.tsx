@@ -69,6 +69,7 @@ import type {
   ContentPath,
 } from '@/types/creator-portal';
 import { CreatorMirror } from '@/components/admin/CreatorMirror';
+import { isLiveStep } from '@/lib/creator-turn';
 import type { Journey } from '@/lib/creator-journey';
 import { blocksPublish, PUBLISH_BLOCKED_MESSAGE } from '@/lib/creator-agreement';
 
@@ -152,7 +153,7 @@ export default function TDIAdminCreatorDetailPage() {
   const [fieldError, setFieldError] = useState<string | null>(null);
 
   // Revision request modal state
-  const [selectedMilestoneForRevision, setSelectedMilestoneForRevision] = useState<{ id: string; title: string } | null>(null);
+  const [selectedMilestoneForRevision, setSelectedMilestoneForRevision] = useState<{ id: string; title: string; recordId?: string } | null>(null);
   const [revisionNote, setRevisionNote] = useState('');
   const [showRevisionModal, setShowRevisionModal] = useState(false);
   const [isRequestingRevision, setIsRequestingRevision] = useState(false);
@@ -350,43 +351,52 @@ export default function TDIAdminCreatorDetailPage() {
     }
   }, [hasAccess, loadData]);
 
-  const handleApprove = async (milestoneId: string, milestoneTitle: string) => {
+  const handleApprove = async (milestoneId: string, milestoneTitle: string, milestoneRecordId?: string) => {
     if (!dashboardData || !canEdit) return;
 
-    setApprovingMilestoneId(milestoneId);
+    setApprovingMilestoneId(milestoneRecordId ?? milestoneId);
     try {
       const response = await fetch('/api/admin/approve-milestone', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           milestoneId,
+          // Says which row when a creator carries the same step on two
+          // projects. The route falls back to looking it up without this.
+          milestoneRecordId,
           creatorId,
           adminEmail,
         }),
       });
 
-      if (!response.ok) {
-        throw new Error(`Request failed with status ${response.status}`);
-      }
-      const result = await response.json();
+      // Read the body before deciding, always.
+      //
+      // This used to throw on !response.ok before reading anything, so the
+      // route's own explanation never reached the screen. Bella clicked Approve
+      // on Holly Stuart, the route replied "Milestone not found" because the
+      // caller was sending a row id where a milestone key belongs, and all she
+      // saw was "Error approving milestone." A refusal that cannot say why is
+      // how a bug survives from 31 August to 8 September.
+      const result = await response.json().catch(() => null);
 
-      if (result.success) {
+      if (response.ok && result?.success) {
         await loadData();
         setSuccessMessage(`Approved: ${milestoneTitle}`);
         setTimeout(() => setSuccessMessage(null), 3000);
       } else {
-        alert(`Failed to approve: ${result.error || 'Unknown error'}`);
+        const why = result?.error || `the server replied ${response.status} and gave no reason`;
+        alert(`Could not approve "${milestoneTitle}": ${why}`);
       }
     } catch (error) {
       console.error('Error approving milestone:', error);
-      alert('Error approving milestone.');
+      alert(`Could not reach the server to approve "${milestoneTitle}". Nothing was changed, so try again.`);
     } finally {
       setApprovingMilestoneId(null);
     }
   };
 
-  const handleRequestRevision = (milestoneId: string, milestoneTitle: string) => {
-    setSelectedMilestoneForRevision({ id: milestoneId, title: milestoneTitle });
+  const handleRequestRevision = (milestoneId: string, milestoneTitle: string, milestoneRecordId?: string) => {
+    setSelectedMilestoneForRevision({ id: milestoneId, title: milestoneTitle, recordId: milestoneRecordId });
     setRevisionNote('');
     setShowRevisionModal(true);
   };
@@ -402,6 +412,8 @@ export default function TDIAdminCreatorDetailPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           milestoneId: selectedMilestoneForRevision.id,
+          // Which row, when a creator carries the same step on two projects.
+          milestoneRecordId: selectedMilestoneForRevision.recordId,
           creatorId,
           adminEmail,
           note: revisionNote.trim(),
@@ -872,7 +884,7 @@ export default function TDIAdminCreatorDetailPage() {
     }
   };
 
-  const handleToggleMilestone = async (milestoneId: string, milestoneTitle: string, currentStatus: string) => {
+  const handleToggleMilestone = async (milestoneId: string, milestoneTitle: string, currentStatus: string, milestoneRecordId?: string) => {
     if (!canEdit) return;
 
     setApprovingMilestoneId(milestoneId);
@@ -895,7 +907,7 @@ export default function TDIAdminCreatorDetailPage() {
         const response = await fetch('/api/admin/approve-milestone', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ milestoneId, creatorId, adminEmail }),
+          body: JSON.stringify({ milestoneId, milestoneRecordId, creatorId, adminEmail }),
         });
         const data = await response.json();
         if (!data.success) throw new Error(data.error);
@@ -1382,7 +1394,7 @@ export default function TDIAdminCreatorDetailPage() {
                         <option value="" disabled>Select a milestone...</option>
                         {dashboardData?.phases.flatMap((phase: PhaseWithMilestones) =>
                           phase.milestones
-                            .filter((m: MilestoneWithStatus) => m.isApplicable !== false && (m.status === 'waiting_approval' || m.status === 'in_progress' || m.status === 'available'))
+                            .filter((m: MilestoneWithStatus) => m.isApplicable !== false && isLiveStep({ status: m.status }))
                             .map((m: MilestoneWithStatus) => (
                               <option key={m.progress_id || m.id} value={m.progress_id || ''}>
                                 {m.title}

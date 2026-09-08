@@ -35,9 +35,23 @@ export function CreatorMirror({
   canEdit?: boolean;
   /** The record currently being written, so its buttons can be disabled. */
   busyRecordId?: string | null;
-  onApprove?: (recordId: string, stepName: string) => void;
-  onRequestRevision?: (recordId: string, stepName: string) => void;
-  onToggleComplete?: (recordId: string, stepName: string, rawStatus: string) => void;
+  /**
+   * Called with the milestone's own key, then the step name, then the row id.
+   *
+   * The key comes first because every route these reach looks the step up by
+   * it. Passing the row id in that first position is what broke Approve,
+   * Request changes and Mark complete on this page from 31 August until
+   * 8 September: `milestones.id` is a text key such as `assets_submitted` and
+   * `creator_milestones.id` is a uuid, so the lookup could never match and the
+   * route replied "Milestone not found". Both are typed `string`, so nothing
+   * caught it.
+   *
+   * The row id is passed too, because a creator with two projects carries the
+   * same step twice and the key alone cannot say which one.
+   */
+  onApprove?: (milestoneKey: string, stepName: string, recordId: string) => void;
+  onRequestRevision?: (milestoneKey: string, stepName: string, recordId: string) => void;
+  onToggleComplete?: (milestoneKey: string, stepName: string, rawStatus: string, recordId: string) => void;
 }) {
   if (!journey || journey.stages.length === 0) {
     return (
@@ -174,9 +188,9 @@ function StepControls({
 }: {
   step: JourneyStep;
   busy: boolean;
-  onApprove?: (recordId: string, stepName: string) => void;
-  onRequestRevision?: (recordId: string, stepName: string) => void;
-  onToggleComplete?: (recordId: string, stepName: string, rawStatus: string) => void;
+  onApprove?: (milestoneKey: string, stepName: string, recordId: string) => void;
+  onRequestRevision?: (milestoneKey: string, stepName: string, recordId: string) => void;
+  onToggleComplete?: (milestoneKey: string, stepName: string, rawStatus: string, recordId: string) => void;
 }) {
   const awaitingReview = step.rawStatus === 'waiting_approval';
   const locked = step.rawStatus === 'locked';
@@ -199,7 +213,7 @@ function StepControls({
         <button
           type="button"
           disabled={busy}
-          onClick={() => onApprove(step.recordId, step.name)}
+          onClick={() => onApprove(step.milestoneId, step.name, step.recordId)}
           style={{ ...base, border: '1px solid #86efac', background: '#f0fdf4', color: '#166534' }}
         >
           Approve
@@ -209,7 +223,7 @@ function StepControls({
         <button
           type="button"
           disabled={busy}
-          onClick={() => onRequestRevision(step.recordId, step.name)}
+          onClick={() => onRequestRevision(step.milestoneId, step.name, step.recordId)}
           style={{ ...base, border: '1px solid #fcd34d', background: '#fffbeb', color: '#92400e' }}
         >
           Request changes
@@ -219,7 +233,7 @@ function StepControls({
         <button
           type="button"
           disabled={busy}
-          onClick={() => onToggleComplete(step.recordId, step.name, step.rawStatus)}
+          onClick={() => onToggleComplete(step.milestoneId, step.name, step.rawStatus, step.recordId)}
           style={{ ...base, border: '1px solid #e5e7eb', background: '#fff', color: '#6b7280' }}
         >
           {done ? 'Reopen' : 'Mark complete'}
