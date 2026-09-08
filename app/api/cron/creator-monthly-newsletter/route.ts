@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { logCreatorEmail } from '@/lib/creator-email-log';
 import { guardCron } from '@/lib/cron-guard';
+import { isWaitingOnUs } from '@/lib/creator-turn';
 import Anthropic from '@anthropic-ai/sdk';
 
 // ---------------------------------------------------------------------------
@@ -180,7 +181,10 @@ export async function GET(request: NextRequest) {
     // one would be asking for something the portal will not let them do.
     const { data: openSteps } = await supabase
       .from('creator_milestones')
-      .select('creator_id, status, due_on, opened_at, milestones(name)')
+      // review_status and requires_team_action are selected because
+      // isWaitingOnUs needs them. Without them the rule degrades to the old
+      // waiting_approval-only answer while looking as though it was fixed.
+      .select('creator_id, status, review_status, due_on, opened_at, milestones(name, requires_team_action)')
       .not('status', 'in', '(completed,locked)');
 
     type NextStep = { milestone: string; dueOn: string | null; withUs: boolean };
@@ -199,7 +203,13 @@ export async function GET(request: NextRequest) {
         nextStepFor.set(row.creator_id, {
           milestone: name,
           dueOn: row.due_on ?? null,
-          withUs: row.status === 'waiting_approval',
+          // Was `status === 'waiting_approval'` alone, which missed every step
+          // that is ours to do and every submitted one. See lib/creator-turn.ts.
+          withUs: isWaitingOnUs({
+            status: row.status,
+            reviewStatus: row.review_status,
+            requiresTeamAction: row.milestones?.requires_team_action,
+          }),
         });
       }
     }
