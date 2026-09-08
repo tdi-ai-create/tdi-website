@@ -62,11 +62,63 @@ export async function GET(request: NextRequest) {
 
     if (waitErr) return NextResponse.json({ error: waitErr.message }, { status: 500 })
 
+    // ── the other three channels ──
+    //
+    // Hub content and marketing content are two pipelines with two tables, and
+    // that is on purpose: the Hub one works and was not worth disturbing. They
+    // meet here, on one calendar, because a person planning a month needs to see
+    // the whole month rather than one lane of it.
+    const { data: queued, error: qErr } = await supabase
+      .from('content_queue_items')
+      .select('id, channel, content_type, title, status, owner, approver, audience_tag, scheduled_for, artifact_rendered_at')
+      .not('status', 'in', '(cancelled)')
+      .or(`and(scheduled_for.gte.${from},scheduled_for.lt.${to}),scheduled_for.is.null`)
+
+    if (qErr) return NextResponse.json({ error: `content queue: ${qErr.message}` }, { status: 500 })
+
+    const queuedAll = queued ?? []
+    // Unscheduled work is not nothing. Kristin asked to place things that are
+    // ready to be drafted but not written, so a brief with no date belongs on
+    // the page, in a rail beside the month rather than on a day.
+    const unscheduled = queuedAll.filter(q => !q.scheduled_for)
+    const onCalendar = queuedAll.filter(q => q.scheduled_for)
+
+    // How far out each cadence is ACTUALLY planned, which is the only reason to
+    // state a horizon at all. This query is deliberately not bounded by the
+    // month on screen: the furthest-out piece is usually in a later one, and
+    // bounding it here would report every month as under-planned.
     const today = todayCT()
+    const { data: furthest, error: hErr } = await supabase
+      .from('content_queue_items')
+      .select('channel, scheduled_for')
+      .not('status', 'in', '(cancelled,published,verified)')
+      .gte('scheduled_for', today)
+
+    if (hErr) return NextResponse.json({ error: `horizons: ${hErr.message}` }, { status: 500 })
+
+    const daysOut = (iso: string) =>
+      Math.round((Date.UTC(+iso.slice(0, 4), +iso.slice(5, 7) - 1, +iso.slice(8, 10))
+        - Date.UTC(+today.slice(0, 4), +today.slice(5, 7) - 1, +today.slice(8, 10))) / 86400000)
+
+    const reach = (channels: string[]) => {
+      const days = (furthest ?? [])
+        .filter(r => channels.includes(r.channel) && r.scheduled_for)
+        .map(r => daysOut(r.scheduled_for as string))
+      return days.length ? Math.max(...days) : 0
+    }
+
     const items = data ?? []
 
     return NextResponse.json({
       month,
+      queued: onCalendar,
+      unscheduled,
+      // Kristin set these on 7 September. Two cadences, not one, so the page can
+      // show how far out each channel is actually planned.
+      horizons: {
+        social: { target: 14, planned: reach(['instagram', 'video_script']) },
+        substack: { target: 30, planned: reach(['substack']) },
+      },
       today_ct: today,
       cap_per_day: HUB_DAILY_CAP,
       waiting_for_a_slot: waiting ?? 0,
