@@ -102,7 +102,7 @@ export async function GET(request: NextRequest) {
       // the predicate reads undefined, returns false for everything, and the
       // deferral silently does nothing while looking as though it works. The
       // dry run caught exactly that on the first attempt.
-      .select('id, name, pursuit_id, status, research_status, window_status, window_checked_at, assigned_agent, eligibility_verdict, eligibility_overridden')
+      .select('id, name, pursuit_id, status, research_status, window_status, window_checked_at, next_action, assigned_agent, eligibility_verdict, eligibility_overridden')
 
     if (oErr) {
       console.error('[eligibility-audit] Could not read opportunities:', oErr)
@@ -206,11 +206,39 @@ export async function GET(request: NextRequest) {
         if (already) {
           questionsExisting.push(`${school.district_name} · ${opp.name}`)
         } else {
+          // What the agent found, when she has already looked.
+          //
+          // A window question only reaches a person after the research agent
+          // has tried and could not establish it, and her finding is the most
+          // useful thing on the row: not "we do not know", but "the foundation
+          // has no public application process, call 703-726-7000". Without this
+          // the person restarts research the agent already did and wrote down.
+          //
+          // It lives on funding_opportunities.next_action, which is where the
+          // sync API puts an agent's note. Trimmed rather than truncated, so a
+          // long finding arrives whole.
+          const agentFinding =
+            result.rule === 'window' && opp.window_checked_at && typeof opp.next_action === 'string'
+              ? opp.next_action.trim()
+              : ''
+
+          // The finding leads, the standing rule follows.
+          //
+          // The rule sentence is boilerplate: identical on every one of these
+          // apart from the funder name, and the reader has seen it five times
+          // already. What the agent found is the only part that tells them what
+          // to do next, so it goes first and the rule becomes the footnote it
+          // actually is.
+          const because = agentFinding
+            ? `The research agent already looked, on ${String(opp.window_checked_at).slice(0, 10)}, and could not establish the window. This is what she found:\n\n${agentFinding}\n\nWhy it still blocks drafting: ${result.reason}`
+            : result.reason
+
           const intended = {
             school: school.district_name ?? '',
             path: opp.name ?? '',
             question: title,
-            because: result.reason,
+            because,
+            agentAlreadyLooked: Boolean(agentFinding),
           }
 
           if (dryRun) {
@@ -222,7 +250,7 @@ export async function GET(request: NextRequest) {
               owner_type: 'tdi',
               title,
               description:
-                `${result.reason}\n\nNothing will be drafted for "${opp.name}" until this is answered.`,
+                `${because}\n\nNothing will be drafted for "${opp.name}" until this is answered.`,
               // 'pending' and 'gate' because those are what the CHECK
               // constraints on this table allow. 'open' and 'eligibility' were
               // rejected on every insert, and because the failure was only
