@@ -115,7 +115,7 @@ export async function GET(request: NextRequest) {
     // from the database rather than from the engine.
     const { data: openRows, error: openError } = await supabase
       .from('creator_milestones')
-      .select('milestones!inner(name)')
+      .select('id, milestones!inner(name)')
       .eq('project_id', project.id)
       .in('status', ['available', 'in_progress', 'waiting_approval']);
 
@@ -128,11 +128,16 @@ export async function GET(request: NextRequest) {
     // relationship is to one row, so both shapes are handled rather than cast
     // away. A silently empty name here would read as "nothing open" and turn a
     // healthy board into a false drift report.
-    const boardShowsOpen = ((openRows ?? []) as unknown as Array<{
+    const openRowsTyped = (openRows ?? []) as unknown as Array<{
+      id: string;
       milestones: { name: string } | Array<{ name: string }> | null;
-    }>)
+    }>;
+
+    const boardShowsOpen = openRowsTyped
       .map((r) => (Array.isArray(r.milestones) ? r.milestones[0]?.name : r.milestones?.name))
       .filter((n): n is string => typeof n === 'string' && n.length > 0);
+
+    const openRecordIds = new Set(openRowsTyped.map((r) => r.id));
 
     const would = await placeProject(supabase, project.id, {
       dryRun: true,
@@ -145,9 +150,31 @@ export async function GET(request: NextRequest) {
     }
 
     const wouldOpen = would.openStep?.name ?? null;
+
+    // Agreement means running this for real would close nothing and open
+    // nothing. Not "the board shows exactly one step".
+    //
+    // The first version of this asked for exactly one open step, which is not
+    // what the engine promises. placeProject never locks an unsigned agreement,
+    // and says so in its own comment: "the board may show two open steps for an
+    // unsigned creator: whatever they are actually doing, and the agreement
+    // waiting for them." Three creators are in exactly that state, so the sweep
+    // called them drifted every night, repaired them into the identical state,
+    // and reported "3 of 3 repaired" every morning having moved nothing. Their
+    // Sign Agreement rows still carry updated_at from 24 and 31 August, which
+    // is how the false positive was caught.
+    //
+    // A monitor that cries every morning cannot report the morning something
+    // is actually wrong. That is the same failure as the Paperclip health check
+    // that read Degraded for a month against a retired host.
+    //
+    // `locked` already excludes the exempt agreement, so it is the honest
+    // measure of "rows this would close". Compared on recordId rather than
+    // name, because two steps may share a name across paths and a name match is
+    // a guess where an id is not.
     const agrees =
-      boardShowsOpen.length === (wouldOpen ? 1 : 0) &&
-      (wouldOpen === null || boardShowsOpen[0] === wouldOpen);
+      would.locked === 0 &&
+      (would.openStep === null || openRecordIds.has(would.openStep.recordId));
 
     if (agrees) {
       agreed += 1;
