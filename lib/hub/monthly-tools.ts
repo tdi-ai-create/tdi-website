@@ -88,6 +88,10 @@ export async function monthlyTools(
     .from('hub_quick_wins')
     .select('title, slug, description, category, roles, lift, scheduled_publish_date, published_at, created_at')
     .eq('is_published', true)
+    // TDI selling itself is not a teacher tool, so it never goes in a monthly
+    // recap. Set by QA on the row rather than guessed from the text, because
+    // "TDI" appears legitimately in content that is genuinely for teachers.
+    .eq('is_promotional', false)
 
   if (error) throw new Error(`Could not read the month's tools: ${error.message}`)
 
