@@ -80,7 +80,49 @@ export async function POST(req: Request) {
             .eq('email', email.toLowerCase())
             .single();
 
+          // A second live subscription on the same email is a duplicate charge,
+          // not an upgrade. The upsert below is keyed on user_id, so without this
+          // check the extra subscription silently overwrites the old row and the
+          // duplicate becomes invisible. That is how one person reached thirteen
+          // subscriptions with only one of them recorded here.
           if (profile) {
+            const incomingSubId =
+              typeof session.subscription === 'string' ? session.subscription : null;
+
+            const { data: priorMembership } = await hubClient
+              .from('hub_memberships')
+              .select('stripe_subscription_id, status')
+              .eq('user_id', profile.id)
+              .maybeSingle();
+
+            if (
+              priorMembership?.stripe_subscription_id &&
+              incomingSubId &&
+              priorMembership.stripe_subscription_id !== incomingSubId &&
+              priorMembership.status === 'active'
+            ) {
+              console.error(
+                '[stripe/webhook] DUPLICATE SUBSCRIPTION',
+                email,
+                'existing:',
+                priorMembership.stripe_subscription_id,
+                'incoming:',
+                incomingSubId
+              );
+
+              await hubClient.from('comp_mismatch_log').insert({
+                email: email.toLowerCase(),
+                expected_amount: session.amount_total ? session.amount_total / 100 : null,
+                mismatch_reason: 'duplicate_active_subscription',
+                raw_csv_row: {
+                  existing_subscription: priorMembership.stripe_subscription_id,
+                  incoming_subscription: incomingSubId,
+                  stripe_session_id: session.id,
+                  tier,
+                },
+              });
+            }
+
             const { error: memError } = await hubClient.from('hub_memberships').upsert(
               {
                 user_id: profile.id,
@@ -104,7 +146,24 @@ export async function POST(req: Request) {
               console.error('[stripe/webhook] membership upsert error', memError);
             }
           } else {
-            console.warn('[stripe/webhook] no hub_profile found for', email);
+            // Someone paid and we have no Hub profile to attach it to. Previously
+            // this was a console.warn, so the membership simply never existed and
+            // nobody found out. Record it so it can be reconciled.
+            console.error('[stripe/webhook] PAID WITH NO HUB PROFILE', email, session.id);
+
+            await hubClient.from('comp_mismatch_log').insert({
+              email: email.toLowerCase(),
+              expected_amount: session.amount_total ? session.amount_total / 100 : null,
+              mismatch_reason: 'paid_but_no_hub_profile',
+              raw_csv_row: {
+                stripe_session_id: session.id,
+                stripe_customer_id:
+                  typeof session.customer === 'string' ? session.customer : null,
+                stripe_subscription_id:
+                  typeof session.subscription === 'string' ? session.subscription : null,
+                tier,
+              },
+            });
           }
         }
 
