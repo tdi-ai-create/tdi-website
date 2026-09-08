@@ -131,6 +131,37 @@ sends one email" is the sentence Rae needs.
 
 **After any write meant to change state, verify the effect.** A 200 is not proof.
 
+**Press the button. There is now somewhere safe to do it.**
+
+Approve, Request changes and Mark complete on the admin creator page were broken
+from 31 August to 8 September. They sent `creator_milestones.id` where the route
+looks up `milestones.id`, a uuid against a text key, so every click returned
+"Milestone not found" and the page showed "Error approving milestone." with no
+reason. The 6 September dry run checked those buttons *rendered* and
+deliberately did not press them, because pressing meant approving a real
+creator's work in production. Rendering was all it proved, and Bella found the
+rest.
+
+Nothing static catches this: both ids are `string`, so typecheck sees nothing,
+and the caller and the route live in different files.
+
+So there is a sandbox creator. Jessica Torres,
+`demo.creator@teachersdeserveit.com`, archived and paused, which excludes her
+from every board, sweep, digest and count, because all of them filter on
+`creators.status = 'active'`. Her page still loads and her buttons are the same
+buttons.
+
+```
+npx tsx scripts/integrity/reset-sandbox-creator.mjs
+```
+
+That leaves one step in review (Approve and Request changes appear) and one step
+open (Mark complete appears). Press them, then confirm in the database, not from
+the screenshot: a screenshot taken a moment too early made a working modal look
+broken during this very session.
+
+Keep her archived. The reset script refuses to run if she is not.
+
 ---
 
 ## 4. Dead code
