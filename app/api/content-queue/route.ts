@@ -122,7 +122,7 @@ export async function POST(request: NextRequest) {
 
     // ── placing a brief creates the row ──
     if (action === 'place_brief') {
-      const { channel, content_type, title, brief, audience_tag, approver } = body
+      const { channel, content_type, title, brief, audience_tag, approver, scheduled_for } = body
       for (const [k, v] of Object.entries({ channel, content_type, audience_tag })) {
         if (!v || !String(v).trim()) {
           return NextResponse.json({ error: `${k} is required` }, { status: 400 })
@@ -131,14 +131,22 @@ export async function POST(request: NextRequest) {
       if (!actorHoldsRole(actor, rule.role)) {
         return NextResponse.json({ error: `"${actor}" cannot place a brief. That is the orchestrator's step.` }, { status: 403 })
       }
+      // A brief may be placed straight onto a day. This was silently dropped
+      // until 8 September: the field was accepted, ignored, and a 200 returned,
+      // so every brief Nora placed sat in "no day yet" forever.
+      if (scheduled_for != null && !/^\d{4}-\d{2}-\d{2}$/.test(String(scheduled_for))) {
+        return NextResponse.json({ error: 'scheduled_for must be YYYY-MM-DD' }, { status: 400 })
+      }
       const entry = { at: new Date().toISOString(), actor, action, to: 'brief', note: note || null }
-      if (dryRun) return NextResponse.json({ dryRun: true, wouldCreate: { channel, content_type, title, audience_tag, status: 'brief' }, logEntry: entry })
+      if (dryRun) return NextResponse.json({ dryRun: true, wouldCreate: { channel, content_type, title, audience_tag, scheduled_for: scheduled_for ?? null, status: 'brief' }, logEntry: entry })
 
       const { data, error } = await supabase.from('content_queue_items').insert({
         channel, content_type, title: title ?? null, brief: brief ?? null,
-        audience_tag, approver: approver ?? null,
+        audience_tag, approver: approver ?? null, scheduled_for: scheduled_for ?? null,
         status: 'brief', owner: OWNER_OF.brief, feedback_log: [entry],
-      }).select('id, status, owner').single()
+      // Echo the stored date back. A caller that asked for a day and got a 200
+      // should be able to see whether the day actually landed.
+      }).select('id, status, owner, scheduled_for').single()
 
       if (error) return NextResponse.json({ error: error.message }, { status: 400 })
       return NextResponse.json({ success: true, ...data })
