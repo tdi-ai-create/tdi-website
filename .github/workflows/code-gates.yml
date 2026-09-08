@@ -98,6 +98,16 @@ jobs:
         # needs no credentials and cannot skip.
         run: npm run check:upserts
 
+      - name: One definition per question
+        # The recurring bug here is two right answers to the same question that
+        # drift apart. On 8 Sep four files each decided whose turn it was on a
+        # creator step, with four different rules, so the Needs You board called
+        # a step ours while the creator's page called it theirs, one click away.
+        # A ratchet like check:writes: judges changed files only, because the
+        # repo carries 63 pre-existing instances and a check nobody can pass is
+        # a check nobody runs.
+        run: npm run check:definitions
+
       - name: Seats belong to a partnership
         # A live all-access seat whose partnership was deleted, or which was
         # hand-provisioned without a link, belongs to a real educator who shows

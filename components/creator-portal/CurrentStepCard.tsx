@@ -81,12 +81,18 @@ export function CurrentStepCard({
     );
   }
 
-  const ours = step.ours;
   const changes = step.status === 'changes_requested';
+  // One shared answer for whose turn it is, so this card and the admin's view
+  // of the same step cannot drift apart. See lib/creator-turn.ts.
+  const withUs = step.waitingOnUs;
+  // Deliberately NOT withUs. This one asks a narrower question: has the creator
+  // handed something in that is still being looked at. A step that is simply
+  // ours to do has nothing of theirs awaiting approval, and passing withUs here
+  // would hide the Submit control on steps they still have to submit.
   const inReview = step.status === 'in_review';
 
-  const accent = changes ? CHANGE : ours || inReview ? BLUE : YELLOW;
-  const pill = changes ? 'Changes asked' : inReview ? 'With the TDI team' : ours ? 'With the TDI team' : 'Your turn';
+  const accent = changes ? CHANGE : withUs ? BLUE : YELLOW;
+  const pill = changes ? 'Changes asked' : withUs ? 'With the TDI team' : 'Your turn';
 
   return (
     <div style={{ background: '#fff', border: `1px solid ${LINE}`, borderRadius: 12, overflow: 'hidden' }}>

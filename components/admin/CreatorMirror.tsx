@@ -61,14 +61,28 @@ export function CreatorMirror({
   return (
     <div className="space-y-4">
       <div className="rounded-xl border border-gray-200 bg-white overflow-hidden">
-        <div className={`border-t-4 p-5 ${stranded ? 'border-[#9c1f31]' : 'border-[#ffba06]'}`}>
+        <div
+          className={`border-t-4 p-5 ${
+            stranded ? 'border-[#9c1f31]' : step?.waitingOnUs ? 'border-[#80a4ed]' : 'border-[#ffba06]'
+          }`}
+        >
           <div className="flex items-center gap-2 mb-3">
             <span
               className={`inline-block rounded px-2 py-1 text-[10px] font-bold uppercase tracking-wider ${
-                stranded ? 'bg-[#9c1f31] text-white' : 'bg-[#ffba06] text-[#1e2749]'
+                stranded
+                  ? 'bg-[#9c1f31] text-white'
+                  : step?.waitingOnUs
+                    ? 'bg-[#80a4ed] text-[#1e2749]'
+                    : 'bg-[#ffba06] text-[#1e2749]'
               }`}
             >
-              {step ? `${firstName}'s turn` : stranded ? 'Board needs repair' : 'Nothing open'}
+              {step
+                ? step.waitingOnUs
+                  ? 'Waiting on us'
+                  : `${firstName}'s turn`
+                : stranded
+                  ? 'Board needs repair'
+                  : 'Nothing open'}
             </span>
             {journey.openStageName && (
               <span className="text-xs text-gray-500">{journey.openStageName}</span>

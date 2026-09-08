@@ -13,6 +13,7 @@
 // ---------------------------------------------------------------------------
 
 import { phaseRank } from './creator-phases';
+import { isInReview, isOursToDo, isWaitingOnUs } from './creator-turn';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 type DbClient = any;
@@ -23,6 +24,16 @@ export interface JourneyStep {
   name: string;
   /** True when TDI does this, not the creator. Shown, never hidden. */
   ours: boolean;
+  /**
+   * True when the ball is with TDI right now: either the step is ours, or the
+   * creator handed something in and is owed a response.
+   *
+   * Separate from `ours` on purpose. A creator step under review is waiting on
+   * us without becoming our work, and every screen that decides whose turn it
+   * is must read this rather than `ours`. Reading `ours` is what made the admin
+   * page say "HOLLY'S TURN" about a step the board had just called ours.
+   */
+  waitingOnUs: boolean;
   status: 'complete' | 'open' | 'in_review' | 'changes_requested' | 'todo';
   /**
    * The untouched creator_milestones.status. The display status above is lossy
@@ -111,7 +122,7 @@ function actionFor(r: Record<string, any>): OpenStepAction {
 function displayStatus(row: { status: string; review_status: string | null }): JourneyStep['status'] {
   if (row.status === 'completed') return 'complete';
   if (row.review_status === 'changes_requested') return 'changes_requested';
-  if (row.status === 'waiting_approval' || row.review_status === 'submitted' || row.review_status === 'under_review') {
+  if (isInReview({ status: row.status, reviewStatus: row.review_status })) {
     return 'in_review';
   }
   if (row.status === 'available') return 'open';
@@ -151,7 +162,12 @@ export async function getJourney(supabase: DbClient, projectId: string): Promise
           recordId: first.id,
           milestoneId: first.milestone_id,
           name: first.milestones.name,
-          ours: Boolean(first.milestones.requires_team_action),
+          ours: isOursToDo({ requiresTeamAction: first.milestones.requires_team_action }),
+          waitingOnUs: isWaitingOnUs({
+            status: first.status,
+            reviewStatus: first.review_status,
+            requiresTeamAction: first.milestones.requires_team_action,
+          }),
           status: displayStatus(first),
           rawStatus: first.status,
           dueOn: first.due_on ?? null,
@@ -213,7 +229,12 @@ export async function getJourney(supabase: DbClient, projectId: string): Promise
     recordId: r.id,
     milestoneId: r.milestone_id,
     name: r.milestones.name,
-    ours: Boolean(r.milestones.requires_team_action),
+    ours: isOursToDo({ requiresTeamAction: r.milestones.requires_team_action }),
+    waitingOnUs: isWaitingOnUs({
+      status: r.status,
+      reviewStatus: r.review_status,
+      requiresTeamAction: r.milestones.requires_team_action,
+    }),
     status: displayStatus(r as { status: string; review_status: string | null }),
     rawStatus: r.status,
     dueOn: r.due_on ?? null,
@@ -234,6 +255,7 @@ export async function getJourney(supabase: DbClient, projectId: string): Promise
     milestoneId: s.milestoneId,
     name: s.name,
     ours: s.ours,
+    waitingOnUs: s.waitingOnUs,
     status: s.status,
     rawStatus: s.rawStatus,
     dueOn: s.dueOn,

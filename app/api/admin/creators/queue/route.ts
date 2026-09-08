@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { hasSubmitted, isWaitingOnUs } from '@/lib/creator-turn';
 import { createClient } from '@supabase/supabase-js';
 import { requireAdminAuth } from '@/lib/tdi-admin/auth';
 
@@ -83,7 +84,7 @@ export async function GET() {
     const m = (Array.isArray(s.milestones) ? s.milestones[0] : s.milestones) as
       | { name?: string; requires_team_action?: boolean }
       | undefined;
-    const submitted = s.review_status === 'submitted';
+    const submitted = hasSubmitted({ reviewStatus: s.review_status });
     return {
       creatorId: s.creator_id,
       recordId: s.id,
@@ -92,10 +93,13 @@ export async function GET() {
       status: c?.status ?? null,
       contentPath: c?.content_path ?? null,
       step: m?.name || 'Unnamed step',
-      // Ours if the step is one we own, or if they have handed something in
-      // and are waiting to hear back. The second half is the case the first
-      // version missed.
-      ours: Boolean(m?.requires_team_action) || s.status === 'waiting_approval' || submitted,
+      // This rule used to live here and nowhere else, which is how three other
+      // screens ended up with three shorter versions of it. See lib/creator-turn.ts.
+      ours: isWaitingOnUs({
+        status: s.status,
+        reviewStatus: s.review_status,
+        requiresTeamAction: m?.requires_team_action,
+      }),
       submitted,
       reviewStatus: s.review_status ?? null,
       days: s.opened_at ? Math.floor((now - new Date(s.opened_at).getTime()) / 86400000) : null,
