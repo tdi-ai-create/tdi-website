@@ -31,6 +31,44 @@ type Item = {
   reviewed_by: string | null;
 };
 
+type QueueItem = {
+  id: string;
+  channel: string;
+  content_type: string | null;
+  title: string | null;
+  status: string;
+  owner: string | null;
+  approver: string | null;
+  audience_tag: string | null;
+  scheduled_for: string | null;
+  artifact_rendered_at: string | null;
+};
+
+// One colour per channel, so a month reads as a shape before it reads as a list.
+const CHANNEL: Record<string, { label: string; dot: string; bg: string }> = {
+  hub:          { label: 'Hub',      dot: '#2F6FB5', bg: '#E6EEF8' },
+  substack:     { label: 'Substack', dot: '#B75B2A', bg: '#F8EBE3' },
+  instagram:    { label: 'Instagram',dot: '#A83A68', bg: '#F8E7EE' },
+  video_script: { label: 'Video',    dot: '#22766A', bg: '#E0F0ED' },
+  email:        { label: 'Email',    dot: '#63549C', bg: '#EDEAF7' },
+};
+const channelOf = (c: string) => CHANNEL[c] ?? { label: c, dot: '#8A94A2', bg: '#F1F3F5' };
+
+// Who a state waits on, phrased for a person rather than a state machine.
+const WAITING: Record<string, string> = {
+  brief: 'not written yet',
+  drafting: 'being written',
+  pending_qa: 'with Julie',
+  pending_creative: 'with Lily',
+  pending_editorial: 'with Olivia',
+  pending_approval: 'waiting on approval',
+  approved: 'approved',
+  scheduled: 'scheduled',
+  published: 'published',
+  verified: 'live and checked',
+  changes_requested: 'sent back',
+};
+
 type Payload = {
   month: string;
   today_ct: string;
@@ -38,6 +76,12 @@ type Payload = {
   waiting_for_a_slot: number;
   overdue: number;
   items: Item[];
+  queued: QueueItem[];
+  unscheduled: QueueItem[];
+  horizons: {
+    social: { target: number; planned: number };
+    substack: { target: number; planned: number };
+  };
 };
 
 function ymd(y: number, m: number, d: number) {
@@ -106,6 +150,14 @@ export default function HubSchedulePage() {
     byDate.set(it.scheduled_publish_date, list);
   }
 
+  const queueByDate = new Map<string, QueueItem[]>();
+  for (const q of data?.queued ?? []) {
+    if (!q.scheduled_for) continue;
+    const list = queueByDate.get(q.scheduled_for) ?? [];
+    list.push(q);
+    queueByDate.set(q.scheduled_for, list);
+  }
+
   const cells: Array<{ iso: string | null; day: number | null }> = [];
   for (let i = 0; i < leading; i++) cells.push({ iso: null, day: null });
   for (let d = 1; d <= daysInMonth; d++) cells.push({ iso: ymd(y, m, d), day: d });
@@ -117,15 +169,15 @@ export default function HubSchedulePage() {
   return (
     <div className="p-6 max-w-[1200px] mx-auto">
       <div className="flex items-center justify-between flex-wrap gap-3 mb-1">
-        <h1 className="text-2xl font-semibold text-[#1e2749]">Release calendar</h1>
+        <h1 className="text-2xl font-semibold text-[#1e2749]">Content calendar</h1>
         <Link href="/tdi-admin/hub" className="text-sm text-[#5B6B8C] hover:underline">
           Back to Hub
         </Link>
       </div>
       <p className="text-sm text-[#6B7684] mb-5 max-w-[70ch]">
-        Approved Quick Wins take the next open weekday, at most {cap} a day, instead of going live the
-        moment they pass. Publishing happens from here on the day itself, never by pressing something
-        on this page.
+        Every channel on one surface. Hub tools take the next open weekday, at most {cap} a day.
+        Marketing content sits where it was scheduled. Publishing happens on the day itself, never by
+        pressing something on this page.
       </p>
 
       <div className="flex items-center gap-3 flex-wrap mb-4">
@@ -193,8 +245,9 @@ export default function HubSchedulePage() {
                     <div className="flex items-center justify-between text-[11px] text-[#6B7684]">
                       <span className={isToday ? 'font-bold text-[#2F5C9E]' : ''}>{c.day}</span>
                       {!weekend && (
-                        <span className={full ? 'text-[#96631A]' : 'text-[#9AA4B0]'}>
-                          {items.length}/{cap}
+                        <span className={full ? 'text-[#96631A]' : 'text-[#9AA4B0]'}
+                          title="Hub tools placed on this day, against the daily cap. Marketing content is not capped.">
+                          {items.length}/{cap} Hub
                         </span>
                       )}
                     </div>
@@ -238,6 +291,34 @@ export default function HubSchedulePage() {
                       )}
                     </div>
                   ))}
+                  {(c.iso ? queueByDate.get(c.iso) ?? [] : []).map(q => {
+                    const ch = channelOf(q.channel);
+                    // An unwritten brief is drawn as an outline: no fill, dashed
+                    // edge. Kristin has to be able to tell a placeholder from a
+                    // finished piece at a glance, without reading either one.
+                    const unwritten = q.status === 'brief' || q.status === 'drafting';
+                    return (
+                      <div key={q.id}
+                        className={[
+                          'rounded px-1.5 py-1 text-[11px] leading-tight border-l-[3px]',
+                          unwritten ? 'border border-dashed' : '',
+                        ].join(' ')}
+                        style={{
+                          background: unwritten ? 'transparent' : ch.bg,
+                          borderLeftColor: ch.dot,
+                          borderColor: unwritten ? ch.dot : undefined,
+                        }}
+                      >
+                        <div className={unwritten ? 'italic text-[#4A5568]' : 'font-semibold text-[#1e2749]'}>
+                          {q.title || '(untitled)'}
+                        </div>
+                        <div className="text-[10px] text-[#6B7684] mt-0.5">
+                          {ch.label} · {WAITING[q.status] ?? q.status}
+                          {q.owner && q.owner !== 'system' && q.owner !== 'nobody' ? ` · ${q.owner}` : ''}
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               );
             })}
@@ -245,7 +326,67 @@ export default function HubSchedulePage() {
         </div>
       )}
 
-      {!loading && data && data.items.length === 0 && (
+      {!loading && data && (
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-3 text-[11px] text-[#6B7684]">
+          {Object.values(CHANNEL).map(ch => (
+            <span key={ch.label} className="flex items-center gap-1.5">
+              <span className="w-2.5 h-2.5 rounded-sm inline-block" style={{ background: ch.dot }} />
+              {ch.label}
+            </span>
+          ))}
+          <span className="flex items-center gap-1.5">
+            <span className="w-2.5 h-2.5 rounded-sm inline-block border border-dashed border-[#8A94A2]" />
+            not written yet
+          </span>
+          <span className="ml-auto flex gap-3">
+            {([['Social', data.horizons.social], ['Substack', data.horizons.substack]] as const).map(([name, h]) => (
+              <span key={name} className={h.planned >= h.target ? 'text-[#3F6B4F]' : 'text-[#96631A]'}>
+                {name} planned {h.planned} of {h.target} days out
+              </span>
+            ))}
+          </span>
+        </div>
+      )}
+
+      {!loading && data && data.unscheduled.length > 0 && (
+        <div className="mt-6 border border-[#D8DDE3] rounded-lg bg-white p-4">
+          <h2 className="!text-sm !font-semibold !leading-normal !m-0 text-[#1e2749] mb-1">
+            No day yet ({data.unscheduled.length})
+          </h2>
+          <p className="text-[12px] text-[#6B7684] mb-3 max-w-[70ch]">
+            Real work with nowhere to sit. These do not block anything, but a month that looks empty
+            while this list is long is not actually an empty month.
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {data.unscheduled.map(q => {
+              const ch = channelOf(q.channel);
+              const unwritten = q.status === 'brief' || q.status === 'drafting';
+              return (
+                <div key={q.id}
+                  className={[
+                    'rounded px-2 py-1.5 text-[11px] border-l-[3px] max-w-[260px]',
+                    unwritten ? 'border border-dashed' : '',
+                  ].join(' ')}
+                  style={{
+                    background: unwritten ? 'transparent' : ch.bg,
+                    borderLeftColor: ch.dot,
+                    borderColor: unwritten ? ch.dot : undefined,
+                  }}>
+                  <div className={unwritten ? 'italic text-[#4A5568]' : 'font-semibold text-[#1e2749]'}>
+                    {q.title || '(untitled)'}
+                  </div>
+                  <div className="text-[10px] text-[#6B7684] mt-0.5">
+                    {ch.label} · {WAITING[q.status] ?? q.status}
+                    {q.owner && q.owner !== 'system' && q.owner !== 'nobody' ? ` · ${q.owner}` : ''}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {!loading && data && data.items.length === 0 && data.queued.length === 0 && (
         <p className="text-sm text-[#6B7684] mt-4">
           Nothing scheduled in {formatDateOnly(`${month}-01`, { month: 'long', year: 'numeric' })}.
           Items appear here once Julie schedules them instead of publishing them.
