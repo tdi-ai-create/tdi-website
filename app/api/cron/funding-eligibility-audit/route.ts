@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { guardCron } from '@/lib/cron-guard'
+import { isAgentWindowWork } from '@/lib/funding-window-work'
 import { screenPath, type EligibilityResult } from '@/lib/funding-eligibility'
 import { NOT_TERMINAL_FILTER } from '@/lib/funding/task-status'
 
@@ -95,7 +96,13 @@ export async function GET(request: NextRequest) {
 
     const { data: opportunities, error: oErr } = await supabase
       .from('funding_opportunities')
-      .select('id, name, pursuit_id, status, window_status, eligibility_verdict, eligibility_overridden')
+      // assigned_agent and window_checked_at decide whether a window question
+      // belongs to the research agent or has already been through her.
+      // research_status is what isAgentWindowWork actually keys on. Without it
+      // the predicate reads undefined, returns false for everything, and the
+      // deferral silently does nothing while looking as though it works. The
+      // dry run caught exactly that on the first attempt.
+      .select('id, name, pursuit_id, status, research_status, window_status, window_checked_at, assigned_agent, eligibility_verdict, eligibility_overridden')
 
     if (oErr) {
       console.error('[eligibility-audit] Could not read opportunities:', oErr)
@@ -107,6 +114,8 @@ export async function GET(request: NextRequest) {
     const changes: Change[] = []
     const questionsToRaise: { school: string; path: string; question: string; because: string }[] = []
     const questionsExisting: string[] = []
+    // Window questions handed to the research agent instead of to a person.
+    const questionsDeferredToAgent: string[] = []
     const questionsFailed: { school: string; path: string; question: string; because: string; error: string }[] = []
     const unchanged: string[] = []
     const skipped: { path: string; why: string }[] = []
@@ -154,6 +163,34 @@ export async function GET(request: NextRequest) {
       if (result.verdict === 'ask_first') {
         const title = QUESTION_BY_RULE[result.rule]
           ?? 'Confirm this before any drafting starts'
+
+        // Do not put an agent's research on a person's list.
+        //
+        // The `window` rule asks whether a funder is open and when it closes.
+        // That is research, and find_work already hands it to the assigned
+        // research agent as `confirm_window`. Raising it here as well asks the
+        // same question twice, of two different parties, and only the human one
+        // is visible, so it looks like the person's job.
+        //
+        // Bella hit this on 8 Sep 2026 and asked in Slack whether she should
+        // just answer them herself. Five window questions were on her list;
+        // Amara's queue for the same funders was empty, because the recheck
+        // floor keyed on updated_at and any write suppressed it. That floor is
+        // fixed separately. This stops the question reaching a person before
+        // the agent has had it at all.
+        //
+        // It comes to a person once the agent has actually looked and still
+        // could not establish it, which window_checked_at now records honestly.
+        //
+        // The test is shared with find_work rather than written twice. Keyed on
+        // research_status, not on a named agent: unassigned research is offered
+        // to whoever asks, so requiring a name here would have sent Casey's
+        // Cash for Classrooms and Corn Belt Energy to Bella while Amara was
+        // being offered both.
+        if (result.rule === 'window' && isAgentWindowWork(opp)) {
+          questionsDeferredToAgent.push(`${school.district_name} · ${opp.name}`)
+          continue
+        }
 
         // Idempotent. A monthly re-audit must not stack twelve copies of the
         // same unanswered question.
@@ -249,6 +286,8 @@ export async function GET(request: NextRequest) {
       verdicts: counts,
       changed: changes.length,
       changes,
+      questionsDeferredToAgent: questionsDeferredToAgent.length,
+      deferredToAgent: questionsDeferredToAgent,
       questionsRaised: questionsToRaise.length,
       questions: questionsToRaise,
       questionsAlreadyOpen: questionsExisting.length,

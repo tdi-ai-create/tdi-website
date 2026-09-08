@@ -83,7 +83,12 @@ export async function GET(request: NextRequest) {
       supabase
         .from('hub_quick_wins')
         .select('id, slug, title, description, category, roles, lift')
-        .eq('is_published', true),
+        .eq('is_published', true)
+        // Excluded from every band. The reason this matters is not tidiness:
+        // before this filter existed, the top curated item for every school
+        // leader and coach was TDI's own PD-model explainer, so a principal
+        // opening the Hub was recommended our marketing.
+        .eq('is_promotional', false),
       supabase
         .from('hub_activity_log')
         .select('user_id, metadata')

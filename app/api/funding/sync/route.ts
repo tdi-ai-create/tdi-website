@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
+import { isSchoolOwned } from '@/lib/funding-ownership'
 import { MAX_QA_ATTEMPTS, ESCALATION_OPTIONS, validateEscalation } from '@/lib/funding-qa'
 import {
   splitQaIssues,
@@ -322,9 +323,15 @@ export async function GET(request: NextRequest) {
       .select(`
         id, pursuit_id, name, plan_category, amount,
         research_status, assigned_agent,
-        window_status, contact_name, application_closes,
+        window_status, window_checked_at, contact_name, application_closes,
         pursuit:funding_pursuits!pursuit_id(id, pursuit_name, district_name)
       `)
+      // These three lines are isAgentWindowWork expressed as a query. The
+      // predicate in lib/funding-window-work.ts is the readable copy, and the
+      // eligibility audit uses it to decide whether the same question should go
+      // to a person instead. If you change one, change both: a narrower audit
+      // puts an agent's work on Bella's list, a wider one sends the question to
+      // nobody.
       .eq('research_status', 'found')
       .or('window_status.is.null,window_status.eq.unknown')
       .not('status', 'in', '("closed","awarded","denied")')
@@ -344,7 +351,21 @@ export async function GET(request: NextRequest) {
       // Fourteen days is a recheck, not a retry: a foundation that publishes
       // nothing today may open a cycle next month, and the Catholic Education
       // Trust Fund's own history is a February to April pattern worth catching.
-      .or(`updated_at.is.null,updated_at.lt.${new Date(Date.now() - WINDOW_RECHECK_DAYS * 86400000).toISOString()}`)
+      // Keyed on window_checked_at, not updated_at.
+      //
+      // updated_at was the original floor, on the assumption that it moves when
+      // the agent writes her note. It does, but so does every other job that
+      // touches the row. Measured 8 Sep 2026: six opportunities matched this
+      // branch and not one was being offered to her. Five were stamped on
+      // 2 Sep within a minute of each other, a batch write rather than five
+      // research sessions, and two more were pushed out to 22 Sep by a write
+      // earlier that same day. Amara's window queue was empty while Bella held
+      // five action items asking the same question, and she asked in Slack
+      // whether she should just answer them herself.
+      //
+      // window_checked_at only moves when a window field is written, so it
+      // means what its name says. Null means never checked.
+      .or(`window_checked_at.is.null,window_checked_at.lt.${new Date(Date.now() - WINDOW_RECHECK_DAYS * 86400000).toISOString()}`)
 
     // Same ownership rule as the branch above, and for the same reason. Without
     // it this hands research to whoever asks first, including the drafting and
@@ -657,6 +678,18 @@ export async function POST(request: NextRequest) {
       allowed[f] = updates[f]
       if (!before || before[f] !== updates[f]) changed = true
     })
+
+    // An answer about the window stamps window_checked_at, and nothing else
+    // does. That is the whole point of the column: find_work's recheck floor
+    // keys on it, so it has to mean "an agent looked at the window" and not
+    // "somebody touched this row". Stamped even when the answer is still
+    // unknown, because "I looked and could not establish it" is a real answer
+    // and deserves the fourteen day pause. Otherwise she is asked hourly for
+    // ever and the reward for answering is being asked again.
+    const WINDOW_FIELDS = ['window_status', 'window_opens', 'window_closes']
+    if (WINDOW_FIELDS.some(f => updates[f] !== undefined)) {
+      allowed.window_checked_at = new Date().toISOString()
+    }
 
     // Only a real change counts as activity. Stamping this on every write is how
     // stalled narratives used to report zero days idle while sitting untouched
@@ -1057,7 +1090,7 @@ export async function POST(request: NextRequest) {
     //
     // Only a person contacts a school. An agent that needs something from one
     // creates work for Bella, with the wording ready, and she sends it.
-    if (ownerType === 'client') {
+    if (isSchoolOwned({ ownerType })) {
       return NextResponse.json({
         error:
           'Agents cannot create client-owned tasks. Create it as TDI-owned and put ' +
