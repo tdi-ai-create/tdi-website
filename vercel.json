@@ -81,6 +81,10 @@
       "schedule": "0 8 * * *"
     },
     {
+      "path": "/api/cron/orphaned-work",
+      "schedule": "0 7 * * 1"
+    },
+    {
       "path": "/api/cron/creator-integrity",
       "schedule": "0 15 * * 1"
     },
