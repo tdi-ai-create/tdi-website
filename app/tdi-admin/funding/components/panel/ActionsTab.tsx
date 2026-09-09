@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { NudgePreviewModal } from './NudgePreviewModal'
+import { isPersonOwned, isSchoolOwned } from '@/lib/funding-ownership'
 
 const CATEGORY_OPTIONS = ['research', 'writing', 'submission', 'follow_up', 'approval', 'documentation']
 
@@ -181,8 +182,8 @@ export function ActionsTab({ pursuitId }: ActionsTabProps) {
   const schoolActions = actions.filter(a => !(a.owner_email === 'rae@teachersdeserveit.com' && a.category === 'approval' && !a.opportunity_id))
   const activeActions = schoolActions.filter(a => a.status !== 'cancelled')
   const cancelledActions = schoolActions.filter(a => a.status === 'cancelled')
-  const clientActions = activeActions.filter(a => a.owner_type === 'client')
-  const tdiActions = activeActions.filter(a => a.owner_type !== 'client')
+  const clientActions = activeActions.filter(a => isSchoolOwned(a))
+  const tdiActions = activeActions.filter(a => isPersonOwned(a))
 
   if (loading) return <div style={{ padding: 20, textAlign: 'center', color: '#6B7280' }}>Loading...</div>
 
@@ -228,8 +229,8 @@ export function ActionsTab({ pursuitId }: ActionsTabProps) {
                 onClick={() => setNewAction({ ...newAction, ownerType: 'client' })}
                 style={{
                   fontSize: 12, padding: '6px 14px', border: 'none', cursor: 'pointer',
-                  background: newAction.ownerType === 'client' ? '#F59E0B' : 'white',
-                  color: newAction.ownerType === 'client' ? 'white' : '#374151',
+                  background: isSchoolOwned(newAction) ? '#F59E0B' : 'white',
+                  color: isSchoolOwned(newAction) ? 'white' : '#374151',
                   fontWeight: 600,
                 }}
               >
@@ -596,10 +597,10 @@ function ActionItem({ action, onToggle, onCancel, onUpdateClientLabel, onNudge, 
           {action.owner_name && (
             <span style={{
               fontSize: 11, fontWeight: 600, padding: '2px 8px', borderRadius: 4,
-              background: action.owner_type === 'client' ? '#FFF7ED' : '#F5F3FF',
-              color: action.owner_type === 'client' ? '#C2410C' : '#6D28D9',
+              background: isSchoolOwned(action) ? '#FFF7ED' : '#F5F3FF',
+              color: isSchoolOwned(action) ? '#C2410C' : '#6D28D9',
             }}>
-              {action.owner_type === 'client' ? `Waiting on ${action.owner_name}` : `${action.owner_name} needs to do this`}
+              {isSchoolOwned(action) ? `Waiting on ${action.owner_name}` : `${action.owner_name} needs to do this`}
             </span>
           )}
           {escalationRung && escalationRung !== 'none' && !isInactive && (() => {
@@ -613,8 +614,15 @@ function ActionItem({ action, onToggle, onCancel, onUpdateClientLabel, onNudge, 
               </span>
             ) : null
           })()}
-          {/* Send nudge button */}
-          {!isInactive && action.owner_email && (
+          {/* Write to the school.
+              Previously gated on action.owner_email, which meant a task owned by
+              a person only offered this if it happened to carry an email, and
+              then addressed it to that person. Of 15 open person-owned tasks on
+              9 September, 8 showed no button at all and 3 would have emailed
+              Bella about her own task. The route now resolves the school contact
+              for person-owned tasks, and explains itself in the preview when
+              there is no contact to write to. */}
+          {!isInactive && (
             <button
               onClick={() => onNudge(action.id)}
               style={{
@@ -623,7 +631,7 @@ function ActionItem({ action, onToggle, onCancel, onUpdateClientLabel, onNudge, 
                 cursor: 'pointer',
               }}
             >
-              Send nudge
+              {isSchoolOwned(action) ? 'Send nudge' : 'Write to the school'}
             </button>
           )}
           {/* Cancel button */}
@@ -670,14 +678,14 @@ function ActionItem({ action, onToggle, onCancel, onUpdateClientLabel, onNudge, 
         )}
 
         {/* Client-specific: prepared materials */}
-        {action.owner_type === 'client' && action.prepared_materials && !isCancelled && (
+        {isSchoolOwned(action) && action.prepared_materials && !isCancelled && (
           <div style={{ fontSize: 11, color: '#9CA3AF', fontStyle: 'italic', marginTop: 4 }}>
             TDI prepared: {action.prepared_materials}
           </div>
         )}
 
         {/* Client-specific: nudge count */}
-        {action.owner_type === 'client' && action.nudge_count > 0 && !isCancelled && (
+        {isSchoolOwned(action) && action.nudge_count > 0 && !isCancelled && (
           <span style={{
             fontSize: 10, fontWeight: 600, padding: '2px 6px', borderRadius: 4,
             background: '#FEF3C7', color: '#92400E', marginTop: 4, display: 'inline-block',

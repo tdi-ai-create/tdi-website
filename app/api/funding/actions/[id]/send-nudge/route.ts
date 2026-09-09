@@ -60,7 +60,7 @@ export async function POST(
   // Fetch the pursuit for school name + owner email fallback
   const { data: pursuit } = await supabase
     .from('funding_pursuits')
-    .select('id, pursuit_name, district_name, next_action_owner_email, client_contact_name')
+    .select('id, pursuit_name, district_name, next_action_owner_email, client_contact_name, client_contact_email')
     .eq('id', item.pursuit_id)
     .single()
 
@@ -73,12 +73,38 @@ export async function POST(
     .eq('pursuit_id', item.pursuit_id)
     .maybeSingle()
 
-  // Resolve the recipient
-  const recipientEmail = item.owner_email ?? pursuit?.next_action_owner_email ?? null
+  // Resolve the recipient.
+  //
+  // Two shapes of task share this one control, and they point in opposite
+  // directions. On a client-owned task the owner IS the school, so nudging the
+  // owner is the whole point. On a person-owned task the owner is a colleague
+  // and the work is "go and contact the school", so nudging the owner would
+  // email Bella about her own task.
+  //
+  // Bella reported exactly that on 8 and 9 September. Measured at the time: of
+  // 15 open person-owned tasks, 8 had no owner_email so no button appeared at
+  // all, and 3 carried her own address.
+  const isClientOwned = String(item.owner_type ?? '').toLowerCase() === 'client'
+
+  const recipientEmail = isClientOwned
+    ? item.owner_email ?? pursuit?.next_action_owner_email ?? null
+    : pursuit?.client_contact_email ?? gate?.submitter_email ?? null
+
   if (!recipientEmail) {
     return NextResponse.json({
       blocked: true,
-      blockReason: 'No recipient email found on this action item or its pursuit',
+      blockReasons: [
+        isClientOwned
+          ? 'This task has no contact email, and neither does its pursuit.'
+          : 'There is no school contact on this pursuit, so there is nobody to write to. ' +
+            'Add a client contact to the pursuit first, then come back here.',
+      ],
+      to: '',
+      from: '',
+      subject: '',
+      html: '',
+      tone: 'client',
+      emailType: 'nudge',
     })
   }
 
@@ -132,7 +158,11 @@ export async function POST(
     contactName,
     schoolName,
     clientLabel: item.client_label,
-    submitterName: item.owner_name ?? recipientEmail,
+    // The person who owes the application, which on a person-owned task is the
+    // school contact and never the colleague whose task it is.
+    submitterName: isClientOwned
+      ? item.owner_name ?? recipientEmail
+      : pursuit?.client_contact_name ?? recipientEmail,
   })
 
   // ── Check safety gates ──
@@ -225,8 +255,14 @@ export async function POST(
     return NextResponse.json({ sent: false, error: result.error }, { status: 500 })
   }
 
+  // Everything below this line happens after the email has already gone, so a
+  // failure must never be reported as a failed send. It must not be silent
+  // either: a lost log row means the Emails tab denies an email that reached a
+  // client, and a lost stamp means we nudge the same school again next week.
+  const bookkeeping: string[] = []
+
   // Log to funding_email_log so it appears in the Emails tab
-  await supabase
+  const { error: logError } = await supabase
     .from('funding_email_log')
     .insert({
       pursuit_id: item.pursuit_id,
@@ -243,13 +279,18 @@ export async function POST(
       email_type: emailType === 'nudge' ? 'nudge' : 'deadline_reminder',
     })
 
+  if (logError) {
+    console.error('[send-nudge] email sent but not logged:', logError.message)
+    bookkeeping.push(`The email went to ${recipientEmail} but could not be recorded in the Emails tab, so it will not appear there.`)
+  }
+
   // Update the action item + auto-log to notes
   const timestamp = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
   const noteEntry = `[${timestamp}] Nudge sent to ${recipientEmail}`
   const existingNotes = item.notes || ''
   const updatedNotes = existingNotes ? `${existingNotes}\n${noteEntry}` : noteEntry
 
-  await supabase
+  const { error: stampError } = await supabase
     .from('funding_action_items')
     .update({
       nudge_count: (item.nudge_count ?? 0) + 1,
@@ -259,6 +300,11 @@ export async function POST(
     })
     .eq('id', actionId)
 
+  if (stampError) {
+    console.error('[send-nudge] email sent but not stamped:', stampError.message)
+    bookkeeping.push('This send was not recorded against the task, so it still looks unsent. Do not send it a second time.')
+  }
+
   // Slack narration
   postFundingEvent(nudgeSentEvent(item.pursuit_id, schoolName, item.title, recipientEmail)).catch(err => console.error('[send-nudge] non-blocking side effect failed:', err))
 
@@ -267,5 +313,6 @@ export async function POST(
     to: email.to,
     subject: email.subject,
     tone: email.tone,
+    warnings: bookkeeping.length > 0 ? bookkeeping : undefined,
   })
 }

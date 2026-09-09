@@ -94,7 +94,7 @@ export function NudgePreviewModal({ actionId, onClose, onSent }: NudgePreviewMod
             display: 'flex', justifyContent: 'space-between', alignItems: 'center',
           }}>
             <div style={{ fontSize: 15, fontWeight: 700, color: '#0a0f1e' }}>
-              Send nudge — preview
+              Read this before it goes
             </div>
             <button
               onClick={onClose}
