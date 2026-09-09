@@ -5,6 +5,7 @@ import { creatorEmailTemplate } from '@/lib/creator-email-template';
 import { randomBytes } from 'crypto';
 import { unpauseUrl } from '@/lib/reengagement-config';
 import { guardCron, checkedWrite } from '@/lib/cron-guard';
+import { loadContactGate, type ContactGate } from '@/lib/creator-contact-budget';
 
 // ---------------------------------------------------------------------------
 // Creator Re-engagement Cron
@@ -192,8 +193,13 @@ export async function GET(request: NextRequest) {
       emailsSent: 0,
       accountsPaused: 0,
       errors: [] as string[],
+      // Held because the creator has never signed in and we already wrote to
+      // them this fortnight. See lib/creator-contact-budget.ts.
+      heldBack: [] as string[],
       plan: [] as Record<string, unknown>[],
     };
+
+    const contactGate: ContactGate = await loadContactGate(supabase);
 
     // ----- PHASE 1: Cancel sequences where creator became active -----
     const { data: activeSequences, error: activeSeqError } = await supabase
@@ -344,6 +350,12 @@ export async function GET(request: NextRequest) {
             continue;
           }
 
+          const verdict = contactGate.may(creator.email);
+          if (!verdict.ok) {
+            results.heldBack.push(`${creator.email}: ${verdict.reason}`);
+            continue;
+          }
+
           const sent = await sendEmail(resendApiKey, creator.email, subject, html);
 
           if (sent) {
@@ -477,6 +489,12 @@ export async function GET(request: NextRequest) {
           });
           results.sequencesStarted++;
           results.emailsSent++;
+          continue;
+        }
+
+        const verdict = contactGate.may(creator.email);
+        if (!verdict.ok) {
+          results.heldBack.push(`${creator.email}: ${verdict.reason}`);
           continue;
         }
 

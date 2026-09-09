@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 import { logCreatorEmail } from '@/lib/creator-email-log';
 import { creatorEmailTemplate } from '@/lib/creator-email-template';
 import { guardCron } from '@/lib/cron-guard';
+import { loadContactGate } from '@/lib/creator-contact-budget';
 
 // ---------------------------------------------------------------------------
 // First-Week Momentum Email
@@ -70,9 +71,17 @@ export async function GET(request: NextRequest) {
     }
 
     let sent = 0;
+    const heldBack: string[] = [];
+    const contactGate = await loadContactGate(supabase);
     const plan: Record<string, unknown>[] = [];
 
     for (const creator of newCreators) {
+      const verdict = contactGate.may(creator.email);
+      if (!verdict.ok) {
+        heldBack.push(`${creator.email}: ${verdict.reason}`);
+        continue;
+      }
+
       // Check if they've completed any milestone
       const { data: completedMilestones } = await supabase
         .from('creator_milestones')
@@ -181,6 +190,7 @@ export async function GET(request: NextRequest) {
       dryRun,
       checked: newCreators.length,
       sent,
+      heldBack,
       ...(dryRun ? { plan } : {}),
     });
   } catch (error) {

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { randomBytes } from 'crypto'
 import { logCreatorEmail } from '@/lib/creator-email-log'
+import { loadContactGate } from '@/lib/creator-contact-budget'
 import { creatorEmailTemplate } from '@/lib/creator-email-template'
 import {
   PAUSE_CHECK_IN_SENDS_ENABLED,
@@ -68,11 +69,21 @@ export async function GET(request: NextRequest) {
 
     const sent: string[] = []
     const suppressed: string[] = []
+    const heldBack: string[] = []
     const errors: string[] = []
+    const contactGate = await loadContactGate(supabase)
     const wouldSend: { creator_id: string; to: string; bcc: string[]; subject: string }[] = []
 
     for (const creator of toSend) {
       if (!creator.email) continue
+
+      // Before the dry-run branch, so a dry run reports what would be held
+      // rather than reporting nothing because it returned first.
+      const verdict = contactGate.may(creator.email)
+      if (!verdict.ok) {
+        heldBack.push(`${creator.email}: ${verdict.reason}`)
+        continue
+      }
 
       const firstName = creator.name?.split(' ')[0] || 'there'
 
@@ -187,6 +198,7 @@ export async function GET(request: NextRequest) {
       eligible: toSend.length,
       sent: sent.length,
       suppressed: suppressed.length,
+      heldBack,
       creator_ids: sent,
       errors,
     })

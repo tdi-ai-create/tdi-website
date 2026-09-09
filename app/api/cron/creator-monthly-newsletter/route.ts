@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { logCreatorEmail } from '@/lib/creator-email-log';
 import { guardCron } from '@/lib/cron-guard';
+import { loadContactGate } from '@/lib/creator-contact-budget';
 import { isWaitingOnUs } from '@/lib/creator-turn';
 import Anthropic from '@anthropic-ai/sdk';
 
@@ -433,10 +434,18 @@ export async function GET(request: NextRequest) {
         ) ?? recipients[0] ?? activeCreators[0]
       : recipients[0] ?? activeCreators[0];
 
+    // Evaluated before the dry-run return, so a dry run says who would be held.
+    const contactGateEarly = await loadContactGate(supabase);
+    const heldBackPreview = (recipients ?? [])
+      .map((r: { email: string }) => ({ email: r.email, v: contactGateEarly.may(r.email) }))
+      .filter((x: { v: { ok: boolean } }) => !x.v.ok)
+      .map((x: { email: string; v: { reason?: string } }) => `${x.email}: ${x.v.reason}`);
+
     if (dryRun) {
       return NextResponse.json({
         success: true,
         dryRun: true,
+        heldBack: heldBackPreview,
         renderedAsOf: now.toISOString().slice(0, 10),
         isFutureIssue: Boolean(asOfDate),
         subject,
@@ -465,7 +474,19 @@ export async function GET(request: NextRequest) {
 
     // Send to all active creators who have not already had this month's issue
     let sent = 0;
+    const heldBack: string[] = [];
+    const contactGate = await loadContactGate(supabase);
+
     for (const creator of recipients) {
+      // A newsletter is the least urgent thing we send, and sending it to
+      // somebody who has never once signed in is how a sender teaches a spam
+      // filter to bury the invite that matters.
+      const verdict = contactGate.may(creator.email);
+      if (!verdict.ok) {
+        heldBack.push(`${creator.email}: ${verdict.reason}`);
+        continue;
+      }
+
       try {
         const res = await fetch('https://api.resend.com/emails', {
           method: 'POST',
@@ -505,6 +526,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       success: true,
       sent,
+      heldBack,
       total: activeCreators.length,
       skippedAlreadySentThisMonth: skipped,
     });
