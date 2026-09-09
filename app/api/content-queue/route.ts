@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import {
-  TRANSITIONS, OWNER_OF, actorHoldsRole, isSelfReview, legalFrom,
+  TRANSITIONS, OWNER_OF, actorHoldsRole, isSelfReview, legalFrom, canRequestChanges,
   type Action, type Status,
 } from '@/lib/content-queue/workflow'
 
@@ -180,6 +180,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({
         error: `"${actor}" wrote this, so cannot also ${action} it. Reviewing your own work is a second draft, not a review.`,
       }, { status: 403 })
+    }
+    // request_changes has no single role: three gates and two approvers can all
+    // refuse, and a writer can recall a submit nobody has touched yet.
+    if (action === 'request_changes') {
+      const verdict = canRequestChanges(actor, item)
+      if (!verdict.allowed) return NextResponse.json({ error: verdict.reason }, { status: 403 })
     }
     if (rule.needsNote && !note) {
       return NextResponse.json({ error: `${action} requires a note saying why.` }, { status: 400 })
