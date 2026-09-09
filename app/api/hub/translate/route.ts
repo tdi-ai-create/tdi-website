@@ -1,10 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+/**
+ * The Hub database, and only the Hub database.
+ *
+ * This route read `NEXT_PUBLIC_SUPABASE_URL` until 9 Sep 2026, which is the
+ * admin project, not the Learning Hub. `hub_quick_wins` exists in both, and the
+ * admin copy is three stale rows with no `title_es` column, so every quick win
+ * lookup failed with 42703, `qw` came back null, and the route answered
+ * "Quick win not found". The Quick Wins page treats that as an English
+ * fallback and says nothing, so the ES toggle looked like it worked while
+ * zero of 265 published items ever got a Spanish title. Courses failed the
+ * same way. See CLAUDE.md section 2.
+ *
+ * Built per request rather than at module load so a missing key is an error
+ * on the call, with a name attached, instead of a blank import-time crash.
+ */
+function db() {
+  const url = process.env.LEARNING_HUB_SUPABASE_URL || process.env.NEXT_PUBLIC_LEARNING_HUB_SUPABASE_URL
+  const key = process.env.LEARNING_HUB_SUPABASE_SERVICE_KEY
+  if (!url || !key) throw new Error('Learning Hub Supabase not configured')
+  return createClient(url, key, { auth: { autoRefreshToken: false, persistSession: false } })
+}
 
 const GOOGLE_TRANSLATE_URL = 'https://translation.googleapis.com/language/translate/v2'
 const API_KEY = process.env.GOOGLE_TRANSLATE_API_KEY
@@ -43,18 +60,26 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
+    const supabase = db()
+
     if (!API_KEY) {
       return NextResponse.json({ error: 'Translation API not configured' }, { status: 500 })
     }
 
     // ── COURSE TRANSLATION ──────────────────────────────────────────────
     if (contentType === 'course') {
-      const { data: course } = await supabase
+      const { data: course, error: courseError } = await supabase
         .from('hub_courses')
         .select('id, title, description, title_es, description_es')
         .eq('id', contentId)
         .single()
 
+      // A failed query is not a missing row. Reporting one as the other is how
+      // a wrong-database bug survived: "not found" reads like bad input.
+      if (courseError && courseError.code !== 'PGRST116') {
+        console.error('Course translation lookup failed:', courseError.message)
+        return NextResponse.json({ error: courseError.message }, { status: 500 })
+      }
       if (!course) return NextResponse.json({ error: 'Course not found' }, { status: 404 })
 
       // Check what still needs translation
@@ -75,14 +100,20 @@ export async function POST(request: NextRequest) {
         needsDescEs ? translateText(course.description || '', lang) : Promise.resolve(course.description_es),
       ])
 
-      // Cache to database
-      await supabase
+      // Cache to database. The discarded error here is what let a route
+      // pointed at the wrong project report success for months.
+      const { error: courseWriteErr } = await supabase
         .from('hub_courses')
         .update({
           ...(needsTitleEs && { title_es: titleEs }),
           ...(needsDescEs && { description_es: descEs }),
         })
         .eq('id', contentId)
+
+      if (courseWriteErr) {
+        console.error('Course translation write failed:', courseWriteErr.message)
+        return NextResponse.json({ error: courseWriteErr.message }, { status: 500 })
+      }
 
       return NextResponse.json({ title_es: titleEs, description_es: descEs, cached: false })
     }
@@ -99,7 +130,10 @@ export async function POST(request: NextRequest) {
         .eq('id', contentId)
         .single()
 
-      if (qwError) console.error('Quick win translation lookup failed:', qwError.message)
+      if (qwError && qwError.code !== 'PGRST116') {
+        console.error('Quick win translation lookup failed:', qwError.message)
+        return NextResponse.json({ error: qwError.message }, { status: 500 })
+      }
       if (!qw) return NextResponse.json({ error: 'Quick win not found' }, { status: 404 })
 
       const needsTitleEs = !qw.title_es && qw.title
@@ -118,13 +152,18 @@ export async function POST(request: NextRequest) {
         needsDescEs ? translateText(qw.description || '', lang) : Promise.resolve(qw.description_es),
       ])
 
-      await supabase
+      const { error: qwWriteErr } = await supabase
         .from('hub_quick_wins')
         .update({
           ...(needsTitleEs && { title_es: titleEs }),
           ...(needsDescEs && { description_es: descEs }),
         })
         .eq('id', contentId)
+
+      if (qwWriteErr) {
+        console.error('Quick win translation write failed:', qwWriteErr.message)
+        return NextResponse.json({ error: qwWriteErr.message }, { status: 500 })
+      }
 
       return NextResponse.json({
         title_es: titleEs,

@@ -1,10 +1,12 @@
 'use client';
 
+import Image from 'next/image';
 import { useRef, useState } from 'react';
 import {
   FOCUS_PACKET_FULL_PATH,
   FOCUS_PACKET_GATED_CONTENTS,
   FOCUS_PACKET_GATED_PAGES,
+  FOCUS_PACKET_PREVIEW_IMAGE,
   FOCUS_PACKET_PREVIEW_PAGES,
   FOCUS_PACKET_PREVIEW_PATH,
   FOCUS_PACKET_ROLES,
@@ -89,7 +91,7 @@ export default function FocusPacketForm() {
 
   if (revealed) {
     return (
-      <div className="fs-packet-grid fs-packet-grid-open">
+      <div className="fs-packet-layout fs-packet-layout-open">
         <div className="fs-packet-reveal" ref={revealRef}>
           <h3>The full packet, all {FOCUS_PACKET_TOTAL_PAGES} pages.</h3>
           <p className="fs-packet-revealnote">
@@ -130,33 +132,30 @@ export default function FocusPacketForm() {
   }
 
   return (
-    <div className="fs-packet-grid">
+    <div className="fs-packet-layout">
       <div className="fs-packet-preview">
         <p className="fs-packet-eyebrow">Open to anyone, pages 1 to 3</p>
-        <object
-          className="fs-packet-frame"
-          data={`${FOCUS_PACKET_PREVIEW_PATH}#view=FitH`}
-          type="application/pdf"
-          aria-label="The Focus sample packet, first three pages"
-        >
-          <p>
-            Your browser will not display the preview here.{' '}
-            <a href={FOCUS_PACKET_PREVIEW_PATH} target="_blank" rel="noopener noreferrer">
-              Open the first three pages in a new tab
-            </a>
-            .
-          </p>
-        </object>
+        <ol className="fs-packet-pages">
+          {FOCUS_PACKET_PREVIEW_PAGES.map((page, i) => (
+            <li key={page.image}>
+              <a href={FOCUS_PACKET_PREVIEW_PATH} target="_blank" rel="noopener noreferrer">
+                <Image
+                  src={page.image}
+                  alt={`Page ${i + 1} of the packet. ${page.label}.`}
+                  width={FOCUS_PACKET_PREVIEW_IMAGE.width}
+                  height={FOCUS_PACKET_PREVIEW_IMAGE.height}
+                  sizes="(max-width: 700px) 92vw, (max-width: 1000px) 46vw, 340px"
+                />
+              </a>
+              <span>{page.label}</span>
+            </li>
+          ))}
+        </ol>
         <p className="fs-packet-openlink">
           <a href={FOCUS_PACKET_PREVIEW_PATH} target="_blank" rel="noopener noreferrer">
-            Open the first three pages in a new tab
+            Open these three pages as a PDF
           </a>
         </p>
-        <ul className="fs-packet-pages">
-          {FOCUS_PACKET_PREVIEW_PAGES.map((page) => (
-            <li key={page}>{page}</li>
-          ))}
-        </ul>
       </div>
 
       <form className="fs-packet-form" onSubmit={handleSubmit} noValidate>

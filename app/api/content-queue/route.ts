@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { notifyApproved } from '@/lib/content-queue/notify'
 import {
   TRANSITIONS, OWNER_OF, actorHoldsRole, isSelfReview, legalFrom, canRequestChanges, canFlagBlocked,
   isTransition, hasContent,
@@ -41,6 +42,7 @@ function authorize(request: NextRequest): boolean {
 type Row = {
   id: string
   title: string | null
+  channel: string
   status: Status
   body: string | null
   owner: string | null
@@ -190,7 +192,7 @@ export async function POST(request: NextRequest) {
 
     const { data: row, error: readErr } = await supabase
       .from('content_queue_items')
-      .select('id, title, status, body, owner, approver, approved_at, artifact_rendered_at, artifact_refs, feedback_log')
+      .select('id, title, channel, status, body, owner, approver, approved_at, artifact_rendered_at, artifact_refs, feedback_log')
       .eq('id', id).single()
 
     if (readErr || !row) return NextResponse.json({ error: 'Item not found' }, { status: 404 })
@@ -237,7 +239,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: `${action} requires a note saying why.` }, { status: 400 })
     }
 
-    const entry = { at: new Date().toISOString(), actor, action, from: item.status, to: rule.to, note: note || null }
+    const entry: Record<string, unknown> = { at: new Date().toISOString(), actor, action, from: item.status, to: rule.to, note: note || null }
     const patch: Record<string, unknown> = {
       status: rule.to,
       owner: OWNER_OF[rule.to],
@@ -255,13 +257,42 @@ export async function POST(request: NextRequest) {
       else if (Array.isArray(refs) && refs.length > 0) patch.artifact_rendered_at = new Date().toISOString()
     }
     if (action === 'pass_qa') patch.qa_spec_version = body.qa_spec_version ?? null
-    if (action === 'approve') { patch.approved_by = actor; patch.approved_at = new Date().toISOString() }
+    if (action === 'approve') {
+      patch.approved_by = actor
+      patch.approved_at = new Date().toISOString()
+      // Tell whoever has to publish it. The outcome goes into the same log entry,
+      // so "nobody was told" is a fact on the record rather than a silence.
+      const told = notifyApproved({ id, title: item.title, channel: item.channel, approved_by: actor })
+      entry.notified = told.attempted
+      entry.notified_note = told.reason
+    }
     if (action === 'schedule') {
       if (!body.scheduled_for) return NextResponse.json({ error: 'scheduled_for is required, as YYYY-MM-DD' }, { status: 400 })
       patch.scheduled_for = body.scheduled_for
     }
-    if (action === 'mark_published') { patch.published_at = new Date().toISOString(); patch.published_url = body.published_url ?? null }
-    if (action === 'verify') { patch.verified_at = new Date().toISOString(); patch.verification_note = note || null }
+    if (action === 'mark_published') {
+      // A publish claim without a URL is somebody saying they saw it. On
+      // 9 September a gate wrote a quality assessment of an empty row, so a
+      // claim that names nothing is not accepted here.
+      const url = typeof body.published_url === 'string' ? body.published_url.trim() : ''
+      if (!url) {
+        return NextResponse.json({
+          error: 'mark_published requires published_url: the actual address where you found it. If you cannot point at it, you have not confirmed it is live.',
+        }, { status: 400 })
+      }
+      patch.published_at = body.published_at ?? new Date().toISOString()
+      patch.published_url = url
+    }
+    if (action === 'verify') {
+      // Same rule one step later: say what you checked, not that you checked.
+      if (!note || !note.trim()) {
+        return NextResponse.json({
+          error: 'verify requires a note saying what you actually looked at and what you saw. "Confirmed" on its own is not a verification.',
+        }, { status: 400 })
+      }
+      patch.verified_at = new Date().toISOString()
+      patch.verification_note = note
+    }
 
     if (dryRun) {
       return NextResponse.json({
