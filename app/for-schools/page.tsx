@@ -1,4 +1,18 @@
+import fs from 'node:fs';
+import path from 'node:path';
+
 import './for-schools.css';
+import BandFigure from './BandFigures';
+import FocusPacketForm from './FocusPacketForm';
+import { FOCUS_PACKET_FULL_PATH, FOCUS_PACKET_PREVIEW_PATH } from '@/lib/focus-packet';
+
+// The packet is a content asset, not code. Until both files are actually in
+// public/downloads the section stays off the page rather than shipping a dead
+// preview and a form that gates nothing. Resolved when the page is built, so
+// dropping the files in and redeploying is all it takes to turn it on.
+const focusPacketReady = [FOCUS_PACKET_PREVIEW_PATH, FOCUS_PACKET_FULL_PATH].every((asset) =>
+  fs.existsSync(path.join(process.cwd(), 'public', asset))
+);
 
 export default function ForSchoolsPage() {
   return (
@@ -132,36 +146,42 @@ export default function ForSchoolsPage() {
 
             <article className="fs-offer" style={{"--c": "var(--pulse)"} as React.CSSProperties}>
               <h3>The Pulse</h3>
+              <BandFigure shape="pulse" name="Before the music" caption="asking what they would even want to play" />
               <p className="fs-who">For the leader who cannot tell how staff are actually doing until someone resigns.</p>
               <p className="fs-ican-h">What a leader can say by March</p>
               <ul className="fs-ican"><li>I can see where my staff are struggling, dimension by dimension, and whether it is improving or sliding week to week</li><li>I can find out what my staff are actually asking for, ranked</li><li>I can find out which grade levels or roles are carrying the problem</li><li>I can know whether my numbers are normal for a school like mine</li><li>I can close the loop with staff without writing it myself, and show leadership something quantitative</li></ul>
               <div className="fs-mech">
                 <b>How it runs.</b> One question every Tuesday, three seconds to answer, rotating through Mood, Energy, Belonging, Purpose and Needs. Delivered by email, outside the hub, so no account is required.
                 <br /><b>How it is measured.</b> Movement across the five areas, what staff ask for under Needs ranked month to month, and weekly response rate.
+                <br /><b>What it will not do.</b> It teaches nobody anything, and it never names an individual.
               </div>
               <div className="fs-foot"><a className="fs-go" href="/get-started">Request a quote</a></div>
             </article>
 
             <article className="fs-offer" style={{"--c": "var(--focus)"} as React.CSSProperties}>
               <h3>The Focus</h3>
+              <BandFigure shape="focus" name="The marching band" caption="same part, same time, same direction" />
               <p className="fs-who">For the district already committed to an initiative with nothing practical behind it.</p>
               <p className="fs-ican-h">What a leader can say by March</p>
               <ul className="fs-ican"><li>I can put real tools behind the initiative I already committed to</li><li>I can see whether my staff are actually using what we send</li><li>I can find out which parts of our focus staff are struggling with most</li><li>I can catch a focus that is not working in November instead of June</li><li>I can add support without adding a meeting, a PD day, or a new priority</li><li>I can get told what to do next instead of handed another dashboard to interpret</li><li>I can sit down twice a year with someone outside the building and decide what to change</li></ul>
               <div className="fs-mech">
                 <b>How it runs.</b> You name the area your district is already working on. 13 tools across the year, one every three weeks, built for it and sent inside the email with a printable version underneath. All 13 dates are set when you sign. One tap back: planning it, skipping it, or want help. Two 45-minute sessions with your leadership team, mid-November and early March, both booked at signing. Those two conversations are your whole time commitment for the year.
                 <br /><b>How it is measured.</b> Planned-use rate across the year, skip rate by tool and by group, and the volume and clustering of help requests.
+                <br /><b>What it will not do.</b> Nobody gets an arrangement written for them, and no one is listening to any individual player.
               </div>
               <div className="fs-foot"><a className="fs-go" href="/get-started">Request a quote</a></div>
             </article>
 
             <article className="fs-offer" style={{"--c": "var(--cohort)"} as React.CSSProperties}>
               <h3>The Cohort</h3>
+              <BandFigure shape="cohort" name="The a cappella group" caption="different parts, one instrument, everybody's voice" />
               <p className="fs-who">For the group carrying the most and getting the least. Paras, new teachers, whoever you would name.</p>
               <p className="fs-ican-h">What a leader can say by March</p>
               <ul className="fs-ican"><li>I can give a specific group real support instead of hoping they figure it out</li><li>I can see whether that group moved from where they started</li><li>I can tell whether the people I invested in actually stayed</li><li>I can support paras or new teachers without building a program myself</li><li>I can point to a number when someone asks whether it worked</li></ul>
               <div className="fs-mech">
                 <b>How it runs.</b> You choose who is in it. 10 standard, 15 maximum, from one building or across a district. Four virtual sessions shaped to that group, full hub and paid blog access all year, optional office hours, and a named team member they can email directly.
                 <br /><b>How it is measured.</b> Retention within the cohort, stress and feeling of support measured at baseline and again in March, hub implementation rate, and session attendance.
+                <br /><b>What it will not do.</b> It reaches only the people in the room, and the rest of the building gains no shared language from it.
               </div>
               <div className="fs-foot"><a className="fs-go" href="/get-started">Request a quote</a></div>
             </article>
@@ -180,11 +200,14 @@ export default function ForSchoolsPage() {
               <p style={{"fontSize": ".86rem", "color": "var(--muted)", "marginTop": "16px"}}>The three phases are how a Blueprint partnership unfolds over time. They are not a ladder the other offerings sit on.</p>
             </div>
             <div>
+              <BandFigure shape="blueprint" name="The jazz ensemble" caption="every line different, and someone listening to each" />
               <a className="fs-btn fs-btn-navy" href="/get-started">Request a quote</a>
             </div>
           </div>
 
-          <div className="fs-notladder">These are not steps. The Pulse, The Focus and The Cohort are not smaller versions of the Blueprint or trial runs for it. Schools run one of them for years without ever buying anything else.</div>
+          <div className="fs-notladder">These are not steps. The Pulse, The Focus and The Cohort are not smaller versions of the Blueprint or trial runs for it. Schools run one of them for years without ever buying anything else.
+            <span className="fs-notladder-music">A marching band and a jazz ensemble are both music, and both take real skill. They are not the same thing, and a building needs different ones at different moments. Most buildings need the marching band first, because you cannot improvise together until everyone knows the tune. But a staff that only ever marches never finds out what any individual player can do.</span>
+          </div>
 
           <div className="fs-tablewrap">
             <table>
@@ -203,6 +226,23 @@ export default function ForSchoolsPage() {
           <p style={{"fontSize": ".85rem", "color": "var(--muted)", "marginTop": "14px"}}>The outcomes row maps each offering to the list above. It is our reading of which route reaches which outcome, not a contractual guarantee.</p>
         </div>
       </section>
+
+      {/* SAMPLE PACKET. Sits here, well away from the ungated downloads block
+          at the foot of the page, so nothing near "No email required" is
+          asking for an email. */}
+      {focusPacketReady && (
+        <section className="fs-sec fs-sec-packet" id="sample-packet">
+          <div className="fs-wrap">
+            <div className="fs-head-narrow">
+              <p className="fs-kicker">Read it before you buy it</p>
+              <h2>See a full year of The Focus, start to finish.</h2>
+              <p className="fs-lede">Real tools and real session guides, not a brochure about them. Read the first three pages right now. The rest opens on this page as soon as you tell us where to send a copy.</p>
+            </div>
+
+            <FocusPacketForm />
+          </div>
+        </section>
+      )}
 
       {/* WHAT WE ACTUALLY DO */}
       <section className="fs-sec">

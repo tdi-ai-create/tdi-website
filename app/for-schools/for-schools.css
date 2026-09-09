@@ -297,3 +297,84 @@ ul.fs-ican li:before{content:"";position:absolute;left:0;top:15px;width:8px;heig
 .fs-page .fs-oc .fs-via{grid-column:2}
 /* the grid made the pill fill its cell; keep it hugging its text */
 .fs-page .fs-oc .fs-via{justify-self:start}
+
+/* ---------- sample packet ---------- */
+/* A navy band, not a third white one. The surrounding sections alternate white
+   and gray and this one sits between them without joining the rotation, which
+   is also the point: it is the only place on the page showing the actual
+   product rather than describing it. Panels reuse the .fs-yearcard treatment
+   so nothing new is invented for navy. */
+.fs-page .fs-sec-packet{background:var(--navy); color:#E7EEF2; border-top:none}
+.fs-page .fs-sec-packet h2{color:#fff}
+.fs-page .fs-sec-packet .fs-kicker{color:#9AA7C0}
+.fs-page .fs-sec-packet .fs-lede{color:#AEB9CE}
+
+.fs-page .fs-packet-grid{display:grid; grid-template-columns:1.05fr .95fr; gap:34px; margin-top:40px; align-items:start}
+@media(max-width:980px){.fs-page .fs-packet-grid{grid-template-columns:1fr; gap:26px}}
+
+.fs-page .fs-packet-eyebrow{font-size:.85rem; font-weight:700; color:#9AA7C0; margin:0 0 12px}
+.fs-page .fs-packet-frame{
+  display:block; width:100%; height:clamp(420px,62vh,640px);
+  background:#fff; border:1px solid #3B4C74; border-radius:12px;
+}
+.fs-page .fs-packet-frame p{color:var(--ink); padding:20px; margin:0}
+.fs-page .fs-packet-openlink{margin:12px 0 0; font-size:.94rem}
+.fs-page .fs-packet-openlink a{color:var(--gold); text-decoration:underline; text-underline-offset:3px}
+/* Phone browsers embed PDFs badly or not at all, so below this width the frame
+   comes out and the link is the whole path to the document. */
+@media(max-width:760px){
+  .fs-page .fs-packet-frame{display:none}
+  .fs-page .fs-packet-openlink{margin-top:0}
+}
+.fs-page .fs-packet-pages{list-style:none; margin:16px 0 0; padding:0; display:grid; gap:8px}
+.fs-page .fs-packet-pages li{position:relative; padding-left:20px; font-size:.94rem; color:#AEB9CE}
+.fs-page .fs-packet-pages li:before{content:""; position:absolute; left:0; top:.55em; width:7px; height:7px; border-radius:50%; background:var(--gold)}
+
+/* the gate */
+.fs-page .fs-packet-form,
+.fs-page .fs-packet-reveal{background:#28375C; border:1px solid #3B4C74; border-radius:14px; padding:28px 28px 26px}
+.fs-page .fs-packet-form h3,
+.fs-page .fs-packet-reveal h3{color:#fff; font-size:1.25rem; margin:0 0 12px}
+.fs-page .fs-packet-list{margin:0 0 16px; padding-left:20px; display:grid; gap:8px}
+.fs-page .fs-packet-list li{font-size:.95rem; color:#E8F0FD}
+.fs-page .fs-packet-formnote{font-size:.92rem; color:#9AA7C0; margin:0 0 22px}
+
+.fs-page .fs-field-grid{display:grid; grid-template-columns:1fr 1fr; gap:16px}
+@media(max-width:560px){.fs-page .fs-field-grid{grid-template-columns:1fr}}
+.fs-page .fs-field{display:flex; flex-direction:column; gap:6px; min-width:0}
+.fs-page .fs-field label{font-size:.86rem; font-weight:700; color:#E8F0FD}
+.fs-page .fs-optional{font-weight:400; color:#9AA7C0}
+.fs-page .fs-field input,
+.fs-page .fs-field select{
+  width:100%; font-family:inherit; font-size:.98rem; color:var(--ink);
+  background:#fff; border:1px solid #3B4C74; border-radius:9px; padding:12px 13px;
+}
+.fs-page .fs-field select{appearance:none; background-image:linear-gradient(45deg,transparent 50%,var(--navy) 50%),linear-gradient(135deg,var(--navy) 50%,transparent 50%); background-position:calc(100% - 19px) calc(50% + 2px),calc(100% - 14px) calc(50% + 2px); background-size:5px 5px,5px 5px; background-repeat:no-repeat; padding-right:38px}
+.fs-page .fs-field input[aria-invalid="true"],
+.fs-page .fs-field select[aria-invalid="true"]{border-color:#F0A0A0; box-shadow:0 0 0 2px rgba(240,160,160,.28)}
+.fs-page .fs-field-error{font-size:.85rem; color:#FFC2C2; margin:0}
+.fs-page .fs-field-error:empty{display:none}
+
+.fs-page .fs-packet-submit{display:flex; flex-wrap:wrap; align-items:center; gap:14px; margin-top:22px}
+.fs-page .fs-packet-submit .fs-btn:disabled{opacity:.62; cursor:default}
+.fs-page .fs-packet-sub{font-size:.85rem; color:#9AA7C0}
+
+/* the reveal */
+.fs-page .fs-packet-grid-open{grid-template-columns:1fr}
+.fs-page .fs-packet-reveal{scroll-margin-top:92px} /* clear the fixed site header */
+.fs-page .fs-packet-revealnote{font-size:.94rem; color:#AEB9CE; margin:0 0 18px}
+.fs-page .fs-packet-reveal .fs-packet-frame{height:clamp(480px,78vh,820px)}
+.fs-page .fs-packet-reveal .fs-btnrow{margin-top:20px}
+/* ---------- the ensemble figures on the offering cards ---------- */
+/* Each offering is a different kind of ensemble. The picture sits at the top
+   of the card, where somebody is actually choosing, rather than in a section
+   of its own further down the page. */
+.fs-page .fs-band-fig{background:var(--paper); border-radius:9px; padding:14px 10px 12px; margin-top:16px; text-align:center}
+.fs-page .fs-band-fig svg{display:block; margin:0 auto; max-width:100%; height:auto}
+.fs-page .fs-band-name{font-size:.95rem; font-weight:700; color:var(--c,var(--navy)); margin:10px 0 2px}
+.fs-page .fs-band-cap{font-size:.78rem; color:var(--muted); margin:0; line-height:1.4}
+/* inside the Blueprint band the figure shares a column with the button */
+.fs-page .fs-blueprint-band .fs-band-fig{margin-top:0; margin-bottom:20px}
+.fs-page .fs-blueprint-band .fs-band-name{color:var(--blueprint)}
+/* the comparison the four figures set up, said once in prose */
+.fs-page .fs-notladder-music{display:block; margin-top:10px}
