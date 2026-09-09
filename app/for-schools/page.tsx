@@ -226,7 +226,7 @@ export default function ForSchoolsPage() {
             <div className="fs-head-narrow">
               <p className="fs-kicker">Read it before you buy it</p>
               <h2>See a full year of The Focus, start to finish.</h2>
-              <p className="fs-lede">The same packet a partner district holds in week one. Read the first three pages right now. The rest opens on this page as soon as you tell us where to send a copy.</p>
+              <p className="fs-lede">Real tools and real session guides, not a brochure about them. Read the first three pages right now. The rest opens on this page as soon as you tell us where to send a copy.</p>
             </div>
 
             <FocusPacketForm />

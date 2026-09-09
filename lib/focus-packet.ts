@@ -23,15 +23,15 @@ export const FOCUS_PACKET_FULL_PATH = '/downloads/the-focus-packet.pdf';
 
 /** What a visitor can read before being asked for anything. */
 export const FOCUS_PACKET_PREVIEW_PAGES = [
-  'What The Focus is, in one page',
-  'An example school year calendar, all 13 dates',
-  'The topics page',
+  'What The Focus is, and everything the packet contains',
+  'An example school year, and what it adds up to',
+  'How a building picks its one topic',
 ] as const;
 
 /** What the form unlocks. Used on the page, in the reveal, and in the email. */
 export const FOCUS_PACKET_GATED_CONTENTS = [
-  'Three of the 13 tools, laid out exactly as staff receive them, one of them in Spanish',
-  'Three administrator session guides, the ones we work from in the November and March sessions',
+  'Three of the 13 tools, laid out exactly as staff receive them, with one of them also in Spanish',
+  'Three administrator session guides: one for a building with a couple of paras, one for a group of ten, one for ten groups running at once',
 ] as const;
 
 export const FOCUS_PACKET_TOTAL_PAGES = 21;
