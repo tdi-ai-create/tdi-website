@@ -1,6 +1,7 @@
 /** @jsxImportSource react */
 import React from 'react'
 import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer'
+import { getLabels, type Lang } from './labels'
 import { categoryColor, NAVY } from '@/lib/hub/categoryColors'
 import { w, AlertBlock, SayBlock, SmallPrint, SectionHeading, resolveWeights, type Alert, type SmallPrintBlock, type WeightedItem } from './weights'
 
@@ -57,9 +58,12 @@ export interface ChecklistData {
    * difference between one page and two.
    */
   notes_lines?: number
+  /** Which language the chrome prints in. */
+  lang?: Lang
 }
 
 export function ChecklistPDF({ data }: { data: ChecklistData }) {
+  const L = getLabels(data.lang ?? 'en')
   return (
     <Document title={data.title} author="Teachers Deserve It">
       <Page size="LETTER" style={s.page}>
@@ -106,7 +110,7 @@ export function ChecklistPDF({ data }: { data: ChecklistData }) {
               could not be turned off and quietly pushed cards onto a second page. */}
           {(data.notes_lines ?? 5) > 0 ? (
             <View style={s.notesSection} wrap={false}>
-              <Text style={s.notesLabel}>Notes</Text>
+              <Text style={s.notesLabel}>{L.notes}</Text>
               {Array.from({ length: data.notes_lines ?? 5 }).map((_, i) => (
                 <View key={i} style={s.notesLine} />
               ))}

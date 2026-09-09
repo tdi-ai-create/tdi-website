@@ -1,6 +1,7 @@
 /** @jsxImportSource react */
 import React from 'react'
 import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer'
+import { type Lang } from './labels'
 import { categoryColor, NAVY } from '@/lib/hub/categoryColors'
 import { AlertBlock, SmallPrint, type Alert, type SmallPrintBlock } from './weights'
 
@@ -55,6 +56,8 @@ export interface FormData {
       lines?: number
     }[]
   }[]
+  /** Accepted for payload symmetry. This template prints no chrome that translates. */
+  lang?: Lang
 }
 
 export function FormPDF({ data }: { data: FormData }) {

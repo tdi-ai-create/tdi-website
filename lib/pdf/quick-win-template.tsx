@@ -1,6 +1,7 @@
 /** @jsxImportSource react */
 import React from 'react'
 import { Document, Page, Text, View, StyleSheet, Link } from '@react-pdf/renderer'
+import { getLabels, liftLabel, roleLabel, type Lang } from './labels'
 
 export interface QuickWinSections {
   overview: string
@@ -19,6 +20,8 @@ export interface QuickWinPDFData {
   lift: string
   duration_minutes: number
   sections: QuickWinSections
+  /** Which language the chrome prints in. The payload is already in that language. */
+  lang?: Lang
 }
 
 const navy = '#1E2749'
@@ -28,22 +31,6 @@ const lightGold = '#FEF9EE'
 const lightNavy = '#F0F2F7'
 const textDark = '#1E2749'
 const textMed = '#4B5563'
-
-function liftLabel(lift: string): string {
-  const map: Record<string, string> = {
-    low: 'Grab & Go', LOW: 'Grab & Go',
-    med: 'Some Prep', MED: 'Some Prep', medium: 'Some Prep',
-    high: 'Deep Dive', HIGH: 'Deep Dive',
-  }
-  return map[lift] || lift
-}
-
-function roleLabel(role: string): string {
-  const map: Record<string, string> = {
-    teacher: 'Teachers', para: 'Paras', leader: 'Leaders', coach: 'Coaches',
-  }
-  return map[role] || role
-}
 
 const s = StyleSheet.create({
   page: {
@@ -240,7 +227,8 @@ const s = StyleSheet.create({
 })
 
 export function QuickWinPDF({ data }: { data: QuickWinPDFData }) {
-  const { title, category, roles, lift, duration_minutes, sections } = data
+  const { title, category, roles, lift, duration_minutes, sections, lang = 'en' } = data
+  const L = getLabels(lang)
 
   return (
     <Document title={data.title} author="Teachers Deserve It">
@@ -256,25 +244,25 @@ export function QuickWinPDF({ data }: { data: QuickWinPDFData }) {
         <View style={s.metaBar}>
           {category ? (
             <View style={s.metaPill}>
-              <Text style={s.metaLabel}>Category </Text>
+              <Text style={s.metaLabel}>{L.category} </Text>
               <Text style={s.metaValue}>{category}</Text>
             </View>
           ) : null}
           {roles && roles.length > 0 ? (
             <View style={s.metaPill}>
-              <Text style={s.metaLabel}>For </Text>
-              <Text style={s.metaValue}>{roles.map(roleLabel).join(' / ')}</Text>
+              <Text style={s.metaLabel}>{L.forRoles} </Text>
+              <Text style={s.metaValue}>{roles.map(r => roleLabel(r, lang)).join(' / ')}</Text>
             </View>
           ) : null}
           {lift ? (
             <View style={s.metaPill}>
-              <Text style={s.metaLabel}>Lift </Text>
-              <Text style={s.metaValue}>{liftLabel(lift)}</Text>
+              <Text style={s.metaLabel}>{L.lift} </Text>
+              <Text style={s.metaValue}>{liftLabel(lift, lang)}</Text>
             </View>
           ) : null}
           {duration_minutes ? (
             <View style={s.metaPill}>
-              <Text style={s.metaLabel}>Time </Text>
+              <Text style={s.metaLabel}>{L.time} </Text>
               <Text style={s.metaValue}>{duration_minutes} min</Text>
             </View>
           ) : null}
@@ -285,7 +273,7 @@ export function QuickWinPDF({ data }: { data: QuickWinPDFData }) {
           {/* Overview */}
           <View style={s.sectionHeader}>
             <View style={s.sectionDot} />
-            <Text style={s.sectionTitle}>Overview</Text>
+            <Text style={s.sectionTitle}>{L.overview}</Text>
           </View>
           <View style={s.sectionDivider} />
           <Text style={s.body}>{sections.overview}</Text>
@@ -293,7 +281,7 @@ export function QuickWinPDF({ data }: { data: QuickWinPDFData }) {
           {/* Why This Works */}
           <View style={s.sectionHeader}>
             <View style={s.sectionDot} />
-            <Text style={s.sectionTitle}>Why This Works</Text>
+            <Text style={s.sectionTitle}>{L.whyThisWorks}</Text>
           </View>
           <View style={s.sectionDivider} />
           <Text style={s.body}>{sections.rationale}</Text>
@@ -301,7 +289,7 @@ export function QuickWinPDF({ data }: { data: QuickWinPDFData }) {
           {/* Steps */}
           <View style={s.sectionHeader}>
             <View style={s.sectionDot} />
-            <Text style={s.sectionTitle}>How to Use This</Text>
+            <Text style={s.sectionTitle}>{L.howToUseThis}</Text>
           </View>
           <View style={s.sectionDivider} />
           {sections.steps.map((step, i) => (
@@ -318,7 +306,7 @@ export function QuickWinPDF({ data }: { data: QuickWinPDFData }) {
             <>
               <View style={s.sectionHeader}>
                 <View style={s.sectionDot} />
-                <Text style={s.sectionTitle}>Adapt It</Text>
+                <Text style={s.sectionTitle}>{L.adaptIt}</Text>
               </View>
               <View style={s.sectionDivider} />
               {sections.adapt_it.map((item, i) => (
@@ -332,13 +320,13 @@ export function QuickWinPDF({ data }: { data: QuickWinPDFData }) {
 
           {/* Try It This Week */}
           <View style={s.tryItBox}>
-            <Text style={[s.calloutLabel, { color: '#92400E' }]}>Try It This Week</Text>
+            <Text style={[s.calloutLabel, { color: '#92400E' }]}>{L.tryItThisWeek}</Text>
             <Text style={s.calloutText}>{sections.try_it}</Text>
           </View>
 
           {/* Reflect */}
           <View style={s.reflectBox}>
-            <Text style={[s.calloutLabel, { color: navy }]}>Reflect</Text>
+            <Text style={[s.calloutLabel, { color: navy }]}>{L.reflect}</Text>
             <Text style={s.calloutText}>{sections.reflection}</Text>
           </View>
 
