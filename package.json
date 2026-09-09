@@ -21,7 +21,8 @@
     "check:labels": "node scripts/integrity/verify-client-labels.mjs",
     "check:fetch": "node scripts/check-fetch.mjs",
     "check:stepowners": "node scripts/integrity/check-step-owners.mjs",
-    "check:definitions": "node scripts/check-one-definition.mjs"
+    "check:definitions": "node scripts/check-one-definition.mjs",
+    "check:games": "node scripts/check-games.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.78.0",
