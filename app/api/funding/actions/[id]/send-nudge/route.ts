@@ -73,6 +73,19 @@ export async function POST(
     .eq('pursuit_id', item.pursuit_id)
     .maybeSingle()
 
+  // The grant's public name, so the email can say which one. Without it the
+  // label gates fall through to "this funding step", which is safe and tells
+  // the school nothing. Bella caught that before sending one to Teri.
+  let opportunityName: string | null = null
+  if (item.opportunity_id) {
+    const { data: opp } = await supabase
+      .from('funding_opportunities')
+      .select('name')
+      .eq('id', item.opportunity_id)
+      .maybeSingle()
+    opportunityName = opp?.name ?? null
+  }
+
   // Resolve the recipient.
   //
   // Two shapes of task share this one control, and they point in opposite
@@ -158,6 +171,7 @@ export async function POST(
     contactName,
     schoolName,
     clientLabel: item.client_label,
+    opportunityName,
     // The person who owes the application, which on a person-owned task is the
     // school contact and never the colleague whose task it is.
     submitterName: isClientOwned
