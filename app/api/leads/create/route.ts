@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServiceSupabase } from '@/lib/supabase';
+import { insertLead, triggerEnrichment } from '@/lib/create-lead';
 import type { CreateLeadInput } from '@/types/leads';
 
 export const maxDuration = 30;
@@ -15,61 +15,19 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const supabase = getServiceSupabase();
+    const { lead, error } = await insertLead(body);
 
-    // Build notes, including contact_role if provided (column may not exist yet)
-    const noteParts: string[] = [];
-    if (body.contact_role) noteParts.push(`Role: ${body.contact_role}`);
-    if (body.notes) noteParts.push(body.notes);
-    const combinedNotes = noteParts.length > 0 ? noteParts.join('\n') : null;
-
-    // Base insert fields — only columns confirmed in the production schema
-    const insertData: Record<string, unknown> = {
-      name: body.district_name,
-      contact_name: body.contact_name || null,
-      contact_email: body.contact_email || null,
-      contact_phone: body.contact_phone || null,
-      source: body.source,
-      value: body.estimated_deal_size || null,
-      heat: body.initial_heat || 'warm',
-      notes: combinedNotes,
-      stage: body.stage || 'qualified',
-      type: 'new_business',
-      school_year: '2026-27',
-      assigned_to_email: body.assigned_to_email || 'rae@teachersdeserveit.com',
-      partnership_status: body.partnership_status || 'prospect',
-    };
-
-    // Add state if provided
-    if (body.state_code) insertData.state = body.state_code;
-
-    // contact_role is included in notes above (column not yet in prod schema)
-
-    let { data: lead, error: insertErr } = await supabase
-      .from('sales_opportunities')
-      .insert(insertData)
-      .select()
-      .single();
-
-    if (insertErr) {
-      console.error('Lead insert failed:', insertErr);
+    if (error || !lead) {
       return NextResponse.json(
-        { error: 'Failed to create lead', details: insertErr.message },
+        { error: 'Failed to create lead', details: error },
         { status: 500 }
       );
     }
 
-    // Fire-and-forget enrichment trigger
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ||
       (req.headers.get('origin') ?? 'http://localhost:3000');
 
-    fetch(`${baseUrl}/api/leads/enrich`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ lead_id: lead.id }),
-    }).catch((err) => {
-      console.error('Enrichment trigger failed (non-blocking):', err);
-    });
+    triggerEnrichment(lead.id, baseUrl);
 
     return NextResponse.json({ lead }, { status: 201 });
   } catch (err) {

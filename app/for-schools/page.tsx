@@ -1,5 +1,18 @@
+import fs from 'node:fs';
+import path from 'node:path';
+
 import './for-schools.css';
 import BandFigure from './BandFigures';
+import FocusPacketForm from './FocusPacketForm';
+import { FOCUS_PACKET_FULL_PATH, FOCUS_PACKET_PREVIEW_PATH } from '@/lib/focus-packet';
+
+// The packet is a content asset, not code. Until both files are actually in
+// public/downloads the section stays off the page rather than shipping a dead
+// preview and a form that gates nothing. Resolved when the page is built, so
+// dropping the files in and redeploying is all it takes to turn it on.
+const focusPacketReady = [FOCUS_PACKET_PREVIEW_PATH, FOCUS_PACKET_FULL_PATH].every((asset) =>
+  fs.existsSync(path.join(process.cwd(), 'public', asset))
+);
 
 export default function ForSchoolsPage() {
   return (
@@ -213,6 +226,23 @@ export default function ForSchoolsPage() {
           <p style={{"fontSize": ".85rem", "color": "var(--muted)", "marginTop": "14px"}}>The outcomes row maps each offering to the list above. It is our reading of which route reaches which outcome, not a contractual guarantee.</p>
         </div>
       </section>
+
+      {/* SAMPLE PACKET. Sits here, well away from the ungated downloads block
+          at the foot of the page, so nothing near "No email required" is
+          asking for an email. */}
+      {focusPacketReady && (
+        <section className="fs-sec fs-sec-packet" id="sample-packet">
+          <div className="fs-wrap">
+            <div className="fs-head-narrow">
+              <p className="fs-kicker">Read it before you buy it</p>
+              <h2>See a full year of The Focus, start to finish.</h2>
+              <p className="fs-lede">Real tools and real session guides, not a brochure about them. Read the first three pages right now. The rest opens on this page as soon as you tell us where to send a copy.</p>
+            </div>
+
+            <FocusPacketForm />
+          </div>
+        </section>
+      )}
 
       {/* WHAT WE ACTUALLY DO */}
       <section className="fs-sec">
