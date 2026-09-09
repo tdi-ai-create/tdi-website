@@ -348,6 +348,12 @@ export default function HubSchedulePage() {
                           {ch.label} · {WAITING[q.status] ?? q.status}
                           {q.owner && q.owner !== 'system' && q.owner !== 'nobody' ? ` · ${q.owner}` : ''}
                         </div>
+                        {q.channel === 'instagram' && !unwritten && (
+                          <a href={`/tdi-admin/hub/carousel?id=${q.id}`}
+                            className="text-[10px] text-[#2F5C9E] hover:underline block mt-0.5">
+                            see the slides
+                          </a>
+                        )}
                         {q.published_url && (
                           <a href={q.published_url} target="_blank" rel="noreferrer"
                             className="text-[10px] text-[#2F5C9E] hover:underline block mt-0.5 truncate">
