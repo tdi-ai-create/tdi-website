@@ -41,6 +41,8 @@ export type Action =
   | 'place_brief' | 'pick_up' | 'submit'
   | 'pass_qa' | 'pass_creative' | 'pass_editorial'
   | 'request_changes' | 'approve' | 'schedule' | 'mark_published' | 'verify' | 'cancel'
+  // Not a transition: it parks a piece where it already is.
+  | 'flag_blocked'
 
 type Rule = {
   from: Status[]
@@ -51,7 +53,7 @@ type Rule = {
   needsNote?: boolean
 }
 
-export const TRANSITIONS: Record<Action, Rule> = {
+export const TRANSITIONS: Record<Exclude<Action, 'flag_blocked'>, Rule> = {
   place_brief:     { from: [],                                     to: 'brief',             role: 'orchestrator' },
   pick_up:         { from: ['brief', 'changes_requested'],         to: 'drafting',          role: 'writer' },
   submit:          { from: ['drafting'],                           to: 'pending_qa',        role: 'writer' },
@@ -100,7 +102,13 @@ export function actorHoldsRole(actor: string, role: string | null): boolean {
   return holders.includes(actor.trim().toLowerCase())
 }
 
+/** flag_blocked is the one action that is not a transition, so it has no rule. */
+export function isTransition(action: Action): action is Exclude<Action, 'flag_blocked'> {
+  return action !== 'flag_blocked'
+}
+
 export function legalFrom(action: Action, current: Status): boolean {
+  if (!isTransition(action)) return false
   const rule = TRANSITIONS[action]
   if (!rule) return false
   return rule.from.includes(current)
@@ -147,4 +155,43 @@ export function canRequestChanges(
     allowed: false,
     reason: `"${actor}" cannot send this back. A gate or an approver can refuse it, and a writer can recall their own work only immediately after submitting it, before anyone has acted. Ask the gate holder instead of pulling it out of review.`,
   }
+}
+
+/** States where a gate is holding the piece and could find itself unable to judge it. */
+export const GATE_STATES = ['pending_qa', 'pending_creative', 'pending_editorial'] as const
+
+/**
+ * A gate that cannot judge a piece must not send it back to the writer.
+ *
+ * On 9 September Lily hit a Substack post with no structural contract, called
+ * the draft "clean and on-voice", and sent it back anyway because that was the
+ * only refusal available to her. Izzy picked it up, changed nothing that
+ * mattered, resubmitted, Julie re-passed, and Lily bounced it again. One full
+ * wasted cycle, and it would have run forever: the writer cannot author a
+ * standard, so the thing being asked for could never arrive.
+ *
+ * Flagging parks the piece where it is instead. It stays in the gate, because
+ * that is the truth of it, and the flag says what is missing and who has to
+ * decide. A piece already flagged is left alone.
+ */
+export function canFlagBlocked(
+  actor: string,
+  item: { status: string; feedback_log?: unknown[] },
+): { allowed: boolean; reason?: string } {
+  if (!(GATE_STATES as readonly string[]).includes(item.status)) {
+    return { allowed: false, reason: `Only a piece sitting in a gate can be flagged. This one is "${item.status}".` }
+  }
+  const who = actor.trim().toLowerCase()
+  const holds =
+    actorHoldsRole(who, 'julie') || actorHoldsRole(who, 'lily') ||
+    actorHoldsRole(who, 'olivia') || actorHoldsRole(who, 'orchestrator')
+  if (!holds) {
+    return { allowed: false, reason: `"${actor}" does not hold a gate, so cannot flag this as blocked.` }
+  }
+  const log = (item.feedback_log ?? []) as Array<Record<string, unknown>>
+  const already = log.some(e => e.action === 'flag_blocked')
+  if (already) {
+    return { allowed: false, reason: 'Already flagged as blocked, and nothing has changed. Leave it parked rather than flagging it again.' }
+  }
+  return { allowed: true }
 }
