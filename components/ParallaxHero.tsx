@@ -76,10 +76,15 @@ export function ParallaxHero() {
         <div className="ml-8 md:ml-16 lg:ml-20 xl:ml-24">
           <div className="max-w-md md:max-w-xl">
             <h1
-              className="text-2xl md:text-3xl lg:text-4xl font-bold mb-4 leading-snug"
-              style={{ color: '#ffffff' }}
+              className="font-bold mb-4 leading-snug"
+              // Sized here rather than by class because a global h1 rule wins
+              // over the Tailwind text scale and pins this to 56px. At 56 the
+              // spelled out "Professional Development" cannot fit the 576px
+              // column and the headline breaks into four lines, pushing the
+              // button below the fold on a laptop.
+              style={{ color: '#ffffff', fontSize: 'clamp(1.6rem, 3.4vw, 2.75rem)' }}
             >
-              PD that actually<br />gets used.
+              Professional Development<br />that actually gets used.
             </h1>
 
             <p className="text-base md:text-lg mb-6" style={{ color: '#ffffff', opacity: 0.92 }}>
