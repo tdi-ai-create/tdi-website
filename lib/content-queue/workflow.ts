@@ -62,7 +62,12 @@ export const TRANSITIONS: Record<Exclude<Action, 'flag_blocked'>, Rule> = {
   pass_editorial:  { from: ['pending_editorial'],                  to: 'pending_approval',  role: 'olivia' },
   approve:         { from: ['pending_approval'],                   to: 'approved',          role: 'approver' },
   schedule:        { from: ['approved'],                           to: 'scheduled',         role: null },
-  mark_published:  { from: ['scheduled'],                          to: 'published',         role: null },
+  // Also from 'approved'. When a person publishes a Substack post themselves,
+  // the piece never passes through 'scheduled': there was no planned date, they
+  // just posted it. Requiring a schedule first would mean inventing one after
+  // the fact so the state machine could be satisfied, which is bookkeeping, not
+  // truth.
+  mark_published:  { from: ['approved', 'scheduled'],              to: 'published',         role: null },
   verify:          { from: ['published'],                          to: 'verified',          role: null },
   cancel:          { from: ['brief','drafting','pending_qa','pending_creative','pending_editorial','pending_approval','changes_requested'],
                      to: 'cancelled',        role: null, needsNote: true },
