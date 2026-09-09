@@ -42,6 +42,11 @@ type QueueItem = {
   audience_tag: string | null;
   scheduled_for: string | null;
   artifact_rendered_at: string | null;
+  published_at: string | null;
+  published_url: string | null;
+  approved_at: string | null;
+  verified_at: string | null;
+  calendar_day?: string | null;
 };
 
 // One colour per channel, so a month reads as a shape before it reads as a list.
@@ -78,6 +83,7 @@ type Payload = {
   items: Item[];
   queued: QueueItem[];
   unscheduled: QueueItem[];
+  stalled: QueueItem[];
   horizons: {
     social: { target: number; planned: number };
     substack: { target: number; planned: number };
@@ -152,10 +158,11 @@ export default function HubSchedulePage() {
 
   const queueByDate = new Map<string, QueueItem[]>();
   for (const q of data?.queued ?? []) {
-    if (!q.scheduled_for) continue;
-    const list = queueByDate.get(q.scheduled_for) ?? [];
+    const day = q.calendar_day ?? q.scheduled_for;
+    if (!day) continue;
+    const list = queueByDate.get(day) ?? [];
     list.push(q);
-    queueByDate.set(q.scheduled_for, list);
+    queueByDate.set(day, list);
   }
 
   const cells: Array<{ iso: string | null; day: number | null }> = [];
@@ -176,8 +183,9 @@ export default function HubSchedulePage() {
       </div>
       <p className="text-sm text-[#6B7684] mb-5 max-w-[70ch]">
         Every channel on one surface. Hub tools take the next open weekday, at most {cap} a day.
-        Marketing content sits where it was scheduled. Publishing happens on the day itself, never by
-        pressing something on this page.
+        Planned work sits on the day it is planned for; work that went out sits on the day it went out,
+        greyed, with a tick once someone has confirmed it is really live. Nothing publishes by pressing
+        something on this page.
       </p>
 
       <div className="flex items-center gap-3 flex-wrap mb-4">
@@ -210,6 +218,22 @@ export default function HubSchedulePage() {
           <strong>{data.overdue}</strong> item{data.overdue === 1 ? '' : 's'} passed a scheduled day and
           did not go live. That usually means the daily publisher is not running, not that the content
           is wrong.
+        </div>
+      )}
+
+      {!loading && data && data.stalled.length > 0 && (
+        <div className="mb-4 p-3 rounded border border-[#96631A] bg-[#F8F0DF] text-sm text-[#1e2749]">
+          <strong>{data.stalled.length}</strong> approved
+          {data.stalled.length === 1 ? ' piece has' : ' pieces have'} been sitting for more than three
+          days without going out. Approval is not publication: a person posts Substack, Zara puts social
+          into Buffer, and either can be missed.
+          <div className="mt-2 flex flex-wrap gap-2">
+            {data.stalled.map(q => (
+              <span key={q.id} className="text-[11px] bg-white border border-[#E3D4B0] rounded px-2 py-1">
+                {q.title || '(untitled)'} · {channelOf(q.channel).label}
+              </span>
+            ))}
+          </div>
         </div>
       )}
 
@@ -297,6 +321,9 @@ export default function HubSchedulePage() {
                     // edge. Kristin has to be able to tell a placeholder from a
                     // finished piece at a glance, without reading either one.
                     const unwritten = q.status === 'brief' || q.status === 'drafting';
+                    // Finished work is stated, not planned. It reads quieter and
+                    // carries a mark, so a month shows what went out at a glance.
+                    const done = q.status === 'published' || q.status === 'verified';
                     return (
                       <div key={q.id}
                         className={[
@@ -304,18 +331,29 @@ export default function HubSchedulePage() {
                           unwritten ? 'border border-dashed' : '',
                         ].join(' ')}
                         style={{
-                          background: unwritten ? 'transparent' : ch.bg,
+                          background: unwritten ? 'transparent' : done ? '#F4F6F8' : ch.bg,
                           borderLeftColor: ch.dot,
                           borderColor: unwritten ? ch.dot : undefined,
+                          opacity: done ? 0.85 : 1,
                         }}
                       >
-                        <div className={unwritten ? 'italic text-[#4A5568]' : 'font-semibold text-[#1e2749]'}>
-                          {q.title || '(untitled)'}
+                        <div className={
+                          unwritten ? 'italic text-[#4A5568]'
+                            : done ? 'font-semibold text-[#6B7684]'
+                            : 'font-semibold text-[#1e2749]'
+                        }>
+                          {q.status === 'verified' ? '\u2713 ' : ''}{q.title || '(untitled)'}
                         </div>
                         <div className="text-[10px] text-[#6B7684] mt-0.5">
                           {ch.label} · {WAITING[q.status] ?? q.status}
                           {q.owner && q.owner !== 'system' && q.owner !== 'nobody' ? ` · ${q.owner}` : ''}
                         </div>
+                        {q.published_url && (
+                          <a href={q.published_url} target="_blank" rel="noreferrer"
+                            className="text-[10px] text-[#2F5C9E] hover:underline block mt-0.5 truncate">
+                            open it
+                          </a>
+                        )}
                       </div>
                     );
                   })}
@@ -337,6 +375,9 @@ export default function HubSchedulePage() {
           <span className="flex items-center gap-1.5">
             <span className="w-2.5 h-2.5 rounded-sm inline-block border border-dashed border-[#8A94A2]" />
             not written yet
+          </span>
+          <span className="flex items-center gap-1.5 text-[#6B7684]">
+            <span>&#10003;</span> live and checked
           </span>
           <span className="ml-auto flex gap-3">
             {([['Social', data.horizons.social], ['Substack', data.horizons.substack]] as const).map(([name, h]) => (

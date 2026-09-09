@@ -70,9 +70,12 @@ export async function GET(request: NextRequest) {
     // the whole month rather than one lane of it.
     const { data: queued, error: qErr } = await supabase
       .from('content_queue_items')
-      .select('id, channel, content_type, title, status, owner, approver, audience_tag, scheduled_for, artifact_rendered_at')
+      .select('id, channel, content_type, title, status, owner, approver, audience_tag, scheduled_for, artifact_rendered_at, published_at, published_url, approved_at, verified_at')
       .not('status', 'in', '(cancelled)')
-      .or(`and(scheduled_for.gte.${from},scheduled_for.lt.${to}),scheduled_for.is.null`)
+      // Published work often has no scheduled_for at all: a person posted it
+      // straight from approved, so there was never a planned date. Placing only
+      // by scheduled_for made a month of finished work invisible.
+      .or(`and(scheduled_for.gte.${from},scheduled_for.lt.${to}),and(published_at.gte.${from},published_at.lt.${to}),scheduled_for.is.null`)
 
     if (qErr) return NextResponse.json({ error: `content queue: ${qErr.message}` }, { status: 500 })
 
@@ -80,8 +83,21 @@ export async function GET(request: NextRequest) {
     // Unscheduled work is not nothing. Kristin asked to place things that are
     // ready to be drafted but not written, so a brief with no date belongs on
     // the page, in a rail beside the month rather than on a day.
-    const unscheduled = queuedAll.filter(q => !q.scheduled_for)
-    const onCalendar = queuedAll.filter(q => q.scheduled_for)
+    // A piece sits on the day it was published if it went out, and on the day it
+    // is planned for if it has not. Published wins, because that is what happened.
+    const dayOf = (q: { scheduled_for: string | null; published_at: string | null }) =>
+      q.published_at ? q.published_at.slice(0, 10) : q.scheduled_for
+
+    const withDay = queuedAll.map(q => ({ ...q, calendar_day: dayOf(q) }))
+    const unscheduled = withDay.filter(q => !q.calendar_day)
+    const onCalendar = withDay.filter(q => q.calendar_day && q.calendar_day >= from && q.calendar_day < to)
+
+    // Approved by a person, published by nobody. This is the failure the whole
+    // build is most likely to have: the gates are strict, so work reaches
+    // approved reliably, and nothing after that is automatic.
+    const stalled = queuedAll.filter(q =>
+      q.status === 'approved' && !q.published_at && q.approved_at &&
+      (Date.now() - new Date(q.approved_at).getTime()) > 3 * 86400000)
 
     // How far out each cadence is ACTUALLY planned, which is the only reason to
     // state a horizon at all. This query is deliberately not bounded by the
@@ -113,6 +129,7 @@ export async function GET(request: NextRequest) {
       month,
       queued: onCalendar,
       unscheduled,
+      stalled,
       // Kristin set these on 7 September. Two cadences, not one, so the page can
       // show how far out each channel is actually planned.
       horizons: {
