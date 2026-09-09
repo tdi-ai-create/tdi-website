@@ -166,6 +166,11 @@ export async function POST(request: NextRequest) {
           tool_file_url: toolUrl,
           tool_file_path: storagePath,
           tool_type,
+          // The payload that produced this file, kept so a damaged or
+          // overwritten PDF can be regenerated instead of rewritten. Storage
+          // upserts in place, so before this the rendered file was the only
+          // copy and ell-empathy-audit proved that unrecoverable on 8 Sep.
+          tool_content,
           updated_at: now,
           ...retired.patch,
         })
@@ -272,6 +277,9 @@ export async function POST(request: NextRequest) {
         file_type: 'application/pdf',
         content_type: 'pdf',
         storage_path: storagePath,
+        // Same reason as tool_content on the other path: keep what produced
+        // the file so it can be regenerated rather than rewritten.
+        guide_sections: sections,
         updated_at: new Date().toISOString(),
       })
       .eq('id', qw.id)
