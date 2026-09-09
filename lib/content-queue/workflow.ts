@@ -195,3 +195,25 @@ export function canFlagBlocked(
   }
   return { allowed: true }
 }
+
+/**
+ * Is there actually anything here to judge?
+ *
+ * On 9 September an empty draft passed QA. Izzy submitted a row whose body was
+ * null and whose artifact_refs were empty, Julie passed it, and Lily then wrote
+ * that it read "clean and on-voice". There was nothing to read.
+ *
+ * Every rule in the database trigger guards against bad content: a named
+ * district, a dash, a headcount. All of them read COALESCE(body,''), so an empty
+ * body satisfies every one of them trivially. The gates could see what was wrong
+ * with the text and could not notice that there was no text.
+ *
+ * A piece carries its content either inline or as a rendered artifact. Either is
+ * fine. Neither is not.
+ */
+export function hasContent(item: { body?: string | null; artifact_refs?: unknown }): boolean {
+  const body = (item.body ?? '').trim()
+  if (body.length > 0) return true
+  const refs = item.artifact_refs
+  return Array.isArray(refs) && refs.length > 0
+}
