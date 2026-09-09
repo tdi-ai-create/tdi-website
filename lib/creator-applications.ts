@@ -16,7 +16,7 @@
 
 import { SITE_URL } from './reengagement-config';
 import { creatorEmailTemplate } from './creator-email-template';
-import { logCreatorEmail } from './creator-email-log';
+import { logCreatorEmail, resendMessageId } from './creator-email-log';
 import { creatorApplicationDecided } from './creator-slack';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -611,10 +611,11 @@ async function sendWelcomeEmail(
     category: 'application_accepted',
     subject,
     sent_by: `application-queue:${decidedBy}`,
-    dry_run: !sent,
+    dry_run: !sent.ok,
+    provider_id: sent.providerId,
   });
 
-  return sent;
+  return sent.ok;
 }
 
 async function sendDeclineEmail(
@@ -649,13 +650,18 @@ async function sendDeclineEmail(
     subject,
     sent_by: 'application-queue',
     metadata: { application_id: application.id, decided_at: now.toISOString() },
-    dry_run: !sent,
+    dry_run: !sent.ok,
+    provider_id: sent.providerId,
   });
 
-  return sent;
+  return sent.ok;
 }
 
-async function send(apiKey: string, to: string, subject: string, html: string): Promise<boolean> {
+/**
+ * Returns the Resend message id on success so /api/webhooks/resend can record
+ * whether this arrived. A success with no id is still a success.
+ */
+async function send(apiKey: string, to: string, subject: string, html: string): Promise<{ ok: boolean; providerId: string | null }> {
   try {
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
@@ -671,11 +677,11 @@ async function send(apiKey: string, to: string, subject: string, html: string): 
     });
     if (!res.ok) {
       console.error('[applications] Resend error:', await res.text());
-      return false;
+      return { ok: false, providerId: null };
     }
-    return true;
+    return { ok: true, providerId: await resendMessageId(res) };
   } catch (e) {
     console.error('[applications] Send failed:', e);
-    return false;
+    return { ok: false, providerId: null };
   }
 }

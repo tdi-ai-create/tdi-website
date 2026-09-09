@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { guardCron } from '@/lib/cron-guard';
+import { loadContactGate } from '@/lib/creator-contact-budget';
 import { classifyClocks, STEP_REMINDERS_ENABLED, type ClockVerdict } from '@/lib/creator-clocks';
 import { creatorEmailTemplate } from '@/lib/creator-email-template';
-import { logCreatorEmail } from '@/lib/creator-email-log';
+import { logCreatorEmail, resendMessageId } from '@/lib/creator-email-log';
 import { postCreatorMessage } from '@/lib/creator-slack';
 import { SITE_URL } from '@/lib/reengagement-config';
 
@@ -79,17 +80,36 @@ export async function GET(request: NextRequest) {
       wouldNudge: toNudge.map((v) => ({ creator: v.creatorName, step: v.step, days: v.daysPastDue, reason: v.reason })),
       needsAPerson: toPerson.map((v) => ({ creator: v.creatorName, step: v.step, days: v.daysPastDue, reason: v.reason })),
       sent: 0,
+      // Held back because the creator has never signed in and we have already
+      // written to them this fortnight. See lib/creator-contact-budget.ts.
+      heldBack: [] as string[],
       errors: [] as string[],
     };
+
+    const gate = await loadContactGate(supabase);
 
     const suppressed = dryRun || !STEP_REMINDERS_ENABLED;
 
     for (const v of toNudge) {
-      if (suppressed || !v.creatorEmail) continue;
+      if (!v.creatorEmail) continue;
+
+      // Evaluated BEFORE the dry-run check, so a dry run reports what the gate
+      // would hold rather than reporting nothing because it never got there.
+      // The first version of this sat after the check and every dry run said
+      // zero held, which is the same failure the placement engine had this
+      // morning: a dry run that does not compute the real decision is trusted
+      // and wrong.
+      const verdict = gate.may(v.creatorEmail);
+      if (!verdict.ok) {
+        results.heldBack.push(`${v.creatorName}: ${verdict.reason}`);
+        continue;
+      }
+
+      if (suppressed) continue;
 
       const { subject, html } = reminderEmail(v);
-      const ok = await send(subject, html, v.creatorEmail);
-      if (!ok) {
+      const sent = await send(subject, html, v.creatorEmail);
+      if (!sent.ok) {
         results.errors.push(`Send failed for ${v.creatorName}`);
         continue;
       }
@@ -97,10 +117,17 @@ export async function GET(request: NextRequest) {
       // Only stamp on a send that actually succeeded. Stamping regardless is
       // what let paused creators go months with no contact while the record
       // said they had been checked in on.
-      await supabase
+      const { error: stampError } = await supabase
         .from('creator_milestones')
         .update({ last_nudged_at: now.toISOString() })
         .eq('id', v.milestoneRecordId);
+
+      // A dropped stamp here means the same creator is nudged again on the next
+      // run, which is the failure this whole change exists to stop. Reported
+      // rather than swallowed.
+      if (stampError) {
+        results.errors.push(`Sent to ${v.creatorName} but could not record it: ${stampError.message}`);
+      }
 
       await logCreatorEmail({
         creator_id: v.creatorId,
@@ -110,6 +137,7 @@ export async function GET(request: NextRequest) {
         category: 'step_reminder',
         subject,
         sent_by: 'cron:creator-step-reminders',
+        provider_id: sent.providerId,
       });
 
       results.sent++;
@@ -124,10 +152,16 @@ export async function GET(request: NextRequest) {
           `These have had their nudges. Another email will not help.${lines}`
       );
       for (const v of toPerson) {
-        await supabase
+        const { error: escalateError } = await supabase
           .from('creator_milestones')
           .update({ escalated_at: now.toISOString() })
           .eq('id', v.milestoneRecordId);
+
+        // If this does not stamp, the same creator is escalated to Slack every
+        // week for ever and the message becomes noise.
+        if (escalateError) {
+          results.errors.push(`Could not mark ${v.creatorName} as escalated: ${escalateError.message}`);
+        }
       }
     }
 
@@ -143,9 +177,15 @@ export async function GET(request: NextRequest) {
   }
 }
 
-async function send(subject: string, html: string, to: string): Promise<boolean> {
+/**
+ * Returns the Resend message id on success, which is what lets
+ * /api/webhooks/resend tell us later whether this actually arrived. A send that
+ * succeeds without an id is still a success: we lose delivery tracking on that
+ * one message, which must never be confused with failing to send it.
+ */
+async function send(subject: string, html: string, to: string): Promise<{ ok: boolean; providerId: string | null }> {
   const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) return false;
+  if (!apiKey) return { ok: false, providerId: null };
   try {
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
@@ -161,11 +201,11 @@ async function send(subject: string, html: string, to: string): Promise<boolean>
     });
     if (!res.ok) {
       console.error('[step-reminders] Resend error:', await res.text());
-      return false;
+      return { ok: false, providerId: null };
     }
-    return true;
+    return { ok: true, providerId: await resendMessageId(res) };
   } catch (e) {
     console.error('[step-reminders] Send failed:', e);
-    return false;
+    return { ok: false, providerId: null };
   }
 }
