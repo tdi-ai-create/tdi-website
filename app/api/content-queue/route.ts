@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { notifyApproved } from '@/lib/content-queue/notify'
+import { parseSlides, carouselProblems } from '@/lib/content-queue/carousel'
 import {
   TRANSITIONS, OWNER_OF, actorHoldsRole, isSelfReview, legalFrom, canRequestChanges, canFlagBlocked,
   isTransition, hasContent,
@@ -252,9 +253,37 @@ export async function POST(request: NextRequest) {
     if (action === 'submit') {
       if (typeof body.body === 'string' && body.body.trim()) patch.body = body.body
       if (body.artifact_refs !== undefined) patch.artifact_refs = body.artifact_refs
-      const refs = body.artifact_refs ?? item.artifact_refs
+
+      // A carousel's slides are derived from its body, so there is no separate
+      // render step an agent could skip or fake. Build them here, and refuse the
+      // submit if they cannot be built: a carousel that cannot be rendered is
+      // not a carousel yet, and that was the judgement Lily's gate had no way to
+      // make.
+      if (item.channel === 'instagram') {
+        const text = (typeof body.body === 'string' ? body.body : item.body) ?? null
+        const slides = parseSlides(text)
+        const problems = carouselProblems(slides)
+        if (problems.length > 0) {
+          return NextResponse.json({
+            error: 'This carousel cannot be built yet, so it is not ready for review.',
+            problems,
+            hint: 'Slides are separated by a blank line. The first is the hook, the last is the ask.',
+          }, { status: 400 })
+        }
+        patch.artifact_refs = slides.map(sl => ({
+          kind: 'carousel_slide',
+          index: sl.index,
+          slide_kind: sl.kind,
+          url: `/api/content-queue/carousel?id=${id}&slide=${sl.index}`,
+        }))
+        patch.artifact_rendered_at = new Date().toISOString()
+      }
+
+      const refs = patch.artifact_refs ?? body.artifact_refs ?? item.artifact_refs
       if (body.artifact_rendered_at) patch.artifact_rendered_at = body.artifact_rendered_at
-      else if (Array.isArray(refs) && refs.length > 0) patch.artifact_rendered_at = new Date().toISOString()
+      else if (Array.isArray(refs) && refs.length > 0 && !patch.artifact_rendered_at) {
+        patch.artifact_rendered_at = new Date().toISOString()
+      }
     }
     if (action === 'pass_qa') patch.qa_spec_version = body.qa_spec_version ?? null
     if (action === 'approve') {
