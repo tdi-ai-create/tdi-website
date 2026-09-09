@@ -131,13 +131,30 @@ function rejectReason(candidate: string): string | null {
  *
  *   1. The client_label, which is what someone intended the school to read.
  *   2. The item title, which is often perfectly clear on its own.
- *   3. Neutral wording, which says little but cannot do harm.
+ *   3. The grant's own name, which is public and is the thing the school
+ *      actually recognises.
+ *   4. Neutral wording, which says little but cannot do harm.
+ *
+ * The grant name was added on 9 September because Bella stopped before sending
+ * one. Almost every real task title starts "Check if...", which the gates reject
+ * correctly, so the school was being told only that "this funding step" was due.
+ * Teri would have had no idea which of Allenwood's grants was meant, and there
+ * is no page she can open to find out. Naming the grant is both safe and the
+ * one detail that makes the email answerable.
  */
-export function clientTaskLabel(rawTitle: string, clientLabel?: string | null): string {
+export function clientTaskLabel(
+  rawTitle: string,
+  clientLabel?: string | null,
+  opportunityName?: string | null,
+): string {
   const candidates: { value: string; source: string }[] = []
   if (clientLabel && clientLabel.trim()) candidates.push({ value: clientLabel.trim(), source: 'client_label' })
   const title = (rawTitle || '').trim()
   if (title) candidates.push({ value: title, source: 'title' })
+  // Still gated like everything else. A funder name is normally clean, but it
+  // is typed by hand and has no special standing here.
+  const opp = (opportunityName || '').trim()
+  if (opp) candidates.push({ value: `the ${opp} application`, source: 'opportunity_name' })
 
   for (const c of candidates) {
     const reason = rejectReason(c.value)
@@ -170,6 +187,8 @@ export interface FollowUpEmailParams {
   contactName?: string
   schoolName?: string
   clientLabel?: string | null
+  /** The grant's public name, used to name the thing when the title cannot be. */
+  opportunityName?: string | null
   submitterName?: string
   nextRung?: string
 }
@@ -232,13 +251,24 @@ export function generateFollowUpEmail(params: FollowUpEmailParams): GeneratedEma
   const {
     to, itemTitle, dueDate, bizDaysOverdue, rungLabel, type, tone,
     contactName = 'there', schoolName: rawSchoolName = 'your school', clientLabel,
-    submitterName = 'unknown', nextRung = 'none',
+    opportunityName, submitterName = 'unknown', nextRung = 'none',
   } = params
 
   // Cleaned once here, so every sentence below inherits it rather than each
   // call site being the one that forgot.
   const schoolName = schoolDisplayName(rawSchoolName)
-  const friendlyTask = clientTaskLabel(itemTitle, clientLabel)
+  const friendlyTask = clientTaskLabel(itemTitle, clientLabel, opportunityName)
+
+  // A school reads "15 September", not "2026-09-15". Internal tone keeps the
+  // ISO form, because we sort and scan those. Anything that is not a plain date,
+  // "TBD" being the common one, passes through untouched.
+  const displayDate = (() => {
+    if (tone === 'internal') return dueDate
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(dueDate)) return dueDate
+    const d = new Date(dueDate + 'T00:00:00')
+    if (Number.isNaN(d.getTime())) return dueDate
+    return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long' })
+  })()
   const displayRungLabel = displayRung(rungLabel)
 
   // Subject lines
@@ -274,7 +304,7 @@ export function generateFollowUpEmail(params: FollowUpEmailParams): GeneratedEma
     if (type === 'reminder') {
       paragraphs = [
         `Hi ${contactName},`,
-        `Just a friendly heads-up, **${friendlyTask}** is coming up around **${dueDate}**. No rush at all, I just want to make sure you have everything you need from us to get it out the door.`,
+        `Just a friendly heads-up, **${friendlyTask}** is coming up around **${displayDate}**. No rush at all, I just want to make sure you have everything you need from us to get it out the door.`,
         `Everything's prepared on our end. If anything's unclear or you'd like me to hop on a quick call to walk through it, I'm here.`,
         `Rooting for you and ${schoolName},`,
         `Bella`,
@@ -283,7 +313,7 @@ export function generateFollowUpEmail(params: FollowUpEmailParams): GeneratedEma
     } else if (type === 'nudge') {
       paragraphs = [
         `Hi ${contactName},`,
-        `I wanted to follow up on **${friendlyTask}**. It was on the calendar for **${dueDate}**, and I know how full your plate is this time of year.`,
+        `I wanted to follow up on **${friendlyTask}**. It was on the calendar for **${displayDate}**, and I know how full your plate is this time of year.`,
         `Is there anything holding it up that I can help with? A question, a quick call, or me sitting on Zoom while you send it. Just say the word.`,
         `We really want to land this funding for your teachers, and you're not doing it alone.`,
         `Here for you,`,
@@ -308,7 +338,7 @@ export function generateFollowUpEmail(params: FollowUpEmailParams): GeneratedEma
     if (type === 'reminder') {
       paragraphs = [
         `**${itemTitle}**`,
-        `Due: **${dueDate}**. On track?`,
+        `Due: **${displayDate}**. On track?`,
       ]
     } else if (type === 'nudge') {
       paragraphs = [
