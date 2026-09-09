@@ -270,8 +270,29 @@ export async function POST(request: NextRequest) {
       if (!body.scheduled_for) return NextResponse.json({ error: 'scheduled_for is required, as YYYY-MM-DD' }, { status: 400 })
       patch.scheduled_for = body.scheduled_for
     }
-    if (action === 'mark_published') { patch.published_at = new Date().toISOString(); patch.published_url = body.published_url ?? null }
-    if (action === 'verify') { patch.verified_at = new Date().toISOString(); patch.verification_note = note || null }
+    if (action === 'mark_published') {
+      // A publish claim without a URL is somebody saying they saw it. On
+      // 9 September a gate wrote a quality assessment of an empty row, so a
+      // claim that names nothing is not accepted here.
+      const url = typeof body.published_url === 'string' ? body.published_url.trim() : ''
+      if (!url) {
+        return NextResponse.json({
+          error: 'mark_published requires published_url: the actual address where you found it. If you cannot point at it, you have not confirmed it is live.',
+        }, { status: 400 })
+      }
+      patch.published_at = body.published_at ?? new Date().toISOString()
+      patch.published_url = url
+    }
+    if (action === 'verify') {
+      // Same rule one step later: say what you checked, not that you checked.
+      if (!note || !note.trim()) {
+        return NextResponse.json({
+          error: 'verify requires a note saying what you actually looked at and what you saw. "Confirmed" on its own is not a verification.',
+        }, { status: 400 })
+      }
+      patch.verified_at = new Date().toISOString()
+      patch.verification_note = note
+    }
 
     if (dryRun) {
       return NextResponse.json({
