@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import {
   TRANSITIONS, OWNER_OF, actorHoldsRole, isSelfReview, legalFrom, canRequestChanges, canFlagBlocked,
-  isTransition,
+  isTransition, hasContent,
   type Action, type Status,
 } from '@/lib/content-queue/workflow'
 
@@ -47,6 +47,7 @@ type Row = {
   approver: string | null
   approved_at: string | null
   artifact_rendered_at: string | null
+  artifact_refs: unknown
   feedback_log: unknown[]
   created_by?: string | null
 }
@@ -189,7 +190,7 @@ export async function POST(request: NextRequest) {
 
     const { data: row, error: readErr } = await supabase
       .from('content_queue_items')
-      .select('id, title, status, body, owner, approver, approved_at, artifact_rendered_at, feedback_log')
+      .select('id, title, status, body, owner, approver, approved_at, artifact_rendered_at, artifact_refs, feedback_log')
       .eq('id', id).single()
 
     if (readErr || !row) return NextResponse.json({ error: 'Item not found' }, { status: 404 })
@@ -218,6 +219,20 @@ export async function POST(request: NextRequest) {
       const verdict = canRequestChanges(actor, item)
       if (!verdict.allowed) return NextResponse.json({ error: verdict.reason }, { status: 403 })
     }
+    // Nothing empty moves past drafting. A gate cannot judge what is not there,
+    // and on 9 September one passed QA on a row with no body at all.
+    const NEEDS_CONTENT = ['submit', 'pass_qa', 'pass_creative', 'pass_editorial', 'approve']
+    if (NEEDS_CONTENT.includes(action)) {
+      const incoming = typeof body.body === 'string' ? body.body : null
+      const merged = { body: incoming ?? item.body, artifact_refs: body.artifact_refs ?? item.artifact_refs }
+      if (!hasContent(merged)) {
+        return NextResponse.json({
+          error: action === 'submit'
+            ? 'Nothing to submit. Send the draft as "body", or attach what you rendered as "artifact_refs". An empty row is not a draft.'
+            : `Cannot ${action}: this item has no body and no rendered artifact. There is nothing to review.`,
+        }, { status: 400 })
+      }
+    }
     if (rule.needsNote && !note) {
       return NextResponse.json({ error: `${action} requires a note saying why.` }, { status: 400 })
     }
@@ -229,7 +244,16 @@ export async function POST(request: NextRequest) {
       feedback_log: [...(item.feedback_log ?? []), entry],
     }
 
-    if (action === 'submit') patch.artifact_rendered_at = body.artifact_rendered_at ?? new Date().toISOString()
+    // artifact_rendered_at claims something was rendered. It used to be stamped
+    // on every submit whether or not anything had been, which made it a field
+    // that asserts proof and supplies none. Only record it when there is one.
+    if (action === 'submit') {
+      if (typeof body.body === 'string' && body.body.trim()) patch.body = body.body
+      if (body.artifact_refs !== undefined) patch.artifact_refs = body.artifact_refs
+      const refs = body.artifact_refs ?? item.artifact_refs
+      if (body.artifact_rendered_at) patch.artifact_rendered_at = body.artifact_rendered_at
+      else if (Array.isArray(refs) && refs.length > 0) patch.artifact_rendered_at = new Date().toISOString()
+    }
     if (action === 'pass_qa') patch.qa_spec_version = body.qa_spec_version ?? null
     if (action === 'approve') { patch.approved_by = actor; patch.approved_at = new Date().toISOString() }
     if (action === 'schedule') {
