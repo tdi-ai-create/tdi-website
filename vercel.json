@@ -89,6 +89,10 @@
       "schedule": "0 12 * * 1-5"
     },
     {
+      "path": "/api/cron/button-smoke-test",
+      "schedule": "45 11 * * 1-5"
+    },
+    {
       "path": "/api/cron/email-delivery-sweep",
       "schedule": "30 * * * *"
     },

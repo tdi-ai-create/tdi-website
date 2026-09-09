@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 import { clearFlagForCompletedMilestone } from '@/lib/creator-agent-flags';
 import { creatorFlag } from '@/lib/creator-flags';
 import { advanceStep, resolveStepRow } from '@/lib/creator-step-engine';
+import { looksLikeRecordId, wrongIdentifierMessage } from '@/lib/milestone-key';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -67,6 +68,20 @@ export async function POST(request: Request) {
       .single();
 
     if (milestoneError) {
+      // Name the mistake rather than describe the symptom. A uuid here is the
+      // caller passing creator_milestones.id where milestones.id belongs, which
+      // broke all three write buttons for eight days in September and reported
+      // itself as a missing milestone the whole time.
+      if (looksLikeRecordId(milestoneId)) {
+        console.error(
+          `[approve-milestone] Caller sent a record id as milestoneId: ${milestoneId}. ` +
+          'Expected a step key such as "assets_submitted".'
+        );
+        return NextResponse.json(
+          { success: false, error: wrongIdentifierMessage('this route') },
+          { status: 400 },
+        );
+      }
       console.error('[approve-milestone] Milestone fetch error:', milestoneError);
       return NextResponse.json({ success: false, error: `Milestone not found: ${milestoneError.message}` }, { status: 404 });
     }
