@@ -35,7 +35,10 @@ jobs:
           # reasons that had nothing to do with the code. We install Chromium
           # from Playwright's own download, so that repo is never needed here.
           # Removing the source does not uninstall the browser the image ships.
-          sudo rm -f /etc/apt/sources.list.d/google-chrome.list
+          # Ubuntu 24.04 runners also carry deb822 ".sources" files, so removing
+          # only google-chrome.list left the repo defined and the job kept
+          # failing. Match both formats.
+          sudo rm -f /etc/apt/sources.list.d/*google*
           npx playwright install chromium --with-deps
 
       - name: Run Site Audit
