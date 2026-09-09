@@ -28,6 +28,54 @@ function authorize(request: NextRequest): boolean {
 }
 
 /**
+ * Live content is writable by anyone who can call this route.
+ *
+ * Published Quick Wins were overwritten with placeholder text three times
+ * between 3 and 8 September, every time by an agent probing the payload shape
+ * against a live item rather than a draft (TEA-412, TEA-427, TEA-437). This is
+ * the only write path to hub_quick_wins with no is_published check; every other
+ * one has had it for months. It also accepted an actor and never recorded it,
+ * so each incident had to be spotted by eye rather than announcing itself.
+ *
+ * The rebuild queue legitimately writes to published items, because the replace
+ * lane is defined as "rebuild, stays live meanwhile", so refusing outright would
+ * stop roughly 148 items of real work. This ships reporting-only: it names the
+ * write and who made it, and lets it through. Once the callers doing legitimate
+ * rebuilds pass allowPublished, the same function starts refusing.
+ *
+ * Enforcement never outruns the callers. See docs/hub-content-standard.md.
+ */
+const ENFORCE_PUBLISHED_GUARD = false
+
+function guardPublishedWrite(
+  qw: { id: string; slug?: string | null; is_published?: boolean | null },
+  target: 'tool' | 'guide',
+  actor: string,
+  allowPublished: boolean
+): { refuse: NextResponse | null; warning: string | null } {
+  if (!qw.is_published || allowPublished) return { refuse: null, warning: null }
+
+  const message =
+    `${actor} is overwriting the ${target} file of PUBLISHED Quick Win ` +
+    `${qw.slug || qw.id} without allowPublished. If this is a rebuild, pass ` +
+    `allowPublished: true. If this is a schema probe, use an unpublished draft.`
+
+  console.warn('[generate-pdf] published-write', JSON.stringify({
+    quickWinId: qw.id, slug: qw.slug, target, actor, enforced: ENFORCE_PUBLISHED_GUARD,
+  }))
+
+  if (!ENFORCE_PUBLISHED_GUARD) return { refuse: null, warning: message }
+
+  return {
+    refuse: NextResponse.json(
+      { error: message, published: true, hint: 'allowPublished: true, or probe against a draft' },
+      { status: 409 }
+    ),
+    warning: null,
+  }
+}
+
+/**
  * Generate a branded TDI Quick Win PDF from structured content.
  *
  * POST /api/hub/generate-pdf
@@ -68,11 +116,18 @@ export async function POST(request: NextRequest) {
 
       const { data: qw, error: fetchErr } = await supabase
         .from('hub_quick_wins')
-        .select('id, slug, title, qa_notes, reviewed_at, reviewed_by')
+        .select('id, slug, title, qa_notes, reviewed_at, reviewed_by, is_published')
         .eq('id', id)
         .single()
 
       if (fetchErr || !qw) return NextResponse.json({ error: 'Quick Win not found' }, { status: 404 })
+
+      // Checked before anything is rendered or uploaded, so a refusal can never
+      // leave a half-applied write or a retired review stamp behind.
+      const toolGuard = guardPublishedWrite(
+        qw, 'tool', body.actor || 'generate_tool', body.allowPublished === true
+      )
+      if (toolGuard.refuse) return toolGuard.refuse
 
       let pdfBuffer: Buffer
       if (tool_type === 'checklist') {
@@ -111,6 +166,11 @@ export async function POST(request: NextRequest) {
           tool_file_url: toolUrl,
           tool_file_path: storagePath,
           tool_type,
+          // The payload that produced this file, kept so a damaged or
+          // overwritten PDF can be regenerated instead of rewritten. Storage
+          // upserts in place, so before this the rendered file was the only
+          // copy and ell-empathy-audit proved that unrecoverable on 8 Sep.
+          tool_content,
           updated_at: now,
           ...retired.patch,
         })
@@ -139,6 +199,7 @@ export async function POST(request: NextRequest) {
         tool_type,
         review_stamp_cleared: retired.hadStamp,
         needs_qa: true,
+        ...(toolGuard.warning ? { warning: toolGuard.warning } : {}),
       })
     }
 
@@ -169,6 +230,15 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (fetchErr || !qw) return NextResponse.json({ error: 'Quick Win not found' }, { status: 404 })
+
+    // Same check as the tool path, before any render or upload. The most recent
+    // live-content incident (TEA-437) was a guide, not a tool, so guarding only
+    // the tool path would have left the route that actually broken.
+    const guideGuard = guardPublishedWrite(
+      qw, 'guide', (body as { actor?: string }).actor || 'generate_pdf',
+      (body as { allowPublished?: boolean }).allowPublished === true
+    )
+    if (guideGuard.refuse) return guideGuard.refuse
 
     // Generate branded PDF
     const pdfBuffer = await renderToBuffer(
@@ -207,13 +277,21 @@ export async function POST(request: NextRequest) {
         file_type: 'application/pdf',
         content_type: 'pdf',
         storage_path: storagePath,
+        // Same reason as tool_content on the other path: keep what produced
+        // the file so it can be regenerated rather than rewritten.
+        guide_sections: sections,
         updated_at: new Date().toISOString(),
       })
       .eq('id', qw.id)
 
     if (updateErr) return NextResponse.json({ error: updateErr.message }, { status: 500 })
 
-    return NextResponse.json({ success: true, file_url: publicUrl, storage_path: storagePath })
+    return NextResponse.json({
+      success: true,
+      file_url: publicUrl,
+      storage_path: storagePath,
+      ...(guideGuard.warning ? { warning: guideGuard.warning } : {}),
+    })
 
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : 'Unknown error'
