@@ -509,6 +509,64 @@ export function computeNextActions(
     })
   }
 
+  // Filed with the funder, and waiting.
+  //
+  // Bella screenshotted Allenwood's NEA card and asked what should come after
+  // "approved". Nothing did. Every rule in this file skips a grant once it is
+  // filed, so the card offered Record award and Record denial and said nothing
+  // about when either was expected or whether anyone was watching for it. The
+  // grant had been with the funder since 16 June.
+  //
+  // Two different situations, and the difference is the whole point. Somebody
+  // watching for the decision is fine and just needs saying. Nobody watching is
+  // how an outcome arrives months late, or never.
+  for (const opp of opportunities) {
+    if (['awarded', 'denied', 'closed', 'not_applicable'].includes(opp.status)) continue
+    const filed = opp.client_submitted === true || ['applied', 'submitted'].includes(opp.status)
+    if (!filed) continue
+
+    const watching = actions.filter(
+      (a: any) =>
+        a.opportunity_id === opp.id &&
+        ['pending', 'blocked'].includes(a.status) &&
+        a.category === 'follow_up',
+    )
+
+    if (watching.length === 0) {
+      result.push({
+        id: `unwatched-${opp.id}`,
+        label: `Nobody is watching for the "${opp.name}" decision`,
+        why: 'It is with the funder and nothing will tell us either way. Add a follow-up with the date a decision is expected.',
+        owner: 'team',
+        urgency: 'high',
+        actionType: 'add_followup',
+        targetId: opp.id,
+        tab: 'opportunities',
+      })
+      continue
+    }
+
+    // Someone is watching. Say so, and say when, so the card reads as waiting
+    // rather than as finished or forgotten.
+    const next = watching
+      .map((a: any) => a.due_date)
+      .filter(Boolean)
+      .sort()[0]
+
+    result.push({
+      id: `awaiting-${opp.id}`,
+      label: `Waiting on the funder for "${opp.name}"`,
+      why: next
+        ? `Filed and with them. Next check is ${new Date(next + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'long' })}.`
+        : 'Filed and with them. The follow-up has no date, so nothing will raise it.',
+      owner: 'team',
+      urgency: next ? 'low' : 'normal',
+      actionType: 'awaiting_decision',
+      targetId: opp.id,
+      tab: 'opportunities',
+    })
+  }
+
   // Approved but not yet sent to the school.
   // Without this nothing tells anyone to send a finished application until a
   // deadline is within 7 days, which is far too late to be the first prompt.
