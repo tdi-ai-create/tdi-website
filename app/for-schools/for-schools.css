@@ -297,3 +297,17 @@ ul.fs-ican li:before{content:"";position:absolute;left:0;top:15px;width:8px;heig
 .fs-page .fs-oc .fs-via{grid-column:2}
 /* the grid made the pill fill its cell; keep it hugging its text */
 .fs-page .fs-oc .fs-via{justify-self:start}
+
+/* ---------- the ensemble figures on the offering cards ---------- */
+/* Each offering is a different kind of ensemble. The picture sits at the top
+   of the card, where somebody is actually choosing, rather than in a section
+   of its own further down the page. */
+.fs-page .fs-band-fig{background:var(--paper); border-radius:9px; padding:14px 10px 12px; margin-top:16px; text-align:center}
+.fs-page .fs-band-fig svg{display:block; margin:0 auto; max-width:100%; height:auto}
+.fs-page .fs-band-name{font-size:.95rem; font-weight:700; color:var(--c,var(--navy)); margin:10px 0 2px}
+.fs-page .fs-band-cap{font-size:.78rem; color:var(--muted); margin:0; line-height:1.4}
+/* inside the Blueprint band the figure shares a column with the button */
+.fs-page .fs-blueprint-band .fs-band-fig{margin-top:0; margin-bottom:20px}
+.fs-page .fs-blueprint-band .fs-band-name{color:var(--blueprint)}
+/* the comparison the four figures set up, said once in prose */
+.fs-page .fs-notladder-music{display:block; margin-top:10px}
