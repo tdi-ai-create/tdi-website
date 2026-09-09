@@ -24,6 +24,7 @@
 import { isAgentWindowWork } from './funding-window-work';
 import { isOursToDo, isWaitingOnUs } from './creator-turn';
 import { isPersonOwned } from './funding-ownership';
+import { loadTeamWork } from './creator-team-work';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 type DbClient = any;
@@ -261,6 +262,38 @@ export async function findOrphanedWork(
         });
       }
     }
+  }
+
+  // 7. Work parked on an agent that no job ever asks.
+  //
+  //    Creator Studio labels two steps as Lily's. Nothing dispatches either:
+  //    assigned_agent and last_agent_activity_at are written by nothing, so a
+  //    creator can sit behind "Lily builds your download" for ever while the
+  //    board reads as though it is in hand.
+  //
+  //    This was already known. loadTeamWork computes agentNeverAsked and the
+  //    digest printed "Agent work does not start on its own yet", which
+  //    describes a gap rather than asking anybody to close it. Bella found it
+  //    on 9 September by asking whether Katie Welch's download would happen by
+  //    itself. It would not have.
+  //
+  //    This rule exists because that question should never have needed asking.
+  try {
+    const teamWork = await loadTeamWork(supabase);
+    for (const w of teamWork) {
+      if (!w.agentNeverAsked) continue;
+      findings.push({
+        rule: 'agent_step_nobody_dispatches',
+        what: `${w.creatorName} on "${w.step}", ${w.daysWaiting} day${w.daysWaiting === 1 ? '' : 's'}`,
+        why:
+          `Labelled as ${w.who}'s work, but no job hands anything to ${w.who}. ` +
+          `Nothing will move this until a person takes it or the step is reassigned.`,
+        where: 'Creator Studio',
+        link: w.url,
+      });
+    }
+  } catch (e) {
+    errors.push(`agent steps: ${String((e as Error).message ?? e)}`);
   }
 
   return { findings, errors };

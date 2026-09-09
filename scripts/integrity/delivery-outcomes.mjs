@@ -27,7 +27,7 @@ const since = new Date(Date.now() - 30 * 86400000).toISOString();
 
 const { data: mail, error } = await supabase
   .from('creator_email_log')
-  .select('creator_name, creator_email, category, subject, sent_at, provider_id, last_event, delivered_at, bounced_at, bounce_reason, complained_at, opened_at')
+  .select('creator_name, creator_email, category, subject, sent_at, provider_id, last_event, delivered_at, bounced_at, bounce_reason, complained_at, opened_at, suppressed_at, status_checked_at')
   .eq('dry_run', false)
   .gte('sent_at', since)
   .order('sent_at', { ascending: false });
@@ -43,6 +43,7 @@ const withEvent = real.filter((r) => r.last_event);
 const delivered = real.filter((r) => r.delivered_at);
 const bounced = real.filter((r) => r.bounced_at);
 const complained = real.filter((r) => r.complained_at);
+const suppressed = real.filter((r) => r.suppressed_at);
 
 console.log(`Real creator emails in the last 30 days: ${real.length}`);
 console.log(`  message id recorded at send time:      ${withId.length}`);
@@ -50,6 +51,14 @@ console.log(`  any outcome received back:             ${withEvent.length}`);
 console.log(`    delivered:                           ${delivered.length}`);
 console.log(`    bounced:                             ${bounced.length}`);
 console.log(`    reported as spam:                    ${complained.length}`);
+console.log(`    never sent at all (suppressed):      ${suppressed.length}`);
+
+if (suppressed.length) {
+  console.log('\nNever left our email provider. Sending again will not help:');
+  for (const s of suppressed) {
+    console.log(`  ${s.creator_name || s.creator_email}  "${s.subject}"`);
+  }
+}
 
 if (bounced.length) {
   console.log('\nNever arrived. These people have not been ignoring us:');
@@ -66,16 +75,27 @@ if (real.length < 3) {
 } else if (withId.length === 0) {
   console.log('DARK: no send site is recording the Resend message id. No outcome can ever be matched.');
 } else if (withEvent.length === 0) {
-  console.log('DARK: ids are recorded but nothing is coming back.');
-  console.log('Resend is not reaching /api/webhooks/resend. Check RESEND_WEBHOOK_SECRET is set');
-  console.log('in Vercel and the endpoint is configured in the Resend dashboard.');
+  // Two very different causes, and naming the wrong one sends somebody to fix
+  // a webhook that is working. A suppressed send never produces an event at
+  // all, so silence there is expected rather than evidence of a broken pipe.
+  const unchecked = withId.filter((r) => !r.status_checked_at).length;
+  console.log('No outcome has come back for any tracked send.');
+  if (unchecked === withId.length) {
+    console.log(`All ${withId.length} are still waiting on their first status check.`);
+    console.log('Run /api/cron/email-delivery-sweep?dryRun=1 before blaming the webhook:');
+    console.log('a suppressed send never fires an event, so this can be normal.');
+  } else {
+    console.log('These have been checked directly and still report nothing, so Resend is');
+    console.log('likely not reaching /api/webhooks/resend. Check RESEND_WEBHOOK_SECRET is');
+    console.log('set in Vercel and the endpoint is configured in the Resend dashboard.');
+  }
 } else {
   console.log(`Delivery tracking is live: ${withEvent.length} of ${withId.length} tracked sends have reported back.`);
 }
 
 // Anyone we must stop writing to. This is what the contact gate now enforces.
 const dead = new Set();
-for (const r of [...bounced, ...complained]) if (r.creator_email) dead.add(r.creator_email.toLowerCase());
+for (const r of [...bounced, ...complained, ...suppressed]) if (r.creator_email) dead.add(r.creator_email.toLowerCase());
 if (dead.size) {
   console.log(`\n${dead.size} address${dead.size === 1 ? '' : 'es'} the contact gate will now refuse to write to:`);
   for (const d of dead) console.log(`  ${d}`);

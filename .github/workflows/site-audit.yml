@@ -28,6 +28,17 @@ jobs:
         working-directory: ./audit
         run: |
           npm install
+          # --with-deps runs apt-get update, which reads every source on the
+          # runner image including Google's Chrome repo. On 9 September 2026
+          # Google republished that index mid-run and apt refused it with a hash
+          # sum mismatch, failing this job twice and blocking a merge for
+          # reasons that had nothing to do with the code. We install Chromium
+          # from Playwright's own download, so that repo is never needed here.
+          # Removing the source does not uninstall the browser the image ships.
+          # Ubuntu 24.04 runners also carry deb822 ".sources" files, so removing
+          # only google-chrome.list left the repo defined and the job kept
+          # failing. Match both formats.
+          sudo rm -f /etc/apt/sources.list.d/*google*
           npx playwright install chromium --with-deps
 
       - name: Run Site Audit

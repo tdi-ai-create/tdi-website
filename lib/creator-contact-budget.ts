@@ -111,17 +111,28 @@ export async function loadContactGate(supabase: DbClient): Promise<ContactGate> 
   try {
     const { data, error } = await supabase
       .from('creator_email_log')
-      .select('creator_email, bounced_at, complained_at, bounce_reason')
-      .or('bounced_at.not.is.null,complained_at.not.is.null');
+      .select('creator_email, bounced_at, complained_at, suppressed_at, bounce_reason')
+      .or('bounced_at.not.is.null,complained_at.not.is.null,suppressed_at.not.is.null');
     if (error) throw new Error(error.message);
     for (const row of (data ?? []) as Array<{
-      creator_email: string; bounced_at: string | null; complained_at: string | null; bounce_reason: string | null;
+      creator_email: string; bounced_at: string | null; complained_at: string | null;
+      suppressed_at: string | null; bounce_reason: string | null;
     }>) {
       if (!row.creator_email) continue;
-      undeliverable.set(
-        row.creator_email.trim().toLowerCase(),
-        row.complained_at ? 'reported a previous email as spam' : `a previous email bounced: ${row.bounce_reason ?? 'no reason given'}`,
-      );
+
+      // Suppression named separately from a bounce because the fix differs.
+      // A bounce means the address is wrong and needs replacing. A suppression
+      // means our provider is refusing regardless, and a correct address will
+      // keep being refused until somebody clears it there.
+      const reason = row.suppressed_at
+        ? 'our email provider is refusing to send to this address, so nothing we send is even attempted. ' +
+          'Correcting the address will not help until the suppression is cleared in Resend'
+        : row.complained_at
+          ? 'reported a previous email as spam. Do not write again until somebody has spoken to them'
+          : `a previous email bounced: ${row.bounce_reason ?? 'no reason given'}. ` +
+            'Correct the email on the creator record, then send';
+
+      undeliverable.set(row.creator_email.trim().toLowerCase(), reason);
     }
   } catch (e) {
     bounceLookupOk = false;
@@ -144,10 +155,7 @@ export async function loadContactGate(supabase: DbClient): Promise<ContactGate> 
       // again: a corrected address is a different key and is not held.
       const dead = undeliverable.get(key);
       if (dead) {
-        return {
-          ok: false,
-          reason: `${dead}. Nothing will reach this address. Correct the email on the creator record, then send.`,
-        };
+        return { ok: false, reason: `Nothing will reach this address: ${dead}.` };
       }
 
       if (opts?.deliberate) return { ok: true };
