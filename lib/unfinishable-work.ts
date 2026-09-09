@@ -159,14 +159,20 @@ export async function findUnfinishableWork(
     );
 
     if (live.length > 0) {
-      const { data: followUps } = await supabase
+      // Any open item counts, not only category 'follow_up'.
+      //
+      // The first version of this rule looked at follow_up alone and reported
+      // four grants. Three of them were being tracked perfectly well under
+      // 'documentation', as "Information needed for X". Reporting those would
+      // have taught the reader to skim, and a skimmed report is the same as no
+      // report. Caught before this ever posted, by checking the four by hand.
+      const { data: openItems } = await supabase
         .from('funding_action_items')
         .select('opportunity_id')
-        .eq('category', 'follow_up')
         .in('status', ['pending', 'blocked'])
         .in('opportunity_id', live.map((o: any) => o.id));
 
-      const chased = new Set((followUps ?? []).map((f: any) => f.opportunity_id));
+      const chased = new Set((openItems ?? []).map((f: any) => f.opportunity_id));
 
       for (const opp of live) {
         if (chased.has(opp.id)) continue;
@@ -177,6 +183,33 @@ export async function findUnfinishableWork(
           link: `${SITE}/tdi-admin/funding/${opp.pursuit_id}`,
         });
       }
+    }
+  }
+
+  // --- Follow-ups that are not attached to the grant they are about ----------
+  //
+  // "Track NEA application decision" sits on Allenwood with opportunity_id null.
+  // It is real work and somebody is doing it, but nothing can attribute it, so
+  // every check that asks "is this grant being chased" answers no. That is how
+  // a tracked grant reads as untracked, and it is what made the rule above
+  // report a false positive on its first run.
+  const { data: unlinked, error: unlinkedErr } = await supabase
+    .from('funding_action_items')
+    .select('id, title, pursuit_id, opportunity_id, category, status')
+    .eq('category', 'follow_up')
+    .is('opportunity_id', null)
+    .in('status', ['pending', 'blocked']);
+
+  if (unlinkedErr) {
+    errors.push(`unlinked follow-ups: ${unlinkedErr.message}`);
+  } else {
+    for (const item of unlinked ?? []) {
+      findings.push({
+        rule: 'followup_not_linked_to_a_grant',
+        what: `"${item.title}"`,
+        why: 'This chases a grant but is not attached to one, so nothing can tell which grant is covered. Any check asking whether that grant is being chased will answer no.',
+        link: `${SITE}/tdi-admin/funding/${item.pursuit_id}`,
+      });
     }
   }
 
