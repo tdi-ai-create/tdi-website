@@ -775,6 +775,39 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
     }).then(() => {});
   }, [quickWin?.id, user?.id]);
 
+  /**
+   * A download is the only moment a Quick Win actually reaches a classroom.
+   * Until now nothing recorded it: the buttons were plain links, and
+   * resource_downloaded fired only on course lesson pages. Four months of the
+   * whole library produced eleven download events, which is a broken counter
+   * rather than a usage signal. Every quality decision was being made blind.
+   *
+   * Fire and forget on purpose. A failed log must never stop a teacher getting
+   * the file, so this never awaits and never blocks the navigation.
+   */
+  const logDownload = (target: 'tool' | 'guide', url: string | null | undefined) => {
+      // target is derived from the data, not assumed. When an item has no
+      // separate tool file, download_url IS the tool and the button says so,
+      // so recording it as a guide would have made the first real usage data
+      // wrong in the direction that matters.
+      if (!quickWin || !user || !url) return;
+      try {
+        const supabase = getSupabase();
+        void supabase.from('hub_activity_log').insert({
+          user_id: user.id,
+          action: 'quick_win_downloaded',
+          metadata: {
+            quick_win_id: quickWin.id,
+            quick_win_title: quickWin.title,
+            target,
+            downloaded_at: new Date().toISOString(),
+          },
+        });
+      } catch {
+        // Never let instrumentation break the download itself.
+      }
+  };
+
   // Load recommendations (same category) and more quick wins
   useEffect(() => {
     if (!quickWin) return;
@@ -1293,6 +1326,8 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                 <>
                   <a
                     href={quickWin.tool_file_url}
+
+                    onClick={() => logDownload('tool', quickWin.tool_file_url)}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center justify-center gap-2 py-3 px-4 font-semibold text-sm rounded-xl transition-opacity hover:opacity-90"
@@ -1304,6 +1339,8 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                   {quickWin.download_url ? (
                     <a
                       href={quickWin.download_url}
+
+                      onClick={() => logDownload(quickWin.tool_file_url ? 'guide' : 'tool', quickWin.download_url)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center justify-center gap-2 py-2.5 px-4 text-xs rounded-xl transition-opacity hover:opacity-80"
@@ -1317,6 +1354,8 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
               ) : quickWin.download_url ? (
                 <a
                   href={quickWin.download_url}
+
+                  onClick={() => logDownload(quickWin.tool_file_url ? 'guide' : 'tool', quickWin.download_url)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center justify-center gap-2 py-3 px-4 font-semibold text-sm rounded-xl transition-opacity hover:opacity-90"
@@ -1416,6 +1455,8 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                   {quickWin.download_url ? (
                     <a
                       href={quickWin.download_url}
+
+                      onClick={() => logDownload(quickWin.tool_file_url ? 'guide' : 'tool', quickWin.download_url)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center justify-center gap-3 w-full py-4 font-semibold text-lg transition-opacity hover:opacity-90"
@@ -1652,6 +1693,8 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                   {quickWin.content_type === 'download' && quickWin.download_url && (
                     <a
                       href={quickWin.download_url}
+
+                      onClick={() => logDownload(quickWin.tool_file_url ? 'guide' : 'tool', quickWin.download_url)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center justify-center gap-2 w-full py-3 text-sm font-semibold transition-opacity hover:opacity-90"
