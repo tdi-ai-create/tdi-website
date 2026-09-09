@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { requireAdminAuth } from '@/lib/tdi-admin/auth'
+import { createSendFollowUps } from '@/lib/funding-followups'
 
 /**
  * POST /api/funding/send-to-client
@@ -59,128 +60,30 @@ export async function POST(request: NextRequest) {
     .single()
   const grantName = opp?.name || 'grant'
 
-  // 3. Create follow-up milestones (only if window dates exist)
+  // 3. Schedule the chases we owe ourselves.
   //
-  // These are TDI's follow-up work, not the school's. Every one of them is
-  // something one of us does: check whether an account got set up, send a
-  // reminder, confirm a submission landed. The school's only task is to submit.
-  //
-  // They were previously created with owner_type 'client' and the principal's
-  // address. That single mislabel is the origin of the worst incident this
-  // system has had. The nightly reminder engine treats a client-owned item as a
-  // task for the school, so it emailed these titles, written in the third
-  // person about the principal, to the principal. "Check if Paula set up her
-  // Deed account" arrived in Paula's inbox. Two principals received 41 of them
-  // between them before anyone noticed.
-  //
-  // Owning them correctly fixes it at the source rather than by sanitising the
-  // wording afterwards, and it means they now reach Bella, who is the person
-  // who actually does them.
-  const milestones = []
-  const firstName = (contactName || '').split(' ')[0] || 'the contact'
+  // This logic used to live inline here, and the approval queue sent the very
+  // same email without any of it, so grants approved from Amara's drafts were
+  // never chased. One definition now, in lib/funding-followups.ts, called by
+  // both send paths.
+  const followUps = await createSendFollowUps(supabase, {
+    pursuitId,
+    opportunityId,
+    grantName,
+    contactName,
+    windowOpens,
+  })
 
-  // Matches the convention in lib/funding-pursuit-template.ts for TDI-owned work.
-  const TDI_OWNER_EMAIL = 'hello@teachersdeserveit.com'
-  const TDI_OWNER_NAME = 'Bella'
-
-  // The submission question is created whether or not this grant has an
-  // application window. It used to sit inside `if (windowOpens)`, and federal
-  // formula funds like Title II-A and IDEA/CEIS never have a window, so exactly
-  // those grants got no follow-ups at all. Measured on 26 Aug: every grant with
-  // a window had three follow-ups and every grant without one had zero, across
-  // 32 grants with no exceptions. Title II-A for Saunemin was sent on 17 Aug,
-  // filed as complete, and sat unsubmitted and invisible for nine days.
-  const WEEKLY_CHASE_DAYS = 7
-  const now = new Date()
-  const windowDate = windowOpens ? new Date(windowOpens + 'T00:00:00') : null
-  const deedCheckDate = windowDate ? new Date(windowDate.getTime() - 3 * 86400000) : null
-  const reminderDate = windowDate ? new Date(windowDate.getTime()) : null
-  // With a window, chase a week after it opens. Without one, chase weekly from
-  // today, because there is no deadline to anchor to.
-  const followUpDate = windowDate
-    ? new Date(windowDate.getTime() + 7 * 86400000)
-    : new Date(now.getTime() + WEEKLY_CHASE_DAYS * 86400000)
-
-  {
-    // Check if milestones already exist
-    const { data: existing } = await supabase
-      .from('funding_action_items')
-      .select('id')
-      .eq('opportunity_id', opportunityId)
-      .eq('category', 'follow_up')
-      .eq('status', 'pending')
-
-    if (!existing || existing.length === 0) {
-      // Window-specific chases. Only meaningful when the funder publishes one.
-      if (windowDate && deedCheckDate && reminderDate) {
-      milestones.push({
-        pursuit_id: pursuitId,
-        opportunity_id: opportunityId,
-        title: `Check if ${firstName} set up their Deed account`,
-        description: `Follow up to confirm Deed registration is complete before the ${grantName} window opens. If not started, offer a call to walk through it.`,
-        owner_type: 'tdi',
-        owner_name: TDI_OWNER_NAME,
-        owner_email: TDI_OWNER_EMAIL,
-        due_date: deedCheckDate!.toISOString().split('T')[0],
-        status: 'pending',
-        category: 'follow_up',
-        action_size: 'light',
-        // Each of these is a question: did they set it up, did they submit.
-        // Closing one without recording what we found is how a school ends up
-        // chased about something already done, or assumed done when it is not.
-        requires_answer: true,
-      })
-
-      milestones.push({
-        pursuit_id: pursuitId,
-        opportunity_id: opportunityId,
-        title: `Remind ${firstName}: ${grantName} window is open. Time to submit.`,
-        description: `Send a reminder that the application window is open. Resend the application package link. Offer to submit together on a call.`,
-        owner_type: 'tdi',
-        owner_name: TDI_OWNER_NAME,
-        owner_email: TDI_OWNER_EMAIL,
-        due_date: reminderDate!.toISOString().split('T')[0],
-        status: 'pending',
-        category: 'follow_up',
-        action_size: 'light',
-      })
-      }
-
-      // Always. This is the one that was missing.
-      milestones.push({
-        pursuit_id: pursuitId,
-        opportunity_id: opportunityId,
-        title: `Check if ${firstName} submitted the ${grantName} application`,
-        description: `Follow up to confirm submission. Ask them to forward the confirmation email to bella@teachersdeserveit.com. If not submitted, offer to walk through it on a call.`,
-        owner_type: 'tdi',
-        owner_name: TDI_OWNER_NAME,
-        owner_email: TDI_OWNER_EMAIL,
-        due_date: followUpDate.toISOString().split('T')[0],
-        status: 'pending',
-        category: 'follow_up',
-        action_size: 'light',
-        // Each of these is a question: did they set it up, did they submit.
-        // Closing one without recording what we found is how a school ends up
-        // chased about something already done, or assumed done when it is not.
-        requires_answer: true,
-      })
-    }
-  }
-
-  let followUpError: string | null = null
-  if (milestones.length > 0) {
-    // If this fails the grant is with the school and nothing will ever ask
+  if (followUps.error) {
+    // The grant is with the school. If this failed, nothing will ever ask
     // whether they submitted it, which is precisely how Title II-A was lost.
-    const { error: msErr } = await supabase.from('funding_action_items').insert(milestones)
-    if (msErr) {
-      followUpError = msErr.message
-      console.error('[send-to-client] SENT but follow-ups failed to create:', msErr.message)
-    }
+    console.error('[send-to-client] SENT but follow-ups failed to create:', followUps.error)
   }
 
   return NextResponse.json({
     success: true,
-    milestonesCreated: milestones.length,
-    followUpError,
+    milestonesCreated: followUps.created,
+    alreadyHadFollowUps: followUps.skipped,
+    followUpError: followUps.error ?? null,
   })
 }
