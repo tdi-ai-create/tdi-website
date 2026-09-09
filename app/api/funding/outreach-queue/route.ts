@@ -6,6 +6,7 @@ import { buildFundingEmailHtml } from '@/lib/funding-email-html'
 import { findInternalText } from '@/lib/funding-draft-warnings'
 import { NEUTRAL_TASK_LABEL } from '@/lib/funding-followup-email'
 import { matchActionItem, usesPlaceholder, type LabelCandidate } from '@/lib/funding-client-label'
+import { createSendFollowUps, type FollowUpResult } from '@/lib/funding-followups'
 
 /**
  * Funding outreach approval queue.
@@ -486,5 +487,54 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  return NextResponse.json({ ok: true, action: 'sent', resendId })
+  // Schedule the chases we owe ourselves.
+  //
+  // This route sent the email and stopped. send-to-client does the same send
+  // and creates the follow-ups, so a grant approved from this queue was never
+  // chased, and funding-next-actions skips an opportunity once it reads 'sent'.
+  // It went quiet and looked finished. Bella asked why there was no next step
+  // beside "approved", and there genuinely was not one.
+  let followUps: FollowUpResult | null = null
+  if (draft.opportunity_id && draft.pursuit_id) {
+    const { data: opp } = await supabase
+      .from('funding_opportunities')
+      .select('name, window_opens')
+      .eq('id', draft.opportunity_id)
+      .maybeSingle()
+
+    const { data: pursuit } = await supabase
+      .from('funding_pursuits')
+      .select('client_contact_name')
+      .eq('id', draft.pursuit_id)
+      .maybeSingle()
+
+    followUps = await createSendFollowUps(supabase, {
+      pursuitId: draft.pursuit_id,
+      opportunityId: draft.opportunity_id,
+      grantName: opp?.name || 'grant',
+      contactName: pursuit?.client_contact_name ?? null,
+      windowOpens: opp?.window_opens ?? null,
+    })
+
+    if (followUps.error) {
+      // The email is gone. Say what did not happen rather than report success.
+      return NextResponse.json({
+        ok: true,
+        action: 'sent',
+        resendId,
+        warning: `${followUps.error} Nothing will chase this grant, so add a follow-up by hand.`,
+      })
+    }
+  }
+
+  return NextResponse.json({
+    ok: true,
+    action: 'sent',
+    resendId,
+    // So the queue can tell the reviewer what happens next instead of the row
+    // simply vanishing.
+    followUps: followUps
+      ? { created: followUps.created, skipped: followUps.skipped, titles: followUps.titles }
+      : null,
+  })
 }
