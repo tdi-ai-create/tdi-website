@@ -105,3 +105,46 @@ export function legalFrom(action: Action, current: Status): boolean {
   if (!rule) return false
   return rule.from.includes(current)
 }
+
+/**
+ * Who may send a piece back.
+ *
+ * The gates and the approver may always refuse: that is what a gate is for.
+ *
+ * A writer may recall their own work, but only in the narrow window where they
+ * have just submitted it and nobody has acted yet. Izzy used this on 8 September
+ * to pull back a draft she had submitted before writing it, which is exactly the
+ * case worth keeping. Outside that window a writer sending work back is a writer
+ * pulling a piece out of review, so it is refused and they have to ask.
+ *
+ * The window is defined by the log rather than by the status, because the log is
+ * what records whether anyone has touched the piece since the submit.
+ */
+export function canRequestChanges(
+  actor: string,
+  item: { status: Status; feedback_log?: unknown[] },
+): { allowed: boolean; reason?: string } {
+  const who = actor.trim().toLowerCase()
+
+  const isReviewer =
+    actorHoldsRole(who, 'julie') ||
+    actorHoldsRole(who, 'lily') ||
+    actorHoldsRole(who, 'olivia') ||
+    actorHoldsRole(who, 'approver')
+  if (isReviewer) return { allowed: true }
+
+  const log = (item.feedback_log ?? []) as Array<Record<string, unknown>>
+  const last = log[log.length - 1]
+  const justSubmittedByThisActor =
+    last != null &&
+    last.action === 'submit' &&
+    typeof last.actor === 'string' &&
+    last.actor.trim().toLowerCase() === who
+
+  if (justSubmittedByThisActor) return { allowed: true }
+
+  return {
+    allowed: false,
+    reason: `"${actor}" cannot send this back. A gate or an approver can refuse it, and a writer can recall their own work only immediately after submitting it, before anyone has acted. Ask the gate holder instead of pulling it out of review.`,
+  }
+}
