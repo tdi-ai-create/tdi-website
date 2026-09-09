@@ -47,13 +47,19 @@ export async function GET(request: NextRequest) {
     const agent = url.searchParams.get('agent')
     const now = new Date()
 
-    // Get all active, non-published creators
+    // Every active creator, including ones who have published before.
+    //
+    // This used to exclude publish_status = 'published', which sounds right and
+    // is not. publish_status describes a project but lives on the creator row,
+    // so anybody who has ever launched anything reads as finished for ever.
+    // Katie Welch published a course in February, started a download in August,
+    // and was invisible to this endpoint the whole time. A creator who is truly
+    // done has no open steps, so nothing is generated for them anyway.
     const { data: creators } = await supabase
       .from('creators')
       .select('id, name, email, content_path, current_phase, updated_at, target_completion_date, lifecycle_state, publish_status, last_followed_up_at, course_title, agreement_signed')
       .eq('status', 'active')
       .or('lifecycle_state.is.null,lifecycle_state.eq.active')
-      .neq('publish_status', 'published')
 
     if (!creators || creators.length === 0) {
       return NextResponse.json({ work: [], count: 0 })
@@ -219,6 +225,83 @@ export async function GET(request: NextRequest) {
       }
     }
 
+    // 5. DESIGN WORK WAITING ON AN AGENT
+    //
+    // Creator Studio has always labelled two steps as Lily's, and nothing ever
+    // told her. She sits in Paperclip as "Lily, Design", alive and idle, while
+    // "Lily Builds Your Download" stays open on a creator's board indefinitely.
+    // Bella asked on 9 September whether Katie Welch's download would build
+    // itself. It would not have, and nothing anywhere said so.
+    //
+    // Keyed on the step being open and team-owned, not on a name, so a renamed
+    // agent does not silently empty the queue. That is the mistake that starved
+    // Amara for six funders.
+    const DESIGN_STEPS: Record<string, string> = {
+      download_being_built: 'Build the branded download from the creator draft attached to the previous step.',
+      marketing_created: 'Build the cover, bio page and promo assets for this creator.',
+    }
+
+    const { data: designSteps } = await supabase
+      .from('creator_milestones')
+      .select('id, creator_id, milestone_id, status, updated_at')
+      .in('creator_id', creatorIds)
+      .in('milestone_id', Object.keys(DESIGN_STEPS))
+      .in('status', ['available', 'in_progress'])
+
+    for (const step of designSteps || []) {
+      const creator = creators.find(c => c.id === step.creator_id)
+      if (!creator) continue
+
+      // What the creator handed in, so the agent has the source file rather
+      // than a step name. A design task with nothing attached is not work.
+      const { data: source } = await supabase
+        .from('creator_milestones')
+        .select('milestone_id, submitted_value')
+        .eq('creator_id', step.creator_id)
+        .not('submitted_value', 'is', null)
+        .order('updated_at', { ascending: false })
+        .limit(1)
+        .maybeSingle()
+
+      const daysWaiting = Math.floor(
+        (now.getTime() - new Date(step.updated_at).getTime()) / (1000 * 60 * 60 * 24)
+      )
+
+      work.push({
+        request_type: 'design_build',
+        severity: daysWaiting >= 7 ? 'high' : 'medium',
+        creator_id: creator.id,
+        creator_name: creator.name,
+        email: creator.email,
+        content_path: creator.content_path,
+        milestone_record_id: step.id,
+        milestone_id: step.milestone_id,
+        instruction: DESIGN_STEPS[step.milestone_id],
+        source_file: source?.submitted_value ?? null,
+        days_waiting: daysWaiting,
+      })
+    }
+
+    // Record that the work was offered, so "nobody ever asked her" stops being
+    // unanswerable. Until now assigned_agent and last_agent_activity_at were
+    // written by nothing at all.
+    if (agent && work.some(w => w.request_type === 'design_build')) {
+      const askedAbout = work
+        .filter(w => w.request_type === 'design_build')
+        .map(w => w.creator_id)
+
+      const { error: stampError } = await supabase
+        .from('creators')
+        .update({ assigned_agent: agent, last_agent_activity_at: now.toISOString() })
+        .in('id', askedAbout)
+
+      // Reported rather than swallowed: if this stamp is lost, the board goes on
+      // saying no agent was ever asked, which is the exact confusion this fixes.
+      if (stampError) {
+        console.error('[creator-sync] Offered design work but could not record it:', stampError.message)
+      }
+    }
+
     // Sort by severity/urgency
     const severityOrder: Record<string, number> = { critical: 0, high: 1, medium: 2 }
     work.sort((a, b) => {
@@ -236,6 +319,7 @@ export async function GET(request: NextRequest) {
         approval_count: work.filter(w => w.request_type === 'approval_waiting').length,
         overdue_count: work.filter(w => w.request_type === 'overdue_target').length,
         submission_review_count: work.filter(w => w.request_type === 'submission_review').length,
+        design_build_count: work.filter(w => w.request_type === 'design_build').length,
       },
     })
   }
@@ -560,11 +644,16 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    // Update milestone review_status to under_review
-    await supabase
+    // Update milestone review_status to under_review.
+    // Reported rather than swallowed: if this is lost the draft exists but the
+    // step still reads as untouched, so the same work is offered again.
+    const { error: underReviewError } = await supabase
       .from('creator_milestones')
       .update({ review_status: 'under_review' })
       .eq('id', milestone_record_id)
+    if (underReviewError) {
+      console.error('[creator-sync] Draft saved but review_status not moved to under_review:', underReviewError.message)
+    }
 
     // Slack notification for feedback draft
     try {
@@ -621,11 +710,16 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: error?.message || 'Feedback not found or already processed' }, { status: 404 })
     }
 
-    // Update milestone review_status to feedback_ready
-    await supabase
+    // Update milestone review_status to feedback_ready.
+    // If this is lost the feedback is approved but the step never advertises it,
+    // so the creator waits on a response that already exists.
+    const { error: feedbackReadyError } = await supabase
       .from('creator_milestones')
       .update({ review_status: 'feedback_ready' })
       .eq('id', feedback.milestone_record_id)
+    if (feedbackReadyError) {
+      console.error('[creator-sync] Feedback approved but review_status not moved to feedback_ready:', feedbackReadyError.message)
+    }
 
     // Slack notification for feedback approval
     try {
@@ -730,7 +824,10 @@ export async function POST(request: NextRequest) {
                 .single()
 
               if (existing && (existing.status === 'locked' || existing.status === 'available')) {
-                await supabase
+                // A dropped auto-skip leaves a step open that the feedback loop
+                // has already resolved, so the creator is asked for something
+                // they have done and the log says it was handled.
+                const { error: skipUpdateError } = await supabase
                   .from('creator_milestones')
                   .update({
                     status: 'completed',
@@ -747,7 +844,11 @@ export async function POST(request: NextRequest) {
                   .eq('creator_id', feedback.creator_id)
                   .eq('milestone_id', skip.id)
 
-                console.log(`[creator-studio-sync] Auto-skipped milestone: ${skip.name} for creator ${feedback.creator_id}`)
+                if (skipUpdateError) {
+                  console.error(`[creator-studio-sync] Could not auto-skip ${skip.name}:`, skipUpdateError.message)
+                } else {
+                  console.log(`[creator-studio-sync] Auto-skipped milestone: ${skip.name} for creator ${feedback.creator_id}`)
+                }
               }
             }
           }
@@ -789,11 +890,17 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    // Reset milestone review_status back to submitted so Anne Marie can try again
-    await supabase
+    // Reset milestone review_status back to submitted so Anne Marie can try again.
+    // Losing this strands the step in under_review with its draft rejected, so
+    // nobody drafts again and the creator waits on a reply that is not coming.
+    const { error: resetError } = await supabase
       .from('creator_milestones')
       .update({ review_status: 'submitted' })
       .eq('id', feedback.milestone_record_id)
+
+    if (resetError) {
+      console.error('[creator-sync] Draft rejected but review_status not reset to submitted:', resetError.message)
+    }
 
     return NextResponse.json({ success: true, feedback_id, reason: reason || null })
   }
