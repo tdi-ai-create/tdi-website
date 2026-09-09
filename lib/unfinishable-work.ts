@@ -213,6 +213,100 @@ export async function findUnfinishableWork(
     }
   }
 
+  // --- Records that disagree with themselves --------------------------------
+  //
+  // Three of Bella's fourteen reports were this shape: the system asserting
+  // that something still needs doing while its own record says it is done.
+  // Approving a signature signed in May. A blocker reading "no NEA member is on
+  // file", printed above a line naming the member who filed it. Closed grants
+  // still asking for work.
+  //
+  // A person cannot act correctly on a card that contradicts itself. They can
+  // only guess which half to believe, and Bella did the right thing by asking
+  // rather than guessing, three separate times.
+  //
+  // Two of these read zero today because they were fixed this week. That is
+  // what a guard is for. The value is in staying at zero.
+
+  // 1. An agreement step still open when the agreement is signed.
+  const { data: agreementRows, error: agreementErr } = await supabase
+    .from('creator_milestones')
+    .select('creator_id, milestone_id, status, creators!inner(name, status, lifecycle_state, agreement_signed), milestones!inner(name)')
+    .in('status', ['available', 'in_progress', 'waiting_approval']);
+
+  if (agreementErr) {
+    errors.push(`agreement steps: ${agreementErr.message}`);
+  } else {
+    for (const row of (agreementRows ?? []) as any[]) {
+      const c = row.creators;
+      const m = row.milestones;
+      if (!c || !m) continue;
+      if (c.status !== 'active' || (c.lifecycle_state && c.lifecycle_state !== 'active')) continue;
+      if (c.agreement_signed !== true) continue;
+      if (!/agreement/i.test(String(m.name))) continue;
+
+      findings.push({
+        rule: 'asks_for_something_already_done',
+        what: `${c.name} on "${m.name}"`,
+        why: 'Their agreement is recorded as signed, so this step asks for something the record says already happened. A signature is a fact, not a review.',
+        link: `${SITE}/tdi-admin/creators/${row.creator_id}`,
+      });
+    }
+  }
+
+  // 2. A pre-draft eligibility blocker on a grant already filed.
+  const { data: gated, error: gatedErr } = await supabase
+    .from('funding_opportunities')
+    .select('id, name, pursuit_id, status, client_submitted, eligibility_verdict, eligibility_rule, eligibility_overridden');
+
+  if (gatedErr) {
+    errors.push(`eligibility stamps: ${gatedErr.message}`);
+  } else {
+    for (const o of (gated ?? []) as any[]) {
+      const blocked = ['ask_first', 'stop'].includes(String(o.eligibility_verdict ?? ''));
+      if (!blocked || o.eligibility_overridden === true) continue;
+      const filed =
+        o.client_submitted === true ||
+        ['applied', 'submitted', 'awarded', 'denied'].includes(String(o.status ?? '').toLowerCase());
+      if (!filed) continue;
+
+      findings.push({
+        rule: 'blocker_on_something_already_filed',
+        what: `${o.name}`,
+        why: `It carries a "${o.eligibility_rule ?? 'pre-draft'}" blocker while the record says it is already filed. Whoever opens this card is told both that the work cannot start and that it finished.`,
+        link: `${SITE}/tdi-admin/funding/${o.pursuit_id}`,
+      });
+    }
+  }
+
+  // 3. A step marked complete that still says it is awaiting review.
+  //
+  //    Not cosmetic. creator-turn treats review_status 'submitted' as waiting
+  //    on us, so a finished step sits in a review queue that cannot be cleared.
+  const { data: bothStates, error: bothErr } = await supabase
+    .from('creator_milestones')
+    .select('creator_id, status, review_status, creators!inner(name, status, lifecycle_state), milestones!inner(name)')
+    .eq('status', 'completed')
+    .eq('review_status', 'submitted');
+
+  if (bothErr) {
+    errors.push(`step review states: ${bothErr.message}`);
+  } else {
+    for (const row of (bothStates ?? []) as any[]) {
+      const c = row.creators;
+      const m = row.milestones;
+      if (!c || !m) continue;
+      if (c.status !== 'active' || (c.lifecycle_state && c.lifecycle_state !== 'active')) continue;
+
+      findings.push({
+        rule: 'complete_but_still_awaiting_review',
+        what: `${c.name} on "${m.name}"`,
+        why: 'The step is complete and still marked submitted for review, so it reads as waiting on us and sits in a review queue nobody can clear.',
+        link: `${SITE}/tdi-admin/creators/${row.creator_id}`,
+      });
+    }
+  }
+
   return { findings, errors };
 }
 
