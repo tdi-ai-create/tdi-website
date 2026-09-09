@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import {
-  TRANSITIONS, OWNER_OF, actorHoldsRole, isSelfReview, legalFrom, canRequestChanges,
+  TRANSITIONS, OWNER_OF, actorHoldsRole, isSelfReview, legalFrom, canRequestChanges, canFlagBlocked,
+  isTransition,
   type Action, type Status,
 } from '@/lib/content-queue/workflow'
 
@@ -111,13 +112,43 @@ export async function POST(request: NextRequest) {
     const note = typeof body.note === 'string' ? body.note.trim() : ''
     const supabase = db()
 
-    if (!action || !TRANSITIONS[action]) {
+    if (!action || (isTransition(action) ? !TRANSITIONS[action] : action !== 'flag_blocked')) {
       return NextResponse.json(
-        { error: `Unknown action "${action}". Known: ${Object.keys(TRANSITIONS).join(', ')}` },
+        { error: `Unknown action "${action}". Known: ${Object.keys(TRANSITIONS).join(', ')}, flag_blocked` },
         { status: 400 })
     }
     if (!actor) return NextResponse.json({ error: 'actor is required, so the log names who did this' }, { status: 400 })
 
+    // ── flagging does not move the row ──
+    //
+    // A gate that cannot judge a piece parks it in place. Sending it back to the
+    // writer asks for something the writer cannot produce, which is how the
+    // 9 September loop happened.
+    if (action === 'flag_blocked') {
+      const fid = body.id
+      if (!fid) return NextResponse.json({ error: 'id is required' }, { status: 400 })
+      if (!note) return NextResponse.json({ error: 'flag_blocked requires a note saying what is missing and who decides.' }, { status: 400 })
+
+      const { data: frow, error: fErr } = await supabase
+        .from('content_queue_items').select('id, status, feedback_log').eq('id', fid).single()
+      if (fErr || !frow) return NextResponse.json({ error: 'Item not found' }, { status: 404 })
+
+      const verdict = canFlagBlocked(actor, frow as { status: string; feedback_log?: unknown[] })
+      if (!verdict.allowed) return NextResponse.json({ error: verdict.reason }, { status: 403 })
+
+      const fEntry = { at: new Date().toISOString(), actor, action, from: frow.status, to: frow.status, note }
+      if (dryRun) return NextResponse.json({ dryRun: true, wouldFlag: fid, staysIn: frow.status, logEntry: fEntry })
+
+      const { error: upErr } = await supabase.from('content_queue_items')
+        .update({ feedback_log: [...((frow.feedback_log as unknown[]) ?? []), fEntry] })
+        .eq('id', fid)
+      if (upErr) return NextResponse.json({ error: upErr.message }, { status: 400 })
+
+      return NextResponse.json({ success: true, id: fid, flagged: true, status: frow.status, note })
+    }
+
+
+    if (!isTransition(action)) return NextResponse.json({ error: `"${action}" is not a transition.` }, { status: 400 })
     const rule = TRANSITIONS[action]
 
     // ── placing a brief creates the row ──
