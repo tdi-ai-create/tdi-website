@@ -112,14 +112,21 @@ export async function GET(request: NextRequest) {
     }
   }
 
+  // Our own addresses are not somebody's work. The sandbox creator and the test
+  // accounts live on teachersdeserveit.com and are deliberately suppressed, so
+  // telling Bella about them is noise that teaches her to skim these.
+  const suppressedForAPerson = results.suppressed.filter(
+    (line) => !line.includes('@teachersdeserveit.com')
+  );
+
   // Suppression is the one a person has to act on: nothing we send reaches them
   // and no amount of resending changes that.
-  if (!dryRun && results.suppressed.length > 0) {
+  if (!dryRun && suppressedForAPerson.length > 0) {
     slackNotify(
       'bella',
-      `${results.suppressed.length} email${results.suppressed.length === 1 ? '' : 's'} never left our email provider. ` +
+      `${suppressedForAPerson.length} email${suppressedForAPerson.length === 1 ? '' : 's'} never left our email provider. ` +
         `The address is on Resend's suppression list, so nothing we send arrives and sending again will not help. ` +
-        `These people have not seen anything from us:\n${results.suppressed.map((s) => `\n- ${s}`).join('')}` +
+        `These people have not seen anything from us:\n${suppressedForAPerson.map((s) => `\n- ${s}`).join('')}` +
         `\n\nThey need a working address, or the suppression lifted in Resend once the mailbox is known good.`
     );
   }
