@@ -18,24 +18,39 @@ import type { ContactRole } from '@/types/leads';
 /** Pages 1 to 3. Public, no email required, safe to link anywhere. */
 export const FOCUS_PACKET_PREVIEW_PATH = '/downloads/the-focus-packet-preview.pdf';
 
-/** All 21 pages. Only linked after the form is submitted, and in the email. */
+/** Every page. Only linked after the form is submitted, and in the email. */
 export const FOCUS_PACKET_FULL_PATH = '/downloads/the-focus-packet.pdf';
 
-/** What a visitor can read before being asked for anything. */
+/**
+ * What a visitor can read before being asked for anything. Each entry is one
+ * page, in order, and pairs with the image of that page on the section.
+ */
 export const FOCUS_PACKET_PREVIEW_PAGES = [
-  'What The Focus is, and everything the packet contains',
-  'An example school year, and what it adds up to',
-  'How a building picks its one topic',
+  {
+    image: '/downloads/focus-preview/page-1.png',
+    label: 'What The Focus is, and everything the packet contains',
+  },
+  {
+    image: '/downloads/focus-preview/page-2.png',
+    label: 'An example school year, and what it adds up to',
+  },
+  {
+    image: '/downloads/focus-preview/page-3.png',
+    label: 'Whether you draw the line around a building or a role',
+  },
 ] as const;
+
+/** Pages 1 to 3 are rendered at this size. Letter, 100 dots per inch. */
+export const FOCUS_PACKET_PREVIEW_IMAGE = { width: 850, height: 1100 } as const;
 
 /** What the form unlocks. Used on the page, in the reveal, and in the email. */
 export const FOCUS_PACKET_GATED_CONTENTS = [
   'Three of the 13 tools, laid out exactly as staff receive them, with one of them also in Spanish',
-  'Three administrator session guides: one for a building with a couple of paras, one for a group of ten, one for ten groups running at once',
+  'The guide for running the ninety minutes: the agenda, who does what, the four adaptation questions and the reflection sheet',
 ] as const;
 
-export const FOCUS_PACKET_TOTAL_PAGES = 21;
-export const FOCUS_PACKET_GATED_PAGES = 18;
+export const FOCUS_PACKET_TOTAL_PAGES = 12;
+export const FOCUS_PACKET_GATED_PAGES = 9;
 
 export const FOCUS_PACKET_ROLES = [
   'Principal',
