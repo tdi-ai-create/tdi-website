@@ -17,6 +17,7 @@
 import { SITE_URL } from './reengagement-config';
 import { phaseRank } from './creator-phases';
 import { isActionable } from './creator-rules';
+import { isOursToDo } from './creator-turn';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 type DbClient = any;
@@ -202,7 +203,11 @@ export async function loadTeamWork(
 
   for (const r of all) {
     const ms = r.milestones;
-    if (!ms || !ms.requires_team_action || ms.is_collapsed_into) continue;
+    // "Is this ours" comes from lib/creator-turn.ts, not from reading the column
+    // here. Four files once answered this question four ways, and the board told
+    // Bella a step was ours while the creator page called it theirs.
+    if (!ms || ms.is_collapsed_into) continue;
+    if (!isOursToDo({ requiresTeamAction: ms.requires_team_action })) continue;
     if (!isActionable(r.status)) continue;
 
     const creator = byId.get(r.creator_id) as Record<string, any> | undefined;
@@ -257,12 +262,20 @@ export function formatTeamWork(items: TeamWorkItem[]): string {
 
   const lines = items.map((i) => {
     const promised = i.creatorSees ? `\n_They are being told: ${i.creatorSees}_` : '';
+    // Agent work nobody has been asked for is not "with Lily". Saying so is
+    // what let this look handled while it sat still.
     const label =
+      i.kind === 'agent' && i.agentNeverAsked ? `nobody, needs an owner (was labelled ${i.who})` :
       i.kind === 'agent' ? `${i.who}, agent work` :
       i.kind === 'human' ? `${i.who}, a person` :
       'nobody, needs an owner';
+    // This used to read "Agent work does not start on its own yet", which is
+    // how a gap becomes permanent: it describes the situation, promises nothing,
+    // and asks nobody for anything. Katie Welch sat on Lily's build step with
+    // that sentence next to it. It now says who has to move and what happens if
+    // nobody does.
     const stalled = i.agentNeverAsked
-      ? '\n_No record of this agent ever being asked. Agent work does not start on its own yet._'
+      ? `\n*Nothing will pick this up.* No job hands work to ${i.who}, so this stays here until a person does it or reassigns it. It is not in progress.`
       : '';
 
     // Do not describe work that is not there. Until 21 August this said "edit
