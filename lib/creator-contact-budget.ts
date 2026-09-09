@@ -19,10 +19,15 @@
 // asd4.org) where filtering is aggressive. Repeatedly mailing an address that
 // has never engaged is how a sender teaches a spam filter to bury it, so the
 // most likely effect of the fourth email is to reduce the chance the fifth
-// arrives. We cannot even check: creator_email_log records that we sent and
-// never what happened next.
+// arrives.
 //
-// So: somebody who has never signed in hears from us at most once a fortnight,
+// Two rules, then. An address that has hard bounced or reported us as spam is
+// never written to again by anything, because nothing will reach it and the
+// attempt damages delivery for everyone else on that domain. That rule only has
+// teeth now that /api/webhooks/resend records what happened to a message: before
+// that, creator_email_log recorded that we sent and never what happened next.
+//
+// And: somebody who has never signed in hears from us at most once a fortnight,
 // across everything. Somebody who has signed in is unaffected, because they are
 // engaged and the individual crons already have their own rules. An email an
 // admin deliberately sends is never blocked, because a person chose it.
@@ -96,16 +101,56 @@ export async function loadContactGate(supabase: DbClient): Promise<ContactGate> 
     console.error('[contact-budget] Could not read the email log, allowing all sends:', String((e as Error).message ?? e));
   }
 
-  const healthy = signInLookupOk && logLookupOk;
+  // Addresses that have hard bounced or reported us as spam, ever. Deliberately
+  // not bounded to the fortnight: an address that did not exist in June does not
+  // start existing in September, and mail to it is pure sender-reputation damage
+  // that harms delivery to everybody else on the same domain.
+  const undeliverable = new Map<string, string>();
+  let bounceLookupOk = true;
+
+  try {
+    const { data, error } = await supabase
+      .from('creator_email_log')
+      .select('creator_email, bounced_at, complained_at, bounce_reason')
+      .or('bounced_at.not.is.null,complained_at.not.is.null');
+    if (error) throw new Error(error.message);
+    for (const row of (data ?? []) as Array<{
+      creator_email: string; bounced_at: string | null; complained_at: string | null; bounce_reason: string | null;
+    }>) {
+      if (!row.creator_email) continue;
+      undeliverable.set(
+        row.creator_email.trim().toLowerCase(),
+        row.complained_at ? 'reported a previous email as spam' : `a previous email bounced: ${row.bounce_reason ?? 'no reason given'}`,
+      );
+    }
+  } catch (e) {
+    bounceLookupOk = false;
+    console.error('[contact-budget] Could not read delivery outcomes, allowing all sends:', String((e as Error).message ?? e));
+  }
+
+  const healthy = signInLookupOk && logLookupOk && bounceLookupOk;
 
   return {
     signedInCount: signedIn.size,
     may(email, opts) {
       if (!healthy) return { ok: true };
-      if (opts?.deliberate) return { ok: true };
       if (!email) return { ok: true };
 
       const key = email.trim().toLowerCase();
+
+      // Checked before the deliberate escape hatch and before the sign-in test,
+      // because a dead address is dead no matter who pressed send or how engaged
+      // its owner used to be. The way out is to correct the address, not to send
+      // again: a corrected address is a different key and is not held.
+      const dead = undeliverable.get(key);
+      if (dead) {
+        return {
+          ok: false,
+          reason: `${dead}. Nothing will reach this address. Correct the email on the creator record, then send.`,
+        };
+      }
+
+      if (opts?.deliberate) return { ok: true };
       if (signedIn.has(key)) return { ok: true };
 
       const last = lastContact.get(key);

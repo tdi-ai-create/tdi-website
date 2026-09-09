@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { logCreatorEmail } from '@/lib/creator-email-log';
+import { logCreatorEmail, resendMessageId } from '@/lib/creator-email-log';
 import { creatorEmailTemplate } from '@/lib/creator-email-template';
 import { guardCron } from '@/lib/cron-guard';
 import { classifyRoster, GateVerdict } from '@/lib/agreement-gate';
@@ -120,12 +120,17 @@ async function closeCreator(
 
   // Send before closing. If the send fails we leave the account alone and try
   // again tomorrow, rather than closing someone silently.
+  // Hoisted so the log entry below can carry it: the send happens here and the
+  // logging happens after the close, and without this the id is lost in between.
+  let providerId: string | null = null;
+
   if (verdict.email && resendApiKey) {
     const sent = await sendEmail(resendApiKey, verdict.email, subject, html);
-    if (!sent) {
+    if (!sent.ok) {
       results.errors.push(`Send failed for ${verdict.email}, not closing`);
       return false;
     }
+    providerId = sent.providerId;
     results.emailsSent++;
   } else {
     results.errors.push(`No email or no Resend key for ${verdict.name}, not closing`);
@@ -165,18 +170,25 @@ async function closeCreator(
     category: 'agreement_gate_close',
     subject,
     sent_by: 'cron:creator-agreement-gate',
+    provider_id: providerId,
   });
 
   console.log(`[agreement-gate] Closed ${verdict.name} (${verdict.reason})`);
   return true;
 }
 
+/**
+ * Returns the Resend message id on success so /api/webhooks/resend can record
+ * whether this arrived. This one matters more than most: it is the closing
+ * notice, and a bounce means somebody's account was closed by a message they
+ * never received.
+ */
 async function sendEmail(
   apiKey: string,
   to: string,
   subject: string,
   html: string
-): Promise<boolean> {
+): Promise<{ ok: boolean; providerId: string | null }> {
   try {
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
@@ -193,11 +205,11 @@ async function sendEmail(
 
     if (!res.ok) {
       console.error('[agreement-gate] Resend error:', await res.json());
-      return false;
+      return { ok: false, providerId: null };
     }
-    return true;
+    return { ok: true, providerId: await resendMessageId(res) };
   } catch (e) {
     console.error('[agreement-gate] Send error:', e);
-    return false;
+    return { ok: false, providerId: null };
   }
 }

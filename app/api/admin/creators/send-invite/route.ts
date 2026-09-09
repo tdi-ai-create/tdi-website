@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServiceSupabase } from '@/lib/supabase';
 import { requireAdminAuth } from '@/lib/tdi-admin/auth';
 import { creatorEmailTemplate } from '@/lib/creator-email-template';
-import { logCreatorEmail } from '@/lib/creator-email-log';
+import { logCreatorEmail, resendMessageId } from '@/lib/creator-email-log';
 
 /**
  * POST /api/admin/creators/send-invite
@@ -171,6 +171,7 @@ export async function POST(request: NextRequest) {
       subject,
       sent_by: `admin:${adminEmail}`,
       dry_run: false,
+      provider_id: await resendMessageId(res),
     });
 
     return NextResponse.json({ success: true, sentTo: creator.email, subject, openStep: stepName });

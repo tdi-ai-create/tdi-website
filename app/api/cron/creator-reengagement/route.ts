@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { logCreatorEmail } from '@/lib/creator-email-log';
+import { logCreatorEmail, resendMessageId } from '@/lib/creator-email-log';
 import { creatorEmailTemplate } from '@/lib/creator-email-template';
 import { randomBytes } from 'crypto';
 import { unpauseUrl } from '@/lib/reengagement-config';
@@ -358,7 +358,7 @@ export async function GET(request: NextRequest) {
 
           const sent = await sendEmail(resendApiKey, creator.email, subject, html);
 
-          if (sent) {
+          if (sent.ok) {
             results.emailsSent++;
 
             if (nextStep === 6) {
@@ -409,6 +409,7 @@ export async function GET(request: NextRequest) {
               subject,
               step: nextStep,
               sent_by: 'cron:creator-reengagement',
+              provider_id: sent.providerId,
             });
             console.log(`[reengagement] Sent step ${nextStep} email to ${creator.email}`);
           } else {
@@ -500,7 +501,7 @@ export async function GET(request: NextRequest) {
 
         const sent = await sendEmail(resendApiKey, creator.email, subject, html);
 
-        if (sent) {
+        if (sent.ok) {
           // Create the sequence record
           await checkedWrite(
             `insert sequence for ${creator.email}`,
@@ -544,6 +545,7 @@ export async function GET(request: NextRequest) {
             subject,
             step: 0,
             sent_by: 'cron:creator-reengagement',
+            provider_id: sent.providerId,
           });
 
           results.sequencesStarted++;
@@ -574,12 +576,16 @@ export async function GET(request: NextRequest) {
 // Helpers
 // ---------------------------------------------------------------------------
 
+/**
+ * Returns the Resend message id on success so /api/webhooks/resend can record
+ * whether this arrived. A success with no id is still a success.
+ */
 async function sendEmail(
   apiKey: string,
   to: string,
   subject: string,
   html: string
-): Promise<boolean> {
+): Promise<{ ok: boolean; providerId: string | null }> {
   try {
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
@@ -600,12 +606,12 @@ async function sendEmail(
     if (!res.ok) {
       const err = await res.json();
       console.error('[reengagement] Resend error:', err);
-      return false;
+      return { ok: false, providerId: null };
     }
-    return true;
+    return { ok: true, providerId: await resendMessageId(res) };
   } catch (e) {
     console.error('[reengagement] Email send error:', e);
-    return false;
+    return { ok: false, providerId: null };
   }
 }
 

@@ -59,8 +59,9 @@ export async function POST(request: NextRequest) {
     .eq('provider_id', providerId)
     .maybeSingle();
 
-  // Not one of ours. Resend carries other TDI mail too.
-  if (!msg) return NextResponse.json({ ok: true, ignored: 'not a billing message' });
+  // Not an invoice. Before giving up, check the creator mail, which travels
+  // through the same Resend account and was silently dropped here until now.
+  if (!msg) return await recordCreatorEvent(sb, { providerId, type, occurredAt, data });
 
   // The audit trail is the point of this endpoint. If the insert fails we must know,
   // not carry on updating the summary as though the event was recorded.
@@ -126,4 +127,84 @@ export async function POST(request: NextRequest) {
   if (error) console.error('[resend-webhook] could not record event:', error.message);
 
   return NextResponse.json({ ok: true, recorded: type });
+}
+
+/**
+ * What happened to a creator email.
+ *
+ * Until this existed, every creator event arriving here was answered with "not a
+ * billing message" and thrown away. creator_email_log recorded that we sent and
+ * never what happened next, which is how nine creators came to look as though
+ * they had been ignoring us for months while nobody had checked whether a single
+ * message reached them.
+ *
+ * A bounce here is the most valuable event we receive. It is the difference
+ * between "they are not engaging" and "they have never seen anything we sent",
+ * and those call for opposite responses.
+ */
+async function recordCreatorEvent(
+  sb: ReturnType<typeof getServiceSupabase>,
+  ev: { providerId: string; type: string; occurredAt: string | null; data: any },
+) {
+  const { providerId, type, occurredAt, data } = ev;
+
+  const { data: msg, error: lookupError } = await sb
+    .from('creator_email_log')
+    .select('id, creator_name, creator_email, category, subject, bounced_at, opened_at')
+    .eq('provider_id', providerId)
+    .maybeSingle();
+
+  if (lookupError) {
+    // Returning 200 here would tell Resend the event was handled and stop it
+    // retrying, losing the event for good.
+    console.error('[resend-webhook] creator lookup failed:', lookupError.message);
+    return NextResponse.json({ error: 'Lookup failed' }, { status: 500 });
+  }
+
+  // Genuinely not ours. Resend carries other TDI mail too.
+  if (!msg) return NextResponse.json({ ok: true, ignored: 'not a tracked message' });
+
+  const at = occurredAt ?? new Date().toISOString();
+  const patch: Record<string, unknown> = { last_event: type, last_event_at: at };
+  const who = msg.creator_name || msg.creator_email;
+
+  switch (type) {
+    case 'email.delivered':
+      patch.delivered_at = at;
+      break;
+
+    case 'email.bounced': {
+      const reason = data.bounce?.message ?? data.reason ?? 'No reason given';
+      patch.bounced_at = at;
+      patch.bounce_reason = String(reason).slice(0, 500);
+      // Only on the first bounce for this message: providers retry events, and
+      // Bella does not need the same bad address three times.
+      if (!msg.bounced_at) {
+        slackNotify('bella',
+          `Email never arrived: "${msg.subject}" to ${who} bounced. ${reason}. ` +
+          `They have not seen it, so this is not them ignoring us. ` +
+          `Nothing further will be sent to that address until it is fixed.`);
+      }
+      break;
+    }
+
+    case 'email.complained':
+      patch.complained_at = at;
+      slackNotify('bella',
+        `Marked as spam: "${msg.subject}" by ${who}. Stop sending to this address until someone speaks to them.`);
+      break;
+
+    case 'email.opened':
+      // First open only. Somebody rereading a reminder is not news.
+      if (!msg.opened_at) patch.opened_at = at;
+      break;
+  }
+
+  const { error } = await sb.from('creator_email_log').update(patch).eq('id', msg.id);
+  if (error) {
+    console.error('[resend-webhook] could not record creator event:', error.message);
+    return NextResponse.json({ error: 'Could not record event' }, { status: 500 });
+  }
+
+  return NextResponse.json({ ok: true, recorded: type, creator: who });
 }

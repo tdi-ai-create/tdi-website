@@ -4,7 +4,7 @@ import { guardCron } from '@/lib/cron-guard';
 import { loadContactGate } from '@/lib/creator-contact-budget';
 import { classifyClocks, STEP_REMINDERS_ENABLED, type ClockVerdict } from '@/lib/creator-clocks';
 import { creatorEmailTemplate } from '@/lib/creator-email-template';
-import { logCreatorEmail } from '@/lib/creator-email-log';
+import { logCreatorEmail, resendMessageId } from '@/lib/creator-email-log';
 import { postCreatorMessage } from '@/lib/creator-slack';
 import { SITE_URL } from '@/lib/reengagement-config';
 
@@ -108,8 +108,8 @@ export async function GET(request: NextRequest) {
       if (suppressed) continue;
 
       const { subject, html } = reminderEmail(v);
-      const ok = await send(subject, html, v.creatorEmail);
-      if (!ok) {
+      const sent = await send(subject, html, v.creatorEmail);
+      if (!sent.ok) {
         results.errors.push(`Send failed for ${v.creatorName}`);
         continue;
       }
@@ -137,6 +137,7 @@ export async function GET(request: NextRequest) {
         category: 'step_reminder',
         subject,
         sent_by: 'cron:creator-step-reminders',
+        provider_id: sent.providerId,
       });
 
       results.sent++;
@@ -176,9 +177,15 @@ export async function GET(request: NextRequest) {
   }
 }
 
-async function send(subject: string, html: string, to: string): Promise<boolean> {
+/**
+ * Returns the Resend message id on success, which is what lets
+ * /api/webhooks/resend tell us later whether this actually arrived. A send that
+ * succeeds without an id is still a success: we lose delivery tracking on that
+ * one message, which must never be confused with failing to send it.
+ */
+async function send(subject: string, html: string, to: string): Promise<{ ok: boolean; providerId: string | null }> {
   const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) return false;
+  if (!apiKey) return { ok: false, providerId: null };
   try {
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
@@ -194,11 +201,11 @@ async function send(subject: string, html: string, to: string): Promise<boolean>
     });
     if (!res.ok) {
       console.error('[step-reminders] Resend error:', await res.text());
-      return false;
+      return { ok: false, providerId: null };
     }
-    return true;
+    return { ok: true, providerId: await resendMessageId(res) };
   } catch (e) {
     console.error('[step-reminders] Send failed:', e);
-    return false;
+    return { ok: false, providerId: null };
   }
 }

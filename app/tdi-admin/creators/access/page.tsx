@@ -23,7 +23,9 @@ type Row = {
   accountMade: string | null;
   lastSignIn: string | null;
   lastInviteSent: string | null;
-  blocker: 'no_account' | 'never_invited' | 'invited_not_arrived' | null;
+  bounceReason: string | null;
+  mailConfirmedDelivered: boolean;
+  blocker: 'no_account' | 'never_invited' | 'email_bounced' | 'invited_not_arrived' | null;
 }
 
 interface Finding {
@@ -52,6 +54,10 @@ const BLOCKER_COPY: Record<string, { label: string; why: string }> = {
   never_invited: {
     label: 'Never sent a way in',
     why: 'The account works. Nobody has ever sent them a link.',
+  },
+  email_bounced: {
+    label: 'The email never reached them',
+    why: 'Our mail bounced off this address, so they have not seen anything we sent and are not ignoring us. Sending again will bounce again. Get a working address, correct it on their record, then invite.',
   },
   invited_not_arrived: {
     label: 'Invited, not arrived',
@@ -336,6 +342,11 @@ export default function CreatorAccessPage() {
 
                 {c.blocker === 'no_account' ? (
                   <span style={{ fontSize: 13, color: '#a32c2c', fontWeight: 600 }}>Needs an account first</span>
+                ) : c.blocker === 'email_bounced' ? (
+                  // No invite button here on purpose. The address is dead, so the
+                  // button's only possible outcome is another bounce, and offering
+                  // it invites somebody to spend the afternoon resending.
+                  <span style={{ fontSize: 13, color: '#a32c2c', fontWeight: 600 }}>Needs a working email first</span>
                 ) : (
                   <CreatorInviteButton
                     creatorId={c.id}
@@ -350,6 +361,20 @@ export default function CreatorAccessPage() {
               <p style={{ fontSize: 13.5, color: '#4d587a', margin: '10px 0 0', lineHeight: 1.5 }}>
                 <strong style={{ color: '#1e2749' }}>{BLOCKER_COPY[c.blocker!].label}.</strong>{' '}
                 {BLOCKER_COPY[c.blocker!].why}
+                {c.bounceReason && (
+                  <>
+                    {' '}
+                    <span style={{ color: '#a32c2c' }}>What the mail server said: {c.bounceReason}</span>
+                  </>
+                )}
+                {/* Only shown when a delivery event actually came back. No badge
+                    means we do not know, which is not the same as bad news. */}
+                {c.mailConfirmedDelivered && c.blocker === 'invited_not_arrived' && (
+                  <>
+                    {' '}
+                    <span style={{ color: '#2f6f4f' }}>Our mail is reaching them: an earlier email was confirmed delivered.</span>
+                  </>
+                )}
               </p>
             </div>
           ))}

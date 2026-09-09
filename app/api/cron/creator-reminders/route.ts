@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { logCreatorEmail } from '@/lib/creator-email-log';
+import { logCreatorEmail, resendMessageId } from '@/lib/creator-email-log';
 import { CREATOR_STUDIO_BCC } from '@/lib/creator-notification-recipients';
 import { guardCron, checkedWrite } from '@/lib/cron-guard';
 
@@ -228,6 +228,7 @@ export async function GET(request: NextRequest) {
                   category: 'countdown_reminder',
                   subject: `You're ${daysLabel} from your launch goal`,
                   sent_by: 'cron:creator-reminders',
+                  provider_id: await resendMessageId(emailResponse),
                   metadata: {
                     reminder_type: interval.type,
                     days: daysUntilTarget,

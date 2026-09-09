@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { logCreatorEmail } from '@/lib/creator-email-log';
+import { logCreatorEmail, resendMessageId } from '@/lib/creator-email-log';
 import {
   AGREEMENT_COLUMNS,
   blocksPublish,
@@ -270,7 +270,7 @@ export async function POST(request: NextRequest) {
 
           const celebrationSubject = `Creator Studio | You're officially published, ${firstName}!`;
 
-          await fetch('https://api.resend.com/emails', {
+          const res = await fetch('https://api.resend.com/emails', {
             method: 'POST',
             headers: {
               Authorization: `Bearer ${resendApiKey}`,
@@ -286,15 +286,22 @@ export async function POST(request: NextRequest) {
             }),
           });
 
-          await logCreatorEmail({
-            creator_id: creatorId,
-            creator_name: data.name,
-            creator_email: data.email,
-            direction: 'to_creator',
-            category: 'publish_celebration',
-            subject: celebrationSubject,
-            sent_by: 'system:publish',
-          });
+          // This response was previously never looked at, so a rejected send was
+          // still written to the log as though the creator had been congratulated.
+          if (!res.ok) {
+            console.error('[publish-celebration] Resend rejected the send:', res.status, await res.text());
+          } else {
+            await logCreatorEmail({
+              creator_id: creatorId,
+              creator_name: data.name,
+              creator_email: data.email,
+              direction: 'to_creator',
+              category: 'publish_celebration',
+              subject: celebrationSubject,
+              sent_by: 'system:publish',
+              provider_id: await resendMessageId(res),
+            });
+          }
         }
       } catch (celebrationError) {
         // Non-blocking — don't fail the publish over a celebration email

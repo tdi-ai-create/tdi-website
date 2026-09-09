@@ -215,6 +215,54 @@ export async function findOrphanedWork(
     }
   }
 
+  // --- Delivery tracking ----------------------------------------------------
+
+  // 6. Is anything telling us what happens to the mail we send?
+  //
+  //    This rule exists because of how it was found. /api/webhooks/resend was
+  //    written for invoices, is correct, and had recorded exactly zero events
+  //    since the day it shipped, because RESEND_WEBHOOK_SECRET was never set and
+  //    Resend was never pointed at it. Nothing noticed, because a thing that
+  //    silently does nothing looks identical to a thing with nothing to do.
+  //
+  //    So the check is not "did an email bounce". It is "given that we have been
+  //    sending, are outcomes coming back at all". A week of sends with no event
+  //    of any kind means the pipe is disconnected again.
+  const deliveryWindow = new Date(Date.now() - 7 * 86400000).toISOString();
+  const { data: recentMail, error: mailErr } = await supabase
+    .from('creator_email_log')
+    .select('provider_id, last_event, sent_at')
+    .eq('dry_run', false)
+    .gte('sent_at', deliveryWindow);
+
+  if (mailErr) {
+    errors.push(`delivery tracking: ${mailErr.message}`);
+  } else {
+    const real = recentMail ?? [];
+    const withId = real.filter((r: any) => r.provider_id);
+    const withEvent = real.filter((r: any) => r.last_event);
+
+    // Only meaningful once something has actually been sent. A quiet week is
+    // not a broken webhook.
+    if (real.length >= 3) {
+      if (withId.length === 0) {
+        findings.push({
+          rule: 'delivery_tracking_dark',
+          what: `${real.length} creator emails sent this week, none with a provider id`,
+          why: 'No send site is recording the Resend message id, so no delivery outcome can ever be matched back. "We emailed them" cannot be checked.',
+          where: 'Creator Studio',
+        });
+      } else if (withEvent.length === 0) {
+        findings.push({
+          rule: 'delivery_tracking_dark',
+          what: `${withId.length} creator emails sent this week, not one delivery event received`,
+          why: 'Ids are being recorded but nothing is coming back, so Resend is not reaching /api/webhooks/resend. Check RESEND_WEBHOOK_SECRET is set and the endpoint is still configured in Resend.',
+          where: 'Creator Studio',
+        });
+      }
+    }
+  }
+
   return { findings, errors };
 }
 

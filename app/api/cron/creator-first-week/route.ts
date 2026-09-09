@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { logCreatorEmail } from '@/lib/creator-email-log';
+import { logCreatorEmail, resendMessageId } from '@/lib/creator-email-log';
 import { creatorEmailTemplate } from '@/lib/creator-email-template';
 import { guardCron } from '@/lib/cron-guard';
 import { loadContactGate } from '@/lib/creator-contact-budget';
@@ -176,6 +176,7 @@ export async function GET(request: NextRequest) {
             category: 'first_week_momentum',
             subject,
             sent_by: 'cron:creator-first-week',
+            provider_id: await resendMessageId(res),
           });
           sent++;
           console.log(`[first-week] Sent momentum email to ${creator.email}`);

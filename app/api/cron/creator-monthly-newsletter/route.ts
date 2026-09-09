@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { logCreatorEmail } from '@/lib/creator-email-log';
+import { logCreatorEmail, resendMessageId } from '@/lib/creator-email-log';
 import { guardCron } from '@/lib/cron-guard';
 import { loadContactGate } from '@/lib/creator-contact-budget';
 import { isWaitingOnUs } from '@/lib/creator-turn';
@@ -513,6 +513,7 @@ export async function GET(request: NextRequest) {
             category: 'monthly_newsletter',
             subject,
             sent_by: 'cron:creator-monthly-newsletter',
+            provider_id: await resendMessageId(res),
           });
           sent++;
         }

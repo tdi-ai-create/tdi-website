@@ -16,7 +16,7 @@ import { requireAdminAuth } from '@/lib/tdi-admin/auth';
  * cleared. It should read all-clear most of the time and go loud when it does not.
  */
 
-type Blocker = 'no_account' | 'never_invited' | 'invited_not_arrived' | null;
+type Blocker = 'no_account' | 'never_invited' | 'email_bounced' | 'invited_not_arrived' | null;
 
 export async function GET() {
   // Verifies the session cookie, not a header. This lists every creator with
@@ -73,14 +73,53 @@ export async function GET() {
     if (row.creator_id && !lastInvite.has(row.creator_id)) lastInvite.set(row.creator_id, row.sent_at);
   }
 
+  // Mail we know never arrived.
+  //
+  // "Invited but never signed in" was an inference: we recorded that we sent and
+  // never what happened next, so somebody whose invite bounced looked exactly
+  // like somebody ignoring it. Those need opposite responses, and only one of
+  // them is the creator's doing.
+  const { data: bounces } = await supabase
+    .from('creator_email_log')
+    .select('creator_email, bounced_at, bounce_reason')
+    .not('bounced_at', 'is', null)
+    .order('bounced_at', { ascending: false });
+
+  const bounced = new Map<string, string>();
+  for (const row of bounces || []) {
+    if (!row.creator_email) continue;
+    const key = row.creator_email.trim().toLowerCase();
+    if (!bounced.has(key)) bounced.set(key, row.bounce_reason || 'No reason given');
+  }
+
+  // Mail we know did land. Kept separate from "no bounce recorded", which is not
+  // the same thing and was not knowable at all until delivery tracking existed.
+  // Reporting "it was delivered" off the back of silence would be a guess wearing
+  // the clothes of a fact.
+  const { data: delivereds } = await supabase
+    .from('creator_email_log')
+    .select('creator_email')
+    .not('delivered_at', 'is', null);
+
+  const confirmedDelivered = new Set<string>(
+    (delivereds || [])
+      .map((r: { creator_email: string | null }) => r.creator_email?.trim().toLowerCase())
+      .filter(Boolean) as string[]
+  );
+
   const rows = (creators || []).map((c) => {
     const auth = c.email ? authByEmail.get(c.email.toLowerCase()) : undefined;
     const signedIn = Boolean(auth?.last_sign_in_at);
     const everSentSomething = Boolean(auth?.recovery_sent_at) || lastInvite.has(c.id);
 
+    const bounceReason = c.email ? bounced.get(c.email.trim().toLowerCase()) ?? null : null;
+
     let blocker: Blocker = null;
     if (!auth) blocker = 'no_account';
     else if (!signedIn && !everSentSomething) blocker = 'never_invited';
+    // Checked before invited_not_arrived, which would otherwise absorb it and
+    // read as "they have not got round to it".
+    else if (!signedIn && bounceReason) blocker = 'email_bounced';
     else if (!signedIn) blocker = 'invited_not_arrived';
 
     return {
@@ -93,6 +132,8 @@ export async function GET() {
       accountMade: auth?.created_at ?? null,
       lastSignIn: auth?.last_sign_in_at ?? null,
       lastInviteSent: lastInvite.get(c.id) ?? null,
+      bounceReason,
+      mailConfirmedDelivered: c.email ? confirmedDelivered.has(c.email.trim().toLowerCase()) : false,
       blocker,
     };
   });
@@ -106,6 +147,7 @@ export async function GET() {
     byBlocker: {
       no_account: rows.filter((r) => r.blocker === 'no_account').length,
       never_invited: rows.filter((r) => r.blocker === 'never_invited').length,
+      email_bounced: rows.filter((r) => r.blocker === 'email_bounced').length,
       invited_not_arrived: rows.filter((r) => r.blocker === 'invited_not_arrived').length,
     },
     creators: rows,
