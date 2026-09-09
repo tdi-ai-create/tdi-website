@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 
@@ -21,15 +21,25 @@ export default function CarouselPreview() {
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
-  useEffect(() => {
-    if (!id) return
+  // Same shape as the calendar page: the load lives in a callback so the effect
+  // only calls it, rather than setting state in the effect body.
+  const load = useCallback(async (which: string) => {
     setLoading(true)
-    fetch(`/api/tdi-admin/carousel-preview?id=${encodeURIComponent(id)}`)
-      .then(r => r.json())
-      .then(j => { if (j.error) setError(j.error); else setData(j) })
-      .catch(e => setError(String(e)))
-      .finally(() => setLoading(false))
-  }, [id])
+    setError(null)
+    try {
+      const res = await fetch(`/api/tdi-admin/carousel-preview?id=${encodeURIComponent(which)}`)
+      const json = await res.json()
+      if (!res.ok) throw new Error(json.error || 'Failed to load the carousel')
+      setData(json)
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Failed to load the carousel')
+      setData(null)
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  useEffect(() => { if (id) load(id) }, [id, load])
 
   return (
     <div className="p-6 max-w-[1200px] mx-auto">
@@ -74,7 +84,9 @@ export default function CarouselPreview() {
             <div className="flex gap-4 overflow-x-auto pb-4">
               {data.slides.map(s => (
                 <figure key={s.index} className="shrink-0 w-[240px]">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  {/* A plain img on purpose: these are generated PNGs at a
+                      known size, so next/image would add a pass over them for
+                      no benefit. */}
                   <img
                     src={`/api/tdi-admin/carousel-preview?id=${encodeURIComponent(data.id)}&slide=${s.index}`}
                     alt={`Slide ${s.index} of ${data.slide_count}`}
