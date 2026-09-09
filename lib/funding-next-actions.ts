@@ -25,6 +25,7 @@
 import { readSchoolProfile } from '@/lib/funding/school-profile'
 import { callTriggerFor } from '@/lib/funding/call-escalation'
 import { DRAFT_SILENCE_HOURS } from './funding-rules'
+import { isSchoolOwned } from './funding-ownership'
 
 export type ActionOwner = 'team' | 'agent' | 'school' | 'auto'
 export type ActionUrgency = 'critical' | 'high' | 'normal' | 'low'
@@ -235,7 +236,7 @@ export function computeNextActions(
     if (due >= today) continue
 
     const daysOverdue = Math.floor((today.getTime() - due.getTime()) / (1000 * 60 * 60 * 24))
-    const isClientOwned = a.owner_type === 'client'
+    const isClientOwned = isSchoolOwned(a)
     const alreadyNudged = (a.nudge_count || 0) > 0
 
     result.push({
@@ -265,7 +266,7 @@ export function computeNextActions(
     if (due < today) continue // already handled above as overdue
 
     const daysUntil = Math.floor((due.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
-    const isClientOwned = a.owner_type === 'client'
+    const isClientOwned = isSchoolOwned(a)
     const isRaeOwned = a.owner_email === 'rae@teachersdeserveit.com'
 
     result.push({
@@ -285,7 +286,7 @@ export function computeNextActions(
   // Pending actions without due dates
   for (const a of pendingActions) {
     if (a.due_date) continue // already handled above
-    const isClientOwned = a.owner_type === 'client'
+    const isClientOwned = isSchoolOwned(a)
     const isRaeOwned = a.owner_email === 'rae@teachersdeserveit.com'
 
     result.push({
@@ -800,7 +801,7 @@ export function computeNextActions(
 
   // Client-owned actions already nudged
   for (const a of pendingActions) {
-    if (a.owner_type !== 'client') continue
+    if (!isSchoolOwned(a)) continue
     if ((a.nudge_count || 0) === 0) continue
     const due = a.due_date ? new Date(a.due_date + 'T00:00:00') : null
     if (due && due < today) continue // already in critical overdue list
