@@ -305,6 +305,62 @@ export async function placeProject(
     return { ok: false, openStep: null, locked: 0, error: 'Project has no steps' };
   }
 
+  // A signature is a fact, not a submission to review.
+  //
+  // Bella asked on 8 September why she has to approve the Sign Agreement step.
+  // The answer is that she should not, and it was only ever in her queue
+  // because two records of the same fact disagreed. Amy Storer signed on
+  // 28 May: creators.agreement_signed is true and timestamped. Her milestone
+  // row nonetheless sat at waiting_approval from 26 August, appearing on the
+  // Blocked on us list as work owed by TDI, for thirteen days.
+  //
+  // Signing in the portal already completes the step; that path is correct. The
+  // disagreement appears when the row is later moved back to open or into
+  // review while the creator record still says signed. Whatever moves it, the
+  // creator's signature is the authority: there is nothing for a person to
+  // approve about a signature that already exists.
+  //
+  // Reconciled here rather than in one caller, because placement runs nightly
+  // on every board, so any board that drifts back is corrected within a day
+  // instead of waiting for somebody to notice it.
+  const signedButOpen = project.signed
+    ? board.filter((m) => isAgreementStep(m.name) && m.status !== 'completed')
+    : [];
+
+  if (signedButOpen.length > 0) {
+    if (!dryRun) {
+      const { error } = await supabase
+        .from('creator_milestones')
+        .update({
+          status: 'completed',
+          review_status: null,
+          completed_at: new Date().toISOString(),
+          completed_by: 'system:agreement-already-signed',
+          updated_at: new Date().toISOString(),
+        })
+        .in('id', signedButOpen.map((m) => m.recordId));
+
+      if (error) {
+        return {
+          ok: false,
+          openStep: null,
+          locked: 0,
+          error: `Could not close an agreement the creator has already signed: ${error.message}`,
+        };
+      }
+    }
+
+    // Applied to the in-memory board in BOTH modes, and only the write is
+    // skipped in a dry run.
+    //
+    // The first version of this guarded the whole block on !dryRun, so the dry
+    // run still saw the agreement as incomplete and reported Amy Storer landing
+    // on Sign Agreement, which is the opposite of what the real run would do. A
+    // dry run that does not compute the same decision as the real run is worse
+    // than no dry run, because it is trusted.
+    for (const m of signedButOpen) m.status = 'completed';
+  }
+
   // A finished project closes rather than being placed. Everything still hanging
   // open gets locked and nothing new is offered.
   if (project.finished) {
