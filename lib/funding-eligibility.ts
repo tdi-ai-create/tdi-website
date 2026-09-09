@@ -52,6 +52,26 @@ export interface PathContext {
   name: string
   windowStatus?: string | null
   namedApplicant?: string | null   // e.g. the NEA member, where one is required
+  /**
+   * True once the school has actually filed this. Every rule here asks whether
+   * it is safe to start drafting, so all of them are moot afterwards.
+   */
+  alreadySubmitted?: boolean | null
+}
+
+/**
+ * Has this path moved past the point where a pre-draft rule can apply.
+ *
+ * One definition, because all three callers of screenPath need the same answer
+ * and a fourth will arrive eventually.
+ */
+export function isPastDrafting(
+  status?: string | null,
+  clientSubmitted?: boolean | null
+): boolean {
+  if (clientSubmitted === true) return true
+  const s = (status || '').toLowerCase()
+  return ['applied', 'submitted', 'awarded', 'denied'].includes(s)
 }
 
 /** A private or independent school is not in the state accountability system. */
@@ -74,6 +94,25 @@ const NEEDS_TDI_AUTHORIZATION = /(Title I Section 1003)/i
  * outranks an ask.
  */
 export function screenPath(path: PathContext, school: SchoolContext): EligibilityResult {
+  // ── Already filed ──
+  //
+  // Every rule below asks whether it is safe to begin drafting. None of them
+  // means anything once the school has filed, and asserting one anyway puts a
+  // blocker on a card that contradicts the record printed underneath it.
+  //
+  // Allenwood's NEA grant is the live example. Jovita Ortiz submitted it as a
+  // named NEA member on 16 June and Teri confirmed it on the 16th. The audit ran
+  // on 18 August and stamped "must be filed by a named union member and no name
+  // is on file". Bella sent a screenshot of that card asking what the next step
+  // was, with the contradiction sitting in the middle of it.
+  if (path.alreadySubmitted) {
+    return {
+      verdict: 'clear',
+      rule: 'already_submitted',
+      reason: 'Already filed with the funder, so the pre-draft checks no longer apply.',
+    }
+  }
+
   // ── Sector ──
   // The strongest rule we have, and it needs no numbers. A school outside the
   // state accountability system cannot carry a CSI, TSI or ATSI identification

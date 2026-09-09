@@ -12,7 +12,7 @@ import {
   findVoiceProblems,
 } from '@/lib/funding-rules'
 import { postFundingEvent, narrativeEvent } from '@/lib/funding-slack'
-import { screenPath } from '@/lib/funding-eligibility'
+import { screenPath, isPastDrafting } from '@/lib/funding-eligibility'
 
 /**
  * Funding Sync API -- Bridge between Paperclip and the Admin Funding Portal
@@ -115,7 +115,7 @@ export async function GET(request: NextRequest) {
     let narrativeQuery = supabase
       .from('funding_opportunities')
       .select(`
-        id, pursuit_id, name, plan_category, amount,
+        id, pursuit_id, name, plan_category, amount, status, client_submitted,
         narrative_status, narrative_url, assigned_agent,
         window_status, window_opens, window_closes,
         application_opens, application_closes,
@@ -224,6 +224,7 @@ export async function GET(request: NextRequest) {
             name: o.name ?? '',
             windowStatus: o.window_status ?? null,
             namedApplicant: (profile.nea_member_name as string) ?? null,
+            alreadySubmitted: isPastDrafting(o.status, o.client_submitted),
           },
           {
             sector: p?.sector ?? null,
