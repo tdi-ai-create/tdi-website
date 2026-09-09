@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { creatorFlag } from '@/lib/creator-flags';
 import { advanceStep, resolveStepRow } from '@/lib/creator-step-engine';
+import { looksLikeRecordId, wrongIdentifierMessage } from '@/lib/milestone-key';
 
 export async function POST(request: NextRequest) {
   try {
@@ -53,6 +54,15 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (milestoneError) {
+      // Same guard as approve-milestone. Both buttons broke the same way in
+      // September and both reported it as a missing milestone.
+      if (looksLikeRecordId(milestoneId)) {
+        console.error(`[request-revision] Caller sent a record id as milestoneId: ${milestoneId}`);
+        return NextResponse.json(
+          { success: false, error: wrongIdentifierMessage('this route') },
+          { status: 400 },
+        );
+      }
       console.error('[request-revision] Milestone not found:', milestoneError);
       return NextResponse.json(
         { success: false, error: 'Milestone not found' },
