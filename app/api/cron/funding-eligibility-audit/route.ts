@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { guardCron } from '@/lib/cron-guard'
 import { isAgentWindowWork } from '@/lib/funding-window-work'
-import { screenPath, type EligibilityResult } from '@/lib/funding-eligibility'
+import { screenPath, isPastDrafting, type EligibilityResult } from '@/lib/funding-eligibility'
 import { NOT_TERMINAL_FILTER } from '@/lib/funding/task-status'
 
 /**
@@ -102,7 +102,7 @@ export async function GET(request: NextRequest) {
       // the predicate reads undefined, returns false for everything, and the
       // deferral silently does nothing while looking as though it works. The
       // dry run caught exactly that on the first attempt.
-      .select('id, name, pursuit_id, status, research_status, window_status, window_checked_at, next_action, assigned_agent, eligibility_verdict, eligibility_overridden')
+      .select('id, name, pursuit_id, status, client_submitted, research_status, window_status, window_checked_at, next_action, assigned_agent, eligibility_verdict, eligibility_overridden')
 
     if (oErr) {
       console.error('[eligibility-audit] Could not read opportunities:', oErr)
@@ -143,6 +143,7 @@ export async function GET(request: NextRequest) {
           name: opp.name ?? '',
           windowStatus: opp.window_status ?? null,
           namedApplicant: (profile.nea_member_name as string) ?? null,
+          alreadySubmitted: isPastDrafting(opp.status, opp.client_submitted),
         },
         {
           sector: school.sector ?? null,

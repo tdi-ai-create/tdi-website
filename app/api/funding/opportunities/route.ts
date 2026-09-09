@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { NARRATIVE_STATES, isNarrativeState } from '@/lib/funding-rules'
-import { screenPath } from '@/lib/funding-eligibility';
+import { screenPath, isPastDrafting } from '@/lib/funding-eligibility';
 import { createClient } from '@supabase/supabase-js';
 import { requireAdminAuth } from '@/lib/tdi-admin/auth';
 import { postFundingEvent, narrativeEvent, windowEvent, submittedEvent, awardEvent, denialEvent, researchEvent } from '@/lib/funding-slack';
@@ -130,7 +130,7 @@ export async function PATCH(request: NextRequest) {
   ) {
     const { data: oppNow } = await supabase
       .from('funding_opportunities')
-      .select('name, window_status, pursuit_id')
+      .select('name, window_status, pursuit_id, status, client_submitted')
       .eq('id', body.id)
       .single();
 
@@ -156,6 +156,7 @@ export async function PATCH(request: NextRequest) {
         name: oppNow?.name ?? '',
         windowStatus: body.window_status ?? oppNow?.window_status ?? null,
         namedApplicant: (profile.nea_member_name as string) ?? null,
+        alreadySubmitted: isPastDrafting(body.status ?? oppNow?.status, oppNow?.client_submitted),
       },
       {
         sector: pursuitNow?.sector ?? null,
