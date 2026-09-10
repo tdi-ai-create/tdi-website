@@ -23,6 +23,7 @@
 import Anthropic from '@anthropic-ai/sdk'
 import { createClient } from '@supabase/supabase-js'
 import { config } from 'dotenv'
+import { cardSystemPrompt, BANNED_IN_TRANSLATION } from '../lib/hub/spanish-glossary'
 
 config({ path: '.env.local' })
 
@@ -31,38 +32,6 @@ const MODEL = 'claude-opus-5'
 // Small enough that one bad batch costs little and the JSON stays short enough
 // to come back whole.
 const BATCH_SIZE = 12
-
-const GLOSSARY = `
-- coach, instructional coach: asesor pedagogico (never "entrenador", that is a sports coach)
-- teacher: maestro or docente
-- paraprofessional, para: paraprofesional
-- principal: director
-- school leader: lider escolar
-- classroom management: manejo del aula
-- Quick Win, Hub, Pulse, Focus, Cohort, Blueprint: leave in English, they are product names
-- IEP, MTSS, PLC, SEL, ELL: leave the acronym, add nothing
-- grade levels: use the US convention, for example "3er grado"
-`.trim()
-
-const SYSTEM = `You translate professional learning materials for United States K-12 educators from English into Spanish.
-
-Your reader is a teacher, paraprofessional, instructional coach or principal in a US school who reads Spanish. Translate for that reader, not for a general audience, and not literally.
-
-Use this glossary. It exists because a general translator gets these wrong:
-${GLOSSARY}
-
-Rules:
-- Keep the same register: direct, warm, plain. No corporate padding.
-- Never use an em dash or a double hyphen. Use a period, a comma or a colon.
-- No emojis.
-- Keep the title short. A title that grows by half is a bad title, rewrite it shorter.
-- Preserve meaning over word order. If a literal translation reads like a machine wrote it, rewrite the sentence.
-- Use standard accents and punctuation, including the opening question and exclamation marks.
-
-Return only JSON, no prose and no code fence, in exactly this shape:
-{"translations":[{"id":"<the id you were given>","title_es":"...","description_es":"..."}]}
-
-Return one entry for every item you were given, with the id copied exactly.`
 
 type Row = {
   id: string
@@ -88,15 +57,13 @@ function parseTranslations(text: string): Translation[] {
   return parsed.translations as Translation[]
 }
 
-const BANNED = /--|—|–/
-
 async function translateBatch(client: Anthropic, rows: Row[]): Promise<Translation[]> {
   const payload = rows.map(r => ({ id: r.id, title: r.title, description: r.description }))
 
   const response = await client.messages.create({
     model: MODEL,
     max_tokens: 16000,
-    system: SYSTEM,
+    system: cardSystemPrompt(),
     messages: [{ role: 'user', content: JSON.stringify({ items: payload }) }],
   })
 
@@ -120,7 +87,7 @@ async function translateBatch(client: Anthropic, rows: Row[]): Promise<Translati
     if (!wanted.has(t.id)) throw new Error(`response carries an id that was not sent: ${t.id}`)
     if (seen.has(t.id)) throw new Error(`response repeats id ${t.id}`)
     if (!t.title_es?.trim() || !t.description_es?.trim()) throw new Error(`empty translation for ${t.id}`)
-    if (BANNED.test(t.title_es) || BANNED.test(t.description_es)) {
+    if (BANNED_IN_TRANSLATION.test(t.title_es) || BANNED_IN_TRANSLATION.test(t.description_es)) {
       throw new Error(`dashes came back in the translation for ${t.id}`)
     }
     seen.add(t.id)
