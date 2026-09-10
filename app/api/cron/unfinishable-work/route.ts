@@ -86,7 +86,7 @@ export async function GET(request: NextRequest) {
   }
 
   if (!dryRun) {
-    await postCreatorMessage(message);
+    await postCreatorMessage(message, 'rae');
     result.posted = true;
   }
 
