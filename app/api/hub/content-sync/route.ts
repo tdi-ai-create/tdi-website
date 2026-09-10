@@ -475,6 +475,56 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ rubric_version: RUBRIC_VERSION, lane, defects, quick_win: data })
   }
 
+  // ── list_spanish_queue: what Paloma works from ──────────────────────────
+  //
+  // Two states and nothing else, because a queue that mixes "needs a
+  // translation" with "needs a read" produces an agent that does neither well.
+  //
+  // An item whose English has not passed QA appears in neither state. Spanish
+  // inherits the English review and cannot run ahead of it, so offering it for
+  // Spanish review would invite a pass on content nobody has checked.
+  if (action === 'list_spanish_queue') {
+    const limit = Math.min(Number(searchParams.get('limit')) || 50, 250)
+
+    const { data, error } = await supabase
+      .from('hub_quick_wins')
+      .select('id, slug, title, title_es, quick_win_type, reviewed_at, translated_at, guide_sections, tool_content, guide_sections_es, tool_content_es, file_url_es, tool_file_url_es')
+      .eq('is_published', true)
+      .in('quick_win_type', RUBRIC_TYPES)
+      .not('reviewed_at', 'is', null)
+      .order('published_at', { ascending: true, nullsFirst: false })
+
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+    const needsTranslation: unknown[] = []
+    const needsReview: unknown[] = []
+
+    for (const row of data || []) {
+      const hasSource = !!row.guide_sections || !!row.tool_content
+      const hasSpanishPayload = !!row.guide_sections_es || !!row.tool_content_es
+      const hasSpanishFile = !!row.file_url_es || !!row.tool_file_url_es
+
+      // No English payload means there is nothing to translate from. Those items
+      // are waiting on the rebuild queue, not on Spanish, and listing them here
+      // would put 197 permanently unactionable rows in front of an agent.
+      if (!hasSource) continue
+
+      const entry = { id: row.id, slug: row.slug, title: row.title, title_es: row.title_es }
+
+      if (!hasSpanishPayload) needsTranslation.push(entry)
+      else if (hasSpanishFile && !row.translated_at) needsReview.push(entry)
+    }
+
+    return NextResponse.json({
+      needs_review: needsReview.slice(0, limit),
+      needs_translation: needsTranslation.slice(0, limit),
+      counts: {
+        needs_review: needsReview.length,
+        needs_translation: needsTranslation.length,
+      },
+    })
+  }
+
   return NextResponse.json({ error: `Unknown action: ${action}` }, { status: 400 })
 }
 
@@ -1298,6 +1348,111 @@ export async function POST(request: NextRequest) {
         id: after.id, slug: after.slug,
         reviewed_at: after.reviewed_at, reviewed_by: after.reviewed_by,
         rubric_version: RUBRIC_VERSION,
+      })
+    }
+
+    // ── review_spanish: Paloma's stamp on a Spanish edition ────────────────
+    //
+    // Deliberately separate from mark_reviewed and review_published. Those say
+    // "this content is good". This says "this Spanish reads like a person wrote
+    // it for a US school", which is a different question about a different
+    // document, and an item can pass one and fail the other.
+    //
+    // Four refusals, each for a failure that has already happened here.
+    if (action === 'review_spanish') {
+      const { id, reviewed_by, notes, file_bytes } = body
+
+      if (!id) return NextResponse.json({ error: 'id is required' }, { status: 400 })
+      if (!reviewed_by?.trim()) {
+        return NextResponse.json({ error: 'reviewed_by is required (who read the Spanish)' }, { status: 400 })
+      }
+
+      const { data: qw, error: fetchErr } = await supabase
+        .from('hub_quick_wins')
+        .select('id, slug, reviewed_at, qa_notes, file_url_es, tool_file_url_es, translated_at')
+        .eq('id', id)
+        .single()
+
+      if (fetchErr || !qw) return NextResponse.json({ error: 'Quick Win not found' }, { status: 404 })
+
+      // 1. Spanish inherits the English review. Without one there is nothing to
+      //    inherit, and a Spanish pass would imply the content was checked.
+      if (!qw.reviewed_at) {
+        return NextResponse.json({
+          success: false,
+          error: 'The English original has not passed QA. Spanish inherits that review and cannot run ahead of it.',
+        }, { status: 400 })
+      }
+
+      // 2. No Spanish document means this is not a review problem.
+      const spanishUrl = qw.file_url_es || qw.tool_file_url_es
+      if (!spanishUrl) {
+        return NextResponse.json({
+          success: false,
+          error: 'This item has no Spanish file, so there is nothing to read. Render one first.',
+        }, { status: 400 })
+      }
+
+      // 3. Prove the file was actually fetched. On 2026-09-01 fifty eight
+      //    documents were stamped by someone who had only eyeballed a field.
+      //    The rule against that was written down, and an instruction is advice.
+      //    This is a gate.
+      const proof = await fetchWasReal(
+        supabase,
+        { file_url: spanishUrl, storage_path: null },
+        file_bytes,
+        'file_bytes',
+      )
+      if (!proof.ok) {
+        return NextResponse.json({ success: false, error: proof.reason }, { status: 400 })
+      }
+
+      // 4. A finding that could describe any document is not a finding.
+      if (!notes?.trim() || notes.trim().length < EVIDENCE_MIN_CHARS) {
+        return NextResponse.json({
+          success: false,
+          error: `notes must be at least ${EVIDENCE_MIN_CHARS} characters and describe this document specifically, ` +
+                 'naming what you checked. "Reads well" applies to anything and proves nothing.',
+        }, { status: 400 })
+      }
+
+      const now = new Date().toISOString()
+      const stampLine = `${now.slice(0, 10)} Spanish edition reviewed by ${reviewed_by.trim()}: ${notes.trim()}`
+
+      const { error: writeErr } = await supabase
+        .from('hub_quick_wins')
+        .update({
+          translated_at: now,
+          translated_by: reviewed_by.trim(),
+          qa_notes: qw.qa_notes ? `${qw.qa_notes}\n${stampLine}` : stampLine,
+          updated_at: now,
+        })
+        .eq('id', id)
+
+      if (writeErr) return NextResponse.json({ error: writeErr.message }, { status: 500 })
+
+      // Read back. Writes on this table have silently dropped fields before
+      // (TEA-236), and a stamp that failed to write is worse than none because
+      // it looks fine.
+      const { data: after } = await supabase
+        .from('hub_quick_wins')
+        .select('translated_at, translated_by')
+        .eq('id', id)
+        .single()
+
+      if (!after?.translated_at) {
+        return NextResponse.json(
+          { error: 'The Spanish review did not stick. translated_at is empty after the write.' },
+          { status: 500 },
+        )
+      }
+
+      return NextResponse.json({
+        success: true, verified: true,
+        id, slug: qw.slug,
+        translated_at: after.translated_at,
+        translated_by: after.translated_by,
+        bytes_read: proof.bytes,
       })
     }
 
