@@ -52,9 +52,17 @@ function guardPublishedWrite(
   qw: { id: string; slug?: string | null; is_published?: boolean | null },
   target: 'tool' | 'guide',
   actor: string,
-  allowPublished: boolean
+  allowPublished: boolean,
+  lang: Lang = 'en'
 ): { refuse: NextResponse | null; warning: string | null } {
   if (!qw.is_published || allowPublished) return { refuse: null, warning: null }
+
+  // A Spanish render writes only the _es columns. It cannot overwrite the
+  // document this guard exists to protect, and the Spanish editions of live
+  // items are the normal case rather than the exception. Guarding them would
+  // mean that the day this becomes enforcing, every routine Spanish render on a
+  // published item starts being refused for a write it never makes.
+  if (lang === 'es') return { refuse: null, warning: null }
 
   const message =
     `${actor} is overwriting the ${target} file of PUBLISHED Quick Win ` +
@@ -149,7 +157,7 @@ export async function POST(request: NextRequest) {
       // Checked before anything is rendered or uploaded, so a refusal can never
       // leave a half-applied write or a retired review stamp behind.
       const toolGuard = guardPublishedWrite(
-        qw, 'tool', body.actor || 'generate_tool', body.allowPublished === true
+        qw, 'tool', body.actor || 'generate_tool', body.allowPublished === true, lang
       )
       if (toolGuard.refuse) return toolGuard.refuse
 
@@ -284,7 +292,7 @@ export async function POST(request: NextRequest) {
     // the tool path would have left the route that actually broken.
     const guideGuard = guardPublishedWrite(
       qw, 'guide', (body as { actor?: string }).actor || 'generate_pdf',
-      (body as { allowPublished?: boolean }).allowPublished === true
+      (body as { allowPublished?: boolean }).allowPublished === true, lang
     )
     if (guideGuard.refuse) return guideGuard.refuse
 

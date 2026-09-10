@@ -32,6 +32,7 @@ export type PdfLabels = {
   reflect: string
   notes: string
   tip: string
+  beforeAnythingElse: string
   lift_low: string
   lift_med: string
   lift_high: string
@@ -54,6 +55,7 @@ const EN: PdfLabels = {
   reflect: 'Reflect',
   notes: 'Notes',
   tip: 'Tip',
+  beforeAnythingElse: 'Before anything else',
   lift_low: 'Grab & Go',
   lift_med: 'Some Prep',
   lift_high: 'Deep Dive',
@@ -76,6 +78,7 @@ const ES: PdfLabels = {
   reflect: 'Reflexiona',
   notes: 'Notas',
   tip: 'Consejo',
+  beforeAnythingElse: 'Antes que nada',
   // Brand vocabulary, chosen rather than translated. Listo para usar keeps the
   // "you can use this now" promise that Grab & Go carries.
   lift_low: 'Listo para usar',
@@ -112,4 +115,35 @@ export function roleLabel(role: string, lang: Lang = 'en'): string {
     coach: L.role_coach,
   }
   return map[role] || role
+}
+
+/**
+ * What the category band prints.
+ *
+ * The stored category stays English because it drives filtering on the Hub, so
+ * this translates the display only. A Spanish document printing CLASSROOM
+ * MANAGEMENT across its header is the same defect as an English heading: the
+ * body was translated and the furniture was not.
+ *
+ * An unmapped category falls through unchanged, which is visibly English and
+ * therefore gets noticed, rather than silently blank.
+ */
+const CATEGORY_ES: Record<string, string> = {
+  'Lesson Planning': 'Planificación de clases',
+  'Assessment': 'Evaluación',
+  'Instructional Strategies': 'Estrategias de enseñanza',
+  'Classroom Setup': 'Organización del aula',
+  'Classroom Management': 'Manejo del aula',
+  'Communication': 'Comunicación',
+  'Time Savers': 'Ahorra tiempo',
+  'Leadership': 'Liderazgo',
+  'Self-Care': 'Bienestar personal',
+  'Stress Relief': 'Alivio del estrés',
+  'Games': 'Juegos',
+  'Vocational': 'Formación profesional',
+}
+
+export function categoryLabel(category: string | undefined | null, lang: Lang = 'en'): string {
+  if (!category) return 'Quick Win'
+  return lang === 'es' ? CATEGORY_ES[category] || category : category
 }

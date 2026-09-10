@@ -17,6 +17,7 @@
  *   5. small print  scope notes and citations, present but not competing
  */
 import React from 'react'
+import { getLabels, type Lang } from './labels'
 import { Text, View, StyleSheet } from '@react-pdf/renderer'
 
 export const NAVY = '#1E2749'
@@ -71,11 +72,11 @@ export interface SmallPrintBlock {
  * at the foot of one page with its body on the next, outside its own box, which
  * is the bug that made the first weighted card unusable.
  */
-export function AlertBlock({ alert }: { alert?: Alert }) {
+export function AlertBlock({ alert, lang = 'en' }: { alert?: Alert; lang?: Lang }) {
   if (!alert) return null
   return (
     <View style={w.alertBox} wrap={false}>
-      <Text style={w.alertLabel}>{alert.label || 'Before anything else'}</Text>
+      <Text style={w.alertLabel}>{alert.label || getLabels(lang).beforeAnythingElse}</Text>
       <Text style={w.alertHead}>{alert.heading}</Text>
       {alert.text ? <Text style={w.alertText}>{alert.text}</Text> : null}
     </View>
