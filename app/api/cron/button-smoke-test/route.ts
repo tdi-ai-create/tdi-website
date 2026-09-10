@@ -96,6 +96,17 @@ export async function GET(request: NextRequest) {
     });
   }
 
+  // round: 0 matters as much as the status.
+  //
+  // Feedback is deliberately capped at two rounds, after which Request changes
+  // approves instead of opening a third. The first version of this reset moved
+  // status and review_status and left the counter alone, so after two runs the
+  // sandbox was permanently capped, the route did exactly the right thing, and
+  // this job reported "a write button has stopped working" every morning.
+  //
+  // It did that on its first production run, 10 September, and it was wrong.
+  // A check that cries wolf daily is worse than no check, because the morning
+  // it is right is the morning it gets skimmed.
   const reset = async () => {
     const rows = [
       { milestone_id: IN_REVIEW_STEP, status: 'waiting_approval', review_status: 'submitted' },
@@ -104,11 +115,33 @@ export async function GET(request: NextRequest) {
     for (const r of rows) {
       const { error } = await supabase
         .from('creator_milestones')
-        .update({ status: r.status, review_status: r.review_status, completed_at: null, updated_at: new Date().toISOString() })
+        .update({
+          status: r.status,
+          review_status: r.review_status,
+          round: 0,
+          completed_at: null,
+          updated_at: new Date().toISOString(),
+        })
         .eq('creator_id', creator.id)
         .eq('milestone_id', r.milestone_id);
       if (error) throw new Error(`Could not reset ${r.milestone_id}: ${error.message}`);
     }
+  };
+
+  /**
+   * Reset, then confirm the board actually reads the way the next check needs.
+   *
+   * A test that reports a product failure when its own setup did not take is a
+   * lying test, and this job exists to stop exactly that class of thing. If the
+   * precondition cannot be established, say so instead of blaming a button.
+   */
+  const resetAndConfirm = async (): Promise<string | null> => {
+    await reset();
+    const row = await stepStatus(IN_REVIEW_STEP);
+    if (row?.status !== 'waiting_approval' || row?.review_status !== 'submitted') {
+      return `expected ${IN_REVIEW_STEP} to read waiting_approval/submitted, found ${row?.status}/${row?.review_status}`;
+    }
+    return null;
   };
 
   const stepStatus = async (milestoneId: string) => {
@@ -143,7 +176,10 @@ export async function GET(request: NextRequest) {
   };
 
   try {
-    await reset();
+    const setupBefore = await resetAndConfirm();
+    if (setupBefore) {
+      add('the sandbox could be put in a testable state', false, setupBefore);
+    }
 
     // 1. The wrong identifier must be refused, and refused by name.
     const wrong = await post('/api/admin/approve-milestone', {
@@ -171,9 +207,16 @@ export async function GET(request: NextRequest) {
       `${before?.status} then ${afterApprove?.status} (http ${approve.status})`,
     );
 
-    await reset();
-
     // 3. Request changes actually sends it back.
+    //
+    // Confirmed rather than assumed: without a clean round counter the route
+    // correctly approves at the cap, and reading that as a broken button is
+    // how this job lied on its first run.
+    const setupForRevision = await resetAndConfirm();
+    if (setupForRevision) {
+      add('the sandbox could be reset before testing Request changes', false, setupForRevision);
+    }
+
     const revision = await post('/api/admin/request-revision', {
       milestoneId: IN_REVIEW_STEP,
       creatorId: creator.id,
@@ -205,6 +248,7 @@ export async function GET(request: NextRequest) {
         `Pressed against the sandbox creator, so no real creator was touched.` +
         failures.map((f) => `\n\n- ${f.name}\n  ${f.detail}`).join('') +
         `\n\n${SITE}/tdi-admin/creators/${creator.id}`,
+      'rae',
     );
   }
 
