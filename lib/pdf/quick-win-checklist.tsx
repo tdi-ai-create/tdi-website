@@ -1,7 +1,7 @@
 /** @jsxImportSource react */
 import React from 'react'
 import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer'
-import { getLabels, type Lang } from './labels'
+import { getLabels, type Lang, categoryLabel } from './labels'
 import { categoryColor, NAVY } from '@/lib/hub/categoryColors'
 import { w, AlertBlock, SayBlock, SmallPrint, SectionHeading, resolveWeights, type Alert, type SmallPrintBlock, type WeightedItem } from './weights'
 
@@ -73,10 +73,10 @@ export function ChecklistPDF({ data }: { data: ChecklistData }) {
           {data.description ? <Text style={s.subtitle}>{data.description}</Text> : null}
         </View>
         <View style={[s.categoryBand, { backgroundColor: categoryColor(data.category) }]}>
-          <Text style={s.categoryLabel}>{data.category || 'Quick Win'}</Text>
+          <Text style={s.categoryLabel}>{categoryLabel(data.category, data.lang ?? 'en')}</Text>
         </View>
         <View style={s.content}>
-          <AlertBlock alert={data.alert} />
+          <AlertBlock alert={data.alert} lang={data.lang ?? 'en'} />
           {data.instructions ? <Text style={s.instructions}>{data.instructions}</Text> : null}
           {data.sections.map((section, si) => (
             <View key={si}>
