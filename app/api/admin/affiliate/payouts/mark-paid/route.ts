@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServiceSupabase } from '@/lib/supabase';
+import { requireAdminAuth } from '@/lib/tdi-admin/auth';
 
 export async function POST(req: NextRequest) {
+  const auth = await requireAdminAuth();
+  if (auth instanceof NextResponse) return auth;
+
   try {
     const supabase = getServiceSupabase();
     const { payoutIds, paidMethod, paidReference, paidAt } = await req.json();

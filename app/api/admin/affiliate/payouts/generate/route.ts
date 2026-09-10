@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServiceSupabase } from '@/lib/supabase';
+import { requireAdminAuth } from '@/lib/tdi-admin/auth';
 
 export async function POST(req: NextRequest) {
+  const auth = await requireAdminAuth();
+  if (auth instanceof NextResponse) return auth;
+
   try {
     const supabase = getServiceSupabase();
-    const { period, adminEmail } = await req.json();
+    const { period } = await req.json();
 
     if (!period) {
       return NextResponse.json({ error: 'period required (e.g. 2026-05)' }, { status: 400 });
@@ -42,6 +46,8 @@ export async function POST(req: NextRequest) {
 
     let payoutsCreated = 0;
 
+    const linkFailures: { payoutId: string; error: string }[] = [];
+
     for (const [creatorId, creatorConversions] of Object.entries(grouped)) {
       const grossCents = creatorConversions.reduce((s, c) => s + c.gross_amount_cents, 0);
       const netCents = creatorConversions.reduce((s, c) => s + (c.net_revenue_cents || 0), 0);
@@ -58,7 +64,9 @@ export async function POST(req: NextRequest) {
           net_revenue_cents: netCents,
           payout_amount_cents: payoutCents,
           status: 'pending',
-          generated_by: adminEmail || 'admin',
+          // Attribution comes from the authenticated session, not from the
+          // request body, which the caller could set to anyone.
+          generated_by: auth.member.email,
         })
         .select()
         .single();
@@ -68,14 +76,36 @@ export async function POST(req: NextRequest) {
         continue;
       }
 
-      // Link conversions to this payout
+      // Link conversions to this payout.
+      //
+      // This must not fail quietly. If the payout row exists but its
+      // conversions are still unlinked, the next run sees them as unpaid and
+      // generates a second payout for the same work.
       const conversionIds = creatorConversions.map(c => c.id);
-      await supabase
+      const { error: linkErr } = await supabase
         .from('affiliate_conversions')
         .update({ payout_id: payout.id })
         .in('id', conversionIds);
 
+      if (linkErr) {
+        console.error('[payouts/generate] Failed to link conversions', {
+          payoutId: payout.id, conversionIds, error: linkErr.message,
+        });
+        linkFailures.push({ payoutId: payout.id, error: linkErr.message });
+      }
+
       payoutsCreated++;
+    }
+
+    // A payout whose conversions did not link is not a finished payout, so
+    // this reports the partial state rather than success.
+    if (linkFailures.length > 0) {
+      return NextResponse.json({
+        success: false,
+        error: 'Payouts were created but some conversions could not be linked. Link them before the next run or they will be paid twice.',
+        payoutsCreated,
+        linkFailures,
+      }, { status: 500 });
     }
 
     return NextResponse.json({
