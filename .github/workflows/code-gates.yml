@@ -108,6 +108,20 @@ jobs:
         # a check nobody runs.
         run: npm run check:definitions
 
+      - name: Every guard can still catch its own case
+        # This repo has roughly forty checks and, until 10 September, no tests.
+        # So nothing had ever confirmed that any of those checks could still
+        # fail, and a guard that has quietly stopped working is indistinguishable
+        # from one that is passing. That is the same silent-failure shape as the
+        # bugs the guards exist to prevent, one level up.
+        #
+        # Each case here is something that already went wrong on a named day.
+        # Pure functions only, so it needs no database and takes under a second.
+        #
+        # Not a ratchet. This one has to pass outright: a guard that cannot
+        # catch its own case is protecting nothing at all.
+        run: npm run check:guards
+
       - name: Seats belong to a partnership
         # A live all-access seat whose partnership was deleted, or which was
         # hand-provisioned without a link, belongs to a real educator who shows
