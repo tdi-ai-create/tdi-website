@@ -22,6 +22,8 @@ in any of them is invisible rather than public.
 | Spanish render path | built, PR #442, verified on the probe draft |
 | Paloma's instructions | on the volume, 7226 bytes, `paperclip:paperclip` |
 | Paloma registered as an agent | **not done, step 1** |
+| Published downloads with a payload | 45 on 10 Sep, up from 27 on 9 Sep |
+| Of those, with an English review to inherit | 30, and this is the translatable set |
 | Spanish editions in existence | 0, plus one throwaway on the probe draft |
 | What a teacher sees in Spanish | card text only. Every download is English |
 
@@ -132,11 +134,24 @@ is off until step 5.
 
 ---
 
-## Step 4. Build the 27
+## Step 4. Translate everything the rebuild queue has finished
 
-**Owner: me.** The 27 published downloads that have a payload to translate from.
-The other 197 get theirs when they are rebuilt, which is the existing remediation
-queue and not new work.
+**Owner: me.** Every published download that has a payload to translate from and
+an English review to inherit.
+
+**This is not a fixed batch, and treating it as one will go wrong.** It read 27
+on 9 September and 30 on the morning of 10 September, because the rebuild queue
+runs at roughly fifteen to twenty items a day and every item it finishes becomes
+translatable. The number in any document is stale the day after it is written,
+so take it from the queue:
+
+```
+GET /api/hub/content-sync?action=list_spanish_queue
+```
+
+`counts.needs_translation` is the live figure. Step 4 is done when it reaches
+zero, and it will climb again tomorrow. That is the programme working, not a
+regression: Spanish rides the rebuild queue rather than running beside it.
 
 Per item: translate the payload, render the Spanish PDF, leave it unreviewed.
 
@@ -151,12 +166,14 @@ select
 from hub_quick_wins;
 ```
 
-Expect `es_payloads` and `es_files` to reach 27 and `es_reviewed` to stay 0.
-An `es_files` number above `es_payloads` means a file exists with no source, which
-is the state that made a damaged PDF unrecoverable on 8 September.
+Expect `es_payloads` and `es_files` to reach whatever
+`counts.needs_translation` said when you started, and `es_reviewed` to stay 0.
 
-**Rollback.** Null the `_es` columns on those 27. No English field is touched at
-any point, so there is nothing else to undo.
+An `es_files` number above `es_payloads` means a file exists with no source,
+which is the state that made a damaged PDF unrecoverable on 8 September.
+
+**Rollback.** Null the `_es` columns on the items you translated. No English
+field is touched at any point, so there is nothing else to undo.
 
 ---
 
@@ -233,7 +250,9 @@ select
 from hub_quick_wins;
 ```
 
-Today that reads 265, 265, 0, 0. After step 4 it should read 265, 265, 27, 0.
+On the morning of 10 September that reads 265, 265, 0, 0, with 30 items
+translatable. After step 4 the third number should equal how many were
+translatable when you began, and the fourth should still be 0.
 After Paloma has worked the queue, the last number moves and nothing else does.
 
 ## Still Rae's
