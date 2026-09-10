@@ -108,6 +108,15 @@ export interface TeamWorkItem {
    * last_agent_activity_at are written by nothing.
    */
   agentNeverAsked: boolean;
+  /**
+   * True when nothing downstream can close because the creator has not signed.
+   *
+   * The engine deliberately leaves the final step open on an unsigned
+   * agreement, so the board was telling Bella to "publish on the Hub" for two
+   * creators whose content went live months ago. The work it named did not
+   * exist and the actual blocker, one step above, was never mentioned.
+   */
+  blockedBySignature: boolean;
   /** Days since the creator last completed anything, which is when it became ours. */
   daysWaiting: number;
   /** What the creator is being told while they wait, so we know what we promised. */
@@ -143,7 +152,7 @@ export async function loadTeamWork(
 ): Promise<TeamWorkItem[]> {
   const { data: creators, error } = await supabase
     .from('creators')
-    .select('id, name, content_path, created_at, status, lifecycle_state, publish_status, is_test_account, last_agent_activity_at');
+    .select('id, name, content_path, created_at, status, lifecycle_state, publish_status, is_test_account, last_agent_activity_at, agreement_signed');
 
   if (error) {
     console.error('[team-work] Failed to load creators:', error);
@@ -236,6 +245,7 @@ export async function loadTeamWork(
       who: guide?.who ?? 'nobody yet',
       action: guide?.action ?? 'No guidance written for this step yet. Decide what it needs and who does it.',
       agentNeverAsked: guide?.kind === 'agent' && !creator.last_agent_activity_at,
+      blockedBySignature: creator.agreement_signed !== true,
       daysWaiting: daysBetween(since, now),
       creatorSees: ms.team_status_message ?? null,
       attachment,
@@ -280,9 +290,22 @@ export function formatTeamWork(items: TeamWorkItem[]): string {
 
     // Do not describe work that is not there. Until 21 August this said "edit
     // and format the post" for two creators whose post was never in the system.
-    const work = i.attachment
-      ? `\nWhat you are reviewing: ${i.attachment}\n${i.action}`
-      : `\n*Nothing is attached to this step.* Their work is not in the system, so find out where it is before anything else.`;
+    // The signature outranks the step.
+    //
+    // Kim Lohse and Dr. Stephanie Nardi have live content and no signed
+    // agreement, one since May. The engine correctly refuses to close their
+    // last step, and this list correctly showed that step, and the sentence it
+    // printed was "Publish on the Hub, then mark this done". Their content had
+    // been published for months. So every morning it named work that did not
+    // exist, and never named the thing that actually blocks them.
+    //
+    // A list that asks for the wrong thing daily gets ignored, and then it is
+    // ignored on the morning it is right.
+    const work = i.blockedBySignature
+      ? `\n*They have not signed the agreement.* Nothing after it can close, so this step stays open no matter what else is done. Chase the signature, not this step.${i.attachment ? `\nTheir work, already in: ${i.attachment}` : ''}`
+      : i.attachment
+        ? `\nWhat you are reviewing: ${i.attachment}\n${i.action}`
+        : `\n*Nothing is attached to this step.* Their work is not in the system, so find out where it is before anything else.`;
 
     return (
       `\n\n*${i.creatorName}* · ${i.step}\n` +
