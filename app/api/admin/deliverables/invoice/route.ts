@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServiceSupabase } from '@/lib/supabase';
 import { asInvoiced } from '@/lib/billing/state'
+import { requireAdminAuth } from '@/lib/tdi-admin/auth';
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
 
@@ -14,23 +15,12 @@ const RESEND_API_KEY = process.env.RESEND_API_KEY;
  * Body: { deliverableId, partnershipId, sendEmail?: boolean }
  */
 export async function POST(request: NextRequest) {
-  const email = request.headers.get('x-user-email');
-  if (!email) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
-  }
-  // Verify team member access
-  if (!email.toLowerCase().endsWith('@teachersdeserveit.com')) {
-    const supabase = getServiceSupabase();
-    const { data: member } = await supabase
-      .from('tdi_team_members')
-      .select('id')
-      .ilike('email', email.toLowerCase())
-      .eq('is_active', true)
-      .limit(1);
-    if (!member || member.length === 0) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
-    }
-  }
+  // Was: trust the x-user-email header, and treat anything ending in our own
+  // domain as authorised. The caller writes that header, so it established
+  // nothing. requireAdminAuth validates the Supabase session cookie and the
+  // tdi_team_members record behind it.
+  const auth = await requireAdminAuth();
+  if (auth instanceof NextResponse) return auth;
 
   const { deliverableId, partnershipId, sendEmail = true, resend = false, resendTo } = await request.json();
 
@@ -99,13 +89,17 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Log the resend
-    await supabase.from('payment_events').insert({
+    // Log the resend. The mail has already gone, so a failure here loses the
+    // audit trail rather than the action. Record it, do not fail the request.
+    const { error: resendLogErr } = await supabase.from('payment_events').insert({
       invoice_id: deliverable.invoice_id,
       event_type: 'invoice_resent',
       event_date: new Date().toISOString().split('T')[0],
       summary: `Invoice resent to ${recipientEmail}`,
     });
+    if (resendLogErr) {
+      console.error('[deliverables/invoice] Resend logged nowhere:', resendLogErr.message);
+    }
 
     return NextResponse.json({ success: true, resent_to: recipientEmail });
   }
@@ -160,15 +154,23 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: iErr?.message || 'Failed to create invoice' }, { status: 500 });
   }
 
-  // Create collections_workflow record
-  await supabase.from('collections_workflow').insert({
+  // Create collections_workflow record. The invoice already exists, so a
+  // failure here means it is not being chased rather than not being billed.
+  const { error: cwErr } = await supabase.from('collections_workflow').insert({
     invoice_id: invoice.id,
     current_stage: 'sent',
     risk_flag: false,
   });
+  if (cwErr) {
+    console.error('[deliverables/invoice] No collections record for invoice', invoice.id, cwErr.message);
+  }
 
-  // Link the deliverable to the invoice
-  await supabase
+  // Link the deliverable to the invoice.
+  //
+  // This must not fail quietly. If the invoice exists but the deliverable is
+  // never marked invoiced, it stays eligible and the school can be billed a
+  // second time for the same work.
+  const { error: linkErr } = await supabase
     .from('contract_deliverables')
     .update({
       invoice_id: invoice.id,
@@ -179,13 +181,28 @@ export async function POST(request: NextRequest) {
     })
     .eq('id', deliverableId);
 
-  // Log a payment event
-  await supabase.from('payment_events').insert({
+  if (linkErr) {
+    console.error('[deliverables/invoice] Invoice created but deliverable not marked', {
+      invoiceId: invoice.id, invoiceNumber, deliverableId, error: linkErr.message,
+    });
+    return NextResponse.json({
+      success: false,
+      error: `Invoice ${invoiceNumber} was created but the deliverable was not marked invoiced. Mark it before invoicing again, or the school may be billed twice.`,
+      invoiceId: invoice.id,
+      invoiceNumber,
+    }, { status: 500 });
+  }
+
+  // Log a payment event. Audit trail, so record a failure and continue.
+  const { error: eventErr } = await supabase.from('payment_events').insert({
     invoice_id: invoice.id,
     event_type: 'invoice_sent',
     event_date: now.toISOString().split('T')[0],
     summary: `Invoice ${invoiceNumber} sent to ${partnership.contact_email} for ${deliverable.label}`,
   });
+  if (eventErr) {
+    console.error('[deliverables/invoice] Invoice sent but not logged', invoice.id, eventErr.message);
+  }
 
   // Send invoice email
   const recipientEmail = partnership.primary_contact_email || partnership.contact_email;
