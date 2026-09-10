@@ -11,12 +11,19 @@ Approved in principle by Rae on 2026-09-09. Sections 3 to 6 are not built.
 |---|---|
 | Published Quick Wins carrying a Spanish title and description | 265 of 265 |
 | Published downloads | 224 |
-| Published downloads whose source payload exists, so they can be re-rendered | 27 |
-| Published downloads with no payload, so there is nothing to render from | **197** |
+| Published downloads whose source payload exists, so they can be re-rendered | 45 |
+| Of those, with an English review to inherit, so they are translatable today | 30 |
+| Published downloads with no payload, so there is nothing to render from | **180** |
 | Columns on `hub_quick_wins` holding a Spanish file | **none** |
 
 The card is bilingual. The download is not, and cannot be until the columns and
 the render path in sections 3 and 4 exist.
+
+**These counts move daily and are not a target.** The payload count read 27 on
+9 September and 45 on 10 September, because the rebuild queue turns roughly
+fifteen to twenty unrenderable items into renderable ones every day. Take the
+live figure from `GET /api/hub/content-sync?action=list_spanish_queue` rather
+than from this table.
 
 ## 2. The decision
 
@@ -66,7 +73,7 @@ quick-wins/{id}/{slug}-resource-es.pdf
 ```
 
 **No constraint, no trigger, no required field.** Enforcement must never outrun
-the content, and 197 items cannot satisfy a Spanish requirement today. See
+the content, and most of the library cannot satisfy a Spanish requirement today. See
 `docs/hub-publish-gate-runbook.md`.
 
 ## 4. The render path
@@ -120,9 +127,9 @@ notices that a translation never shipped.
 
 ## 6. Sequencing, and why this rides the rebuild queue
 
-197 published downloads have no payload, so there is nothing to translate from.
-Building a separate Spanish project would mean reconstructing those 197 twice,
-once for the rebuild queue and once for Spanish.
+Most published downloads have no payload, so there is nothing to translate from.
+Building a separate Spanish project would mean reconstructing every one of them
+twice, once for the rebuild queue and once for Spanish.
 
 So Spanish attaches to the work already happening in
 `docs/hub-content-standard.md` section 8:
@@ -133,9 +140,10 @@ So Spanish attaches to the work already happening in
 2. **Rebuilt items get a Spanish edition in the same pass.** An item in the
    replace lane is already being reconstructed into structured content. Adding
    the Spanish render there is cheap and needs no second handling.
-3. **The 27 that already have a payload** can be translated immediately and are
-   the pilot. They prove the render path against real content before anything
-   depends on it.
+3. **Whatever already has a payload and an English review** can be translated
+   immediately and is the pilot. It proves the render path against real content
+   before anything depends on it. That set grows every day the rebuild queue
+   runs, so read it from the queue endpoint rather than fixing a number.
 4. **The rest wait for their rebuild.** That is deliberate. A machine translated
    PDF, or a translation of a document nobody has read, is the failure this
    whole standard exists to prevent.
@@ -193,7 +201,7 @@ Two constraints on that role, both from things that have already gone wrong here
 2. **Who reviews.** Nobody at TDI is currently named as the Spanish reviewer of
    record. Until someone is, Spanish editions can be drafted and rendered, and
    they should not go live.
-3. **Whether the 27 pilot items publish their Spanish editions immediately** or
+3. **Whether the pilot items publish their Spanish editions immediately** or
    hold until a reviewer exists. Holding is the safer default and is what this
    document assumes.
 
