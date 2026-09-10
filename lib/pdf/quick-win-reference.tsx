@@ -1,6 +1,7 @@
 /** @jsxImportSource react */
 import React from 'react'
 import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer'
+import { getLabels, type Lang } from './labels'
 import { categoryColor, NAVY } from '@/lib/hub/categoryColors'
 import { w, AlertBlock, SayBlock, SmallPrint, SectionHeading, resolveWeights, type Alert, type SmallPrintBlock, type WeightedItem } from './weights'
 
@@ -63,9 +64,12 @@ export interface ReferenceData {
   }[]
   /** Weight 5. Scope notes and citations. Present, not competing. */
   small_print?: SmallPrintBlock[]
+  /** Which language the chrome prints in. */
+  lang?: Lang
 }
 
 export function ReferencePDF({ data }: { data: ReferenceData }) {
+  const L = getLabels(data.lang ?? 'en')
   return (
     <Document title={data.title} author="Teachers Deserve It">
       <Page size="LETTER" style={s.page}>
@@ -121,7 +125,7 @@ export function ReferencePDF({ data }: { data: ReferenceData }) {
               ) : null}
               {section.tip ? (
                 <View style={s.tipBox} wrap={false}>
-                  <Text style={s.tipLabel}>Tip</Text>
+                  <Text style={s.tipLabel}>{L.tip}</Text>
                   <Text style={s.highlightText}>{section.tip}</Text>
                 </View>
               ) : null}

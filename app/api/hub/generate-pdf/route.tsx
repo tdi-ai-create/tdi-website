@@ -10,6 +10,7 @@ import { ToolkitPDF, type ToolkitData } from '@/lib/pdf/quick-win-toolkit'
 import React from 'react'
 import { retireReviewStamp } from '@/lib/hub/replace-file'
 import { safeContent } from '@/lib/pdf/safe-text'
+import type { Lang } from '@/lib/pdf/labels'
 
 export const maxDuration = 60
 
@@ -76,6 +77,27 @@ function guardPublishedWrite(
 }
 
 /**
+ * Which language this render is in, and which columns it therefore writes.
+ *
+ * A Spanish edition is the same payload rendered again through the same
+ * template, so it shares this route rather than getting one of its own. It
+ * writes only the _es columns, so an English document can never be replaced by
+ * a Spanish render and a failed Spanish render cannot take an English file
+ * down with it. See docs/hub-bilingual-resource-spec.md.
+ */
+function langOf(body: { lang?: unknown }): Lang | null {
+  const raw = body.lang
+  if (raw === undefined || raw === null || raw === 'en') return 'en'
+  if (raw === 'es') return 'es'
+  return null
+}
+
+/** File naming. The English names are unchanged, Spanish takes an -es suffix. */
+function suffixed(base: string, lang: Lang): string {
+  return lang === 'es' ? `${base}-es` : base
+}
+
+/**
  * Generate a branded TDI Quick Win PDF from structured content.
  *
  * POST /api/hub/generate-pdf
@@ -108,6 +130,8 @@ export async function POST(request: NextRequest) {
     // Route to generate_tool if action specified
     if (action === 'generate_tool') {
       const { id, tool_type } = body
+      const lang = langOf(body)
+      if (!lang) return NextResponse.json({ error: 'lang must be "en" or "es"' }, { status: 400 })
       // Strip characters Helvetica cannot draw before anything is rendered.
       // Applied here so it covers every tool_type, including future ones.
       const tool_content = safeContent(body.tool_content)
@@ -116,7 +140,7 @@ export async function POST(request: NextRequest) {
 
       const { data: qw, error: fetchErr } = await supabase
         .from('hub_quick_wins')
-        .select('id, slug, title, qa_notes, reviewed_at, reviewed_by, is_published')
+        .select('id, slug, title, qa_notes, reviewed_at, reviewed_by, is_published, translated_at')
         .eq('id', id)
         .single()
 
@@ -131,18 +155,18 @@ export async function POST(request: NextRequest) {
 
       let pdfBuffer: Buffer
       if (tool_type === 'checklist') {
-        pdfBuffer = await renderToBuffer(<ChecklistPDF data={tool_content as ChecklistData} />)
+        pdfBuffer = await renderToBuffer(<ChecklistPDF data={{ ...(tool_content as ChecklistData), lang }} />)
       } else if (tool_type === 'form') {
-        pdfBuffer = await renderToBuffer(<FormPDF data={tool_content as FormData} />)
+        pdfBuffer = await renderToBuffer(<FormPDF data={{ ...(tool_content as FormData), lang }} />)
       } else if (tool_type === 'reference_card') {
-        pdfBuffer = await renderToBuffer(<ReferencePDF data={tool_content as ReferenceData} />)
+        pdfBuffer = await renderToBuffer(<ReferencePDF data={{ ...(tool_content as ReferenceData), lang }} />)
       } else if (tool_type === 'toolkit') {
-        pdfBuffer = await renderToBuffer(<ToolkitPDF data={tool_content as ToolkitData} />)
+        pdfBuffer = await renderToBuffer(<ToolkitPDF data={{ ...(tool_content as ToolkitData), lang }} />)
       } else {
         return NextResponse.json({ error: `Unknown tool_type: ${tool_type}` }, { status: 400 })
       }
 
-      const toolFilename = `${qw.slug || 'tool'}-resource.pdf`
+      const toolFilename = `${suffixed(`${qw.slug || 'tool'}-resource`, lang)}.pdf`
       const storagePath = `quick-wins/${qw.id}/${toolFilename}`
 
       const { error: uploadErr } = await supabase.storage
@@ -158,19 +182,37 @@ export async function POST(request: NextRequest) {
       // Same update as the new URL: a document can never be live under a review
       // of the document it replaced.
       const now = new Date().toISOString()
-      const retired = retireReviewStamp(qw, 'tool', body.actor || 'generate_tool', now)
+
+      // An English render retires the English review stamp, because the stamp
+      // describes the file it was given. A Spanish render must not: it does not
+      // touch the English document, and clearing reviewed_at would send an
+      // already-reviewed English item back through QA for a change that did not
+      // happen to it. Spanish carries its own stamp instead.
+      const retired = lang === 'en'
+        ? retireReviewStamp(qw, 'tool', body.actor || 'generate_tool', now)
+        : { patch: { translated_at: null, translated_by: null }, hadStamp: !!qw.translated_at }
+
+      const languageColumns = lang === 'es'
+        ? {
+            tool_file_url_es: toolUrl,
+            tool_file_path_es: storagePath,
+            tool_content_es: tool_content,
+          }
+        : {
+            tool_file_url: toolUrl,
+            tool_file_path: storagePath,
+            // The payload that produced this file, kept so a damaged or
+            // overwritten PDF can be regenerated instead of rewritten. Storage
+            // upserts in place, so before this the rendered file was the only
+            // copy and ell-empathy-audit proved that unrecoverable on 8 Sep.
+            tool_content,
+          }
 
       const { error: updateErr } = await supabase
         .from('hub_quick_wins')
         .update({
-          tool_file_url: toolUrl,
-          tool_file_path: storagePath,
+          ...languageColumns,
           tool_type,
-          // The payload that produced this file, kept so a damaged or
-          // overwritten PDF can be regenerated instead of rewritten. Storage
-          // upserts in place, so before this the rendered file was the only
-          // copy and ell-empathy-audit proved that unrecoverable on 8 Sep.
-          tool_content,
           updated_at: now,
           ...retired.patch,
         })
@@ -181,11 +223,14 @@ export async function POST(request: NextRequest) {
       // A 200 has proved nothing on this table before (TEA-236), so read it back.
       const { data: after } = await supabase
         .from('hub_quick_wins')
-        .select('tool_file_url, reviewed_at')
+        .select('tool_file_url, tool_file_url_es, reviewed_at, translated_at')
         .eq('id', qw.id)
         .single()
 
-      if (after?.tool_file_url !== toolUrl || after?.reviewed_at !== null) {
+      const wroteUrl = lang === 'es' ? after?.tool_file_url_es : after?.tool_file_url
+      const clearedStamp = lang === 'es' ? after?.translated_at : after?.reviewed_at
+
+      if (wroteUrl !== toolUrl || clearedStamp !== null) {
         return NextResponse.json(
           { error: 'Tool replacement did not stick. The file or the cleared review stamp is not what was written.' },
           { status: 500 },
@@ -194,6 +239,7 @@ export async function POST(request: NextRequest) {
 
       return NextResponse.json({
         success: true,
+        lang,
         tool_file_url: toolUrl,
         storage_path: storagePath,
         tool_type,
@@ -205,6 +251,8 @@ export async function POST(request: NextRequest) {
 
     // Default: generate_pdf (guide)
     const { id } = body as { id: string }
+    const lang = langOf(body)
+    if (!lang) return NextResponse.json({ error: 'lang must be "en" or "es"' }, { status: 400 })
     const sections = safeContent((body as { sections: QuickWinSections }).sections)
 
     if (!sections) return NextResponse.json({ error: 'sections object is required' }, { status: 400 })
@@ -244,19 +292,20 @@ export async function POST(request: NextRequest) {
     const pdfBuffer = await renderToBuffer(
       <QuickWinPDF
         data={{
-          title: qw.title,
+          title: (lang === 'es' ? qw.title_es : qw.title) || qw.title,
           category: qw.category || '',
-          description: qw.description || '',
+          description: (lang === 'es' ? qw.description_es : qw.description) || '',
           roles: qw.roles || [],
           lift: qw.lift || '',
           duration_minutes: qw.duration_minutes,
           sections,
+          lang,
         }}
       />
     )
 
     // Upload to Supabase storage
-    const pdfFilename = `${qw.slug || 'quick-win'}.pdf`
+    const pdfFilename = `${suffixed(qw.slug || 'quick-win', lang)}.pdf`
     const storagePath = `quick-wins/${qw.id}/${pdfFilename}`
 
     const { error: uploadErr } = await supabase.storage
@@ -269,25 +318,53 @@ export async function POST(request: NextRequest) {
     const publicUrl = urlData?.publicUrl
 
     // Update the Quick Win record with the PDF URL
+    // Spanish writes only the _es columns. file_type, content_type and
+    // storage_path describe the English document the Hub falls back to, so a
+    // Spanish render leaves them alone.
+    const guideColumns = lang === 'es'
+      ? {
+          file_url_es: publicUrl,
+          file_path_es: storagePath,
+          guide_sections_es: sections,
+          translated_at: null,
+          translated_by: null,
+        }
+      : {
+          file_url: publicUrl,
+          file_path: storagePath,
+          file_type: 'application/pdf',
+          content_type: 'pdf',
+          storage_path: storagePath,
+          // Same reason as tool_content on the other path: keep what produced
+          // the file so it can be regenerated rather than rewritten.
+          guide_sections: sections,
+        }
+
     const { error: updateErr } = await supabase
       .from('hub_quick_wins')
-      .update({
-        file_url: publicUrl,
-        file_path: storagePath,
-        file_type: 'application/pdf',
-        content_type: 'pdf',
-        storage_path: storagePath,
-        // Same reason as tool_content on the other path: keep what produced
-        // the file so it can be regenerated rather than rewritten.
-        guide_sections: sections,
-        updated_at: new Date().toISOString(),
-      })
+      .update({ ...guideColumns, updated_at: new Date().toISOString() })
       .eq('id', qw.id)
 
     if (updateErr) return NextResponse.json({ error: updateErr.message }, { status: 500 })
 
+    // A 200 from PostgREST has proved nothing on this table before (TEA-236).
+    const { data: after } = await supabase
+      .from('hub_quick_wins')
+      .select('file_url, file_url_es')
+      .eq('id', qw.id)
+      .single()
+
+    const wroteUrl = lang === 'es' ? after?.file_url_es : after?.file_url
+    if (wroteUrl !== publicUrl) {
+      return NextResponse.json(
+        { error: 'Guide write did not stick. The file URL is not what was written.' },
+        { status: 500 },
+      )
+    }
+
     return NextResponse.json({
       success: true,
+      lang,
       file_url: publicUrl,
       storage_path: storagePath,
       ...(guideGuard.warning ? { warning: guideGuard.warning } : {}),
