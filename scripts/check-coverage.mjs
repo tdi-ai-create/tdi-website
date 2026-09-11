@@ -65,6 +65,45 @@ for (const f of routeFiles) {
 const covered = writeRoutes.filter((r) => EXERCISED.includes(r.path));
 const uncovered = writeRoutes.filter((r) => !EXERCISED.includes(r.path));
 
+// --- Which of those her screens can actually reach ---------------------------
+//
+// 79 write routes is the wrong target. Some are called by crons, by agents, or
+// by nothing at all. The ones that matter first are the ones a click can reach,
+// because those are the ones she can find broken.
+//
+// Matched by scanning her pages for fetch('/api/...'), with dynamic segments
+// normalised, so this stays true as pages change.
+
+const calledPaths = new Set();
+const fetchRe = /fetch\(\s*[`'"](\/api\/[^`'"$)]*)/g;
+
+for (const f of PAGE_DIRS.flatMap(walk).filter((x) => x.endsWith('.tsx'))) {
+  const src = readFileSync(join(ROOT, f), 'utf8');
+  let m;
+  while ((m = fetchRe.exec(src)) !== null) {
+    // Strip a trailing partial segment left by a template expression, and any
+    // query string, then keep the leading static portion.
+    const cleaned = m[1].split('?')[0].replace(/\/$/, '');
+    calledPaths.add(cleaned);
+  }
+}
+
+/** Does any fetch in her pages target this route file. */
+function reachableFromHerScreens(routePath) {
+  const api = '/' + routePath.replace(/^app\//, '');       // /api/admin/foo
+  // Exact, or a dynamic route whose static prefix is fetched.
+  for (const called of calledPaths) {
+    if (called === api) return true;
+    const staticPrefix = api.replace(/\/\[[^\]]+\]/g, '');
+    if (called === staticPrefix) return true;
+    if (called.startsWith(staticPrefix + '/')) return true;
+    if (api.includes('[') && called.startsWith(api.split('/[')[0] + '/')) return true;
+  }
+  return false;
+}
+
+for (const r of writeRoutes) r.reachable = reachableFromHerScreens(r.path);
+
 // --- Buttons ----------------------------------------------------------------
 //
 // Counted, not enumerated by name. A button's label is often built from state,
@@ -82,20 +121,27 @@ const pages = PAGE_DIRS.flatMap(walk).filter((f) => f.endsWith('page.tsx')).leng
 
 // --- Report -----------------------------------------------------------------
 
-const pct = writeRoutes.length === 0 ? 0 : Math.round((covered.length / writeRoutes.length) * 100);
+const reachable = writeRoutes.filter((r) => r.reachable);
+const reachableCovered = reachable.filter((r) => EXERCISED.includes(r.path));
+const reachableUncovered = reachable.filter((r) => !EXERCISED.includes(r.path));
+const pct = reachable.length === 0 ? 0 : Math.round((reachableCovered.length / reachable.length) * 100);
 
 console.log(`\nBella's surface`);
 console.log(`  ${pages} pages`);
 console.log(`  ${buttonCount} buttons`);
-console.log(`  ${writeRoutes.length} write routes\n`);
+console.log(`  ${writeRoutes.length} write routes, of which ${reachable.length} can be reached by a click\n`);
 
-console.log(`Write routes pressed and asserted: ${covered.length} of ${writeRoutes.length}  (${pct}%)`);
-for (const c of covered) console.log(`  exercised  ${c.path.replace('app/api/', '')}  [${c.verbs.join(', ')}]`);
+console.log(`Reachable write routes pressed and asserted: ${reachableCovered.length} of ${reachable.length}  (${pct}%)`);
+for (const c of reachableCovered) console.log(`  exercised  ${c.path.replace('app/api/', '')}  [${c.verbs.join(', ')}]`);
 
-console.log(`\nNot exercised (${uncovered.length}):`);
-for (const u of uncovered) console.log(`  -  ${u.path.replace('app/api/', '')}  [${u.verbs.join(', ')}]`);
+console.log(`\nShe can click these and nothing checks them (${reachableUncovered.length}):`);
+for (const u of reachableUncovered) console.log(`  -  ${u.path.replace('app/api/', '')}  [${u.verbs.join(', ')}]`);
+
+const unreachable = uncovered.filter((r) => !r.reachable);
+console.log(`\nNot reachable from her screens (${unreachable.length}). Crons, agents, or nothing at all.`);
+console.log(`These still matter, but they are not what breaks under her hands.`);
 
 console.log(
-  `\nA route in that list can stop working and nothing will notice until\n` +
-  `somebody clicks it. That is how Approve stayed broken for eight days.\n`
+  `\nA route in the clickable list can stop working and nothing notices until\n` +
+  `she clicks it. That is how Approve stayed broken for eight days.\n`
 );
