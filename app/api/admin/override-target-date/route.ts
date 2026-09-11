@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServiceSupabase } from '@/lib/supabase';
+import { requireAdminAuth } from '@/lib/tdi-admin/auth';
 
 export async function POST(request: NextRequest) {
+  const auth = await requireAdminAuth();
+  if (auth instanceof NextResponse) return auth;
+
   try {
     const supabase = getServiceSupabase();
     const { creatorId, newDate, reason, adminEmail } = await request.json();
@@ -82,12 +86,17 @@ export async function POST(request: NextRequest) {
 
     // Create audit note
     const adminName = adminEmail.split('@')[0] || 'Admin';
-    await supabase.from('creator_notes').insert({
+    // Audit note. The date itself is already saved above, so a failure here
+    // loses the record of why rather than the change.
+    const { error: noteErr } = await supabase.from('creator_notes').insert({
       creator_id: creatorId,
       content: `[Auto] Target date overridden to ${newDate} by ${adminName}. Reason: ${reason}`,
       author: 'System',
       visible_to_creator: false,
     });
+    if (noteErr) {
+      console.error('[override-target-date] Date changed but reason not noted:', noteErr.message);
+    }
 
     return NextResponse.json({ success: true });
   } catch (error) {
