@@ -75,6 +75,28 @@ function parseLines(text: string): { n: number; es: string }[] {
   return parsed.lines as { n: number; es: string }[]
 }
 
+/**
+ * Keep the document title and the card title saying the same thing.
+ *
+ * The card title and the payload title are translated by two different scripts.
+ * When the English source has them identical, two independent translations
+ * produce two different Spanish sentences, and a teacher sees one title on the
+ * card and another at the top of the download. Paloma filed that three times
+ * (TEA-563, 564, 566) before this existed.
+ *
+ * Only when the English matched. Where the English deliberately differs, for
+ * example a card title for browsing and a kid-facing title inside the document,
+ * the Spanish is left free to differ too.
+ */
+function alignTitle(payload: Json, englishTitle: string | null, spanishTitle: string | null): Json {
+  if (!englishTitle || !spanishTitle) return payload
+  if (!payload || typeof payload !== 'object' || Array.isArray(payload)) return payload
+  const obj = payload as Record<string, Json>
+  if (typeof obj.title !== 'string') return payload
+  if (obj.title.trim() !== englishTitle.trim()) return payload
+  return { ...obj, title: spanishTitle }
+}
+
 async function translatePayload(client: Anthropic, payload: Json, label: string): Promise<Json> {
   const strings: { path: (string | number)[]; text: string }[] = []
   collectStrings(payload, [], strings)
@@ -137,7 +159,7 @@ async function main() {
 
   let query = supabase
     .from('hub_quick_wins')
-    .select('id, slug, title, guide_sections, tool_content, guide_sections_es, tool_content_es, reviewed_at')
+    .select('id, slug, title, title_es, guide_sections, tool_content, guide_sections_es, tool_content_es, reviewed_at')
     .eq('is_published', true)
 
   if (slug) query = query.eq('slug', slug)
@@ -166,8 +188,14 @@ async function main() {
     const label = row.slug || row.id
     try {
       const patch: Record<string, Json> = {}
-      if (row.tool_content) patch.tool_content_es = await translatePayload(client, row.tool_content as Json, `${label} tool`)
-      if (row.guide_sections) patch.guide_sections_es = await translatePayload(client, row.guide_sections as Json, `${label} guide`)
+      if (row.tool_content) {
+        const translated = await translatePayload(client, row.tool_content as Json, `${label} tool`)
+        patch.tool_content_es = alignTitle(translated, row.title, row.title_es)
+      }
+      if (row.guide_sections) {
+        const translated = await translatePayload(client, row.guide_sections as Json, `${label} guide`)
+        patch.guide_sections_es = alignTitle(translated, row.title, row.title_es)
+      }
 
       if (dryRun) {
         const sample = JSON.stringify(patch.tool_content_es ?? patch.guide_sections_es).slice(0, 220)
