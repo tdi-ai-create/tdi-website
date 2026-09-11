@@ -33,12 +33,10 @@
   "notify",
   "override-target-date",
   "partnerships/by-deal",
-  "publish-course",
   "recruitment-analytics",
   "reengagement/pipeline",
   "reopen-milestone",
   "request-revision",
-  "resend-welcome",
   "restore-project",
   "run-migration",
   "schema-check",
@@ -51,7 +49,5 @@
   "sync-milestones",
   "target-date-history",
   "test-notification",
-  "update-content-path",
-  "update-post-launch-notes",
-  "update-publish-status"
+  "update-post-launch-notes"
 ]
