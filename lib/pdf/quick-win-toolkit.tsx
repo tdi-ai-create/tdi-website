@@ -90,7 +90,7 @@ export function ToolkitPDF({ data }: { data: ToolkitData }) {
                       </View>
                       <Text style={w.why}>{whyText}</Text>
                       {item.meta ? <Text style={s.itemMeta}>{item.meta}</Text> : null}
-                      <SayBlock say={say} />
+                      <SayBlock say={say} lang={data.lang ?? 'en'} />
                     </View>
                   </View>
                 )

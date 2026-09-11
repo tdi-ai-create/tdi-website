@@ -113,7 +113,7 @@ export function ReferencePDF({ data }: { data: ReferenceData }) {
                         )}
                       </View>
                     </View>
-                    <SayBlock say={say} />
+                    <SayBlock say={say} lang={data.lang ?? 'en'} />
                   </View>
                 )
               })}

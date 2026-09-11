@@ -84,11 +84,12 @@ export function AlertBlock({ alert, lang = 'en' }: { alert?: Alert; lang?: Lang 
 }
 
 /** Weight 4. */
-export function SayBlock({ say, label = 'Say' }: { say?: string; label?: string }) {
+export function SayBlock({ say, label, lang = 'en' }: { say?: string; label?: string; lang?: Lang }) {
+  const resolved = label || getLabels(lang).say
   if (!say) return null
   return (
     <View style={w.sayBox} wrap={false}>
-      <Text style={w.sayLabel}>{label}</Text>
+      <Text style={w.sayLabel}>{resolved}</Text>
       <Text style={w.sayText}>{say}</Text>
     </View>
   )

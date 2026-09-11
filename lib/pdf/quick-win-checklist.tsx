@@ -99,7 +99,7 @@ export function ChecklistPDF({ data }: { data: ChecklistData }) {
                         )}
                       </View>
                     </View>
-                    <SayBlock say={say} />
+                    <SayBlock say={say} lang={data.lang ?? 'en'} />
                   </View>
                 )
               })}

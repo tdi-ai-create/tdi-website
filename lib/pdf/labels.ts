@@ -33,6 +33,7 @@ export type PdfLabels = {
   notes: string
   tip: string
   beforeAnythingElse: string
+  say: string
   lift_low: string
   lift_med: string
   lift_high: string
@@ -56,6 +57,7 @@ const EN: PdfLabels = {
   notes: 'Notes',
   tip: 'Tip',
   beforeAnythingElse: 'Before anything else',
+  say: 'Say',
   lift_low: 'Grab & Go',
   lift_med: 'Some Prep',
   lift_high: 'Deep Dive',
@@ -79,6 +81,7 @@ const ES: PdfLabels = {
   notes: 'Notas',
   tip: 'Consejo',
   beforeAnythingElse: 'Antes que nada',
+  say: 'Dilo así',
   // Brand vocabulary, chosen rather than translated. Listo para usar keeps the
   // "you can use this now" promise that Grab & Go carries.
   lift_low: 'Listo para usar',
@@ -144,6 +147,10 @@ const CATEGORY_ES: Record<string, string> = {
 }
 
 export function categoryLabel(category: string | undefined | null, lang: Lang = 'en'): string {
+  // Deliberately English in both languages. Quick Win is a product name, and
+  // the glossary keeps product names in English. This looks like a leak on a
+  // Spanish page and is not one, which is why it is written down here and in
+  // Paloma's instructions rather than left for each reviewer to rediscover.
   if (!category) return 'Quick Win'
   return lang === 'es' ? CATEGORY_ES[category] || category : category
 }
