@@ -190,3 +190,14 @@ jobs:
         # condition and asserts the suite notices. A guard that cannot catch its
         # own failure is decoration.
         run: npm run check:spanish
+
+      - name: The translator leaves our own names alone
+        # Found on the day Spanish went live, by looking at a real page. Google
+        # had been rendering the company name as "Los profesores se lo merecen"
+        # and Quick Wins as "Victorias rapidas" since June, on every Spanish
+        # page, and Coaches as "Entrenadores", the sports kind.
+        #
+        # Product names are masked before translation and restored after, and a
+        # few strings have a chosen Spanish form so the page and the document a
+        # reader opens cannot contradict each other.
+        run: npm run check:uitranslation
