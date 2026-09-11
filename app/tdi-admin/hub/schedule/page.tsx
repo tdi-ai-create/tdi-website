@@ -177,9 +177,14 @@ export default function HubSchedulePage() {
     <div className="p-6 max-w-[1200px] mx-auto">
       <div className="flex items-center justify-between flex-wrap gap-3 mb-1">
         <h1 className="text-2xl font-semibold text-[#1e2749]">Content calendar</h1>
-        <Link href="/tdi-admin/hub" className="text-sm text-[#5B6B8C] hover:underline">
-          Back to Hub
-        </Link>
+        <div className="flex items-center gap-4">
+          <Link href="/tdi-admin/hub/review" className="text-sm font-semibold text-[#1e2749] hover:underline">
+            Waiting on you
+          </Link>
+          <Link href="/tdi-admin/hub" className="text-sm text-[#5B6B8C] hover:underline">
+            Back to Hub
+          </Link>
+        </div>
       </div>
       <p className="text-sm text-[#6B7684] mb-5 max-w-[70ch]">
         Every channel on one surface. Hub tools take the next open weekday, at most {cap} a day.
