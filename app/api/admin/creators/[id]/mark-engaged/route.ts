@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { requireAdminAuth } from '@/lib/tdi-admin/auth';
 
 // POST /api/admin/creators/[id]/mark-engaged
 // One-click action for Bella to mark a creator as engaged,
@@ -9,6 +10,9 @@ export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const auth = await requireAdminAuth();
+  if (auth instanceof NextResponse) return auth;
+
   try {
     const { id } = await params;
     const body = await request.json().catch(() => ({}));
@@ -31,7 +35,12 @@ export async function POST(
       .single();
 
     if (activeSeq) {
-      await supabase
+      // This must not fail quietly. Marking someone engaged is how we stop
+      // mailing them. If the cancellation is lost the sequence stays active and
+      // the creator keeps receiving re-engagement email after a person decided
+      // they should not. The comment below records that an earlier version of
+      // this route already had a whole update silently rejected by Postgres.
+      const { error: cancelErr } = await supabase
         .from('creator_reengagement_sequences')
         .update({
           status: 'cancelled',
@@ -40,6 +49,16 @@ export async function POST(
           updated_at: now,
         })
         .eq('id', activeSeq.id);
+
+      if (cancelErr) {
+        console.error('[mark-engaged] Sequence not cancelled', {
+          creatorId: id, sequenceId: activeSeq.id, error: cancelErr.message,
+        });
+        return NextResponse.json({
+          success: false,
+          error: 'The re-engagement sequence was not cancelled, so this creator will keep receiving those emails. Retry before assuming it stopped.',
+        }, { status: 500 });
+      }
     }
 
     // Record the touch. This previously also wrote followed_up_by, a column
@@ -79,6 +98,9 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const auth = await requireAdminAuth();
+  if (auth instanceof NextResponse) return auth;
+
   try {
     const { id } = await params;
 
