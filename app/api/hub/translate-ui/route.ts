@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { prepareForTranslation, unmaskProtected } from '@/lib/hub/ui-translation-guard';
 import { createClient } from '@supabase/supabase-js';
 
 // Service role client for server-side operations
@@ -45,8 +46,44 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Resolve anything the glossary answers without a translator: product
+    // names, the company name, and the words Rae chose rather than translated.
+    // See lib/hub/ui-translation-guard.ts for why this exists.
+    const resolvedByGlossary: Record<string, string> = {};
+    const masks = new Map<string, { masked: string; found: string[] }>();
+
+    for (const str of validStrings) {
+      if (cachedMap[str]) continue;
+      const prepared = prepareForTranslation(str);
+      if (prepared.resolved !== undefined) {
+        resolvedByGlossary[str] = prepared.resolved;
+      } else {
+        masks.set(str, { masked: prepared.masked!, found: prepared.found! });
+      }
+    }
+
     // Find strings that need translation
-    const needsTranslation = validStrings.filter(s => !cachedMap[s]);
+    const needsTranslation = validStrings.filter(
+      s => !cachedMap[s] && resolvedByGlossary[s] === undefined,
+    );
+
+    // A glossary answer is as cacheable as a translated one, and caching it
+    // means the next page load does not re-derive it.
+    if (Object.keys(resolvedByGlossary).length > 0) {
+      const glossaryRows = Object.entries(resolvedByGlossary).map(([source_text, translated_text]) => ({
+        source_text, target_lang: lang, translated_text,
+      }));
+      const { error: glossaryCacheError } = await supabase
+        .from('hub_ui_translations')
+        .upsert(glossaryRows, { onConflict: 'source_text,target_lang' });
+      // The cache is an optimisation, so a failure here does not fail the
+      // request. It does get said out loud: a cache that silently stopped
+      // writing would look like a slow page and nothing else.
+      if (glossaryCacheError) {
+        console.error('[translate-ui] glossary cache write failed:', glossaryCacheError.message);
+      }
+      Object.assign(cachedMap, resolvedByGlossary);
+    }
 
     // If all strings are cached, return immediately
     if (needsTranslation.length === 0) {
@@ -72,7 +109,7 @@ export async function POST(request: NextRequest) {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            q: needsTranslation,
+            q: needsTranslation.map(str => masks.get(str)?.masked ?? str),
             source: 'en',
             target: lang,
             format: 'text',
@@ -99,7 +136,9 @@ export async function POST(request: NextRequest) {
 
       for (let i = 0; i < needsTranslation.length; i++) {
         const source = needsTranslation[i];
-        const translated = translations[i]?.translatedText || source;
+        const raw = translations[i]?.translatedText || source;
+        // Restore the names that were masked out, or the page prints a token.
+        const translated = unmaskProtected(raw, masks.get(source)?.found ?? []);
         result[source] = translated;
         toCache.push({
           source_text: source,
@@ -110,10 +149,12 @@ export async function POST(request: NextRequest) {
 
       // Cache translations (ignore errors - cache is optional)
       if (toCache.length > 0) {
-        await supabase
+        const { error: cacheError } = await supabase
           .from('hub_ui_translations')
-          .upsert(toCache, { onConflict: 'source_text,target_lang' })
-          .then(() => {});
+          .upsert(toCache, { onConflict: 'source_text,target_lang' });
+        if (cacheError) {
+          console.error('[translate-ui] translation cache write failed:', cacheError.message);
+        }
       }
 
       return NextResponse.json({ translations: result });
