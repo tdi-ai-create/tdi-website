@@ -5,6 +5,7 @@ import {
   blocksPublish,
   PUBLISH_BLOCKED_MESSAGE,
 } from '@/lib/creator-agreement';
+import { requireAdminAuth } from '@/lib/tdi-admin/auth';
 
 /**
  * API endpoint for admins to mark a creator's course as published.
@@ -12,6 +13,9 @@ import {
  * milestones as optional, and updates the creator's details.
  */
 export async function POST(request: Request) {
+  const auth = await requireAdminAuth();
+  if (auth instanceof NextResponse) return auth;
+
   try {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;

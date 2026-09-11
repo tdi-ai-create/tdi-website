@@ -6,6 +6,7 @@ import {
   blocksPublish,
   PUBLISH_BLOCKED_MESSAGE,
 } from '@/lib/creator-agreement';
+import { requireAdminAuth } from '@/lib/tdi-admin/auth';
 
 /**
  * Rule B. Actions that put a creator's work in front of the public, or keep it
@@ -15,6 +16,9 @@ import {
 const GOES_LIVE = ['publish_now', 'schedule', 'reschedule', 'mark_published'];
 
 export async function POST(request: NextRequest) {
+  const auth = await requireAdminAuth();
+  if (auth instanceof NextResponse) return auth;
+
   try {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
