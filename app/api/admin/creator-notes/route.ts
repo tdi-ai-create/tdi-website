@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServiceSupabase } from '@/lib/supabase'
 import { notifyCreatorOfNote } from '@/lib/creator-note-notify'
+import { requireAdminAuth } from '@/lib/tdi-admin/auth';
 
 /**
  * Admin API for managing creator draft notes (Anne Marie's check-in notes)
@@ -41,6 +42,9 @@ function contactWarning(creator: { lifecycle_state?: string | null; status?: str
 }
 
 export async function GET(request: NextRequest) {
+  const auth = await requireAdminAuth();
+  if (auth instanceof NextResponse) return auth;
+
   const { searchParams } = new URL(request.url)
   const status = searchParams.get('status') || 'pending_approval'
   const supabase = getServiceSupabase()
@@ -112,6 +116,9 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const auth = await requireAdminAuth();
+  if (auth instanceof NextResponse) return auth;
+
   const body = await request.json()
   const { action, note_id, approved_by } = body
   const supabase = getServiceSupabase()
