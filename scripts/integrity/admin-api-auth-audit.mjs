@@ -66,7 +66,12 @@ for (const file of routes) {
   const guard = GUARDS.find((g) => new RegExp(`\\b${g}\\s*\\(|\\b${g}\\b\\s*[=!]==?`).test(code));
   const writes = methods.some((m) => m !== 'GET');
 
-  const record = { file: file.replace(`${ROOT}/`, '').replace('/route.ts', ''), methods, guard, writes };
+  // A plain replace of '/route.ts' leaves the trailing x on a route.tsx file,
+// so deliverables/send-invoice was listed and baselined as
+// 'deliverables/send-invoicex'. That mangled name is why an unguarded
+// route that emails invoices to schools was overlooked when the money
+// routes were fixed.
+  const record = { file: file.replace(`${ROOT}/`, '').replace(/\/route\.tsx?$/, ''), methods, guard, writes };
   (guard ? guarded : open).push(record);
 }
 

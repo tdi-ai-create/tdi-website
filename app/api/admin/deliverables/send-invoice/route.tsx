@@ -7,6 +7,7 @@ import { renderToBuffer } from '@react-pdf/renderer';
 import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
 import React from 'react';
 import { asInvoiced } from '@/lib/billing/state'
+import { requireAdminAuth } from '@/lib/tdi-admin/auth';
 
 function getResend() {
   return new Resend(process.env.RESEND_API_KEY);
@@ -166,6 +167,9 @@ function InvoicePDF({ data }: { data: InvoiceData }) {
  * }
  */
 export async function POST(request: NextRequest) {
+  const auth = await requireAdminAuth();
+  if (auth instanceof NextResponse) return auth;
+
   const emailHeader = request.headers.get('x-user-email');
   if (!emailHeader) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
@@ -243,7 +247,13 @@ export async function POST(request: NextRequest) {
     dueDate = existing.due_date;
 
     if (notes) {
-      await supabase.from('intelligence_invoices').update({ notes }).eq('id', invoiceId);
+      // Cosmetic field on an invoice that already exists. Record a failure,
+      // do not fail the send.
+      const { error: notesErr } = await supabase
+        .from('intelligence_invoices').update({ notes }).eq('id', invoiceId);
+      if (notesErr) {
+        console.error('[send-invoice] Notes not saved on', invoiceId, notesErr.message);
+      }
     }
   } else if (deliverable.invoice_id && !resend) {
     return NextResponse.json({ error: 'Already invoiced. Use resend: true to resend.' }, { status: 400 });
@@ -279,11 +289,16 @@ export async function POST(request: NextRequest) {
 
     invoiceId = invoice.id;
 
-    await supabase.from('collections_workflow').insert({
+    // The invoice already exists, so a failure here means it is not being
+    // chased rather than not being billed.
+    const { error: cwErr } = await supabase.from('collections_workflow').insert({
       invoice_id: invoiceId,
       current_stage: 'sent',
       risk_flag: false,
     });
+    if (cwErr) {
+      console.error('[send-invoice] No collections record for', invoiceId, cwErr.message);
+    }
 
     // Auto-mark as delivered if still pending/scheduled, then set to invoiced
     const deliverableUpdate: Record<string, unknown> = {
@@ -297,10 +312,26 @@ export async function POST(request: NextRequest) {
       deliverableUpdate.delivery_date = now.toISOString().split('T')[0];
     }
 
-    await supabase
+    // This must not fail quietly. The duplicate guard earlier in this route
+    // reads deliverable.invoice_id, so if this write is lost the deliverable
+    // never looks invoiced, the guard never trips, and the school can be
+    // billed a second time for the same work.
+    const { error: linkErr } = await supabase
       .from('contract_deliverables')
       .update(deliverableUpdate)
       .eq('id', deliverableId);
+
+    if (linkErr) {
+      console.error('[send-invoice] Invoice created but deliverable not marked', {
+        invoiceId, invoiceNumber, deliverableId, error: linkErr.message,
+      });
+      return NextResponse.json({
+        success: false,
+        error: `Invoice ${invoiceNumber} was created but the deliverable was not marked invoiced. Mark it before invoicing again, or the school may be billed twice.`,
+        invoiceId,
+        invoiceNumber,
+      }, { status: 500 });
+    }
   }
 
   // An explicit override still wins, since Bella may know something the record
@@ -373,12 +404,17 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Email send failed' }, { status: 500 });
   }
 
-  await supabase.from('payment_events').insert({
+  // The mail has already gone, so a failure here loses the audit trail rather
+  // than the action.
+  const { error: eventErr } = await supabase.from('payment_events').insert({
     invoice_id: invoiceId,
     event_type: resend ? 'invoice_resent' : 'invoice_sent',
     event_date: now.toISOString().split('T')[0],
     summary: `Invoice ${invoiceNumber} ${resend ? 'resent' : 'sent'} to ${recipientEmail}${poNumber ? ` (PO #${poNumber})` : ''} with PDF attached`,
   });
+  if (eventErr) {
+    console.error('[send-invoice] Invoice sent but not logged', invoiceId, eventErr.message);
+  }
 
   return NextResponse.json({
     success: true,
