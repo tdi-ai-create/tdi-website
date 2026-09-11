@@ -180,3 +180,13 @@ jobs:
         # a TypeScript runner this job does not have, and a check that cannot
         # run is a check that quietly passes. Verified against both real bugs.
         run: npm run check:chrome
+
+      - name: A Spanish file is only served after it is read
+        # Every Spanish document exists for some minutes before anyone reviews
+        # it. If the page served one because the file existed, every item would
+        # be live and unreviewed for those minutes.
+        #
+        # Eight reader states, plus a case that deliberately removes the review
+        # condition and asserts the suite notices. A guard that cannot catch its
+        # own failure is decoration.
+        run: npm run check:spanish
