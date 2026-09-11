@@ -73,10 +73,15 @@ export async function POST(request: NextRequest) {
       const glossaryRows = Object.entries(resolvedByGlossary).map(([source_text, translated_text]) => ({
         source_text, target_lang: lang, translated_text,
       }));
-      await supabase
+      const { error: glossaryCacheError } = await supabase
         .from('hub_ui_translations')
-        .upsert(glossaryRows, { onConflict: 'source_text,target_lang' })
-        .then(() => {});
+        .upsert(glossaryRows, { onConflict: 'source_text,target_lang' });
+      // The cache is an optimisation, so a failure here does not fail the
+      // request. It does get said out loud: a cache that silently stopped
+      // writing would look like a slow page and nothing else.
+      if (glossaryCacheError) {
+        console.error('[translate-ui] glossary cache write failed:', glossaryCacheError.message);
+      }
       Object.assign(cachedMap, resolvedByGlossary);
     }
 
@@ -144,10 +149,12 @@ export async function POST(request: NextRequest) {
 
       // Cache translations (ignore errors - cache is optional)
       if (toCache.length > 0) {
-        await supabase
+        const { error: cacheError } = await supabase
           .from('hub_ui_translations')
-          .upsert(toCache, { onConflict: 'source_text,target_lang' })
-          .then(() => {});
+          .upsert(toCache, { onConflict: 'source_text,target_lang' });
+        if (cacheError) {
+          console.error('[translate-ui] translation cache write failed:', cacheError.message);
+        }
       }
 
       return NextResponse.json({ translations: result });
