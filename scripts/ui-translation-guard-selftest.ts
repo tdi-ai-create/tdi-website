@@ -97,6 +97,22 @@ const bad = (name: string, detail: string) => {
   else bad('no override smuggles in a dash or an emoji', offenders.map(o => o[0]).join(', '))
 }
 
+// 9. Caps. LEARNING HUB in the nav slipped through a case-sensitive pass on
+//    the first day of this fix and rendered as CENTRO DE APRENDIZAJE.
+{
+  const r = prepareForTranslation('LEARNING HUB')
+  if (r.resolved === 'LEARNING HUB') ok('a protected name in caps is protected, and keeps its caps')
+  else bad('a protected name in caps is protected', JSON.stringify(r))
+}
+
+// 10. Grammar. A masked name reads as neuter, so "Share this Quick Win" came
+//     back as "Comparte esto Quick Win" rather than "este".
+{
+  const r = prepareForTranslation('Share this Quick Win')
+  if (r.resolved === 'Comparte este Quick Win') ok('a determiner before a product name agrees with it')
+  else bad('a determiner before a product name agrees with it', JSON.stringify(r))
+}
+
 if (failed > 0) {
   console.log(`\n${failed} failure(s).`)
   process.exit(1)

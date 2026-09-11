@@ -71,6 +71,19 @@ export const UI_OVERRIDES_ES: Record<string, string> = {
   // The one term a general translator always gets wrong here.
   'Coaches': 'Asesores',
   'Coach': 'Asesor',
+
+  // Whole phrases, because masking a product name leaves the translator
+  // guessing its gender and it guesses neuter: "Share this Quick Win" came
+  // back as "Comparte esto Quick Win". These are the phrases on the Hub today
+  // that pair a determiner with a masked name.
+  'Share this Quick Win': 'Comparte este Quick Win',
+  'Explore Quick Wins': 'Explora los Quick Wins',
+  'Explore all Quick Wins': 'Explora todos los Quick Wins',
+  'Explore more Quick Wins': 'Descubre más Quick Wins',
+  'Browse Quick Wins': 'Explora los Quick Wins',
+  'Back to Quick Wins': 'Volver a Quick Wins',
+  'This Quick Win': 'Este Quick Win',
+  'Save this Quick Win': 'Guarda este Quick Win',
 }
 
 /** A token no translator will touch or reorder, unlike the words themselves. */
@@ -88,10 +101,17 @@ export function maskProtected(text: string): { masked: string; found: string[] }
   let masked = text
 
   for (const name of DO_NOT_TRANSLATE) {
-    if (!masked.includes(name)) continue
+    // Case-insensitive, because the nav prints LEARNING HUB in caps and a
+    // case-sensitive pass let exactly that through on the first day. What goes
+    // back is the case as it appeared in the original, not the case in the
+    // list, so a heading stays a heading.
+    const pattern = new RegExp(name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi')
+    const hits = masked.match(pattern)
+    if (!hits) continue
+
     const index = found.length
-    found.push(name)
-    masked = masked.split(name).join(token(index))
+    found.push(hits[0])
+    masked = masked.replace(pattern, token(index))
   }
 
   return { masked, found }
@@ -124,7 +144,12 @@ export function prepareForTranslation(text: string): {
   if (override) return { resolved: override }
 
   // A string that is nothing but a protected name never goes to a translator.
-  if (DO_NOT_TRANSLATE.includes(text.trim())) return { resolved: text }
+  // Compared case-insensitively for the same reason the masking is: the nav
+  // prints LEARNING HUB in caps. The original is returned, so its case is kept.
+  const trimmed = text.trim()
+  if (DO_NOT_TRANSLATE.some(n => n.toLowerCase() === trimmed.toLowerCase())) {
+    return { resolved: text }
+  }
 
   const { masked, found } = maskProtected(text)
   return { masked, found }
