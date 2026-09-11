@@ -23,6 +23,7 @@
     "check:stepowners": "node scripts/integrity/check-step-owners.mjs",
     "check:definitions": "node scripts/check-one-definition.mjs",
     "check:guards": "npx tsx scripts/check-guards.mjs",
+    "check:coverage": "node scripts/check-coverage.mjs",
     "check:games": "node scripts/check-games.mjs"
   },
   "dependencies": {
