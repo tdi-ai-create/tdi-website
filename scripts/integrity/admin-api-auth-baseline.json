@@ -1,5 +1,4 @@
 [
-  "add-note",
   "affiliate/creator",
   "affiliate/leaderboard",
   "affiliate/metrics",
@@ -9,10 +8,7 @@
   "approve-milestone",
   "archive-project",
   "creator-email-activity",
-  "creator-feedback",
-  "creator-internal-notes",
   "creator-locations",
-  "creator-notes",
   "creators/[id]/ai-summary",
   "creators/[id]/data",
   "creators/[id]/date-history",
@@ -24,7 +20,6 @@
   "fix-aitabe-milestones",
   "fix-milestone-progression",
   "fix-milestone-status",
-  "mark-followed-up",
   "notifications",
   "notify",
   "partnerships/by-deal",
@@ -41,6 +36,5 @@
   "survey-responses",
   "sync-milestones",
   "target-date-history",
-  "test-notification",
-  "update-post-launch-notes"
+  "test-notification"
 ]
