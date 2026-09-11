@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { requireAdminAuth } from '@/lib/tdi-admin/auth'
+import {
+  applyAnswerOutcome,
+  VALID_OUTCOMES as VALID_ANSWER_OUTCOMES,
+} from '@/lib/funding-answer-actions'
 
 function db() {
   return createClient(
@@ -89,7 +93,7 @@ export async function POST(
  *   stop_path      this path is not viable, close it
  *   still_blocked  answered, but it does not unblock us yet
  */
-const VALID_OUTCOMES = ['proceed', 'stop_path', 'still_blocked']
+const VALID_OUTCOMES = VALID_ANSWER_OUTCOMES
 
 // PATCH -- update an action item
 export async function PATCH(
@@ -183,7 +187,7 @@ export async function PATCH(
             note: 'Recorded on the item. Use when an answer is never coming.',
           },
         }, { status: 400 })
-      } else if (!outcome || !VALID_OUTCOMES.includes(String(outcome))) {
+      } else if (!outcome || !(VALID_OUTCOMES as string[]).includes(String(outcome))) {
         return NextResponse.json({
           error: `"${existing.title}" needs to say what the answer means before closing.`,
           requires: {
@@ -228,43 +232,68 @@ export async function PATCH(
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-  // "stop_path" was a valid outcome that nothing acted on. A person could
-  // answer "nobody here is an NEA member, stop this path", it would be recorded
-  // faithfully, and the path would stay open for an agent to keep drafting.
+  // Every outcome now does something.
   //
-  // The path is closed, never deleted. It keeps the answer that closed it, who
-  // gave it and when, so it can be reopened if the facts change.
+  // "stop_path" was the only one of the three that did, so a person could
+  // answer "the window is open, proceed", it would be recorded faithfully, and
+  // no next step would exist. St. Peter Chanel sat like that from 9 September
+  // on a window closing 1 October.
+  //
+  // lib/funding-answer-actions.ts is the single place that decides what an
+  // answer means for the work. Reading one file answers "what happens when she
+  // replies", rather than one rule here and two absences.
   let pathStopped: { opportunityId: string; reason: string } | null = null
+  let nextSteps: { created: number; titles: string[]; because: string } | null = null
+  let nextStepError: string | null = null
 
-  if (updates.outcome === 'stop_path') {
-    const { data: item } = await supabase
+  if (updates.outcome) {
+    const { data: answered } = await supabase
       .from('funding_action_items')
-      .select('opportunity_id, answer, answered_by, title')
+      .select('id, pursuit_id, opportunity_id, title, answer, answered_by, category, reminder_count')
       .eq('id', body.actionId)
       .single()
 
-    if (item?.opportunity_id) {
-      const why = [
-        item.answer ? `"${item.answer}"` : null,
-        item.answered_by ? `answered by ${item.answered_by}` : null,
-        item.title ? `in reply to: ${item.title}` : null,
-      ].filter(Boolean).join(' · ')
+    if (answered) {
+      // The funder's name and the school, so the work this creates reads like
+      // something a person can act on without opening the record first.
+      let grantName: string | null = null
+      if (answered.opportunity_id) {
+        const { data: opp } = await supabase
+          .from('funding_opportunities')
+          .select('name')
+          .eq('id', answered.opportunity_id)
+          .maybeSingle()
+        grantName = opp?.name ?? null
+      }
+      const { data: pursuit } = await supabase
+        .from('funding_pursuits')
+        .select('district_name')
+        .eq('id', answered.pursuit_id)
+        .maybeSingle()
 
-      const { error: stopErr } = await supabase
-        .from('funding_opportunities')
-        .update({
-          status: 'closed',
-          eligibility_verdict: 'stop',
-          eligibility_reason: why || 'Stopped by an answer recorded against this path.',
-          eligibility_rule: 'answered',
-          eligibility_checked_at: new Date().toISOString(),
-        })
-        .eq('id', item.opportunity_id)
+      const result = await applyAnswerOutcome(supabase, {
+        actionId: String(answered.id),
+        pursuitId: String(answered.pursuit_id),
+        opportunityId: answered.opportunity_id,
+        outcome: updates.outcome as 'proceed' | 'stop_path' | 'still_blocked',
+        questionTitle: String(answered.title ?? ''),
+        answer: answered.answer ?? null,
+        answeredBy: answered.answered_by ?? null,
+        category: answered.category ?? null,
+        grantName,
+        schoolName: pursuit?.district_name ?? null,
+        priorReAsks: Number(answered.reminder_count ?? 0),
+      })
 
-      if (stopErr) {
-        console.error('[actions] Answer said stop_path but the path did not close:', stopErr)
-      } else {
-        pathStopped = { opportunityId: item.opportunity_id, reason: why }
+      pathStopped = result.pathStopped
+      nextSteps = { created: result.created, titles: result.titles, because: result.because }
+
+      // Surfaced, never swallowed. An answer that produced no next step is the
+      // failure this replaced, so it has to be visible at the moment it
+      // happens rather than discovered weeks later by the person waiting.
+      if (result.error) {
+        nextStepError = result.error
+        console.error('[actions] answer recorded but the next step was not created:', result.error)
       }
     }
   }
@@ -278,14 +307,22 @@ export async function PATCH(
       .single()
 
     if (action?.opportunity_id) {
-      await supabase
+      // Logged rather than returned. A stale last_activity_at makes a grant
+      // look quieter than it is, which is worth knowing about, but it is not a
+      // reason to tell the person their answer failed when it saved.
+      const { error: activityError } = await supabase
         .from('funding_opportunities')
         .update({ last_activity_at: new Date().toISOString() })
         .eq('id', action.opportunity_id)
+      if (activityError) {
+        console.error('[actions] last_activity_at not updated:', activityError.message)
+      }
     }
   }
 
-  // Tell the caller the path closed, so the UI can say so rather than leaving
-  // the person to wonder whether their answer did anything.
-  return NextResponse.json({ success: true, pathStopped })
+  // Tell the caller what the answer did: whether it closed the path, and what
+  // work it created. She should see what her reply set in motion in the same
+  // breath as giving it. A reply that vanishes into a record is the thing
+  // being fixed here.
+  return NextResponse.json({ success: true, pathStopped, nextSteps, nextStepError })
 }

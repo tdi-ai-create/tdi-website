@@ -26,6 +26,7 @@ import { looksLikeRecordId } from '../milestone-key';
 import { isPastDrafting, screenPath } from '../funding-eligibility';
 import { isOursToDo, isWaitingOnUs, whoseTurn } from '../creator-turn';
 import { isPersonOwned, isSchoolOwned } from '../funding-ownership';
+import { planAfterAnswer } from '../funding-answer-actions';
 
 export interface GuardCase {
   /** What this case proves, in words. */
@@ -162,6 +163,115 @@ export const GUARDS: Guard[] = [
       { name: 'camelCase is read the same way', holds: () => isSchoolOwned({ ownerType: 'client' }) === true },
     ],
   },
+  {
+    id: 'answer-creates-work',
+    protects: 'An answer that produces no next step',
+    origin:
+      '11 September 2026: of the three things an answer can mean, only stop_path did anything. ' +
+      'Bella confirmed on 9 September that the St. Peter Chanel window was open and closing ' +
+      '1 October. The answer saved, nothing was created, and the work stopped there.',
+    cases: [
+      {
+        name: 'proceed always creates work',
+        holds: () =>
+          (['gate', 'documentation', 'follow_up', '', 'something_new'] as string[]).every(
+            (category) =>
+              planAfterAnswer({
+                outcome: 'proceed',
+                questionTitle: 'Is this funder actually open, and when does it close?',
+                answer: 'Sept 1 to Oct 1, open now',
+                category,
+              }).items.length > 0
+          ),
+      },
+      {
+        name: 'a cleared gate asks for the application, not another question',
+        holds: () => {
+          const plan = planAfterAnswer({
+            outcome: 'proceed',
+            questionTitle: 'Is TDI an approved vendor with this state agency?',
+            answer: 'Yes, approved',
+            category: 'gate',
+            grantName: 'NEA Learning and Leadership',
+          });
+          return (
+            plan.items.length === 1 &&
+            plan.items[0].requiresAnswer === false &&
+            plan.items[0].title.includes('NEA Learning and Leadership')
+          );
+        },
+      },
+      {
+        name: 'a confirmed submission turns into watching for the decision',
+        holds: () => {
+          const plan = planAfterAnswer({
+            outcome: 'proceed',
+            questionTitle: 'Check if Gary submitted the IAA Foundation application',
+            answer: 'Submitted 9 Sept, confirmation forwarded',
+            category: 'follow_up',
+            grantName: 'IAA Foundation',
+          });
+          return plan.items.length === 1 && /decision/i.test(plan.items[0].title);
+        },
+      },
+      {
+        name: 'still stuck comes back rather than going quiet',
+        holds: () => {
+          const plan = planAfterAnswer({
+            outcome: 'still_blocked',
+            questionTitle: 'Does anyone at this school hold the membership this grant requires?',
+            answer: 'Left a voicemail, no reply yet',
+            category: 'gate',
+            priorReAsks: 0,
+          });
+          return (
+            plan.items.length === 1 &&
+            plan.items[0].requiresAnswer === true &&
+            plan.items[0].dueInDays > 0
+          );
+        },
+      },
+      {
+        name: 'a question that has come back twice becomes a decision for Rae',
+        holds: () => {
+          const plan = planAfterAnswer({
+            outcome: 'still_blocked',
+            questionTitle: 'Is TDI an approved vendor with this state agency?',
+            answer: 'Still no answer from the state',
+            category: 'gate',
+            priorReAsks: 2,
+          });
+          return plan.items.length === 1 && plan.items[0].ownerType === 'rae';
+        },
+      },
+      {
+        name: 'a chase never lands on the school',
+        holds: () =>
+          (['proceed', 'still_blocked'] as const).every((outcome) =>
+            planAfterAnswer({
+              outcome,
+              questionTitle: 'Check if Teri submitted the Pepco application',
+              answer: 'Not yet',
+              category: 'follow_up',
+              priorReAsks: 0,
+            }).items.every((i) => i.ownerType === 'tdi' || i.ownerType === 'rae')
+          ),
+      },
+      {
+        name: 'stop_path closes the path and creates nothing',
+        holds: () => {
+          const plan = planAfterAnswer({
+            outcome: 'stop_path',
+            questionTitle: 'Does anyone at this school hold the membership this grant requires?',
+            answer: 'No, confirmed by email 17 Aug',
+            category: 'gate',
+          });
+          return plan.closesPath === true && plan.items.length === 0;
+        },
+      },
+    ],
+  },
+
 ];
 
 export interface GuardResult {

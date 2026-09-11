@@ -26,6 +26,12 @@ const OUTCOME_WORDS: Record<string, string> = {
 export function ActionsTab({ pursuitId }: ActionsTabProps) {
   // What the server said when it refused to close an item, keyed by item.
   const [blocked, setBlocked] = useState<Record<string, BlockedClose>>({})
+  // What the last answer set in motion. The same answer given from My Tasks
+  // says this already; a second door that stays silent is how two paths
+  // through the same action drift apart.
+  const [justAnswered, setJustAnswered] = useState<
+    { next: string[]; because?: string; problem?: string } | null
+  >(null)
   const [addError, setAddError] = useState<string | null>(null)
   const [answers, setAnswers] = useState<Record<string, { answer: string; outcome: string; skip: string; showSkip: boolean }>>({})
 
@@ -85,6 +91,14 @@ export function ActionsTab({ pursuitId }: ActionsTabProps) {
           },
         }))
         return
+      }
+      if (data.nextSteps?.titles?.length || data.nextStepError) {
+        setJustAnswered({
+          next: data.nextSteps?.titles ?? [],
+          because: data.nextSteps?.because,
+          problem: data.nextStepError || undefined,
+        })
+        setTimeout(() => setJustAnswered(null), 14000)
       }
       fetchActions()
     } catch {
@@ -189,6 +203,31 @@ export function ActionsTab({ pursuitId }: ActionsTabProps) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      {justAnswered && (
+        <div style={{
+          padding: '10px 14px', background: '#ECFDF5', border: '1px solid #A7F3D0',
+          borderRadius: 8, fontSize: 12, color: '#065F46',
+        }}>
+          {justAnswered.next.length > 0 && (
+            <>
+              <div style={{ fontWeight: 600 }}>
+                {justAnswered.next.length === 1 ? 'Next step created:' : 'Next steps created:'}
+              </div>
+              {justAnswered.next.map(t => (
+                <div key={t} style={{ marginTop: 2 }}>{t}</div>
+              ))}
+              {justAnswered.because && (
+                <div style={{ marginTop: 4, opacity: 0.85 }}>{justAnswered.because}</div>
+              )}
+            </>
+          )}
+          {justAnswered.problem && (
+            <div style={{ marginTop: justAnswered.next.length ? 6 : 0, color: '#92400E' }}>
+              Your answer was saved, but the next step was not created. {justAnswered.problem}
+            </div>
+          )}
+        </div>
+      )}
       {/* Add button */}
       <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
         <button
