@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { notifyApproved } from '@/lib/content-queue/notify'
+import { notifyApproved, notifyWaiting } from '@/lib/content-queue/notify'
 import { parseSlides, carouselProblems } from '@/lib/content-queue/carousel'
 import {
   TRANSITIONS, OWNER_OF, actorHoldsRole, isSelfReview, legalFrom, canRequestChanges, canFlagBlocked,
@@ -286,6 +286,13 @@ export async function POST(request: NextRequest) {
       }
     }
     if (action === 'pass_qa') patch.qa_spec_version = body.qa_spec_version ?? null
+    // Reaching an approver is the moment a person is needed. Announcing it only
+    // after they act tells them something they already know.
+    if (rule.to === 'pending_approval') {
+      const told = notifyWaiting({ id, title: item.title, channel: item.channel })
+      entry.notified = told.attempted
+      entry.notified_note = told.reason
+    }
     if (action === 'approve') {
       patch.approved_by = actor
       patch.approved_at = new Date().toISOString()
