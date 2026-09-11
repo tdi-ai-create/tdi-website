@@ -168,3 +168,15 @@ jobs:
         # behavioural test would need a TypeScript runner this repo does not
         # have, and a check that cannot run is a check that quietly passes.
         run: npm run check:labels
+
+      - name: Every printed word knows its language
+        # A Spanish document has to be Spanish all the way to the furniture. Two
+        # labels reached teachers as English over Spanish: the alert heading on
+        # 10 September and the Say label on 11 September. Both were defaults
+        # rather than text in the page, so reading the templates for text in the
+        # page found neither, twice.
+        #
+        # Scans the source rather than a rendered file, because rendering needs
+        # a TypeScript runner this job does not have, and a check that cannot
+        # run is a check that quietly passes. Verified against both real bugs.
+        run: npm run check:chrome
