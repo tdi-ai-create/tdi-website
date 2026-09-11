@@ -32,13 +32,9 @@ const WAITING: Record<string, string> = {
 
 export default function ReviewQueue() {
   const [rows, setRows] = useState<Row[]>([])
-  const [you, setYou] = useState<string | null>(null)
   const [openId, setOpenId] = useState<string | null>(null)
   const [detail, setDetail] = useState<Detail | null>(null)
-  const [note, setNote] = useState('')
-  const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [done, setDone] = useState<string | null>(null)
 
   const loadList = useCallback(async () => {
     setError(null)
@@ -46,12 +42,12 @@ export default function ReviewQueue() {
       const res = await fetch('/api/tdi-admin/content-queue')
       const j = await res.json()
       if (!res.ok) throw new Error(j.error || 'Could not load the queue')
-      setRows(j.items ?? []); setYou(j.you ?? null)
+      setRows(j.items ?? [])
     } catch (e) { setError(e instanceof Error ? e.message : 'Could not load the queue') }
   }, [])
 
   const loadDetail = useCallback(async (id: string) => {
-    setDetail(null); setNote(''); setError(null)
+    setDetail(null); setError(null)
     try {
       const res = await fetch(`/api/tdi-admin/content-queue?id=${encodeURIComponent(id)}`)
       const j = await res.json()
@@ -62,24 +58,6 @@ export default function ReviewQueue() {
 
   useEffect(() => { loadList() }, [loadList])
   useEffect(() => { if (openId) loadDetail(openId) }, [openId, loadDetail])
-
-  async function act(action: 'approve' | 'request_changes') {
-    if (!openId) return
-    setBusy(true); setError(null); setDone(null)
-    try {
-      const res = await fetch('/api/tdi-admin/content-queue', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: openId, action, note: note || undefined }),
-      })
-      const j = await res.json()
-      if (!res.ok) throw new Error(j.error || 'That did not go through')
-      setDone(action === 'approve' ? 'Approved. Whoever publishes it has been told.' : 'Sent back to the writer with your note.')
-      setOpenId(null); setDetail(null); setNote('')
-      await loadList()
-    } catch (e) { setError(e instanceof Error ? e.message : 'That did not go through') }
-    finally { setBusy(false) }
-  }
 
   const mine = rows.filter(r => r.status === 'pending_approval')
   const elsewhere = rows.filter(r => r.status !== 'pending_approval')
@@ -93,17 +71,16 @@ export default function ReviewQueue() {
         </Link>
       </div>
       <p className="text-sm text-[#6B7684] mb-5 max-w-[70ch]">
-        Content that has cleared QA, creative and editorial, and now needs a person. Open a piece, read
-        the actual draft, and either approve it or send it back with a note saying what to change.
+        Content that has cleared QA, creative and editorial. Read the draft here, where a carousel
+        actually renders and a post reads at full length. Approving happens on the Paperclip board,
+        where you are already asked for everything else and where answering wakes the agent that
+        raised it.
       </p>
 
-      {you === null && (
-        <div className="mb-4 p-3 rounded border border-[#96631A] bg-[#F8F0DF] text-sm text-[#1e2749]">
-          You can read everything here but cannot approve. Approval is recorded under Kristin&apos;s or
-          Rae&apos;s name, so it has to be one of them signing it.
-        </div>
-      )}
-      {done && <div className="mb-4 p-3 rounded border border-[#3F6B4F] bg-[#E8F0E9] text-sm">{done}</div>}
+      <div className="mb-4 p-3 rounded border border-[#D8DDE3] bg-[#F4F6F8] text-sm text-[#1e2749]">
+        This page does not approve anything. It is here to read. The decision is a board approval in
+        Paperclip, which carries the summary and the risks and wakes the agent waiting on it.
+      </div>
       {error && <div className="mb-4 p-3 rounded border border-[#9E3B3B] bg-[#F8E7E6] text-sm">{error}</div>}
 
       <h2 className="!text-sm !font-semibold !m-0 mb-2 text-[#1e2749]">
@@ -152,20 +129,11 @@ export default function ReviewQueue() {
             ))}
           </div>
 
-          <textarea value={note} onChange={e => setNote(e.target.value)}
-            placeholder="If you are sending it back, say what to change. Required."
-            className="w-full border border-[#D8DDE3] rounded p-2 text-sm mb-3" rows={3} />
-
-          <div className="flex gap-2">
-            <button disabled={busy || you === null} onClick={() => act('approve')}
-              className="px-4 py-2 text-sm rounded bg-[#1e2749] text-white disabled:opacity-40">
-              Approve
-            </button>
-            <button disabled={busy || you === null || !note.trim()} onClick={() => act('request_changes')}
-              className="px-4 py-2 text-sm rounded border border-[#9E3B3B] text-[#9E3B3B] disabled:opacity-40">
-              Send it back
-            </button>
-          </div>
+          <a href="https://paperclip-railway-template-production.up.railway.app/TEA/dashboard"
+            target="_blank" rel="noreferrer"
+            className="inline-block px-4 py-2 text-sm rounded bg-[#1e2749] text-white">
+            Decide this on the board
+          </a>
         </div>
       )}
 

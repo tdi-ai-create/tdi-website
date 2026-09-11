@@ -4,7 +4,7 @@ import { notifyApproved, notifyWaiting } from '@/lib/content-queue/notify'
 import { parseSlides, carouselProblems } from '@/lib/content-queue/carousel'
 import {
   TRANSITIONS, OWNER_OF, actorHoldsRole, isSelfReview, legalFrom, canRequestChanges, canFlagBlocked,
-  isTransition, hasContent,
+  isTransition, hasContent, canRecordBoardDecision,
   type Action, type Status,
 } from '@/lib/content-queue/workflow'
 
@@ -116,12 +116,66 @@ export async function POST(request: NextRequest) {
     const note = typeof body.note === 'string' ? body.note.trim() : ''
     const supabase = db()
 
-    if (!action || (isTransition(action) ? !TRANSITIONS[action] : action !== 'flag_blocked')) {
+    const NON_TRANSITIONS = ['flag_blocked', 'record_board_decision']
+    if (!action || (isTransition(action) ? !TRANSITIONS[action] : !NON_TRANSITIONS.includes(action))) {
       return NextResponse.json(
-        { error: `Unknown action "${action}". Known: ${Object.keys(TRANSITIONS).join(', ')}, flag_blocked` },
+        { error: `Unknown action "${action}". Known: ${Object.keys(TRANSITIONS).join(', ')}, ${NON_TRANSITIONS.join(', ')}` },
         { status: 400 })
     }
     if (!actor) return NextResponse.json({ error: 'actor is required, so the log names who did this' }, { status: 400 })
+
+    // ── a decision made on the board, written down here ──
+    if (action === 'record_board_decision') {
+      const rid = body.id
+      const decidedBy = typeof body.decided_by === 'string' ? body.decided_by.trim() : ''
+      const boardId = typeof body.board_approval_id === 'string' ? body.board_approval_id.trim() : ''
+      const decision = body.decision
+
+      if (!rid) return NextResponse.json({ error: 'id is required' }, { status: 400 })
+      if (!decidedBy) return NextResponse.json({ error: 'decided_by is required: name the person who actually decided.' }, { status: 400 })
+      if (!boardId) return NextResponse.json({ error: 'board_approval_id is required: a decision with no board record behind it is not a decision.' }, { status: 400 })
+      if (decision !== 'approved' && decision !== 'denied') {
+        return NextResponse.json({ error: 'decision must be "approved" or "denied".' }, { status: 400 })
+      }
+      if (decision === 'denied' && !note) {
+        return NextResponse.json({ error: 'A denial needs the note the board gave, so the writer knows what to change.' }, { status: 400 })
+      }
+
+      const { data: brow, error: bErr } = await supabase
+        .from('content_queue_items').select('id, title, channel, status, feedback_log').eq('id', rid).single()
+      if (bErr || !brow) return NextResponse.json({ error: 'Item not found' }, { status: 404 })
+
+      const verdict = canRecordBoardDecision(actor, decidedBy, brow as { status: Status })
+      if (!verdict.allowed) return NextResponse.json({ error: verdict.reason }, { status: 403 })
+
+      const to = decision === 'approved' ? 'approved' : 'changes_requested'
+      const bEntry = {
+        at: new Date().toISOString(), actor, action, from: brow.status, to,
+        note: note || null,
+        decided_by: decidedBy, board_approval_id: boardId, relayed_by: actor,
+      }
+      if (dryRun) return NextResponse.json({ dryRun: true, wouldMove: rid, to, logEntry: bEntry })
+
+      const bPatch: Record<string, unknown> = {
+        status: to,
+        owner: OWNER_OF[to as Status],
+        feedback_log: [...((brow.feedback_log as unknown[]) ?? []), bEntry],
+      }
+      if (decision === 'approved') {
+        // The person approved it, not the agent that typed it in.
+        bPatch.approved_by = decidedBy
+        bPatch.approved_at = new Date().toISOString()
+      }
+
+      const { error: bUp } = await supabase.from('content_queue_items').update(bPatch).eq('id', rid)
+      if (bUp) return NextResponse.json({ success: false, refusedBy: 'database gate', error: bUp.message }, { status: 400 })
+
+      if (decision === 'approved') {
+        const told = notifyApproved({ id: rid, title: brow.title, channel: brow.channel, approved_by: decidedBy })
+        return NextResponse.json({ success: true, id: rid, to, approved_by: decidedBy, notified: told.attempted, notified_note: told.reason })
+      }
+      return NextResponse.json({ success: true, id: rid, to, decided_by: decidedBy })
+    }
 
     // ── flagging does not move the row ──
     //
@@ -289,9 +343,11 @@ export async function POST(request: NextRequest) {
     // Reaching an approver is the moment a person is needed. Announcing it only
     // after they act tells them something they already know.
     if (rule.to === 'pending_approval') {
-      const told = notifyWaiting({ id, title: item.title, channel: item.channel })
-      entry.notified = told.attempted
-      entry.notified_note = told.reason
+      // Deliberately silent here. Reaching a person raises a board approval in
+      // Paperclip, which is where Rae already works and which wakes the
+      // requesting agent with the result. A Slack message as well would be a
+      // second place to be asked for the same decision.
+      entry.awaiting_board = true
     }
     if (action === 'approve') {
       patch.approved_by = actor

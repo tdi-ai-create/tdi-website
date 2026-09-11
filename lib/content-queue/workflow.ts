@@ -43,6 +43,8 @@ export type Action =
   | 'request_changes' | 'approve' | 'schedule' | 'mark_published' | 'verify' | 'cancel'
   // Not a transition: it parks a piece where it already is.
   | 'flag_blocked'
+  // A human decided in Paperclip and an agent is transcribing it here.
+  | 'record_board_decision'
 
 type Rule = {
   from: Status[]
@@ -53,7 +55,7 @@ type Rule = {
   needsNote?: boolean
 }
 
-export const TRANSITIONS: Record<Exclude<Action, 'flag_blocked'>, Rule> = {
+export const TRANSITIONS: Record<Exclude<Action, 'flag_blocked' | 'record_board_decision'>, Rule> = {
   place_brief:     { from: [],                                     to: 'brief',             role: 'orchestrator' },
   pick_up:         { from: ['brief', 'changes_requested'],         to: 'drafting',          role: 'writer' },
   submit:          { from: ['drafting'],                           to: 'pending_qa',        role: 'writer' },
@@ -108,8 +110,8 @@ export function actorHoldsRole(actor: string, role: string | null): boolean {
 }
 
 /** flag_blocked is the one action that is not a transition, so it has no rule. */
-export function isTransition(action: Action): action is Exclude<Action, 'flag_blocked'> {
-  return action !== 'flag_blocked'
+export function isTransition(action: Action): action is Exclude<Action, 'flag_blocked' | 'record_board_decision'> {
+  return action !== 'flag_blocked' && action !== 'record_board_decision'
 }
 
 export function legalFrom(action: Action, current: Status): boolean {
@@ -221,4 +223,34 @@ export function hasContent(item: { body?: string | null; artifact_refs?: unknown
   if (body.length > 0) return true
   const refs = item.artifact_refs
   return Array.isArray(refs) && refs.length > 0
+}
+
+/**
+ * A decision made in Paperclip, written down here.
+ *
+ * Approval belongs on the board. That is where Rae already works, where agents
+ * raise approvals natively, and where Paperclip wakes the requester with the
+ * result. What it cannot do is reach into this queue, so an agent transcribes
+ * the decision.
+ *
+ * The transcription has to stay honest about who decided. approved_by is the
+ * person. The agent that relayed it and the board approval it came from are
+ * recorded alongside, so the audit trail says a human decided and a named agent
+ * wrote it down, rather than implying the agent approved anything.
+ */
+export function canRecordBoardDecision(
+  actor: string,
+  decidedBy: string,
+  item: { status: Status },
+): { allowed: boolean; reason?: string } {
+  if (item.status !== 'pending_approval') {
+    return { allowed: false, reason: `Only a piece waiting on a person can carry a board decision. This one is "${item.status}".` }
+  }
+  if (!actorHoldsRole(actor, 'orchestrator')) {
+    return { allowed: false, reason: `"${actor}" cannot record a board decision. That is the orchestrator's step.` }
+  }
+  if (!actorHoldsRole(decidedBy, 'approver')) {
+    return { allowed: false, reason: `"${decidedBy}" does not hold the approver role, so a decision cannot be recorded in their name.` }
+  }
+  return { allowed: true }
 }
