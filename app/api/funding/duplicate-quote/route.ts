@@ -96,7 +96,33 @@ export async function POST(request: NextRequest) {
       is_recommended: pkg.is_recommended,
     }))
 
-    await supabase.from('quote_packages').insert(newPackages)
+    const { error: packagesErr } = await supabase.from('quote_packages').insert(newPackages)
+
+    if (packagesErr) {
+      // A quote with no packages is not a duplicate, it is an empty quote that
+      // looks ready to send. Nothing else is attached to the new row yet, so
+      // remove it rather than leaving a priceless draft in the list.
+      console.error('[duplicate-quote] Packages not copied, removing the empty quote', {
+        sourceQuoteId: quoteId, newQuoteId: newQuote.id, packages: newPackages.length,
+        error: packagesErr.message,
+      })
+
+      const { error: cleanupErr } = await supabase.from('quotes').delete().eq('id', newQuote.id)
+
+      if (cleanupErr) {
+        console.error('[duplicate-quote] Empty quote could not be removed either', {
+          newQuoteId: newQuote.id, error: cleanupErr.message,
+        })
+        return NextResponse.json({
+          error: `Quote ${newNumber} was created but its packages were not copied, and the empty quote could not be removed. Delete ${newNumber} by hand before anyone sends it.`,
+          newQuoteId: newQuote.id,
+        }, { status: 500 })
+      }
+
+      return NextResponse.json({
+        error: 'The packages could not be copied, so no quote was created. Nothing was left behind. Retry.',
+      }, { status: 500 })
+    }
   }
 
   return NextResponse.json({ success: true, newQuoteId: newQuote.id, quoteNumber: newNumber })
