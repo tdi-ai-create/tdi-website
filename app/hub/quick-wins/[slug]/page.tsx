@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, use } from 'react';
+import { pickDownloads } from '@/lib/hub/spanish-download';
 import Link from 'next/link';
 import { getQuizBySlug } from '@/lib/hub/quizConfigs';
 import { useRouter } from 'next/navigation';
@@ -378,6 +379,50 @@ function getTestimonials(id: string): typeof TESTIMONIALS {
 
 // ─── Interfaces ─────────────────────────────────────────────────────────────
 
+/**
+ * One line telling the reader what language the file is in.
+ *
+ * Shown only when it is not obvious: a Spanish reader getting a Spanish file
+ * gets a quiet confirmation, and a Spanish reader getting English gets told
+ * before they open it rather than after. An English reader sees nothing,
+ * because nothing about their download is surprising.
+ *
+ * The alternative was hiding the button when no Spanish document exists. That
+ * tells a Spanish speaking teacher the Hub has nothing for her, when it has
+ * hundreds of things for her and most of them are in English today.
+ */
+function LanguageNote({
+  picked,
+  tUI,
+}: {
+  picked: { fileLanguage: 'en' | 'es'; fellBackToEnglish: boolean };
+  tUI: (s: string) => string;
+}) {
+  if (picked.fellBackToEnglish) {
+    return (
+      <div
+        className="flex items-center gap-1.5 text-[11px] px-0.5"
+        style={{ color: '#FFD98A' }}
+      >
+        <span className="w-1.5 h-1.5 rounded-full" style={{ background: 'currentColor' }} />
+        {tUI('This PDF is in English')}
+      </div>
+    );
+  }
+  if (picked.fileLanguage === 'es') {
+    return (
+      <div
+        className="flex items-center gap-1.5 text-[11px] px-0.5"
+        style={{ color: 'rgba(255,255,255,0.62)' }}
+      >
+        <span className="w-1.5 h-1.5 rounded-full" style={{ background: 'currentColor' }} />
+        {tUI('PDF in Spanish')}
+      </div>
+    );
+  }
+  return null;
+}
+
 interface QuickWin {
   id: string;
   slug: string;
@@ -390,6 +435,10 @@ interface QuickWin {
   video_url: string | null;
   download_url: string | null;
   tool_file_url?: string | null;
+  file_url_es?: string | null;
+  tool_file_url_es?: string | null;
+  /** Paloma's stamp. No stamp, no Spanish file, however good it looks. */
+  translated_at?: string | null;
   capacity?: 'low' | 'medium' | 'high' | null;
   title_es?: string | null;
   description_es?: string | null;
@@ -415,6 +464,9 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
   const { user } = useHub();
   const isTDIAdmin = useIsTDIAdmin(!!user?.email);
   const { language, t } = useLanguage();
+  // hub_config is not readable with the anon key, so the flag comes from a
+  // server route that hands out a narrow allowlist. Off until it answers.
+  const [spanishDownloads, setSpanishDownloads] = useState(false);
   const lang = language === 'es' ? 'es' : 'en';
 
   // ─── Interactive Quiz Route ──────────────────────────────────────────────
@@ -679,6 +731,13 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
 
   // ─── Data Loading ─────────────────────────────────────────────────────────
 
+  // Which file this reader gets. A plain call rather than a memo: this
+  // component already calls hooks after an early return in 22 places, and a
+  // hook here would be the 23rd. The function is pure and cheap, so recomputing
+  // it on every render costs nothing and cannot go stale when the language
+  // toggles or the flag arrives.
+  const picked = pickDownloads(quickWin ?? {}, language, spanishDownloads);
+
   // Fetch quick win data
   useEffect(() => {
     async function loadQuickWin() {
@@ -712,6 +771,13 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
           video_url: null,
           download_url: data.file_url || null,
           tool_file_url: data.tool_file_url || null,
+          // Carried raw rather than resolved here. Which file a reader gets
+          // depends on the language toggle and a flag that arrives after this
+          // fetch, and baking the answer in at load time means flipping the
+          // toggle leaves the old file behind the button.
+          file_url_es: data.file_url_es || null,
+          tool_file_url_es: data.tool_file_url_es || null,
+          translated_at: data.translated_at || null,
           capacity: data.lift === 'LOW' ? 'low' : data.lift === 'MED' ? 'medium' : data.lift === 'HIGH' ? 'high' : null,
           title_es: data.title_es || null,
           description_es: data.description_es || null,
@@ -728,6 +794,11 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
         setIsLoading(false);
       }
     }
+
+    fetch('/api/hub/flags')
+      .then(r => (r.ok ? r.json() : null))
+      .then(f => setSpanishDownloads(!!f?.spanish_downloads_enabled))
+      .catch(() => setSpanishDownloads(false));
 
     loadQuickWin();
   }, [slug, router]);
@@ -1322,12 +1393,12 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                   <Play size={16} />
                   {tUI('Take Quiz')}
                 </Link>
-              ) : quickWin.tool_file_url ? (
+              ) : picked.toolFileUrl ? (
                 <>
                   <a
-                    href={quickWin.tool_file_url}
+                    href={picked.toolFileUrl || undefined}
 
-                    onClick={() => logDownload('tool', quickWin.tool_file_url)}
+                    onClick={() => logDownload('tool', picked.toolFileUrl)}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center justify-center gap-2 py-3 px-4 font-semibold text-sm rounded-xl transition-opacity hover:opacity-90"
@@ -1336,11 +1407,12 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                     <Download size={16} />
                     {tUI('Download Tool')}
                   </a>
-                  {quickWin.download_url ? (
+                  <LanguageNote picked={picked} tUI={tUI} />
+                  {picked.downloadUrl ? (
                     <a
-                      href={quickWin.download_url}
+                      href={picked.downloadUrl}
 
-                      onClick={() => logDownload(quickWin.tool_file_url ? 'guide' : 'tool', quickWin.download_url)}
+                      onClick={() => logDownload(picked.toolFileUrl ? 'guide' : 'tool', picked.downloadUrl)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center justify-center gap-2 py-2.5 px-4 text-xs rounded-xl transition-opacity hover:opacity-80"
@@ -1351,11 +1423,12 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                     </a>
                   ) : null}
                 </>
-              ) : quickWin.download_url ? (
+              ) : picked.downloadUrl ? (
+                <>
                 <a
-                  href={quickWin.download_url}
+                  href={picked.downloadUrl}
 
-                  onClick={() => logDownload(quickWin.tool_file_url ? 'guide' : 'tool', quickWin.download_url)}
+                  onClick={() => logDownload(picked.toolFileUrl ? 'guide' : 'tool', picked.downloadUrl)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center justify-center gap-2 py-3 px-4 font-semibold text-sm rounded-xl transition-opacity hover:opacity-90"
@@ -1364,6 +1437,8 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                   <Download size={16} />
                   {tUI('Download Tool')}
                 </a>
+                <LanguageNote picked={picked} tUI={tUI} />
+                </>
               ) : quickWin.content_type === 'quiz' ? (
                 <div
                   className="flex items-center justify-center gap-2 py-3 px-4 text-sm rounded-xl"

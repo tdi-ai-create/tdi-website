@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { notifyAdmin } from '@/lib/admin-notify';
+import { requireAdminAuth } from '@/lib/tdi-admin/auth';
 
 /**
  * POST /api/admin/notify
@@ -14,6 +15,9 @@ import { notifyAdmin } from '@/lib/admin-notify';
  * Body: { event, partnershipName, details, urgency? }
  */
 export async function POST(request: NextRequest) {
+  const auth = await requireAdminAuth();
+  if (auth instanceof NextResponse) return auth;
+
   try {
     const { event, partnershipName, details, urgency } = await request.json();
     const result = await notifyAdmin({ event, partnershipName, details, urgency });

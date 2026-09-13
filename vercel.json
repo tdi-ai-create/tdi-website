@@ -203,6 +203,10 @@
     {
       "path": "/api/cron/hub-monthly",
       "schedule": "0 13 26 * *"
+    },
+    {
+      "path": "/api/cron/hub-spanish-editions",
+      "schedule": "45 * * * *"
     }
   ]
 }

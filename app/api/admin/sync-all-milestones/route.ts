@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { requireAdminAuth } from '@/lib/tdi-admin/auth';
 
 /**
  * POST /api/admin/sync-all-milestones
@@ -13,6 +14,9 @@ import { createClient } from '@supabase/supabase-js';
  * - Respects content path filtering (applies_to field on milestones)
  */
 export async function POST(request: Request) {
+  const auth = await requireAdminAuth();
+  if (auth instanceof NextResponse) return auth;
+
   try {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -67,14 +71,17 @@ export async function POST(request: Request) {
 
     // Log the action for audit purposes
     if (adminEmail) {
-      await supabase.from('admin_audit_log').insert({
+      // Best effort audit log, but say so out loud instead of swallowing it in
+      // a .then(). The sync itself already succeeded above.
+      const { error: auditErr } = await supabase.from('admin_audit_log').insert({
         action: 'sync_all_milestones',
         admin_email: adminEmail,
         details: data,
         created_at: new Date().toISOString(),
-      }).then(() => {
-        // Ignore errors - audit logging is best-effort
       });
+      if (auditErr) {
+        console.error('[sync-all-milestones] Sync ran but was not logged:', auditErr.message);
+      }
     }
 
     return NextResponse.json({

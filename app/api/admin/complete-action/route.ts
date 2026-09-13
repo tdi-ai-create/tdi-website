@@ -1,12 +1,16 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { clearFlagForCompletedMilestone } from '@/lib/creator-agent-flags';
+import { requireAdminAuth } from '@/lib/tdi-admin/auth';
 
 /**
  * API endpoint for admins to complete creator actions on their behalf.
  * This creates an audit trail and handles all the same logic as creator submissions.
  */
 export async function POST(request: Request) {
+  const auth = await requireAdminAuth();
+  if (auth instanceof NextResponse) return auth;
+
   try {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -188,8 +192,9 @@ export async function POST(request: Request) {
     // Doing the work the flag asked for should retire the flag.
     await clearFlagForCompletedMilestone(supabase, creatorId, milestoneId);
 
-    // Record in creator_submissions for full audit trail
-    await supabase
+    // Audit trail. The milestone is already completed, so record a failure
+    // here rather than failing the request.
+    const { error: subErr } = await supabase
       .from('creator_submissions')
       .insert({
         creator_id: creatorId,
@@ -275,8 +280,8 @@ export async function POST(request: Request) {
       }
     }
 
-    // Add internal note documenting the admin action
-    await supabase
+    // Internal note documenting the admin action.
+    const { error: noteErr } = await supabase
       .from('creator_notes')
       .insert({
         creator_id: creatorId,
@@ -284,9 +289,11 @@ export async function POST(request: Request) {
         author: adminEmail,
         visible_to_creator: false
       });
+    if (noteErr) {
+      console.error('[complete-action] Action taken but not noted:', noteErr.message);
+    }
 
-    // Create admin notification for audit
-    await supabase
+    const { error: notifyErr } = await supabase
       .from('admin_notifications')
       .insert({
         creator_id: creatorId,
@@ -294,6 +301,9 @@ export async function POST(request: Request) {
         message: `${adminEmail} completed "${milestoneName}" for ${creator.name}`,
         link: `/admin/creators/${creatorId}`,
       });
+    if (notifyErr) {
+      console.error('[complete-action] No audit notification:', notifyErr.message);
+    }
 
     console.log('[admin/complete-action] Successfully completed action for creator');
 

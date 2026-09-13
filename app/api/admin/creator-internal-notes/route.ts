@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServiceSupabase } from '@/lib/supabase'
+import { requireAdminAuth } from '@/lib/tdi-admin/auth';
 
 /**
  * Internal TDI documentation on a creator, with an optional follow-up date.
@@ -19,6 +20,9 @@ import { getServiceSupabase } from '@/lib/supabase'
  */
 
 export async function GET(request: NextRequest) {
+  const auth = await requireAdminAuth();
+  if (auth instanceof NextResponse) return auth;
+
   const { searchParams } = new URL(request.url)
   const creatorId = searchParams.get('creator_id')
   const supabase = getServiceSupabase()
@@ -73,6 +77,9 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const auth = await requireAdminAuth();
+  if (auth instanceof NextResponse) return auth;
+
   const body = await request.json()
   const { action } = body
   const supabase = getServiceSupabase()

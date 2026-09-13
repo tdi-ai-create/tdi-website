@@ -1,11 +1,15 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { requireAdminAuth } from '@/lib/tdi-admin/auth';
 
 /**
  * API endpoint for admins to mark milestones as optional (bonus) or required (core).
  * Optional milestones don't count against core completion percentage.
  */
 export async function POST(request: Request) {
+  const auth = await requireAdminAuth();
+  if (auth instanceof NextResponse) return auth;
+
   try {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -70,6 +74,7 @@ export async function POST(request: Request) {
       .in('milestone_id', milestoneIds);
 
     // Update each milestone with merged metadata
+    const setFailures: string[] = [];
     for (const cm of currentMilestones || []) {
       const existingMetadata = (cm.metadata as Record<string, unknown>) || {};
       const newMetadata = {
@@ -80,7 +85,10 @@ export async function POST(request: Request) {
         optional_set_at: isOptional ? new Date().toISOString() : null,
       };
 
-      await supabase
+      // This update is the whole point of the request. If it fails quietly the
+      // milestone keeps its old status while the screen reports success, which
+      // is the shape that broke five features in two days.
+      const { error: setErr } = await supabase
         .from('creator_milestones')
         .update({
           metadata: newMetadata,
@@ -88,6 +96,21 @@ export async function POST(request: Request) {
         })
         .eq('creator_id', creatorId)
         .eq('milestone_id', cm.milestone_id);
+
+      if (setErr) {
+        console.error('[milestones/optional] Failed to set milestone', {
+          creatorId, milestoneId: cm.milestone_id, error: setErr.message,
+        });
+        setFailures.push(cm.milestone_id);
+      }
+    }
+
+    if (setFailures.length > 0) {
+      return NextResponse.json({
+        success: false,
+        error: `${setFailures.length} of ${milestoneIds.length} milestone(s) could not be updated. Nothing was noted, so retry rather than assuming it worked.`,
+        failedMilestoneIds: setFailures,
+      }, { status: 500 });
     }
 
     // Add internal note documenting the change
@@ -96,7 +119,9 @@ export async function POST(request: Request) {
       ? `Admin ${action}: ${milestoneNames}. Reason: ${reason}`
       : `Admin ${action}: ${milestoneNames}`;
 
-    await supabase
+    // Audit note. The status change above already succeeded, so record a
+    // failure here and carry on.
+    const { error: noteErr } = await supabase
       .from('creator_notes')
       .insert({
         creator_id: creatorId,
@@ -104,9 +129,12 @@ export async function POST(request: Request) {
         author: adminEmail || 'admin',
         visible_to_creator: false
       });
+    if (noteErr) {
+      console.error('[milestones/optional] Change made but not noted:', noteErr.message);
+    }
 
     // Create admin notification for audit
-    await supabase
+    const { error: notifyErr } = await supabase
       .from('admin_notifications')
       .insert({
         creator_id: creatorId,
@@ -114,6 +142,9 @@ export async function POST(request: Request) {
         message: `${milestoneIds.length} milestone(s) ${action} for ${creator.name}`,
         link: `/admin/creators/${creatorId}`,
       });
+    if (notifyErr) {
+      console.error('[milestones/optional] No audit notification:', notifyErr.message);
+    }
 
     console.log('[admin/milestones/optional] Successfully updated milestones');
 

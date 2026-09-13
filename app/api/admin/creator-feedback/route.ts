@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { requireAdminAuth } from '@/lib/tdi-admin/auth';
 
 function db() {
   return createClient(
@@ -11,6 +12,9 @@ function db() {
 
 // GET: list feedback items by status, with creator and milestone info
 export async function GET(request: NextRequest) {
+  const auth = await requireAdminAuth();
+  if (auth instanceof NextResponse) return auth;
+
   const url = request.nextUrl
   const status = url.searchParams.get('status') || 'pending_review'
   const creatorId = url.searchParams.get('creator_id')
@@ -84,6 +88,9 @@ export async function GET(request: NextRequest) {
 
 // POST: admin actions on feedback (approve, reject, add direct feedback)
 export async function POST(request: NextRequest) {
+  const auth = await requireAdminAuth();
+  if (auth instanceof NextResponse) return auth;
+
   const body = await request.json()
   const { action } = body
   const supabase = db()
@@ -116,11 +123,23 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: error?.message || 'Feedback not found' }, { status: 404 })
     }
 
-    // Update milestone review_status
-    await supabase
+    // The status transition is the work. If it is lost the feedback exists but
+    // the milestone never becomes feedback_ready, so the review queue steps
+    // over it while this reports success.
+    const { error: statusErr } = await supabase
       .from('creator_milestones')
       .update({ review_status: 'feedback_ready' })
       .eq('id', feedback.milestone_record_id)
+
+    if (statusErr) {
+      console.error('[creator-feedback] Approved but status not set', {
+        feedbackId: feedback.id, milestoneRecordId: feedback.milestone_record_id,
+        error: statusErr.message,
+      })
+      return NextResponse.json({
+        error: 'Feedback was approved but the milestone status was not updated, so the creator will not see it. Retry before assuming it sent.',
+      }, { status: 500 })
+    }
 
     // Send email notification
     const { data: creator } = await supabase
@@ -190,12 +209,23 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    // Reset milestone to submitted
+    // Reset milestone to submitted. If this is lost the milestone stays in
+    // review with nothing pending, which is how work goes quiet.
     if (feedback) {
-      await supabase
+      const { error: resetErr } = await supabase
         .from('creator_milestones')
         .update({ review_status: 'submitted' })
         .eq('id', feedback.milestone_record_id)
+
+      if (resetErr) {
+        console.error('[creator-feedback] Rejected but status not reset', {
+          feedbackId: feedback_id, milestoneRecordId: feedback.milestone_record_id,
+          error: resetErr.message,
+        })
+        return NextResponse.json({
+          error: 'Feedback was rejected but the milestone was not returned to submitted, so it will sit in review. Retry.',
+        }, { status: 500 })
+      }
     }
 
     return NextResponse.json({ success: true, feedback_id, reason })
@@ -243,11 +273,21 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    // Update milestone review_status
-    await supabase
+    // Same transition as the approve path, same consequence if it is lost.
+    const { error: statusErr } = await supabase
       .from('creator_milestones')
       .update({ review_status: 'feedback_ready' })
       .eq('id', milestone_record_id)
+
+    if (statusErr) {
+      console.error('[creator-feedback] Direct feedback saved but status not set', {
+        feedbackId: feedback.id, milestoneRecordId: milestone_record_id,
+        error: statusErr.message,
+      })
+      return NextResponse.json({
+        error: 'Feedback was saved but the milestone status was not updated, so the creator will not see it. Retry before assuming it sent.',
+      }, { status: 500 })
+    }
 
     return NextResponse.json({ success: true, feedback_id: feedback.id })
   }

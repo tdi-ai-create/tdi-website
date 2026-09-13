@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { writeSchoolProfile } from '@/lib/funding/school-profile'
 import { createClient } from '@supabase/supabase-js';
+import { requireAdminAuth } from '@/lib/tdi-admin/auth';
 
 /**
  * POST /api/admin/deal-to-partnership
@@ -51,6 +52,9 @@ async function getUniqueSlug(supabase: any, name: string): Promise<string> {
 }
 
 export async function POST(request: NextRequest) {
+  const auth = await requireAdminAuth();
+  if (auth instanceof NextResponse) return auth;
+
   try {
     const supabase = getSupabaseAdmin();
     const body = await request.json();

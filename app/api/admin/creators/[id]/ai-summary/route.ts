@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { requireAdminAuth } from '@/lib/tdi-admin/auth';
+import { isWaitingOnUs } from '@/lib/creator-turn';
 
 // POST /api/admin/creators/[id]/ai-summary
 // Generates an on-demand summary of a creator's profile for the admin team.
@@ -10,6 +12,9 @@ export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const auth = await requireAdminAuth();
+  if (auth instanceof NextResponse) return auth;
+
   try {
     const { id } = await params;
 
@@ -24,7 +29,7 @@ export async function POST(
       supabase.from('creators').select('*').eq('id', id).single(),
       supabase
         .from('creator_milestones')
-        .select('milestone_id, status, completed_at, notes, updated_at')
+        .select('milestone_id, status, review_status, completed_at, notes, updated_at, milestones(requires_team_action)')
         .eq('creator_id', id)
         .order('updated_at', { ascending: false }),
       supabase
@@ -52,7 +57,21 @@ export async function POST(
 
     const completedCount = milestones.filter((m: any) => m.status === 'completed').length;
     const inProgressCount = milestones.filter((m: any) => m.status === 'in_progress').length;
-    const waitingCount = milestones.filter((m: any) => m.status === 'waiting_approval').length;
+    // Was `status === 'waiting_approval'`, which lib/creator-turn.ts names as
+    // one of the four rules that disagreed about whose turn it is. It missed a
+    // step the creator had submitted and a step that was always TDI's work, so
+    // the summary under-reported what was waiting on us. review_status and
+    // milestones.requires_team_action are now selected for this reason.
+    const waitingCount = milestones.filter((m: any) => {
+      // Supabase types the joined row as an array when it cannot prove the
+      // relationship is to-one. It is to-one here.
+      const ms = Array.isArray(m.milestones) ? m.milestones[0] : m.milestones;
+      return isWaitingOnUs({
+        status: m.status,
+        reviewStatus: m.review_status,
+        requiresTeamAction: ms?.requires_team_action,
+      });
+    }).length;
     const totalCount = milestones.length;
 
     const daysSinceActive = creator.updated_at

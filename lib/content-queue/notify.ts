@@ -16,6 +16,39 @@ export function needsPersonHandoff(channel: string): boolean {
 
 const SITE = 'https://www.teachersdeserveit.com'
 
+/**
+ * Something has reached a person and is waiting.
+ *
+ * This is the message that actually matters. The original build only announced
+ * an approval after it happened, which is the moment a human has already acted;
+ * nothing announced that one was needed. On 10 September a finished post sat in
+ * pending_approval for thirteen hours and nobody was told.
+ */
+export function waitingMessage(item: {
+  id: string
+  title: string | null
+  channel: string
+}): string {
+  return [
+    `*Needs approving*`,
+    `${item.title || '(untitled)'}`,
+    `Cleared QA, creative and editorial. Read it and approve it, or send it back.`,
+    `${SITE}/tdi-admin/hub/review`,
+  ].join('\n')
+}
+
+export function notifyWaiting(item: {
+  id: string
+  title: string | null
+  channel: string
+}): { attempted: boolean; reason: string } {
+  if (!process.env.SLACK_WEBHOOK_RAE) {
+    return { attempted: false, reason: 'SLACK_WEBHOOK_RAE is not set, so nobody was told it needs approving' }
+  }
+  slackNotify('rae', waitingMessage(item))
+  return { attempted: true, reason: 'told #rae-actions it needs approving' }
+}
+
 export function approvalMessage(item: {
   id: string
   title: string | null

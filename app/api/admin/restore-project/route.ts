@@ -1,7 +1,11 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { requireAdminAuth } from '@/lib/tdi-admin/auth';
 
 export async function POST(request: Request) {
+  const auth = await requireAdminAuth();
+  if (auth instanceof NextResponse) return auth;
+
   try {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -40,8 +44,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: restoreError.message }, { status: 500 });
     }
 
-    // Create a note
-    await supabase
+    // Audit note. The archive state change above already succeeded and is
+    // error checked, so a failure here loses the record of who did it rather
+    // than the action itself.
+    const { error: noteErr } = await supabase
       .from('creator_notes')
       .insert({
         creator_id: creatorId,
@@ -49,6 +55,9 @@ export async function POST(request: Request) {
         author: 'System',
         visible_to_creator: false,
       });
+    if (noteErr) {
+      console.error('[restore-project] Change made but not noted:', noteErr.message);
+    }
 
     console.log('[restore-project] Successfully restored project:', projectId);
 

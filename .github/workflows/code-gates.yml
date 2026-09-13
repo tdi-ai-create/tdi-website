@@ -168,3 +168,36 @@ jobs:
         # behavioural test would need a TypeScript runner this repo does not
         # have, and a check that cannot run is a check that quietly passes.
         run: npm run check:labels
+
+      - name: Every printed word knows its language
+        # A Spanish document has to be Spanish all the way to the furniture. Two
+        # labels reached teachers as English over Spanish: the alert heading on
+        # 10 September and the Say label on 11 September. Both were defaults
+        # rather than text in the page, so reading the templates for text in the
+        # page found neither, twice.
+        #
+        # Scans the source rather than a rendered file, because rendering needs
+        # a TypeScript runner this job does not have, and a check that cannot
+        # run is a check that quietly passes. Verified against both real bugs.
+        run: npm run check:chrome
+
+      - name: A Spanish file is only served after it is read
+        # Every Spanish document exists for some minutes before anyone reviews
+        # it. If the page served one because the file existed, every item would
+        # be live and unreviewed for those minutes.
+        #
+        # Eight reader states, plus a case that deliberately removes the review
+        # condition and asserts the suite notices. A guard that cannot catch its
+        # own failure is decoration.
+        run: npm run check:spanish
+
+      - name: The translator leaves our own names alone
+        # Found on the day Spanish went live, by looking at a real page. Google
+        # had been rendering the company name as "Los profesores se lo merecen"
+        # and Quick Wins as "Victorias rapidas" since June, on every Spanish
+        # page, and Coaches as "Entrenadores", the sports kind.
+        #
+        # Product names are masked before translation and restored after, and a
+        # few strings have a chosen Spanish form so the page and the document a
+        # reader opens cannot contradict each other.
+        run: npm run check:uitranslation
