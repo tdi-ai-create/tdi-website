@@ -194,3 +194,39 @@ export function screenPath(path: PathContext, school: SchoolContext): Eligibilit
     reason: 'No rule objects to this path for this school.',
   }
 }
+
+/**
+ * The question a person has to answer, per rule.
+ *
+ * The rule's own reason is written for a reader and becomes the body. This is
+ * the one-line ask that appears in a list.
+ */
+export const QUESTION_BY_RULE: Record<string, string> = {
+  named_applicant: 'Does anyone at this school hold the membership this grant requires?',
+  designation: 'Does this school hold a school-improvement designation?',
+  tdi_authorization: 'Is TDI an approved vendor with this state agency?',
+  window: 'Is this funder actually open, and when does it close?',
+  sector: 'Does this school sit inside the state accountability system?',
+}
+
+/**
+ * The same question, with the grant it is about on the front.
+ *
+ * Four of these sat on Bella's list on 10 September, every one titled "Is this
+ * funder actually open, and when does it close?" and nothing else. The grant
+ * name was on the row, in twelve pixel grey beneath the title. She wrote that
+ * she could not find anything about the Washington Commanders Charitable
+ * Foundation or Sharing Prince Georges. Amara had researched both on
+ * 8 September and her findings were sitting inside two of those identical rows.
+ *
+ * A list of repeated sentences is not a list. Whatever distinguishes one row
+ * from another belongs where a person reads first.
+ */
+export function eligibilityQuestionTitle(rule: string, grantName?: string | null): string {
+  const question = QUESTION_BY_RULE[rule] ?? 'Confirm this before any drafting starts'
+  const grant = (grantName ?? '').trim()
+  if (!grant) return question
+  // Already named, so do not say it twice.
+  if (question.toLowerCase().includes(grant.toLowerCase())) return question
+  return `${grant}: ${question}`
+}

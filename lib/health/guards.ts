@@ -23,10 +23,11 @@
 
 import { clientTaskLabel, NEUTRAL_TASK_LABEL } from '../funding-followup-email';
 import { looksLikeRecordId } from '../milestone-key';
-import { isPastDrafting, screenPath } from '../funding-eligibility';
+import { isPastDrafting, screenPath, eligibilityQuestionTitle } from '../funding-eligibility';
 import { isOursToDo, isWaitingOnUs, whoseTurn } from '../creator-turn';
 import { isPersonOwned, isSchoolOwned } from '../funding-ownership';
 import { planAfterAnswer } from '../funding-answer-actions';
+import { canAgentDraft, stalledDraftMessage } from '../funding-offerable';
 
 export interface GuardCase {
   /** What this case proves, in words. */
@@ -301,6 +302,138 @@ export const GUARDS: Guard[] = [
             category: 'gate',
           });
           return plan.closesPath === true && plan.items.length === 0;
+        },
+      },
+    ],
+  },
+
+  {
+    id: 'question-names-its-grant',
+    protects: 'A list of questions nobody can tell apart',
+    origin:
+      '10 September 2026: four questions sat on Bella\'s list, every one titled "Is this funder ' +
+      'actually open, and when does it close?". She reported she could not find anything about the ' +
+      'Washington Commanders Charitable Foundation or Sharing Prince Georges. Amara had researched ' +
+      'both on 8 September and the findings were inside two of those identical rows.',
+    cases: [
+      {
+        name: 'the grant name leads the question',
+        holds: () =>
+          eligibilityQuestionTitle('window', 'Washington Commanders Charitable Foundation').startsWith(
+            'Washington Commanders Charitable Foundation'
+          ),
+      },
+      {
+        name: 'two grants asked the same question get two different titles',
+        holds: () =>
+          eligibilityQuestionTitle('window', 'Washington Commanders Charitable Foundation') !==
+          eligibilityQuestionTitle('window', 'Sharing Prince Georges'),
+      },
+      {
+        name: 'the question survives when no grant name is available',
+        holds: () => {
+          const t = eligibilityQuestionTitle('window', null);
+          return t.length > 0 && t.includes('open');
+        },
+      },
+      {
+        name: 'an unknown rule still produces something a person can act on',
+        holds: () => {
+          const t = eligibilityQuestionTitle('something_new', 'Some Grant');
+          return t.startsWith('Some Grant') && t.length > 'Some Grant: '.length;
+        },
+      },
+      {
+        name: 'a grant already named in the question is not named twice',
+        holds: () => {
+          const t = eligibilityQuestionTitle('window', 'funder');
+          return (t.match(/funder/gi) || []).length === 1;
+        },
+      },
+    ],
+  },
+
+  {
+    id: 'chase-only-what-is-offered',
+    protects: 'Telling a person to chase a writer who was never handed the work',
+    origin:
+      '13 September 2026: Bella\'s board said "Title I Section 1003: nobody has picked this draft up. ' +
+      'Requested 9 days ago and vanessa has not started. The portal is offering it correctly, so this ' +
+      'is on our side to chase." It was not being offered. The eligibility screen refuses that path ' +
+      'because TDI\'s approved-vendor status in that state is unconfirmed.',
+    cases: [
+      {
+        name: 'a finished grant is never offered to a writer',
+        holds: () =>
+          ['closed', 'denied', 'awarded', 'applied', 'submitted'].every(
+            (status) =>
+              canAgentDraft(
+                { name: 'Some Grant', status, window_status: 'open' },
+                { sector: 'public' },
+                { gate_open: true },
+              ).offerable === false
+          ),
+      },
+      {
+        name: 'a shut gate blocks it, and says so',
+        holds: () => {
+          const v = canAgentDraft(
+            { name: 'Some Grant', status: 'not_started', window_status: 'open' },
+            { sector: 'public' },
+            { gate_open: false },
+          );
+          return v.offerable === false && v.blockedBy === 'gate' && v.reason.length > 0;
+        },
+      },
+      {
+        name: 'an unverified window blocks it',
+        holds: () => {
+          const v = canAgentDraft(
+            { name: 'Some Grant', status: 'not_started', window_status: 'unknown' },
+            { sector: 'public' },
+            { gate_open: true },
+          );
+          return v.offerable === false && v.blockedBy === 'window';
+        },
+      },
+      {
+        name: 'the eligibility screen can block it too, which is the check that was missing',
+        holds: () => {
+          const v = canAgentDraft(
+            { name: 'Title I Section 1003 (School Improvement)', status: 'not_started', window_status: 'open' },
+            { sector: 'diocesan', stateCode: 'LA' },
+            { gate_open: true },
+          );
+          return v.offerable === false && v.blockedBy === 'screen';
+        },
+      },
+      {
+        name: 'blocked work never tells anyone to chase',
+        holds: () => {
+          const blocked = stalledDraftMessage(
+            { offerable: false, blockedBy: 'screen', reason: 'TDI is not a confirmed vendor' },
+            'vanessa',
+            9,
+          );
+          return !/chase/i.test(blocked.why) || /will not help/i.test(blocked.why);
+        },
+      },
+      {
+        name: 'work genuinely on offer does say to chase',
+        holds: () => {
+          const open = stalledDraftMessage({ offerable: true, blockedBy: null, reason: '' }, 'vanessa', 9);
+          return /chase/i.test(open.why) && /9 days/.test(open.why);
+        },
+      },
+      {
+        name: 'a blocked reason is never empty',
+        holds: () => {
+          const cases = [
+            canAgentDraft({ name: 'G', status: 'closed' }, {}, { gate_open: true }),
+            canAgentDraft({ name: 'G', status: 'not_started', window_status: 'open' }, { archived: true }, { gate_open: true }),
+            canAgentDraft({ name: 'G', status: 'not_started', window_status: 'closed_missed' }, {}, { gate_open: true }),
+          ];
+          return cases.every((c) => !c.offerable && c.reason.trim().length > 0);
         },
       },
     ],
