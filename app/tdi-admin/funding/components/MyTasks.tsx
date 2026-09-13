@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { isSchoolOwned } from '@/lib/funding-ownership'
 
 interface Task {
@@ -77,7 +78,7 @@ export function MyTasks() {
   const [summary, setSummary] = useState({ total: 0, overdue: 0, due_this_week: 0, waiting_on_client: 0 })
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState<'all' | 'overdue' | 'client' | 'tdi'>('all')
-  const [nudging, setNudging] = useState<string | null>(null)
+  const router = useRouter()
   const [completing, setCompleting] = useState<string | null>(null)
   const [collapsed, setCollapsed] = useState(false)
   // Which task is expanded, and any answer the server is holding out for.
@@ -180,23 +181,6 @@ export function MyTasks() {
 
   const setDraftFor = (id: string, patch: Partial<AnswerDraft>) =>
     setAnswerDraft(d => ({ ...d, [id]: { ...draftFor(id), ...patch } }))
-
-  const nudge = async (taskId: string) => {
-    setNudging(taskId)
-    try {
-      const res = await fetch('/api/funding/nudge', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ actionId: taskId, sendImmediately: true }),
-      })
-      const result = await res.json()
-      if (result.success) {
-        loadTasks()
-      } else {
-        console.error('Nudge failed:', result.error)
-      }
-    } catch {} finally { setNudging(null) }
-  }
 
   if (loading) return null
   if (tasks.length === 0) return null
@@ -442,20 +426,33 @@ export function MyTasks() {
                         ) : null
                       })()}
 
-                      {/* Nudge button for client tasks */}
-                      {isSchoolOwned(task) && task.pursuit?.client_contact_email && (
-                        <button
-                          onClick={(e) => { e.stopPropagation(); nudge(task.id) }}
-                          disabled={nudging === task.id}
-                          style={{
-                            fontSize: 10, fontWeight: 600, padding: '4px 8px', borderRadius: 6,
-                            border: '1px solid #E5E7EB', background: nudging === task.id ? '#F3F4F6' : 'white',
-                            color: '#6B7280', cursor: 'pointer',
-                          }}
-                        >
-                          {nudging === task.id ? 'Sending...' : 'Nudge'}
-                        </button>
-                      )}
+                      {/* Write to the school.
+                          This used to render only when the school owned the
+                          task, so the majority of this list, the items that are
+                          ours, offered no way to contact anyone. Bella asked for
+                          "a follow up button, or something to check in with the
+                          school". The button already existed on the school page
+                          and had been fixed there in September for exactly this,
+                          gated on the wrong thing. This list was never updated.
+
+                          It opens the drafted email rather than sending from
+                          here. Two send paths through one action is the shape
+                          that left grants unchased for nine days, so this one
+                          goes to the preview that already works and nothing
+                          leaves until a person reads it. */}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          router.push(`/tdi-admin/funding/${task.pursuit?.id}?open=actions&action=${task.id}&write=1`)
+                        }}
+                        style={{
+                          fontSize: 10, fontWeight: 600, padding: '4px 8px', borderRadius: 6,
+                          border: '1px solid #8B5CF6', background: '#F5F3FF',
+                          color: '#6D28D9', cursor: 'pointer',
+                        }}
+                      >
+                        {isSchoolOwned(task) ? 'Send nudge' : 'Write to the school'}
+                      </button>
                     </div>
                   </div>
 

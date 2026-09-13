@@ -5,6 +5,7 @@ import { postFundingEvent } from '@/lib/funding-slack'
 import { isGateOpen } from '@/lib/funding-gate-gaps'
 import { callTriggerFor } from '@/lib/funding/call-escalation'
 import { sourceItemKeyFor } from '@/lib/funding-client-label'
+import { isSchoolOwned } from '@/lib/funding-ownership'
 import {
   generateFollowUpEmail,
   buildConsolidatedEmail,
@@ -159,7 +160,7 @@ function buildEffectiveLadder(
     steps.push({ rung, email })
   }
 
-  if (ownerType === 'client') {
+  if (isSchoolOwned({ ownerType })) {
     tryAdd('submitter', gate?.submitter_email ?? ownerEmail)
     tryAdd('backup', gate?.backup_email)
     tryAdd('admin_sponsor', gate?.admin_sponsor_email)
@@ -304,6 +305,10 @@ async function sendFollowUpEmail(params: {
   contactName?: string   // full stored name for greeting (e.g. "Dr. Porter", "Teri")
   schoolName?: string
   clientLabel?: string   // optional client-friendly task label from DB
+  /** What the school has to do. Dropped by clientAsk() if it reads as internal. */
+  clientAskText?: string | null
+  /** The task's category, which carries the ask when the free text cannot. */
+  clientAskCategory?: string | null
   // Internal tone fields
   submitterName?: string
   nextRung?: string
@@ -322,7 +327,7 @@ async function sendFollowUpEmail(params: {
 
   const {
     to, itemTitle, dueDate, bizDaysOverdue, rungLabel, type, tone,
-    contactName = 'there', schoolName = 'your school', clientLabel,
+    contactName = 'there', schoolName = 'your school', clientLabel, clientAskText, clientAskCategory,
     submitterName = 'unknown', nextRung = 'none',
   } = params
 
@@ -340,7 +345,7 @@ async function sendFollowUpEmail(params: {
   // message that goes out.
   const generated = generateFollowUpEmail({
     to, itemTitle, dueDate, bizDaysOverdue, rungLabel, type, tone,
-    contactName, schoolName, clientLabel, submitterName, nextRung,
+    contactName, schoolName, clientLabel, clientAskText, clientAskCategory, submitterName, nextRung,
   })
   const subject = generated.subject
   const text = generated.text
@@ -740,7 +745,7 @@ export async function GET(request: NextRequest) {
 
       // Don't send reminders if the gate isn't open and this is a client-facing action
       // (gate must be satisfied before any school outreach)
-      if (item.owner_type === 'client') {
+      if (isSchoolOwned(item)) {
         const gate = gateByPursuit.get(item.pursuit_id)
         // One definition of an open gate, shared with the gate route and the
         // gap sync, rather than a private approximation of it.
@@ -888,6 +893,8 @@ export async function GET(request: NextRequest) {
             contactName: ownerFirstName,
             schoolName,
             clientLabel: item.client_label,
+            clientAskText: item.description,
+            clientAskCategory: item.category,
             pursuitId: item.pursuit_id,
             opportunityId: item.opportunity_id,
           })
@@ -958,7 +965,7 @@ export async function GET(request: NextRequest) {
         if (atCeiling && !item.nudge_ceiling_notified_at) {
           updates.nudge_ceiling_notified_at = now.toISOString()
 
-          const handTo = item.owner_type === 'client' ? 'bella' : 'rae'
+          const handTo = isSchoolOwned(item) ? 'bella' : 'rae'
           const who = item.client_label || item.title
 
           postFundingEvent({
@@ -1014,6 +1021,8 @@ export async function GET(request: NextRequest) {
               contactName: ownerFirstName,
               schoolName,
               clientLabel: item.client_label,
+            clientAskText: item.description,
+            clientAskCategory: item.category,
               pursuitId: item.pursuit_id,
               opportunityId: item.opportunity_id,
             })
@@ -1085,6 +1094,8 @@ export async function GET(request: NextRequest) {
                 contactName: resolveContactName(nextStep, gate, item, ownerFirstName),
                 schoolName,
                 clientLabel: item.client_label,
+            clientAskText: item.description,
+            clientAskCategory: item.category,
                 submitterName: item.owner_name ?? ownerEmail ?? 'unknown',
                 nextRung: nextNextStep?.rung ?? 'none',
                 pursuitId: item.pursuit_id,
@@ -1163,6 +1174,8 @@ export async function GET(request: NextRequest) {
                     contactName: resolveContactName(nextStep, gate, item, ownerFirstName),
                     schoolName,
                     clientLabel: item.client_label,
+            clientAskText: item.description,
+            clientAskCategory: item.category,
                     submitterName: item.owner_name ?? ownerEmail ?? 'unknown',
                     nextRung: advNextStep?.rung ?? 'none',
                     pursuitId: item.pursuit_id,

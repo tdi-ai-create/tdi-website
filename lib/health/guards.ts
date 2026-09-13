@@ -21,7 +21,7 @@
 // name the day it cost something, it does not belong here yet.
 // ---------------------------------------------------------------------------
 
-import { clientTaskLabel, NEUTRAL_TASK_LABEL } from '../funding-followup-email';
+import { clientTaskLabel, clientAsk, askForCategory, NEUTRAL_TASK_LABEL } from '../funding-followup-email';
 import { looksLikeRecordId } from '../milestone-key';
 import { isPastDrafting, screenPath, eligibilityQuestionTitle } from '../funding-eligibility';
 import { isOursToDo, isWaitingOnUs, whoseTurn } from '../creator-turn';
@@ -435,6 +435,72 @@ export const GUARDS: Guard[] = [
           ];
           return cases.every((c) => !c.offerable && c.reason.trim().length > 0);
         },
+      },
+    ],
+  },
+
+  {
+    id: 'email-says-what-we-need',
+    protects: 'A school being told a task is due and not what to do about it',
+    origin:
+      '10 September 2026: Bella asked that automatically written emails "be specific about what we ' +
+      'need from contacts". They named the task, gave a date, and said everything was ready on our ' +
+      'end, which tells a principal nothing actionable.',
+    cases: [
+      {
+        name: 'a real ask survives',
+        holds: () => {
+          const ask = clientAsk(
+            'Please log into eGMS and report back the exact field labels shown for the Title II-A narrative.'
+          );
+          return ask !== null && /eGMS/.test(ask);
+        },
+      },
+      {
+        name: 'an instruction to a colleague never reaches a school',
+        holds: () =>
+          [
+            'Check if Gary submitted the application and then mark it complete',
+            'Ask Bella to confirm the window before we draft anything',
+            'Email Teri and remind her about the deadline this week',
+          ].every((t) => clientAsk(t) === null),
+      },
+      {
+        name: 'our own wording never reaches a school',
+        holds: () =>
+          clientAsk(
+            'If 3+ staff, proceed with the $5,000 group tier. If zero, mark this opportunity not applicable.'
+          ) === null,
+      },
+      {
+        name: 'nothing is said when there is nothing to say',
+        holds: () =>
+          clientAsk(null) === null && clientAsk('') === null && clientAsk('   ') === null,
+      },
+      {
+        name: 'a label is not mistaken for an ask',
+        holds: () => clientAsk('Title II-A application') === null,
+      },
+      {
+        name: 'a status note is never labelled as a request',
+        holds: () =>
+          clientAsk('Submitted by Jovita Ortiz ~June 16. Expected notification mid-September.') === null,
+      },
+      {
+        name: 'the common task kinds all carry an ask',
+        holds: () =>
+          ['follow_up', 'documentation', 'gate', 'submission'].every((c) => {
+            const a = askForCategory(c);
+            return typeof a === 'string' && a.length > 20;
+          }),
+      },
+      {
+        name: 'an unknown kind says nothing rather than guessing',
+        holds: () => askForCategory('something_new') === null && askForCategory(null) === null,
+      },
+      {
+        name: 'a whole brief is not pasted into an email',
+        holds: () => clientAsk('word '.repeat(200)) === null,
       },
     ],
   },
