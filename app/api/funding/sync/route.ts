@@ -13,6 +13,7 @@ import {
 } from '@/lib/funding-rules'
 import { postFundingEvent, narrativeEvent } from '@/lib/funding-slack'
 import { screenPath, isPastDrafting } from '@/lib/funding-eligibility'
+import { canAgentDraft } from '@/lib/funding-offerable'
 
 /**
  * Funding Sync API -- Bridge between Paperclip and the Admin Funding Portal
@@ -219,21 +220,19 @@ export async function GET(request: NextRequest) {
           } catch { return {} as Record<string, unknown> }
         })()
 
-        const result = screenPath(
-          {
-            name: o.name ?? '',
-            windowStatus: o.window_status ?? null,
-            namedApplicant: (profile.nea_member_name as string) ?? null,
-            alreadySubmitted: isPastDrafting(o.status, o.client_submitted),
-          },
-          {
-            sector: p?.sector ?? null,
-            county: p?.county ?? null,
-            stateCode: p?.state_code ?? null,
-            titleIStatus: (profile.title_i_status as string) ?? null,
-            designation: (profile.designation as string) ?? null,
-          },
-        )
+        // One answer to "can an agent pick this up", shared with the board.
+        //
+        // The board used to run two of these checks and then tell Bella the
+        // portal was offering work it was not, so she chased a writer who had
+        // never been handed it. Reading the same function is what stops the
+        // two drifting apart again.
+        //
+        // Gate and archive are already applied above, and re-running them here
+        // is free and keeps this honest if that changes.
+        const verdict = canAgentDraft(o, p, { gate_open: true })
+        const result = verdict.offerable
+          ? ({ verdict: 'clear', reason: '', rule: 'offerable' } as const)
+          : ({ verdict: 'blocked', reason: verdict.reason, rule: verdict.blockedBy ?? 'blocked' } as const)
 
         if (result.verdict === 'clear') {
           cleared.push(o)

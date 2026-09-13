@@ -315,6 +315,20 @@ export default function NeedsYouBoard({
 
   const researching = grants.filter(g => g.status === 'researching')
 
+  // Which of those are actually still with an agent.
+  //
+  // Every card in this column said "Agent checking eligibility and dates",
+  // regardless. On 13 September three of them said that while the same
+  // question sat on Bella's own list, because the agent had already looked and
+  // could not establish the window. She read the board as the agents not doing
+  // their work while she did it for them, and the board was telling her
+  // exactly that.
+  const waitingOnMe = new Set(
+    steps
+      .filter(i => i.owner === 'team' && !i.inProgress && i.opportunityId)
+      .map(i => String(i.opportunityId)),
+  )
+
   // Anything with a narrative under way that is not yet ours to act on.
   // Escalated shows red: that is the case that sat on one person for nine days.
   const writing = grants.filter(
@@ -390,12 +404,22 @@ export default function NeedsYouBoard({
 
       <div style={{ display: 'flex', overflowX: 'auto', background: C.sunk }}>
         <Column name="Researching" count={researching.length} empty="nothing in research">
-          {researching.map(g => (
-            <CardView
-              key={g.id}
-              c={{ name: g.name, school: g.school, tone: 'quiet', line: 'Agent checking eligibility and dates.' }}
-            />
-          ))}
+          {researching.map(g => {
+            const mine = waitingOnMe.has(String(g.id))
+            return (
+              <CardView
+                key={g.id}
+                c={{
+                  name: g.name,
+                  school: g.school,
+                  tone: mine ? 'stuck' : 'quiet',
+                  line: mine
+                    ? 'Research came back without an answer. It is on your list now.'
+                    : 'Agent checking eligibility and dates.',
+                }}
+              />
+            )
+          })}
         </Column>
 
         <Column name="Writing" count={writing.length} empty="nothing being written">

@@ -26,6 +26,7 @@ import { readSchoolProfile } from '@/lib/funding/school-profile'
 import { callTriggerFor } from '@/lib/funding/call-escalation'
 import { DRAFT_SILENCE_HOURS } from './funding-rules'
 import { isSchoolOwned } from './funding-ownership'
+import { canAgentDraft, stalledDraftMessage } from './funding-offerable'
 
 export type ActionOwner = 'team' | 'agent' | 'school' | 'auto'
 export type ActionUrgency = 'critical' | 'high' | 'normal' | 'low'
@@ -401,8 +402,35 @@ export function computeNextActions(
   // Funding windows unverified — assigned to agents, not Bella
   // Federal formula funds (Title II-A, IDEA/CEIS) should auto-mark as open on creation.
   // Remaining unknown windows are agent research tasks.
+  //
+  // Skipped once a person is already holding the same question.
+  //
+  // These two lists ran independently, so on 13 September the Washington
+  // Commanders window was an open research task for an agent AND an open
+  // question on Bella's list, at the same time, about the same thing. Three
+  // funders were in that state. From her seat that reads exactly as "the agent
+  // is not doing their work and I am being asked to do it", which is what she
+  // reported. It was true.
+  //
+  // A question reaches a person only after an agent has looked and could not
+  // establish it. Once it is theirs, asking the agent again is asking twice.
+  const heldByAPerson = new Set(
+    (actions ?? [])
+      .filter(
+        (a: any) =>
+          a.requires_answer &&
+          !a.answered_at &&
+          a.opportunity_id &&
+          !['completed', 'cancelled', 'done', 'skipped'].includes(String(a.status)),
+      )
+      .map((a: any) => String(a.opportunity_id)),
+  )
+
   const unverifiedWindows = opportunities.filter(
-    (o: any) => !['awarded', 'denied', 'closed'].includes(o.status) && (o.window_status || 'unknown') === 'unknown'
+    (o: any) =>
+      !['awarded', 'denied', 'closed'].includes(o.status) &&
+      (o.window_status || 'unknown') === 'unknown' &&
+      !heldByAPerson.has(String(o.id)),
   )
   for (const opp of unverifiedWindows) {
     result.push({
@@ -741,28 +769,32 @@ export function computeNextActions(
 
   for (const opp of opportunities) {
     if (opp.narrative_status === 'requested') {
-      // Agents only see drafting work when the window is open AND the gate is open
-      // (see find_work in app/api/funding/sync/route.ts). If either is false the
-      // request is invisible to every agent, so saying "waiting for agent" is a lie.
-      const windowOpen = opp.window_status === 'open'
-      const blockers: string[] = []
-      if (!gate?.gate_open) blockers.push('the gate is not satisfied')
-      if (!windowOpen) blockers.push(`the window is ${opp.window_status || 'unverified'}`)
+      // Whether an agent can see this is decided in one place now.
+      //
+      // This used to check the gate and the window, two of the five tests
+      // find_work applies, and then state as fact that "the portal is offering
+      // it correctly, so this is on our side to chase". For Title I Section
+      // 1003 that sentence was false: the eligibility screen refuses the path
+      // because TDI's approved-vendor status in that state is unconfirmed, so
+      // no agent has ever been offered it. Bella was told to chase Vanessa for
+      // work Vanessa could not see.
+      const offer = canAgentDraft(opp, pursuit, gate)
 
-      result.push(blockers.length > 0 ? {
+      result.push(!offer.offerable ? {
         id: `blocked-draft-${opp.id}`,
-        label: `"${opp.name}" — draft requested but blocked`,
-        why: `No agent can pick this up while ${blockers.join(' and ')}. Nothing will happen until that clears.`,
+        label: `"${opp.name}" — ${stalledDraftMessage(offer, opp.assigned_agent, 0).label}`,
+        why: stalledDraftMessage(offer, opp.assigned_agent, 0).why,
         owner: 'team',
         urgency: 'high',
         actionType: 'unblock_draft',
         targetId: opp.id,
         tab: 'overview',
       } : stalledDraft(opp, draftSilenceHours) ? {
-        // Nothing is coming. Say so, and put it on a person.
+        // Genuinely on offer and nobody has taken it. Chasing is the right
+        // advice here and only here.
         id: `drafting-stalled-${opp.id}`,
-        label: `"${opp.name}" — nobody has picked this draft up`,
-        why: `Requested ${Math.floor(quietHours(opp) / 24)} days ago and ${opp.assigned_agent || 'the agent'} has not started. The portal is offering it correctly, so this is on our side to chase.`,
+        label: `"${opp.name}" — ${stalledDraftMessage(offer, opp.assigned_agent, Math.floor(quietHours(opp) / 24)).label}`,
+        why: stalledDraftMessage(offer, opp.assigned_agent, Math.floor(quietHours(opp) / 24)).why,
         owner: 'team',
         urgency: 'high',
         actionType: 'unblock_draft',
