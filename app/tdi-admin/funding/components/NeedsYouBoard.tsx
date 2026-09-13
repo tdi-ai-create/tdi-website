@@ -123,6 +123,9 @@ interface Card {
   tone: Tone
   action?: string
   onAction?: () => void
+  /** A second, quieter action. Used for writing to the school from the board. */
+  secondary?: string
+  onSecondary?: () => void
 }
 
 function CardView({ c }: { c: Card }) {
@@ -205,6 +208,25 @@ function CardView({ c }: { c: Card }) {
           }}
         >
           {c.action}
+        </button>
+      )}
+      {c.secondary && (
+        <button
+          onClick={c.onSecondary}
+          style={{
+            marginTop: 7,
+            marginLeft: 6,
+            fontSize: 11.5,
+            fontWeight: 700,
+            padding: '4px 9px',
+            borderRadius: 6,
+            background: 'transparent',
+            color: C.navy,
+            border: `1px solid ${C.line}`,
+            cursor: 'pointer',
+          }}
+        >
+          {c.secondary}
         </button>
       )}
     </div>
@@ -291,6 +313,7 @@ function Stat({ k, v, n, hot }: { k: string; v: string; n: string; hot?: boolean
 export default function NeedsYouBoard({
   schools,
   onOpenItem,
+  onWriteToSchool,
 }: {
   schools: BoardSchool[]
   /**
@@ -303,6 +326,8 @@ export default function NeedsYouBoard({
    * now go straight to it.
    */
   onOpenItem: (item: BoardQueueItem) => void
+  /** Open the drafted email for this item, on the school page. */
+  onWriteToSchool: (item: BoardQueueItem) => void
 }) {
   const [filter, setFilter] = useState<string>('all')
   const [showClosed, setShowClosed] = useState(false)
@@ -453,6 +478,22 @@ export default function NeedsYouBoard({
                 line: i.why,
                 action: VERBS[i.actionType] ?? 'Open',
                 onAction: () => onOpenItem(i),
+                // Writing to the school from the place she is already looking.
+                //
+                // She asked for "a follow up button, or something to check in
+                // with the school". It existed only on the school page, two
+                // clicks away, and a first attempt at this went into
+                // MyTasks.tsx, which nothing imports and nobody can reach.
+                //
+                // Only on items that are ours and are about a real piece of
+                // work. Nothing here sends: it opens the drafted email on the
+                // school page, which is the one send path.
+                ...(i.actionItemId
+                  ? {
+                      secondary: 'Write to the school',
+                      onSecondary: () => onWriteToSchool(i),
+                    }
+                  : {}),
               }}
             />
           ))}

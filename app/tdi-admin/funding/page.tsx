@@ -297,6 +297,13 @@ export default function FundingPage() {
       {view === 'board' && (
         <NeedsYouBoard
           schools={schools}
+          onWriteToSchool={item => {
+            // Straight to the drafted email on the school page. Nothing sends
+            // from the board; the preview there is the only send path.
+            router.push(
+              `/tdi-admin/funding/${item.pursuitId}?open=actions&action=${item.actionItemId}&write=1`,
+            )
+          }}
           onOpenItem={item => {
             // Straight to the row the card is about. The deep link machinery
             // on the school page already existed for Slack; it just was never
