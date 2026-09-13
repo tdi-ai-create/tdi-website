@@ -82,7 +82,7 @@ export default function CheckInSlideUp({ onDismiss }: CheckInSlideUpProps) {
 
     const score = scoreResponse(question, value)
     const supabase = getSupabase()
-    await supabase.from('hub_assessments').insert({
+    const { error: saveError } = await supabase.from('hub_assessments').insert({
       user_id: user.id,
       type: 'daily_check_in',
       question_id: question.id,
@@ -92,6 +92,16 @@ export default function CheckInSlideUp({ onDismiss }: CheckInSlideUpProps) {
       response_text: value,
       responses: { question_id: question.id, category: question.category, selected: [value] },
     })
+
+    // A check-in that failed to save is a check-in that did not happen. Saying
+    // "Thanks for checking in" over a failed write is how this table quietly
+    // stops being true, and the numbers on it are used to judge how people are
+    // doing.
+    if (saveError) {
+      console.error('[check-in] response was not saved:', saveError.message)
+      setIsSubmitting(false)
+      return
+    }
 
     setIsDone(true)
     setTimeout(handleQueueDismiss, 1800)
@@ -107,7 +117,7 @@ export default function CheckInSlideUp({ onDismiss }: CheckInSlideUpProps) {
     const score = scoreResponse(question, primaryValue)
 
     const supabase = getSupabase()
-    await supabase.from('hub_assessments').insert({
+    const { error: saveError } = await supabase.from('hub_assessments').insert({
       user_id: user.id,
       type: 'daily_check_in',
       question_id: question.id,
@@ -125,6 +135,16 @@ export default function CheckInSlideUp({ onDismiss }: CheckInSlideUpProps) {
       },
     })
 
+    // A check-in that failed to save is a check-in that did not happen. Saying
+    // "Thanks for checking in" over a failed write is how this table quietly
+    // stops being true, and the numbers on it are used to judge how people are
+    // doing.
+    if (saveError) {
+      console.error('[check-in] response was not saved:', saveError.message)
+      setIsSubmitting(false)
+      return
+    }
+
     setIsDone(true)
     setTimeout(handleQueueDismiss, 1800)
   }
@@ -136,7 +156,7 @@ export default function CheckInSlideUp({ onDismiss }: CheckInSlideUpProps) {
     setSelectedValues([value])
 
     const supabase = getSupabase()
-    await supabase.from('hub_assessments').insert({
+    const { error: saveError } = await supabase.from('hub_assessments').insert({
       user_id: user.id,
       type: 'daily_check_in',
       question_id: question.id,
@@ -146,6 +166,16 @@ export default function CheckInSlideUp({ onDismiss }: CheckInSlideUpProps) {
       response_text: String(value),
       responses: { question_id: question.id, category: question.category, selected: [value] },
     })
+
+    // A check-in that failed to save is a check-in that did not happen. Saying
+    // "Thanks for checking in" over a failed write is how this table quietly
+    // stops being true, and the numbers on it are used to judge how people are
+    // doing.
+    if (saveError) {
+      console.error('[check-in] response was not saved:', saveError.message)
+      setIsSubmitting(false)
+      return
+    }
 
     setIsDone(true)
     setTimeout(handleQueueDismiss, 1800)
@@ -230,7 +260,7 @@ export default function CheckInSlideUp({ onDismiss }: CheckInSlideUpProps) {
                 className="font-bold mb-6 leading-snug"
                 style={{ fontSize: '18px', color: '#1B2A4A' }}
               >
-                {question.question}
+                {tUI(question.question)}
               </div>
 
               {/* RESPONSE: Color scale - submit on tap */}
@@ -255,7 +285,7 @@ export default function CheckInSlideUp({ onDismiss }: CheckInSlideUpProps) {
                       onMouseEnter={e => (e.currentTarget.style.transform = 'translateY(-3px)')}
                       onMouseLeave={e => (e.currentTarget.style.transform = 'translateY(0)')}
                     >
-                      {opt.label}
+                      {tUI(opt.label)}
                     </button>
                   ))}
                 </div>
@@ -293,7 +323,7 @@ export default function CheckInSlideUp({ onDismiss }: CheckInSlideUpProps) {
                           color: selectedValues.includes(opt.value) ? 'rgba(255,255,255,0.7)' : '#9CA3AF',
                           letterSpacing: '0.02em',
                         }}>
-                          {opt.label}
+                          {tUI(opt.label)}
                         </span>
                       </button>
                     ))}
@@ -341,7 +371,7 @@ export default function CheckInSlideUp({ onDismiss }: CheckInSlideUpProps) {
                           transition: 'all 0.15s',
                         }}
                       >
-                        {opt.label}
+                        {tUI(opt.label)}
                       </button>
                     ))}
                   </div>
@@ -412,7 +442,7 @@ export default function CheckInSlideUp({ onDismiss }: CheckInSlideUpProps) {
                           transition: 'all 0.15s',
                         }}
                       >
-                        {opt.label}
+                        {tUI(opt.label)}
                       </button>
                     ))}
                   </div>
@@ -474,7 +504,7 @@ export default function CheckInSlideUp({ onDismiss }: CheckInSlideUpProps) {
                           color: selectedValues.includes(opt.value) ? '#fff' : '#374151',
                           lineHeight: 1.3,
                         }}>
-                          {opt.label}
+                          {tUI(opt.label)}
                         </div>
                       </button>
                     ))}
