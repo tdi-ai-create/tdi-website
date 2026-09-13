@@ -87,11 +87,25 @@ export async function POST(
       return NextResponse.json({ error: invoiceError.message }, { status: 500 })
     }
 
-    await supabase
+    // billing_state on the deliverable is what the billing position report
+    // sums, so if this is lost the payment is recorded and the invoice reads
+    // paid while the report still counts that money as outstanding. You would
+    // believe a school owes you money it has already sent.
+    //
+    // Reported rather than thrown, deliberately. The payment event is already
+    // inserted by this point, so failing the request invites a retry that
+    // records the same payment twice. Same treatment as emailError below.
+    const { error: deliverableError } = await supabase
       .from('contract_deliverables')
       .update({ ...asPaid(), updated_at: new Date().toISOString() })
       .eq('invoice_id', id)
       .eq('invoice_type', 'intelligence_invoice')
+
+    if (deliverableError) {
+      console.error('[invoice-pay] Payment recorded but deliverable not marked paid', {
+        invoiceId: id, error: deliverableError.message,
+      })
+    }
 
     const { error: workflowError } = await supabase
       .from('collections_workflow')
@@ -216,6 +230,11 @@ export async function POST(
       emailSent,
       emailError,
       recipientEmail,
+      // Present only when the deliverable line did not take the paid state, so
+      // the caller can say the billing report will be wrong until it is fixed.
+      deliverableWarning: deliverableError
+        ? 'Payment was recorded, but the deliverable line was not marked paid, so the billing position report will still count this as outstanding.'
+        : null,
     })
   } catch (error) {
     console.error('[invoice-pay] Error:', error)
