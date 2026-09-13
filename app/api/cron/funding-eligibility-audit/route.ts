@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { guardCron } from '@/lib/cron-guard'
 import { isAgentWindowWork } from '@/lib/funding-window-work'
-import { screenPath, isPastDrafting, type EligibilityResult } from '@/lib/funding-eligibility'
+import { screenPath, isPastDrafting, eligibilityQuestionTitle, type EligibilityResult } from '@/lib/funding-eligibility'
 import { NOT_TERMINAL_FILTER } from '@/lib/funding/task-status'
 
 /**
@@ -48,18 +48,6 @@ function readProfile(raw: unknown): Record<string, unknown> {
 // Paths in these states are finished. Re-screening them would churn history
 // for no benefit and could reopen a decision someone already made.
 const SETTLED = new Set(['awarded', 'denied', 'closed', 'submitted', 'applied'])
-
-/**
- * The question a person has to answer, per rule. The rule's own reason is
- * written for a reader, so it becomes the body; this is the one-line ask.
- */
-const QUESTION_BY_RULE: Record<string, string> = {
-  named_applicant: 'Does anyone at this school hold the membership this grant requires?',
-  designation:     'Does this school hold a school-improvement designation?',
-  tdi_authorization: 'Is TDI an approved vendor with this state agency?',
-  window:          'Is this funder actually open, and when does it close?',
-  sector:          'Does this school sit inside the state accountability system?',
-}
 
 interface Change {
   school: string
@@ -162,8 +150,10 @@ export async function GET(request: NextRequest) {
       // asked. Raise it as a real question, owned by a person, that cannot be
       // closed without recording what they were told.
       if (result.verdict === 'ask_first') {
-        const title = QUESTION_BY_RULE[result.rule]
-          ?? 'Confirm this before any drafting starts'
+        // The grant leads. Without it a person reading their list sees four
+        // rows of the same sentence and has to open each one to find the
+        // funder they are looking for.
+        const title = eligibilityQuestionTitle(result.rule, opp.name)
 
         // Do not put an agent's research on a person's list.
         //
@@ -249,6 +239,11 @@ export async function GET(request: NextRequest) {
               pursuit_id: opp.pursuit_id,
               opportunity_id: opp.id,
               owner_type: 'tdi',
+              // Named, not just typed. An item with owner_type 'tdi' and no
+              // owner_name renders with an empty owner and cannot be filtered
+              // to a person. Eleven of nineteen open items were in that state.
+              owner_name: 'Bella',
+              owner_email: 'hello@teachersdeserveit.com',
               title,
               description:
                 `${because}\n\nNothing will be drafted for "${opp.name}" until this is answered.`,

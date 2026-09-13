@@ -23,7 +23,7 @@
 
 import { clientTaskLabel, NEUTRAL_TASK_LABEL } from '../funding-followup-email';
 import { looksLikeRecordId } from '../milestone-key';
-import { isPastDrafting, screenPath } from '../funding-eligibility';
+import { isPastDrafting, screenPath, eligibilityQuestionTitle } from '../funding-eligibility';
 import { isOursToDo, isWaitingOnUs, whoseTurn } from '../creator-turn';
 import { isPersonOwned, isSchoolOwned } from '../funding-ownership';
 import { planAfterAnswer } from '../funding-answer-actions';
@@ -301,6 +301,52 @@ export const GUARDS: Guard[] = [
             category: 'gate',
           });
           return plan.closesPath === true && plan.items.length === 0;
+        },
+      },
+    ],
+  },
+
+  {
+    id: 'question-names-its-grant',
+    protects: 'A list of questions nobody can tell apart',
+    origin:
+      '10 September 2026: four questions sat on Bella\'s list, every one titled "Is this funder ' +
+      'actually open, and when does it close?". She reported she could not find anything about the ' +
+      'Washington Commanders Charitable Foundation or Sharing Prince Georges. Amara had researched ' +
+      'both on 8 September and the findings were inside two of those identical rows.',
+    cases: [
+      {
+        name: 'the grant name leads the question',
+        holds: () =>
+          eligibilityQuestionTitle('window', 'Washington Commanders Charitable Foundation').startsWith(
+            'Washington Commanders Charitable Foundation'
+          ),
+      },
+      {
+        name: 'two grants asked the same question get two different titles',
+        holds: () =>
+          eligibilityQuestionTitle('window', 'Washington Commanders Charitable Foundation') !==
+          eligibilityQuestionTitle('window', 'Sharing Prince Georges'),
+      },
+      {
+        name: 'the question survives when no grant name is available',
+        holds: () => {
+          const t = eligibilityQuestionTitle('window', null);
+          return t.length > 0 && t.includes('open');
+        },
+      },
+      {
+        name: 'an unknown rule still produces something a person can act on',
+        holds: () => {
+          const t = eligibilityQuestionTitle('something_new', 'Some Grant');
+          return t.startsWith('Some Grant') && t.length > 'Some Grant: '.length;
+        },
+      },
+      {
+        name: 'a grant already named in the question is not named twice',
+        holds: () => {
+          const t = eligibilityQuestionTitle('window', 'funder');
+          return (t.match(/funder/gi) || []).length === 1;
         },
       },
     ],
