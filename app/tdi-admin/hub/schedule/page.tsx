@@ -51,6 +51,8 @@ type QueueItem = {
 
 // One colour per channel, so a month reads as a shape before it reads as a list.
 const CHANNEL: Record<string, { label: string; dot: string; bg: string }> = {
+  linkedin:     { label: 'LinkedIn', dot: '#2A5C8A', bg: '#E4EDF5' },
+  facebook:     { label: 'Facebook', dot: '#3B5A9A', bg: '#E7ECF6' },
   hub:          { label: 'Hub',      dot: '#2F6FB5', bg: '#E6EEF8' },
   substack:     { label: 'Substack', dot: '#B75B2A', bg: '#F8EBE3' },
   instagram:    { label: 'Instagram',dot: '#A83A68', bg: '#F8E7EE' },
