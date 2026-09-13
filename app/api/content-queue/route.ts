@@ -109,7 +109,12 @@ export async function GET(request: NextRequest) {
   const owner = searchParams.get('owner')
 
   let q = supabase.from('content_queue_items')
-    .select('id, channel, content_type, title, status, owner, approver, audience_tag, scheduled_for, artifact_rendered_at, updated_at')
+    // body is included deliberately. A reader that lists titles and withholds the
+    // draft is not a reader: the Paperclip calendar opened a finished Substack
+    // post on 13 September and said "no draft on this piece yet", because the
+    // draft was never sent. Anyone allowed to see the queue is allowed to read
+    // what is in it.
+    .select('id, channel, content_type, title, body, status, owner, approver, audience_tag, scheduled_for, published_at, published_url, artifact_refs, artifact_rendered_at, updated_at')
     .order('updated_at', { ascending: false })
     .limit(200)
   if (status) q = q.eq('status', status)
