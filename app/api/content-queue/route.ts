@@ -34,10 +34,33 @@ function db() {
   return createClient(url, key, { auth: { autoRefreshToken: false, persistSession: false } })
 }
 
-function authorize(request: NextRequest): boolean {
+/**
+ * Who is calling, and therefore what they may do.
+ *
+ * Two keys, deliberately not one. The agents' sync key can drive the whole
+ * machine: place briefs, pass gates, mark things published. The Paperclip
+ * calendar only ever needs to read the queue and record a person's decision, so
+ * it gets a key that can do only that.
+ *
+ * The reason is where the key has to live. Paperclip's own secret store refuses
+ * plugin references on this build, so a plugin key ends up in plugin config,
+ * which is a weaker home than the encrypted secret store. A key that can do two
+ * things is a much smaller thing to keep somewhere weaker than a key that can do
+ * everything, and it can be revoked without stopping any agent.
+ */
+type Caller = 'agent' | 'calendar'
+
+/** All the calendar is for: read the queue, and record what a person decided. */
+const CALENDAR_ACTIONS = ['approve', 'request_changes']
+
+function authorize(request: NextRequest): Caller | null {
+  const header = request.headers.get('authorization')
+  if (!header) return null
   const syncKey = process.env.PAPERCLIP_SYNC_KEY
-  if (!syncKey) return false
-  return request.headers.get('authorization') === `Bearer ${syncKey}`
+  if (syncKey && header === `Bearer ${syncKey}`) return 'agent'
+  const calendarKey = process.env.CONTENT_CALENDAR_KEY
+  if (calendarKey && header === `Bearer ${calendarKey}`) return 'calendar'
+  return null
 }
 
 type Row = {
@@ -105,13 +128,23 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  if (!authorize(request)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const caller = authorize(request)
+  if (!caller) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const dryRun = request.nextUrl.searchParams.get('dryRun') === '1'
 
   try {
     const body = await request.json()
     const action = body.action as Action
+
+    // The calendar key decides; it does not run the pipeline. Checked before
+    // anything else so a limited caller can never reach a step it should not,
+    // even if a later guard is wrong.
+    if (caller === 'calendar' && !CALENDAR_ACTIONS.includes(action)) {
+      return NextResponse.json({
+        error: `The content calendar can read the queue and record a decision. It cannot ${action}. That is an agent's step.`,
+      }, { status: 403 })
+    }
     const actor = String(body.actor ?? '').trim().toLowerCase()
     const note = typeof body.note === 'string' ? body.note.trim() : ''
     const supabase = db()
