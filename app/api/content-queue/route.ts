@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { notifyApproved, notifyWaiting } from '@/lib/content-queue/notify'
 import { parseSlides, carouselProblems } from '@/lib/content-queue/carousel'
+import { voiceProblems } from '@/lib/content-queue/voice'
 import {
   TRANSITIONS, OWNER_OF, actorHoldsRole, isSelfReview, legalFrom, canRequestChanges, canFlagBlocked,
   isTransition, hasContent, canRecordBoardDecision,
@@ -44,6 +45,7 @@ type Row = {
   id: string
   title: string | null
   channel: string
+  audience_tag: string | null
   status: Status
   body: string | null
   owner: string | null
@@ -247,7 +249,7 @@ export async function POST(request: NextRequest) {
 
     const { data: row, error: readErr } = await supabase
       .from('content_queue_items')
-      .select('id, title, channel, status, body, owner, approver, approved_at, artifact_rendered_at, artifact_refs, feedback_log')
+      .select('id, title, channel, audience_tag, status, body, owner, approver, approved_at, artifact_rendered_at, artifact_refs, feedback_log')
       .eq('id', id).single()
 
     if (readErr || !row) return NextResponse.json({ error: 'Item not found' }, { status: 404 })
@@ -282,6 +284,17 @@ export async function POST(request: NextRequest) {
     if (NEEDS_CONTENT.includes(action)) {
       const incoming = typeof body.body === 'string' ? body.body : null
       const merged = { body: incoming ?? item.body, artifact_refs: body.artifact_refs ?? item.artifact_refs }
+      // The spec is a rule, not a preference. Rae, 13 September: all content
+      // must follow it specifically. Checked here as well as at the gates
+      // because a piece that breaks an absolute should never have reached one.
+      const vText = typeof body.body === 'string' ? body.body : item.body
+      const vProblems = voiceProblems(vText, item.channel, item.audience_tag)
+      if (vProblems.length > 0) {
+        return NextResponse.json({
+          error: 'This does not follow the voice spec for its outlet.',
+          problems: vProblems,
+        }, { status: 400 })
+      }
       if (!hasContent(merged)) {
         return NextResponse.json({
           error: action === 'submit'
