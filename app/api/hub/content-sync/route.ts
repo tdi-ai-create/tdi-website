@@ -1064,7 +1064,11 @@ export async function POST(request: NextRequest) {
       // Fields that describe the item. Safe to correct while live.
       const BACKFILLABLE = [
         'objectives', 'topic_tags', 'danielson_domains', 'roles',
-        'title_es', 'description_es',
+        // The Spanish half of the same descriptive fields. objectives_es was
+        // missing here while objectives, title_es and description_es were all
+        // present, so a Spanish edition could be described in every way except
+        // its objectives. Paloma filed that as a blocker and was right.
+        'title_es', 'description_es', 'objectives_es',
       ] as const
 
       // Fields that define what the item IS. Changing these on a live item

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import Anthropic from '@anthropic-ai/sdk'
-import { translatePayload, alignTitle, type Json } from '@/lib/hub/translate-payload'
+import { translatePayload, translateCardText, alignTitle, type Json } from '@/lib/hub/translate-payload'
 
 /**
  * Build the Spanish edition of anything that has become eligible for one.
@@ -43,7 +43,9 @@ type Row = {
   id: string
   slug: string | null
   title: string | null
+  description: string | null
   title_es: string | null
+  description_es: string | null
   tool_content: Json | null
   guide_sections: Json | null
   tool_type: string | null
@@ -79,7 +81,7 @@ export async function GET(request: NextRequest) {
   // review and cannot run ahead of it.
   const { data, error } = await supabase
     .from('hub_quick_wins')
-    .select('id, slug, title, title_es, tool_content, guide_sections, tool_type, tool_content_es, guide_sections_es, tool_file_url_es, file_url_es')
+    .select('id, slug, title, description, title_es, description_es, tool_content, guide_sections, tool_type, tool_content_es, guide_sections_es, tool_file_url_es, file_url_es')
     .eq('is_published', true)
     .not('reviewed_at', 'is', null)
     .or('tool_content.not.is.null,guide_sections.not.is.null')
@@ -104,7 +106,12 @@ export async function GET(request: NextRequest) {
     const needsGuideText = !!r.guide_sections && !r.guide_sections_es
     const needsToolFile = !!r.tool_content_es && !r.tool_file_url_es
     const needsGuideFile = !!r.guide_sections_es && !r.file_url_es
-    return needsToolText || needsGuideText || needsToolFile || needsGuideFile
+    // A Spanish document behind an English card is its own kind of unfinished,
+    // and it is the one this job used to create: it built the document and
+    // nothing filled in the card, so a reader browsing in Spanish saw English,
+    // clicked it, and got Spanish. Three items were in that state on 13 Sep.
+    const needsCard = !r.title_es
+    return needsToolText || needsGuideText || needsToolFile || needsGuideFile || needsCard
   })
   const batch = waiting.slice(0, PER_RUN)
 
@@ -124,6 +131,24 @@ export async function GET(request: NextRequest) {
   for (const row of batch) {
     const label = row.slug || row.id
     try {
+      // The card first, because an item can need only this.
+      if (!row.title_es) {
+        const card = await translateCardText(anthropic, {
+          id: row.id, title: row.title, description: row.description,
+        })
+        const { error: cardErr } = await supabase
+          .from('hub_quick_wins')
+          .update({ title_es: card.title_es, description_es: card.description_es })
+          .eq('id', row.id)
+        if (cardErr) {
+          failed.push({ slug: label, reason: `card write failed: ${cardErr.message}` })
+          continue
+        }
+        // The document title reuses the card translation when the English
+        // matched, so the card has to exist before the payload is built.
+        row.title_es = card.title_es
+      }
+
       // Translate only what is missing. An item here because its render failed
       // already has good Spanish text, and re-translating it would spend a
       // model call to produce slightly different wording for no reason.

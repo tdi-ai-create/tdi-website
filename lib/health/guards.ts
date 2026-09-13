@@ -258,6 +258,40 @@ export const GUARDS: Guard[] = [
           ),
       },
       {
+        name: 'an answer does not declare a path clear while something still blocks it',
+        holds: () => {
+          const plan = planAfterAnswer({
+            outcome: 'proceed',
+            questionTitle: 'Does anyone at this school hold the membership this grant requires?',
+            answer: 'All teachers at his school hold an NEA membership',
+            category: 'gate',
+            grantName: 'NEA Learning and Leadership',
+            schoolName: 'Saunemin CCSD #438',
+            remainingBlocker: 'must be filed by a named union member and no name is on file.',
+          });
+          return (
+            plan.items.length === 1 &&
+            !/clear to pursue/i.test(plan.items[0].title) &&
+            plan.items[0].requiresAnswer === true &&
+            /named union member/i.test(plan.items[0].description)
+          );
+        },
+      },
+      {
+        name: 'with nothing else blocking, it does ask for the application',
+        holds: () => {
+          const plan = planAfterAnswer({
+            outcome: 'proceed',
+            questionTitle: 'Does anyone at this school hold the membership this grant requires?',
+            answer: 'Yes, Gary Doughan is a current member',
+            category: 'gate',
+            grantName: 'NEA Learning and Leadership',
+            remainingBlocker: null,
+          });
+          return plan.items.length === 1 && /clear to pursue/i.test(plan.items[0].title);
+        },
+      },
+      {
         name: 'stop_path closes the path and creates nothing',
         holds: () => {
           const plan = planAfterAnswer({

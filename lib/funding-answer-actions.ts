@@ -94,6 +94,21 @@ export interface AnswerContext {
   schoolName?: string | null;
   /** How many times this question has already come back unresolved. */
   priorReAsks?: number;
+  /**
+   * What the eligibility screen still refuses this path for, if anything.
+   *
+   * An answer of "proceed" is a person's judgement that their question is
+   * settled. It is not evidence that every other precondition is met, and
+   * trusting it as though it were produces the most expensive kind of next
+   * step: one that tells somebody to start work the system will then refuse.
+   *
+   * Found on 13 September against the live NEA grant for Saunemin. Gary
+   * answered that all his teachers hold NEA membership, which is true and
+   * settles the question asked. The grant requires a named member on the
+   * application and no name is on file, so "prepare the application" was
+   * created for work no writer could begin.
+   */
+  remainingBlocker?: string | null;
 }
 
 function subject(ctx: AnswerContext): string {
@@ -206,6 +221,30 @@ export function planAfterAnswer(ctx: AnswerContext): AnswerPlan {
   }
 
   // gate, or anything else that was blocking the pursuit.
+  //
+  // One question being answered does not mean every question is. Say what is
+  // still in the way rather than announcing the path is clear when it is not.
+  const stillBlocked = (ctx.remainingBlocker || '').trim();
+  if (stillBlocked) {
+    return {
+      closesPath: false,
+      items: [
+        {
+          title: `${what} still cannot be drafted${where ? ` for ${where}` : ''}`,
+          description:
+            `"${ctx.questionTitle}" is answered. ${quoted} That part is settled. ` +
+            `Something else still blocks it: ${stillBlocked} ` +
+            `Resolve that and the writer can start.`,
+          ownerType: 'tdi',
+          dueInDays: RESUME_DAYS,
+          requiresAnswer: true,
+          category: 'gate',
+        },
+      ],
+      because: `That question is settled, but ${what} is still blocked by something else, so the next step is that rather than the application.`,
+    };
+  }
+
   return {
     closesPath: false,
     items: [
