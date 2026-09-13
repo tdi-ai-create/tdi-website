@@ -105,34 +105,23 @@ export async function POST(request: NextRequest) {
     let countWarning: string | null = null;
 
     if (counter) {
-      const { data: partnership, error: readError } = await supabase
-        .from('partnerships')
-        .select(counter)
-        .eq('id', partnership_id)
-        .single();
+      // Atomic, via increment_partnership_usage (migration 143).
+      //
+      // This used to read the counter, add one, and write it back. Two
+      // completions logged close together both read N and both wrote N+1, so
+      // one delivered session vanished with nothing erroring. #469 added the
+      // error check, which could not catch that at all. The database does the
+      // arithmetic now, so concurrent completions serialise.
+      const { error: bumpError } = await supabase.rpc('increment_partnership_usage', {
+        p_partnership_id: partnership_id,
+        p_counter: counter,
+      });
 
-      if (readError) {
-        console.error('[timeline-events] Could not read used count, not advanced', {
-          partnershipId: partnership_id, counter, error: readError.message,
+      if (bumpError) {
+        console.error('[timeline-events] Event recorded but used count not advanced', {
+          partnershipId: partnership_id, counter, error: bumpError.message,
         });
-        countWarning = `The event was recorded, but ${counter} could not be read, so the used count was not advanced.`;
-      } else {
-        // Supabase cannot type a select() whose column comes from a variable,
-        // so it infers GenericStringError. Cast through unknown.
-        const row = partnership as unknown as Record<string, unknown> | null;
-        const current = Number(row?.[counter] ?? 0);
-
-        const { error: bumpError } = await supabase
-          .from('partnerships')
-          .update({ [counter]: current + 1 })
-          .eq('id', partnership_id);
-
-        if (bumpError) {
-          console.error('[timeline-events] Event recorded but used count not advanced', {
-            partnershipId: partnership_id, counter, error: bumpError.message,
-          });
-          countWarning = `The event was recorded, but ${counter} was not advanced, so this partnership reads as having one more session remaining than it does.`;
-        }
+        countWarning = `The event was recorded, but ${counter} was not advanced, so this partnership reads as having one more session remaining than it does.`;
       }
     }
 
