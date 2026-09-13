@@ -98,7 +98,25 @@ export async function GET() {
         return null
       }
 
+      // The grant an action item belongs to is a column on the row. Read it.
+      //
+      // opportunityId was guessed from the end of the card id, which works for
+      // cards built from an opportunity and returns null for every card built
+      // from an action item, because those ids end with the action's own uuid.
+      //
+      // So every question card carried opportunityId: null, and anything
+      // keyed on it silently did nothing. That is how the Researching column
+      // kept saying "Agent checking eligibility and dates" for three grants
+      // whose question was already sitting on Bella's list: the fix for it was
+      // correct and could never fire.
+      const oppOfAction = new Map(
+        (actionsByPursuit.get(p.id) ?? [])
+          .filter((a: any) => a.opportunity_id)
+          .map((a: any) => [String(a.id), String(a.opportunity_id)]),
+      )
+
       for (const action of nextActions) {
+        const actionItemId = tailOf(action.id, actionIds)
         allItems.push({
           ...action,
           pursuitId: p.id,
@@ -106,8 +124,10 @@ export async function GET() {
           districtName: p.district_name,
           contactName: p.client_contact_name,
           contactEmail: p.client_contact_email,
-          actionItemId: tailOf(action.id, actionIds),
-          opportunityId: tailOf(action.id, oppIds),
+          actionItemId,
+          opportunityId:
+            tailOf(action.id, oppIds) ??
+            (actionItemId ? oppOfAction.get(String(actionItemId)) ?? null : null),
         })
       }
     }
