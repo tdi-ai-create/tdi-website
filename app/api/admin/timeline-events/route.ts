@@ -85,52 +85,63 @@ export async function POST(request: NextRequest) {
 
     if (error) throw error;
 
-    // If this is a session completion, update the partnership's used counts
-    if (event_type === 'observation_day_completed') {
-      // Get current count and increment
-      const { data: partnership } = await supabase
+    // If this is a session completion, advance the partnership's used count.
+    //
+    // This was three near-identical blocks, one per event type, which is how
+    // the same missing error check ended up in all three. One table now, so
+    // the rule lives once.
+    //
+    // These counters are not internal bookkeeping. The partnership page shows
+    // "used / total", remaining_count is total minus used, and a school's own
+    // dashboard reads them. A lost increment shows a school more sessions
+    // remaining than it actually has, and we deliver work nobody bought.
+    const USED_COUNTER: Record<string, string> = {
+      observation_day_completed: 'observation_days_used',
+      virtual_session_completed: 'virtual_sessions_used',
+      executive_session_completed: 'executive_sessions_used',
+    };
+
+    const counter = USED_COUNTER[event_type];
+    let countWarning: string | null = null;
+
+    if (counter) {
+      const { data: partnership, error: readError } = await supabase
         .from('partnerships')
-        .select('observation_days_used')
+        .select(counter)
         .eq('id', partnership_id)
         .single();
 
-      await supabase
-        .from('partnerships')
-        .update({
-          observation_days_used: (partnership?.observation_days_used || 0) + 1,
-        })
-        .eq('id', partnership_id);
-    } else if (event_type === 'virtual_session_completed') {
-      const { data: partnership } = await supabase
-        .from('partnerships')
-        .select('virtual_sessions_used')
-        .eq('id', partnership_id)
-        .single();
+      if (readError) {
+        console.error('[timeline-events] Could not read used count, not advanced', {
+          partnershipId: partnership_id, counter, error: readError.message,
+        });
+        countWarning = `The event was recorded, but ${counter} could not be read, so the used count was not advanced.`;
+      } else {
+        // Supabase cannot type a select() whose column comes from a variable,
+        // so it infers GenericStringError. Cast through unknown.
+        const row = partnership as unknown as Record<string, unknown> | null;
+        const current = Number(row?.[counter] ?? 0);
 
-      await supabase
-        .from('partnerships')
-        .update({
-          virtual_sessions_used: (partnership?.virtual_sessions_used || 0) + 1,
-        })
-        .eq('id', partnership_id);
-    } else if (event_type === 'executive_session_completed') {
-      const { data: partnership } = await supabase
-        .from('partnerships')
-        .select('executive_sessions_used')
-        .eq('id', partnership_id)
-        .single();
+        const { error: bumpError } = await supabase
+          .from('partnerships')
+          .update({ [counter]: current + 1 })
+          .eq('id', partnership_id);
 
-      await supabase
-        .from('partnerships')
-        .update({
-          executive_sessions_used: (partnership?.executive_sessions_used || 0) + 1,
-        })
-        .eq('id', partnership_id);
+        if (bumpError) {
+          console.error('[timeline-events] Event recorded but used count not advanced', {
+            partnershipId: partnership_id, counter, error: bumpError.message,
+          });
+          countWarning = `The event was recorded, but ${counter} was not advanced, so this partnership reads as having one more session remaining than it does.`;
+        }
+      }
     }
 
     return NextResponse.json({
       success: true,
       event: data,
+      // Present only when the event was recorded but the used count was not
+      // advanced, so the remaining-sessions figure is known to be wrong.
+      countWarning,
     });
   } catch (error) {
     console.error('Error creating timeline event:', error);
