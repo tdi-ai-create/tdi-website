@@ -111,6 +111,82 @@ function rejectReason(candidate: string): string | null {
   return null
 }
 
+/** An ask is a sentence or two. Beyond this it is a brief, not an email line. */
+const MAX_ASK_LENGTH = 400
+
+/** Wording that makes something a request of the reader rather than a note. */
+const REQUEST_SHAPES: RegExp[] = [
+  /\bplease\b/i,
+  /\bcan you\b/i,
+  /\bcould you\b/i,
+  /\bwe need (?:you|them)\b/i,
+  /\breport back\b/i,
+  /\blet us know\b/i,
+  /\bforward (?:the|a|your)\b/i,
+  /\bprovide (?:the|a|your|us)\b/i,
+  /\bconfirm (?:the|that|whether|your)\b/i,
+  /\bsend (?:the|a|us|your)\b/i,
+]
+
+/**
+ * The specific thing we need from the school, if it is safe to say.
+ *
+ * Bella asked for emails to "be specific about what we need from contacts".
+ * They named the task and then said everything was ready, which tells a
+ * principal nothing about what to actually do.
+ *
+ * The text comes from the item's own description, which is written for us, so
+ * it goes through the same rejection rules that stop internal wording reaching
+ * a school. Anything that reads as an instruction to a colleague, or carries
+ * our own jargon, is dropped and the email falls back to its previous wording.
+ * A vague email is a poor email. An email containing our pricing ladder is an
+ * incident, and that has already happened once.
+ */
+const ASK_BY_CATEGORY: Record<string, string> = {
+  follow_up:
+    'confirm whether the application has been submitted, and forward us the confirmation email so we can close it off.',
+  documentation:
+    'send us the documents or details listed, so we can finish the application on your behalf.',
+  gate:
+    'confirm the details we are missing, so we can start drafting.',
+  submission:
+    'complete the submission, or tell us what is holding it up so we can help.',
+}
+
+/**
+ * The ask, derived from what kind of task this is.
+ *
+ * Free text on these items is written for us. Requiring it to be both safe and
+ * genuinely a request left zero of nineteen open items qualifying, which is a
+ * feature that never fires.
+ *
+ * The category is a field we set ourselves and can trust, and for these four
+ * the ask is always the same sentence. It is accurate, it says what the school
+ * has to do, and it cannot leak anything internal because we wrote it here.
+ */
+export function askForCategory(category?: string | null): string | null {
+  return ASK_BY_CATEGORY[(category ?? '').trim()] ?? null
+}
+
+export function clientAsk(raw?: string | null): string | null {
+  const candidate = (raw ?? '').trim()
+  if (!candidate) return null
+  if (candidate.length > MAX_ASK_LENGTH) return null
+  // Too short to be an ask, and usually a label that is already in the subject.
+  if (candidate.split(/\s+/).length < 5) return null
+  if (INTERNAL_TITLE_SHAPES.some(shape => shape.test(candidate))) return null
+  if (findInternalText(candidate, '').length > 0) return null
+  // It has to be a request.
+  //
+  // Descriptions on these items are notes as often as asks. Rendering a real
+  // one showed "What we need from you: Submitted by Jovita Ortiz ~June 16.
+  // Expected notification mid-September", which is a status update wearing the
+  // label of a request, and worse than saying nothing. Safe to send is not the
+  // same test as worth sending.
+  if (!REQUEST_SHAPES.some(shape => shape.test(candidate))) return null
+  return candidate
+}
+
 /**
  * What a school is told this task is about.
  *
@@ -189,6 +265,10 @@ export interface FollowUpEmailParams {
   clientLabel?: string | null
   /** The grant's public name, used to name the thing when the title cannot be. */
   opportunityName?: string | null
+  /** What we actually need the school to do. Dropped if it is not safe to send. */
+  clientAskText?: string | null
+  /** The task's category, used when the free text is not a usable request. */
+  clientAskCategory?: string | null
   submitterName?: string
   nextRung?: string
 }
@@ -258,6 +338,7 @@ export function generateFollowUpEmail(params: FollowUpEmailParams): GeneratedEma
   // call site being the one that forgot.
   const schoolName = schoolDisplayName(rawSchoolName)
   const friendlyTask = clientTaskLabel(itemTitle, clientLabel, opportunityName)
+  const theAsk = clientAsk(params.clientAskText) ?? askForCategory(params.clientAskCategory)
 
   // A school reads "15 September", not "2026-09-15". Internal tone keeps the
   // ISO form, because we sort and scan those. Anything that is not a plain date,
@@ -305,6 +386,7 @@ export function generateFollowUpEmail(params: FollowUpEmailParams): GeneratedEma
       paragraphs = [
         `Hi ${contactName},`,
         `Just a friendly heads-up, **${friendlyTask}** is coming up around **${displayDate}**. No rush at all, I just want to make sure you have everything you need from us to get it out the door.`,
+        ...(theAsk ? [`What we need from you: ${theAsk}`] : []),
         `Everything's prepared on our end. If anything's unclear or you'd like me to hop on a quick call to walk through it, I'm here.`,
         `Rooting for you and ${schoolName},`,
         `Bella`,
@@ -314,6 +396,7 @@ export function generateFollowUpEmail(params: FollowUpEmailParams): GeneratedEma
       paragraphs = [
         `Hi ${contactName},`,
         `I wanted to follow up on **${friendlyTask}**. It was on the calendar for **${displayDate}**, and I know how full your plate is this time of year.`,
+        ...(theAsk ? [`What we need from you: ${theAsk}`] : []),
         `Is there anything holding it up that I can help with? A question, a quick call, or me sitting on Zoom while you send it. Just say the word.`,
         `We really want to land this funding for your teachers, and you're not doing it alone.`,
         `Here for you,`,

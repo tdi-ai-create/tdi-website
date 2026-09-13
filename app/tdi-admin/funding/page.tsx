@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { DraftEmailModal, introEmailDraft, gateBlockerEmailDraft } from './components/panel/DraftEmailModal'
@@ -80,8 +80,20 @@ export default function FundingPage() {
   const [draftEmail, setDraftEmail] = useState<any & { opportunityId?: string; windowOpens?: string; windowCloses?: string } | null>(null)
   const [toast, setToast] = useState<string | null>(null)
 
-  useEffect(() => {
-    Promise.all([
+  /**
+   * Load the board. Callable, not a one-shot.
+   *
+   * This used to be a bare useEffect with an empty dependency list, so the
+   * board was fetched once when the page opened and never again. Closing a
+   * task, closing a grant or sending an application changed the database and
+   * nothing on screen, so the item stayed put and the only way to see the
+   * truth was a browser reload.
+   *
+   * Bella reported it as "need a refresh for tasks that are checked as done,
+   * and refresh page for closed grants too". It is the same cause for both.
+   */
+  const load = useCallback(() => {
+    return Promise.all([
       fetch('/api/funding/dashboard').then(r => r.json()),
       fetch('/api/funding/queue').then(r => r.json()).catch(() => ({ items: [] })),
     ])
@@ -153,6 +165,39 @@ export default function FundingPage() {
       })
       .catch(() => setLoading(false))
   }, [])
+
+  useEffect(() => { load() }, [load])
+
+  /**
+   * Reload when the page comes back into view.
+   *
+   * Work is finished somewhere else. A card here sends you to the school page,
+   * you close the task there, and you come back to a board built before you
+   * did any of it, still showing the thing you just finished and the grant you
+   * just closed. Nothing was wrong in the database; the screen was simply old.
+   *
+   * Throttled, because switching tabs quickly should not mean refetching every
+   * pursuit each time.
+   */
+  useEffect(() => {
+    let last = Date.now()
+    const MIN_GAP_MS = 5000
+
+    const refreshIfStale = () => {
+      if (document.visibilityState !== 'visible') return
+      const now = Date.now()
+      if (now - last < MIN_GAP_MS) return
+      last = now
+      void load()
+    }
+
+    document.addEventListener('visibilitychange', refreshIfStale)
+    window.addEventListener('focus', refreshIfStale)
+    return () => {
+      document.removeEventListener('visibilitychange', refreshIfStale)
+      window.removeEventListener('focus', refreshIfStale)
+    }
+  }, [load])
 
   if (loading) {
     return (
@@ -386,7 +431,7 @@ function SchoolCard({ school, onDraftEmail, onToast }: {
   // What the school still owes us, in the words they will actually read.
   // Maintained by lib/funding-gate-sync.ts, so this stays in step automatically.
   const gateGapLabels = school.actions
-    .filter(a => a.category === 'gate' && a.ownerType === 'client')
+    .filter(a => a.category === 'gate' && isSchoolOwned(a))
     .map(a => a.clientLabel || a.title)
 
   const bannerBg = isBlocked ? '#FEF2F2' : isWaiting ? '#F0FDF4' : isIntro ? '#EFF6FF' : '#F5F3FF'
@@ -541,7 +586,7 @@ function SchoolCard({ school, onDraftEmail, onToast }: {
           const clientActions = school.actions.filter(isSchoolOwned)
 
           const ownerBadge = (ownerType: string) =>
-            ownerType === 'client'
+            isSchoolOwned({ ownerType })
               ? { bg: '#FEF3C7', color: '#92400E', label: 'School' }
               : { bg: '#F5F3FF', color: '#6D28D9', label: 'You' }
 

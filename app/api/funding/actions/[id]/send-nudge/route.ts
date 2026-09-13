@@ -172,6 +172,12 @@ export async function POST(
     schoolName,
     clientLabel: item.client_label,
     opportunityName,
+    // What the school actually has to do. Taken from the item's own
+    // description, and dropped by clientAsk() if it reads as internal. The
+    // email used to name the task and then say everything was ready, which
+    // tells a principal nothing about what to do next.
+    clientAskText: item.description,
+    clientAskCategory: item.category,
     // The person who owes the application, which on a person-owned task is the
     // school contact and never the colleague whose task it is.
     submitterName: isClientOwned
