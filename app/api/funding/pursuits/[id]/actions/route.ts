@@ -5,6 +5,7 @@ import {
   applyAnswerOutcome,
   VALID_OUTCOMES as VALID_ANSWER_OUTCOMES,
 } from '@/lib/funding-answer-actions'
+import { screenPath, isPastDrafting } from '@/lib/funding-eligibility'
 
 function db() {
   return createClient(
@@ -267,9 +268,52 @@ export async function PATCH(
       }
       const { data: pursuit } = await supabase
         .from('funding_pursuits')
-        .select('district_name')
+        .select('district_name, sector, county, state_code, school_profile')
         .eq('id', answered.pursuit_id)
         .maybeSingle()
+
+      // Re-run the eligibility screen before declaring a path clear.
+      //
+      // An answer settles the question it was asked and nothing else. Without
+      // this, answering one blocker produces "prepare the application" for a
+      // grant the portal will still refuse to hand to a writer, which is work
+      // that cannot be started and reads as a writer ignoring it.
+      let remainingBlocker: string | null = null
+      if (updates.outcome === 'proceed' && answered.opportunity_id) {
+        const { data: opp } = await supabase
+          .from('funding_opportunities')
+          .select('name, window_status, status, client_submitted')
+          .eq('id', answered.opportunity_id)
+          .maybeSingle()
+
+        if (opp) {
+          const profile = (() => {
+            try {
+              const raw = pursuit?.school_profile
+              if (!raw) return {} as Record<string, unknown>
+              const once = typeof raw === 'string' ? JSON.parse(raw) : raw
+              return (typeof once === 'string' ? JSON.parse(once) : once) as Record<string, unknown>
+            } catch { return {} as Record<string, unknown> }
+          })()
+
+          const screen = screenPath(
+            {
+              name: opp.name ?? '',
+              windowStatus: opp.window_status ?? null,
+              namedApplicant: (profile.nea_member_name as string) ?? null,
+              alreadySubmitted: isPastDrafting(opp.status, opp.client_submitted),
+            },
+            {
+              sector: pursuit?.sector ?? null,
+              county: pursuit?.county ?? null,
+              stateCode: pursuit?.state_code ?? null,
+              titleIStatus: (profile.title_i_status as string) ?? null,
+              designation: (profile.designation as string) ?? null,
+            },
+          )
+          if (screen.verdict !== 'clear') remainingBlocker = screen.reason ?? 'The eligibility screen still refuses this path.'
+        }
+      }
 
       const result = await applyAnswerOutcome(supabase, {
         actionId: String(answered.id),
@@ -283,6 +327,7 @@ export async function PATCH(
         grantName,
         schoolName: pursuit?.district_name ?? null,
         priorReAsks: Number(answered.reminder_count ?? 0),
+        remainingBlocker,
       })
 
       pathStopped = result.pathStopped
