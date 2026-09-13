@@ -17,6 +17,7 @@ export async function POST(request: NextRequest) {
   }
 
   const supabase = getServiceSupabase()
+  let totalsWarning: string | null = null
 
   // 1. Get the pursuit and its linked partnership
   const { data: pursuit } = await supabase
@@ -41,7 +42,13 @@ export async function POST(request: NextRequest) {
 
   // 3. Flip them to pending (deliverable)
   if (flippedCount > 0) {
-    await supabase
+    // Releasing the hold is the whole point of confirming an award, and
+    // flippedCount was counted from the select above rather than from this
+    // update. So a lost write here still told Slack and the caller that N
+    // services were unlocked for delivery while every one of them stayed on
+    // hold. Fail here, before anything is announced: nothing has been logged
+    // or notified yet, so a retry is safe and is the right thing to do.
+    const { error: releaseError } = await supabase
       .from('contract_deliverables')
       .update({
         ...asReleasedFromFunding(),
@@ -50,6 +57,15 @@ export async function POST(request: NextRequest) {
       })
       .eq('funding_pursuit_id', funding_pursuit_id)
       .eq('funding_hold', true)
+
+    if (releaseError) {
+      console.error('[confirm-award] Services not released', {
+        pursuitId: funding_pursuit_id, held: flippedCount, error: releaseError.message,
+      })
+      return NextResponse.json({
+        error: `The award was not applied. ${flippedCount} service(s) are still on funding hold, so nothing has been unlocked for delivery. Retry.`,
+      }, { status: 500 })
+    }
   }
 
   // 4. If partnership exists, recalculate service totals from all deliverables
@@ -76,17 +92,29 @@ export async function POST(request: NextRequest) {
         if (field) counts[field] += d.quantity || 1
       })
 
-      await supabase
+      // These totals are what the partnership reports as bought. The services
+      // are already released by this point, so failing the request would be
+      // wrong: a retry would find nothing on hold and report zero unlocked.
+      // Reported instead, so a stale entitlement count is visible.
+      const { error: totalsError } = await supabase
         .from('partnerships')
         .update({
           ...counts,
           data_updated_at: new Date().toISOString(),
         })
         .eq('id', pursuit.partnership_id)
+
+      if (totalsError) {
+        console.error('[confirm-award] Services released but partnership totals not recalculated', {
+          partnershipId: pursuit.partnership_id, error: totalsError.message,
+        })
+        totalsWarning = 'Services were unlocked, but the partnership service totals were not recalculated, so the counts it shows are out of date.'
+      }
     }
 
     // 5. Log activity on partnership
-    await supabase.from('activity_log').insert({
+    // Audit trail. The award is already applied, so record a failure and move on.
+    const { error: logError } = await supabase.from('activity_log').insert({
       partnership_id: pursuit.partnership_id,
       action: 'grant_awarded',
       details: {
@@ -96,6 +124,10 @@ export async function POST(request: NextRequest) {
         confirmed_by: email,
       },
     })
+
+    if (logError) {
+      console.error('[confirm-award] Award applied but not logged:', logError.message)
+    }
   }
 
   // Slack notification
@@ -107,5 +139,7 @@ export async function POST(request: NextRequest) {
     success: true,
     message: `Grant confirmed for ${pursuit.district_name || pursuit.pursuit_name}. ${flippedCount} services unlocked for delivery.`,
     deliverables_unlocked: flippedCount,
+    // Present only when the release worked but the partnership totals did not.
+    totalsWarning,
   })
 }

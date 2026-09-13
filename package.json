@@ -26,7 +26,8 @@
     "check:coverage": "node scripts/check-coverage.mjs",
     "check:games": "node scripts/check-games.mjs",
     "check:chrome": "node scripts/check-pdf-chrome.mjs",
-    "check:spanish": "tsx scripts/spanish-download-selftest.ts"
+    "check:spanish": "tsx scripts/spanish-download-selftest.ts",
+    "check:uitranslation": "tsx scripts/ui-translation-guard-selftest.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.78.0",
