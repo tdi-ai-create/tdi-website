@@ -228,8 +228,13 @@ Run it after any change that touches a query.
 These are absolute, and they apply to code, UI copy, emails, PDFs, commit
 messages, and anything a person reads.
 
-- **No emojis.** Anywhere. Use Lucide icons, colored dots, or gradients for
-  status, heat, and urgency.
+- **No emojis.** Anywhere, with one exception. Use Lucide icons, colored dots,
+  or gradients for status, heat, and urgency.
+
+  The exception is **Vibe Check options**, where the emoji is the answer rather
+  than decoration: a teacher taps a face, not a word. Rae confirmed this on
+  13 September 2026 after a session flagged them as a rule violation. They stay.
+  Nowhere else.
 - **No em dashes and no double hyphens.** Rae treats them as a giveaway that
   content was AI written. Use periods, commas, colons, or restructure.
 - No underlines except real links on hover.
@@ -249,6 +254,12 @@ Do not display, anywhere user facing:
 
 Say "Vibe Check", never "Wellbeing", in any user facing copy. The database
 action may stay `wellbeing_check`.
+
+Everything a reader reads has to go through `tUI()`, including text that comes
+from a constant rather than a database. The Vibe Check questions and the Quick
+Win category were both rendered straight to the page, so a Spanish reader got a
+Spanish frame around English content until 13 September 2026. If you add copy
+that a person reads, wrap it, or it is English forever in every language.
 
 Spanish translation is required on game and Hub landing pages.
 
