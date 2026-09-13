@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { isSchoolOwned } from '@/lib/funding-ownership'
 
 interface Task {
   id: string
@@ -83,7 +84,9 @@ export function MyTasks() {
   const [openTask, setOpenTask] = useState<string | null>(null)
   const [blocked, setBlocked] = useState<Record<string, BlockedClose>>({})
   const [answerDraft, setAnswerDraft] = useState<Record<string, AnswerDraft>>({})
-  const [justDone, setJustDone] = useState<{ id: string; title: string } | null>(null)
+  const [justDone, setJustDone] = useState<
+    { id: string; title: string; next?: string[]; because?: string; problem?: string } | null
+  >(null)
 
   const loadTasks = () => {
     fetch('/api/funding/tasks?status=open')
@@ -100,7 +103,7 @@ export function MyTasks() {
 
   const filtered = tasks.filter(t => {
     if (filter === 'overdue') return t.is_overdue
-    if (filter === 'client') return t.owner_type === 'client'
+    if (filter === 'client') return isSchoolOwned(t)
     if (filter === 'tdi') return t.owner_type === 'tdi'
     return true
   })
@@ -143,8 +146,17 @@ export function MyTasks() {
       // Closed for real. Say so, because the row is about to vanish and a row
       // disappearing on its own is indistinguishable from a page refresh.
       const closed = tasks.find(t => t.id === taskId)
-      setJustDone({ id: taskId, title: closed?.client_label || closed?.title || 'Task' })
-      setTimeout(() => setJustDone(cur => (cur?.id === taskId ? null : cur)), 6000)
+      setJustDone({
+        id: taskId,
+        title: closed?.client_label || closed?.title || 'Task',
+        // An answer is supposed to start the next thing. Naming it here is the
+        // difference between replying and being told the reply landed.
+        next: Array.isArray(data.nextSteps?.titles) ? data.nextSteps.titles : undefined,
+        because: data.nextSteps?.because,
+        problem: data.nextStepError || undefined,
+      })
+      // Left up longer when there is something to read.
+      setTimeout(() => setJustDone(cur => (cur?.id === taskId ? null : cur)), data.nextSteps?.titles?.length ? 14000 : 6000)
 
       setBlocked(b => { const n = { ...b }; delete n[taskId]; return n })
       setAnswerDraft(d => { const n = { ...d }; delete n[taskId]; return n })
@@ -253,10 +265,37 @@ export function MyTasks() {
           {justDone && (
             <div style={{
               padding: '10px 20px', background: '#ECFDF5', borderBottom: '1px solid #A7F3D0',
-              fontSize: 12, color: '#065F46', display: 'flex', alignItems: 'center', gap: 8,
+              fontSize: 12, color: '#065F46', display: 'flex', alignItems: 'flex-start', gap: 8,
             }}>
-              <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#10B981', flexShrink: 0 }} />
-              <span><strong>{justDone.title}</strong> is closed and has moved out of this list.</span>
+              <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#10B981', flexShrink: 0, marginTop: 4 }} />
+              <div>
+                <div><strong>{justDone.title}</strong> is closed and has moved out of this list.</div>
+
+                {/* What her answer started. Until 11 September an answer of
+                    "proceed" or "still stuck" was recorded and created nothing,
+                    so the reply went nowhere and only she noticed. */}
+                {justDone.next && justDone.next.length > 0 && (
+                  <div style={{ marginTop: 6 }}>
+                    <div style={{ fontWeight: 600 }}>
+                      {justDone.next.length === 1 ? 'Next step created:' : 'Next steps created:'}
+                    </div>
+                    {justDone.next.map(t => (
+                      <div key={t} style={{ marginTop: 2 }}>{t}</div>
+                    ))}
+                    {justDone.because && (
+                      <div style={{ marginTop: 4, opacity: 0.85 }}>{justDone.because}</div>
+                    )}
+                  </div>
+                )}
+
+                {/* Never silent. The answer is saved either way, so a failure
+                    here leaves a question resolved and nothing following it. */}
+                {justDone.problem && (
+                  <div style={{ marginTop: 6, color: '#92400E' }}>
+                    Your answer was saved, but the next step was not created. {justDone.problem}
+                  </div>
+                )}
+              </div>
             </div>
           )}
 
@@ -314,10 +353,10 @@ export function MyTasks() {
                         <span style={{
                           fontSize: 10, fontWeight: 800, padding: '2px 8px', borderRadius: 4,
                           textTransform: 'uppercase', letterSpacing: 0.5,
-                          background: task.owner_type === 'client' ? '#FFF7ED' : '#F5F3FF',
-                          color: task.owner_type === 'client' ? '#C2410C' : '#6D28D9',
+                          background: isSchoolOwned(task) ? '#FFF7ED' : '#F5F3FF',
+                          color: isSchoolOwned(task) ? '#C2410C' : '#6D28D9',
                         }}>
-                          {task.owner_type === 'client' ? 'School' : 'TDI'}
+                          {isSchoolOwned(task) ? 'School' : 'TDI'}
                         </span>
                         {/* Title. Opens the detail rather than being inert text,
                             because "what do I actually do here" was the question. */}
@@ -354,7 +393,7 @@ export function MyTasks() {
                       </div>
 
                       {/* Prepared materials for client tasks */}
-                      {task.owner_type === 'client' && task.prepared_materials && (
+                      {isSchoolOwned(task) && task.prepared_materials && (
                         <div style={{ fontSize: 10, color: '#9CA3AF', fontStyle: 'italic', marginTop: 3 }}>
                           TDI prepared: {task.prepared_materials.length > 100 ? task.prepared_materials.slice(0, 97) + '...' : task.prepared_materials}
                         </div>
@@ -381,7 +420,7 @@ export function MyTasks() {
                       )}
 
                       {/* Nudge count */}
-                      {task.owner_type === 'client' && task.nudge_count > 0 && (
+                      {isSchoolOwned(task) && task.nudge_count > 0 && (
                         <span style={{
                           fontSize: 9, fontWeight: 700, padding: '2px 6px', borderRadius: 4,
                           background: '#FFF7ED', color: '#C2410C',
@@ -404,7 +443,7 @@ export function MyTasks() {
                       })()}
 
                       {/* Nudge button for client tasks */}
-                      {task.owner_type === 'client' && task.pursuit?.client_contact_email && (
+                      {isSchoolOwned(task) && task.pursuit?.client_contact_email && (
                         <button
                           onClick={(e) => { e.stopPropagation(); nudge(task.id) }}
                           disabled={nudging === task.id}
@@ -430,7 +469,7 @@ export function MyTasks() {
                       )}
 
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16, fontSize: 12, color: '#6B7280', marginBottom: 12 }}>
-                        <span><strong style={{ color: '#374151' }}>Owner</strong> {task.owner_name || (task.owner_type === 'client' ? 'The school' : 'TDI')}</span>
+                        <span><strong style={{ color: '#374151' }}>Owner</strong> {task.owner_name || (isSchoolOwned(task) ? 'The school' : 'TDI')}</span>
                         {task.owner_email && <span><strong style={{ color: '#374151' }}>Contact</strong> {task.owner_email}</span>}
                         {task.due_date && <span><strong style={{ color: '#374151' }}>Due</strong> {task.due_date}</span>}
                         {task.category && <span><strong style={{ color: '#374151' }}>Category</strong> {task.category}</span>}
