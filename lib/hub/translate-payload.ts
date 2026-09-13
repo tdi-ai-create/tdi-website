@@ -12,7 +12,7 @@
  */
 
 import Anthropic from '@anthropic-ai/sdk'
-import { payloadSystemPrompt, BANNED_IN_TRANSLATION } from './spanish-glossary'
+import { payloadSystemPrompt, cardSystemPrompt, BANNED_IN_TRANSLATION } from './spanish-glossary'
 
 export const TRANSLATION_MODEL = 'claude-opus-5'
 
@@ -128,3 +128,47 @@ export async function translatePayload(client: Anthropic, payload: Json, label: 
   return translated
 }
 
+
+/**
+ * Translate the card text: the title and description a reader sees before they
+ * open anything.
+ *
+ * Separate from the payload because it is one short pair of strings with its
+ * own rule, that a title which grows by half is a bad title.
+ *
+ * This lives beside the payload translator because they have to run together.
+ * On 13 September three items had a Spanish document behind an English card,
+ * since the hourly job built the document and nothing filled in the card. A
+ * reader browsing in Spanish saw English, clicked it, and got Spanish.
+ */
+export async function translateCardText(
+  client: Anthropic,
+  item: { id: string; title: string | null; description: string | null },
+): Promise<{ title_es: string; description_es: string }> {
+  const response = await client.messages.create({
+    model: TRANSLATION_MODEL,
+    max_tokens: 4000,
+    system: cardSystemPrompt(),
+    messages: [{ role: 'user', content: JSON.stringify({ items: [item] }) }],
+  })
+
+  if (response.stop_reason === 'refusal') throw new Error('the model declined this card')
+
+  const text = response.content
+    .filter((b): b is Anthropic.TextBlock => b.type === 'text')
+    .map(b => b.text)
+    .join('')
+
+  const cleaned = text.trim().replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '')
+  const parsed = JSON.parse(cleaned) as { translations?: { id: string; title_es: string; description_es: string }[] }
+  const got = parsed.translations?.[0]
+
+  if (!got) throw new Error('no translation came back for the card')
+  if (got.id !== item.id) throw new Error(`card translation came back for the wrong id: ${got.id}`)
+  if (!got.title_es?.trim()) throw new Error('the card title came back empty')
+  if (BANNED_IN_TRANSLATION.test(got.title_es) || BANNED_IN_TRANSLATION.test(got.description_es ?? '')) {
+    throw new Error('a dash came back in the card translation')
+  }
+
+  return { title_es: got.title_es, description_es: got.description_es ?? '' }
+}
