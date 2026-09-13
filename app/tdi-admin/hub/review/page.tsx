@@ -16,6 +16,8 @@ type Detail = Row & {
 }
 
 const CHANNEL: Record<string, { label: string; dot: string }> = {
+  linkedin: { label: 'LinkedIn', dot: '#2A5C8A' },
+  facebook: { label: 'Facebook', dot: '#3B5A9A' },
   hub: { label: 'Hub', dot: '#2F6FB5' },
   substack: { label: 'Substack', dot: '#B75B2A' },
   instagram: { label: 'Instagram', dot: '#A83A68' },
