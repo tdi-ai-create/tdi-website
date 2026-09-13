@@ -40,6 +40,29 @@ export function ActionsTab({ pursuitId }: ActionsTabProps) {
   const [showAddForm, setShowAddForm] = useState(false)
   const [newAction, setNewAction] = useState({ title: '', ownerType: 'tdi', dueDate: '', category: 'research', actionSize: 'standard', ownerName: '', ownerEmail: '', description: '' })
   const [nudgeActionId, setNudgeActionId] = useState<string | null>(null)
+
+  /**
+   * Open the drafted email straight away when the board sent us here for it.
+   *
+   * The board's "Write to the school" links to ?action=<id>&write=1. Without
+   * this the parameter did nothing, so the link scrolled to the right row and
+   * she had to find and press the same button a second time. A link that says
+   * it will write to the school should write to the school.
+   *
+   * Runs once per action id, so closing the preview does not reopen it.
+   */
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const params = new URLSearchParams(window.location.search)
+    if (params.get('write') !== '1') return
+    const id = params.get('action')
+    if (!id) return
+    setNudgeActionId(id)
+    // Drop the flag so a refresh, or closing the preview, does not reopen it.
+    params.delete('write')
+    const rest = params.toString()
+    window.history.replaceState({}, '', `${window.location.pathname}${rest ? `?${rest}` : ''}`)
+  }, [])
   const [addingAction, setAddingAction] = useState(false)
 
   const fetchActions = () => {
