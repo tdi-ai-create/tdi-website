@@ -27,6 +27,7 @@ import { isPastDrafting, screenPath, eligibilityQuestionTitle } from '../funding
 import { isOursToDo, isWaitingOnUs, whoseTurn } from '../creator-turn';
 import { isPersonOwned, isSchoolOwned } from '../funding-ownership';
 import { planAfterAnswer } from '../funding-answer-actions';
+import { canAgentDraft, stalledDraftMessage } from '../funding-offerable';
 
 export interface GuardCase {
   /** What this case proves, in words. */
@@ -347,6 +348,92 @@ export const GUARDS: Guard[] = [
         holds: () => {
           const t = eligibilityQuestionTitle('window', 'funder');
           return (t.match(/funder/gi) || []).length === 1;
+        },
+      },
+    ],
+  },
+
+  {
+    id: 'chase-only-what-is-offered',
+    protects: 'Telling a person to chase a writer who was never handed the work',
+    origin:
+      '13 September 2026: Bella\'s board said "Title I Section 1003: nobody has picked this draft up. ' +
+      'Requested 9 days ago and vanessa has not started. The portal is offering it correctly, so this ' +
+      'is on our side to chase." It was not being offered. The eligibility screen refuses that path ' +
+      'because TDI\'s approved-vendor status in that state is unconfirmed.',
+    cases: [
+      {
+        name: 'a finished grant is never offered to a writer',
+        holds: () =>
+          ['closed', 'denied', 'awarded', 'applied', 'submitted'].every(
+            (status) =>
+              canAgentDraft(
+                { name: 'Some Grant', status, window_status: 'open' },
+                { sector: 'public' },
+                { gate_open: true },
+              ).offerable === false
+          ),
+      },
+      {
+        name: 'a shut gate blocks it, and says so',
+        holds: () => {
+          const v = canAgentDraft(
+            { name: 'Some Grant', status: 'not_started', window_status: 'open' },
+            { sector: 'public' },
+            { gate_open: false },
+          );
+          return v.offerable === false && v.blockedBy === 'gate' && v.reason.length > 0;
+        },
+      },
+      {
+        name: 'an unverified window blocks it',
+        holds: () => {
+          const v = canAgentDraft(
+            { name: 'Some Grant', status: 'not_started', window_status: 'unknown' },
+            { sector: 'public' },
+            { gate_open: true },
+          );
+          return v.offerable === false && v.blockedBy === 'window';
+        },
+      },
+      {
+        name: 'the eligibility screen can block it too, which is the check that was missing',
+        holds: () => {
+          const v = canAgentDraft(
+            { name: 'Title I Section 1003 (School Improvement)', status: 'not_started', window_status: 'open' },
+            { sector: 'diocesan', stateCode: 'LA' },
+            { gate_open: true },
+          );
+          return v.offerable === false && v.blockedBy === 'screen';
+        },
+      },
+      {
+        name: 'blocked work never tells anyone to chase',
+        holds: () => {
+          const blocked = stalledDraftMessage(
+            { offerable: false, blockedBy: 'screen', reason: 'TDI is not a confirmed vendor' },
+            'vanessa',
+            9,
+          );
+          return !/chase/i.test(blocked.why) || /will not help/i.test(blocked.why);
+        },
+      },
+      {
+        name: 'work genuinely on offer does say to chase',
+        holds: () => {
+          const open = stalledDraftMessage({ offerable: true, blockedBy: null, reason: '' }, 'vanessa', 9);
+          return /chase/i.test(open.why) && /9 days/.test(open.why);
+        },
+      },
+      {
+        name: 'a blocked reason is never empty',
+        holds: () => {
+          const cases = [
+            canAgentDraft({ name: 'G', status: 'closed' }, {}, { gate_open: true }),
+            canAgentDraft({ name: 'G', status: 'not_started', window_status: 'open' }, { archived: true }, { gate_open: true }),
+            canAgentDraft({ name: 'G', status: 'not_started', window_status: 'closed_missed' }, {}, { gate_open: true }),
+          ];
+          return cases.every((c) => !c.offerable && c.reason.trim().length > 0);
         },
       },
     ],

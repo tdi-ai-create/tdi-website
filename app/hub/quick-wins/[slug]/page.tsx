@@ -1314,7 +1314,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                     letterSpacing: '0.03em',
                   }}
                 >
-                  {quickWin.category}
+                  {tUI(quickWin.category)}
                 </p>
               )}
 

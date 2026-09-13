@@ -1,0 +1,81 @@
+name: Deploy Freshness
+
+# Production stopped deploying for two days between 11 and 13 September 2026.
+# Nothing failed and nothing was queued: builds were simply never triggered,
+# and eight merges sat on main believing they were live. It surfaced because
+# somebody happened to ask an unrelated question.
+#
+# This asks the only question that matters: is the commit serving traffic the
+# commit we merged. The repository knows what should have shipped; the running
+# deployment reports what did.
+
+on:
+  schedule:
+    # Every two hours. A gap shorter than that is a build in progress, not a
+    # stall, and alerting on those would train everyone to ignore this.
+    - cron: '17 */2 * * *'
+  workflow_dispatch:
+
+jobs:
+  freshness:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          # Enough history to measure how far behind production is, without
+          # cloning years of it.
+          fetch-depth: 50
+
+      - name: Compare what is live against what is merged
+        run: |
+          set -euo pipefail
+
+          LIVE=$(curl -fsS --max-time 20 https://www.teachersdeserveit.com/api/health/version \
+            | python3 -c 'import sys,json; print(json.load(sys.stdin).get("commit") or "")')
+          HEAD_SHA=$(git rev-parse HEAD)
+
+          if [ -z "$LIVE" ]; then
+            echo "The live site did not report a commit."
+            echo "Either the version endpoint is not deployed yet, which is expected"
+            echo "on the first run, or the site is not answering. Check both."
+            exit 1
+          fi
+
+          echo "live: $LIVE"
+          echo "main: $HEAD_SHA"
+
+          if [ "$LIVE" = "$HEAD_SHA" ]; then
+            echo "Production is serving the head of main."
+            exit 0
+          fi
+
+          # Not equal is normal for a few minutes after a merge. What matters is
+          # how long the live commit has been superseded.
+          if ! git cat-file -e "$LIVE^{commit}" 2>/dev/null; then
+            echo "Production is serving a commit this checkout does not contain."
+            echo "That usually means it is far enough behind to fall outside the"
+            echo "last 50 commits, which is itself the problem."
+            exit 1
+          fi
+
+          BEHIND=$(git rev-list --count "$LIVE..HEAD")
+          LIVE_AGE_MIN=$(( ( $(date +%s) - $(git show -s --format=%ct "$LIVE") ) / 60 ))
+
+          echo "commits behind: $BEHIND"
+          echo "live commit age: ${LIVE_AGE_MIN} minutes"
+
+          # Ninety minutes covers a slow build plus a queue. Beyond that, a
+          # merge that believes it shipped has not shipped.
+          if [ "$LIVE_AGE_MIN" -gt 90 ] && [ "$BEHIND" -gt 0 ]; then
+            echo ""
+            echo "Production is $BEHIND commit(s) behind main and the live commit is"
+            echo "${LIVE_AGE_MIN} minutes old. Merges are not reaching production."
+            echo ""
+            echo "Not deployed:"
+            git log --oneline "$LIVE..HEAD" | head -20
+            exit 1
+          fi
+
+          echo "Behind, but recently enough to be a build in flight rather than a stall."
