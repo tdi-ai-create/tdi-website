@@ -9,7 +9,7 @@ import NeedsYouBoard from './components/NeedsYouBoard'
 import FundersTab from './components/FundersTab'
 import AwardedTab from './components/AwardedTab'
 import OutreachQueue from './components/OutreachQueue'
-import { isPersonOwned, isSchoolOwned } from '@/lib/funding-ownership'
+import { isDecisionForRae, isPersonOwned, isSchoolOwned } from '@/lib/funding-ownership'
 
 /**
  * One next-step item, exactly as computed by lib/funding-next-actions.ts and
@@ -20,6 +20,8 @@ interface QueueItem {
   id: string
   label: string
   why: string
+  /** The person who owns it. 'team' covers more than one person. */
+  ownerName?: string | null
   owner: 'team' | 'agent' | 'school' | 'auto'
   urgency: 'critical' | 'high' | 'normal' | 'low'
   actionType: string
@@ -214,7 +216,15 @@ export default function FundingPage() {
 
   const totalPipeline = schools.reduce((s, sc) => s + sc.pipeline, 0)
   const totalGrants = schools.reduce((s, sc) => s + sc.grants.length, 0)
-  const needsYou = schools.reduce((s, sc) => s + sc.nextSteps.filter(i => !i.inProgress && i.owner === 'team').length, 0)
+  // Hers, not ours collectively.
+  //
+  // This counted every 'team' item, including the decisions that route to Rae,
+  // while the board column beneath it excluded them. Her screen read 31 in the
+  // badge and 23 in the stat, four pixels apart.
+  const needsYou = schools.reduce(
+    (s, sc) => s + sc.nextSteps.filter(i => !i.inProgress && i.owner === 'team' && !isDecisionForRae(i)).length,
+    0,
+  )
 
   const openFor = (sc: SchoolData, owner: 'team' | 'agent' | 'school') =>
     sc.nextSteps.filter(i => !i.inProgress && i.owner === owner).length
@@ -595,13 +605,19 @@ function SchoolCard({ school, onDraftEmail, onToast }: {
           // One rule, shared with the board, so the two counts on this screen
           // can never disagree again. See lib/funding-ownership.ts for why the
           // old category test was splitting one person's queue in half.
-          const myActions = school.actions.filter(isPersonOwned)
+          // Decisions that route to Rae are ours but not hers. Listing them
+          // under "Ready for You" and badging them "You" is the same mistake
+          // the tab badge was making, in a second place on the same screen.
+          const myActions = school.actions.filter(a => isPersonOwned(a) && !isDecisionForRae(a))
+          const raeActions = school.actions.filter(a => isPersonOwned(a) && isDecisionForRae(a))
           const clientActions = school.actions.filter(isSchoolOwned)
 
-          const ownerBadge = (ownerType: string) =>
-            isSchoolOwned({ ownerType })
+          const ownerBadge = (action: { ownerType?: string | null; ownerName?: string | null }) =>
+            isSchoolOwned({ ownerType: action.ownerType })
               ? { bg: '#FEF3C7', color: '#92400E', label: 'School' }
-              : { bg: '#F5F3FF', color: '#6D28D9', label: 'You' }
+              : isDecisionForRae(action)
+                ? { bg: '#E8F0FD', color: '#1e2749', label: 'Rae' }
+                : { bg: '#F5F3FF', color: '#6D28D9', label: 'You' }
 
           return (
             <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid #F3F4F6' }}>
@@ -614,7 +630,7 @@ function SchoolCard({ school, onDraftEmail, onToast }: {
                       to hide rows behind a cap she cannot see. */}
                   {myActions.map(action => {
                     const daysUntil = action.dueDate ? Math.ceil((new Date(action.dueDate + 'T00:00:00').getTime() - Date.now()) / 86400000) : null
-                    const badge = ownerBadge(action.ownerType)
+                    const badge = ownerBadge(action)
                     return (
                       <div key={action.id} style={{
                         display: 'flex', justifyContent: 'space-between', alignItems: 'center',
@@ -649,9 +665,31 @@ function SchoolCard({ school, onDraftEmail, onToast }: {
                   so it sits under her list rather than in a separate place.
                   Agent work is not here at all: an agent's work is a grant path,
                   shown above as "Running by itself", never an action item. */}
+              {/* Ours, but a decision rather than her work. Shown, never
+                  counted as hers, so nothing disappears by being reassigned. */}
+              {raeActions.length > 0 && (
+                <>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: '#1e2749', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 8, marginTop: myActions.length > 0 ? 12 : 0 }}>
+                    Rae decides ({raeActions.length})
+                  </div>
+                  {raeActions.map(action => (
+                    <div key={action.id} style={{
+                      display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                      padding: '6px 0', borderBottom: '1px solid #FAFAFA',
+                    }}>
+                      <span style={{ fontSize: 13, fontWeight: 600, color: '#1e2749', flex: 1 }}>{action.title}</span>
+                      <span style={{
+                        fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 4,
+                        background: '#E8F0FD', color: '#1e2749', flexShrink: 0,
+                      }}>Rae</span>
+                    </div>
+                  ))}
+                </>
+              )}
+
               {clientActions.length > 0 && (
                 <>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: '#92400E', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 8, marginTop: myActions.length > 0 ? 12 : 0 }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: '#92400E', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 8, marginTop: myActions.length > 0 || raeActions.length > 0 ? 12 : 0 }}>
                     Waiting on the school ({clientActions.length})
                   </div>
                   {clientActions.map(action => (

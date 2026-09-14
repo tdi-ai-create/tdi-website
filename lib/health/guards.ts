@@ -30,7 +30,7 @@ import {
   ownerOfBlockedPath,
 } from '../funding-eligibility';
 import { isOursToDo, isWaitingOnUs, whoseTurn } from '../creator-turn';
-import { isPersonOwned, isSchoolOwned } from '../funding-ownership';
+import { isPersonOwned, isSchoolOwned, isDecisionForRae } from '../funding-ownership';
 import { planAfterAnswer } from '../funding-answer-actions';
 import { canAgentDraft, stalledDraftMessage } from '../funding-offerable';
 import { computeNextActions } from '../funding-next-actions';
@@ -673,6 +673,38 @@ export const GUARDS: Guard[] = [
           const t = awardedTotal([{ status: 'applied', amount: 5000, awarded_amount: 5000 }]);
           return t.total === 0 && t.unrecorded === 0;
         },
+      },
+    ],
+  },
+
+  {
+    id: 'one-count-of-her-work',
+    protects: 'Two numbers for the same workload on one screen',
+    origin:
+      '14 September 2026: the tab badge read "Needs you 31" and the stat four pixels below it read ' +
+      '23. The badge counted every team item including the decisions routed to Rae; the board column ' +
+      'excluded them. The Schools tab made the same mistake again, listing her decisions under ' +
+      '"Ready for You" badged "You".',
+    cases: [
+      {
+        name: "Rae's decisions are recognised by either field shape",
+        holds: () =>
+          isDecisionForRae({ ownerName: 'Rae' }) && isDecisionForRae({ owner_name: 'Rae' }),
+      },
+      {
+        name: 'the test is not confused by case or spacing',
+        holds: () => isDecisionForRae({ ownerName: '  rae ' }),
+      },
+      {
+        name: "Bella's work is never counted as a decision",
+        holds: () =>
+          !isDecisionForRae({ ownerName: 'Bella' }) &&
+          !isDecisionForRae({ ownerName: null }) &&
+          !isDecisionForRae({}),
+      },
+      {
+        name: "a decision is still ours, not the school's",
+        holds: () => isPersonOwned({ ownerType: 'tdi' }) && !isSchoolOwned({ ownerType: 'tdi' }),
       },
     ],
   },

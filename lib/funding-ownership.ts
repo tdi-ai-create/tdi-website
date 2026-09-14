@@ -54,3 +54,24 @@ export function isPersonOwned(item: OwnedItem): boolean {
 export function isSchoolOwned(item: OwnedItem): boolean {
   return ownerOf(item) === 'school';
 }
+
+/** Anything carrying the name of the person who owns it. */
+export interface NamedOwner {
+  ownerName?: string | null;
+  owner_name?: string | null;
+}
+
+/**
+ * Has this been escalated past the operator to a decision.
+ *
+ * owner on a card is 'team', 'agent' or 'school'. Bella and Rae are both
+ * 'team', so once research dead ends started routing to Rae there were two
+ * different answers to "is this Bella's": the board excluded Rae's items from
+ * its column and the tab badge above it did not. On 14 September her screen
+ * said 31 in the badge and 23 in the stat directly beneath it.
+ *
+ * One predicate, read by both.
+ */
+export function isDecisionForRae(item: NamedOwner): boolean {
+  return (item.ownerName ?? item.owner_name ?? '').trim().toLowerCase() === 'rae';
+}

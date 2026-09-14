@@ -28,6 +28,7 @@
 
 import { useState } from 'react'
 import { awardedTotal as awardedSum } from '@/lib/funding-award'
+import { isDecisionForRae } from '@/lib/funding-ownership'
 
 interface BoardQueueItem {
   id: string
@@ -377,8 +378,8 @@ export default function NeedsYouBoard({
   // difference between a list of nine things she can do and a list of thirty
   // she cannot tell apart.
   const allReady = steps.filter(i => i.owner === 'team' && !i.inProgress)
-  const readyForYou = allReady.filter(i => i.ownerName !== 'Rae')
-  const raeDecides = allReady.filter(i => i.ownerName === 'Rae')
+  const readyForYou = allReady.filter(i => !isDecisionForRae(i))
+  const raeDecides = allReady.filter(i => isDecisionForRae(i))
   const withSchool = steps.filter(i => i.owner === 'school')
   const submitted = grants.filter(g => IN_PLAY.has(g.status))
   const closed = grants.filter(g => ENDED.has(g.status))
