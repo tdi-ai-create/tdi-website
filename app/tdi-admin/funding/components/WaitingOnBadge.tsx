@@ -1,6 +1,7 @@
 'use client'
 
 import { STATE_RULES, isNarrativeState, type Owner } from '@/lib/funding-rules'
+import { isOver } from '@/lib/funding-status'
 
 /**
  * Who owes the next move, and what that move is.
@@ -55,7 +56,7 @@ export function WaitingOnBadge({
   // The write path clears it now, but rows written before that fix still carry
   // the stale value, and a dead grant claiming your attention is the exact
   // thing this was reported for.
-  if (status && ['closed', 'denied', 'awarded'].includes(status)) return null
+  if (isOver(status)) return null
 
   if (waitingOn === 'none') return null
   const c = CONFIG[waitingOn]

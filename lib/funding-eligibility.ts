@@ -1,3 +1,5 @@
+
+import { isWithFunder } from './funding-status'
 /**
  * The stop rule.
  *
@@ -71,7 +73,7 @@ export function isPastDrafting(
 ): boolean {
   if (clientSubmitted === true) return true
   const s = (status || '').toLowerCase()
-  return ['applied', 'submitted', 'awarded', 'denied'].includes(s)
+  return isWithFunder(s)
 }
 
 /** A private or independent school is not in the state accountability system. */

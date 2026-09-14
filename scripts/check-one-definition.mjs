@@ -81,6 +81,37 @@ const RULES = [
       /ownerType\s*(===|!==)\s*['"]client['"]/,
     ],
   },
+  {
+    // A census on 14 September found this written twenty-one times in six
+    // different ways. One list treated a submitted grant as finished and
+    // another did not; three ignored 'closed' entirely. That is why a closed
+    // grant sat in a writer's queue and a grant we had won was offered for
+    // drafting.
+    question: 'where a grant has got to',
+    owner: 'lib/funding-status.ts',
+    use: 'import { isOver, isLive, isWithFunder, hasFunderDecided } from "@/lib/funding-status"',
+    owners: ['lib/funding-status.ts'],
+    patterns: [
+      // Any list of grant statuses standing in for one of the three questions.
+      /\[[^\]]*['"]awarded['"][^\]]*['"]denied['"][^\]]*\]\s*\.includes/,
+      /\[[^\]]*['"]denied['"][^\]]*['"]awarded['"][^\]]*\]\s*\.includes/,
+      /new Set\(\[[^\]]*['"]awarded['"][^\]]*['"]denied['"][^\]]*\]\)/,
+      /new Set\(\[[^\]]*['"]denied['"][^\]]*['"]awarded['"][^\]]*\]\)/,
+    ],
+  },
+  {
+    // Five screens answered this by falling back to opp.amount, which is what
+    // we asked for. Bella found it as "the email says $500, the site says
+    // $5,000".
+    question: 'what a grant was actually awarded',
+    owner: 'lib/funding-award.ts',
+    use: 'import { awardedAmountOf, awardedTotal, awardLabel } from "@/lib/funding-award"',
+    owners: ['lib/funding-award.ts'],
+    patterns: [
+      /awarded_amount\s*(\?\?|\|\|)\s*\w*\.?amount/,
+      /awardedAmount\s*(\?\?|\|\|)\s*\w*\.?amount/,
+    ],
+  },
 ];
 
 function sh(cmd, args) {

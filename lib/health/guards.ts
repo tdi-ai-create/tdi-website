@@ -33,6 +33,7 @@ import { isOursToDo, isWaitingOnUs, whoseTurn } from '../creator-turn';
 import { isPersonOwned, isSchoolOwned, isDecisionForRae } from '../funding-ownership';
 import { planAfterAnswer } from '../funding-answer-actions';
 import { canAgentDraft, stalledDraftMessage } from '../funding-offerable';
+import { hasFunderDecided, isLive, isOver, isWithFunder } from '../funding-status';
 import { computeNextActions } from '../funding-next-actions';
 import { awardLabel, awardedSummary, awardedAmountOf, awardedTotal } from '../funding-award';
 
@@ -705,6 +706,63 @@ export const GUARDS: Guard[] = [
       {
         name: "a decision is still ours, not the school's",
         holds: () => isPersonOwned({ ownerType: 'tdi' }) && !isSchoolOwned({ ownerType: 'tdi' }),
+      },
+    ],
+  },
+
+  {
+    id: 'three-questions-not-six-lists',
+    protects: 'Screens disagreeing about whether a grant is finished',
+    origin:
+      'A census on 14 September 2026 found "this grant is finished" written twenty-one times in six ' +
+      'different ways. One list treated a submitted grant as finished and another did not. Three ' +
+      'ignored "closed" entirely. That is why a closed grant sat in a writer queue for nine days and ' +
+      'a grant already won was still offered for drafting.',
+    cases: [
+      {
+        name: 'only the funder decides, and only two states mean that',
+        holds: () =>
+          hasFunderDecided('awarded') &&
+          hasFunderDecided('denied') &&
+          !hasFunderDecided('closed') &&
+          !hasFunderDecided('applied'),
+      },
+      {
+        name: 'closing something ourselves is not the funder deciding',
+        holds: () => !hasFunderDecided('closed') && !hasFunderDecided('not_applicable'),
+      },
+      {
+        name: 'with the funder covers everything that has left our hands',
+        holds: () =>
+          ['applied', 'submitted', 'awarded', 'denied'].every(isWithFunder) &&
+          !isWithFunder('researching') &&
+          !isWithFunder('not_started'),
+      },
+      {
+        name: 'over covers every way work can end, including the four often missed',
+        holds: () =>
+          ['awarded', 'denied', 'closed', 'not_applicable', 'cancelled', 'archived'].every(isOver),
+      },
+      {
+        name: 'a grant still being worked is never over',
+        holds: () =>
+          ['not_started', 'researching', 'applied', 'submitted', 'waiting'].every((st) => !isOver(st)),
+      },
+      {
+        name: 'live is exactly the inverse of over',
+        holds: () =>
+          ['awarded', 'closed', 'not_started', 'researching', 'cancelled', ''].every(
+            (st) => isLive(st) === !isOver(st),
+          ),
+      },
+      {
+        name: 'casing and whitespace cannot fork any of the three',
+        holds: () =>
+          isOver('  Awarded ') && isWithFunder('APPLIED') && hasFunderDecided('Denied'),
+      },
+      {
+        name: 'an unknown status is treated as live rather than quietly finished',
+        holds: () => isLive('some_new_status') && !isOver('some_new_status'),
       },
     ],
   },

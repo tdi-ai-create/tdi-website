@@ -1,3 +1,5 @@
+
+import { isOver } from './funding-status';
 // ---------------------------------------------------------------------------
 // Is establishing this funder's window the research agent's job.
 //
@@ -32,7 +34,9 @@ export interface WindowWorkInput {
 }
 
 /** Paths that are over. Nothing about their window is worth anyone's time. */
-const FINISHED = new Set(['closed', 'awarded', 'denied']);
+/** Was a local set of three. isOver also covers cancelled, archived and
+ *  not_applicable, which this omitted. */
+const FINISHED = { has: (status: string) => isOver(status) };
 
 /** The window is not established: nobody has answered the question yet. */
 export function windowIsUnestablished(opp: WindowWorkInput): boolean {

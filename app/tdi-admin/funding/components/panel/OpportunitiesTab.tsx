@@ -5,6 +5,7 @@ import { ESCALATION_OPTIONS } from '@/lib/funding-qa'
 import { APPROVAL_SEND_BACK_TO, isWindowOpen } from '@/lib/funding-rules'
 import { NarrativeMarkdown } from '@/components/funding/NarrativeMarkdown'
 import { awardLabel, awardedAmountOf } from '@/lib/funding-award'
+import { hasFunderDecided } from '@/lib/funding-status'
 
 const PLAN_COLORS: Record<string, string> = { A: '#0F766E', B: '#1B365D', C: '#7C3AED', D: '#B45309' }
 const PLAN_LABELS: Record<string, string> = {
@@ -1154,7 +1155,7 @@ function ResearchControl({ opp, onRequest }: {
   const rs = opp.research_status || null
   const agent = opp.assigned_agent || ''
 
-  if (['awarded', 'denied'].includes(opp.status)) return null
+  if (hasFunderDecided(opp.status)) return null
 
   return (
     <div style={{ marginTop: 4, display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -1228,7 +1229,7 @@ function SubmissionPanel({ opp, gateOpen, onPatch }: {
   const fwdSent = fwdStatus === 'sent'
 
   // Don't show for awarded/denied
-  if (['awarded', 'denied'].includes(opp.status)) return null
+  if (hasFunderDecided(opp.status)) return null
 
   const handleSubmit = () => {
     onPatch({

@@ -27,6 +27,7 @@ import { callTriggerFor } from '@/lib/funding/call-escalation'
 import { DRAFT_SILENCE_HOURS } from './funding-rules'
 import { isSchoolOwned } from './funding-ownership'
 import { canAgentDraft, stalledDraftMessage } from './funding-offerable'
+import { isOver, isWithFunder } from './funding-status'
 
 export type ActionOwner = 'team' | 'agent' | 'school' | 'auto'
 export type ActionUrgency = 'critical' | 'high' | 'normal' | 'low'
@@ -159,7 +160,7 @@ export function computeNextActions(
       : null
 
     let closingSoon: { grantName: string; daysLeft: number; amount: number; blockedBy: string | null } | null = null
-    if (opp && opp.application_closes && !['applied', 'awarded', 'denied', 'closed'].includes(opp.status)) {
+    if (opp && opp.application_closes && !isWithFunder(opp.status) && !isOver(opp.status)) {
       const closes = new Date(opp.application_closes + 'T00:00:00')
       const daysLeft = Math.ceil((closes.getTime() - today.getTime()) / 86400000)
       if (daysLeft <= 7) {
@@ -332,7 +333,7 @@ export function computeNextActions(
 
   // Deadline within 7 days with submission not ready
   for (const opp of opportunities) {
-    if (['awarded', 'denied', 'closed'].includes(opp.status)) continue
+    if (isOver(opp.status)) continue
     const deadline = opp.internal_deadline || opp.application_closes
     if (!deadline) continue
     const due = new Date(deadline + 'T00:00:00')
@@ -428,7 +429,7 @@ export function computeNextActions(
 
   const unverifiedWindows = opportunities.filter(
     (o: any) =>
-      !['awarded', 'denied', 'closed'].includes(o.status) &&
+      !isOver(o.status) &&
       (o.window_status || 'unknown') === 'unknown' &&
       !heldByAPerson.has(String(o.id)),
   )
@@ -459,7 +460,7 @@ export function computeNextActions(
   // raises the same condition as a critical alert.
   for (const opp of opportunities) {
     if (opp.narrative_status !== 'qa_review' || opp.qa_passed === true) continue
-    if (['awarded', 'denied', 'closed'].includes(opp.status)) continue
+    if (isOver(opp.status)) continue
 
     const attempt = (opp.qa_attempt_count ?? 0) + 1
     const since = opp.narrative_status_changed_at || opp.updated_at
@@ -506,7 +507,7 @@ export function computeNextActions(
   // See lib/funding-qa.ts.
   for (const opp of opportunities) {
     if (opp.narrative_status !== 'escalated') continue
-    if (['awarded', 'denied', 'closed'].includes(opp.status)) continue
+    if (isOver(opp.status)) continue
     const esc = opp.qa_escalation || {}
 
     if (esc.awaiting_client) {
@@ -550,7 +551,7 @@ export function computeNextActions(
   // watching for the decision is fine and just needs saying. Nobody watching is
   // how an outcome arrives months late, or never.
   for (const opp of opportunities) {
-    if (['awarded', 'denied', 'closed', 'not_applicable'].includes(opp.status)) continue
+    if (isOver(opp.status)) continue
     const filed = opp.client_submitted === true || ['applied', 'submitted'].includes(opp.status)
     if (!filed) continue
 
@@ -601,7 +602,7 @@ export function computeNextActions(
   // deadline is within 7 days, which is far too late to be the first prompt.
   for (const opp of opportunities) {
     if (opp.narrative_status !== 'ready') continue
-    if (['awarded', 'denied', 'closed'].includes(opp.status)) continue
+    if (isOver(opp.status)) continue
     if (opp.forwarding_email_status === 'sent') continue
 
     const contact = pursuit.client_contact_name?.split(' ')[0] || 'the school'
@@ -773,7 +774,7 @@ export function computeNextActions(
   // Opportunities with open window + gate open but narrative not started
   if (gate?.gate_open) {
     for (const opp of opportunities) {
-      if (['awarded', 'denied', 'closed'].includes(opp.status)) continue
+      if (isOver(opp.status)) continue
       if (opp.window_status !== 'open') continue
       if (opp.narrative_status && opp.narrative_status !== 'not_started') continue
       result.push({

@@ -28,6 +28,7 @@
 
 import { clientTaskLabel, NEUTRAL_TASK_LABEL } from './funding-followup-email';
 import { isPersonOwned } from './funding-ownership';
+import { isOver, isWithFunder } from './funding-status';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 type DbClient = any;
@@ -155,7 +156,7 @@ export async function findUnfinishableWork(
     errors.push(`sent opportunities: ${sentErr.message}`);
   } else {
     const live = (sentOpps ?? []).filter(
-      (o: any) => !['awarded', 'denied', 'closed', 'not_applicable'].includes(String(o.status ?? ''))
+      (o: any) => !isOver(o.status)
     );
 
     if (live.length > 0) {
@@ -267,7 +268,7 @@ export async function findUnfinishableWork(
       if (!blocked || o.eligibility_overridden === true) continue;
       const filed =
         o.client_submitted === true ||
-        ['applied', 'submitted', 'awarded', 'denied'].includes(String(o.status ?? '').toLowerCase());
+        isWithFunder(o.status);
       if (!filed) continue;
 
       findings.push({
