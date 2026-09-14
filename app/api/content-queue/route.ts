@@ -50,8 +50,15 @@ function db() {
  */
 type Caller = 'agent' | 'calendar'
 
-/** All the calendar is for: read the queue, and record what a person decided. */
-const CALENDAR_ACTIONS = ['approve', 'request_changes']
+/**
+ * All the calendar is for: read the queue, and record what a person decided.
+ *
+ * schedule is here because picking the date an approved piece goes out is a
+ * person's decision, not a pipeline step, and a marketing calendar you cannot
+ * set a date in is a read-only picture of one. It still cannot place briefs,
+ * pass gates or publish.
+ */
+const CALENDAR_ACTIONS = ['approve', 'request_changes', 'schedule']
 
 function authorize(request: NextRequest): Caller | null {
   const header = request.headers.get('authorization')
@@ -405,8 +412,21 @@ export async function POST(request: NextRequest) {
       entry.notified_note = told.reason
     }
     if (action === 'schedule') {
-      if (!body.scheduled_for) return NextResponse.json({ error: 'scheduled_for is required, as YYYY-MM-DD' }, { status: 400 })
-      patch.scheduled_for = body.scheduled_for
+      const when = typeof body.scheduled_for === 'string' ? body.scheduled_for.trim() : ''
+      if (!when) return NextResponse.json({ error: 'scheduled_for is required, as YYYY-MM-DD' }, { status: 400 })
+      // Checked rather than trusted. scheduled_for is a date column, so a bad
+      // string is rejected by Postgres with a message about input syntax, which
+      // tells a person in the calendar nothing about what they did wrong. The
+      // round trip also catches a real date that does not exist, like 31 June.
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(when)) {
+        return NextResponse.json({ error: `scheduled_for must look like YYYY-MM-DD. Got "${when}".` }, { status: 400 })
+      }
+      const parsed = new Date(`${when}T00:00:00Z`)
+      if (Number.isNaN(parsed.getTime()) || parsed.toISOString().slice(0, 10) !== when) {
+        return NextResponse.json({ error: `${when} is not a real date.` }, { status: 400 })
+      }
+      patch.scheduled_for = when
+      entry.scheduled_for = when
     }
     if (action === 'mark_published') {
       // A publish claim without a URL is somebody saying they saw it. On
