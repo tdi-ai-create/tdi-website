@@ -381,11 +381,19 @@ export async function POST(request: NextRequest) {
     // Reaching an approver is the moment a person is needed. Announcing it only
     // after they act tells them something they already know.
     if (rule.to === 'pending_approval') {
-      // Deliberately silent here. Reaching a person raises a board approval in
-      // Paperclip, which is where Rae already works and which wakes the
-      // requesting agent with the result. A Slack message as well would be a
-      // second place to be asked for the same decision.
+      // This was silent, on the assumption that Nora raises a board approval for
+      // every piece that reaches a person. On 14 September ten pieces were
+      // waiting and only two had ever had one raised. The other eight were
+      // waiting with nobody told, which is indistinguishable from nobody caring.
+      //
+      // The board approval still carries the decision and still wakes the agent
+      // that asked. This only makes sure a person hears that it is there. The
+      // outcome goes into the log, so "nobody was told" is on the record rather
+      // than being a silence.
       entry.awaiting_board = true
+      const told = notifyWaiting({ id, title: item.title, channel: item.channel })
+      entry.notified = told.attempted
+      entry.notified_note = told.reason
     }
     if (action === 'approve') {
       patch.approved_by = actor
