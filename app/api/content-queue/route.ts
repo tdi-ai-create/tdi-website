@@ -209,7 +209,7 @@ export async function POST(request: NextRequest) {
       if (bUp) return NextResponse.json({ success: false, refusedBy: 'database gate', error: bUp.message }, { status: 400 })
 
       if (decision === 'approved') {
-        const told = notifyApproved({ id: rid, title: brow.title, channel: brow.channel, approved_by: decidedBy })
+        const told = await notifyApproved({ id: rid, title: brow.title, channel: brow.channel, approved_by: decidedBy })
         return NextResponse.json({ success: true, id: rid, to, approved_by: decidedBy, notified: told.attempted, notified_note: told.reason })
       }
       return NextResponse.json({ success: true, id: rid, to, decided_by: decidedBy })
@@ -391,7 +391,7 @@ export async function POST(request: NextRequest) {
       // outcome goes into the log, so "nobody was told" is on the record rather
       // than being a silence.
       entry.awaiting_board = true
-      const told = notifyWaiting({ id, title: item.title, channel: item.channel })
+      const told = await notifyWaiting({ id, title: item.title, channel: item.channel })
       entry.notified = told.attempted
       entry.notified_note = told.reason
     }
@@ -400,7 +400,7 @@ export async function POST(request: NextRequest) {
       patch.approved_at = new Date().toISOString()
       // Tell whoever has to publish it. The outcome goes into the same log entry,
       // so "nobody was told" is a fact on the record rather than a silence.
-      const told = notifyApproved({ id, title: item.title, channel: item.channel, approved_by: actor })
+      const told = await notifyApproved({ id, title: item.title, channel: item.channel, approved_by: actor })
       entry.notified = told.attempted
       entry.notified_note = told.reason
     }
