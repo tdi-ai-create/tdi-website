@@ -1,4 +1,4 @@
-import { slackNotify } from '@/lib/slack-notify'
+import { postContentAlert, type AlertResult } from '@/lib/content-slack'
 
 /**
  * Channels where a person does the publishing, so a person has to be told.
@@ -57,16 +57,12 @@ export function waitingMessage(item: {
  *
  * The board approval stays as it is. This is the push; that is the record.
  */
-export function notifyWaiting(item: {
+export async function notifyWaiting(item: {
   id: string
   title: string | null
   channel: string
-}): { attempted: boolean; reason: string } {
-  if (!process.env.SLACK_WEBHOOK_KRISTIN) {
-    return { attempted: false, reason: 'SLACK_WEBHOOK_KRISTIN is not set, so nobody was told it needs approving' }
-  }
-  slackNotify('kristin', waitingMessage(item))
-  return { attempted: true, reason: 'told #kristin-actions it needs approving' }
+}): Promise<AlertResult> {
+  return postContentAlert('approval', waitingMessage(item))
 }
 
 export function approvalMessage(item: {
@@ -89,24 +85,19 @@ export function approvalMessage(item: {
 /**
  * Tell a person their piece is ready.
  *
- * Returns what actually happened rather than nothing. slackNotify is
- * fire-and-forget and returns silently when the webhook is unconfigured, which
- * is precisely the failure that matters here: an approval nobody hears about
- * looks identical to an approval nobody acted on. The result is written into the
- * item's log so a missing message is discoverable afterwards.
+ * Returns what actually happened rather than nothing, because an approval
+ * nobody hears about looks identical to an approval nobody acted on. The result
+ * is written into the item's log so a missing message is discoverable
+ * afterwards.
  */
-export function notifyApproved(item: {
+export async function notifyApproved(item: {
   id: string
   title: string | null
   channel: string
   approved_by?: string | null
-}): { attempted: boolean; reason: string } {
+}): Promise<AlertResult> {
   if (!needsPersonHandoff(item.channel)) {
     return { attempted: false, reason: `${item.channel} goes to Zara's ready list, not to a person` }
   }
-  if (!process.env.SLACK_WEBHOOK_RAE) {
-    return { attempted: false, reason: 'SLACK_WEBHOOK_RAE is not set, so nobody was told' }
-  }
-  slackNotify('rae', approvalMessage(item))
-  return { attempted: true, reason: 'sent to #rae-actions' }
+  return postContentAlert('publish', approvalMessage(item))
 }
