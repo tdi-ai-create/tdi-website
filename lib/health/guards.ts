@@ -33,6 +33,7 @@ import { isOursToDo, isWaitingOnUs, whoseTurn } from '../creator-turn';
 import { isPersonOwned, isSchoolOwned } from '../funding-ownership';
 import { planAfterAnswer } from '../funding-answer-actions';
 import { canAgentDraft, stalledDraftMessage } from '../funding-offerable';
+import { computeNextActions } from '../funding-next-actions';
 
 export interface GuardCase {
   /** What this case proves, in words. */
@@ -537,6 +538,72 @@ export const GUARDS: Guard[] = [
       {
         name: 'the two owners are never the same person',
         holds: () => ownerOfBlockedPath(true).ownerEmail !== ownerOfBlockedPath(false).ownerEmail,
+      },
+    ],
+  },
+
+  {
+    id: 'never-allocate-the-ask',
+    protects: 'Allocating money a funder never gave us',
+    origin:
+      '14 September 2026: Bella reported that the funder email said $500 and the site said $5,000. ' +
+      'Walmart Spark Good for Saunemin was marked awarded with no amount recorded, and the board fell ' +
+      'back to the $5,000 we asked for. She was one click from mapping ten times the money to line ' +
+      'items in a conversation with the school.',
+    cases: [
+      {
+        name: 'an awarded grant with no amount asks for the real figure, not an allocation',
+        holds: () => {
+          const actions = computeNextActions(
+            { id: 'p1' },
+            [{ id: 'o1', name: 'Walmart Spark Good Grant', status: 'awarded', amount: 5000, awarded_amount: null }],
+            [],
+            { gate_open: true },
+            [],
+          );
+          const allocate = actions.find((a) => a.id === 'allocate-o1');
+          const record = actions.find((a) => a.id === 'record-award-o1');
+          return !allocate && !!record;
+        },
+      },
+      {
+        name: 'the ask never appears as an amount to allocate',
+        holds: () => {
+          const actions = computeNextActions(
+            { id: 'p1' },
+            [{ id: 'o1', name: 'Some Grant', status: 'awarded', amount: 5000, awarded_amount: null }],
+            [],
+            { gate_open: true },
+            [],
+          );
+          return !actions.some((a) => /Allocate \$5,000/.test(a.label));
+        },
+      },
+      {
+        name: 'a real award is still allocated',
+        holds: () => {
+          const actions = computeNextActions(
+            { id: 'p1' },
+            [{ id: 'o1', name: 'Some Grant', status: 'awarded', amount: 5000, awarded_amount: 500 }],
+            [],
+            { gate_open: true },
+            [],
+          );
+          return actions.some((a) => a.id === 'allocate-o1' && /\$500/.test(a.label));
+        },
+      },
+      {
+        name: 'a fully allocated award stops asking',
+        holds: () => {
+          const actions = computeNextActions(
+            { id: 'p1' },
+            [{ id: 'o1', name: 'Some Grant', status: 'awarded', amount: 5000, awarded_amount: 500 }],
+            [],
+            { gate_open: true },
+            [{ funding_opportunity_id: 'o1', allocated_amount: 500 }],
+          );
+          return !actions.some((a) => a.id === 'allocate-o1');
+        },
       },
     ],
   },

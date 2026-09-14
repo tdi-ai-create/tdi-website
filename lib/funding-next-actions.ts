@@ -639,8 +639,32 @@ export function computeNextActions(
     if (opp.status !== 'awarded') continue
     const oppAllocs = allocations.filter((a: any) => a.funding_opportunity_id === opp.id)
     const allocatedTotal = oppAllocs.reduce((s: number, a: any) => s + (a.allocated_amount || 0), 0)
-    const awardedAmt = opp.awarded_amount ?? opp.amount ?? 0
-    if (awardedAmt > 0 && allocatedTotal < awardedAmt) {
+    // What they actually gave us, never what we asked for.
+    //
+    // This used to fall back to opp.amount when awarded_amount was empty, so a
+    // grant we asked $5,000 for and which nobody had recorded an award against
+    // produced "Allocate $5,000". Bella read the funder's email on 14 September
+    // and it said $500. She was one click from mapping ten times the money to
+    // line items, in a conversation with the school.
+    //
+    // The ask and the award are different facts. An unknown award is not the
+    // ask, it is unknown, and the work is to go and find it.
+    const awardedAmt = opp.awarded_amount ?? 0
+
+    if (!opp.awarded_amount) {
+      result.push({
+        id: `record-award-${opp.id}`,
+        label: `Record what "${opp.name}" actually awarded`,
+        why:
+          `Marked as awarded with no amount on file. We asked for $${(opp.amount ?? 0).toLocaleString()}, ` +
+          `which is not evidence of what they gave. Take the figure from the funder's own email before anything is allocated.`,
+        owner: 'team',
+        urgency: 'high',
+        actionType: 'allocate_award',
+        targetId: opp.id,
+        tab: 'opportunities',
+      })
+    } else if (awardedAmt > 0 && allocatedTotal < awardedAmt) {
       result.push({
         id: `allocate-${opp.id}`,
         label: `Allocate $${(awardedAmt - allocatedTotal).toLocaleString()} from "${opp.name}"`,
