@@ -178,8 +178,15 @@ Rules:
    importer is on a live route. Two greps, and it prevents an entire bug class.
 2. When you replace a component, delete the old one in the same PR. Leaving it
    "just in case" is how the next session edits the wrong file.
-3. Run `npm run deadcode` before opening a PR that touches components. It
-   exits non-zero when it finds anything, so it works as a gate.
+3. `npm run check:reachable` fails when a file you changed has no importer.
+   It is a ratchet on changed files, like `check:writes`, because 70 unreachable
+   files already exist and a check nobody can pass is a check nobody runs.
+   `npm run deadcode` still reports the whole backlog.
+
+   This became a gate because the rule above was written down in August and
+   skipped twice anyway. On 13 September a fix for Bella went into
+   `MyTasks.tsx`, which nothing imports. It typechecked, shipped, deployed and
+   changed nothing for her, and was found only by loading the page.
 4. Beware duplicate trees. Git worktrees under `.claude/worktrees/` and in
    scratchpad contain full copies of every source file. A bare `grep -r` returns
    five copies of everything. Always scope searches to `app components lib`.
@@ -197,6 +204,7 @@ npm run typecheck      # tsc --noEmit, check the exit code
 npm run lint           # eslint
 npm run deadcode       # knip: unused files, exports, and dependencies
 npm run check:writes   # fails if a changed file has a Supabase write whose error is discarded
+npm run check:reachable # fails if a changed component has no importer
 npm run check:schema   # detects DB schema drift against the baseline
 npm run validate:quizzes
 ```
