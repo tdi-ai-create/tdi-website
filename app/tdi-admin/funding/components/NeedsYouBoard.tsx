@@ -40,6 +40,8 @@ interface BoardQueueItem {
   /** The row this card is about, when it is about one. Set by /api/funding/queue. */
   actionItemId?: string | null
   opportunityId?: string | null
+  /** The person who owns it. 'team' covers more than one person. */
+  ownerName?: string | null
 }
 
 interface BoardGrant {
@@ -364,7 +366,15 @@ export default function NeedsYouBoard({
       ['requested', 'qa_review', 'escalated'].includes(g.narrativeStatus || ''),
   )
 
-  const readyForYou = steps.filter(i => i.owner === 'team' && !i.inProgress)
+  // Whose work this actually is.
+  //
+  // Everything ours is 'team', so a decision that belongs to Rae sat in the
+  // same column as Bella's chases and inflated her count. Splitting them is the
+  // difference between a list of nine things she can do and a list of thirty
+  // she cannot tell apart.
+  const allReady = steps.filter(i => i.owner === 'team' && !i.inProgress)
+  const readyForYou = allReady.filter(i => i.ownerName !== 'Rae')
+  const raeDecides = allReady.filter(i => i.ownerName === 'Rae')
   const withSchool = steps.filter(i => i.owner === 'school')
   const submitted = grants.filter(g => IN_PLAY.has(g.status))
   const closed = grants.filter(g => ENDED.has(g.status))
@@ -494,6 +504,22 @@ export default function NeedsYouBoard({
                       onSecondary: () => onWriteToSchool(i),
                     }
                   : {}),
+              }}
+            />
+          ))}
+        </Column>
+
+        <Column name="Rae decides" count={raeDecides.length} empty="nothing waiting on Rae">
+          {raeDecides.map(i => (
+            <CardView
+              key={i.id}
+              c={{
+                name: i.label,
+                school: nameOf(i.pursuitId),
+                tone: 'quiet',
+                line: i.why,
+                action: 'Open',
+                onAction: () => onOpenItem(i),
               }}
             />
           ))}
