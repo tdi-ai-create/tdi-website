@@ -58,7 +58,9 @@ function walk(dir, out = []) {
       continue;
     }
     if (st.isDirectory()) walk(p, out);
-    else if (/\.(ts|tsx|mts)$/.test(p)) out.push(p);
+    // .mjs and .js included as readers. Missing them meant check-guards.mjs
+    // was never read, so the guard registry it imports looked unreachable.
+    else if (/\.(ts|tsx|mts|mjs|js)$/.test(p)) out.push(p);
   }
   return out;
 }
@@ -67,7 +69,12 @@ function walk(dir, out = []) {
 // that scanning text beats building a real module graph, and a missed import is
 // a false pass rather than a false failure, which is the right way round for a
 // gate that blocks merges.
-const SOURCE_DIRS = ['app', 'lib', 'components'];
+// scripts/ is read as a *source of imports* but never judged as a file that
+// needs one. lib/health/guards.ts is imported only by
+// scripts/check-guards.mjs, so leaving scripts out reported the guard
+// registry as unreachable. A gate that fails honest work gets switched off
+// faster than a leaky one gets trusted.
+const SOURCE_DIRS = ['app', 'lib', 'components', 'scripts'];
 const allFiles = SOURCE_DIRS.flatMap((d) => walk(d));
 const contents = new Map();
 for (const f of allFiles) {
@@ -90,13 +97,18 @@ function hasImporter(file) {
   const withoutExt = file.replace(/\.(ts|tsx|mts)$/, '');
   const aliased = '@/' + withoutExt;
 
+  // An optional explicit extension. scripts/check-guards.mjs imports
+  // '../lib/health/guards.ts' with the extension written out, which every
+  // extensionless pattern missed.
+  const ext = '(?:\\.(?:ts|tsx|mts|js|mjs))?';
+
   const patterns = [
-    new RegExp(`from\\s+['"]${escape(aliased)}['"]`),
-    new RegExp(`import\\s*\\(\\s*['"]${escape(aliased)}['"]`),
+    new RegExp(`from\\s+['"]${escape(aliased)}${ext}['"]`),
+    new RegExp(`import\\s*\\(\\s*['"]${escape(aliased)}${ext}['"]`),
     // Relative: any path that ends with /<name> or is ./<name>
-    new RegExp(`from\\s+['"][^'"]*\\/${escape(name)}['"]`),
-    new RegExp(`from\\s+['"]\\.\\/${escape(name)}['"]`),
-    new RegExp(`import\\s*\\(\\s*['"][^'"]*\\/${escape(name)}['"]`),
+    new RegExp(`from\\s+['"][^'"]*\\/${escape(name)}${ext}['"]`),
+    new RegExp(`from\\s+['"]\\.\\/${escape(name)}${ext}['"]`),
+    new RegExp(`import\\s*\\(\\s*['"][^'"]*\\/${escape(name)}${ext}['"]`),
   ];
 
   for (const [other, src] of contents) {

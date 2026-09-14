@@ -23,7 +23,12 @@
 
 import { clientTaskLabel, clientAsk, askForCategory, NEUTRAL_TASK_LABEL } from '../funding-followup-email';
 import { looksLikeRecordId } from '../milestone-key';
-import { isPastDrafting, screenPath, eligibilityQuestionTitle } from '../funding-eligibility';
+import {
+  isPastDrafting,
+  screenPath,
+  eligibilityQuestionTitle,
+  ownerOfBlockedPath,
+} from '../funding-eligibility';
 import { isOursToDo, isWaitingOnUs, whoseTurn } from '../creator-turn';
 import { isPersonOwned, isSchoolOwned } from '../funding-ownership';
 import { planAfterAnswer } from '../funding-answer-actions';
@@ -501,6 +506,37 @@ export const GUARDS: Guard[] = [
       {
         name: 'a whole brief is not pasted into an email',
         holds: () => clientAsk('word '.repeat(200)) === null,
+      },
+    ],
+  },
+
+  {
+    id: 'dead-ends-are-decisions',
+    protects: 'Research a manager cannot do landing on a manager',
+    origin:
+      "13 September 2026: six of Bella's thirteen open items were research questions such as " +
+      '"Is TDI an approved vendor with this state agency?". Four had already been looked at by an ' +
+      'agent who could not establish the answer, so the fallback for every agent dead end was her.',
+    cases: [
+      {
+        name: 'a dead end goes to Rae',
+        holds: () => ownerOfBlockedPath(true).ownerName === 'Rae',
+      },
+      {
+        name: 'something nobody has looked at yet stays with Bella',
+        holds: () => ownerOfBlockedPath(false).ownerName === 'Bella',
+      },
+      {
+        name: 'both owners are reachable',
+        holds: () =>
+          [true, false].every((looked) => {
+            const o = ownerOfBlockedPath(looked);
+            return /@teachersdeserveit\.com$/.test(o.ownerEmail) && o.ownerName.length > 0;
+          }),
+      },
+      {
+        name: 'the two owners are never the same person',
+        holds: () => ownerOfBlockedPath(true).ownerEmail !== ownerOfBlockedPath(false).ownerEmail,
       },
     ],
   },

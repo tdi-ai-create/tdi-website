@@ -2,7 +2,14 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { guardCron } from '@/lib/cron-guard'
 import { isAgentWindowWork } from '@/lib/funding-window-work'
-import { screenPath, isPastDrafting, eligibilityQuestionTitle, type EligibilityResult } from '@/lib/funding-eligibility'
+import {
+  screenPath,
+  isPastDrafting,
+  eligibilityQuestionTitle,
+  ownerOfBlockedPath,
+  deadEndTitle,
+  type EligibilityResult,
+} from '@/lib/funding-eligibility'
 import { NOT_TERMINAL_FILTER } from '@/lib/funding/task-status'
 
 /**
@@ -227,14 +234,32 @@ export async function GET(request: NextRequest) {
           const intended = {
             school: school.district_name ?? '',
             path: opp.name ?? '',
-            question: title,
+            question: agentFinding ? deadEndTitle(opp.name ?? 'This grant') : title,
             because,
             agentAlreadyLooked: Boolean(agentFinding),
+            // Named in the dry run, because who it lands on is the thing that
+            // changed and a preview that hides it is not a preview.
+            owner: ownerOfBlockedPath(Boolean(agentFinding)).ownerName,
           }
 
           if (dryRun) {
             questionsToRaise.push(intended)
           } else {
+            // A dead end goes to Rae as a decision, not to Bella as research.
+            //
+            // The agent has already looked and could not establish it, so
+            // "answer this" is asking a manager to succeed where the research
+            // failed. What is actually needed is a call on whether the funder
+            // is worth pursuing, which is Rae's. Anything the agent has not
+            // yet tried still goes to Bella, because chasing a school is hers.
+            const owner = ownerOfBlockedPath(Boolean(agentFinding))
+            const itemTitle = agentFinding ? deadEndTitle(opp.name ?? 'This grant') : title
+            const closing = agentFinding
+              ? `\n\nResearch is exhausted on this one. The choice is to act on what she suggests, ` +
+                `drop the path, or pursue it anyway knowing the window is unconfirmed. ` +
+                `Nothing will be drafted for "${opp.name}" until that is decided.`
+              : `\n\nNothing will be drafted for "${opp.name}" until this is answered.`
+
             const { error: qErr } = await supabase.from('funding_action_items').insert({
               pursuit_id: opp.pursuit_id,
               opportunity_id: opp.id,
@@ -242,11 +267,10 @@ export async function GET(request: NextRequest) {
               // Named, not just typed. An item with owner_type 'tdi' and no
               // owner_name renders with an empty owner and cannot be filtered
               // to a person. Eleven of nineteen open items were in that state.
-              owner_name: 'Bella',
-              owner_email: 'hello@teachersdeserveit.com',
-              title,
-              description:
-                `${because}\n\nNothing will be drafted for "${opp.name}" until this is answered.`,
+              owner_name: owner.ownerName,
+              owner_email: owner.ownerEmail,
+              title: itemTitle,
+              description: `${because}${closing}`,
               // 'pending' and 'gate' because those are what the CHECK
               // constraints on this table allow. 'open' and 'eligibility' were
               // rejected on every insert, and because the failure was only

@@ -230,3 +230,41 @@ export function eligibilityQuestionTitle(rule: string, grantName?: string | null
   if (question.toLowerCase().includes(grant.toLowerCase())) return question
   return `${grant}: ${question}`
 }
+
+/**
+ * Who a blocked path belongs to once an agent has tried.
+ *
+ * A question only reaches a person after the research agent has looked and
+ * could not establish the answer. Until now the fallback was always Bella, so
+ * the better the agents got at admitting they were stuck, the more research
+ * landed on a manager. Six of her thirteen open items on 13 September were
+ * questions like "is TDI an approved vendor with this state agency", which is
+ * not her job and not something she can find out by trying harder.
+ *
+ * A dead end is not a task. It is a decision about whether this funder is
+ * worth pursuing at all, and Amara's own notes say so: on Washington
+ * Commanders she wrote that there may be no open application process, and
+ * recommended a call rather than a deadline. That is Rae's call to make.
+ *
+ * Anything the agent has not yet looked at stays with Bella, because chasing a
+ * school for an answer is genuinely hers.
+ */
+export function ownerOfBlockedPath(agentAlreadyLooked: boolean): {
+  ownerName: string
+  ownerEmail: string
+} {
+  return agentAlreadyLooked
+    ? { ownerName: 'Rae', ownerEmail: 'rae@teachersdeserveit.com' }
+    : { ownerName: 'Bella', ownerEmail: 'hello@teachersdeserveit.com' }
+}
+
+/**
+ * How a dead end is worded.
+ *
+ * "Answer this" is the wrong ask when nobody can answer it from a desk. The
+ * options are named instead, so the item can be closed with a decision rather
+ * than sitting open because the research is genuinely exhausted.
+ */
+export function deadEndTitle(grantName: string): string {
+  return `${grantName}: decide whether to keep pursuing it`
+}
