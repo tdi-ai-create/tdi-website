@@ -14,7 +14,15 @@ export function needsPersonHandoff(channel: string): boolean {
   return (PERSON_PUBLISHES as readonly string[]).includes(channel)
 }
 
-const SITE = 'https://www.teachersdeserveit.com'
+/**
+ * Where approving actually happens.
+ *
+ * Not the portal. `/tdi-admin/hub/review` is deliberately read-only and exists
+ * so a carousel can be seen rendering; it cannot record a decision. Sending an
+ * approver there is sending them somewhere they cannot do the thing the message
+ * is asking for.
+ */
+const CALENDAR = 'https://paperclip-railway-template-production.up.railway.app/TEA/content-calendar'
 
 /**
  * Something has reached a person and is waiting.
@@ -32,21 +40,33 @@ export function waitingMessage(item: {
   return [
     `*Needs approving*`,
     `${item.title || '(untitled)'}`,
-    `Cleared QA, creative and editorial. Read it and approve it, or send it back.`,
-    `${SITE}/tdi-admin/hub/review`,
+    `Cleared QA, creative and editorial. Open it in Paperclip, read it, then approve it or send it back.`,
+    CALENDAR,
   ].join('\n')
 }
 
+/**
+ * Tell the approver something is waiting.
+ *
+ * Goes to Kristin, because she is the approver for content. Reaching an
+ * approver was left silent when approval moved onto the board, on the
+ * assumption that Nora would raise a board approval for every piece. On
+ * 14 September ten pieces sat in pending_approval and only two had ever had one
+ * raised, so eight were waiting with nobody told. An agent remembering to write
+ * a ticket is not a mechanism.
+ *
+ * The board approval stays as it is. This is the push; that is the record.
+ */
 export function notifyWaiting(item: {
   id: string
   title: string | null
   channel: string
 }): { attempted: boolean; reason: string } {
-  if (!process.env.SLACK_WEBHOOK_RAE) {
-    return { attempted: false, reason: 'SLACK_WEBHOOK_RAE is not set, so nobody was told it needs approving' }
+  if (!process.env.SLACK_WEBHOOK_KRISTIN) {
+    return { attempted: false, reason: 'SLACK_WEBHOOK_KRISTIN is not set, so nobody was told it needs approving' }
   }
-  slackNotify('rae', waitingMessage(item))
-  return { attempted: true, reason: 'told #rae-actions it needs approving' }
+  slackNotify('kristin', waitingMessage(item))
+  return { attempted: true, reason: 'told #kristin-actions it needs approving' }
 }
 
 export function approvalMessage(item: {
@@ -61,7 +81,7 @@ export function approvalMessage(item: {
     `*Ready to ${where}*`,
     `${item.title || '(untitled)'}`,
     `${who}. Nothing else is waiting on you in the queue for this one.`,
-    `${SITE}/tdi-admin/hub/schedule`,
+    CALENDAR,
     `id ${item.id}`,
   ].join('\n')
 }
