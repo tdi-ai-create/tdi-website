@@ -28,7 +28,8 @@
     "check:chrome": "node scripts/check-pdf-chrome.mjs",
     "check:spanish": "tsx scripts/spanish-download-selftest.ts",
     "check:uitranslation": "tsx scripts/ui-translation-guard-selftest.ts",
-    "check:answers": "npx tsx scripts/integrity/verify-answer-actions.mts"
+    "check:answers": "npx tsx scripts/integrity/verify-answer-actions.mts",
+    "check:reachable": "node scripts/check-reachable.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.78.0",

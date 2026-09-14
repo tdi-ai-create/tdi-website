@@ -90,6 +90,20 @@ jobs:
 
           exit $status
 
+      - name: Changed components are reachable
+        # A component nobody imports ships unreachable, so editing it changes
+        # nothing for anyone while looking exactly like a fix.
+        #
+        # MyTasks.tsx absorbed a fix for Bella on 13 September and never ran it.
+        # A Record tab was built inside PanelShell.tsx and shipped the same way.
+        # CLAUDE.md has said "confirm something imports it" since August, and
+        # the rule was skipped both times, which is why it is a gate now rather
+        # than a sentence.
+        #
+        # A ratchet: only files this PR changed are judged, so the existing
+        # unused-file backlog does not block unrelated work.
+        run: npm run check:reachable
+
       - name: Upserts name a conflict target that exists
         # `.upsert(row, { onConflict: 'a,b' })` needs a unique index on exactly
         # those columns. Five call sites named targets that do not exist, four
