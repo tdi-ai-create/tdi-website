@@ -115,6 +115,18 @@ export async function GET() {
           .map((a: any) => [String(a.id), String(a.opportunity_id)]),
       )
 
+      // Who owns it, by name.
+      //
+      // owner on a card is 'team', 'agent' or 'school'. Bella and Rae are both
+      // 'team', so moving four research dead ends onto Rae changed the database
+      // and nothing on Bella's board: she still saw thirty items in one column
+      // headed "Ready for you", eight of which were not hers.
+      const ownerOfAction = new Map(
+        (actionsByPursuit.get(p.id) ?? [])
+          .filter((a: any) => a.owner_name)
+          .map((a: any) => [String(a.id), String(a.owner_name)]),
+      )
+
       for (const action of nextActions) {
         const actionItemId = tailOf(action.id, actionIds)
         allItems.push({
@@ -125,6 +137,7 @@ export async function GET() {
           contactName: p.client_contact_name,
           contactEmail: p.client_contact_email,
           actionItemId,
+          ownerName: actionItemId ? ownerOfAction.get(String(actionItemId)) ?? null : null,
           opportunityId:
             tailOf(action.id, oppIds) ??
             (actionItemId ? oppOfAction.get(String(actionItemId)) ?? null : null),
