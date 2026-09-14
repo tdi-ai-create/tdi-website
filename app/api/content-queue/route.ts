@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { notifyApproved, notifyWaiting } from '@/lib/content-queue/notify'
 import { parseSlides, carouselProblems } from '@/lib/content-queue/carousel'
+import { summariseHistory } from '@/lib/content-queue/history'
 import {
   TRANSITIONS, OWNER_OF, actorHoldsRole, isSelfReview, legalFrom, canRequestChanges, canFlagBlocked,
   isTransition, hasContent, canRecordBoardDecision,
@@ -121,7 +122,10 @@ export async function GET(request: NextRequest) {
     // post on 13 September and said "no draft on this piece yet", because the
     // draft was never sent. Anyone allowed to see the queue is allowed to read
     // what is in it.
-    .select('id, channel, content_type, title, body, status, owner, approver, audience_tag, scheduled_for, published_at, published_url, artifact_refs, artifact_rendered_at, updated_at')
+    // feedback_log is read but never returned. It is the whole transcript,
+    // mostly procedural, and several kilobytes per piece; what an approver needs
+    // from it is two facts, so it is summarised below and dropped here.
+    .select('id, channel, content_type, title, body, status, owner, approver, audience_tag, scheduled_for, published_at, published_url, artifact_refs, artifact_rendered_at, updated_at, feedback_log')
     .order('updated_at', { ascending: false })
     .limit(200)
   if (status) q = q.eq('status', status)
@@ -130,12 +134,20 @@ export async function GET(request: NextRequest) {
   const { data, error } = await q
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
+  // What happened on the way here, so a reader can say "this came back twice and
+  // Lily still has no standard for it" instead of showing a clean draft and
+  // nothing else.
+  const items = (data ?? []).map((row) => {
+    const { feedback_log, ...rest } = row as Record<string, unknown>
+    return { ...rest, history: summariseHistory(feedback_log) }
+  })
+
   // An empty result is only a measured zero because the query ran, so the filter
   // used is reported back. Three filters silently failed to filter this week.
   return NextResponse.json({
-    count: data?.length ?? 0,
+    count: items.length,
     filter: { status: status ?? '(any)', owner: owner ?? '(any)' },
-    items: data ?? [],
+    items,
   })
 }
 
