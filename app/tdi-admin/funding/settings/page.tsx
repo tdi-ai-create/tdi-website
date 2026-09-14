@@ -142,6 +142,28 @@ export default function FundingSettingsPage() {
           />
         </Field>
 
+        {/* Content Queue: needs approving */}
+        <Field label="Content approval Webhook URL" description="Where the content queue says a piece needs approving. Kristin approves content, so normally #kristin-actions">
+          <input
+            value={settings?.content_approval_webhook_url || ''}
+            onChange={e => setSettings((s: any) => ({ ...s, content_approval_webhook_url: e.target.value }))}
+            onBlur={e => save({ content_approval_webhook_url: e.target.value })}
+            placeholder="https://hooks.slack.com/services/..."
+            style={inputStyle}
+          />
+        </Field>
+
+        {/* Content Queue: ready to publish */}
+        <Field label="Content publish Webhook URL" description="Where the content queue says an approved piece is ready to publish (e.g. #rae-actions)">
+          <input
+            value={settings?.content_publish_webhook_url || ''}
+            onChange={e => setSettings((s: any) => ({ ...s, content_publish_webhook_url: e.target.value }))}
+            onBlur={e => save({ content_publish_webhook_url: e.target.value })}
+            placeholder="https://hooks.slack.com/services/..."
+            style={inputStyle}
+          />
+        </Field>
+
         {/* Slack handles */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
           <Field label="Bella's Slack handle" description="For @mentions on Bella items">
