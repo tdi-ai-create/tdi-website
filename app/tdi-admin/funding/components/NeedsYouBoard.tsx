@@ -27,6 +27,7 @@
  */
 
 import { useState } from 'react'
+import { awardedTotal as awardedSum } from '@/lib/funding-award'
 
 interface BoardQueueItem {
   id: string
@@ -47,7 +48,10 @@ interface BoardQueueItem {
 interface BoardGrant {
   name: string
   id: string
+  /** What we asked for. */
   amount: number
+  /** What the funder gave, when recorded. Null is not zero and not the ask. */
+  awardedAmount?: number | null
   status: string
   narrativeStatus: string
   forwardingStatus: string | null
@@ -379,7 +383,11 @@ export default function NeedsYouBoard({
   const submitted = grants.filter(g => IN_PLAY.has(g.status))
   const closed = grants.filter(g => ENDED.has(g.status))
 
-  const awardedTotal = grants.filter(g => g.status === 'awarded').reduce((s, g) => s + (g.amount || 0), 0)
+  // Received, not requested. This summed `amount`, which is the ask, and
+  // headed it "Awarded, received", so Walmart Spark Good showed $5,000 when the
+  // funder's email said $500 and nobody had recorded a figure at all.
+  const award = awardedSum(grants)
+  const awardedTotal = award.total
   const withFunders = submitted.reduce((s, g) => s + (g.amount || 0), 0)
   const stillToFind = Math.max(0, visible.reduce((s, sc) => s + sc.pipeline, 0) - awardedTotal)
   const schoolsNeedingYou = new Set(readyForYou.map(i => i.pursuitId)).size
@@ -433,7 +441,17 @@ export default function NeedsYouBoard({
           v={money(stillToFind)}
           n={`${visible.length} school${visible.length === 1 ? '' : 's'}`}
         />
-        <Stat k="Awarded" v={money(awardedTotal)} n={awardedTotal === 0 ? 'nothing yet' : 'received'} />
+        <Stat
+          k="Awarded"
+          v={money(awardedTotal)}
+          n={
+            award.unrecorded > 0
+              ? `${award.unrecorded} more not recorded`
+              : awardedTotal === 0
+                ? 'nothing yet'
+                : 'received'
+          }
+        />
         <Stat k="With funders" v={money(withFunders)} n={`${submitted.length} submitted`} />
       </div>
 

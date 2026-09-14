@@ -4,6 +4,7 @@ import { screenPath, isPastDrafting } from '@/lib/funding-eligibility';
 import { createClient } from '@supabase/supabase-js';
 import { requireAdminAuth } from '@/lib/tdi-admin/auth';
 import { postFundingEvent, narrativeEvent, windowEvent, submittedEvent, awardEvent, denialEvent, researchEvent } from '@/lib/funding-slack';
+import { awardedAmountOf } from '@/lib/funding-award'
 
 function db() {
   return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, { auth: { autoRefreshToken: false, persistSession: false } });
@@ -374,7 +375,7 @@ export async function PATCH(request: NextRequest) {
     }
     // Award recorded
     if (body.status === 'awarded' && before.status !== 'awarded') {
-      postFundingEvent(awardEvent(pId, pName, oName, oppNow?.awarded_amount || oppNow?.amount || 0)).catch(err => console.error('[opportunities] non-blocking side effect failed:', err))
+      postFundingEvent(awardEvent(pId, pName, oName, awardedAmountOf(oppNow ?? {}) ?? 0)).catch(err => console.error('[opportunities] non-blocking side effect failed:', err))
     }
     // Denial recorded
     if (body.status === 'denied' && before.status !== 'denied') {

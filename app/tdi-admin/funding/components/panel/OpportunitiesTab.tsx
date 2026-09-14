@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { ESCALATION_OPTIONS } from '@/lib/funding-qa'
 import { APPROVAL_SEND_BACK_TO, isWindowOpen } from '@/lib/funding-rules'
 import { NarrativeMarkdown } from '@/components/funding/NarrativeMarkdown'
+import { awardLabel, awardedAmountOf } from '@/lib/funding-award'
 
 const PLAN_COLORS: Record<string, string> = { A: '#0F766E', B: '#1B365D', C: '#7C3AED', D: '#B45309' }
 const PLAN_LABELS: Record<string, string> = {
@@ -1413,7 +1414,7 @@ function OutcomePanel({ opp, onPatch }: { opp: any; onPatch: (fields: Record<str
       <div style={{ marginTop: 8, padding: '8px 12px', background: '#D1FAE5', borderRadius: 6, border: '1px solid #6EE7B7', display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
         <span style={{ fontSize: 10, fontWeight: 700, color: '#065F46', textTransform: 'uppercase', letterSpacing: 0.5 }}>Awarded</span>
         <span style={{ fontSize: 13, fontWeight: 700, color: '#065F46' }}>
-          ${(opp.awarded_amount ?? opp.amount ?? 0).toLocaleString()}
+          {awardLabel(opp)}
         </span>
         {opp.decision_date && (
           <span style={{ fontSize: 10, color: '#065F46' }}>
@@ -1538,7 +1539,9 @@ function AllocationPanel({ opp, pursuitId, contract2LineItems, contract2QuotePac
 
   useEffect(() => { fetchAllocations() }, [opp.id])
 
-  const awardedAmt = opp.awarded_amount ?? opp.amount ?? 0
+  // Never the ask. An unrecorded award is zero here, so nothing downstream
+  // can divide, compare or display a number the funder never gave us.
+  const awardedAmt = awardedAmountOf(opp) ?? 0
   const allocatedTotal = allocations.reduce((sum: number, a: any) => sum + (a.allocated_amount || 0), 0)
   const remaining = awardedAmt - allocatedTotal
 

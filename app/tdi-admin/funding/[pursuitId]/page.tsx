@@ -11,6 +11,7 @@ import { EmailsTab } from '../components/panel/EmailsTab'
 import { RecordTab } from '../components/panel/RecordTab'
 import { pickTheOneThing, groupWork, isLivePath } from './workbench/lib'
 import { C, Panel, KV, TheOneThing, WorkGroup, TaskRow, AgentRow, PathRow } from './workbench/parts'
+import { awardedAmountOf } from '@/lib/funding-award'
 
 /**
  * The pursuit page.
@@ -177,7 +178,9 @@ export default function PursuitPage() {
   const livePaths = opportunities.filter(isLivePath)
   const awarded = opportunities
     .filter(o => o.status === 'awarded')
-    .reduce((s, o) => s + Number(o.awarded_amount || o.amount || 0), 0)
+    // The award only. Falling back to the ask reported money we had not been
+    // given, which is what Bella caught on 14 September.
+    .reduce((s, o) => s + (awardedAmountOf(o) ?? 0), 0)
   const pipeline = Number(p.total_amount || 0)
 
   const sortedPaths = [...opportunities].sort((a, b) => {

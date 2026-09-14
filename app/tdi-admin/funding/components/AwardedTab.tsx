@@ -1,5 +1,7 @@
 'use client'
 
+import { awardLabel, awardedSummary } from '@/lib/funding-award'
+
 /**
  * Awarded and denied outcomes.
  *
@@ -27,7 +29,10 @@ const C = {
 export interface AwardedGrant {
   id: string
   name: string
+  /** What we asked the funder for. Never a receipt. */
   amount: number
+  /** What they actually gave, when someone has recorded it. */
+  awardedAmount?: number | null
   status: string
   school: string
 }
@@ -38,7 +43,8 @@ const money = (n: number) =>
 export default function AwardedTab({ grants }: { grants: AwardedGrant[] }) {
   const awarded = grants.filter(g => g.status === 'awarded')
   const denied = grants.filter(g => g.status === 'denied')
-  const total = awarded.reduce((sum, g) => sum + (g.amount || 0), 0)
+  // The award, never the ask. This tab used to sum `amount` and head it
+  // "awarded", so a $500 grant with no figure recorded read as $5,000 received.
   const lost = denied.reduce((sum, g) => sum + (g.amount || 0), 0)
 
   return (
@@ -58,16 +64,22 @@ export default function AwardedTab({ grants }: { grants: AwardedGrant[] }) {
           </>
         ) : (
           <>
-            <strong style={{ color: C.ink }}>
-              {money(total)} awarded across {awarded.length} grant{awarded.length === 1 ? '' : 's'}.
-            </strong>{' '}
+            <strong style={{ color: C.ink }}>{awardedSummary(awarded)}</strong>{' '}
             Recorded when a school tells us the outcome.
           </>
         )}
       </div>
 
       {awarded.map(g => (
-        <Row key={g.id} name={g.name} school={g.school} amount={g.amount} pill="Awarded" bg={C.okBg} fg={C.ok} />
+        <Row
+          key={g.id}
+          name={g.name}
+          school={g.school}
+          amountLabel={awardLabel(g)}
+          pill="Awarded"
+          bg={C.okBg}
+          fg={C.ok}
+        />
       ))}
 
       {denied.length > 0 && (
@@ -90,7 +102,7 @@ export default function AwardedTab({ grants }: { grants: AwardedGrant[] }) {
               key={g.id}
               name={g.name}
               school={g.school}
-              amount={g.amount}
+              amountLabel={money(g.amount)}
               pill="Denied"
               bg={C.stopBg}
               fg={C.stop}
@@ -105,14 +117,15 @@ export default function AwardedTab({ grants }: { grants: AwardedGrant[] }) {
 function Row({
   name,
   school,
-  amount,
+  amountLabel,
   pill,
   bg,
   fg,
 }: {
   name: string
   school: string
-  amount: number
+  /** Already formatted, because an unrecorded award is words, not a figure. */
+  amountLabel: string
   pill: string
   bg: string
   fg: string
@@ -121,9 +134,9 @@ function Row({
     <div style={{ padding: '11px 18px', borderBottom: `1px solid ${C.line}` }}>
       <div style={{ display: 'flex', gap: 8, alignItems: 'baseline', flexWrap: 'wrap' }}>
         <span style={{ fontWeight: 700, fontSize: 15, color: C.ink }}>{name}</span>
-        {amount ? (
+        {amountLabel ? (
           <span style={{ fontSize: 13, color: C.faint, fontVariantNumeric: 'tabular-nums' }}>
-            {money(amount)}
+            {amountLabel}
           </span>
         ) : null}
         <span
