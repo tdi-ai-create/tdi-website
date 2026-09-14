@@ -34,6 +34,7 @@ import { isPersonOwned, isSchoolOwned } from '../funding-ownership';
 import { planAfterAnswer } from '../funding-answer-actions';
 import { canAgentDraft, stalledDraftMessage } from '../funding-offerable';
 import { computeNextActions } from '../funding-next-actions';
+import { awardLabel, awardedSummary, awardedAmountOf, awardedTotal } from '../funding-award';
 
 export interface GuardCase {
   /** What this case proves, in words. */
@@ -603,6 +604,74 @@ export const GUARDS: Guard[] = [
             [{ funding_opportunity_id: 'o1', allocated_amount: 500 }],
           );
           return !actions.some((a) => a.id === 'allocate-o1');
+        },
+      },
+    ],
+  },
+
+  {
+    id: 'the-ask-is-not-a-receipt',
+    protects: 'Money we were never given being reported as received',
+    origin:
+      '14 September 2026: Bella reported "the email says $500 but our site shows $5,000". Five screens ' +
+      'answered "what was this awarded" by falling back to opp.amount, which is what we asked for. ' +
+      'Walmart Spark Good for Saunemin was marked awarded with no figure recorded, so the Awarded tab ' +
+      'read "$5K awarded across 2 grants", the board read "Awarded $5K received", and the pipeline ' +
+      'subtracted a receipt that did not exist.',
+    cases: [
+      {
+        name: 'an unrecorded award is never the ask',
+        holds: () => awardedAmountOf({ status: 'awarded', amount: 5000, awarded_amount: null }) === null,
+      },
+      {
+        name: 'a recorded award is itself',
+        holds: () => awardedAmountOf({ status: 'awarded', amount: 5000, awarded_amount: 500 }) === 500,
+      },
+      {
+        name: 'a total never includes an unrecorded award',
+        holds: () => {
+          const t = awardedTotal([
+            { status: 'awarded', amount: 5000, awarded_amount: null },
+            { status: 'awarded', amount: 1000, awarded_amount: 500 },
+          ]);
+          return t.total === 500 && t.unrecorded === 1;
+        },
+      },
+      {
+        name: 'a short total says it is short',
+        holds: () => {
+          const line = awardedSummary([
+            { status: 'awarded', amount: 5000, awarded_amount: null },
+            { status: 'awarded', amount: 1000, awarded_amount: 500 },
+          ]);
+          return /\$500/.test(line) && /incomplete/i.test(line) && !/\$5,000/.test(line);
+        },
+      },
+      {
+        name: 'nothing recorded at all does not print a figure',
+        holds: () => {
+          const line = awardedSummary([{ status: 'awarded', amount: 5000, awarded_amount: null }]);
+          return !/\$/.test(line) && /not recorded/i.test(line);
+        },
+      },
+      {
+        name: 'a row with no award says so instead of showing the ask',
+        holds: () => {
+          const label = awardLabel({ status: 'awarded', amount: 5000, awarded_amount: null });
+          return label === 'amount not recorded' && !/5,000/.test(label);
+        },
+      },
+      {
+        name: 'a zero or negative award counts as unrecorded rather than real',
+        holds: () =>
+          awardedAmountOf({ status: 'awarded', amount: 5000, awarded_amount: 0 }) === null &&
+          awardedAmountOf({ status: 'awarded', amount: 5000, awarded_amount: -1 }) === null,
+      },
+      {
+        name: 'a grant that is not awarded contributes nothing',
+        holds: () => {
+          const t = awardedTotal([{ status: 'applied', amount: 5000, awarded_amount: 5000 }]);
+          return t.total === 0 && t.unrecorded === 0;
         },
       },
     ],

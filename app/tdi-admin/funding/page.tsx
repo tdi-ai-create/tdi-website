@@ -42,7 +42,10 @@ interface SchoolData {
   grants: {
     name: string
     id: string
+    /** What we asked for. */
     amount: number
+    /** What the funder gave, when recorded. Null is not zero and not the ask. */
+    awardedAmount?: number | null
     status: string
     windowOpen: boolean
     windowOpens: string | null
@@ -129,6 +132,8 @@ export default function FundingPage() {
                 name: o.name,
                 id: o.id,
                 amount: o.amount || 0,
+                // What the funder actually gave, kept separate from the ask.
+                awardedAmount: o.awarded_amount ?? null,
                 status: o.status,
                 windowOpen: o.window_status === 'open',
                 windowOpens: o.application_opens,
@@ -331,7 +336,8 @@ export default function FundingPage() {
       {view === 'awarded' && (
         <AwardedTab
           grants={schools.flatMap(sc => sc.grants.map(g => ({
-            id: g.id, name: g.name, amount: g.amount, status: g.status, school: sc.name,
+            id: g.id, name: g.name, amount: g.amount, awardedAmount: g.awardedAmount,
+            status: g.status, school: sc.name,
           })))}
         />
       )}
