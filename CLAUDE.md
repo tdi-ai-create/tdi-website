@@ -353,6 +353,15 @@ multi-section summaries are hard to follow. Give one detail, then ask whether
 she is ready for more, and wait. No stacked headers, no multi-row tables, and
 no lists of open items in a single message, even when a lot is genuinely done.
 
+**Ask questions one at a time.** One question, wait for the answer, then the
+next. Never a numbered list of things to decide, and never a question with two
+questions inside it. This holds even when several answers are needed before
+anything can start: ask the first, use it, then ask the second. Rae has asked
+for this more than once, which means it keeps being ignored.
+
+The same goes for anything she has to do. One step, then confirmation, then the
+next step. A list of four actions reads as a wall and nothing gets done.
+
 Do not work from memory or assumption. Read the actual source file, query the
 live data, and go one layer deeper than feels necessary before recommending
 what to keep, cut, change, or rebuild.
