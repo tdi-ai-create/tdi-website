@@ -781,7 +781,9 @@ export const GUARDS: Guard[] = [
       'one ran the checks. The Emails tab put a Send button on every draft row, including ' +
       'the drafts the hourly cron addresses to a school and queues for Bella to review, and ' +
       'that button ran no allowlist, no internal-wording check and no label check. ' +
-      '/api/funding/nudge had no gates at all, sent as Rae personally, and no UI called it.',
+      '/api/funding/nudge had no gates at all, sent as Rae personally, and the component that ' +
+      'called it had already been deleted, so it was a live unguarded route reachable by nothing. ' +
+      'That route is now deleted too.',
     cases: [
       {
         name: 'a school address is refused',

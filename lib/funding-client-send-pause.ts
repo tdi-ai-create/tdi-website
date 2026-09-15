@@ -11,13 +11,19 @@
 //   /api/funding/actions/[id]/send-nudge       allowlist + window gate + preview
 //   /api/funding/send-email                    allowlist only
 //   /api/funding/pursuits/[id]/emails PATCH    nothing
-//   /api/funding/nudge                         nothing, and no UI calls it at all
+//   /api/funding/nudge                         nothing whatsoever
 //
-// The last two are the reason this exists. The Emails tab put a Send button on
-// every draft row, including the drafts the hourly cron writes and addresses to
-// Bella for review, and that button ran none of her checks. So the queue was
-// never the only way out. It was one of several, and the weakest one decided
-// what a principal actually received.
+// The Emails tab is the reason this exists. It put a Send button on every draft
+// row, including the drafts the hourly cron writes and addresses to Bella for
+// review, and that button ran none of her checks. So the queue was never the
+// only way out. It was one of several, and the weakest one decided what a
+// principal actually received.
+//
+// /api/funding/nudge is gone. It had no gates at all and sent as Rae personally
+// rather than as Bella, and by the time it was paused the component that called
+// it had already been deleted, so it was a live unguarded route reachable by
+// nothing. It was removed rather than left paused: a lock on a door that should
+// not exist still reads to the next person as a door.
 //
 // The rule now has one sentence: an email reaches a school only when a person
 // approved it in the Outreach Queue. Everything else stops here.
