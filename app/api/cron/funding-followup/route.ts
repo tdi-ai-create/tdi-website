@@ -6,6 +6,7 @@ import { isGateOpen } from '@/lib/funding-gate-gaps'
 import { callTriggerFor } from '@/lib/funding/call-escalation'
 import { sourceItemKeyFor } from '@/lib/funding-client-label'
 import { isSchoolOwned } from '@/lib/funding-ownership'
+import { ALLOWLIST_ENABLED, SEND_ALLOWLIST, isOnAllowlist, allowlistProblems } from '@/lib/send-allowlist'
 import {
   generateFollowUpEmail,
   buildConsolidatedEmail,
@@ -48,16 +49,9 @@ import {
 // Order of checks: DRY_RUN → WINDOW GATE → TDI? → ALLOWLIST → send.
 //                                            └→ not TDI: draft for Bella.
 // ══════════════════════════════════════════════════════════════
-const ALLOWLIST_ENABLED = true
-const SEND_ALLOWLIST: string[] = [
-  'rae@teachersdeserveit.com',
-  'hello@teachersdeserveit.com',
-  'bella@teachersdeserveit.com',
-]
-
-function isOnAllowlist(email: string): boolean {
-  return SEND_ALLOWLIST.some(a => a.toLowerCase() === email.toLowerCase())
-}
+// The list moved to lib/send-allowlist.ts so a guard can hold it. It was a
+// const here, where adding one address or flipping one boolean would have
+// started emailing schools with nothing to notice.
 
 const LOG = '[funding-followup]'
 
@@ -554,6 +548,18 @@ export async function GET(request: NextRequest) {
   const guard = guardCron(request)
   if (!guard.ok) {
     return NextResponse.json({ error: guard.error }, { status: guard.status ?? 401 })
+  }
+
+  // A widened allowlist is a change of blast radius, not a config tweak.
+  // Refuse the run rather than discovering it from a school's reply.
+  const listProblems = allowlistProblems()
+  if (listProblems.length > 0) {
+    console.error(LOG, 'Refusing to run. The send allowlist is not safe:', listProblems)
+    return NextResponse.json({
+      success: false,
+      error: 'The send allowlist would let this job email someone outside TDI. Nothing was sent.',
+      problems: listProblems,
+    }, { status: 500 })
   }
   const DRY_RUN = guard.dryRun
 
