@@ -148,6 +148,8 @@ function InvoiceDetail({ i }: { i: Invoice }) {
       )}
       {i.status === 'voided' && <Banner tone="amber" title="Voided">{i.void_reason}</Banner>}
 
+      <InvoiceDocumentBar i={i} />
+
       <div style={S.panes}>
         <Pane title="Invoice">
           <KV k="Amount" v={money2(i.amount)} />
@@ -182,6 +184,44 @@ function InvoiceDetail({ i }: { i: Invoice }) {
             ))}
       </div>
     </>
+  );
+}
+
+/**
+ * The invoice itself, as a document you can open.
+ *
+ * This is the thing the page promised in its own blurb and did not have. An
+ * invoice was a row and some line items, never a file, so when a client asked
+ * for a copy the only way to answer was to search somebody's sent mail.
+ *
+ * Both links point at the same renderer, so what you read on screen is byte for
+ * byte what downloads and what a client would be sent.
+ */
+function InvoiceDocumentBar({ i }: { i: Invoice }) {
+  const href = `/api/tdi-admin/billing/invoice/${i.id}/pdf`;
+  return (
+    <div
+      style={{
+        display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap',
+        background: '#fff', border: '1px solid #E2E8F0', borderRadius: 10,
+        padding: '11px 13px', marginTop: 12,
+      }}
+    >
+      <span style={{ flex: 1, minWidth: 180 }}>
+        <b style={{ display: 'block', fontSize: 13 }}>Invoice {i.ref}</b>
+        <span style={{ display: 'block', fontSize: 12.3, color: '#64748B' }}>
+          {i.status === 'draft'
+            ? 'Not sent. This is what the client would receive.'
+            : `Rebuilt from the record, ${money2(i.amount)}${i.part_paid ? `, ${money2(i.outstanding)} still owed` : ''}.`}
+        </span>
+      </span>
+      <a href={href} target="_blank" rel="noopener noreferrer" style={{ ...S.btn, textDecoration: 'none' }}>
+        View PDF
+      </a>
+      <a href={`${href}?download=1`} style={{ ...S.btnGhost, textDecoration: 'none' }}>
+        Download PDF
+      </a>
+    </div>
   );
 }
 
