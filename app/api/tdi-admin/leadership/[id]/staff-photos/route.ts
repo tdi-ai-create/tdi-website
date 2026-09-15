@@ -6,6 +6,11 @@ import sharp from 'sharp'
 const THUMB_SIZE = 64
 const FULL_SIZE = 400
 const MAX_FILE_SIZE = 10 * 1024 * 1024
+const ADMIN_EMAIL_DOMAIN = '@teachersdeserveit.com'
+
+function isTdiAdminEmail(email: string | null): email is string {
+  return !!email && email.toLowerCase().endsWith(ADMIN_EMAIL_DOMAIN)
+}
 
 export async function POST(
   request: NextRequest,
@@ -18,6 +23,10 @@ export async function POST(
     const auth = await requireAdminAuth();
     if (auth instanceof NextResponse) return auth;
     const userEmail = auth.member.email;
+
+    if (!isTdiAdminEmail(userEmail)) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
 
     const formData = await request.formData()
     const file = formData.get('file') as File
@@ -160,6 +169,10 @@ export async function DELETE(
     const auth = await requireAdminAuth();
     if (auth instanceof NextResponse) return auth;
     const userEmail = auth.member.email;
+
+    if (!isTdiAdminEmail(userEmail)) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
 
     const { searchParams } = new URL(request.url)
     const staffMemberId = searchParams.get('staffMemberId')
