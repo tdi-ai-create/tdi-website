@@ -131,6 +131,21 @@ sends one email" is the sentence Rae needs.
 
 **After any write meant to change state, verify the effect.** A 200 is not proof.
 
+**Every dry run ends in the browser.** A dry run that only reports what it
+would have done proves the data moved, not that a person can use the result.
+Open the page in Chrome, press the controls, and write down what you saw.
+
+`npm run check:browserpass` fails when a change touches a screen someone
+operates and no record exists under `browser-passes/`. It also rejects a record
+with no figure and no quoted text in it, because an observation you could have
+written without looking is not an observation. Copy `browser-passes/TEMPLATE.md`.
+
+This is a gate because the rule alone did not hold. On 13 September a fix for
+Bella went into `MyTasks.tsx`, which nothing imports. On the 14th another read a
+field that was always null. A third claimed in its own description that a link
+opened a drafted email, and pressing it showed that it did not. All three
+typechecked, all three deployed, and all three were caught by loading the site.
+
 **Press the button. There is now somewhere safe to do it.**
 
 Approve, Request changes and Mark complete on the admin creator page were broken
@@ -205,6 +220,7 @@ npm run lint           # eslint
 npm run deadcode       # knip: unused files, exports, and dependencies
 npm run check:writes   # fails if a changed file has a Supabase write whose error is discarded
 npm run check:reachable # fails if a changed component has no importer
+npm run check:browserpass # fails if a changed screen has no recorded browser pass
 npm run check:schema   # detects DB schema drift against the baseline
 npm run validate:quizzes
 ```

@@ -31,7 +31,8 @@
     "check:spanish": "tsx scripts/spanish-download-selftest.ts",
     "check:uitranslation": "tsx scripts/ui-translation-guard-selftest.ts",
     "check:answers": "npx tsx scripts/integrity/verify-answer-actions.mts",
-    "check:reachable": "node scripts/check-reachable.mjs"
+    "check:reachable": "node scripts/check-reachable.mjs",
+    "check:browserpass": "node scripts/check-browser-pass.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.78.0",
