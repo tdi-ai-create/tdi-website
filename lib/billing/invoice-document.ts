@@ -10,6 +10,12 @@ import { resolveBillingContact } from '@/lib/billing-contact';
  *
  * One loader, used by the viewer, the download, and the send path, so a client
  * cannot be looking at a different document from the one Billing is looking at.
+ *
+ * It deliberately does not read `billing_invoice_notes`, and must not. That
+ * table holds the team's own collections commentary about the client who would
+ * receive this page: who was called, who is stalling, what to try next. The
+ * same mistake in a milder form already reached page two of a client PDF via
+ * `intelligence_invoices.notes`. Nothing internal belongs on this document.
  */
 
 export interface InvoiceLine {

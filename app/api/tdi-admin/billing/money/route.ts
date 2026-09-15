@@ -20,7 +20,7 @@ export async function GET(_request: NextRequest) {
   const sb = getServiceSupabase();
   const today = new Date().toISOString().slice(0, 10);
 
-  const [{ data: invoices }, { data: payments }, { data: apps }, { data: districts }, { data: quotes }, { data: outbox }] =
+  const [{ data: invoices }, { data: payments }, { data: apps }, { data: districts }, { data: quotes }, { data: outbox }, { data: notes }] =
     await Promise.all([
       sb.from('intelligence_invoices').select('*').order('invoice_date', { ascending: false }),
       sb.from('billing_payments').select('*').order('created_at', { ascending: false }),
@@ -28,6 +28,10 @@ export async function GET(_request: NextRequest) {
       sb.from('districts').select('id, name'),
       sb.from('quotes').select('id, quote_number'),
       sb.from('billing_outbox').select('id, invoice_id, kind, to_email, subject, status, sent_at, send_result').order('created_at', { ascending: false }),
+      // Ids only. The notes themselves are internal collections commentary and
+      // are fetched per invoice when a row is opened, never shipped in a list
+      // payload covering every client at once.
+      sb.from('billing_invoice_notes').select('invoice_id, created_at').is('deleted_at', null),
     ]);
 
   const dName = new Map((districts ?? []).map((d) => [d.id, d.name]));
@@ -44,6 +48,17 @@ export async function GET(_request: NextRequest) {
     (sends.get(o.invoice_id) ?? sends.set(o.invoice_id, []).get(o.invoice_id)!).push(o);
   }
   const invNumber = new Map((invoices ?? []).map((i) => [i.id, i.invoice_number]));
+
+  // How much chasing has been recorded, and when it last happened. An invoice
+  // three weeks overdue with no note against it is a different problem from one
+  // chased yesterday, and the list could not tell them apart before.
+  const noteCount = new Map<string, number>();
+  const lastNoteAt = new Map<string, string>();
+  for (const n of notes ?? []) {
+    noteCount.set(n.invoice_id, (noteCount.get(n.invoice_id) ?? 0) + 1);
+    const seen = lastNoteAt.get(n.invoice_id);
+    if (!seen || n.created_at > seen) lastNoteAt.set(n.invoice_id, n.created_at);
+  }
 
   const invoiceRows = (invoices ?? []).map((i) => {
     const paid = (appsByInvoice.get(i.id) ?? []).reduce((s, a) => s + Number(a.amount), 0);
@@ -73,6 +88,12 @@ export async function GET(_request: NextRequest) {
       part_paid: paid > 0 && paid < Number(i.amount),
       missing_payment_record: i.status === 'paid' && paid === 0,
       sends: sends.get(i.id) ?? [],
+      note_count: noteCount.get(i.id) ?? 0,
+      last_note_at: lastNoteAt.get(i.id) ?? null,
+      // An overdue invoice nobody has written anything against. This is the
+      // Allenwood shape: three weeks of silence that looked like activity
+      // because the invoice was sitting in a list.
+      overdue_unchased: overdue && !noteCount.get(i.id),
     };
   });
 
@@ -111,6 +132,7 @@ export async function GET(_request: NextRequest) {
     voided: invoiceRows.filter((i) => i.status === 'voided').length,
     unverified_payments: paymentRows.filter((p) => !p.details_verified).length,
     missing_payment_records: live.filter((i) => i.missing_payment_record).length,
+    overdue_unchased: live.filter((i) => i.overdue_unchased).length,
     // Money still owed on a school year that has ended. It is chased on its own
     // and it is the easiest thing to lose, because everything else on the page
     // is about the year everyone is currently thinking about.
