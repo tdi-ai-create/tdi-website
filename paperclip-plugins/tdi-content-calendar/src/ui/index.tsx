@@ -191,6 +191,13 @@ const SEND_BACK_REASONS: Array<{ label: string; text: string }> = [
   },
 ];
 
+/**
+ * Where a published Quick Win actually lives. The same address the Hub's own
+ * emails and the community reporter use, so a link from the calendar lands on
+ * the page an educator would see rather than an internal preview of it.
+ */
+const HUB_SITE = "https://www.teachersdeserveit.com";
+
 function ymd(y: number, m: number, d: number) {
   return `${y}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
 }
@@ -724,22 +731,45 @@ export function ContentCalendarPage(_props: PluginWidgetProps) {
                   );
                 })}
 
-                {c.iso && (hubByDay.get(c.iso) ?? []).map((h) => (
-                  <div key={h.id}
-                    title={h.category ?? undefined}
-                    style={{
-                      marginBottom: 4, borderRadius: 3, padding: "4px 6px",
-                      borderLeft: `3px solid ${chan("hub").dot}`,
-                      background: h.is_published ? "#F4F6F8" : "#EDF2F9",
-                      opacity: h.is_published ? 0.8 : 1,
-                      fontSize: 11, lineHeight: 1.25,
-                    }}>
-                    <div style={{ fontWeight: 600 }}>{h.title || "(untitled)"}</div>
-                    <div style={{ color: "#5A6472", fontSize: 10 }}>
-                      Hub · {h.is_published ? "live" : "not live yet"}
+                {c.iso && (hubByDay.get(c.iso) ?? []).map((h) => {
+                  const card = {
+                    display: "block", marginBottom: 4, borderRadius: 3, padding: "4px 6px",
+                    borderLeft: `3px solid ${chan("hub").dot}`,
+                    background: h.is_published ? "#F4F6F8" : "#EDF2F9",
+                    fontSize: 11, lineHeight: 1.25,
+                    textDecoration: "none", color: "inherit",
+                  } as const;
+
+                  const label = (
+                    <>
+                      <div style={{ fontWeight: 600 }}>{h.title || "(untitled)"}</div>
+                      <div style={{ color: "#5A6472", fontSize: 10 }}>
+                        {h.category ? `${h.category} · ` : ""}
+                        {h.is_published ? "open in the Hub" : "not live yet"}
+                      </div>
+                    </>
+                  );
+
+                  // A live Quick Win has a real page, so the card opens it. An
+                  // unpublished one has no page anywhere: there is no per-item
+                  // admin view either, so a link would be a promise nothing can
+                  // keep. It stays flat and says why rather than looking
+                  // clickable and doing nothing.
+                  return h.is_published && h.slug ? (
+                    <a key={h.id} href={`${HUB_SITE}/hub/quick-wins/${h.slug}`}
+                      target="_blank" rel="noreferrer"
+                      title={`Open "${h.title ?? ""}" in the Hub`}
+                      style={card}>
+                      {label}
+                    </a>
+                  ) : (
+                    <div key={h.id}
+                      title="Not published yet, so there is no page to open. It is waiting on a board approval."
+                      style={{ ...card, cursor: "default" }}>
+                      {label}
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
 
                 {c.iso && (slotsByDay.get(c.iso) ?? [])
                   .filter((s) => !s.filled_by)

@@ -54,3 +54,29 @@ counts work dated into the month on screen, and reports undated work separately
 rather than folding it in or dropping it. The first draft of this browser pass
 claimed August showed an empty strip "which is correct". It did not, and I had
 written that before pressing the button.
+
+## Second pass, v0.6.0: Hub cards are clickable
+
+Rae asked why the Hub items were not clickable. They were plain divs.
+
+- Opened the calendar on v0.6.0 and counted from the rendered page: 10 cards are
+  now `<a>` elements pointing at `/hub/quick-wins/<slug>` with `target="_blank"`,
+  and 16 are still flat divs carrying the title "Not published yet, so there is
+  no page to open. It is waiting on a board approval."
+- Saw the first three hrefs resolve to real slugs: `ell-empathy-audit`,
+  `whole-room-reset-regulation`, `student-shutdown-response-card`.
+- Followed one: https://www.teachersdeserveit.com/hub/quick-wins/ell-empathy-audit
+  Saw the real Quick Win page render, headed "The ELL Empathy Audit", tagged
+  "Instructional Strategies", "5 min", "PDF Download", with Download Tool and
+  Save to Library controls. Not a not-found state.
+
+A check I threw away. `curl` returned HTTP 200 for the real slug and also 200
+for `definitely-not-a-real-slug`, and both served a shell containing the words
+"Not Found", because the Hub renders client side behind a login. The status code
+could not fail, so it proved nothing. The observation above is from a signed-in
+browser instead.
+
+## What I did not press
+
+I did not press Download Tool on the live Quick Win, and I did not answer the
+Vibe Check that opened over it. Both write against a real educator account.
