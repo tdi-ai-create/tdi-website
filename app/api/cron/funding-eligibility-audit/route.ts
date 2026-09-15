@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js'
 import { guardCron } from '@/lib/cron-guard'
 import { isAgentWindowWork } from '@/lib/funding-window-work'
 import { isOver, isWithFunder } from '@/lib/funding-status'
+import { readTdiFacts, answeredCredential, missingCredentials } from '@/lib/funding/tdi-facts'
 import {
   screenPath,
   isPastDrafting,
@@ -127,6 +128,31 @@ export async function GET(request: NextRequest) {
 
     const bySchool = new Map((pursuits ?? []).map(p => [p.id, p]))
 
+    // What we know about ourselves, read once for the whole run.
+    //
+    // One screening rule is about TDI rather than about the school: whether we
+    // are authorized to deliver under a state administered programme. It used
+    // to fire on the grant's name alone, so it re-raised the same question on
+    // every school every month and none of those askings could ever be
+    // satisfied by another's answer. On Saunemin it stayed open 26 days and was
+    // auto-cancelled unanswered when the path closed.
+    const { facts: tdiFacts, error: tdiErr } = await readTdiFacts(supabase)
+    if (tdiErr) {
+      // Not fatal, and deliberately not silent. With no facts the screen
+      // behaves exactly as it did before this change: it asks. Reporting it
+      // matters because "we asked again" and "we could not tell whether we
+      // already knew" look identical from the outside.
+      console.error('[eligibility-audit] Could not read what we know about TDI:', tdiErr)
+    }
+
+    const statesWeWorkIn = [
+      ...new Set(
+        (pursuits ?? [])
+          .map(p => p.state_code)
+          .filter((c): c is string => Boolean(c)),
+      ),
+    ]
+
     const changes: Change[] = []
     const questionsToRaise: { school: string; path: string; question: string; because: string }[] = []
     const questionsExisting: string[] = []
@@ -167,6 +193,13 @@ export async function GET(request: NextRequest) {
           stateCode: school.state_code ?? null,
           titleIStatus: (profile.title_i_status as string) ?? null,
           designation: (profile.designation as string) ?? null,
+        },
+        {
+          // Scoped to this school's state, falling back to a fact recorded as
+          // true everywhere. An Illinois answer says nothing about New Jersey.
+          tdiAuthorizationConfirmed: Boolean(
+            answeredCredential(tdiFacts, 'approved_provider_status', school.state_code ?? null),
+          ),
         },
       )
 
@@ -366,6 +399,13 @@ export async function GET(request: NextRequest) {
       questionFailures: questionsFailed,
       unchangedCount: unchanged.length,
       skipped,
+      // What we still do not know about ourselves, across the states we work
+      // in. Listed rather than counted: a count says there is a problem, a
+      // list says what to go and find out. This is the answer to "why did that
+      // grant stop and whose question was it".
+      ourOwnOpenQuestions: missingCredentials(tdiFacts, statesWeWorkIn).length,
+      aboutUs: missingCredentials(tdiFacts, statesWeWorkIn),
+      couldNotReadOurOwnFacts: tdiErr ?? null,
       note: dryRun
         ? 'Nothing was written. Every verdict above was computed against live data.'
         : 'Verdicts recorded. No path was deleted and no human override was touched.',
