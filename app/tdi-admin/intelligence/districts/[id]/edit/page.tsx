@@ -178,6 +178,9 @@ export default function EditDistrictPage() {
               <option value="district">District</option>
               <option value="single_school">Single School</option>
               <option value="charter_network">Charter Network</option>
+              {/* Not a school at all: a conference, a nonprofit, an association.
+                  Separate so school counts stay school counts. */}
+              <option value="organization">Organization (not a school)</option>
             </select>
           </div>
         </div>
