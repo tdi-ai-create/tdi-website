@@ -12,5 +12,8 @@
   ],
   "ignoreDependencies": [
     "tailwindcss"
+  ],
+  "ignore": [
+    "paperclip-plugins/**"
   ]
 }
