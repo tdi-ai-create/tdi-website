@@ -43,7 +43,31 @@ export default function MoneyPage() {
   if (!data) return <Shell title="Money" blurb=""><div style={{ color: '#64748B', padding: 40 }}>Loading…</div></Shell>;
 
   const t = data.totals;
-  const rows: (Invoice | Payment)[] = [...data.invoices, ...data.payments];
+
+  // A payment that lands entirely on one invoice is not a second thing that happened.
+  // It is the other half of that invoice, and listing it separately made a single
+  // $1,499.10 transaction read as two records at the same amount. Nest it instead.
+  // A payment spanning several invoices, or carrying an unapplied remainder, stays
+  // top level: it is not owned by any one invoice and hiding it would lose it.
+  const invoiceByRef = new Map(data.invoices.map((i) => [i.ref, i]));
+  const nested = new Map<string, Payment[]>();
+  for (const p of data.payments) {
+    if (p.settles.length !== 1 || Math.abs(p.unapplied) > 0.005) continue;
+    const ref = p.settles[0].invoice_number;
+    const parent = invoiceByRef.get(ref);
+    // Never nest under a row the list is about to hide, or the payment goes with it.
+    if (!parent || parent.status === 'voided') continue;
+    nested.set(ref, [...(nested.get(ref) ?? []), p]);
+  }
+  const nestedIds = new Set([...nested.values()].flat().map((p) => p.id));
+
+  // Nesting is a courtesy of the combined list only. Every payment-facing filter stays
+  // flat, so a nested payment is never unreachable and never drops out of a count.
+  const flatPayments = filter === 'payments' || filter === 'attention';
+  const rows: (Invoice | Payment)[] = [
+    ...data.invoices,
+    ...data.payments.filter((p) => flatPayments || !nestedIds.has(p.id)),
+  ];
   const shown = rows.filter((r) => {
     if (filter === 'invoices') return r.kind === 'invoice' && r.status !== 'voided';
     if (filter === 'payments') return r.kind === 'payment';
@@ -52,6 +76,7 @@ export default function MoneyPage() {
     if (filter === 'attention') return (r.kind === 'invoice' && (r.missing_payment_record || r.status === 'overdue')) || (r.kind === 'payment' && !r.details_verified);
     return r.kind !== 'invoice' || r.status !== 'voided';
   });
+  const allCount = t.invoices + data.payments.filter((p) => !nestedIds.has(p.id)).length;
 
   return (
     <Shell title="Money" blurb="Every invoice and every payment in one list. Open a row to see the document, what was sent, and the notes.">
@@ -83,7 +108,7 @@ export default function MoneyPage() {
 
       <div style={S.card}>
         <div style={S.filters}>
-          {[['all', `All (${t.invoices + t.payments})`], ['invoices', `Invoices (${t.invoices})`], ['payments', `Payments (${t.payments})`],
+          {[['all', `All (${allCount})`], ['invoices', `Invoices (${t.invoices})`], ['payments', `Payments (${t.payments})`],
             ['overdue', `Overdue (${data.invoices.filter((i) => i.status === 'overdue').length})`],
             ['attention', 'Needs attention'], ['voided', `Voided (${t.voided})`]].map(([k, label]) => (
             <button key={k} onClick={() => setFilter(k)} style={filter === k ? S.chipOn : S.chip}>{label}</button>
@@ -103,7 +128,7 @@ export default function MoneyPage() {
                 <span style={{ flex: 1, minWidth: 0, textAlign: 'left' }}>
                   <b style={{ display: 'block', fontSize: 13.5, textDecoration: r.kind === 'invoice' && r.status === 'voided' ? 'line-through' : 'none' }}>{r.ref}</b>
                   <span style={{ display: 'block', color: '#64748B', fontSize: 11.8 }}>
-                    {r.client}{r.kind === 'invoice' && r.school_year ? `, ${r.school_year}` : ''}{r.kind === 'invoice' && r.contract ? `, ${r.contract}` : ''}{r.kind === 'payment' ? `, ${r.settles.length} invoice${r.settles.length === 1 ? '' : 's'}` : ''}
+                    {r.client}{r.kind === 'invoice' && r.school_year ? `, ${r.school_year}` : ''}{r.kind === 'invoice' && r.contract ? `, ${r.contract}` : ''}{r.kind === 'payment' ? (r.settles.length === 1 ? ` · settles ${r.settles[0].invoice_number}` : r.settles.length === 0 ? ' · settles nothing yet' : ` · settles ${r.settles.length} invoices`) : ''}
                     {r.kind === 'invoice' && r.note_count > 0 ? `, ${r.note_count} note${r.note_count === 1 ? '' : 's'}` : ''}
                   </span>
                 </span>
@@ -136,11 +161,36 @@ export default function MoneyPage() {
                   {r.kind === 'invoice' ? <InvoiceDetail i={r} /> : <PaymentDetail p={r} />}
                 </div>
               )}
+
+              {r.kind === 'invoice' && !flatPayments && (nested.get(r.ref) ?? []).map((p) => (
+                <NestedPayment key={p.id} p={p} open={open.has(p.id)} onToggle={() => toggle(p.id)} />
+              ))}
             </div>
           );
         })}
       </div>
     </Shell>
+  );
+}
+
+/** The money half of an invoice, shown as a child of the bill it settles. */
+function NestedPayment({ p, open, onToggle }: { p: Payment; open: boolean; onToggle: () => void }) {
+  return (
+    <>
+      <button onClick={onToggle} aria-expanded={open} aria-label={`Payment of ${money2(p.amount)} settling ${p.settles[0]?.invoice_number ?? 'this invoice'}`}
+        style={{ ...S.row, padding: '9px 16px 9px 46px', background: open ? '#FAFBFC' : '#fff', borderTop: '1px solid #F8FAFC' }}>
+        <span aria-hidden style={{ color: '#CBD5E1', fontSize: 12.5, marginLeft: -12, marginRight: 2 }}>&#9492;</span>
+        <span style={{ flex: 1, minWidth: 0, textAlign: 'left', fontSize: 12.5, color: '#475569' }}>
+          {p.ref === 'Payment' ? 'Payment' : p.ref} {money2(p.amount)}
+          <span style={{ color: '#94A3B8' }}>
+            {' \u00b7 '}{p.method ? p.method : 'method not captured'}
+            {p.received_on ? `, ${shortDate(p.received_on)}` : ', date unknown'}
+          </span>
+        </span>
+        {!p.details_verified && <Pill tone="amber">detail missing</Pill>}
+      </button>
+      {open && <div style={S.body}><PaymentDetail p={p} /></div>}
+    </>
   );
 }
 
