@@ -551,7 +551,13 @@ export default function NeedsYouBoard({
               c={{
                 name: i.label,
                 school: nameOf(i.pursuitId),
-                tone: 'stuck',
+                // Red was the only colour this column had, so a grant sitting
+                // normally with a school and a chase already booked looked
+                // identical to one nobody has heard from in a month. The engine
+                // has always said which is which in `urgency`; the column threw
+                // it away. Four paths acquired a card here the day this shipped
+                // and every one of them is progressing as intended.
+                tone: i.urgency === 'low' ? 'quiet' : 'stuck',
                 line: i.why,
                 action: 'Chase',
                 onAction: () => onOpenItem(i),
