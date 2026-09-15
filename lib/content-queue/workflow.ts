@@ -43,6 +43,9 @@ export type Action =
   | 'request_changes' | 'approve' | 'schedule' | 'mark_published' | 'verify' | 'cancel'
   // Not a transition: it parks a piece where it already is.
   | 'flag_blocked'
+  // Not a transition either: it writes a planned date and leaves the piece
+  // exactly where it is in the pipeline.
+  | 'set_date'
   // A human decided in Paperclip and an agent is transcribing it here.
   | 'record_board_decision'
 
@@ -55,7 +58,7 @@ type Rule = {
   needsNote?: boolean
 }
 
-export const TRANSITIONS: Record<Exclude<Action, 'flag_blocked' | 'record_board_decision'>, Rule> = {
+export const TRANSITIONS: Record<Exclude<Action, 'flag_blocked' | 'record_board_decision' | 'set_date'>, Rule> = {
   place_brief:     { from: [],                                     to: 'brief',             role: 'orchestrator' },
   pick_up:         { from: ['brief', 'changes_requested'],         to: 'drafting',          role: 'writer' },
   submit:          { from: ['drafting'],                           to: 'pending_qa',        role: 'writer' },
@@ -113,9 +116,36 @@ export function actorHoldsRole(actor: string, role: string | null): boolean {
   return holders.includes(actor.trim().toLowerCase())
 }
 
-/** flag_blocked is the one action that is not a transition, so it has no rule. */
-export function isTransition(action: Action): action is Exclude<Action, 'flag_blocked' | 'record_board_decision'> {
-  return action !== 'flag_blocked' && action !== 'record_board_decision'
+/**
+ * Three actions are not transitions, so they have no rule in the table above.
+ *
+ * flag_blocked parks a piece where it already is. record_board_decision
+ * transcribes a decision made in Paperclip. set_date writes a planned date and
+ * changes nothing else.
+ */
+export function isTransition(action: Action): action is Exclude<Action, 'flag_blocked' | 'record_board_decision' | 'set_date'> {
+  return action !== 'flag_blocked' && action !== 'record_board_decision' && action !== 'set_date'
+}
+
+/**
+ * Where a planned date may be written without approving anything.
+ *
+ * Rae, 15 September: she wanted to lay a month out first and work through the
+ * approvals after, and dragging an undated piece onto a day is the obvious way
+ * to ask for that. `schedule` could not do it, because it moves a piece to
+ * `scheduled`, and the database refuses that status without an approval.
+ *
+ * This writes `scheduled_for` and leaves `status` alone, so a plan is a plan and
+ * nothing about it claims the work was signed off. Published and verified work
+ * is excluded: its date is a record of what happened, not an intention.
+ */
+export const DATEABLE: Status[] = [
+  'brief', 'drafting', 'pending_qa', 'pending_creative', 'pending_editorial',
+  'pending_approval', 'changes_requested', 'approved', 'scheduled',
+]
+
+export function canSetDate(status: Status): boolean {
+  return DATEABLE.includes(status)
 }
 
 export function legalFrom(action: Action, current: Status): boolean {
