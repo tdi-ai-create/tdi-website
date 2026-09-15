@@ -89,10 +89,48 @@ export async function GET(request: NextRequest) {
 
   if (stdError) return NextResponse.json({ error: stdError.message }, { status: 500 })
 
+  // Hub Quick Wins run on their own release schedule and have never appeared on
+  // the calendar. September 2026 has 26 of them, three per weekday from the 10th
+  // to the 23rd, against two dated pieces in the marketing queue. A month that
+  // shows the two and hides the twenty six is not a picture of what TDI is
+  // publishing.
+  //
+  // Placed on published_at when it went out, and on scheduled_publish_date when
+  // it has not, which is the same rule the queue's own items follow: planned
+  // work sits on the day it is planned for, work that went out sits on the day
+  // it went out.
+  //
+  // Read only here. Deciding a Quick Win is a board approval in Paperclip, and
+  // is_published is what the Hub actually reads, so flipping it from a calendar
+  // would be publishing rather than planning.
+  const { data: hub, error: hubError } = await supabase
+    .from('hub_quick_wins')
+    .select('id, slug, title, category, quick_win_type, status, is_published, scheduled_publish_date, published_at')
+    .or(`and(published_at.gte.${from},published_at.lt.${to}),and(published_at.is.null,scheduled_publish_date.gte.${from},scheduled_publish_date.lt.${to})`)
+    .order('scheduled_publish_date', { ascending: true })
+
+  // A Hub read that fails must not take the marketing month down with it. The
+  // reason is reported so a missing half is visible rather than looking like a
+  // quiet week.
+  const hubItems = (hub ?? []).map((q) => ({
+    id: q.id,
+    slug: q.slug,
+    title: q.title,
+    category: q.category,
+    quick_win_type: q.quick_win_type,
+    is_published: q.is_published,
+    // status is deliberately not surfaced. It has drifted from is_published:
+    // 106 live pieces still say "reviewed" and 34 still say "pending_review",
+    // so showing it would put a word on screen that means nothing.
+    day: q.published_at ? String(q.published_at).slice(0, 10) : q.scheduled_publish_date,
+  }))
+
   return NextResponse.json({
     month,
     slots: slots ?? [],
     standards: standards ?? [],
+    hub: hubItems,
+    hubError: hubError ? hubError.message : null,
   })
 }
 
