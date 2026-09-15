@@ -23,6 +23,25 @@
  * checkbox is that it demands observations, not intentions: the URL, the
  * control pressed, and what actually appeared, including at least one figure or
  * piece of text read off the screen.
+ *
+ * WHEN THE LOCAL APP CANNOT BE DRIVEN
+ *
+ * Rae's rule, 15 September 2026: if localhost will not load, or cannot be
+ * signed in to, the pass happens on production straight after the deploy
+ * instead of blocking the merge.
+ *
+ * The admin portal is the case that forced it. It authenticates against a
+ * Supabase session cookie scoped to the live domain, so a local server answers
+ * every admin page with a login screen no amount of local setup can pass
+ * without a person's own credentials.
+ *
+ * So a record may be DEFERRED: it names why the local app could not be driven
+ * and the production URL it will be checked on, and it merges without the
+ * observations. What stops that becoming a permanent escape hatch is the last
+ * check in this file: if any earlier deferred record is still sitting there
+ * with no observations in it, the next change to her screens does not merge.
+ * One deferral is a sequencing decision. Two is a habit, and the second one
+ * pays for the first.
  */
 
 import { execFileSync } from 'node:child_process';
@@ -110,6 +129,33 @@ if (records.length === 0) {
   ]);
 }
 
+/**
+ * A record that says the pass is waiting for the deploy.
+ *
+ * Both lines are required. The reason keeps it honest, and the URL is what the
+ * follow-up gets checked against, so neither is decoration.
+ */
+function isDeferred(text) {
+  // [^\S\n] rather than \s after the colon. \s matches a newline, so "Saw:"
+  // with nothing after it happily matched the first character of the next line
+  // and an empty heading read as a filled-in one.
+  return /^[^\S\n]*[-*]?[^\S\n]*deferred:[^\S\n]*\S/im.test(text)
+    && /^[^\S\n]*[-*]?[^\S\n]*verify after deploy:[^\S\n]*\S/im.test(text);
+}
+
+/**
+ * Observations have been written into it, whether or not it was ever deferred.
+ *
+ * Requires something after the colon. A deferred record carries the empty
+ * "Saw:" heading it will later be filled in under, and an earlier version of
+ * this counted that as an observation, so the deferral fell straight through
+ * into the full check and failed for having written nothing under a heading
+ * that exists precisely to be blank.
+ */
+function hasObservations(text) {
+  return /^[^\S\n]*[-*][^\S\n]*saw:[^\S\n]*\S/im.test(text);
+}
+
 // A record that has not been filled in is worse than none, because it looks
 // like evidence.
 const problems = [];
@@ -125,6 +171,14 @@ for (const file of records) {
   if (!/https?:\/\/\S+/.test(text)) {
     problems.push(`${file}: no URL. Say which page you opened.`);
   }
+
+  // Deferred to production. Merge on the promise, and the promise is enforced
+  // by the unresolved-deferral check below rather than by trust.
+  if (isDeferred(text) && !hasObservations(text)) {
+    console.log(`${file}: pass deferred to production. It must carry observations before the next change to these screens.`);
+    continue;
+  }
+
   if (!/^\s*[-*]\s*pressed:/im.test(text)) {
     problems.push(`${file}: no "Pressed:" line. Name the control you actually clicked.`);
   }
@@ -143,6 +197,42 @@ for (const file of records) {
 }
 
 if (problems.length > 0) fail(['The browser pass record is not usable:', '', ...problems.map((p) => `  ${p}`)]);
+
+// The debt from the last deferral, collected now.
+//
+// Every record in the folder is read, not only the ones this change touched. A
+// deferred pass that never came back is an unverified change sitting in
+// production, and the cheapest moment to notice is the next time somebody wants
+// to move one of these screens.
+const outstanding = [];
+try {
+  const all = sh('git', ['ls-files', 'browser-passes']).split('\n').filter(Boolean);
+  const untracked = sh('git', ['ls-files', '--others', '--exclude-standard', 'browser-passes'])
+    .split('\n')
+    .filter(Boolean);
+  for (const f of [...new Set([...all, ...untracked])]) {
+    if (!/^browser-passes\/.+\.md$/.test(f) || /TEMPLATE\.md$/.test(f)) continue;
+    if (records.includes(f)) continue;
+    if (!existsSync(f)) continue;
+    const text = readFileSync(f, 'utf8');
+    if (isDeferred(text) && !hasObservations(text)) outstanding.push(f);
+  }
+} catch {
+  // Listing the folder is not the check. If git cannot answer, say nothing
+  // rather than inventing a failure.
+}
+
+if (outstanding.length > 0) {
+  fail([
+    'A previous browser pass was deferred to production and never completed:',
+    '',
+    ...outstanding.map((f) => `  ${f}`),
+    '',
+    'That change is live and unverified. Open the page, press the control it names,',
+    'and write the "Pressed:" and "Saw:" lines into that file before moving these',
+    'screens again.',
+  ]);
+}
 
 console.log(`Browser pass recorded in ${records.map((r) => r.split('/').pop()).join(', ')}.`);
 process.exit(0);
