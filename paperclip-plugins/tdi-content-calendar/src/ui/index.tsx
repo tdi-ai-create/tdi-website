@@ -82,10 +82,27 @@ type Standard = {
   set_at: string;
 };
 
+/**
+ * A Hub Quick Win. A separate pipeline from the marketing queue, on purpose,
+ * but the same month. September 2026 has 26 of these against two dated pieces
+ * in the queue, so a calendar that hides them is not showing the month.
+ */
+type HubItem = {
+  id: string;
+  slug: string | null;
+  title: string | null;
+  category: string | null;
+  quick_win_type: string | null;
+  is_published: boolean;
+  day: string | null;
+};
+
 type Plan = {
   month: string;
   slots: Slot[];
   standards: Standard[];
+  hub?: HubItem[];
+  hubError?: string | null;
   error?: string | null;
 };
 
@@ -255,13 +272,27 @@ function HistoryStrip({ history }: { history?: History | null }) {
  * Counts, not percentages. At this volume a percentage of eleven is a number
  * that sounds more precise than it is.
  */
-function MixStrip({ items }: { items: QueueItem[] }) {
+function MixStrip({ items, hub, month }: { items: QueueItem[]; hub: HubItem[]; month: string }) {
+  // Scoped to the month on screen. The board returns every live queue item
+  // regardless of month, so counting it raw made August report "10 pieces in
+  // this month" when August has none. Found by pressing Previous.
+  const inMonth = (i: QueueItem) => {
+    const day = i.published_at ? i.published_at.slice(0, 7) : i.scheduled_for?.slice(0, 7);
+    return day === month;
+  };
+
   const live = items.filter((i) => i.status !== "cancelled");
-  if (live.length === 0) return null;
+  const dated = live.filter(inMonth);
+  // Undated work is real and belongs to no month, so it is counted separately
+  // rather than folded in or dropped. Dropping it silently is how a backlog
+  // stops being visible.
+  const undatedCount = live.filter((i) => !i.scheduled_for && !i.published_at).length;
+
+  if (dated.length === 0 && hub.length === 0 && undatedCount === 0) return null;
 
   const tally = (get: (i: QueueItem) => string | null) => {
     const m = new Map<string, number>();
-    for (const i of live) {
+    for (const i of dated) {
       const k = get(i);
       if (!k) continue;
       m.set(k, (m.get(k) ?? 0) + 1);
@@ -269,7 +300,11 @@ function MixStrip({ items }: { items: QueueItem[] }) {
     return [...m.entries()].sort((a, b) => b[1] - a[1]);
   };
 
+  // Hub counts as a channel. It is a different pipeline, not a different month,
+  // and leaving it out made September look like five pieces when it was
+  // thirty one.
   const byChannel = tally((i) => i.channel);
+  if (hub.length > 0) byChannel.unshift(["hub", hub.length]);
   const byAudience = tally((i) => i.audience_tag);
 
   const AUDIENCE: Record<string, string> = {
@@ -307,7 +342,8 @@ function MixStrip({ items }: { items: QueueItem[] }) {
       <Row label="Channel" pairs={byChannel} colour={(k) => chan(k).dot} />
       <Row label="Audience" pairs={byAudience} />
       <div style={{ fontSize: 12, color: "#7A8494" }}>
-        {live.length} {live.length === 1 ? "piece" : "pieces"} in this month, cancelled work excluded.
+        {dated.length + hub.length} {dated.length + hub.length === 1 ? "piece" : "pieces"} on this month, cancelled work excluded.
+        {undatedCount > 0 && ` ${undatedCount} more written and waiting for a day.`}
       </div>
     </div>
   );
@@ -441,6 +477,18 @@ export function ContentCalendarPage(_props: PluginWidgetProps) {
   const standards = plan?.standards ?? [];
   const slots = plan?.slots ?? [];
   const standardFor = (channel: string) => standards.find((s) => s.channel === channel) ?? null;
+
+  const hubItems = plan?.hub ?? [];
+  const hubByDay = useMemo(() => {
+    const map = new Map<string, HubItem[]>();
+    for (const h of hubItems) {
+      if (!h.day) continue;
+      const list = map.get(h.day) ?? [];
+      list.push(h);
+      map.set(h.day, list);
+    }
+    return map;
+  }, [hubItems]);
 
   const slotsByDay = useMemo(() => {
     const map = new Map<string, Slot[]>();
@@ -645,7 +693,7 @@ export function ContentCalendarPage(_props: PluginWidgetProps) {
         </div>
       )}
 
-      <MixStrip items={items} />
+      <MixStrip items={items} hub={hubItems} month={month} />
 
       <div style={{ border: "1px solid #D8DDE3", borderRadius: 6, overflow: "hidden", background: "#fff" }}>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", background: "#F4F6F8", borderBottom: "1px solid #D8DDE3" }}>
@@ -675,6 +723,23 @@ export function ContentCalendarPage(_props: PluginWidgetProps) {
                     </button>
                   );
                 })}
+
+                {c.iso && (hubByDay.get(c.iso) ?? []).map((h) => (
+                  <div key={h.id}
+                    title={h.category ?? undefined}
+                    style={{
+                      marginBottom: 4, borderRadius: 3, padding: "4px 6px",
+                      borderLeft: `3px solid ${chan("hub").dot}`,
+                      background: h.is_published ? "#F4F6F8" : "#EDF2F9",
+                      opacity: h.is_published ? 0.8 : 1,
+                      fontSize: 11, lineHeight: 1.25,
+                    }}>
+                    <div style={{ fontWeight: 600 }}>{h.title || "(untitled)"}</div>
+                    <div style={{ color: "#5A6472", fontSize: 10 }}>
+                      Hub · {h.is_published ? "live" : "not live yet"}
+                    </div>
+                  </div>
+                ))}
 
                 {c.iso && (slotsByDay.get(c.iso) ?? [])
                   .filter((s) => !s.filled_by)

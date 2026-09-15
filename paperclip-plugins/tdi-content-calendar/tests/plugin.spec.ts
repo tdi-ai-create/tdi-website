@@ -233,6 +233,37 @@ describe("the content calendar page", () => {
     expect(calls).toHaveLength(0);
   });
 
+  it("carries Hub Quick Wins through with the plan", async () => {
+    const hub = [
+      { id: "h1", slug: "a", title: "What Dyslexia Looks Like", category: "Instructional Strategies",
+        quick_win_type: "guide", is_published: false, day: "2026-09-23" },
+    ];
+    const { harness } = harnessWith((url) =>
+      url.includes("/plan")
+        ? { status: 200, body: { month: "2026-09", slots: [], standards: [], hub, hubError: null } }
+        : { status: 200, body: { items: [] } },
+    );
+    await plugin.definition.setup(harness.ctx);
+
+    const out = await harness.getData<{ hub: typeof hub }>("plan", { month: "2026-09" });
+    expect(out.hub).toEqual(hub);
+  });
+
+  it("still returns a month when the Hub half is missing", async () => {
+    const { harness } = harnessWith((url) =>
+      url.includes("/plan")
+        ? { status: 200, body: { month: "2026-09", slots: [{ id: "s1" }], standards: [] } }
+        : { status: 200, body: { items: [] } },
+    );
+    await plugin.definition.setup(harness.ctx);
+
+    // hub absent entirely must not blank the slots. The calendar showed a month
+    // before Hub content was on it and has to keep doing so.
+    const out = await harness.getData<{ slots: unknown[]; hub?: unknown[] }>("plan", { month: "2026-09" });
+    expect(out.slots).toHaveLength(1);
+    expect(out.hub ?? []).toEqual([]);
+  });
+
   it("will not let the calendar fill a slot, only plan one", async () => {
     const { harness, calls } = harnessWith(() => ({ status: 200, body: { success: true } }));
     await plugin.definition.setup(harness.ctx);
