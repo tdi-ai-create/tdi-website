@@ -237,7 +237,18 @@ const plugin = definePlugin({
             error: String(r.json?.error ?? `The queue refused it (HTTP ${r.status}).`),
           };
         }
-        return { month, slots: r.json.slots ?? [], standards: r.json.standards ?? [], error: null };
+        // Listed explicitly rather than spread, so a field the queue adds later
+        // is a deliberate change here rather than arriving by accident. The cost
+        // is that forgetting one drops it silently, which is exactly what
+        // happened to `hub` the first time this was written.
+        return {
+          month,
+          slots: r.json.slots ?? [],
+          standards: r.json.standards ?? [],
+          hub: r.json.hub ?? [],
+          hubError: r.json.hubError ?? null,
+          error: null,
+        };
       } catch (e) {
         return {
           month, slots: [], standards: [],
