@@ -10,6 +10,7 @@ import {
   type EmailType,
 } from '@/lib/funding-followup-email'
 import { postFundingEvent, nudgeSentEvent } from '@/lib/funding-slack'
+import { fundingClientSendBlockReason } from '@/lib/funding-client-send-pause'
 
 function db() {
   return createClient(
@@ -234,6 +235,20 @@ export async function POST(
     }
   }
 
+  // ── Pause gate. ──
+  //
+  // Reported through the same blocked/blockReasons channel as the window and
+  // allowlist gates, so the preview modal shows it without a UI change and the
+  // reviewer sees WHY before pressing anything. A button that silently does
+  // nothing gets pressed four more times.
+  //
+  // Recipient-based, not route-based: this route also carries the internal
+  // escalation to Rae, and that is not a client email. Pausing it too would
+  // mean nobody at TDI hears that a school has gone quiet, at exactly the
+  // moment nothing automated is contacting them either.
+  const pausedReason = fundingClientSendBlockReason(recipientEmail)
+  const pauseBlocked = pausedReason !== null
+
   // Allowlist gate
   let allowlistBlocked = false
   let allowlistReason = ''
@@ -253,15 +268,21 @@ export async function POST(
       html: email.html,
       tone: email.tone,
       emailType,
-      blocked: windowBlocked || allowlistBlocked,
+      blocked: pauseBlocked || windowBlocked || allowlistBlocked,
       blockReasons: [
+        ...(pauseBlocked ? [pausedReason as string] : []),
         ...(windowBlocked ? [windowReason] : []),
         ...(allowlistBlocked ? [allowlistReason] : []),
       ],
     })
   }
 
-  // For send: enforce gates
+  // For send: enforce gates. The pause is checked first because it is the one
+  // the reviewer most needs to understand, and because the others describe
+  // fixable data while this one describes a decision.
+  if (pauseBlocked) {
+    return NextResponse.json({ sent: false, blocked: true, paused: true, blockReason: pausedReason })
+  }
   if (windowBlocked) {
     return NextResponse.json({ sent: false, blocked: true, blockReason: windowReason })
   }

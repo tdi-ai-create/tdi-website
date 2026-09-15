@@ -1,4 +1,5 @@
 import { findInternalText } from '@/lib/funding-draft-warnings'
+import { fundingClientSendBlockReason } from '@/lib/funding-client-send-pause'
 
 /**
  * Email template + send logic for messages a PERSON chooses to send.
@@ -464,6 +465,16 @@ export function generateFollowUpEmail(params: FollowUpEmailParams): GeneratedEma
 // ── Send via Resend ──
 
 export async function sendFollowUpEmail(email: GeneratedEmail): Promise<{ ok: boolean; error?: string; id?: string | null }> {
+  // The pause lives here as well as in the route that calls this, on purpose.
+  //
+  // The route's copy exists so the preview modal can explain itself before
+  // anyone presses send. This copy exists so that the next caller of this
+  // function, written by someone who never read that route, is safe by
+  // default. Every leak this system has had came from a second code path that
+  // did not know about the first one's rule.
+  const pausedReason = fundingClientSendBlockReason(email.to)
+  if (pausedReason) return { ok: false, error: pausedReason }
+
   const resendKey = process.env.RESEND_API_KEY
   if (!resendKey) return { ok: false, error: 'RESEND_API_KEY not set' }
 
