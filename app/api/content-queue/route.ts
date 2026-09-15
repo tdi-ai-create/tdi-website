@@ -5,7 +5,7 @@ import { parseSlides, carouselProblems } from '@/lib/content-queue/carousel'
 import { summariseHistory } from '@/lib/content-queue/history'
 import {
   TRANSITIONS, OWNER_OF, actorHoldsRole, isSelfReview, legalFrom, canRequestChanges, canFlagBlocked,
-  isTransition, hasContent, canRecordBoardDecision,
+  isTransition, hasContent, canRecordBoardDecision, canSetDate,
   type Action, type Status,
 } from '@/lib/content-queue/workflow'
 
@@ -59,7 +59,7 @@ type Caller = 'agent' | 'calendar'
  * set a date in is a read-only picture of one. It still cannot place briefs,
  * pass gates or publish.
  */
-const CALENDAR_ACTIONS = ['approve', 'request_changes', 'schedule']
+const CALENDAR_ACTIONS = ['approve', 'request_changes', 'schedule', 'set_date']
 
 function authorize(request: NextRequest): Caller | null {
   const header = request.headers.get('authorization')
@@ -173,7 +173,7 @@ export async function POST(request: NextRequest) {
     const note = typeof body.note === 'string' ? body.note.trim() : ''
     const supabase = db()
 
-    const NON_TRANSITIONS = ['flag_blocked', 'record_board_decision']
+    const NON_TRANSITIONS = ['flag_blocked', 'record_board_decision', 'set_date']
     if (!action || (isTransition(action) ? !TRANSITIONS[action] : !NON_TRANSITIONS.includes(action))) {
       return NextResponse.json(
         { error: `Unknown action "${action}". Known: ${Object.keys(TRANSITIONS).join(', ')}, ${NON_TRANSITIONS.join(', ')}` },
@@ -239,6 +239,58 @@ export async function POST(request: NextRequest) {
     // A gate that cannot judge a piece parks it in place. Sending it back to the
     // writer asks for something the writer cannot produce, which is how the
     // 9 September loop happened.
+    // ── a date, without claiming anything was approved ───────────────────
+    if (action === 'set_date') {
+      const sid = body.id
+      if (!sid) return NextResponse.json({ error: 'id is required' }, { status: 400 })
+
+      const when = typeof body.scheduled_for === 'string' ? body.scheduled_for.trim() : ''
+      if (!when) return NextResponse.json({ error: 'scheduled_for is required, as YYYY-MM-DD' }, { status: 400 })
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(when)) {
+        return NextResponse.json({ error: `scheduled_for must look like YYYY-MM-DD. Got "${when}".` }, { status: 400 })
+      }
+      const parsed = new Date(`${when}T00:00:00Z`)
+      if (Number.isNaN(parsed.getTime()) || parsed.toISOString().slice(0, 10) !== when) {
+        return NextResponse.json({ error: `${when} is not a real date.` }, { status: 400 })
+      }
+
+      const { data: srow, error: sread } = await supabase
+        .from('content_queue_items')
+        .select('id, title, status, feedback_log')
+        .eq('id', sid)
+        .maybeSingle()
+      if (sread) return NextResponse.json({ error: sread.message }, { status: 500 })
+      if (!srow) return NextResponse.json({ error: 'No piece with that id' }, { status: 404 })
+
+      if (!canSetDate(srow.status as Status)) {
+        return NextResponse.json({
+          error: `"${srow.title}" is ${srow.status}. A date on it would be a record of what happened, not a plan.`,
+        }, { status: 409 })
+      }
+
+      if (dryRun) {
+        return NextResponse.json({ dryRun: true, would: 'set_date', id: sid, scheduled_for: when, status_unchanged: srow.status })
+      }
+
+      const sentry = {
+        at: new Date().toISOString(),
+        actor,
+        action: 'set_date',
+        scheduled_for: when,
+        note: note || null,
+      }
+      const { error: swrite } = await supabase
+        .from('content_queue_items')
+        .update({
+          scheduled_for: when,
+          feedback_log: [...((srow.feedback_log ?? []) as unknown[]), sentry],
+        })
+        .eq('id', sid)
+      if (swrite) return NextResponse.json({ error: swrite.message }, { status: 500 })
+
+      return NextResponse.json({ success: true, id: sid, scheduled_for: when, status: srow.status })
+    }
+
     if (action === 'flag_blocked') {
       const fid = body.id
       if (!fid) return NextResponse.json({ error: 'id is required' }, { status: 400 })
