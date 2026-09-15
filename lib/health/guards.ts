@@ -34,6 +34,7 @@ import { isPersonOwned, isSchoolOwned, isDecisionForRae } from '../funding-owner
 import { planAfterAnswer } from '../funding-answer-actions';
 import { canAgentDraft, stalledDraftMessage } from '../funding-offerable';
 import { hasFunderDecided, isLive, isOver, isWithFunder } from '../funding-status';
+import { objectsToAnApprovedClaim, retiredClaimsIn } from '../approved-claims';
 import { computeNextActions } from '../funding-next-actions';
 import { awardLabel, awardedSummary, awardedAmountOf, awardedTotal } from '../funding-award';
 import {
@@ -819,6 +820,69 @@ export const GUARDS: Guard[] = [
       },
     ],
   },
+  {
+    id: 'settled-claims-stay-settled',
+    protects: 'A grant being blocked on a claim TDI has already approved',
+    origin:
+      '14 September 2026: a complete Cox Charities application worth $2,500 to St. Peter Chanel was ' +
+      'failed twice by QA, both times on the 74% implementation figure. That number is TDI\'s own, ' +
+      'used across the team and on our own site. The rubric was missing that fact and the argument ' +
+      'cost sixteen days off a window closing 1 October.',
+    cases: [
+      {
+        name: "the real verdict that blocked Cox is caught",
+        holds: () =>
+          objectsToAnApprovedClaim(
+            'Fails at 15/20 with one blocking issue: two unsourced statistics (74% classroom ' +
+              'implementation rate, 10% average for one-time PD) with no citation, so they cannot be verified.',
+            null,
+          ).found.length > 0,
+      },
+      {
+        name: 'the second one is caught too',
+        holds: () =>
+          objectsToAnApprovedClaim(
+            'Fails at 14/20 with two blocking issues still open. The 74%% implementation-rate / 10%% ' +
+              'benchmark statistic still cannot be verified.',
+            null,
+          ).found.length > 0,
+      },
+      {
+        name: 'a claim cited in the issues rather than the summary is still caught',
+        holds: () =>
+          objectsToAnApprovedClaim('Fails on sourcing.', [{ note: 'the 74 percent figure is unverifiable' }])
+            .found.length > 0,
+      },
+      {
+        name: 'an unrelated objection is never suppressed',
+        holds: () =>
+          objectsToAnApprovedClaim(
+            'Fails: no school credentials block, no EIN on file, and the budget does not add up.',
+            null,
+          ).found.length === 0,
+      },
+      {
+        name: 'a different implementation rate can still be objected to',
+        holds: () =>
+          objectsToAnApprovedClaim('The 38% implementation rate quoted here is unsourced.', null).found
+            .length === 0,
+      },
+      {
+        name: 'the retired claim is still refused',
+        holds: () =>
+          retiredClaimsIn('the draft cites a 94% success rate').length > 0 &&
+          retiredClaimsIn('the draft cites a 74% success rate').length === 0,
+      },
+      {
+        name: 'empty text claims nothing',
+        holds: () =>
+          objectsToAnApprovedClaim('', null).found.length === 0 &&
+          objectsToAnApprovedClaim(null, null).found.length === 0 &&
+          retiredClaimsIn(null).length === 0,
+      },
+    ],
+  },
+
 ];
 
 export interface GuardResult {
