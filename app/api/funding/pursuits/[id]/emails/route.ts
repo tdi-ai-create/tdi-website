@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { requireAdminAuth } from '@/lib/tdi-admin/auth'
+import { fundingClientSendBlockReason } from '@/lib/funding-client-send-pause'
 
 function db() {
   return createClient(
@@ -92,6 +93,22 @@ export async function PATCH(
 
     if (!draft) return NextResponse.json({ error: 'Email not found' }, { status: 404 })
 
+    // ── Paused. This was the widest door in the system. ──
+    //
+    // The Emails tab renders a Send button on every row whose status is
+    // 'draft'. That set includes the drafts the hourly follow-up cron writes,
+    // which are addressed to a school and queued specifically so that Bella
+    // reviews them. Pressing Send here ran no allowlist, no internal-wording
+    // check and no client-label check, so the exact draft the Outreach Queue
+    // would have refused went out clean from the pursuit page.
+    //
+    // 423 rather than 400: the request is well formed and the caller did
+    // nothing wrong. The resource is locked, and it will unlock.
+    const pausedReason = fundingClientSendBlockReason(draft.to_email)
+    if (pausedReason) {
+      return NextResponse.json({ error: pausedReason, paused: true, sent: false }, { status: 423 })
+    }
+
     // Send via Resend
     const resendKey = process.env.RESEND_API_KEY
     if (!resendKey) return NextResponse.json({ error: 'Email service not configured' }, { status: 500 })
@@ -111,15 +128,21 @@ export async function PATCH(
       const result = await res.json()
 
       if (!res.ok) {
-        await supabase
+        const { error: failErr } = await supabase
           .from('funding_email_log')
           .update({ status: 'failed' })
           .eq('id', body.emailId)
+        if (failErr) console.error('[funding/emails] send failed and the draft could not be marked failed:', failErr.message)
         return NextResponse.json({ error: result.message || 'Send failed' }, { status: 500 })
       }
 
+      // Past this line the email has gone. Nothing below can be reported as a
+      // failed send, and nothing below may fail quietly either: a draft that
+      // still reads as a draft is the shape that gets sent twice.
+      const bookkeeping: string[] = []
+
       // Mark as sent
-      await supabase
+      const { error: sentErr } = await supabase
         .from('funding_email_log')
         .update({
           status: 'sent',
@@ -127,45 +150,56 @@ export async function PATCH(
           resend_id: result.id || null,
         })
         .eq('id', body.emailId)
+      if (sentErr) bookkeeping.push(`The email went to ${draft.to_email} but still reads as a draft: ${sentErr.message}. Do not resend.`)
 
       // Auto-create timeline event on the pursuit
-      await supabase.from('funding_pursuit_timeline').insert({
+      const { error: timelineErr } = await supabase.from('funding_pursuit_timeline').insert({
         pursuit_id: pursuitId,
         event_date: new Date().toISOString().split('T')[0],
         event_title: `Email sent: ${draft.subject}`,
         event_detail: `Sent to ${draft.to_name || draft.to_email}`,
         status: 'complete',
       })
+      if (timelineErr) bookkeeping.push(`The timeline does not show this email: ${timelineErr.message}.`)
 
       // If linked to an opportunity, update last_activity_at and nudge count on related actions
       if (draft.opportunity_id) {
-        await supabase
+        const { error: oppErr } = await supabase
           .from('funding_opportunities')
           .update({ last_activity_at: new Date().toISOString() })
           .eq('id', draft.opportunity_id)
+        if (oppErr) bookkeeping.push(`The grant's last activity date did not update: ${oppErr.message}.`)
 
         // Increment nudge count on pending client actions for this opportunity
         if (draft.email_type === 'nudge' || draft.email_type === 'deadline_reminder') {
-          const { data: actions } = await supabase
+          const { data: actions, error: readErr } = await supabase
             .from('funding_action_items')
             .select('id, nudge_count')
             .eq('opportunity_id', draft.opportunity_id)
             .eq('owner_type', 'client')
             .in('status', ['pending', 'in_progress'])
+          if (readErr) bookkeeping.push(`Could not read the tasks to stamp: ${readErr.message}. This chase is not counted against any of them.`)
 
           for (const action of (actions || [])) {
-            await supabase
+            const { error: countErr } = await supabase
               .from('funding_action_items')
               .update({
                 nudge_count: (action.nudge_count || 0) + 1,
                 last_nudge_sent_at: new Date().toISOString(),
               })
               .eq('id', action.id)
+            if (countErr) bookkeeping.push(`Task ${action.id} was not stamped: ${countErr.message}.`)
           }
         }
       }
 
-      return NextResponse.json({ success: true, resendId: result.id })
+      if (bookkeeping.length > 0) console.error('[funding/emails] sent but not fully recorded:', bookkeeping)
+
+      return NextResponse.json({
+        success: true,
+        resendId: result.id,
+        warnings: bookkeeping.length > 0 ? bookkeeping : undefined,
+      })
     } catch (e: unknown) {
       const message = e instanceof Error ? e.message : 'Unknown error'
       return NextResponse.json({ error: message }, { status: 500 })

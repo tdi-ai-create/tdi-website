@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js'
 import { requireAdminAuth } from '@/lib/tdi-admin/auth'
 import { isOnAllowlist, ALLOWLIST_ENABLED } from '@/lib/funding-followup-email'
 import { buildFundingEmailHtml } from '@/lib/funding-email-html'
+import { fundingClientSendBlockReason } from '@/lib/funding-client-send-pause'
 
 /**
  * POST /api/funding/send-email
@@ -21,6 +22,21 @@ export async function POST(request: NextRequest) {
 
   if (!to || !subject || !body) {
     return NextResponse.json({ error: 'Missing required fields: to, subject, body' }, { status: 400 })
+  }
+
+  // ── Paused. Compose still works; sending does not. ──
+  //
+  // This is Bella's compose box, and it is the closest call in the pause: she
+  // writes the words herself and the allowlist below already applies. It stops
+  // anyway because Rae drew the line at the approval button, not at whether a
+  // person typed the message. An intro email composed here never entered the
+  // queue and so was never reviewed by anyone but its author.
+  //
+  // The route's own Save Draft path is untouched, so the way through is to save
+  // and approve in the queue.
+  const pausedReason = fundingClientSendBlockReason(to)
+  if (pausedReason) {
+    return NextResponse.json({ error: pausedReason, paused: true, sent: false }, { status: 423 })
   }
 
   // Allowlist check
