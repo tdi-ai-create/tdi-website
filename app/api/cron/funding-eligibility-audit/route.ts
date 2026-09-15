@@ -4,6 +4,7 @@ import { guardCron } from '@/lib/cron-guard'
 import { isAgentWindowWork } from '@/lib/funding-window-work'
 import { isOver, isWithFunder } from '@/lib/funding-status'
 import { readTdiFacts, answeredCredential, missingCredentials } from '@/lib/funding/tdi-facts'
+import { readFunderViability, viabilityOf } from '@/lib/funding-funder-viability'
 import {
   screenPath,
   isPastDrafting,
@@ -119,7 +120,7 @@ export async function GET(request: NextRequest) {
       // open row would look like it had no closing date and the predicate
       // would widen to all of them. Same trap as research_status above, in the
       // opposite direction.
-      .select('id, name, pursuit_id, status, client_submitted, research_status, window_status, window_checked_at, application_closes, next_action, assigned_agent, eligibility_verdict, eligibility_overridden')
+      .select('id, name, pursuit_id, status, client_submitted, research_status, window_status, window_checked_at, application_closes, funder_id, next_action, assigned_agent, eligibility_verdict, eligibility_overridden')
 
     if (oErr) {
       console.error('[eligibility-audit] Could not read opportunities:', oErr)
@@ -143,6 +144,16 @@ export async function GET(request: NextRequest) {
       // matters because "we asked again" and "we could not tell whether we
       // already knew" look identical from the outside.
       console.error('[eligibility-audit] Could not read what we know about TDI:', tdiErr)
+    }
+
+    // The catalogue's viability findings, read once. A funder that is not
+    // running a cycle stops every school carrying it, which is the whole point
+    // of holding the answer on the funder rather than on each pursuit.
+    const { byFunderId: funderViability, error: viabErr } = await readFunderViability(supabase)
+    if (viabErr) {
+      // Not fatal, and not silent. With no findings the screen behaves as it
+      // did before, which is to judge each path on its own merits.
+      console.error('[eligibility-audit] Could not read funder viability:', viabErr)
     }
 
     const statesWeWorkIn = [
@@ -186,6 +197,12 @@ export async function GET(request: NextRequest) {
           windowStatus: opp.window_status ?? null,
           namedApplicant: (profile.nea_member_name as string) ?? null,
           alreadySubmitted: isPastDrafting(opp.status, opp.client_submitted),
+          // One decision, every school. Null for the opportunities with no
+          // catalogue link, which behave exactly as they did before.
+          funderNotContinuing: (() => {
+            const v = viabilityOf(opp.funder_id ? funderViability.get(opp.funder_id) : null)
+            return v.stop && v.reason ? { reason: v.reason } : null
+          })(),
         },
         {
           sector: school.sector ?? null,
