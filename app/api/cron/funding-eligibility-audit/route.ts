@@ -4,6 +4,7 @@ import { guardCron } from '@/lib/cron-guard'
 import { isAgentWindowWork } from '@/lib/funding-window-work'
 import { isOver, isWithFunder } from '@/lib/funding-status'
 import { readTdiFacts, answeredCredential, missingCredentials } from '@/lib/funding/tdi-facts'
+import { buildDecisionBrief, renderDecisionBrief } from '@/lib/funding-decision-brief'
 import {
   screenPath,
   isPastDrafting,
@@ -294,6 +295,9 @@ export async function GET(request: NextRequest) {
             // Named in the dry run, because who it lands on is the thing that
             // changed and a preview that hides it is not a preview.
             owner: ownerOfBlockedPath(Boolean(agentFinding)).ownerName,
+            // Surfaced in the preview, because a recommendation nobody can see
+            // before it ships is not reviewable.
+            recommendation: agentFinding ? buildDecisionBrief(opp).recommendation : null,
           }
 
           if (dryRun) {
@@ -308,10 +312,17 @@ export async function GET(request: NextRequest) {
             // yet tried still goes to Bella, because chasing a school is hers.
             const owner = ownerOfBlockedPath(Boolean(agentFinding))
             const itemTitle = agentFinding ? deadEndTitle(opp.name ?? 'This grant') : title
+            // The three facts the choice turns on, printed rather than left to
+            // be researched. Two of these items sat untouched on Saunemin
+            // because answering either one meant going and finding this out
+            // first.
+            const brief = agentFinding ? buildDecisionBrief(opp) : null
+
             const closing = agentFinding
               ? `\n\nResearch is exhausted on this one. The choice is to act on what she suggests, ` +
                 `drop the path, or pursue it anyway knowing the window is unconfirmed. ` +
-                `Nothing will be drafted for "${opp.name}" until that is decided.`
+                `Nothing will be drafted for "${opp.name}" until that is decided.` +
+                (brief ? `\n\n${renderDecisionBrief(brief)}` : '')
               : `\n\nNothing will be drafted for "${opp.name}" until this is answered.`
 
             const { error: qErr } = await supabase.from('funding_action_items').insert({
