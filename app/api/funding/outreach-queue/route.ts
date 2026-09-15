@@ -8,6 +8,7 @@ import { NEUTRAL_TASK_LABEL } from '@/lib/funding-followup-email'
 import { matchActionItem, usesPlaceholder, type LabelCandidate } from '@/lib/funding-client-label'
 import { createSendFollowUps, type FollowUpResult } from '@/lib/funding-followups'
 import { isCloseDateRequiredToSend } from '@/lib/funding-qa'
+import { otherOpenDraftFor, claimDraftForSending, releaseClaim } from '@/lib/funding-send-once'
 
 /**
  * Funding outreach approval queue.
@@ -433,6 +434,30 @@ export async function POST(request: NextRequest) {
     )
   }
 
+  // One person receives one email. The follow-up cron enforces this when it
+  // drafts; nothing enforced it when we send. So a reviewer working the queue
+  // top to bottom could send two people's worth of questions to one person in
+  // two messages, which is the outcome the drafting rule exists to prevent.
+  const { draft: waiting, error: waitingErr } = await otherOpenDraftFor(supabase, to, id)
+  if (waitingErr) {
+    // A failed read is not proof there is nothing waiting.
+    return NextResponse.json(
+      { error: `Could not check whether ${to} already has an email waiting: ${waitingErr}` },
+      { status: 500 }
+    )
+  }
+  if (waiting) {
+    return NextResponse.json(
+      {
+        error:
+          `${to} already has another email waiting: "${waiting.subject ?? 'untitled'}". ` +
+          `One person receives one email. Merge this ask into that draft and send once.`,
+        otherWaitingDraftId: waiting.id,
+      },
+      { status: 409 }
+    )
+  }
+
   if (dryRun) {
     return NextResponse.json({
       ok: true,
@@ -446,12 +471,32 @@ export async function POST(request: NextRequest) {
       closeDateGap,
       wouldBlockOnCloseDate: Boolean(closeDateGap) && isCloseDateRequiredToSend(),
       closeDateEnforcementOn: isCloseDateRequiredToSend(),
+      // Null by the time we get here: a waiting draft returns 409 above.
+      otherWaitingDraft: null,
     })
   }
 
   const resendKey = process.env.RESEND_API_KEY
   if (!resendKey) {
     return NextResponse.json({ error: 'Email service not configured (RESEND_API_KEY missing)' }, { status: 500 })
+  }
+
+  // Claimed before Resend is called, not after. Two requests arriving together
+  // both used to read status 'draft', both send, and both write 'sent' over
+  // each other. That is how one superintendent received the same question
+  // twice, ten seconds apart, on 8 September.
+  const claim = await claimDraftForSending(supabase, id, actor)
+  if (!claim.claimed) {
+    if (claim.reason === 'already_taken') {
+      return NextResponse.json(
+        { error: 'This draft is already being sent or has been sent. Nothing was sent again.', sent: false },
+        { status: 409 }
+      )
+    }
+    return NextResponse.json(
+      { error: `Could not claim this draft for sending: ${claim.message}`, sent: false },
+      { status: 500 }
+    )
   }
 
   let resendId: string | null = null
@@ -472,6 +517,9 @@ export async function POST(request: NextRequest) {
     })
     const resData = await res.json().catch(() => ({}))
     if (!res.ok) {
+      // The row is claimed. Leaving it claimed would record a send that never
+      // happened, so hand it back before returning.
+      await releaseClaim(supabase, id, JSON.stringify(resData).slice(0, 300))
       return NextResponse.json(
         { error: `Send failed: ${JSON.stringify(resData)}`, sent: false },
         { status: 502 }
@@ -480,19 +528,19 @@ export async function POST(request: NextRequest) {
     resendId = resData?.id ?? null
   } catch (e: unknown) {
     const message = e instanceof Error ? e.message : 'Send failed'
+    await releaseClaim(supabase, id, message)
     return NextResponse.json({ error: message, sent: false }, { status: 502 })
   }
 
-  // Only mark sent once Resend has accepted it, so a failed send never looks
-  // like a delivered one.
+  // The claim already wrote status, sent_at and sent_by. This records what was
+  // actually sent plus the Resend id, which is also what closes the
+  // claimed-but-unconfirmed signature: status 'sent' with resend_id null means
+  // a claim that never got here.
   const { error: updErr } = await supabase
     .from('funding_email_log')
     .update({
-      status: 'sent',
       subject: finalSubject,
       body: finalBody,
-      sent_at: new Date().toISOString(),
-      sent_by: actor,
       resend_id: resendId,
     })
     .eq('id', id)

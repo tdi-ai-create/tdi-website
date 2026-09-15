@@ -4,6 +4,7 @@ import { requireAdminAuth } from '@/lib/tdi-admin/auth'
 import { isOnAllowlist, ALLOWLIST_ENABLED } from '@/lib/funding-followup-email'
 import { buildFundingEmailHtml } from '@/lib/funding-email-html'
 import { fundingClientSendBlockReason } from '@/lib/funding-client-send-pause'
+import { otherOpenDraftFor } from '@/lib/funding-send-once'
 
 /**
  * POST /api/funding/send-email
@@ -24,6 +25,15 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Missing required fields: to, subject, body' }, { status: 400 })
   }
 
+  // One client for the whole handler. It used to be built after the send,
+  // inside the pursuitId branch, which meant nothing before the send could
+  // read the database.
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    { auth: { autoRefreshToken: false, persistSession: false } }
+  )
+
   // ── Paused. Compose still works; sending does not. ──
   //
   // This is Bella's compose box, and it is the closest call in the pause: she
@@ -37,6 +47,30 @@ export async function POST(request: NextRequest) {
   const pausedReason = fundingClientSendBlockReason(to)
   if (pausedReason) {
     return NextResponse.json({ error: pausedReason, paused: true, sent: false }, { status: 423 })
+  }
+
+  // One person receives one email. This path is behind the pause above, so the
+  // check cannot fire today. It is here so that lifting the pause does not
+  // also reopen the gap: this is the route that sent two package emails to one
+  // superintendent a minute apart on 8 September.
+  const { draft: waiting, error: waitingErr } = await otherOpenDraftFor(supabase, to)
+  if (waitingErr) {
+    return NextResponse.json(
+      { error: `Could not check whether ${to} already has an email waiting: ${waitingErr}`, sent: false },
+      { status: 500 }
+    )
+  }
+  if (waiting) {
+    return NextResponse.json(
+      {
+        error:
+          `${to} already has an email waiting: "${waiting.subject ?? 'untitled'}". ` +
+          `One person receives one email. Add this to that draft and send once.`,
+        otherWaitingDraftId: waiting.id,
+        sent: false,
+      },
+      { status: 409 }
+    )
   }
 
   // Allowlist check
@@ -80,11 +114,6 @@ export async function POST(request: NextRequest) {
 
     // Mark intro_sent_at + log to email timeline
     if (pursuitId) {
-      const supabase = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.SUPABASE_SERVICE_ROLE_KEY!,
-        { auth: { autoRefreshToken: false, persistSession: false } }
-      )
       // The email is already out by this point, so a failure here cannot undo
       // it. Report it instead of swallowing it: a send that never reaches the
       // timeline reads as "we never contacted them" and gets sent twice.
