@@ -51,7 +51,7 @@ export type NarrativeState =
  * Who owes the next move. `null` means nothing is owed, not that nobody owns
  * it: a finished narrative is nobody's problem, an unclaimed one is.
  */
-export type Owner = 'writer' | 'qa' | 'bella' | 'team' | 'school' | null;
+export type Owner = 'writer' | 'qa' | 'tdi_admin' | 'team' | 'school' | null;
 
 export interface StateRule {
   state: NarrativeState;
@@ -134,15 +134,15 @@ export const STATE_RULES: Record<NarrativeState, StateRule> = {
   },
   approval: {
     state: 'approval',
-    owner: 'bella',
-    meaning: 'Passed QA. Bella decides whether it is true about the school and sounds like us.',
+    owner: 'tdi_admin',
+    meaning: 'Passed QA. TDI admin decides whether it is true about the school and sounds like us.',
     observed: false,
     expiresHours: BELLA_SILENCE_HOURS,
   },
   escalated: {
     state: 'escalated',
-    owner: 'bella',
-    meaning: 'QA ran out of attempts. Bella picks from concrete options.',
+    owner: 'tdi_admin',
+    meaning: 'QA ran out of attempts. TDI admin picks from concrete options.',
     observed: true,
     expiresHours: BELLA_SILENCE_HOURS,
   },
@@ -174,8 +174,8 @@ export const TRANSITION_OWNER: Record<string, Owner> = {
   // QA posted as chatter and was filtered out at any verbosity above verbose.
   // Owner is null on purpose: it is Julie's next, and Julie is not chased.
   'requested→qa_review': null,
-  'qa_review→approval': 'bella',
-  'qa_review→escalated': 'bella',
+  'qa_review→approval': 'tdi_admin',
+  'qa_review→escalated': 'tdi_admin',
   'qa_review→ready': null,
 
   // The move Bella herself makes, missing until 15 September.

@@ -66,9 +66,11 @@ export function WaitingOnBadge({
   const move = rule ? NEXT_MOVE[rule.state] : null
   const owner: Owner | null = rule ? rule.owner : null
 
-  // Highlight when the move is actually Bella's, so hers stand out from the
-  // ones she is only watching.
-  const isYours = owner === 'bella'
+  // Highlight when the move is actually ours, so the ones needing a person
+  // stand out from the ones we are only watching. The owner used to read
+  // 'bella'; it is a role now, not a person, so this badge does not change
+  // what it highlights, only what the value is called.
+  const isYours = owner === 'tdi_admin'
   const bg = isYours ? '#FEF3C7' : c.bg
   const text = isYours ? '#92400E' : c.text
 

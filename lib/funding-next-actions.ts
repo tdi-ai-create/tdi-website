@@ -270,13 +270,12 @@ export function computeNextActions(
 
     const daysUntil = Math.floor((due.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
     const isClientOwned = isSchoolOwned(a)
-    const isRaeOwned = a.owner_email === 'rae@teachersdeserveit.com'
 
     result.push({
       id: `upcoming-${a.id}`,
       label: a.client_label || a.title,
       why: a.description || `Due in ${daysUntil} day${daysUntil !== 1 ? 's' : ''}`,
-      owner: isClientOwned ? 'school' : isRaeOwned ? 'team' : 'team',
+      owner: isClientOwned ? 'school' : 'team',
       urgency: daysUntil <= 3 ? 'high' : 'normal',
       dueDate: a.due_date,
       actionType: 'complete_action',
@@ -290,13 +289,12 @@ export function computeNextActions(
   for (const a of pendingActions) {
     if (a.due_date) continue // already handled above
     const isClientOwned = isSchoolOwned(a)
-    const isRaeOwned = a.owner_email === 'rae@teachersdeserveit.com'
 
     result.push({
       id: `action-${a.id}`,
       label: a.client_label || a.title,
       why: a.description || 'No due date set',
-      owner: isClientOwned ? 'school' : isRaeOwned ? 'team' : 'team',
+      owner: isClientOwned ? 'school' : 'team',
       urgency: 'low',
       actionType: 'complete_action',
       targetId: a.id,
