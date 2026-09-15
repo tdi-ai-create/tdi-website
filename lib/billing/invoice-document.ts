@@ -133,12 +133,16 @@ export async function loadInvoiceDocument(
   }));
 
   // An invoice with no line items still has to produce a document, because the
-  // client is holding one with that number on it. The label stays generic on
-  // purpose: `notes` is an internal ledger field on some rows and must never
-  // reach a client-facing page. See the comment in invoice-pdf.tsx.
+  // client is holding one with that number on it. Not every invoice has a
+  // contract behind it: contract_deliverables requires a quote and a package, and
+  // a speaking fee has neither, so those invoices legitimately have no lines.
+  //
+  // `line_description` is the one client-facing free text field on the invoice,
+  // added for exactly this. It is NOT `notes`, which is internal and must never
+  // reach a page a client reads. See the comment in invoice-pdf.tsx.
   if (docLines.length === 0) {
     docLines.push({
-      label: 'Services rendered',
+      label: invoice.line_description?.trim() || 'Services rendered',
       serviceType: null,
       quantity: 1,
       unitPrice: Number(invoice.amount ?? 0),
@@ -165,7 +169,12 @@ export async function loadInvoiceDocument(
 
     clientName: partnership?.org_name?.trim() || district?.name || 'Unknown client',
     billToName: contact.name,
-    billToEmail: contact.email,
+    // The billing contact is resolved through the partnership, and an invoice
+    // with no contract has no partnership to resolve it from. `sent_to` records
+    // where the invoice actually went, which for those is the only address there
+    // is, and an invoice addressed to nobody is worse than one addressed from
+    // the send record.
+    billToEmail: contact.email ?? invoice.sent_to ?? null,
 
     lines: docLines,
     amount,
