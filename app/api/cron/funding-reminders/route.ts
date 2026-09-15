@@ -6,6 +6,7 @@ import { loadSettings } from '@/lib/funding-slack'
 import { shouldPostDigest, recordDigestPost, recordDigestSuppressed, heartbeatNote } from '@/lib/digest-state'
 import { guardCron } from '@/lib/cron-guard'
 import { NOT_TERMINAL_FILTER } from '@/lib/funding/task-status'
+import { otherOpenDraftFor } from '@/lib/funding-send-once'
 import { isOver as isOverStatus } from '@/lib/funding-status'
 
 /**
@@ -108,6 +109,10 @@ export async function GET(request: NextRequest) {
     // Auto-draft nudge emails for critical deadline alerts
     let draftCount = 0
     const draftFailures: string[] = []
+    // Nudges withheld because the recipient already had an email waiting.
+    // Reported rather than dropped: a cron that silently declines to write is
+    // indistinguishable from one that had nothing to do.
+    const heldForOneEmail: { path: string; recipient: string; joins: string }[] = []
     for (const alert of critical) {
       if (alert.category !== 'deadline' || !alert.opportunity_id) continue
 
@@ -148,6 +153,33 @@ export async function GET(request: NextRequest) {
         .limit(1)
 
       if (recentlySent && recentlySent.length > 0) continue
+
+      // One person receives one email, and until now this cron did not ask.
+      // Both checks above are keyed on opportunity_id, so a contact with three
+      // grants approaching their deadlines got three separate drafts. Each was
+      // individually correct and the three together broke the rule.
+      //
+      // The follow-up cron rebuilds one consolidated draft per recipient from
+      // their open items, so when a draft is already waiting for this person
+      // the right move is to leave it alone: it either already covers them or
+      // that cron will fold this in. Skipping is reported, not silent.
+      const { draft: alreadyWaiting, error: waitingErr } = await otherOpenDraftFor(
+        supabase,
+        pursuit.client_contact_email,
+      )
+      if (waitingErr) {
+        console.error('[funding-reminders] Could not check for a waiting draft:', waitingErr)
+        draftFailures.push(`${alert.opportunity_name}: could not check for a waiting draft: ${waitingErr}`)
+        continue
+      }
+      if (alreadyWaiting) {
+        heldForOneEmail.push({
+          path: alert.opportunity_name ?? alert.opportunity_id,
+          recipient: pursuit.client_contact_email,
+          joins: alreadyWaiting.subject ?? alreadyWaiting.id,
+        })
+        continue
+      }
 
       // Auto-draft a nudge. status 'draft', never sent by this cron.
       const { error: draftErr } = dryRun
@@ -617,6 +649,8 @@ export async function GET(request: NextRequest) {
         : undefined,
       drafts_failed: draftFailures.length,
       draft_failures: draftFailures,
+      drafts_held_for_one_email: heldForOneEmail.length,
+      held_for_one_email: heldForOneEmail,
       discovery_requested: discoveryCreated,
       discovery_briefs: discoveryBriefs,
       discovery_failed: discoveryFailures.length,
