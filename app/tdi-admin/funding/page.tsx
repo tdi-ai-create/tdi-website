@@ -838,10 +838,20 @@ function GrantRow({ grant, school, onDraftEmail, onToast, onRefresh }: {
                   View Doc
                 </a>
               )}
-              <button onClick={handleSendToClient}
-                style={{ fontSize: 12, fontWeight: 700, padding: '6px 14px', borderRadius: 8, border: 'none', background: '#3B82F6', color: 'white', cursor: 'pointer' }}>
-                Send to {school.contact.split(' ')[0]}
-              </button>
+              {/* This was a Send button, and it could not send.
+                  It opened the compose modal, which posts to
+                  /api/funding/send-email, which has refused every client
+                  address since PR #500. So the most prominent control on an
+                  approved grant led to the words "Sending paused" and no way
+                  forward, which is the same dead end as having no button, with
+                  a click in the middle of it.
+
+                  Approving now queues the drafted email in the Outreach Queue
+                  at the top of this page, which is the one door a funding email
+                  may leave by. This says so rather than pretending otherwise. */}
+              <span style={{ fontSize: 11, fontWeight: 600, color: '#8a5500' }}>
+                In the Outreach Queue to send
+              </span>
             </>
           )}
 

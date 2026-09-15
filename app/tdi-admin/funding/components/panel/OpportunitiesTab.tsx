@@ -818,6 +818,42 @@ function NarrativeControl({ opp, gateOpen, onRequestDraft, onApprove, onSendBack
           Narrative
         </span>
 
+        {/* ── ready: approved, and what happens to it now ──
+            Outside the windowOpen test on purpose. Everything this control
+            offered for an approved grant sat behind an open window, so a
+            narrative approved against a window nobody had verified rendered an
+            empty row: the state with the most valuable pending work in the
+            system displayed nothing at all.
+
+            No Send button here, deliberately. Since PR #500 an email reaches a
+            school only by a person approving it in the Outreach Queue, and a
+            second door on this panel would be the hole that audit closed. What
+            approving does now is put the drafted email in that queue, so this
+            says where it went. */}
+        {ns === 'ready' && (
+          <>
+            <span style={{ fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 4, background: '#D1FAE5', color: '#065F46' }}>
+              Approved
+            </span>
+            {opp.forwarding_email_status === 'sent' ? (
+              <span style={{ fontSize: 10, color: '#6B7280' }}>Sent to the school</span>
+            ) : (
+              <>
+                <span style={{ fontSize: 10, color: '#92400E', fontWeight: 600 }}>
+                  Not with the school yet
+                </span>
+                <a
+                  href="/tdi-admin/funding"
+                  onClick={e => e.stopPropagation()}
+                  style={{ fontSize: 10, fontWeight: 600, padding: '3px 10px', borderRadius: 4, background: '#1e2749', color: 'white', textDecoration: 'none' }}
+                >
+                  Send it from the Outreach Queue
+                </a>
+              </>
+            )}
+          </>
+        )}
+
         {/* ── not_started / ready: request draft ── */}
         {(ns === 'not_started' || ns === 'ready') && windowOpen && (
           <>
@@ -831,7 +867,6 @@ function NarrativeControl({ opp, gateOpen, onRequestDraft, onApprove, onSendBack
             <button onClick={() => onRequestDraft(agentPick)} style={{ fontSize: 10, fontWeight: 600, padding: '3px 10px', borderRadius: 4, border: 'none', background: '#8B5CF6', color: 'white', cursor: 'pointer' }}>
               {ns === 'ready' ? 'Request new draft' : 'Request draft'}
             </button>
-            {ns === 'ready' && <span style={{ fontSize: 10, fontWeight: 600, color: '#10B981' }}>Approved</span>}
           </>
         )}
         {(ns === 'not_started') && !windowOpen && (

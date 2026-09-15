@@ -231,14 +231,13 @@ export async function GET(request: NextRequest) {
         // Gate and archive are already applied above, and re-running them here
         // is free and keeps this honest if that changes.
         const verdict = canAgentDraft(o, p, { gate_open: true })
-        const result = verdict.offerable
-          ? ({ verdict: 'clear', reason: '', rule: 'offerable' } as const)
-          : ({ verdict: 'blocked', reason: verdict.reason, rule: verdict.blockedBy ?? 'blocked' } as const)
 
-        if (result.verdict === 'clear') {
+        if (verdict.offerable) {
           cleared.push(o)
           continue
         }
+
+        const result = { reason: verdict.reason, rule: verdict.blockedBy ?? 'blocked' }
 
         // Recorded, not just withheld. A path that silently fails to reach an
         // agent is the same failure as a path that silently stalls: the portal
@@ -246,15 +245,37 @@ export async function GET(request: NextRequest) {
         blockedByScreen.push({
           id: o.id, name: o.name, reason: result.reason, rule: result.rule,
         })
-        // Best effort: the verdict is already being returned to the caller in
-        // blockedByScreen, so a failure here loses a cached value, not a decision.
-        const { error: verdictErr } = await supabase.from('funding_opportunities').update({
-          eligibility_verdict: result.verdict,
-          eligibility_reason: result.reason,
-          eligibility_rule: result.rule,
-          eligibility_checked_at: new Date().toISOString(),
-        }).eq('id', o.id)
-        if (verdictErr) console.error('[sync] Could not cache eligibility verdict:', verdictErr)
+        // Only the eligibility screen writes to the eligibility columns.
+        //
+        // This used to stamp `eligibility_verdict: 'blocked'` for every refusal,
+        // including a shut gate and an unverified window, which are facts about
+        // today rather than about the school. Three consequences, all live until
+        // 15 September:
+        //
+        //   'blocked' is not one of the three verdicts anything reads. The daily
+        //   digest looks for 'stop' and 'ask_first', so a path wearing it fell
+        //   out of the one report that exists to catch a wrong rule.
+        //
+        //   It overwrote real verdicts. Saunemin's NEA path was stamped
+        //   'blocked' with rule 'screen', which is the screen having genuinely
+        //   refused it, with the answer to which way thrown away.
+        //
+        //   A gate that opens tomorrow left a permanent eligibility verdict
+        //   behind it.
+        //
+        // So: when the screen is what refused this, record the screen's own
+        // verdict. When anything else refused it, record nothing here. The
+        // reason still reaches the caller in blockedByScreen either way, which
+        // is what "recorded, not just withheld" was actually asking for.
+        if (verdict.blockedBy === 'screen' && verdict.screen) {
+          const { error: verdictErr } = await supabase.from('funding_opportunities').update({
+            eligibility_verdict: verdict.screen.verdict,
+            eligibility_reason: verdict.screen.reason,
+            eligibility_rule: verdict.screen.rule,
+            eligibility_checked_at: new Date().toISOString(),
+          }).eq('id', o.id)
+          if (verdictErr) console.error('[sync] Could not cache eligibility verdict:', verdictErr)
+        }
       }
       narrativeWork = cleared
     }

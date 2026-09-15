@@ -94,6 +94,21 @@ export const QA_SILENCE_HOURS = 24;
  */
 export const BELLA_SILENCE_HOURS = 48;
 
+/**
+ * How long an approved application may sit before anyone has sent it.
+ *
+ * `ready` carried `expiresHours: null` until 15 September, alone among the
+ * waiting states, and the comment below it already said somebody has to
+ * actually submit it. Nothing measured how long that somebody took.
+ *
+ * It is the most expensive state to leave unmeasured. The work is finished and
+ * paid for, the school is expecting it, and a grant that never leaves the
+ * portal is indistinguishable from one that was never written. Two days, the
+ * same allowance as an approval, because it is the same person on the same
+ * part-time week.
+ */
+export const SEND_SILENCE_HOURS = 48;
+
 /** The table. One row per state, and no state may be absent from it. */
 export const STATE_RULES: Record<NarrativeState, StateRule> = {
   not_started: {
@@ -136,7 +151,7 @@ export const STATE_RULES: Record<NarrativeState, StateRule> = {
     owner: 'team',
     meaning: 'Approved. Somebody has to actually submit it.',
     observed: true,
-    expiresHours: null,
+    expiresHours: SEND_SILENCE_HOURS,
   },
 };
 
@@ -162,6 +177,19 @@ export const TRANSITION_OWNER: Record<string, Owner> = {
   'qa_review→approval': 'bella',
   'qa_review→escalated': 'bella',
   'qa_review→ready': null,
+
+  // The move Bella herself makes, missing until 15 September.
+  //
+  // `qa_review→ready` was here and the transition a person actually performs
+  // was not, so pressing Approve posted as chatter: level 'verbose', no
+  // at-mention, filtered out entirely at any verbosity above it. The one
+  // transition in the whole table that a human performs was the one the table
+  // did not describe.
+  //
+  // Owned by Bella rather than null, because approving does not finish a
+  // grant. It hands her the send, and until the school has it the work has
+  // bought nothing.
+  'approval→ready': 'bella',
 };
 
 /**

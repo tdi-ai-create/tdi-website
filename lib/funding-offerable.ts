@@ -27,7 +27,7 @@
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { isWindowOpen } from './funding-rules';
-import { screenPath, isPastDrafting } from './funding-eligibility';
+import { screenPath, isPastDrafting, type EligibilityResult } from './funding-eligibility';
 import { isOver, isWithFunder } from './funding-status';
 
 /** A grant in one of these is finished, whatever the narrative field says. */
@@ -46,6 +46,19 @@ export interface OfferVerdict {
    * blocked" with no reason is what sends someone to chase the wrong party.
    */
   reason: string;
+  /**
+   * The eligibility screen's own verdict, present only when it is what refused
+   * this path.
+   *
+   * Callers that persist a refusal need to know which of the two questions was
+   * answered. "No agent can pick this up right now" is true of a shut gate and
+   * an unverified window, and says nothing at all about whether the school
+   * could win the grant. The sync route used to flatten all five blockers into
+   * a single verdict of 'blocked' written onto eligibility_verdict, which is a
+   * value no screen, digest or query recognises, and it overwrote whatever the
+   * screen had genuinely decided.
+   */
+  screen?: EligibilityResult;
 }
 
 const OFFERABLE: OfferVerdict = { offerable: true, blockedBy: null, reason: '' };
@@ -109,6 +122,7 @@ export function canAgentDraft(opp: any, pursuit: any, gate: any): OfferVerdict {
       offerable: false,
       blockedBy: 'screen',
       reason: screen.reason || 'the eligibility screen refuses this path',
+      screen,
     };
   }
 

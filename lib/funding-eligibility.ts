@@ -270,3 +270,59 @@ export function ownerOfBlockedPath(agentAlreadyLooked: boolean): {
 export function deadEndTitle(grantName: string): string {
   return `${grantName}: decide whether to keep pursuing it`
 }
+
+/**
+ * Does the eligibility screen currently refuse this path.
+ *
+ * One definition, because four places were each writing their own copy of the
+ * same three-clause expression:
+ *
+ *   OpportunitiesTab      verdict && verdict !== 'clear' && overridden !== true
+ *   workbench/parts       verdict && verdict !== 'clear' && overridden !== true
+ *   funding-reminders     .in(['stop','ask_first']) .eq(overridden, false)
+ *   funding-next-actions  nothing at all
+ *
+ * The last one is the bug. The draft rule checked the gate, the window and the
+ * narrative state and never asked whether the school could win the thing, so a
+ * path the screen had already refused still produced "Request draft" the moment
+ * its window was verified open. St. Peter Chanel's Community Schools Budget sat
+ * in exactly that position on 15 September: verdict 'stop', rule 'sector', a
+ * private school against a federal path, with an agent assigned to go and open
+ * its window.
+ *
+ * The digest's version is the reason this takes an opportunity row rather than
+ * a verdict string. It enumerated the two verdicts it knew about, so the fourth
+ * value the sync route used to write slipped past it. Anything that is not
+ * 'clear' blocks, whatever it is called.
+ */
+export function isEligibilityBlocked(opp: {
+  eligibility_verdict?: string | null
+  eligibility_overridden?: boolean | null
+}): boolean {
+  if (opp?.eligibility_overridden === true) return false
+  const verdict = opp?.eligibility_verdict
+  return !!verdict && verdict !== 'clear'
+}
+
+/**
+ * Has the screen ruled that this school cannot win this path, full stop.
+ *
+ * Narrower than isEligibilityBlocked on purpose, and the difference matters.
+ *
+ * 'ask_first' usually means the window is unestablished: five of the six
+ * blocked paths live on 15 September carry rule 'window'. Research is exactly
+ * what unblocks those, so suppressing the agent's window work on an 'ask_first'
+ * path would wall it in permanently, which is a worse bug than the one being
+ * fixed.
+ *
+ * 'stop' is a fact about the school rather than about our knowledge. St. Peter
+ * Chanel is a private school and the Community Schools Budget is federal; no
+ * amount of window research changes that. Work assigned against a 'stop' is
+ * spend with no reachable outcome.
+ */
+export function isEligibilityRefused(opp: {
+  eligibility_verdict?: string | null
+  eligibility_overridden?: boolean | null
+}): boolean {
+  return opp?.eligibility_overridden !== true && opp?.eligibility_verdict === 'stop'
+}
