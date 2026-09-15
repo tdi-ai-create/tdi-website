@@ -2,6 +2,7 @@ import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAdminAuth } from '@/lib/tdi-admin/auth'
 import { FUNDING_EMAIL_TEMPLATES, renderTemplate } from '@/lib/funding-email-templates'
+import { fundingClientSendBlockReason } from '@/lib/funding-client-send-pause'
 
 /**
  * One-click nudge: auto-drafts and sends a nudge email for a client action item.
@@ -80,6 +81,28 @@ export async function POST(request: NextRequest) {
 
     if (insertErr) return NextResponse.json({ error: insertErr.message }, { status: 500 })
 
+    // ── Paused. The draft above is kept; the send below does not happen. ──
+    //
+    // This route had no allowlist, no preview, no window gate and no nudge
+    // ceiling, and it sent as Rae personally rather than as Bella. It is also
+    // orphaned: its only caller, MyTasks.tsx, is imported by nothing, so this
+    // is a live unguarded door with no button attached to it.
+    //
+    // The draft insert above is left running on purpose. A paused send that
+    // also threw away the email would lose the work; this way the message is
+    // sitting in the Outreach Queue for Bella when whoever called this goes
+    // looking for it.
+    const pausedReason = fundingClientSendBlockReason(pursuit.client_contact_email)
+    if (pausedReason) {
+      return NextResponse.json({
+        success: true,
+        sent: false,
+        paused: true,
+        emailId: emailRecord.id,
+        message: pausedReason,
+      })
+    }
+
     // Send if requested
     if (sendImmediately) {
       const resendKey = process.env.RESEND_API_KEY
@@ -99,39 +122,57 @@ export async function POST(request: NextRequest) {
       const result = await res.json()
 
       if (res.ok) {
+        // Everything below this line runs after the email has already gone, so
+        // a failure here must never be reported as a failed send. It must not
+        // be silent either: a lost stamp means the next run believes this was
+        // never sent and sends it again.
+        const bookkeeping: string[] = []
+
         // Update email log
-        await supabase.from('funding_email_log').update({
+        const { error: logErr } = await supabase.from('funding_email_log').update({
           status: 'sent',
           sent_at: new Date().toISOString(),
           resend_id: result.id || null,
         }).eq('id', emailRecord.id)
+        if (logErr) bookkeeping.push(`The email went to ${pursuit.client_contact_email} but the log still reads as a draft: ${logErr.message}. Do not resend.`)
 
         // Update nudge tracking on action item
-        await supabase.from('funding_action_items').update({
+        const { error: stampErr } = await supabase.from('funding_action_items').update({
           nudge_count: (action.nudge_count || 0) + 1,
           last_nudge_sent_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         }).eq('id', actionId)
+        if (stampErr) bookkeeping.push(`This send was not recorded against the task: ${stampErr.message}. It still looks unsent. Do not send it a second time.`)
 
         // Update opportunity activity
         if (action.opportunity_id) {
-          await supabase.from('funding_opportunities').update({
+          const { error: oppErr } = await supabase.from('funding_opportunities').update({
             last_activity_at: new Date().toISOString(),
           }).eq('id', action.opportunity_id)
+          if (oppErr) bookkeeping.push(`The grant's last activity date did not update: ${oppErr.message}.`)
         }
 
         // Timeline event
-        await supabase.from('funding_pursuit_timeline').insert({
+        const { error: timelineErr } = await supabase.from('funding_pursuit_timeline').insert({
           pursuit_id: pursuit.id,
           event_date: new Date().toISOString().split('T')[0],
           event_title: `Nudge sent: ${action.title}`,
           event_detail: `Email sent to ${pursuit.client_contact_name || pursuit.client_contact_email}`,
           status: 'complete',
         })
+        if (timelineErr) bookkeeping.push(`The timeline does not show this nudge: ${timelineErr.message}.`)
 
-        return NextResponse.json({ success: true, sent: true, emailId: emailRecord.id })
+        if (bookkeeping.length > 0) console.error('[funding/nudge] sent but not fully recorded:', bookkeeping)
+
+        return NextResponse.json({
+          success: true,
+          sent: true,
+          emailId: emailRecord.id,
+          warnings: bookkeeping.length > 0 ? bookkeeping : undefined,
+        })
       } else {
-        await supabase.from('funding_email_log').update({ status: 'failed' }).eq('id', emailRecord.id)
+        const { error: failErr } = await supabase.from('funding_email_log').update({ status: 'failed' }).eq('id', emailRecord.id)
+        if (failErr) console.error('[funding/nudge] send failed and the draft could not be marked failed:', failErr.message)
         return NextResponse.json({ error: result.message || 'Send failed', emailId: emailRecord.id }, { status: 500 })
       }
     }

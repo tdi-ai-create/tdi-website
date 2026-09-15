@@ -36,6 +36,11 @@ import { canAgentDraft, stalledDraftMessage } from '../funding-offerable';
 import { hasFunderDecided, isLive, isOver, isWithFunder } from '../funding-status';
 import { computeNextActions } from '../funding-next-actions';
 import { awardLabel, awardedSummary, awardedAmountOf, awardedTotal } from '../funding-award';
+import {
+  fundingClientSendBlockReason,
+  canSendToFundingClient,
+  isFundingClientSendPaused,
+} from '../funding-client-send-pause';
 
 export interface GuardCase {
   /** What this case proves, in words. */
@@ -767,6 +772,53 @@ export const GUARDS: Guard[] = [
     ],
   },
 
+  {
+    id: 'client-send-paused',
+    protects: 'Funding email reaching a school without an approval',
+    origin:
+      '15 September 2026: an audit found six code paths that could email a school and only ' +
+      'one ran the checks. The Emails tab put a Send button on every draft row, including ' +
+      'the drafts the hourly cron addresses to a school and queues for Bella to review, and ' +
+      'that button ran no allowlist, no internal-wording check and no label check. ' +
+      '/api/funding/nudge had no gates at all, sent as Rae personally, and no UI called it.',
+    cases: [
+      {
+        name: 'a school address is refused',
+        holds: () => fundingClientSendBlockReason('ppoche@stpchanel.org') !== null,
+      },
+      {
+        name: 'an address already on the send allowlist is still refused',
+        holds: () => !canSendToFundingClient('zwemke@ogschool.com'),
+      },
+      {
+        name: 'the refusal says where the email goes instead',
+        holds: () => {
+          const reason = fundingClientSendBlockReason('dneukirch@d41.org') ?? '';
+          return reason.includes('Outreach Queue') && reason.includes('dneukirch@d41.org');
+        },
+      },
+      {
+        name: 'our own address is not refused, so escalations to Rae still work',
+        holds: () => canSendToFundingClient('rae@teachersdeserveit.com'),
+      },
+      {
+        name: 'case and whitespace do not sneak an address past the us-or-them test',
+        holds: () => canSendToFundingClient('  Bella@TeachersDeserveIt.com  '),
+      },
+      {
+        name: 'a lookalike domain counts as a school, not as us',
+        holds: () => !canSendToFundingClient('someone@teachersdeserveit.com.example.org'),
+      },
+      {
+        name: 'a missing recipient is not treated as a school',
+        holds: () => canSendToFundingClient(null) && canSendToFundingClient(''),
+      },
+      {
+        name: 'the pause is actually on',
+        holds: () => isFundingClientSendPaused(),
+      },
+    ],
+  },
 ];
 
 export interface GuardResult {

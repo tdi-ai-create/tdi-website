@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { findInternalText } from '@/lib/funding-draft-warnings'
+import { fundingClientSendBlockReason } from '@/lib/funding-client-send-pause'
 
 const EMAIL_TYPE_OPTIONS = ['nudge', 'submission_instructions', 'deadline_reminder', 'status_update', 'follow_up', 'custom']
 
@@ -140,6 +141,12 @@ export function EmailsTab({ pursuitId, pursuit }: EmailsTabProps) {
   const warnings = findInternalText(draft.subject, draft.body)
   const blockedByWording = warnings.length > 0
 
+  // Sending to a school is paused. The server refuses it either way, but a
+  // button that fails when pressed reads as a broken page, and the person
+  // holding an email they need to get out deserves to be told where it goes
+  // instead. Same function the route calls, so the two cannot disagree.
+  const composerPauseReason = fundingClientSendBlockReason(draft.toEmail)
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       {/* Composer */}
@@ -171,6 +178,18 @@ export function EmailsTab({ pursuitId, pursuit }: EmailsTabProps) {
             rows={8}
             style={{ fontSize: 13, padding: '8px 12px', border: '1px solid #E5E7EB', borderRadius: 6, width: '100%', boxSizing: 'border-box', resize: 'vertical', fontFamily: 'inherit' }}
           />
+          {composerPauseReason && (
+            <div style={{ padding: '12px 14px', background: '#EEF2FF', border: '1px solid #C7D2FE', borderRadius: 8 }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: '#3730A3', marginBottom: 4 }}>
+                Direct sending is paused
+              </div>
+              <div style={{ fontSize: 12, color: '#4B5563' }}>
+                {composerPauseReason} Save Draft still works, and the draft appears in the
+                Outreach Queue on the Funding board.
+              </div>
+            </div>
+          )}
+
           {blockedByWording && (
             <div style={{ padding: '12px 14px', background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 8 }}>
               <div style={{ fontSize: 12, fontWeight: 700, color: '#92400E', marginBottom: 4 }}>
@@ -209,17 +228,24 @@ export function EmailsTab({ pursuitId, pursuit }: EmailsTabProps) {
                 )
                 if (ok) handleSendNow()
               }}
-              disabled={blockedByWording}
-              title={blockedByWording ? 'Reword the flagged phrases first' : undefined}
+              disabled={blockedByWording || composerPauseReason !== null}
+              title={
+                composerPauseReason ??
+                (blockedByWording ? 'Reword the flagged phrases first' : undefined)
+              }
               style={{
                 fontSize: 12, fontWeight: 600, padding: '8px 16px', borderRadius: 6,
                 border: 'none',
-                background: blockedByWording ? '#C7C9D1' : '#8B5CF6',
+                background: blockedByWording || composerPauseReason ? '#C7C9D1' : '#8B5CF6',
                 color: 'white',
-                cursor: blockedByWording ? 'not-allowed' : 'pointer',
+                cursor: blockedByWording || composerPauseReason ? 'not-allowed' : 'pointer',
               }}
             >
-              {blockedByWording ? 'Reword before sending' : 'Send Now'}
+              {composerPauseReason
+                ? 'Sending paused'
+                : blockedByWording
+                  ? 'Reword before sending'
+                  : 'Send Now'}
             </button>
             <button
               onClick={() => setComposing(false)}
@@ -284,18 +310,30 @@ export function EmailsTab({ pursuitId, pursuit }: EmailsTabProps) {
                     {new Date(email.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}
                   </div>
                 )}
-                {(email.status === 'draft' || !email.status) && (
-                  <button
-                    onClick={() => handleSendExisting(email.id, email.to_email || email.toEmail, email.subject)}
-                    style={{
-                      fontSize: 11, fontWeight: 600, padding: '4px 10px', borderRadius: 6,
-                      border: '1px solid #D1D5DB', background: 'white', color: '#374151',
-                      cursor: 'pointer', marginTop: 8,
-                    }}
-                  >
-                    Send
-                  </button>
-                )}
+                {(email.status === 'draft' || !email.status) && (() => {
+                  // This button was the bypass. It sent the cron's drafts, the
+                  // ones addressed to a school and written for Bella to review,
+                  // with none of the queue's checks.
+                  const rowPauseReason = fundingClientSendBlockReason(
+                    email.to_email || email.toEmail
+                  )
+                  return (
+                    <button
+                      onClick={() => handleSendExisting(email.id, email.to_email || email.toEmail, email.subject)}
+                      disabled={rowPauseReason !== null}
+                      title={rowPauseReason ?? undefined}
+                      style={{
+                        fontSize: 11, fontWeight: 600, padding: '4px 10px', borderRadius: 6,
+                        border: '1px solid #D1D5DB',
+                        background: rowPauseReason ? '#F3F4F6' : 'white',
+                        color: rowPauseReason ? '#9CA3AF' : '#374151',
+                        cursor: rowPauseReason ? 'not-allowed' : 'pointer', marginTop: 8,
+                      }}
+                    >
+                      {rowPauseReason ? 'Approve in Outreach Queue' : 'Send'}
+                    </button>
+                  )
+                })()}
               </div>
             ))}
           </div>
