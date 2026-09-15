@@ -63,7 +63,11 @@ export const TRANSITIONS: Record<Exclude<Action, 'flag_blocked' | 'record_board_
   pass_creative:   { from: ['pending_creative'],                   to: 'pending_editorial', role: 'lily' },
   pass_editorial:  { from: ['pending_editorial'],                  to: 'pending_approval',  role: 'olivia' },
   approve:         { from: ['pending_approval'],                   to: 'approved',          role: 'approver' },
-  schedule:        { from: ['approved'],                           to: 'scheduled',         role: null },
+  // Also from 'scheduled', so a date can be moved. A calendar you cannot change
+  // a date on is a picture of a plan rather than the plan. Re-scheduling writes
+  // a new scheduled_for and appends to the log like any other action, so the
+  // history shows the date moved and who moved it.
+  schedule:        { from: ['approved', 'scheduled'],              to: 'scheduled',         role: null },
   // Also from 'approved'. When a person publishes a Substack post themselves,
   // the piece never passes through 'scheduled': there was no planned date, they
   // just posted it. Requiring a schedule first would mean inventing one after
