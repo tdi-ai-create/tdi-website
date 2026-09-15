@@ -35,6 +35,7 @@ import { planAfterAnswer } from '../funding-answer-actions';
 import { canAgentDraft, stalledDraftMessage } from '../funding-offerable';
 import { hasFunderDecided, isLive, isOver, isWithFunder } from '../funding-status';
 import { objectsToAnApprovedClaim, retiredClaimsIn } from '../approved-claims';
+import { allowlistProblems, isOnAllowlist, SEND_ALLOWLIST, ALLOWLIST_ENABLED } from '../send-allowlist';
 import { computeNextActions } from '../funding-next-actions';
 import { awardLabel, awardedSummary, awardedAmountOf, awardedTotal } from '../funding-award';
 
@@ -827,6 +828,56 @@ export const GUARDS: Guard[] = [
           objectsToAnApprovedClaim('', null).found.length === 0 &&
           objectsToAnApprovedClaim(null, null).found.length === 0 &&
           retiredClaimsIn(null).length === 0,
+      },
+    ],
+  },
+
+  {
+    id: 'no-school-on-the-send-list',
+    protects: 'A scheduled job emailing a school without a person reading it first',
+    origin:
+      '15 September 2026: Rae confirmed that every grant package reaches a school because Bella opened ' +
+      'it and pressed send. The only thing enforcing that on the follow-up cron was a three-address ' +
+      'list declared as a const inside the cron file. Adding one address, or flipping one boolean, ' +
+      'would have started sending to schools with nothing to notice.',
+    cases: [
+      {
+        name: 'the list as it stands is safe',
+        holds: () => allowlistProblems().length === 0,
+      },
+      {
+        name: 'a school address is refused',
+        holds: () => {
+          const p = allowlistProblems([...SEND_ALLOWLIST, 'ppoche@stpchanel.org']);
+          return p.length === 1 && /stpchanel/.test(p[0].entry);
+        },
+      },
+      {
+        name: 'turning the list off is refused',
+        holds: () => allowlistProblems(SEND_ALLOWLIST, false).length > 0,
+      },
+      {
+        name: 'a wildcard or bare domain is refused',
+        holds: () =>
+          allowlistProblems(['@teachersdeserveit.com']).length > 0 &&
+          allowlistProblems(['*@teachersdeserveit.com']).length > 0,
+      },
+      {
+        name: 'a lookalike domain is refused',
+        holds: () => allowlistProblems(['bella@teachersdeserveit.com.evil.net']).length > 0,
+      },
+      {
+        name: 'an empty list is not treated as safe',
+        holds: () => allowlistProblems([]).length > 0,
+      },
+      {
+        name: 'the membership test still works and is case insensitive',
+        holds: () =>
+          isOnAllowlist('BELLA@teachersdeserveit.com') && !isOnAllowlist('ppoche@stpchanel.org'),
+      },
+      {
+        name: 'the list is on',
+        holds: () => ALLOWLIST_ENABLED === true,
       },
     ],
   },
