@@ -3,8 +3,16 @@
 import Link from 'next/link';
 import { useTranslation } from '@/lib/hub/useTranslation';
 
-const FOOTER_LINKS = [
+type FooterLink = {
+  href: string;
+  label: string;
+  external?: boolean;
+};
+
+const FOOTER_LINKS: FooterLink[] = [
   { href: '/', label: 'TeachersDeserveIt.com' },
+  { href: 'https://raehughart.substack.com/', label: 'Blog', external: true },
+  { href: '/create-with-us', label: 'Become a Creator' },
   { href: '/contact', label: 'Support' },
   { href: '/privacy', label: 'Privacy' },
 ];
@@ -35,6 +43,8 @@ export default function HubFooter() {
                   href={link.href}
                   className="text-[13px] transition-colors"
                   style={{ color: 'rgba(255, 255, 255, 0.6)' }}
+                  target={link.external ? '_blank' : undefined}
+                  rel={link.external ? 'noopener noreferrer' : undefined}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.color = 'rgba(255, 255, 255, 0.9)';
                   }}
