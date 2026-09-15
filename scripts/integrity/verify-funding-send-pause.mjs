@@ -42,7 +42,6 @@ const SCAN = [
 //               a school. Fails if the drafting branch disappears.
 const EXPECTED = {
   'app/api/funding/outreach-queue/route.ts': ['approval'],
-  'app/api/funding/nudge/route.ts': ['paused'],
   'app/api/funding/send-email/route.ts': ['paused'],
   'app/api/funding/pursuits/[id]/emails/route.ts': ['paused'],
   'lib/funding-followup-email.ts': ['paused'],
