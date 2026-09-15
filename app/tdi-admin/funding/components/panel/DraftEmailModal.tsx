@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { fundingClientSendBlockReason } from '@/lib/funding-client-send-pause'
 
 interface DraftEmailModalProps {
   to: string
@@ -20,6 +21,10 @@ export function DraftEmailModal({ to, toName, subject: initialSubject, body: ini
   const [sent, setSent] = useState(false)
   const [error, setError] = useState('')
 
+  // Same function the route calls, so the button and the server cannot
+  // disagree about whether this is going anywhere.
+  const pauseReason = fundingClientSendBlockReason(to)
+
   const handleSend = async () => {
     setSending(true)
     setError('')
@@ -29,12 +34,20 @@ export function DraftEmailModal({ to, toName, subject: initialSubject, body: ini
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ to, toName, subject, body, schoolName, pursuitId }),
       })
-      const result = await res.json()
-      if (result.sent) {
+      // The route answers 423 when sending is paused and 500 when it breaks,
+      // and this read the body without ever looking at the status. A response
+      // that carried no `sent` field reported "Failed to send" whatever had
+      // actually happened, so a deliberate pause and a dead email service were
+      // indistinguishable on screen.
+      const result = await res.json().catch(() => ({} as Record<string, unknown>))
+      if (res.ok && result.sent) {
         setSent(true)
         setTimeout(() => onSent(), 1500)
       } else {
-        setError(result.error || 'Failed to send')
+        setError(
+          (typeof result.error === 'string' && result.error) ||
+            `Failed to send (${res.status})`
+        )
       }
     } catch (e: any) {
       setError(e.message)
@@ -137,6 +150,16 @@ export function DraftEmailModal({ to, toName, subject: initialSubject, body: ini
               />
             </div>
 
+            {/* Paused */}
+            {pauseReason && !sent && (
+              <div style={{
+                padding: '10px 14px', background: '#EEF2FF', border: '1px solid #C7D2FE',
+                borderRadius: 8, color: '#3730A3', fontSize: 13,
+              }}>
+                <strong>Direct sending is paused.</strong> {pauseReason}
+              </div>
+            )}
+
             {/* Error */}
             {error && (
               <div style={{
@@ -179,14 +202,15 @@ export function DraftEmailModal({ to, toName, subject: initialSubject, body: ini
               {!sent && (
                 <button
                   onClick={handleSend}
-                  disabled={sending || !subject || !body}
+                  disabled={sending || !subject || !body || pauseReason !== null}
+                  title={pauseReason ?? undefined}
                   style={{
                     fontSize: 13, fontWeight: 700, padding: '8px 24px', borderRadius: 8,
-                    border: 'none', background: sending ? '#9CA3AF' : '#8B5CF6',
-                    color: 'white', cursor: sending ? 'default' : 'pointer',
+                    border: 'none', background: sending || pauseReason ? '#9CA3AF' : '#8B5CF6',
+                    color: 'white', cursor: sending || pauseReason ? 'default' : 'pointer',
                   }}
                 >
-                  {sending ? 'Sending...' : 'Send Email'}
+                  {pauseReason ? 'Sending paused' : sending ? 'Sending...' : 'Send Email'}
                 </button>
               )}
             </div>
