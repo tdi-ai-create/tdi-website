@@ -59,6 +59,12 @@ export interface PathContext {
    * it is safe to start drafting, so all of them are moot afterwards.
    */
   alreadySubmitted?: boolean | null
+  /**
+   * The catalogue's verdict on whether this funder is still running a cycle.
+   * Null when there is no catalogue link or nobody has asked, which is the
+   * majority today and behaves exactly as it did before this field existed.
+   */
+  funderNotContinuing?: { reason: string } | null;
 }
 
 /**
@@ -124,6 +130,22 @@ export function screenPath(
   // on 18 August and stamped "must be filed by a named union member and no name
   // is on file". Bella sent a screenshot of that card asking what the next step
   // was, with the contradiction sitting in the middle of it.
+  // A funder that is not running a cycle stops the path before any other rule
+  // is worth evaluating, and it stops it for every school at once. Saunemin's
+  // Community Schools path burned three drafting and review cycles because this
+  // question was asked per pursuit and so could never be answered once.
+  //
+  // Checked after alreadySubmitted below would be wrong: a filed application is
+  // filed regardless of what we later learn about the programme.
+  if (path.funderNotContinuing && !path.alreadySubmitted) {
+    return {
+      verdict: 'stop',
+      rule: 'funder_not_continuing',
+      reason: path.funderNotContinuing.reason,
+      unblockedBy: 'Re-check the funder and update the catalogue if it has reopened.',
+    }
+  }
+
   if (path.alreadySubmitted) {
     return {
       verdict: 'clear',
@@ -232,6 +254,7 @@ export const QUESTION_BY_RULE: Record<string, string> = {
   tdi_authorization: 'Is TDI an approved vendor with this state agency?',
   window: 'Is this funder actually open, and when does it close?',
   sector: 'Does this school sit inside the state accountability system?',
+  funder_not_continuing: 'This funder is recorded as not continuing. Should the path close?',
 }
 
 /**
