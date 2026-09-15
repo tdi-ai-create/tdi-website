@@ -6,6 +6,7 @@ import { loadSettings } from '@/lib/funding-slack'
 import { shouldPostDigest, recordDigestPost, recordDigestSuppressed, heartbeatNote } from '@/lib/digest-state'
 import { guardCron } from '@/lib/cron-guard'
 import { NOT_TERMINAL_FILTER } from '@/lib/funding/task-status'
+import { isOver as isOverStatus } from '@/lib/funding-status'
 
 /**
  * Daily cron endpoint for funding reminders.
@@ -244,7 +245,7 @@ export async function GET(request: NextRequest) {
       const openPlaceholder = oppsHere.some(
         o =>
           (o.name || '').startsWith(DISCOVERY_NAME) &&
-          !['closed', 'awarded', 'denied', 'archived'].includes(
+          !isOverStatus(
             (o.status || '').toLowerCase()
           )
       )

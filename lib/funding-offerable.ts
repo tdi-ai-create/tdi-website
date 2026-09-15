@@ -28,9 +28,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { isWindowOpen } from './funding-rules';
 import { screenPath, isPastDrafting } from './funding-eligibility';
+import { isOver, isWithFunder } from './funding-status';
 
 /** A grant in one of these is finished, whatever the narrative field says. */
-const FINISHED = ['closed', 'denied', 'awarded', 'applied', 'submitted'];
+/** A grant already with the funder, or over, is not draftable either way. */
+const notDraftable = (status?: string | null) => isOver(status) || isWithFunder(status);
 
 export type OfferBlocker = 'finished' | 'gate' | 'window' | 'archived' | 'screen';
 
@@ -56,7 +58,7 @@ const OFFERABLE: OfferVerdict = { offerable: true, blockedBy: null, reason: '' }
  * handled here so three callers do not each get it slightly wrong.
  */
 export function canAgentDraft(opp: any, pursuit: any, gate: any): OfferVerdict {
-  if (FINISHED.includes(String(opp?.status))) {
+  if (notDraftable(opp?.status)) {
     return { offerable: false, blockedBy: 'finished', reason: `this grant is ${opp.status}` };
   }
 

@@ -25,6 +25,7 @@ import { isAgentWindowWork } from './funding-window-work';
 import { isOursToDo, isWaitingOnUs } from './creator-turn';
 import { isPersonOwned } from './funding-ownership';
 import { loadTeamWork } from './creator-team-work';
+import { isOver } from './funding-status';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 type DbClient = any;
@@ -80,7 +81,8 @@ export async function findOrphanedWork(
 
   const oppById = new Map<string, any>((opps ?? []).map((o: any) => [o.id, o]));
 
-  const SETTLED = new Set(['closed', 'denied', 'awarded', 'not_applicable']);
+  // Was a local set. Missed cancelled and archived.
+  const SETTLED = { has: (status: string) => isOver(status) };
 
   for (const it of (items ?? []) as any[]) {
     const school = pursuits.get(it.pursuit_id);

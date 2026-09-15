@@ -5,6 +5,7 @@ import { createClient } from '@supabase/supabase-js';
 import { requireAdminAuth } from '@/lib/tdi-admin/auth';
 import { postFundingEvent, narrativeEvent, windowEvent, submittedEvent, awardEvent, denialEvent, researchEvent } from '@/lib/funding-slack';
 import { awardedAmountOf } from '@/lib/funding-award'
+import { isOver } from '@/lib/funding-status';
 
 function db() {
   return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, { auth: { autoRefreshToken: false, persistSession: false } });
@@ -275,8 +276,8 @@ export async function PATCH(request: NextRequest) {
   // Written here rather than guarded in the badge, because every screen that
   // reads waiting_on would otherwise need to remember, and the read-side
   // version of this bug is the one we keep fixing.
-  const FINISHED_STATUSES = ['closed', 'denied', 'awarded'];
-  if (body.status && FINISHED_STATUSES.includes(body.status) && body.status !== before?.status) {
+  // Was a local list of three, which missed not_applicable and cancelled.
+  if (body.status && isOver(body.status) && body.status !== before?.status) {
     updates.waiting_on = 'none';
   }
 
@@ -402,7 +403,7 @@ export async function PATCH(request: NextRequest) {
         const hasSent = allOpps.some((o: { forwarding_email_status: string }) => o.forwarding_email_status === 'sent')
         const hasSubmitted = allOpps.some((o: { client_submitted: boolean }) => o.client_submitted === true)
         const hasAwarded = allOpps.some((o: { status: string }) => o.status === 'awarded')
-        const allDecided = allOpps.every((o: { status: string }) => ['awarded', 'denied', 'closed'].includes(o.status))
+        const allDecided = allOpps.every((o: { status: string }) => isOver(o.status))
 
         if (allDecided) computedPhase = hasAwarded ? 'awarded' : 'denied'
         else if (hasSubmitted) computedPhase = 'submitted'
