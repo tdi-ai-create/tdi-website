@@ -14,6 +14,7 @@ import {
 import { postFundingEvent, narrativeEvent } from '@/lib/funding-slack'
 import { screenPath, isPastDrafting } from '@/lib/funding-eligibility'
 import { canAgentDraft } from '@/lib/funding-offerable'
+import { objectsToAnApprovedClaim, retiredClaimsIn } from '@/lib/approved-claims'
 
 /**
  * Funding Sync API -- Bridge between Paperclip and the Admin Funding Portal
@@ -929,6 +930,40 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({
         error: 'summary required on a fail — the writer needs to know what to change',
       }, { status: 400 })
+    }
+
+    // A settled claim is not a reason to fail a draft.
+    //
+    // On 14 September a complete Cox Charities application, worth $2,500 to a
+    // school with no instructional coach, was failed twice on the 74%
+    // implementation figure. QA was applying its rubric correctly and the
+    // rubric was missing a fact: that number is TDI's own, used across the team
+    // and on our own site, and Rae approved it for external use on
+    // 15 September.
+    //
+    // Refused here rather than in the reviewer's prompt, because the reviewer
+    // runs outside this repo and a rule that lives only in a prompt is a rule
+    // nobody can check. If the draft has other problems, they come back on the
+    // next verdict; nothing is lost except the argument.
+    if (!passed) {
+      const objection = objectsToAnApprovedClaim(summary, issues)
+      if (objection.found.length > 0) {
+        return NextResponse.json({
+          error:
+            `This fail rests on a claim TDI has already approved: ` +
+            objection.found.map(c => c.id).join(', ') +
+            `. Re-review without it. If the draft has other blocking problems, say those instead.`,
+          approvedClaims: objection.found.map(c => ({ id: c.id, note: c.note })),
+          foundIn: objection.where,
+        }, { status: 409 })
+      }
+    }
+
+    // The other half of the register. A retired claim is a hard stop whichever
+    // way the verdict went, including on a pass.
+    const retired = retiredClaimsIn(String(summary ?? '') + ' ' + JSON.stringify(issues ?? ''))
+    if (retired.length > 0) {
+      console.error('[sync] QA verdict references a retired claim:', retired.map(c => c.id).join(', '))
     }
 
     // Sort the findings before deciding anything. An untagged verdict, which is
