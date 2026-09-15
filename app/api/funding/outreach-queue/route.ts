@@ -8,6 +8,8 @@ import { NEUTRAL_TASK_LABEL } from '@/lib/funding-followup-email'
 import { matchActionItem, usesPlaceholder, type LabelCandidate } from '@/lib/funding-client-label'
 import { createSendFollowUps, type FollowUpResult } from '@/lib/funding-followups'
 import { isCloseDateRequiredToSend } from '@/lib/funding-qa'
+import { evaluateSendGate, describeVerdict, fetchProbe, type GateVerdict } from '@/lib/funding-send-gate'
+import { isSendGateEnforced } from '@/lib/funding-send-gate-flag'
 
 /**
  * Funding outreach approval queue.
@@ -402,23 +404,89 @@ export async function POST(request: NextRequest) {
   // Reported even when the flag is off, so the dry run and the queue response
   // show what the block would catch before it is switched on.
   let closeDateGap: { opportunity: string; windowStatus: string | null } | null = null
+  let gate: GateVerdict | null = null
+
   if (draft.opportunity_id) {
-    const { data: windowOpp, error: windowErr } = await supabase
+    const { data: gateOpp, error: gateErr } = await supabase
       .from('funding_opportunities')
-      .select('name, window_status, application_closes')
+      .select('name, window_status, application_closes, narrative_url, qa_passed, qa_escalation, funder_id')
       .eq('id', draft.opportunity_id)
       .single()
 
-    // A read failure is not proof the date is present, so say so rather than
-    // letting a silent error read as a pass.
-    if (windowErr) {
-      console.error('[outreach-queue] Could not check the closing date:', windowErr.message)
-    } else if (windowOpp && !windowOpp.application_closes) {
-      closeDateGap = {
-        opportunity: windowOpp.name,
-        windowStatus: windowOpp.window_status ?? null,
+    // A read failure is not proof anything is fine, so it blocks rather than
+    // passing quietly. The whole point of this gate is that silence stopped
+    // being treated as a pass.
+    if (gateErr) {
+      console.error('[outreach-queue] Could not evaluate the send gate:', gateErr.message)
+      return NextResponse.json(
+        { error: `Could not check whether this package is ready to send: ${gateErr.message}` },
+        { status: 500 }
+      )
+    }
+
+    if (gateOpp) {
+      const { count: passingReviews, error: revErr } = await supabase
+        .from('funding_narrative_qa_reviews')
+        .select('id', { count: 'exact', head: true })
+        .eq('opportunity_id', draft.opportunity_id)
+        .eq('passed', true)
+
+      if (revErr) {
+        console.error('[outreach-queue] Could not count passing reviews:', revErr.message)
+        return NextResponse.json(
+          { error: `Could not check the quality review for this package: ${revErr.message}` },
+          { status: 500 }
+        )
+      }
+
+      // The funder's spend rules, where the catalogue has an opinion. Absent is
+      // not a failure: most funders have never been asked.
+      let funderCanFundUs: boolean | null = null
+      if (gateOpp.funder_id) {
+        const { data: funder } = await supabase
+          .from('funders')
+          .select('allowable_uses')
+          .eq('id', gateOpp.funder_id)
+          .maybeSingle()
+        const uses = (funder?.allowable_uses ?? '').toString().toLowerCase()
+        if (uses && /classroom materials only|not for (vendor|provider|services)|materials only/.test(uses)) {
+          funderCanFundUs = false
+        }
+      }
+
+      gate = await evaluateSendGate(
+        {
+          name: gateOpp.name,
+          narrative_url: gateOpp.narrative_url,
+          application_closes: gateOpp.application_closes,
+          qa_passed: gateOpp.qa_passed,
+          qa_escalation: gateOpp.qa_escalation,
+          passingReviewCount: passingReviews ?? 0,
+          funderCanFundUs,
+        },
+        fetchProbe(),
+      )
+
+      // Kept for the existing response shape and the close-date flag, which
+      // predates this gate and is switched independently of it.
+      if (!gateOpp.application_closes) {
+        closeDateGap = { opportunity: gateOpp.name, windowStatus: gateOpp.window_status ?? null }
       }
     }
+  }
+
+  // The hard checks. A missing or unopenable document is not a judgement call
+  // and no override covers it: two packages went out on an override with no
+  // document at all, and the client told us so.
+  if (gate && !gate.sendable && isSendGateEnforced()) {
+    return NextResponse.json(
+      {
+        error: gate.blocking.map(c => c.reason).filter(Boolean).join(' '),
+        gateBlocking: gate.blocking.map(c => ({ check: c.id, reason: c.reason })),
+        gateNotes: describeVerdict(gate),
+      },
+      { status: 400 }
+    )
   }
 
   if (closeDateGap && isCloseDateRequiredToSend()) {
@@ -446,6 +514,11 @@ export async function POST(request: NextRequest) {
       closeDateGap,
       wouldBlockOnCloseDate: Boolean(closeDateGap) && isCloseDateRequiredToSend(),
       closeDateEnforcementOn: isCloseDateRequiredToSend(),
+      // Reported whether or not enforcement is on, so the blast radius is
+      // visible before anybody switches it.
+      gate: gate ? { sendable: gate.sendable, notes: describeVerdict(gate) } : null,
+      wouldBlockOnGate: Boolean(gate && !gate.sendable),
+      gateEnforcementOn: isSendGateEnforced(),
     })
   }
 
