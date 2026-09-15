@@ -26,6 +26,24 @@ export function isQaAgentEnabled(): boolean {
   return process.env.FUNDING_QA_AGENT_ENABLED === 'true'
 }
 
+/**
+ * Whether a package send is blocked when the funder's closing date is unknown.
+ *
+ * Default off, on purpose. This is enforcement, and enforcement applies to
+ * every school the moment it is true, with no gradual rollout. Nine of one
+ * district's fourteen grants currently have no closing date on record, so
+ * turning this on before the research queue has worked through the backlog
+ * would block sends that people are expecting to go out.
+ *
+ * The order is: ship this dark, let the widened window queue fill the dates
+ * in, confirm the block would catch only genuine gaps, then set
+ * FUNDING_REQUIRE_CLOSE_DATE=true. Rolling back is unsetting one variable, no
+ * deploy needed.
+ */
+export function isCloseDateRequiredToSend(): boolean {
+  return process.env.FUNDING_REQUIRE_CLOSE_DATE === 'true'
+}
+
 
 export type EscalationOptionKey =
   | 'approve_anyway'

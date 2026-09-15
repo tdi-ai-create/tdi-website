@@ -76,7 +76,10 @@ export async function findOrphanedWork(
 
   const { data: opps, error: oErr } = await supabase
     .from('funding_opportunities')
-    .select('id, pursuit_id, name, status, research_status, window_status, window_checked_at');
+    // application_closes is required by windowIsUnestablished as of 15 Sep
+    // 2026. Without it the field reads undefined and every open row looks like
+    // it has no closing date.
+    .select('id, pursuit_id, name, status, research_status, window_status, window_checked_at, application_closes');
   if (oErr) errors.push(`opportunities: ${oErr.message}`);
 
   const oppById = new Map<string, any>((opps ?? []).map((o: any) => [o.id, o]));

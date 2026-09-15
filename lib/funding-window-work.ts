@@ -30,6 +30,7 @@ export interface WindowWorkInput {
   research_status?: string | null;
   window_status?: string | null;
   window_checked_at?: string | null;
+  application_closes?: string | null;
   status?: string | null;
 }
 
@@ -38,9 +39,28 @@ export interface WindowWorkInput {
  *  not_applicable, which this omitted. */
 const FINISHED = { has: (status: string) => isOver(status) };
 
-/** The window is not established: nobody has answered the question yet. */
+/**
+ * The window is not established: nobody has answered the question yet.
+ *
+ * 'open' with no closing date counts as unestablished, and this is the half
+ * that was missing. Only half the question is "is it open". The other half is
+ * "until when", and that is the half the pipeline actually runs on: nudges,
+ * the call rung and the overdue clocks are all driven by the closing date.
+ *
+ * A row stamped 'open' with `application_closes` null looked answered to this
+ * predicate and was therefore never offered to anyone, while `isWindowOpen`
+ * read it as open forever, because with no date there is nothing to compare
+ * against. So the grant sat permanently open, permanently unchased, and
+ * permanently invisible to the agent whose job is to establish the date.
+ *
+ * Measured on Saunemin CCSD 438, 15 Sep 2026: nine of fourteen opportunities
+ * sat at 'open' with no closing date and `window_checked_at` null. Four of
+ * those also read `research_status = 'found'`, so they were the research
+ * agent's work and she was never offered them. The largest was $10,000.
+ */
 export function windowIsUnestablished(opp: WindowWorkInput): boolean {
-  return !opp.window_status || opp.window_status === 'unknown';
+  if (!opp.window_status || opp.window_status === 'unknown') return true;
+  return opp.window_status === 'open' && !opp.application_closes;
 }
 
 /**

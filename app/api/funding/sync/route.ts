@@ -334,7 +334,13 @@ export async function GET(request: NextRequest) {
       // puts an agent's work on Bella's list, a wider one sends the question to
       // nobody.
       .eq('research_status', 'found')
-      .or('window_status.is.null,window_status.eq.unknown')
+      // windowIsUnestablished expressed as a query. The third arm is the one
+      // that was missing: 'open' with no closing date is not an established
+      // window, it is a row nobody has finished. Without it a grant stamped
+      // 'open' was treated as answered and offered to nobody, while
+      // isWindowOpen read it as open indefinitely because there was no date to
+      // compare. Nine of Saunemin's fourteen sat in exactly that state.
+      .or('window_status.is.null,window_status.eq.unknown,and(window_status.eq.open,application_closes.is.null)')
       .not('status', 'in', '("closed","awarded","denied")')
       // Do not ask the same unanswerable question every hour.
       //

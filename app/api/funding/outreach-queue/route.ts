@@ -7,6 +7,7 @@ import { findInternalText } from '@/lib/funding-draft-warnings'
 import { NEUTRAL_TASK_LABEL } from '@/lib/funding-followup-email'
 import { matchActionItem, usesPlaceholder, type LabelCandidate } from '@/lib/funding-client-label'
 import { createSendFollowUps, type FollowUpResult } from '@/lib/funding-followups'
+import { isCloseDateRequiredToSend } from '@/lib/funding-qa'
 
 /**
  * Funding outreach approval queue.
@@ -392,6 +393,46 @@ export async function POST(request: NextRequest) {
     )
   }
 
+  // A package email promises a reminder on the day the window opens, and that
+  // reminder is built from the closing date. With no date the email prints a
+  // placeholder where the date belongs and no reminder is scheduled at all, so
+  // we commit in writing to something nothing exists to deliver. One
+  // superintendent quoted that placeholder back to us on 14 Sep 2026.
+  //
+  // Reported even when the flag is off, so the dry run and the queue response
+  // show what the block would catch before it is switched on.
+  let closeDateGap: { opportunity: string; windowStatus: string | null } | null = null
+  if (draft.opportunity_id) {
+    const { data: windowOpp, error: windowErr } = await supabase
+      .from('funding_opportunities')
+      .select('name, window_status, application_closes')
+      .eq('id', draft.opportunity_id)
+      .single()
+
+    // A read failure is not proof the date is present, so say so rather than
+    // letting a silent error read as a pass.
+    if (windowErr) {
+      console.error('[outreach-queue] Could not check the closing date:', windowErr.message)
+    } else if (windowOpp && !windowOpp.application_closes) {
+      closeDateGap = {
+        opportunity: windowOpp.name,
+        windowStatus: windowOpp.window_status ?? null,
+      }
+    }
+  }
+
+  if (closeDateGap && isCloseDateRequiredToSend()) {
+    return NextResponse.json(
+      {
+        error:
+          `${closeDateGap.opportunity} has no closing date on record, so this email would promise a reminder that nothing is scheduled to send. ` +
+          `Establish the window first, then approve this.`,
+        closeDateGap,
+      },
+      { status: 400 }
+    )
+  }
+
   if (dryRun) {
     return NextResponse.json({
       ok: true,
@@ -402,6 +443,9 @@ export async function POST(request: NextRequest) {
       bodyPreview: finalBody.slice(0, 200),
       htmlBytes: buildFundingEmailHtml(finalBody).length,
       wouldUpdateOpportunity: draft.opportunity_id ?? null,
+      closeDateGap,
+      wouldBlockOnCloseDate: Boolean(closeDateGap) && isCloseDateRequiredToSend(),
+      closeDateEnforcementOn: isCloseDateRequiredToSend(),
     })
   }
 

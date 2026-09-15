@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { guardCron } from '@/lib/cron-guard'
 import { isAgentWindowWork } from '@/lib/funding-window-work'
+import { isOver, isWithFunder } from '@/lib/funding-status'
 import {
   screenPath,
   isPastDrafting,
@@ -52,9 +53,23 @@ function readProfile(raw: unknown): Record<string, unknown> {
   }
 }
 
-// Paths in these states are finished. Re-screening them would churn history
-// for no benefit and could reopen a decision someone already made.
-const SETTLED = new Set(['awarded', 'denied', 'closed', 'submitted', 'applied'])
+/**
+ * Paths that are finished. Re-screening them would churn history for no
+ * benefit and could reopen a decision someone already made.
+ *
+ * This was a local set of five: awarded, denied, closed, submitted, applied.
+ * It is the union of two definitions that already have an owner in
+ * lib/funding-status.ts, so the local copy was a third answer waiting to drift
+ * from the other two. Composed from the owned pair instead.
+ *
+ * The composition is deliberately wider than the set it replaces. isOver also
+ * covers not_applicable, cancelled and archived, which the local set omitted,
+ * so those three were being re-screened every month despite being dead. Skipping
+ * them is what the comment above always claimed to do.
+ */
+function isSettled(status?: string | null): boolean {
+  return isWithFunder(status) || isOver(status)
+}
 
 interface Change {
   school: string
@@ -97,7 +112,13 @@ export async function GET(request: NextRequest) {
       // the predicate reads undefined, returns false for everything, and the
       // deferral silently does nothing while looking as though it works. The
       // dry run caught exactly that on the first attempt.
-      .select('id, name, pursuit_id, status, client_submitted, research_status, window_status, window_checked_at, next_action, assigned_agent, eligibility_verdict, eligibility_overridden')
+      // application_closes joined this list on 15 Sep 2026, when
+      // windowIsUnestablished started counting 'open' with no closing date as
+      // unestablished. Omitting it reads undefined, which is falsy, so every
+      // open row would look like it had no closing date and the predicate
+      // would widen to all of them. Same trap as research_status above, in the
+      // opposite direction.
+      .select('id, name, pursuit_id, status, client_submitted, research_status, window_status, window_checked_at, application_closes, next_action, assigned_agent, eligibility_verdict, eligibility_overridden')
 
     if (oErr) {
       console.error('[eligibility-audit] Could not read opportunities:', oErr)
@@ -126,7 +147,7 @@ export async function GET(request: NextRequest) {
         skipped.push({ path: opp.name ?? '', why: 'a person overrode this rule' })
         continue
       }
-      if (opp.status && SETTLED.has(String(opp.status))) {
+      if (isSettled(opp.status)) {
         skipped.push({ path: opp.name ?? '', why: `already ${opp.status}` })
         continue
       }
