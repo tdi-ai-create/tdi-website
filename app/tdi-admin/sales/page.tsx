@@ -1044,13 +1044,19 @@ export default function SalesPage() {
     }))
   }
 
-  // Active opps: 26-27 only, exclude contact-only, paid, lost, deleted
-  const activeOpps = useMemo(() =>
+  // Board opps: 26-27 only, exclude contact-only, lost, deleted. Keeps paid so the Won column can render.
+  const boardOpps = useMemo(() =>
     opportunities.filter(o =>
-      !o.isContactOnly && !['lost', 'paid'].includes(o.stage) && !o.deleted_at
+      !o.isContactOnly && o.stage !== 'lost' && !o.deleted_at
       && o.schoolYear === '2026-27'
     ),
     [opportunities]
+  )
+
+  // Active opps: the board minus won. Drives pipeline totals, chip counts and the call sheet.
+  const activeOpps = useMemo(() =>
+    boardOpps.filter(o => o.stage !== 'paid'),
+    [boardOpps]
   )
 
   // Trashed opps
@@ -1084,7 +1090,7 @@ export default function SalesPage() {
 
   // Apply filters
   const filtered = useMemo(() => {
-    return activeOpps.filter(opp => {
+    return boardOpps.filter(opp => {
       const f = activeFilters
       if (f.search) {
         const q = f.search.toLowerCase()
@@ -1100,7 +1106,7 @@ export default function SalesPage() {
       if (showCallSheetOnly && !opp.onCallSheet) return false
       return true
     })
-  }, [activeOpps, activeFilters, showCallSheetOnly])
+  }, [boardOpps, activeFilters, showCallSheetOnly])
 
   // Counts for filter chips
   const dealTypeCounts = useMemo(() => {

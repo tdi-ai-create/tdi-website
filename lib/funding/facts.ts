@@ -32,6 +32,20 @@ export type SchoolFact = {
 };
 
 /**
+ * The part of a fact that decides whether it may be used.
+ *
+ * Freshness and citeability never look at where a fact came from, only at how
+ * well it is known and when. Typing the three rules below against this rather
+ * than against SchoolFact lets facts about TDI itself share them without
+ * widening SchoolFact's origin, which is constrained in the database to the
+ * three values a school fact may have.
+ */
+export type FactCredibility = Pick<
+  SchoolFact,
+  'key' | 'status' | 'value' | 'source' | 'verifiedOn'
+>;
+
+/**
  * How long a fact stays trustworthy, by kind.
  *
  * Saunemin's proficiency figures are from the 2022-23 cycle and someone
@@ -53,7 +67,7 @@ const FRESHNESS_DAYS: Record<string, number> = {
 };
 const DEFAULT_FRESHNESS_DAYS = 365;
 
-export function isStale(fact: SchoolFact, asOf: Date = new Date()): boolean {
+export function isStale(fact: FactCredibility, asOf: Date = new Date()): boolean {
   if (fact.status !== 'known' || !fact.verifiedOn) return false;
   const window = FRESHNESS_DAYS[fact.key] ?? DEFAULT_FRESHNESS_DAYS;
   const checked = new Date(fact.verifiedOn + 'T00:00:00');
@@ -69,12 +83,12 @@ export function isStale(fact: SchoolFact, asOf: Date = new Date()): boolean {
  * provenance, which is precisely the state that produced the 48% incident, so
  * it is readable everywhere and citeable nowhere.
  */
-export function isCiteable(fact: SchoolFact, asOf: Date = new Date()): boolean {
+export function isCiteable(fact: FactCredibility, asOf: Date = new Date()): boolean {
   return fact.status === 'known' && !isStale(fact, asOf);
 }
 
 /** Why a fact cannot be cited, in words a person can act on. */
-export function blockedReason(fact: SchoolFact, asOf: Date = new Date()): string | null {
+export function blockedReason(fact: FactCredibility, asOf: Date = new Date()): string | null {
   if (fact.status === 'not_checked') return 'Nobody has looked this up yet.';
   if (fact.status === 'not_published') {
     return fact.source ? `Not published. ${fact.source}` : 'Checked, and it is not published anywhere.';

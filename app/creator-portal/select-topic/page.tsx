@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@supabase/supabase-js'
+import { getSupabase } from '@/lib/supabase'
 import {
   BookOpen, BookMarked, PenLine, Activity, Calculator, FlaskConical, Palette,
   GraduationCap, Sparkles, Globe, Languages, HeartHandshake, Music, Library,
@@ -22,10 +22,12 @@ const ICONS: Record<string, any> = {
 
 export default function SelectTopicPage() {
   const router = useRouter()
-  const [supabase] = useState(() => createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  ))
+  // Must be the shared client from @/lib/supabase, not a fresh createClient.
+  // Since 18f9320f the browser session lives in cookies (createBrowserClient),
+  // while a raw createClient reads localStorage and finds nothing. This page
+  // building its own client is why a signed-in creator sent here by the topic
+  // gate got bounced straight back to /creator-portal, with no error shown.
+  const [supabase] = useState(() => getSupabase())
   const [userEmail, setUserEmail] = useState<string | null>(null)
   const [creatorId, setCreatorId] = useState<string | null>(null)
   const [creatorName, setCreatorName] = useState<string>('')

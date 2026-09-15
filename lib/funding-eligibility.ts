@@ -95,7 +95,24 @@ const NEEDS_TDI_AUTHORIZATION = /(Title I Section 1003)/i
  * Run every rule against one path. First rule to object wins, and a stop
  * outranks an ask.
  */
-export function screenPath(path: PathContext, school: SchoolContext): EligibilityResult {
+/**
+ * What we know about ourselves, as far as screening cares.
+ *
+ * Only one rule here is about us rather than about the school, and until now it
+ * had no way to know whether the question had already been answered. It fired
+ * on the grant's name alone, every month, on every school, forever. The answer
+ * lives in tdi_facts now, so the caller resolves it once and passes it in.
+ */
+export interface UsContext {
+  /** Our authorization to deliver under this state's programme is established. */
+  tdiAuthorizationConfirmed?: boolean;
+}
+
+export function screenPath(
+  path: PathContext,
+  school: SchoolContext,
+  us: UsContext = {},
+): EligibilityResult {
   // ── Already filed ──
   //
   // Every rule below asks whether it is safe to begin drafting. None of them
@@ -165,7 +182,13 @@ export function screenPath(path: PathContext, school: SchoolContext): Eligibilit
 
   // ── Our own authorization ──
   // We can be the blocker. Worth saying out loud rather than discovering late.
-  if (NEEDS_TDI_AUTHORIZATION.test(path.name)) {
+  //
+  // Skipped once our authorization for this state is established, because the
+  // question is about TDI and not about this school. Answering it for one
+  // school answered it for all of them, and re-asking per pursuit is how it
+  // stayed open for 26 days on Saunemin and was then auto-cancelled unanswered
+  // when the path closed.
+  if (NEEDS_TDI_AUTHORIZATION.test(path.name) && !us.tdiAuthorizationConfirmed) {
     return {
       verdict: 'ask_first',
       rule: 'tdi_authorization',

@@ -4,6 +4,8 @@ import { guardCron } from '@/lib/cron-guard'
 import { isAgentWindowWork } from '@/lib/funding-window-work'
 import { isOver, isWithFunder } from '@/lib/funding-status'
 import { closePathWithReason, cancelWorkOnClosedPath } from '@/lib/funding-path-closure'
+import { readTdiFacts, answeredCredential, missingCredentials } from '@/lib/funding/tdi-facts'
+import { buildDecisionBrief, renderDecisionBrief } from '@/lib/funding-decision-brief'
 import {
   screenPath,
   isPastDrafting,
@@ -128,6 +130,31 @@ export async function GET(request: NextRequest) {
 
     const bySchool = new Map((pursuits ?? []).map(p => [p.id, p]))
 
+    // What we know about ourselves, read once for the whole run.
+    //
+    // One screening rule is about TDI rather than about the school: whether we
+    // are authorized to deliver under a state administered programme. It used
+    // to fire on the grant's name alone, so it re-raised the same question on
+    // every school every month and none of those askings could ever be
+    // satisfied by another's answer. On Saunemin it stayed open 26 days and was
+    // auto-cancelled unanswered when the path closed.
+    const { facts: tdiFacts, error: tdiErr } = await readTdiFacts(supabase)
+    if (tdiErr) {
+      // Not fatal, and deliberately not silent. With no facts the screen
+      // behaves exactly as it did before this change: it asks. Reporting it
+      // matters because "we asked again" and "we could not tell whether we
+      // already knew" look identical from the outside.
+      console.error('[eligibility-audit] Could not read what we know about TDI:', tdiErr)
+    }
+
+    const statesWeWorkIn = [
+      ...new Set(
+        (pursuits ?? [])
+          .map(p => p.state_code)
+          .filter((c): c is string => Boolean(c)),
+      ),
+    ]
+
     const changes: Change[] = []
     const questionsToRaise: { school: string; path: string; question: string; because: string }[] = []
     const questionsExisting: string[] = []
@@ -171,6 +198,13 @@ export async function GET(request: NextRequest) {
           stateCode: school.state_code ?? null,
           titleIStatus: (profile.title_i_status as string) ?? null,
           designation: (profile.designation as string) ?? null,
+        },
+        {
+          // Scoped to this school's state, falling back to a fact recorded as
+          // true everywhere. An Illinois answer says nothing about New Jersey.
+          tdiAuthorizationConfirmed: Boolean(
+            answeredCredential(tdiFacts, 'approved_provider_status', school.state_code ?? null),
+          ),
         },
       )
 
@@ -265,6 +299,9 @@ export async function GET(request: NextRequest) {
             // Named in the dry run, because who it lands on is the thing that
             // changed and a preview that hides it is not a preview.
             owner: ownerOfBlockedPath(Boolean(agentFinding)).ownerName,
+            // Surfaced in the preview, because a recommendation nobody can see
+            // before it ships is not reviewable.
+            recommendation: agentFinding ? buildDecisionBrief(opp).recommendation : null,
           }
 
           if (dryRun) {
@@ -279,10 +316,17 @@ export async function GET(request: NextRequest) {
             // yet tried still goes to Bella, because chasing a school is hers.
             const owner = ownerOfBlockedPath(Boolean(agentFinding))
             const itemTitle = agentFinding ? deadEndTitle(opp.name ?? 'This grant') : title
+            // The three facts the choice turns on, printed rather than left to
+            // be researched. Two of these items sat untouched on Saunemin
+            // because answering either one meant going and finding this out
+            // first.
+            const brief = agentFinding ? buildDecisionBrief(opp) : null
+
             const closing = agentFinding
               ? `\n\nResearch is exhausted on this one. The choice is to act on what she suggests, ` +
                 `drop the path, or pursue it anyway knowing the window is unconfirmed. ` +
-                `Nothing will be drafted for "${opp.name}" until that is decided.`
+                `Nothing will be drafted for "${opp.name}" until that is decided.` +
+                (brief ? `\n\n${renderDecisionBrief(brief)}` : '')
               : `\n\nNothing will be drafted for "${opp.name}" until this is answered.`
 
             const { error: qErr } = await supabase.from('funding_action_items').insert({
@@ -420,6 +464,13 @@ export async function GET(request: NextRequest) {
       closuresFailed: closureFailures.length,
       closureFailures,
       skipped,
+      // What we still do not know about ourselves, across the states we work
+      // in. Listed rather than counted: a count says there is a problem, a
+      // list says what to go and find out. This is the answer to "why did that
+      // grant stop and whose question was it".
+      ourOwnOpenQuestions: missingCredentials(tdiFacts, statesWeWorkIn).length,
+      aboutUs: missingCredentials(tdiFacts, statesWeWorkIn),
+      couldNotReadOurOwnFacts: tdiErr ?? null,
       note: dryRun
         ? 'Nothing was written and nothing was closed. Every verdict and closure above was computed against live data.'
         : 'Verdicts recorded. No path was deleted and no human override was touched.',
