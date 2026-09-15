@@ -22,6 +22,7 @@
 // ---------------------------------------------------------------------------
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { SEND_SILENCE_HOURS } from './funding-rules';
 type DbClient = any;
 
 /** Matches the convention in lib/funding-pursuit-template.ts for TDI-owned work. */
@@ -147,4 +148,94 @@ export async function createSendFollowUps(
   }
 
   return { created: rows.length, titles: rows.map((r) => String(r.title)), skipped: false };
+}
+
+/**
+ * The step Bella is owed the moment she approves a narrative.
+ *
+ * Approving used to write a status and nothing else. Measured on 15 September:
+ * the Cox Charities application for St. Peter Chanel went to 'ready' that
+ * morning and produced no action item, no email draft, no change to waiting_on
+ * and no clock. The pursuit page builds its work from action items plus the two
+ * drafting states, so the grant left "Running by itself" and landed in nothing.
+ * The page showed fewer items after she clicked than before.
+ *
+ * The board did carry a "Review and send" card the whole time, computed live by
+ * funding-next-actions. That is the trap in this class of bug: the prompt
+ * existed, on the page she had just navigated away from, so the system looked
+ * correct from every angle except the one she was standing at.
+ *
+ * A row in funding_action_items is what makes it real rather than merely
+ * displayed. It shows on the pursuit page, it carries a due date so the overdue
+ * rule can find it, it reaches the daily digest, and it survives a reload.
+ *
+ * Owned by TDI, never the school. The school cannot send itself its own
+ * application, and an item owned the wrong way is how two principals received
+ * forty-one emails written about themselves.
+ */
+export async function createApprovedSendStep(
+  supabase: DbClient,
+  input: {
+    pursuitId: string;
+    opportunityId: string;
+    grantName: string;
+    contactName?: string | null;
+    now?: Date;
+  }
+): Promise<{ created: boolean; title: string | null; skipped: boolean; error?: string }> {
+  const { pursuitId, opportunityId, grantName, contactName } = input;
+  const now = input.now ?? new Date();
+  const firstName = (contactName || '').split(' ')[0] || 'the school';
+
+  // 'submission' rather than a category of its own. funding_action_items.category
+  // carries a CHECK constraint naming seven values, and a 'send' category would
+  // have been rejected by the database on every insert while this function
+  // cheerfully reported success to a caller that does not read its result. That
+  // is the silent-write shape this codebase has already paid for seven times.
+  //
+  // Approving twice, or approving a redraft of something already approved once,
+  // must not stack two identical items. Matching on the category and the path
+  // rather than on the title, because the title carries a contact name that can
+  // change under it and a duplicate is a duplicate whatever it is called.
+  const { data: existing, error: readError } = await supabase
+    .from('funding_action_items')
+    .select('id')
+    .eq('opportunity_id', opportunityId)
+    .eq('category', 'submission')
+    .in('status', ['pending', 'blocked']);
+
+  if (readError) {
+    return { created: false, title: null, skipped: false, error: `Could not check for an existing send step: ${readError.message}` };
+  }
+  if (existing && existing.length > 0) {
+    return { created: false, title: null, skipped: true };
+  }
+
+  const due = new Date(now.getTime() + SEND_SILENCE_HOURS * 3600000);
+  const title = `Send the ${grantName} application to ${firstName}`;
+
+  const { error: insertError } = await supabase.from('funding_action_items').insert({
+    pursuit_id: pursuitId,
+    opportunity_id: opportunityId,
+    owner_type: 'tdi',
+    owner_name: TDI_OWNER_NAME,
+    owner_email: TDI_OWNER_EMAIL,
+    status: 'pending',
+    category: 'submission',
+    action_size: 'light',
+    title,
+    description:
+      `Approved and ready. It does nothing for the school until it reaches them. ` +
+      `The email is drafted and waiting in the Outreach Queue at the top of the Funding board. ` +
+      `Approving it there sends it and schedules the chases.`,
+    due_date: due.toISOString().split('T')[0],
+  });
+
+  if (insertError) {
+    // Never swallowed. A failure here returns the system to exactly the state
+    // this function exists to fix: approved, invisible, and chased by nothing.
+    return { created: false, title: null, skipped: false, error: `The send step was not created: ${insertError.message}` };
+  }
+
+  return { created: true, title, skipped: false };
 }

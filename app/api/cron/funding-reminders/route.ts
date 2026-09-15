@@ -455,6 +455,29 @@ export async function GET(request: NextRequest) {
       .map(o => `  • ${nameFor.get(o.pursuit_id) ?? 'unknown'}: ${o.name} passed QA and is waiting`)
     if (approvals.length) sections.push(`*Finished, waiting on your approval (${approvals.length})*\n${cap(approvals, 6).join('\n')}`)
 
+    // Approved, and still here.
+    //
+    // Every other waiting state had a section and this one did not, which is
+    // how the most expensive kind of idle in the system stayed invisible: the
+    // work is finished and paid for, the school is expecting it, and a grant
+    // that never leaves the portal is worth exactly as much as one nobody
+    // wrote. The board carried a card for it; the morning message, which is
+    // what Bella actually reads, did not.
+    const unsent = opportunities
+      .filter(o => o.narrative_status === 'ready'
+        && o.forwarding_email_status !== 'sent'
+        && !isOverStatus(o.status))
+      .map(o => {
+        const since = o.narrative_status_changed_at
+          ? Math.floor((Date.now() - new Date(o.narrative_status_changed_at).getTime()) / 86400000)
+          : null
+        const age = since === null ? '' : since === 0 ? ', approved today' : ` , approved ${since} day${since === 1 ? '' : 's'} ago`
+        return `  • ${nameFor.get(o.pursuit_id) ?? 'unknown'}: ${o.name}${age}`
+      })
+    if (unsent.length) sections.push(
+      `*Approved and not yet with the school (${unsent.length})*\n${cap(unsent, 6).join('\n')}\n` +
+      `  _the email is drafted in the Outreach Queue, ready for you to approve and send_`)
+
     const draftLines = (pendingDrafts ?? []).map(d =>
       `  • ${d.to_name || d.to_email || 'unknown'}, ${nameFor.get(d.pursuit_id) ?? 'unknown'}: ${d.subject}`)
     if (draftLines.length) sections.push(`*Written and waiting for you to send (${draftLines.length})*\n${cap(draftLines, 6).join('\n')}`)
@@ -476,7 +499,14 @@ export async function GET(request: NextRequest) {
     const { data: stopped } = await supabase
       .from('funding_opportunities')
       .select('name, pursuit_id, eligibility_verdict, eligibility_reason')
-      .in('eligibility_verdict', ['stop', 'ask_first'])
+      // Anything the screen did not clear, rather than the two verdicts this
+      // knew to look for. The sync route spent months writing a fourth value,
+      // 'blocked', which this enumeration silently excluded, so a refused path
+      // could sit outside the one report whose entire job is catching a wrong
+      // rule. That writer is fixed, but naming the values is what made the
+      // fault possible and a future fifth would do it again.
+      .neq('eligibility_verdict', 'clear')
+      .not('eligibility_verdict', 'is', null)
       .eq('eligibility_overridden', false)
       .not('eligibility_checked_at', 'is', null)
 

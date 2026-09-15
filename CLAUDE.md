@@ -140,6 +140,31 @@ operates and no record exists under `browser-passes/`. It also rejects a record
 with no figure and no quoted text in it, because an observation you could have
 written without looking is not an observation. Copy `browser-passes/TEMPLATE.md`.
 
+**When localhost cannot be driven, ship first and check production.** Rae,
+15 September 2026. Try local first, always. But the admin portal authenticates
+against a Supabase session cookie scoped to the live domain, so a local server
+answers every `/tdi-admin` page with a login screen that nobody but Rae can get
+past. Blocking a merge on a pass that cannot physically be performed just stops
+the work.
+
+So if the local app will not load, or will not let you sign in, say so in the
+record and merge on a deferred pass:
+
+```
+- Deferred: <why the local app could not be driven>
+- Verify after deploy: <the production URL you will check>
+```
+
+Then deploy, open that URL, press the control, and write the `Pressed:` and
+`Saw:` lines into the same file. This is a change of order, not an excuse: the
+check refuses the next change to those screens while an earlier deferred record
+is still missing its observations. One deferral is sequencing. The second one
+pays for the first.
+
+Never defer because local setup is inconvenient, slow, or because the change
+"obviously works". The only reason that counts is that the page cannot be
+reached or cannot be signed in to.
+
 This is a gate because the rule alone did not hold. On 13 September a fix for
 Bella went into `MyTasks.tsx`, which nothing imports. On the 14th another read a
 field that was always null. A third claimed in its own description that a link

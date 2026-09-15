@@ -6,6 +6,8 @@ import { requireAdminAuth } from '@/lib/tdi-admin/auth';
 import { postFundingEvent, narrativeEvent, windowEvent, submittedEvent, awardEvent, denialEvent, researchEvent } from '@/lib/funding-slack';
 import { awardedAmountOf } from '@/lib/funding-award'
 import { isOver } from '@/lib/funding-status';
+import { createApprovedSendStep } from '@/lib/funding-followups';
+import { queueApplicationEmail } from '@/lib/funding-application-email';
 
 function db() {
   return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, { auth: { autoRefreshToken: false, persistSession: false } });
@@ -257,6 +259,13 @@ export async function PATCH(request: NextRequest) {
     if (before?.narrative_status === 'approval' && body.narrative_status === 'requested') {
       updates.qa_passed = null;
     }
+
+    // Approved means the ball is ours, and says so on every badge that reads
+    // waiting_on. It used to be left untouched, so a grant Bella had just
+    // approved kept whatever the drafting stage had put there.
+    if (body.narrative_status === 'ready' && !isOver(body.status ?? before?.status)) {
+      updates.waiting_on = 'tdi';
+    }
   }
 
   // When client_submitted flips to true, set timestamp and update activity
@@ -288,6 +297,62 @@ export async function PATCH(request: NextRequest) {
 
   const { error } = await supabase.from('funding_opportunities').update(updates).eq('id', body.id);
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+  // ── Approving owes a send ──
+  //
+  // The write above is the whole of what approving used to do. See
+  // createApprovedSendStep for what that cost; in short, the grant became
+  // invisible on the page where the button was pressed.
+  //
+  // Awaited rather than fired and forgotten, and its outcome is returned to the
+  // caller. Everything else below this line is narration that can safely fail;
+  // this is the next piece of work, and a person who is told "Narrative
+  // approved" while nothing was scheduled is back where they started.
+  let sendStep: Awaited<ReturnType<typeof createApprovedSendStep>> | null = null;
+  let queuedEmail: Awaited<ReturnType<typeof queueApplicationEmail>> | null = null;
+  if (
+    body.narrative_status === 'ready' &&
+    before?.narrative_status !== 'ready' &&
+    before?.pursuit_id &&
+    !isOver(body.status ?? before?.status)
+  ) {
+    const { data: approved } = await supabase
+      .from('funding_opportunities')
+      .select('name, narrative_url, application_opens, application_closes')
+      .eq('id', body.id).single();
+    const { data: school } = await supabase
+      .from('funding_pursuits')
+      .select('district_name, pursuit_name, client_contact_name, client_contact_email')
+      .eq('id', before.pursuit_id).single();
+
+    sendStep = await createApprovedSendStep(supabase, {
+      pursuitId: before.pursuit_id,
+      opportunityId: body.id,
+      grantName: approved?.name || 'grant',
+      contactName: school?.client_contact_name ?? null,
+    });
+    if (sendStep.error) console.error('[funding/opportunities] APPROVED but no send step was created:', sendStep.error);
+
+    // And the thing she is being asked to do has to exist.
+    //
+    // A task saying "send this" is still a dead end while the only sanctioned
+    // way to send is a queue with nothing in it. See funding-application-email:
+    // on 15 September that queue held zero drafts and every other door was
+    // paused, so an approved application could not be sent by anybody.
+    queuedEmail = await queueApplicationEmail(supabase, {
+      pursuitId: before.pursuit_id,
+      opportunityId: body.id,
+      grantName: approved?.name || 'grant',
+      schoolName: school?.district_name || school?.pursuit_name || '',
+      contactName: school?.client_contact_name ?? null,
+      toEmail: school?.client_contact_email ?? null,
+      toName: school?.client_contact_name ?? null,
+      docLink: approved?.narrative_url ?? null,
+      windowOpens: approved?.application_opens ?? null,
+      windowCloses: approved?.application_closes ?? null,
+    });
+    if (queuedEmail.error) console.error('[funding/opportunities] APPROVED but the email was not queued:', queuedEmail.error);
+  }
 
   // If adding a note
   if (body.note) {
@@ -424,7 +489,18 @@ export async function PATCH(request: NextRequest) {
     }
   }
 
-  return NextResponse.json({ success: true });
+  // Reported, not merely logged. The screen says "Narrative approved"; if the
+  // step that follows it was not created, the person deserves to see that in
+  // the same breath rather than discover it by the grant going quiet.
+  return NextResponse.json({
+    success: true,
+    ...(sendStep
+      ? { sendStep: { created: sendStep.created, title: sendStep.title, alreadyScheduled: sendStep.skipped, error: sendStep.error ?? null } }
+      : {}),
+    ...(queuedEmail
+      ? { queuedEmail: { queued: queuedEmail.queued, alreadyQueued: queuedEmail.skipped, because: queuedEmail.because ?? null, error: queuedEmail.error ?? null } }
+      : {}),
+  });
 }
 
 // DELETE

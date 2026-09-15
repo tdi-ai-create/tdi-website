@@ -26,6 +26,7 @@ import { readSchoolProfile } from '@/lib/funding/school-profile'
 import { callTriggerFor } from '@/lib/funding/call-escalation'
 import { DRAFT_SILENCE_HOURS } from './funding-rules'
 import { isSchoolOwned } from './funding-ownership'
+import { isEligibilityBlocked, isEligibilityRefused } from './funding-eligibility'
 import { canAgentDraft, stalledDraftMessage } from './funding-offerable'
 import { isOver, isWithFunder } from './funding-status'
 
@@ -427,10 +428,20 @@ export function computeNextActions(
       .map((a: any) => String(a.opportunity_id)),
   )
 
+  // A path the screen has refused outright is not worth an agent's window
+  // research. St. Peter Chanel's Community Schools Budget was in exactly that
+  // position on 15 September: verdict 'stop', rule 'sector', a private school
+  // against a federal programme, and the only thing the engine had to say about
+  // it was that an agent should go and find out when the window opens.
+  //
+  // Only 'stop'. See isEligibilityRefused: an 'ask_first' path is usually
+  // blocked *because* the window is unestablished, so this is the one piece of
+  // work that can free it.
   const unverifiedWindows = opportunities.filter(
     (o: any) =>
       !isOver(o.status) &&
       (o.window_status || 'unknown') === 'unknown' &&
+      !isEligibilityRefused(o) &&
       !heldByAPerson.has(String(o.id)),
   )
   for (const opp of unverifiedWindows) {
@@ -618,6 +629,72 @@ export function computeNextActions(
     })
   }
 
+  // Sent to the school, and not submitted.
+  //
+  // The gap between the two rules either side of this one. A grant is skipped
+  // by the rule above the moment forwarding_email_status reads 'sent', and it
+  // cannot be picked up by the funder rules until client_submitted is true or
+  // its status reaches 'applied'. Between those points it belongs to the
+  // school, and the board had nothing at all to say about it.
+  //
+  // Measured on 15 September: four paths sat there, at Allenwood and Saunemin,
+  // approved and delivered with their status still reading 'researching'.
+  //
+  // They were being chased, by the follow-up items createSendFollowUps writes,
+  // so this is not the Title II-A failure again. It is that the path itself
+  // went quiet: the chases appear as tasks on a list while the grant they are
+  // about shows nothing, so "what is happening with Pepco" had no answer on the
+  // screen that exists to answer it.
+  //
+  // Status is left alone deliberately. Moving it to 'waiting' or 'applied' to
+  // make the funder rules fire would be a lie in the direction that costs most:
+  // both count as in play on the board, and the money would be added to "with
+  // funders" for applications nobody has submitted.
+  for (const opp of opportunities) {
+    if (isOver(opp.status)) continue
+    if (opp.forwarding_email_status !== 'sent') continue
+    if (opp.client_submitted === true) continue
+    if (isWithFunder(opp.status)) continue
+
+    const chases = actions.filter(
+      (a: any) =>
+        a.opportunity_id === opp.id &&
+        ['pending', 'blocked'].includes(a.status) &&
+        ['follow_up', 'submission'].includes(a.category),
+    )
+    const contact = pursuit.client_contact_name?.split(' ')[0] || 'the school'
+    const nextChase = chases.map((a: any) => a.due_date).filter(Boolean).sort()[0]
+
+    // Nothing open against it is the dangerous half. Title II-A was sent, filed
+    // as complete, and sat unsubmitted and invisible for nine days.
+    if (chases.length === 0) {
+      result.push({
+        id: `unchased-${opp.id}`,
+        label: `Nobody is chasing "${opp.name}" with ${contact}`,
+        why: 'It is with the school and nothing is scheduled to ask whether they submitted it.',
+        owner: 'team',
+        urgency: 'high',
+        actionType: 'add_followup',
+        targetId: opp.id,
+        tab: 'opportunities',
+      })
+      continue
+    }
+
+    result.push({
+      id: `with-school-${opp.id}`,
+      label: `Waiting on ${contact} to submit "${opp.name}"`,
+      why: nextChase
+        ? `Sent and not submitted. Next chase is ${new Date(nextChase + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'long' })}.`
+        : 'Sent and not submitted. The chase has no date, so nothing will raise it.',
+      owner: 'school',
+      urgency: nextChase ? 'low' : 'normal',
+      actionType: 'awaiting_submission',
+      targetId: opp.id,
+      tab: 'opportunities',
+    })
+  }
+
   // QA passed → Bella approves. Nothing reaches a school without this step.
   for (const opp of opportunities) {
     if (opp.narrative_status === 'approval' ||
@@ -772,9 +849,20 @@ export function computeNextActions(
   }
 
   // Opportunities with open window + gate open but narrative not started
+  //
+  // The eligibility check was missing here from the day the screen was built.
+  // This rule asked three questions, gate, window and narrative state, and
+  // never the one the screen exists to answer, so a path already ruled
+  // unwinnable still produced "Request draft" the moment its window was
+  // verified open. Nothing in the loop below could tell the difference.
+  //
+  // It has not misfired in production yet, and only by luck: every refused path
+  // happens to be sitting on an unverified window, which the next line already
+  // rejects. One successful window check on the wrong path was all it needed.
   if (gate?.gate_open) {
     for (const opp of opportunities) {
       if (isOver(opp.status)) continue
+      if (isEligibilityBlocked(opp)) continue
       if (opp.window_status !== 'open') continue
       if (opp.narrative_status && opp.narrative_status !== 'not_started') continue
       result.push({

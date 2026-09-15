@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js'
 import { guardCron } from '@/lib/cron-guard'
 import { isAgentWindowWork } from '@/lib/funding-window-work'
 import { isOver, isWithFunder } from '@/lib/funding-status'
+import { closePathWithReason, cancelWorkOnClosedPath } from '@/lib/funding-path-closure'
 import { readTdiFacts, answeredCredential, missingCredentials } from '@/lib/funding/tdi-facts'
 import { buildDecisionBrief, renderDecisionBrief } from '@/lib/funding-decision-brief'
 import {
@@ -161,6 +162,9 @@ export async function GET(request: NextRequest) {
     const questionsDeferredToAgent: string[] = []
     const questionsFailed: { school: string; path: string; question: string; because: string; error: string }[] = []
     const unchanged: string[] = []
+    // Paths the screen ended this run, and the ones it tried to end and could not.
+    const closures: { school: string; path: string; rule: string; reason: string; workCancelled?: number }[] = []
+    const closureFailures: { school: string; path: string; rule: string; reason: string; error: string }[] = []
     const skipped: { path: string; why: string }[] = []
     const counts = { stop: 0, ask_first: 0, clear: 0 }
 
@@ -360,6 +364,49 @@ export async function GET(request: NextRequest) {
         }
       }
 
+      // ── A 'stop' ends the path, and the log says why ──
+      //
+      // Before this, a stop verdict was recorded on the row and nothing else
+      // happened. The path stayed open at whatever status it held, kept its
+      // open action items, and kept being offered work: St. Peter Chanel's
+      // Community Schools Budget was a private school against a federal
+      // programme, verdict 'stop', rule 'sector', and the only thing the
+      // portal had to say about it was that an agent should go and establish
+      // its window. Nothing anywhere recorded that the school did not qualify.
+      //
+      // Placed above the unchanged check on purpose. A path that was already
+      // 'stop' before this ran is precisely the backlog this is meant to
+      // clear, and continuing past it as "unchanged" would leave every
+      // existing one open forever.
+      if (result.verdict === 'stop' && !isSettled(opp.status)) {
+        const intended = {
+          school: school.district_name ?? '',
+          path: opp.name ?? '',
+          rule: result.rule,
+          reason: result.reason,
+        }
+        if (dryRun) {
+          closures.push(intended)
+        } else {
+          const closure = await closePathWithReason(supabase, {
+            opportunityId: opp.id,
+            reason: result.reason,
+            rule: result.rule,
+          })
+          if (closure.closed) {
+            const tidy = await cancelWorkOnClosedPath(supabase, opp.id)
+            if (tidy.error) console.error(`[eligibility-audit] ${tidy.error}`)
+            closures.push({ ...intended, workCancelled: tidy.cancelled })
+          } else {
+            // Counted as a failure, never as a closure. A run that reports
+            // eight closed and closed six is the reporting bug this codebase
+            // keeps paying for.
+            console.error(`[eligibility-audit] Could not close ${opp.id}:`, closure.error)
+            closureFailures.push({ ...intended, error: closure.error ?? 'unknown' })
+          }
+        }
+      }
+
       if (result.verdict === opp.eligibility_verdict) {
         unchanged.push(opp.name ?? '')
         continue
@@ -409,6 +456,13 @@ export async function GET(request: NextRequest) {
       questionsFailed: questionsFailed.length,
       questionFailures: questionsFailed,
       unchangedCount: unchanged.length,
+      // Reported as its own number rather than folded into `changed`. Closing a
+      // school's funding path is the most consequential thing this route does
+      // and the one a wrong rule would do wholesale.
+      pathsClosed: closures.length,
+      closures,
+      closuresFailed: closureFailures.length,
+      closureFailures,
       skipped,
       // What we still do not know about ourselves, across the states we work
       // in. Listed rather than counted: a count says there is a problem, a
@@ -418,7 +472,7 @@ export async function GET(request: NextRequest) {
       aboutUs: missingCredentials(tdiFacts, statesWeWorkIn),
       couldNotReadOurOwnFacts: tdiErr ?? null,
       note: dryRun
-        ? 'Nothing was written. Every verdict above was computed against live data.'
+        ? 'Nothing was written and nothing was closed. Every verdict and closure above was computed against live data.'
         : 'Verdicts recorded. No path was deleted and no human override was touched.',
     })
   } catch (error) {
