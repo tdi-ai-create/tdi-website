@@ -107,12 +107,20 @@ export default function EditDistrictPage() {
 
     if (districtError) { setError('Failed to save. Please try again.'); setSaving(false); return }
 
-    // Handle contacts
+    // Contacts save one at a time, and every one of these three writes used to
+    // throw its result away. A contact that failed to save looked exactly like
+    // one that saved: the loop carried on and the page navigated away. That is
+    // the shape that silently broke five features in August, and losing a
+    // billing contact here is how an invoice goes to an address nobody reads.
+    const contactFailures: string[] = []
     for (const contact of contacts) {
+      const who = contact.name.trim() || 'a contact with no name'
+
       if (contact._deleted && contact.id) {
-        await supabase.from('district_contacts').delete().eq('id', contact.id)
+        const { error } = await supabase.from('district_contacts').delete().eq('id', contact.id)
+        if (error) contactFailures.push(`could not remove ${who}`)
       } else if (contact.id && !contact._deleted) {
-        await supabase.from('district_contacts').update({
+        const { error } = await supabase.from('district_contacts').update({
           name: contact.name.trim(),
           title: contact.title.trim() || null,
           email: contact.email.trim() || null,
@@ -120,8 +128,9 @@ export default function EditDistrictPage() {
           department: contact.department.trim() || null,
           is_primary: contact.is_primary,
         }).eq('id', contact.id)
+        if (error) contactFailures.push(`could not update ${who}`)
       } else if (!contact.id && !contact._deleted && contact.name.trim()) {
-        await supabase.from('district_contacts').insert({
+        const { error } = await supabase.from('district_contacts').insert({
           district_id: id,
           name: contact.name.trim(),
           title: contact.title.trim() || null,
@@ -130,7 +139,16 @@ export default function EditDistrictPage() {
           department: contact.department.trim() || null,
           is_primary: contact.is_primary,
         })
+        if (error) contactFailures.push(`could not add ${who}`)
       }
+    }
+
+    // Say which half worked. "Failed to save" would be a lie when the district
+    // itself is already updated.
+    if (contactFailures.length) {
+      setError(`The district saved, but ${contactFailures.join(', ')}. Those contacts are unchanged. Check them and save again.`)
+      setSaving(false)
+      return
     }
 
     router.push(`/tdi-admin/intelligence/districts/${id}`)

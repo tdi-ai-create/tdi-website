@@ -78,7 +78,7 @@ export default function NewDistrictPage() {
     // Insert contacts (filter out blank ones)
     const validContacts = contacts.filter(c => c.name.trim())
     if (validContacts.length > 0) {
-      await supabase.from('district_contacts').insert(
+      const { error: contactsError } = await supabase.from('district_contacts').insert(
         validContacts.map(c => ({
           district_id: district.id,
           name: c.name.trim(),
@@ -89,6 +89,20 @@ export default function NewDistrictPage() {
           is_primary: c.is_primary,
         }))
       )
+
+      // The client already exists at this point, so this cannot claim the save
+      // failed. It says exactly what is missing instead. Before this the result
+      // was discarded and you landed on a client page with no contacts on it,
+      // looking like nobody had been entered rather than like a write that
+      // failed.
+      if (contactsError) {
+        setError(
+          `${form.name.trim()} was created, but its ${validContacts.length === 1 ? 'contact was' : `${validContacts.length} contacts were`} not saved. ` +
+          'Open the client and add them there.',
+        )
+        setSaving(false)
+        return
+      }
     }
 
     router.push(`/tdi-admin/intelligence/districts/${district.id}`)
