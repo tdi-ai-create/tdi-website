@@ -97,7 +97,13 @@ export async function GET(request: NextRequest) {
       // the predicate reads undefined, returns false for everything, and the
       // deferral silently does nothing while looking as though it works. The
       // dry run caught exactly that on the first attempt.
-      .select('id, name, pursuit_id, status, client_submitted, research_status, window_status, window_checked_at, next_action, assigned_agent, eligibility_verdict, eligibility_overridden')
+      // application_closes joined this list on 15 Sep 2026, when
+      // windowIsUnestablished started counting 'open' with no closing date as
+      // unestablished. Omitting it reads undefined, which is falsy, so every
+      // open row would look like it had no closing date and the predicate
+      // would widen to all of them. Same trap as research_status above, in the
+      // opposite direction.
+      .select('id, name, pursuit_id, status, client_submitted, research_status, window_status, window_checked_at, application_closes, next_action, assigned_agent, eligibility_verdict, eligibility_overridden')
 
     if (oErr) {
       console.error('[eligibility-audit] Could not read opportunities:', oErr)

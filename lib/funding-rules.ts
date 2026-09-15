@@ -375,6 +375,28 @@ export function isWindowOpen(opp: WindowSubject, today: Date = new Date()): bool
   return closes >= todayStr;
 }
 
+/**
+ * The window is open AND we know when it shuts.
+ *
+ * Deliberately stricter than `isWindowOpen`, and deliberately a separate
+ * function rather than a change to it. `isWindowOpen` returns true for a row
+ * stamped 'open' with no closing date (see the line above), which is what the
+ * portal's draft controls and `find_work` have always keyed on. Tightening it
+ * in place would make draft buttons vanish across every school at once.
+ *
+ * This is the test for the one thing that genuinely must not happen without a
+ * date: telling a school their application is ready and promising to remind
+ * them when the window opens. That email is built from the closing date, and
+ * with the date missing it prints a placeholder and schedules no reminder, so
+ * we promise something no job exists to deliver.
+ *
+ * Use this at the send boundary. Use `isWindowOpen` everywhere else.
+ */
+export function windowOpenWithKnownClose(opp: WindowSubject, today: Date = new Date()): boolean {
+  if (!opp.application_closes) return false;
+  return isWindowOpen(opp, today);
+}
+
 /** Days until the window shuts. Negative once it has. Null with no date. */
 export function daysUntilClose(opp: WindowSubject, today: Date = new Date()): number | null {
   if (!opp.application_closes) return null;
