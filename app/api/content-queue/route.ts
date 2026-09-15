@@ -125,7 +125,7 @@ export async function GET(request: NextRequest) {
     // feedback_log is read but never returned. It is the whole transcript,
     // mostly procedural, and several kilobytes per piece; what an approver needs
     // from it is two facts, so it is summarised below and dropped here.
-    .select('id, channel, content_type, title, body, status, owner, approver, audience_tag, scheduled_for, published_at, published_url, artifact_refs, artifact_rendered_at, updated_at, feedback_log')
+    .select('id, channel, content_type, title, body, status, owner, approver, audience_tag, scheduled_for, published_at, published_url, artifact_refs, artifact_rendered_at, approved_at, approved_by, updated_at, feedback_log')
     .order('updated_at', { ascending: false })
     .limit(200)
   if (status) q = q.eq('status', status)
