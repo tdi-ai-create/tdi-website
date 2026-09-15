@@ -54,8 +54,26 @@ export function isOnAllowlist(email: string): boolean {
 export type EmailTone = 'client' | 'internal'
 export type EmailType = 'reminder' | 'nudge' | 'escalation'
 
+/**
+ * The rung that means "this is ours now".
+ *
+ * Stored as the literal 'rae' since the ladder was built. Rae's rule of
+ * 15 September 2026 is that she and Bella are one role and not two owners, so
+ * the rung is a role and the role is TDI admin. 'tdi_admin' is what new code
+ * should write; 'rae' keeps working because it is already on live rows and
+ * renaming a stored value would need a migration to say nothing new.
+ */
+export const TDI_ADMIN_RUNGS = ['tdi_admin', 'rae'] as const
+
+export function isTdiAdminRung(rung: string): boolean {
+  return (TDI_ADMIN_RUNGS as readonly string[]).includes(rung)
+}
+
 export function toneForRung(rung: string): EmailTone {
-  return rung === 'rae' ? 'internal' : 'client'
+  // The top rung is internal chasing, so the email is written to us rather
+  // than to the school. That distinction is doing real work and survives the
+  // rename: what changes is that the rung stops carrying a person's name.
+  return isTdiAdminRung(rung) ? 'internal' : 'client'
 }
 
 // ── Client-facing task label ──
@@ -246,7 +264,10 @@ export function clientTaskLabel(
 }
 
 export function displayRung(rung: string): string {
-  if (rung === 'rae') return 'Rae'
+  // Never a person's name. An escalation that reads "ESCALATED to Rae" splits
+  // one role into two owners, and work filed under somebody else's name is
+  // work nobody does.
+  if (isTdiAdminRung(rung)) return 'TDI admin'
   if (rung === 'admin_sponsor') return 'Admin Sponsor'
   return rung.charAt(0).toUpperCase() + rung.slice(1)
 }

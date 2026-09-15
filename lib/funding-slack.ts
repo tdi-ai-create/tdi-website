@@ -6,6 +6,7 @@
 
 import { createClient } from '@supabase/supabase-js'
 import { isHandoff as isHandoffTransition, transitionOwner } from './funding-rules'
+import { isTdiAdminRung } from './funding-followup-email'
 
 const LOG = '[funding-slack]'
 
@@ -65,7 +66,14 @@ export interface SlackEvent {
   pursuitName: string
   message: string        // the narration line (markdown)
   level: EventLevel
-  owner?: 'bella' | 'rae' | null  // who to @mention
+  /**
+   * Who to @mention. One role, not two people: Rae's rule of 15 September
+   * 2026 is that anything in Funding needing a person is a TDI admin
+   * approval. The two handles below are the addresses that role currently
+   * has, so both are mentioned rather than the message picking one of them
+   * and quietly halving who sees it.
+   */
+  owner?: 'tdi_admin' | null
   timelineTitle?: string  // for the timeline record
   timelineDetail?: string
   /**
@@ -92,10 +100,13 @@ export async function postFundingEvent(event: SlackEvent): Promise<void> {
   const pursuitLink = `<${portalUrl}/tdi-admin/funding/${event.pursuitId}${deepParams}|${linkLabel}>`
 
   let mention = ''
-  if (event.owner === 'bella' && settings.bella_slack_handle) {
-    mention = ` <@${settings.bella_slack_handle}>`
-  } else if (event.owner === 'rae' && settings.rae_slack_handle) {
-    mention = ` <@${settings.rae_slack_handle}>`
+  if (event.owner === 'tdi_admin') {
+    // Deduped, because the two settings can hold the same handle and one role
+    // should not be pinged twice in one line.
+    const handles = [...new Set(
+      [settings.bella_slack_handle, settings.rae_slack_handle].filter(Boolean),
+    )]
+    mention = handles.map(h => ` <@${h}>`).join('')
   }
 
   const slackText = `*${event.pursuitName}* — ${event.message}${mention}\n${pursuitLink}`
@@ -194,7 +205,7 @@ export function windowEvent(pursuitId: string, pursuitName: string, oppName: str
   return {
     pursuitId, pursuitName, message,
     level: closed ? 'critical' : 'handoffs',
-    owner: 'bella',
+    owner: 'tdi_admin',
     timelineTitle: `Window status: ${oppName} → ${newStatus}`,
   }
 }
@@ -204,7 +215,7 @@ export function gateEvent(pursuitId: string, pursuitName: string): SlackEvent {
     pursuitId, pursuitName,
     message: 'Alignment gate satisfied → all 5 conditions met, submission work can proceed',
     level: 'handoffs',
-    owner: 'bella',
+    owner: 'tdi_admin',
     timelineTitle: 'Gate satisfied',
     timelineDetail: 'Submitter, backup, admin sponsor named; both contracts signed',
   }
@@ -249,12 +260,12 @@ export function nudgeSentEvent(pursuitId: string, pursuitName: string, actionTit
 }
 
 export function escalationEvent(pursuitId: string, pursuitName: string, actionTitle: string, fromRung: string, toRung: string, toEmail: string): SlackEvent {
-  const isRae = toRung === 'rae'
+  const isFinalRung = isTdiAdminRung(toRung)
   return {
     pursuitId, pursuitName,
-    message: `"${actionTitle}" escalated ${fromRung} → ${toRung} (${toEmail})${isRae ? ' — final rung' : ''}`,
-    level: isRae ? 'critical' : 'handoffs',
-    owner: isRae ? 'rae' : 'bella',
+    message: `"${actionTitle}" escalated ${fromRung} → ${toRung} (${toEmail})${isFinalRung ? ' (final rung)' : ''}`,
+    level: isFinalRung ? 'critical' : 'handoffs',
+    owner: 'tdi_admin',
     timelineTitle: `Escalated to ${toRung}: ${actionTitle}`,
     timelineDetail: `From ${fromRung} to ${toRung} (${toEmail})`,
   }
@@ -265,7 +276,7 @@ export function submittedEvent(pursuitId: string, pursuitName: string, oppName: 
     pursuitId, pursuitName,
     message: `${oppName} marked SUBMITTED${proof ? ` (${proof})` : ''}`,
     level: 'handoffs',
-    owner: 'bella',
+    owner: 'tdi_admin',
     timelineTitle: `Submitted: ${oppName}`,
     timelineDetail: proof,
   }
@@ -276,7 +287,7 @@ export function awardEvent(pursuitId: string, pursuitName: string, oppName: stri
     pursuitId, pursuitName,
     message: `${oppName} AWARDED $${amount.toLocaleString()} → needs allocation to line items`,
     level: 'critical',
-    owner: 'rae',
+    owner: 'tdi_admin',
     timelineTitle: `Awarded: ${oppName} — $${amount.toLocaleString()}`,
   }
 }
@@ -307,7 +318,7 @@ export function renewalEvent(pursuitId: string, pursuitName: string, newPursuitN
     pursuitId, pursuitName,
     message: `Renewal pursuit created: ${newPursuitName}`,
     level: 'handoffs',
-    owner: 'bella',
+    owner: 'tdi_admin',
     timelineTitle: `Renewal started: ${newPursuitName}`,
   }
 }
@@ -318,7 +329,7 @@ export function contractLinkedEvent(pursuitId: string, pursuitName: string, cont
     pursuitId, pursuitName,
     message: `${label} linked: "${quoteTitle}"`,
     level: 'handoffs',
-    owner: 'bella',
+    owner: 'tdi_admin',
     timelineTitle: `${label} linked`,
     timelineDetail: quoteTitle,
   }

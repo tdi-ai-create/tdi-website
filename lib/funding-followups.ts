@@ -26,7 +26,22 @@ type DbClient = any;
 
 /** Matches the convention in lib/funding-pursuit-template.ts for TDI-owned work. */
 const TDI_OWNER_EMAIL = 'hello@teachersdeserveit.com';
-const TDI_OWNER_NAME = 'Bella';
+
+/**
+ * The owner is a role, not a person.
+ *
+ * This stamped the literal 'Bella' on every follow-up it created. Rae's rule of
+ * 15 September 2026 is that she and Bella are one role: anything needing a
+ * person in Funding is a TDI admin approval, and naming one of them makes the
+ * other's queue look like somebody else's work.
+ *
+ * Nothing should be reading this to decide ownership in the first place.
+ * owner_type does that, via lib/funding-ownership.ts, and owner_name is null on
+ * more than half the live rows anyway. Existing rows keep whatever they were
+ * stamped with, because a name in a column nobody matches on is not worth a
+ * migration.
+ */
+const TDI_OWNER_NAME = 'TDI admin';
 
 /** With no window to anchor to, chase weekly from today. */
 const WEEKLY_CHASE_DAYS = 7;
