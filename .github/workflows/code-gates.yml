@@ -90,6 +90,19 @@ jobs:
 
           exit $status
 
+      - name: Someone opened the page
+        # CI cannot drive Chrome, so this does not run the browser pass. It
+        # refuses to merge a change to a screen someone operates without a
+        # record of one, and rejects a record that could have been written
+        # without looking.
+        #
+        # Two fixes shipped broken on 13 and 14 September and both were caught
+        # only by loading the live site. One went into a file nothing imports.
+        # One read a field that was always empty. Both typechecked and both
+        # deployed. Forty other checks in this repo test the code or the data;
+        # not one of them opens a page.
+        run: npm run check:browserpass
+
       - name: Changed components are reachable
         # A component nobody imports ships unreachable, so editing it changes
         # nothing for anyone while looking exactly like a fix.
