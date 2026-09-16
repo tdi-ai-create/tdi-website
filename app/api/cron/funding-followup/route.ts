@@ -971,7 +971,10 @@ export async function GET(request: NextRequest) {
         if (atCeiling && !item.nudge_ceiling_notified_at) {
           updates.nudge_ceiling_notified_at = now.toISOString()
 
-          const handTo = isSchoolOwned(item) ? 'bella' : 'rae'
+          // One role either way. This picked 'bella' for a school-owned item
+          // and 'rae' for ours, which is the same split Rae removed on
+          // 15 September 2026: both are a TDI admin picking the item up.
+          const handTo = 'tdi_admin' as const
           const who = item.client_label || item.title
 
           postFundingEvent({
@@ -985,7 +988,7 @@ export async function GET(request: NextRequest) {
             timelineTitle: `Automated reminders stopped: ${item.title}`,
             timelineDetail:
               `${nudgesSoFar} reminders sent to ${ownerEmail ?? 'unknown'} with no resolution. ` +
-              `Ceiling is ${MAX_NUDGES}. Handed to ${handTo}. ` +
+              `Ceiling is ${MAX_NUDGES}. Handed to TDI admin. ` +
               `The item stays open and keeps its due date; only the automated sending stops.`,
           }).catch(err => console.error('[funding-followup] non-blocking side effect failed:', err))
 
