@@ -165,7 +165,9 @@ const plugin = definePlugin({
     ctx.actions.register("decide", async (params, context) => {
       const p = params as { id?: string; decision?: string; note?: string; scheduled_for?: string };
       if (!p?.id) return { ok: false, error: "No piece was named." };
-      const DECISIONS = ["approve", "request_changes", "schedule"];
+      // set_date writes a planned day and leaves the piece where it is, so a
+      // month can be laid out before anything is approved.
+      const DECISIONS = ["approve", "request_changes", "schedule", "set_date"];
       if (!p.decision || !DECISIONS.includes(p.decision)) {
         return { ok: false, error: `A decision is one of ${DECISIONS.join(", ")}.` };
       }
@@ -175,7 +177,7 @@ const plugin = definePlugin({
       // Checked here as well as in the queue, so a mistyped date is a sentence
       // rather than a Postgres error about input syntax. The queue is still the
       // one that decides; this only stops the obvious case earlier.
-      if (p.decision === "schedule") {
+      if (p.decision === "schedule" || p.decision === "set_date") {
         const when = (p.scheduled_for ?? "").trim();
         if (!when) return { ok: false, error: "Pick a date first." };
         if (!/^\d{4}-\d{2}-\d{2}$/.test(when)) {
@@ -202,7 +204,9 @@ const plugin = definePlugin({
           id: p.id,
           actor,
           note: p.note ?? null,
-          ...(p.decision === "schedule" ? { scheduled_for: (p.scheduled_for ?? "").trim() } : {}),
+          ...(p.decision === "schedule" || p.decision === "set_date"
+            ? { scheduled_for: (p.scheduled_for ?? "").trim() }
+            : {}),
         },
       });
 
@@ -265,6 +269,108 @@ const plugin = definePlugin({
      * is the pipeline saying "this brief is the work for that intention", not a
      * person's decision, and the queue refuses the calendar key for it anyway.
      */
+    /**
+     * Board approvals that are holding Hub work, keyed by the Quick Win they
+     * cover.
+     *
+     * The link is not a field. Nora writes the Quick Win ids into the approval's
+     * summary prose, like `id a39ed4c0-...`, so the only way to connect the two
+     * is to read uuids out of the text. That is fragile and worth saying out
+     * loud: if she changes how she words a summary, this finds nothing, and the
+     * calendar will say a piece is waiting on nothing rather than inventing a
+     * link.
+     *
+     * One approval commonly covers several pieces. The dyslexia and autism
+     * opener covers six. So this maps quick win id to the approval, and the
+     * panel says how many others the same decision releases.
+     */
+    ctx.data.register("hub_approvals", async (params) => {
+      const companyId = String((params as { companyId?: string }).companyId ?? "");
+      if (!companyId) return { byItem: {}, error: "No company." };
+
+      try {
+        const pending = await ctx.approvals.list({ companyId, status: "pending" });
+        const byItem: Record<string, {
+          approvalId: string;
+          title: string;
+          summary: string;
+          risks: string[];
+          covers: string[];
+        }> = {};
+
+        const UUID = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi;
+
+        for (const a of pending) {
+          const payload = (a.payload ?? {}) as {
+            title?: unknown; summary?: unknown; risks?: unknown;
+          };
+          const summary = typeof payload.summary === "string" ? payload.summary : "";
+          const title = typeof payload.title === "string" ? payload.title : "Board approval";
+          const risks = Array.isArray(payload.risks)
+            ? payload.risks.filter((r): r is string => typeof r === "string")
+            : [];
+
+          const ids = [...new Set((summary.match(UUID) ?? []).map((s) => s.toLowerCase()))];
+          if (ids.length === 0) continue;
+
+          for (const id of ids) {
+            byItem[id] = { approvalId: a.id, title, summary, risks, covers: ids };
+          }
+        }
+
+        return { byItem, error: null };
+      } catch (e) {
+        // A calendar that cannot read approvals should say so, not quietly show
+        // every held piece as if nothing were holding it.
+        return { byItem: {}, error: e instanceof Error ? e.message : String(e) };
+      }
+    });
+
+    /**
+     * Decide a board approval from the calendar.
+     *
+     * The host re-verifies that the signed-in person is an active human board
+     * member of this company before applying anything, so this cannot decide as
+     * an identity the web app would refuse.
+     */
+    ctx.actions.register("decide_approval", async (params, context) => {
+      const p = params as { approvalId?: string; action?: string; note?: string };
+      if (!p?.approvalId) return { ok: false, error: "No approval was named." };
+      if (p.action !== "approve" && p.action !== "reject") {
+        return { ok: false, error: "A decision is either approve or reject." };
+      }
+      if (p.action === "reject" && !p.note?.trim()) {
+        return { ok: false, error: "Say why you are holding it. A refusal with no reason is not feedback." };
+      }
+
+      const actorCtx = context?.actor;
+      if (!actorCtx || actorCtx.type !== "user" || !actorCtx.userId) {
+        return { ok: false, error: "Only a signed-in person can decide an approval." };
+      }
+      const companyId = context?.companyId ?? actorCtx.companyId ?? "";
+
+      try {
+        const r = await ctx.approvals.decide(p.approvalId, {
+          action: p.action,
+          actorUserId: actorCtx.userId,
+          decisionNote: p.note?.trim() || null,
+        }, companyId);
+
+        ctx.logger.info("Board approval decided from the calendar", {
+          approvalId: p.approvalId, action: p.action, applied: r.applied,
+        });
+        // applied false means it had already been decided elsewhere. Saying so
+        // beats reporting success for something this call did not do.
+        return {
+          ok: true,
+          applied: r.applied,
+          alreadyDecided: !r.applied,
+        };
+      } catch (e) {
+        return { ok: false, error: e instanceof Error ? e.message : String(e) };
+      }
+    });
+
     ctx.actions.register("plan_edit", async (params, context) => {
       const p = params as {
         action?: string;

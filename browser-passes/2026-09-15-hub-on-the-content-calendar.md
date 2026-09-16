@@ -80,3 +80,38 @@ browser instead.
 
 I did not press Download Tool on the live Quick Win, and I did not answer the
 Vibe Check that opened over it. Both write against a real educator account.
+
+## Third pass, v0.7.2: every card opens, and drag works
+
+Rae: read only is no use, and every tool should be clickable for feedback,
+notes and approval. Plus drag and drop to reschedule.
+
+- Opened the calendar on v0.7.2 with a disposable row, "TEST ROW, delete me.
+  Drag check", sitting undated in "No day yet".
+- Dragged it onto 25 September using real drag events. Saw the day cell take a
+  2px outline while the card was over it, and after the drop the banner read
+  "Planned for 2026-09-25. Still waiting on you."
+- Checked the database rather than the banner: `scheduled_for` became
+  `2026-09-25`, `status` stayed `pending_approval`, and the log entry reads
+  `{"actor":"rae","action":"set_date","scheduled_for":"2026-09-25"}`. A date was
+  written and nothing claimed the piece was approved.
+- Saw the card move out of "No day yet" and onto the 25th.
+- Deleted the disposable row and confirmed the queue is back to 10 real pieces.
+
+A bug the screenshot caught that no assertion would have. The two blank cells
+before the 1st were permanently outlined blue. `c.iso` is null on padding cells
+and `dragOverDay` is null when idle, so `dragOverDay === c.iso` was true forever.
+Fixed, and re-checked: zero cells carry the highlight while idle.
+
+## What I could not build
+
+Deciding a Hub board approval from the calendar. The SDK types offer
+`approvals.read` and `approvals.respond`, so it compiled and all 29 tests
+passed, and the running Paperclip host rejects both as invalid manifest values.
+Adding them failed activation and left the plugin in error state with the
+calendar down for a few minutes on 15 September. Reverted, back up on v0.7.1,
+config key intact.
+
+So the calendar can show that sixteen Hub pieces are held and cannot release
+any of them. That is a host limit, not a design choice, and it is written here
+rather than hidden behind a button that looks like it works.
