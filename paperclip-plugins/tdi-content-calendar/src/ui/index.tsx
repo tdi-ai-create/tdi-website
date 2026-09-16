@@ -97,6 +97,15 @@ type HubItem = {
   day: string | null;
 };
 
+/** A board approval holding one or more Hub pieces. */
+type HubApproval = {
+  approvalId: string;
+  title: string;
+  summary: string;
+  risks: string[];
+  covers: string[];
+};
+
 type Plan = {
   month: string;
   slots: Slot[];
@@ -387,6 +396,20 @@ export function ContentCalendarPage(_props: PluginWidgetProps) {
    * controls that are always on. A month covered in "Plan something" buttons
    * while you are trying to read a post is noise.
    */
+  /** The Hub piece open in the panel. Separate from openId: they come from two
+   * different pipelines and nothing guarantees their ids cannot collide. */
+  const [openHubId, setOpenHubId] = useState<string | null>(null);
+
+  /**
+   * Which piece is being dragged, and which day is under it.
+   *
+   * Only queue work can be dragged. A Hub Quick Win carries its own release
+   * date on its own schedule, and moving one from here would change what goes
+   * out to educators without touching the pipeline that actually publishes it.
+   */
+  const [dragId, setDragId] = useState<string | null>(null);
+  const [dragOverDay, setDragOverDay] = useState<string | null>(null);
+
   const [planMode, setPlanMode] = useState(false);
   const [slotDay, setSlotDay] = useState<string | null>(null);
   const [slotChannel, setSlotChannel] = useState("substack");
@@ -395,8 +418,13 @@ export function ContentCalendarPage(_props: PluginWidgetProps) {
 
   const { data, loading, error, refresh } = usePluginData<Board>("board");
   const { data: plan, refresh: refreshPlan } = usePluginData<Plan>("plan", { month });
+  const { data: approvalsData, refresh: refreshApprovals } =
+    usePluginData<{ byItem: Record<string, HubApproval>; error: string | null }>(
+      "hub_approvals", {},
+    );
   const decide = usePluginAction("decide");
   const planEdit = usePluginAction("plan_edit");
+  const decideApproval = usePluginAction("decide_approval");
 
   const [y, m] = month.split("-").map(Number);
   const items = data?.items ?? [];
@@ -486,6 +514,8 @@ export function ContentCalendarPage(_props: PluginWidgetProps) {
   const standardFor = (channel: string) => standards.find((s) => s.channel === channel) ?? null;
 
   const hubItems = plan?.hub ?? [];
+  const hubApprovals = approvalsData?.byItem ?? {};
+  const openHub = hubItems.find((h) => h.id === openHubId) ?? null;
   const hubByDay = useMemo(() => {
     const map = new Map<string, HubItem[]>();
     for (const h of hubItems) {
@@ -516,6 +546,84 @@ export function ContentCalendarPage(_props: PluginWidgetProps) {
       setSaid(done);
       refreshPlan();
       refresh();
+    } catch (e) {
+      setSaid(e instanceof Error ? e.message : "That did not go through.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  /**
+   * Move a piece to a day by dragging it there.
+   *
+   * Same action the date picker uses, so the log records it identically and a
+   * drag is not a second way of writing the same fact. Refused before it starts
+   * for anything not yet approved: a date on unapproved work would be a plan
+   * for something nobody has agreed to publish.
+   */
+  async function dropOn(day: string) {
+    const item = items.find((i) => i.id === dragId);
+    setDragId(null);
+    setDragOverDay(null);
+    if (!item || !day) return;
+    if (item.scheduled_for === day) return;
+
+    // Work that is already out has a date recording what happened. Moving it
+    // would be rewriting history rather than changing a plan.
+    if (item.status === "published" || item.status === "verified") {
+      setSaid(`"${item.title ?? "That piece"}" has already gone out. Its date is a record, not a plan.`);
+      return;
+    }
+
+    // Approved work moves through schedule, which is a real transition.
+    // Anything earlier gets set_date, which writes the day and leaves the piece
+    // exactly where it is, so laying out a month claims nothing about sign off.
+    const approved = item.status === "approved" || item.status === "scheduled";
+
+    setBusy(true);
+    setSaid(null);
+    try {
+      const res = (await decide({
+        id: item.id,
+        decision: approved ? "schedule" : "set_date",
+        scheduled_for: day,
+      })) as { ok?: boolean; error?: string };
+      if (!res?.ok) throw new Error(res?.error ?? "That did not go through.");
+      setSaid(approved
+        ? `Moved to ${day}.`
+        : `Planned for ${day}. Still ${WAITING[item.status] ?? item.status}.`);
+      refresh();
+    } catch (e) {
+      setSaid(e instanceof Error ? e.message : "That did not go through.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function actOnApproval(action: "approve" | "reject") {
+    if (!openHub) return;
+    const held = hubApprovals[openHub.id];
+    if (!held) return;
+    setBusy(true);
+    setSaid(null);
+    try {
+      const res = (await decideApproval({
+        approvalId: held.approvalId,
+        action,
+        note: note || undefined,
+      })) as { ok?: boolean; error?: string; alreadyDecided?: boolean };
+      if (!res?.ok) throw new Error(res?.error ?? "That did not go through.");
+      setSaid(
+        res.alreadyDecided
+          ? "That had already been decided somewhere else, so nothing changed here."
+          : action === "approve"
+            ? `Approved. That releases ${held.covers.length} ${held.covers.length === 1 ? "piece" : "pieces"}.`
+            : "Held, with your reason on the record.",
+      );
+      setOpenHubId(null);
+      setNote("");
+      refreshApprovals();
+      refreshPlan();
     } catch (e) {
       setSaid(e instanceof Error ? e.message : "That did not go through.");
     } finally {
@@ -712,12 +820,32 @@ export function ContentCalendarPage(_props: PluginWidgetProps) {
           {cells.map((c, i) => {
             const day = c.iso ? byDay.get(c.iso) ?? [] : [];
             return (
-              <div key={i} style={{ minHeight: 104, borderRight: "1px solid #E9ECF0", borderBottom: "1px solid #E9ECF0", padding: 6, background: c.iso ? "#fff" : "#F8FAFB" }}>
+              <div key={i}
+                onDragOver={(e) => { if (c.iso && dragId) { e.preventDefault(); setDragOverDay(c.iso); } }}
+                onDragLeave={() => { if (dragOverDay === c.iso) setDragOverDay(null); }}
+                onDrop={(e) => { e.preventDefault(); if (c.iso) void dropOn(c.iso); }}
+                style={{
+                  minHeight: 104, borderRight: "1px solid #E9ECF0", borderBottom: "1px solid #E9ECF0",
+                  padding: 6,
+                  background: !c.iso ? "#F8FAFB" : dragOverDay === c.iso ? "#E8F0FD" : "#fff",
+                  // c.iso is null on the padding cells before the 1st and after
+                  // the last. dragOverDay is null when nothing is being dragged,
+                  // so an equality check alone lit those cells up permanently.
+                  outline: c.iso && dragOverDay === c.iso ? "2px solid #80A4ED" : "none",
+                  outlineOffset: -2,
+                }}>
                 {c.day && <div style={{ fontSize: 11, color: "#8A94A2", marginBottom: 4 }}>{c.day}</div>}
                 {day.map((it) => {
                   const done = it.status === "published" || it.status === "verified";
+                  // Published work has already gone out. Dragging it would be
+                  // rewriting history rather than changing a plan.
+                  const movable = it.status !== "published" && it.status !== "verified" && it.status !== "cancelled";
                   return (
-                    <button key={it.id} onClick={() => { setOpenId(it.id); setNote(""); setWhen(it.scheduled_for ?? ""); }}
+                    <button key={it.id}
+                      draggable={movable}
+                      onDragStart={(e) => { setDragId(it.id); e.dataTransfer.effectAllowed = "move"; }}
+                      onDragEnd={() => { setDragId(null); setDragOverDay(null); }}
+                      onClick={() => { setOpenId(it.id); setNote(""); setWhen(it.scheduled_for ?? ""); }}
                       style={{
                         display: "block", width: "100%", textAlign: "left", marginBottom: 4,
                         border: "none", borderLeft: `3px solid ${chan(it.channel).dot}`,
@@ -731,43 +859,29 @@ export function ContentCalendarPage(_props: PluginWidgetProps) {
                   );
                 })}
 
+                {/*
+                  Every card opens. Rae, 15 September: read only is no use. A
+                  month where some cards open a panel, some leave the app and
+                  some do nothing is three behaviours wearing one costume.
+                */}
                 {c.iso && (hubByDay.get(c.iso) ?? []).map((h) => {
-                  const card = {
-                    display: "block", marginBottom: 4, borderRadius: 3, padding: "4px 6px",
-                    borderLeft: `3px solid ${chan("hub").dot}`,
-                    background: h.is_published ? "#F4F6F8" : "#EDF2F9",
-                    fontSize: 11, lineHeight: 1.25,
-                    textDecoration: "none", color: "inherit",
-                  } as const;
-
-                  const label = (
-                    <>
+                  const held = hubApprovals[h.id];
+                  return (
+                    <button key={h.id} onClick={() => { setOpenHubId(h.id); setNote(""); }}
+                      title={h.category ?? undefined}
+                      style={{
+                        display: "block", width: "100%", textAlign: "left",
+                        marginBottom: 4, borderRadius: 3, padding: "4px 6px",
+                        border: "none", borderLeft: `3px solid ${chan("hub").dot}`,
+                        background: h.is_published ? "#F4F6F8" : "#EDF2F9",
+                        cursor: "pointer", fontSize: 11, lineHeight: 1.25,
+                        font: "inherit", fontWeight: 400,
+                      }}>
                       <div style={{ fontWeight: 600 }}>{h.title || "(untitled)"}</div>
-                      <div style={{ color: "#5A6472", fontSize: 10 }}>
-                        {h.category ? `${h.category} · ` : ""}
-                        {h.is_published ? "open in the Hub" : "not live yet"}
+                      <div style={{ color: held ? "#8A5A1A" : "#5A6472", fontSize: 10 }}>
+                        Hub · {h.is_published ? "live" : held ? "waiting on you" : "not live yet"}
                       </div>
-                    </>
-                  );
-
-                  // A live Quick Win has a real page, so the card opens it. An
-                  // unpublished one has no page anywhere: there is no per-item
-                  // admin view either, so a link would be a promise nothing can
-                  // keep. It stays flat and says why rather than looking
-                  // clickable and doing nothing.
-                  return h.is_published && h.slug ? (
-                    <a key={h.id} href={`${HUB_SITE}/hub/quick-wins/${h.slug}`}
-                      target="_blank" rel="noreferrer"
-                      title={`Open "${h.title ?? ""}" in the Hub`}
-                      style={card}>
-                      {label}
-                    </a>
-                  ) : (
-                    <div key={h.id}
-                      title="Not published yet, so there is no page to open. It is waiting on a board approval."
-                      style={{ ...card, cursor: "default" }}>
-                      {label}
-                    </div>
+                    </button>
                   );
                 })}
 
@@ -824,12 +938,21 @@ export function ContentCalendarPage(_props: PluginWidgetProps) {
         <div style={{ marginTop: 20, border: "1px solid #D8DDE3", borderRadius: 6, background: "#fff", padding: 14 }}>
           <strong>No day yet ({undated.length})</strong>
           <p style={{ color: "#5A6472", margin: "4px 0 10px", maxWidth: "72ch" }}>
+            Drag any of these onto a day to plan it. That gives it a date and
+            changes nothing else, so a month can be laid out before anything is
+            approved.{" "}
             Real work with nowhere to sit. A month that looks empty while this list is long is not an empty month.
           </p>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
             {undated.map((it) => (
-              <button key={it.id} onClick={() => { setOpenId(it.id); setNote(""); setWhen(it.scheduled_for ?? ""); }}
-                style={{ textAlign: "left", cursor: "pointer", border: "1px solid #E3E7EC", borderLeft: `3px solid ${chan(it.channel).dot}`, borderRadius: 3, padding: "6px 8px", background: "#fff", maxWidth: 260, fontSize: 11 }}>
+              // Draggable. This rail is where the month gets built from: pull a
+              // piece onto a day and it stops being work with nowhere to sit.
+              <button key={it.id}
+                draggable
+                onDragStart={(e) => { setDragId(it.id); e.dataTransfer.effectAllowed = "move"; }}
+                onDragEnd={() => { setDragId(null); setDragOverDay(null); }}
+                onClick={() => { setOpenId(it.id); setNote(""); setWhen(it.scheduled_for ?? ""); }}
+                style={{ textAlign: "left", cursor: "grab", border: "1px solid #E3E7EC", borderLeft: `3px solid ${chan(it.channel).dot}`, borderRadius: 3, padding: "6px 8px", background: "#fff", maxWidth: 260, fontSize: 11 }}>
                 <div style={{ fontWeight: 600 }}>{it.title || "(untitled)"}</div>
                 <div style={{ color: "#5A6472", fontSize: 10 }}>{chan(it.channel).label} · {WAITING[it.status] ?? it.status}</div>
               </button>
@@ -837,6 +960,82 @@ export function ContentCalendarPage(_props: PluginWidgetProps) {
           </div>
         </div>
       )}
+
+      {openHub && (() => {
+        const held = hubApprovals[openHub.id];
+        const others = held ? held.covers.length - 1 : 0;
+        return (
+          <div style={{ marginTop: 20, border: "1px solid #D8DDE3", borderRadius: 6, background: "#fff", padding: 18 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", alignItems: "baseline" }}>
+              <h2 style={{ fontSize: 17, fontWeight: 600, margin: 0 }}>{openHub.title || "(untitled)"}</h2>
+              <span style={{ fontSize: 12, color: "#5A6472" }}>
+                Hub Quick Win{openHub.category ? ` · ${openHub.category}` : ""}
+                {openHub.day ? ` · ${openHub.is_published ? "went out" : "planned for"} ${openHub.day}` : ""}
+              </span>
+            </div>
+
+            {openHub.is_published && openHub.slug && (
+              <div style={{ margin: "12px 0 0", fontSize: 13 }}>
+                This one is live.{" "}
+                <a href={`${HUB_SITE}/hub/quick-wins/${openHub.slug}`} target="_blank" rel="noreferrer"
+                  style={{ color: "#1E2749" }}>
+                  Open it in the Hub
+                </a>{" "}
+                to see what an educator sees.
+              </div>
+            )}
+
+            {!openHub.is_published && !held && (
+              <div style={{ margin: "12px 0 0", padding: "10px 12px", borderRadius: 4, background: "#F4F6F8", border: "1px solid #D8DDE3", fontSize: 13, color: "#3D4756" }}>
+                Not live yet, and nothing is holding it. It is scheduled and will
+                go out on its day without needing anyone. Nothing to decide here.
+              </div>
+            )}
+
+            {held && (
+              <div style={{ margin: "12px 0 0", padding: "10px 12px", borderRadius: 4, background: "#F8F0DF", border: "1px solid #96631A", color: "#5A431A", fontSize: 13, lineHeight: 1.5 }}>
+                <strong>{held.title}</strong>
+                {others > 0 && (
+                  <div style={{ marginTop: 4 }}>
+                    Deciding this releases {others + 1} pieces, not just this one.
+                  </div>
+                )}
+                {held.risks.length > 0 && (
+                  <ul style={{ margin: "8px 0 0", paddingLeft: 18 }}>
+                    {held.risks.map((r, i) => <li key={i} style={{ marginBottom: 4 }}>{r}</li>)}
+                  </ul>
+                )}
+                <div style={{ marginTop: 8, whiteSpace: "pre-wrap", color: "#6B5222", fontSize: 12.5 }}>
+                  {held.summary}
+                </div>
+              </div>
+            )}
+
+            <textarea value={note} onChange={(e) => setNote(e.target.value)} rows={3}
+              placeholder={held ? "If you are holding it, say why. Required." : "A note for the record. Optional."}
+              style={{ width: "100%", padding: 8, border: "1px solid #D8DDE3", borderRadius: 4, margin: "12px 0 10px" }} />
+
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              {held && (
+                <>
+                  <button disabled={busy} onClick={() => void actOnApproval("approve")}
+                    style={{ padding: "8px 16px", borderRadius: 4, border: "none", background: "#1E2749", color: "#fff", cursor: "pointer" }}>
+                    Approve{others > 0 ? ` all ${others + 1}` : ""}
+                  </button>
+                  <button disabled={busy || !note.trim()} onClick={() => void actOnApproval("reject")}
+                    style={{ padding: "8px 16px", borderRadius: 4, border: "1px solid #9E3B3B", background: "#fff", color: "#9E3B3B", cursor: "pointer" }}>
+                    Hold it
+                  </button>
+                </>
+              )}
+              <button onClick={() => { setOpenHubId(null); setNote(""); }}
+                style={{ padding: "8px 16px", borderRadius: 4, border: "1px solid #D8DDE3", background: "#fff", cursor: "pointer" }}>
+                Close
+              </button>
+            </div>
+          </div>
+        );
+      })()}
 
       {open && (
         <div style={{ marginTop: 20, border: "1px solid #D8DDE3", borderRadius: 6, background: "#fff", padding: 18 }}>

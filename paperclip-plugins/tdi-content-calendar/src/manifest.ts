@@ -13,7 +13,7 @@ import type { PaperclipPluginManifestV1 } from "@paperclipai/plugin-sdk";
 const manifest: PaperclipPluginManifestV1 = {
   id: "tdi-content-calendar",
   apiVersion: 1,
-  version: "0.6.0",
+  version: "0.7.2",
   displayName: "Content calendar",
   description:
     "Plan and approve TDI content by month, on the board, without leaving Paperclip.",
@@ -25,6 +25,11 @@ const manifest: PaperclipPluginManifestV1 = {
     "http.outbound",
     "plugin.state.read",
     "plugin.state.write",
+    // NOT approvals.read / approvals.respond. The SDK types offer them and this
+    // Paperclip build rejects them outright: adding them failed manifest
+    // validation and left the plugin in error state with the calendar down on
+    // 15 September. The host is older than the SDK. Until it catches up, the
+    // calendar can show that a Hub piece is held and cannot release it.
   ],
   // Operator-editable, per instance. Named instanceConfigSchema by the host.
   // The key lives here as a plain value, which is not where a credential
