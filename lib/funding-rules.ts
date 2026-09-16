@@ -186,10 +186,11 @@ export const TRANSITION_OWNER: Record<string, Owner> = {
   // transition in the whole table that a human performs was the one the table
   // did not describe.
   //
-  // Owned by Bella rather than null, because approving does not finish a
-  // grant. It hands her the send, and until the school has it the work has
-  // bought nothing.
-  'approval→ready': 'bella',
+  // Owned by a person rather than null, because approving does not finish a
+  // grant. It hands over the send, and until the school has it the work has
+  // bought nothing. The owner is the TDI admin role, not a named person: see
+  // the note on the Owner type.
+  'approval→ready': 'tdi_admin',
 };
 
 /**
