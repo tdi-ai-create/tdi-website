@@ -2421,15 +2421,25 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                 Partner Dashboard
               </span>
             </div>
-            <a
-              href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-[#FFBA06] text-[#1e2749] px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 hover:bg-[#e5a805] transition-colors"
-            >
-              <Calendar className="w-4 h-4" />
-              <span className="hidden sm:inline">Schedule Session</span>
-            </a>
+            <div className="flex items-center gap-2 ml-auto mr-3">
+              <a
+                href="/hub"
+                className="border border-white/25 text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 whitespace-nowrap hover:bg-white/10 hover:border-white/40 transition-colors"
+              >
+                <BookOpen className="w-4 h-4" />
+                <span className="hidden sm:inline">Open Learning Hub</span>
+                <span className="sm:hidden">Hub</span>
+              </a>
+              <a
+                href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-[#FFBA06] text-[#1e2749] px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 whitespace-nowrap hover:bg-[#e5a805] transition-colors"
+              >
+                <Calendar className="w-4 h-4" />
+                <span className="hidden sm:inline">Schedule Session</span>
+              </a>
+            </div>
             <button
               onClick={() => { setTourStep(0); setTourDismissed(false); }}
               className="text-white/50 hover:text-white/90 transition-colors"
