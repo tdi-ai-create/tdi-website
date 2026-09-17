@@ -548,22 +548,6 @@ export default function ForSchoolsPage() {
         </div>
       </section>
 
-      <section className="fs-sec" id="downloads">
-        <div className="fs-wrap">
-          <div className="fs-head-narrow">
-            <p className="fs-kicker">Take it to your team</p>
-            <h2>Everything on this page, on paper.</h2>
-            <p className="fs-lede">No email required. Built to be printed, forwarded, or dropped into a board packet as-is.</p>
-          </div>
-          <div className="fs-dl-grid">
-            <a className="fs-dl" href="/downloads/the-pulse.pdf" target="_blank" rel="noopener noreferrer" style={{"--c":"var(--pulse)"} as React.CSSProperties}><b>The Pulse</b><span>Three pages &middot; what staff get, what you see, and the twenty questions</span></a>
-            <a className="fs-dl" href="/downloads/the-focus.pdf" target="_blank" rel="noopener noreferrer" style={{"--c":"var(--focus)"} as React.CSSProperties}><b>The Focus</b><span>Three pages &middot; the 13 dates, the three answers, and how it runs</span></a>
-            <a className="fs-dl" href="/downloads/the-cohort.pdf" target="_blank" rel="noopener noreferrer" style={{"--c":"var(--cohort)"} as React.CSSProperties}><b>The Cohort</b><span>Two pages &middot; the year, baseline against March, and how it runs</span></a>
-            <a className="fs-dl" href="/downloads/the-blueprint.pdf" target="_blank" rel="noopener noreferrer" style={{"--c":"var(--blueprint)"} as React.CSSProperties}><b>The Blueprint</b><span>Two pages &middot; what a school achieves, and what it is made of</span></a>
-          </div>
-        </div>
-      </section>
-
       <section className="fs-finale">
         <div className="fs-wrap">
           <h2>Ready to start the conversation?</h2>
