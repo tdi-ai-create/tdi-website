@@ -130,7 +130,7 @@ export function DashboardHeader({
               {/* Partnership year badge */}
               {yearBadge && (
                 <span
-                  className="hidden md:inline-flex px-3 py-1 rounded-full text-xs font-semibold"
+                  className="hidden md:inline-flex whitespace-nowrap px-3 py-1 rounded-full text-xs font-semibold"
                   style={{
                     background: 'linear-gradient(135deg, rgba(255,186,6,0.2), rgba(255,186,6,0.1))',
                     border: '1px solid rgba(255,186,6,0.4)',
@@ -146,25 +146,12 @@ export function DashboardHeader({
             </p>
           </div>
           <div className="flex items-center gap-3">
-            {/* Hub Access toggle - partner-facing only */}
-            {!isAdminView && (
-              <a
-                href="/hub"
-                className="px-4 py-2 rounded-xl text-sm font-semibold flex items-center gap-2 transition-all hover:bg-white/20"
-                style={{
-                  background: 'rgba(255,255,255,0.1)',
-                  border: '1px solid rgba(255,255,255,0.2)',
-                  color: '#fff',
-                  textDecoration: 'none',
-                }}
-              >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-                Learning Hub
-              </a>
-            )}
+            {/* Learning Hub moved to the sticky nav. It is an action, and sitting
+                here styled like the year and phase chips read as a status label
+                rather than something to click. */}
             {/* Phase badge with glow */}
             <div
-              className="px-4 py-2 rounded-xl text-sm font-semibold flex items-center gap-2"
+              className="px-4 py-2 rounded-xl text-sm font-semibold flex items-center gap-2 whitespace-nowrap"
               style={{
                 background: phaseConfig.bg,
                 border: `1px solid ${phaseConfig.border}`,
