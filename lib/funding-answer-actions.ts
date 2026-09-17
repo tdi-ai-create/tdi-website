@@ -37,6 +37,8 @@
 // ---------------------------------------------------------------------------
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { recordAnswerAsFact } from './funding-answer-to-fact';
+
 type DbClient = any;
 
 /** Matches lib/funding-followups.ts. TDI work is owned by TDI, never the school. */
@@ -295,6 +297,27 @@ export async function applyAnswerOutcome(
 ): Promise<ApplyResult> {
   const now = input.now ?? new Date();
   const plan = planAfterAnswer(input);
+
+  // Write the answer into the field the eligibility screen reads, and record it
+  // as a school fact with provenance. Without this the answer lives only on the
+  // action item, the screen keeps returning the same verdict, and the next
+  // monthly audit asks the school the same question again. Six of the eight
+  // approaches we made to one superintendent were repeats of two questions for
+  // exactly this reason.
+  //
+  // Non-fatal on purpose, and never silent. The outcome the person recorded is
+  // the important part and must still apply. A failure to write the fact means
+  // the question will recur, which is worth saying out loud rather than hiding.
+  const factWrite = await recordAnswerAsFact(supabase, {
+    pursuitId: input.pursuitId,
+    questionTitle: input.questionTitle,
+    answer: input.answer,
+    answeredBy: input.answeredBy,
+    now,
+  });
+  if (factWrite.error) {
+    console.error('[answer-actions] answer recorded but not written down as a fact:', factWrite.error);
+  }
 
   let pathStopped: ApplyResult['pathStopped'] = null;
 
