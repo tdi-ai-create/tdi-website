@@ -65,6 +65,18 @@ into the route file so the next person does not widen it by accident.
   body, so the tab cannot be reached or signed in to here.
 - Verify after deploy: https://www.teachersdeserveit.com/partners/saunemin-ccsd-438
 
+## Deferred pass PARTIALLY CLOSED, 16 September 2026
+
+Observed on production in a screenshot Rae sent after deploy, relayed rather than driven
+by me.
+
+- Saw: the Our Partnership tab now renders "Your TDI Journey" followed directly by
+  "Partnership Timeline", with no funding block between them and no trace of the
+  $66,225 goal, Dr. Porter, Dr. Gloster, Jovita Ortiz or PGCPS. The exposure is gone from
+  the live page.
+
+Still open: nobody has pressed the Funding tab itself.
+
 **The Funding tab itself is unverified in the browser.** It renders on
 `/partners/[dashboardSlug]`, which requires a Supabase session, and the Chrome profile the
 extension controls has an expired one. I verified the data path end to end and the tab's
