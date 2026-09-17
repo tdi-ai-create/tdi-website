@@ -24,6 +24,31 @@ import {
 import { HorizontalBarChart, DonutChart, DonutLegend, LiveSectionHeader } from '@/components/tdi-admin/hub-charts/HubCharts'
 import { OFFERINGS, OFFERING_LABELS, OFFERING_HINTS, offeringLabel } from '@/lib/partnerships/offerings'
 
+interface MuckCardScore {
+  total: number | null
+  band: 'light' | 'moderate' | 'heavy' | null
+  breakdown: { delivery: number; grant: number; drag: number; travel: number }
+  rae: number
+  bella: number
+  value: number | null
+  valuePredicted: boolean
+  perPoint: number | null
+  noteCount: number
+  stageMedian: number
+  offering: string | null
+  travelTier: 'drive' | 'long_drive' | 'fly' | null
+}
+
+interface MuckRollupShape {
+  scored: number
+  unscored: number
+  totalMuck: number
+  factoredMuck: number
+  rae: number
+  bella: number
+  heavy: number
+}
+
 type ViewMode = 'kanban' | 'list'
 type PageTab = 'pipeline' | 'outreach' | 'analytics' | 'contracts' | 'hub-leads' | 'trash' | 'invoices' | 'coaching'
 
@@ -148,13 +173,10 @@ interface Opportunity {
   city: string | null
   state: string | null
   // AI enrichment
-  leadScore: number | null
-  scoreBreakdown: { fit?: number; pain?: number; funding?: number; warmth?: number } | null
   enrichmentData: Record<string, any> | null
   strategicBrief: string | null
   enrichmentStatus: string | null
   enrichedAt: string | null
-  tier: 'T1' | 'T2' | 'T3' | null
 }
 
 const STAGE_DISPLAY: Record<string, string> = {
@@ -209,15 +231,7 @@ function formatCurrencyFull(n: number): string {
   return n.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 })
 }
 
-function computeTier(leadScore: unknown): 'T1' | 'T2' | 'T3' | null {
-  const score = typeof leadScore === 'number' ? leadScore : typeof leadScore === 'string' ? parseInt(leadScore) : null
-  if (score == null || isNaN(score)) return null
-  if (score >= 70) return 'T1'
-  if (score >= 40) return 'T2'
-  return 'T3'
-}
-
-function toCardOpp(opp: Opportunity): SalesCardOpp {
+function toCardOpp(opp: Opportunity, muckById: Record<string, MuckCardScore>): SalesCardOpp {
   return {
     id: opp.supabase_id,
     name: opp.name,
@@ -235,8 +249,7 @@ function toCardOpp(opp: Opportunity): SalesCardOpp {
     contract_year: opp.contract_year,
     city: opp.city,
     state: opp.state,
-    leadScore: opp.leadScore,
-    tier: opp.tier,
+    muck: muckById[opp.supabase_id] ?? null,
   }
 }
 
@@ -250,6 +263,11 @@ export default function SalesPage() {
   const [lastSynced, setLastSynced] = useState<Date | null>(null)
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null)
   const [oppNotes, setOppNotes] = useState<Record<string, { body: string; created_at: string }[]>>({})
+  // Muck points come from /api/sales/muck rather than being computed here.
+  // Bands are assigned by rank, which needs the whole board at once, and drag
+  // needs a full note count that the anon key cannot read.
+  const [muckById, setMuckById] = useState<Record<string, MuckCardScore>>({})
+  const [muckRollup, setMuckRollup] = useState<MuckRollupShape | null>(null)
   const [quickNoteOppId, setQuickNoteOppId] = useState<string | null>(null)
   const [quickNoteText, setQuickNoteText] = useState('')
   const [savingQuickNote, setSavingQuickNote] = useState(false)
@@ -528,13 +546,10 @@ export default function SalesPage() {
         website: row.website,
         city: row.city,
         state: row.state,
-        leadScore: row.lead_score,
-        scoreBreakdown: row.score_breakdown,
         enrichmentData: row.enrichment_data,
         strategicBrief: row.ai_strategic_brief,
         enrichmentStatus: row.enrichment_status,
         enrichedAt: row.enriched_at,
-        tier: computeTier(row.lead_score),
       } } catch (e) { console.error('Failed to map opportunity:', row.id, e); return null } }).filter(Boolean) as Opportunity[]
 
       setOpportunities(mapped)
@@ -553,6 +568,19 @@ export default function SalesPage() {
         }
       } catch (e) {
         console.error('[sales] notes summary request failed:', e)
+      }
+
+      try {
+        const muckRes = await fetch('/api/sales/muck')
+        if (muckRes.ok) {
+          const { scores, rollup } = await muckRes.json()
+          setMuckById(scores ?? {})
+          setMuckRollup(rollup ?? null)
+        } else {
+          console.error('[sales] muck failed:', muckRes.status)
+        }
+      } catch (e) {
+        console.error('[sales] muck request failed:', e)
       }
     } catch (err: any) {
       setError(err.message || 'Failed to load opportunities')
@@ -1099,10 +1127,6 @@ export default function SalesPage() {
       }
       if (f.deal_types.length > 0 && !f.deal_types.includes(opp.type)) return false
       if (f.sources.length > 0 && !f.sources.includes(opp.source || 'Other')) return false
-      if (f.tiers.length > 0) {
-        const oppTier = opp.tier || 'unscored'
-        if (!f.tiers.includes(oppTier)) return false
-      }
       if (showCallSheetOnly && !opp.onCallSheet) return false
       return true
     })
@@ -1127,15 +1151,6 @@ export default function SalesPage() {
     return counts
   }, [activeOpps])
 
-  const tierCounts = useMemo(() => {
-    const counts: Record<string, number> = {}
-    activeOpps.forEach(o => {
-      const t = o.tier || 'unscored'
-      counts[t] = (counts[t] || 0) + 1
-    })
-    return counts
-  }, [activeOpps])
-
   // Stats for sticky top bar (exclude Targeting from pipeline totals — cold outbound, 5% probability)
   const stats = useMemo(() => {
     const pipelineOpps = activeOpps.filter(o => o.stage !== 'targeting')
@@ -1147,9 +1162,12 @@ export default function SalesPage() {
       invoiceCount: opportunities.filter(o => o.needs_invoice && !o.deleted_at && !o.grantSupport).length,
       callSheetCount: callSheetOpps.length,
       callSheetValue: callSheetOpps.reduce((s, o) => s + (o.value ?? 0), 0),
-      tier1Count: pipelineOpps.filter(o => o.tier === 'T1').length,
+      factoredMuck: muckRollup?.factoredMuck ?? 0,
+      muckRae: muckRollup?.rae ?? 0,
+      muckBella: muckRollup?.bella ?? 0,
+      heavyCount: muckRollup?.heavy ?? 0,
     }
-  }, [activeOpps, opportunities])
+  }, [activeOpps, opportunities, muckRollup])
 
   const stagesToShow = showAllStages ? ALL_ACTIVE_STAGES : DEFAULT_KANBAN_STAGES
 
@@ -1190,7 +1208,7 @@ export default function SalesPage() {
           <button
             disabled={batchEnriching}
             onClick={async () => {
-              const unscored = opportunities.filter(o => !o.deleted_at && !o.leadScore && o.stage !== 'lost' && o.stage !== 'paid')
+              const unscored = opportunities.filter(o => !o.deleted_at && o.enrichmentStatus !== 'complete' && o.stage !== 'lost' && o.stage !== 'paid')
               if (unscored.length === 0) {
                 showToastMsg('All active leads already have scores', 'success')
                 return
@@ -1279,15 +1297,19 @@ export default function SalesPage() {
           .filter(o => !o.deleted_at && o.stage !== 'lost' && o.stage !== 'paid' && o.contactEmail)
           .map(o => {
             const daysSince = o.lastActivityAt ? Math.floor((now - new Date(o.lastActivityAt).getTime()) / 86400000) : 999
-            const tierWeight = o.tier === 'T1' ? 30 : o.tier === 'T2' ? 20 : 10
-            const priority = tierWeight + Math.min(daysSince, 60) + Math.min((o.value || 0) / 5000, 10)
+            // Light leads are cheap to chase, so they rank ahead of heavy ones
+            // when everything else is equal. This used to weight by the retired
+            // fit tier, which never updated after the lead was created.
+            const band = muckById[o.supabase_id]?.band ?? null
+            const muckWeight = band === 'light' ? 30 : band === 'moderate' ? 20 : band === 'heavy' ? 10 : 15
+            const priority = muckWeight + Math.min(daysSince, 60) + Math.min((o.value || 0) / 5000, 10)
             let action = 'Initial outreach'
             if (daysSince < 7) action = 'Follow up if no response'
             else if (daysSince < 14) action = 'Follow-up email -- been a week'
             else if (daysSince < 30) action = 'Re-engagement needed'
             else if (daysSince >= 30) action = 'Dormant -- re-engage or archive'
             if (!o.lastActivityAt) action = 'No contact yet -- initial outreach'
-            return { ...o, daysSince, priority, action, needsOutreach: daysSince >= 14 || !o.lastActivityAt }
+            return { ...o, daysSince, priority, action, band, muckTotal: muckById[o.supabase_id]?.total ?? null, needsOutreach: daysSince >= 14 || !o.lastActivityAt }
           })
           .filter(o => o.needsOutreach)
           .sort((a, b) => b.priority - a.priority)
@@ -1297,7 +1319,7 @@ export default function SalesPage() {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
               <div>
                 <h2 style={{ fontSize: 18, fontWeight: 700, color: '#0a0f1e', margin: 0 }}>Outreach Queue</h2>
-                <p style={{ fontSize: 12, color: '#6B7280', margin: '2px 0 0' }}>{staleLeads.length} leads needing outreach -- sorted by priority (tier + staleness + value)</p>
+                <p style={{ fontSize: 12, color: '#6B7280', margin: '2px 0 0' }}>{staleLeads.length} leads needing outreach, sorted by priority. Muck, staleness and value.</p>
               </div>
             </div>
             {staleLeads.length === 0 ? (
@@ -1311,7 +1333,7 @@ export default function SalesPage() {
                     style={{
                       background: 'white', border: '1px solid #E5E7EB', borderRadius: 10, padding: '12px 16px',
                       cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                      borderLeft: `3px solid ${lead.tier === 'T1' ? '#10B981' : lead.tier === 'T2' ? '#F59E0B' : '#D1D5DB'}`,
+                      borderLeft: `3px solid ${lead.band === 'light' ? '#10B981' : lead.band === 'moderate' ? '#F59E0B' : lead.band === 'heavy' ? '#1e2749' : '#D1D5DB'}`,
                       transition: 'border-color 0.1s',
                     }}
                     onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.borderColor = '#0a0f1e' }}
@@ -1320,8 +1342,8 @@ export default function SalesPage() {
                     <div style={{ flex: 1 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                         <span style={{ fontSize: 14, fontWeight: 600, color: '#0a0f1e' }}>{lead.name}</span>
-                        {lead.tier && (
-                          <span style={{ fontSize: 9, fontWeight: 700, padding: '1px 5px', borderRadius: 4, background: lead.tier === 'T1' ? '#D1FAE5' : lead.tier === 'T2' ? '#FEF3C7' : '#F3F4F6', color: lead.tier === 'T1' ? '#065F46' : lead.tier === 'T2' ? '#854D0E' : '#374151' }}>{lead.tier}</span>
+                        {lead.band && (
+                          <span title="Muck points: how much work this lead is predicted to take." style={{ fontSize: 9, fontWeight: 700, padding: '1px 5px', borderRadius: 4, background: '#EEF1F8', color: '#1e2749' }}>{lead.muckTotal} muck</span>
                         )}
                         {lead.value && <span style={{ fontSize: 11, color: '#6B7280' }}>${(lead.value / 1000).toFixed(0)}K</span>}
                       </div>
@@ -1346,7 +1368,6 @@ export default function SalesPage() {
                               contactName: lead.contactName,
                               state: lead.state,
                               city: lead.city,
-                              tier: lead.tier,
                             }, templateType)
                             const mailto = `mailto:${lead.contactEmail}?subject=${encodeURIComponent(email.subject)}&body=${encodeURIComponent(email.body)}`
                             window.open(mailto, '_blank')
@@ -1416,7 +1437,6 @@ export default function SalesPage() {
                 sources={uniqueSources}
                 dealTypeCounts={dealTypeCounts}
                 sourceCounts={sourceCounts}
-                tierCounts={tierCounts}
               />
 
               {/* KANBAN VIEW */}
@@ -1446,7 +1466,7 @@ export default function SalesPage() {
                         key={stage}
                         stage={stage}
                         label={`${STAGE_LABELS[stage] || stage} (${STAGE_PROBABILITY[stage] || 0}%)`}
-                        opportunities={oppsForStage.map(toCardOpp)}
+                        opportunities={oppsForStage.map(o => toCardOpp(o, muckById))}
                         onCardClick={(opp) => setDetailPanelOppId(opp.id)}
                         onDrop={handleStageDrop}
                         onCardContextMenu={handleCardContextMenu}
@@ -1473,7 +1493,7 @@ export default function SalesPage() {
                       .map(opp => (
                         <SalesCard
                           key={opp.supabase_id}
-                          opp={toCardOpp(opp)}
+                          opp={toCardOpp(opp, muckById)}
                           onClick={() => setDetailPanelOppId(opp.supabase_id)}
                           onFieldSaved={handleFieldSaved}
                           onToggleCallSheet={handleToggleCallSheet}
@@ -2068,6 +2088,7 @@ export default function SalesPage() {
 
       {/* Detail Panel */}
       <OpportunityDetailPanel
+        muck={detailPanelOppId ? (muckById[detailPanelOppId] ?? null) : null}
         opportunityId={detailPanelOppId}
         onClose={() => setDetailPanelOppId(null)}
         onUpdate={(id, changes) => {

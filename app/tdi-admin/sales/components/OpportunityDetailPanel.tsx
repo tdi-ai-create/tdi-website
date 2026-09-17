@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { PanelHeader } from './panel/PanelHeader'
 import { ContractsTab } from './panel/ContractsTab'
 import { IntelligenceTab } from './panel/IntelligenceTab'
-import { IntelligenceBar } from './panel/IntelligenceBar'
+import { MuckBar, type MuckPanelScore } from './panel/MuckBar'
 
 export interface OppNote {
   id: string
@@ -105,6 +105,8 @@ const TYPE_BADGE_COLORS: Record<string, { bg: string; color: string }> = {
 }
 
 interface Props {
+  /** Muck score for this lead, computed board-wide by /api/sales/muck. */
+  muck?: MuckPanelScore | null
   opportunityId: string | null
   onClose: () => void
   onUpdate: (id: string, changes: Partial<FullOpportunity>) => void
@@ -112,7 +114,8 @@ interface Props {
   showToast: (message: string, type: 'success' | 'error') => void
 }
 
-export function OpportunityDetailPanel({ opportunityId, onClose, onUpdate, onDelete, showToast }: Props) {
+export function OpportunityDetailPanel({
+  muck, opportunityId, onClose, onUpdate, onDelete, showToast }: Props) {
   const [opp, setOpp] = useState<FullOpportunity | null>(null)
   const [loading, setLoading] = useState(false)
   const [fetchError, setFetchError] = useState('')
@@ -434,19 +437,8 @@ export function OpportunityDetailPanel({ opportunityId, onClose, onUpdate, onDel
           <>
             <PanelHeader opp={opp} onClose={onClose} onPatch={patchOpp} />
 
-            {/* Intelligence summary bar */}
-            <IntelligenceBar
-              opp={opp}
-              onExpandIntelligence={() => {
-                if (!intelOpen) setIntelOpen(true)
-                // Scroll the right column to the intelligence section after a tick
-                setTimeout(() => {
-                  if (intelSectionRef.current && rightColRef.current) {
-                    intelSectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' })
-                  }
-                }, 100)
-              }}
-            />
+            {/* Muck breakdown. Replaces the retired T1 fit score bar. */}
+            <MuckBar score={muck ?? null} />
 
             {/* Two-column body */}
             <div style={{ display: 'flex', flex: 1, minHeight: 0, overflow: 'hidden' }}>

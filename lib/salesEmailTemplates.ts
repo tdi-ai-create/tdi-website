@@ -1,6 +1,11 @@
 /**
  * Sales Email Templates
- * Personalized outreach templates based on lead tier and enrichment data.
+ * Personalized outreach templates based on how much is known about the lead.
+ *
+ * These were keyed off the T1 fit tier, which is retired: it labelled 41 percent
+ * of the board top priority and never recomputed after a lead was created. The
+ * fuller template is now chosen by whether enough is actually known to
+ * personalise it, which is what the tier was standing in for.
  * Used by: Sophia (drafting), Olivia (sending), and the portal outreach UI.
  */
 
@@ -10,7 +15,8 @@ interface LeadContext {
   contactTitle?: string | null
   state: string | null
   city: string | null
-  tier: 'T1' | 'T2' | 'T3' | null
+  /** Retired. Kept optional so old callers still compile; no longer read. */
+  tier?: 'T1' | 'T2' | 'T3' | null
   enrollment?: number | null
   priorities?: string[]
   tdiAlignment?: string | null    // From enrichment
@@ -138,9 +144,10 @@ export function generateOutreachEmail(ctx: LeadContext, templateType: 'initial' 
   if (templateType === 'follow_up') return followUp(ctx)
   if (templateType === 're_engagement') return reEngagement(ctx)
 
-  // Initial outreach -- tier determines personalization level
-  if (ctx.tier === 'T1') return tier1Initial(ctx)
-  return tier2Initial(ctx)
+  // The fuller template needs a real place to point at. With a city and a state
+  // it reads as written for them; without, it reads as a mail merge that failed.
+  const personalisable = Boolean(ctx.city && ctx.state)
+  return personalisable ? tier1Initial(ctx) : tier2Initial(ctx)
 }
 
 /**

@@ -7,7 +7,11 @@ interface TopBarStats {
   invoiceCount: number
   callSheetCount: number
   callSheetValue: number
-  tier1Count?: number
+  /** Factored muck across the board, and how it splits between Rae and Bella. */
+  factoredMuck?: number
+  muckRae?: number
+  muckBella?: number
+  heavyCount?: number
 }
 
 export function StickyTopBar({
@@ -67,14 +71,25 @@ export function StickyTopBar({
           </div>
         </div>
 
-        {/* Tier 1 leads */}
-        {(stats.tier1Count ?? 0) > 0 && (
+        {/* Muck across the board. Factored by stage probability, for the same
+            reason pipeline value is: a lead at five percent should not put its
+            full weight on the total. */}
+        {(stats.factoredMuck ?? 0) > 0 && (
           <div style={{ borderLeft: '1px solid #E5E7EB', paddingLeft: 20 }}>
-            <div style={{ fontSize: 14, fontWeight: 700, color: '#065F46', display: 'flex', alignItems: 'center', gap: 5 }}>
-              <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#10B981', display: 'inline-block' }} />
-              {stats.tier1Count} Tier 1
+            <div
+              title="Muck points across the board, factored by stage probability. A relative weight, so it shows whether this month is heavier than last. It cannot tell you that you are full."
+              style={{ fontSize: 14, fontWeight: 700, color: '#1e2749', display: 'flex', alignItems: 'center', gap: 5 }}
+            >
+              {stats.factoredMuck} muck
+              {(stats.heavyCount ?? 0) > 0 && (
+                <span style={{ fontSize: 11, fontWeight: 600, color: '#6B7280' }}>
+                  &middot; {stats.heavyCount} heavy
+                </span>
+              )}
             </div>
-            <div style={{ fontSize: 11, color: '#6B7280' }}>top-fit leads</div>
+            <div style={{ fontSize: 11, color: '#6B7280' }}>
+              {stats.muckRae ?? 0} you &middot; {stats.muckBella ?? 0} Bella
+            </div>
           </div>
         )}
 

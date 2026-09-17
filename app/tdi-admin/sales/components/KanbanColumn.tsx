@@ -44,12 +44,15 @@ export function KanbanColumn({
     if (byHeat[h]) byHeat[h].push(o)
     else byHeat.warm.push(o)
   })
-  // Sort within heat groups: by lead score first (best fit leads on top), then by factored value
+  // Sort within heat groups by value per muck point, cheapest work for the most
+  // money on top. This used to sort by the retired T1 fit score. A lead with no
+  // muck score yet sorts below the scored ones rather than above them, because
+  // unknown is not the same as cheap.
   Object.values(byHeat).forEach(arr =>
     arr.sort((a, b) => {
-      const scoreA = a.leadScore || 0
-      const scoreB = b.leadScore || 0
-      if (scoreB !== scoreA) return scoreB - scoreA
+      const ra = a.muck?.total ? (a.value || 0) / a.muck.total : -1
+      const rb = b.muck?.total ? (b.value || 0) / b.muck.total : -1
+      if (rb !== ra) return rb - ra
       return ((b.value || 0) * (b.probability || 0)) - ((a.value || 0) * (a.probability || 0))
     })
   )
