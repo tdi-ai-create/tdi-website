@@ -390,6 +390,12 @@ export default function PartnerDashboard() {
   const [staffStats, setStaffStats] = useState<StaffStats>({ total: 0, hubLoggedIn: 0 });
   const [metricSnapshots, setMetricSnapshots] = useState<MetricSnapshot[]>([]);
   const [apiBuildings, setApiBuildings] = useState<Building[]>([]);
+  // Funding status for this school only, from its own funding_pursuits row.
+  const [funding, setFunding] = useState<{
+    hasFunding: boolean;
+    amountPursued?: number | null;
+    stage?: string;
+  } | null>(null);
   const [timelineEvents, setTimelineEvents] = useState<TimelineEvent[]>([]);
   const [teacherQuotes, setTeacherQuotes] = useState<{ id: string; quote_text: string; teacher_role: string; session_type: string; created_at: string }[]>([]);
   const [suggestions, setSuggestions] = useState<TDISuggestion[]>([]);
@@ -714,6 +720,19 @@ export default function PartnerDashboard() {
         }
       } catch (impactError) {
         console.error('Error fetching observation impact:', impactError);
+      }
+
+      // Fetch funding status for this school. On any failure we leave `funding`
+      // null so the tab stays hidden, rather than rendering an empty Funding tab
+      // that would read as "nothing is happening".
+      try {
+        const fundingResponse = await fetch(`/api/partners/funding/${partnershipId}`);
+        if (fundingResponse.ok) {
+          const fundingData = await fundingResponse.json();
+          if (fundingData.hasFunding) setFunding(fundingData);
+        }
+      } catch (fundingError) {
+        console.error('Error fetching funding status:', fundingError);
       }
     } catch (error) {
       console.error('Error loading dashboard data:', error);
@@ -1421,6 +1440,9 @@ export default function PartnerDashboard() {
     { id: 'our-partnership', label: 'Our Partnership' },
     { id: 'blueprint', label: 'Your Plan' },
     { id: 'reporting', label: 'Reports' },
+    // Funding only appears when this school actually has a live pursuit.
+    // It used to live inside Our Partnership, which Rae wants kept on goals.
+    ...(funding?.hasFunding ? [{ id: 'funding', label: 'Funding' }] : []),
     { id: 'next-year', label: 'Next Year', badge: true },
     { id: 'team', label: 'Team' },
   ];
@@ -7828,151 +7850,6 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
               </p>
             </div>
 
-            {/* Grant Funding Status -- only for grant-supported partnerships */}
-            {partnership?.has_grant_support && (
-              <div className="bg-white rounded-xl border border-gray-100 overflow-hidden" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-                {/* Header with funding goal countdown */}
-                <div className="bg-gradient-to-r from-[#1B2A4A] to-[#38618C] px-6 py-5">
-                  <div className="flex items-center gap-3 mb-3">
-                    <Sprout className="w-5 h-5 text-[#E8B84B]" />
-                    <h2 className="text-base font-bold" style={{ color: '#FFFFFF' }}>Funding Your Full Partnership</h2>
-                  </div>
-                  <p className="text-xs mb-4" style={{ color: 'rgba(255,255,255,0.6)' }}>TDI is actively pursuing funding so your entire staff gets access. Here is where things stand.</p>
-
-                  {/* Funding Progress Bar */}
-                  <div className="bg-white/10 rounded-lg p-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-xs font-semibold" style={{ color: 'rgba(255,255,255,0.8)' }}>Funding Goal: $66,225</span>
-                      <span className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>For 75 educators</span>
-                    </div>
-                    <div className="h-3 bg-white/10 rounded-full overflow-hidden mb-2">
-                      <div className="h-full rounded-full bg-gradient-to-r from-green-400 to-green-500" style={{ width: '4%' }} />
-                    </div>
-                    <div className="flex justify-between text-[10px]" style={{ color: 'rgba(255,255,255,0.5)' }}>
-                      <span>$2,332 confirmed (base contract)</span>
-                      <span>$63,893 being pursued</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="p-6 space-y-5">
-                  {/* Funding Paths */}
-                  <div>
-                    <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-3">Funding Paths</p>
-                    <div className="space-y-2">
-                      {[
-                        { name: 'Base Contract (Signed)', amount: '$2,332', status: 'confirmed', detail: '13 Hub memberships, guaranteed regardless of grants' },
-                        { name: 'Section 1003 / ATSI (Federal)', amount: 'TBD', status: 'submitted', detail: 'The big lever. Letter sent to school June 21 for Dr. Porter to submit to Dr. Gloster (Innovation & Performance). Not competitive, Allenwood is entitled to this money as an ATSI school.' },
-                        { name: 'NEA Grant', amount: 'Pending', status: 'submitted', detail: 'Application submitted June 16 via Jovita Ortiz. Awaiting decision.' },
-                        { name: 'Walmart Spark Good', amount: '$1,800', status: 'ready', detail: 'Easy win. Application drafted for professional books. School applies directly by NCES number. Next cycle Aug 1 to Nov 30. Instructions sent to school June 21.' },
-                        { name: 'Excellence in Education Foundation', amount: 'Exploring', status: 'outreach', detail: 'Inquiry sent June 18 to Thea Wilson at PGCPS foundation. Awaiting response.' },
-                        { name: 'Greater Washington Community Foundation', amount: 'Exploring', status: 'outreach', detail: 'Inquiry sent June 18 to Darcelle Wilson. Awaiting response.' },
-                        { name: 'Title II-A (Federal)', amount: '$33,225', status: 'stalled', detail: 'Submitted May 18. Bounced between Mrs. Flood, Clarence Parker ("we don\'t offer grants"), and Kevin Thompson. TDI tracking.' },
-                        { name: 'IDEA/CEIS (Federal)', amount: '$27,000', status: 'pending', detail: 'Budget narrative drafted May 2026. Not yet submitted to PGCPS Special Education office. TDI will coordinate timing.' },
-                        { name: 'Community Schools', amount: '$6,000', status: 'pending', detail: 'Budget narrative drafted May 2026. Not yet submitted. Kevin Thompson identified as contact.' },
-                      ].map((path, i) => (
-                        <div key={i} className={`flex items-center gap-3 p-3 rounded-lg ${
-                          path.status === 'confirmed' ? 'bg-green-50 border border-green-100' :
-                          path.status === 'ready' ? 'bg-teal-50 border border-teal-100' :
-                          path.status === 'submitted' ? 'bg-blue-50 border border-blue-100' :
-                          path.status === 'outreach' ? 'bg-purple-50 border border-purple-100' :
-                          path.status === 'stalled' ? 'bg-amber-50 border border-amber-100' :
-                          'bg-gray-50 border border-gray-100'
-                        }`}>
-                          <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 ${
-                            path.status === 'confirmed' ? 'bg-green-200' :
-                            path.status === 'ready' ? 'bg-teal-200' :
-                            path.status === 'submitted' ? 'bg-blue-200' :
-                            path.status === 'outreach' ? 'bg-purple-200' :
-                            path.status === 'stalled' ? 'bg-amber-200' :
-                            'bg-gray-200'
-                          }`}>
-                            {path.status === 'confirmed' ? <Check className="w-3.5 h-3.5 text-green-700" /> :
-                             path.status === 'ready' ? <FileText className="w-3.5 h-3.5 text-teal-700" /> :
-                             path.status === 'submitted' ? <Clock className="w-3.5 h-3.5 text-blue-700" /> :
-                             path.status === 'outreach' ? <Mail className="w-3.5 h-3.5 text-purple-700" /> :
-                             path.status === 'stalled' ? <AlertCircle className="w-3.5 h-3.5 text-amber-700" /> :
-                             <div className="w-2 h-2 rounded-full bg-gray-400" />}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center justify-between">
-                              <p className="text-sm font-medium text-[#1e2749]">{path.name}</p>
-                              <span className={`text-xs font-bold ${
-                                path.status === 'confirmed' ? 'text-green-700' :
-                                path.status === 'ready' ? 'text-teal-700' :
-                                path.status === 'submitted' ? 'text-blue-700' :
-                                path.status === 'outreach' ? 'text-purple-700' :
-                                path.status === 'stalled' ? 'text-amber-700' :
-                                'text-gray-500'
-                              }`}>{path.amount}</span>
-                            </div>
-                            <p className="text-[10px] text-gray-500">{path.detail}</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* What Expands */}
-                  <div className="border-t border-gray-100 pt-4">
-                    <p className="text-xs font-bold text-green-600 uppercase tracking-wide mb-2">What Full Funding Unlocks</p>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                      {[
-                        { value: '75', label: 'Hub Memberships', current: String(partnership.staff_enrolled || 0) },
-                        { value: '3', label: 'Observation Days', current: String(partnership.observation_days_total || 0) },
-                        { value: '3', label: 'Exec Sessions', current: String(partnership.executive_sessions_total || 0) },
-                        { value: '4', label: 'Virtual Sessions', current: String(partnership.virtual_sessions_total || 0) },
-                      ].map((item, i) => (
-                        <div key={i} className="rounded-lg bg-green-50 p-3 text-center border border-green-100">
-                          <p className="text-lg font-bold text-green-700">{item.value}</p>
-                          <p className="text-[10px] text-green-600">{item.label}</p>
-                          <p className="text-[9px] text-gray-400 mt-0.5">Currently: {item.current}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* TDI Work Timeline */}
-                  <div className="border-t border-gray-100 pt-4">
-                    <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-3">What TDI Has Done</p>
-                    <div className="space-y-3">
-                      {[
-                        { phase: 'Research', status: 'done', detail: 'Identified 8 funding paths. Researched PGCPS contacts, mapped eligibility for Title II-A, IDEA/CEIS, Community Schools, Section 1003/ATSI, NEA, Walmart, and private foundations.' },
-                        { phase: 'Document Prep', status: 'done', detail: 'Drafted 3 federal budget narratives, NEA packet, 2 foundation emails, Section 1003 principal letter, Walmart Spark Good application. All copy-paste ready.' },
-                        { phase: 'Title II-A Submission', status: 'done', detail: 'Submitted May 18. Got redirected between 4 offices (Flood, Parker, Thompson). Parker said "we don\'t offer grants." TDI diagnosed as a framing issue and is tracking.' },
-                        { phase: 'NEA Grant', status: 'done', detail: 'Found NEA member Jovita Ortiz on staff, drafted full packet. Application submitted June 16.' },
-                        { phase: 'Foundation Outreach', status: 'done', detail: 'Emails sent June 18 to Excellence in Education Foundation (PGCPS) and Greater Washington Community Foundation.' },
-                        { phase: 'Section 1003 / ATSI', status: 'active', detail: 'New approach. Letter drafted for Dr. Porter to send to Dr. Gloster (Innovation & Performance). Sent to school June 21. Waiting for Dr. Porter to send.' },
-                        { phase: 'Corporate & Local Grants', status: 'active', detail: 'Walmart Spark Good application drafted ($1,800 for books). Account setup instructions sent to school June 21. Application cycle opens August 1.' },
-                        { phase: 'IDEA/CEIS & Community Schools', status: 'pending', detail: 'Budget narratives drafted. TDI will coordinate submission timing after Section 1003 response comes back.' },
-                        { phase: 'Approvals & Decisions', status: 'pending', detail: 'Awaiting NEA decision, foundation responses, Dr. Porter/Dr. Gloster response on Section 1003.' },
-                      ].map((step, i) => (
-                        <div key={i} className="flex items-start gap-3">
-                          <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${
-                            step.status === 'done' ? 'bg-green-100' : step.status === 'active' ? 'bg-amber-100' : 'bg-gray-100'
-                          }`}>
-                            {step.status === 'done' ? <Check className="w-3.5 h-3.5 text-green-600" /> :
-                             step.status === 'active' ? <Clock className="w-3.5 h-3.5 text-amber-600" /> :
-                             <div className="w-2 h-2 rounded-full bg-gray-300" />}
-                          </div>
-                          <div>
-                            <p className={`text-sm font-medium ${step.status === 'pending' ? 'text-gray-400' : 'text-[#1e2749]'}`}>{step.phase}</p>
-                            <p className="text-xs text-gray-500">{step.detail}</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="bg-[#1B2A4A] rounded-lg p-4">
-                    <p className="text-xs font-semibold" style={{ color: '#E8B84B' }}>Why TDI does this</p>
-                    <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.7)' }}>
-                      Most PD companies sign a contract and move on. We believe every educator at your school deserves access, not just the ones the budget covers. That is why we research, draft, submit, and follow up on funding applications on your behalf. Your base contract is guaranteed. Everything we find through grants expands what your team gets at no additional cost to your school.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
 
             {/* Phase Timeline */}
             <div className="bg-white rounded-xl border border-gray-100 p-6"
@@ -8481,6 +8358,57 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
         )}
 
         {/* GROWTH PLAN TAB (formerly 2026-27 Preview) */}
+        {/* ─── FUNDING ─── this school's own pursuit, nothing hardcoded ─── */}
+        {activeTab === 'funding' && funding?.hasFunding && (
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-4">
+            <div className="bg-white rounded-xl border border-gray-100 overflow-hidden"
+              style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+              <div className="bg-gradient-to-r from-[#1B2A4A] to-[#38618C] px-6 py-5">
+                <div className="flex items-center gap-3 mb-2">
+                  <Sprout className="w-5 h-5 text-[#E8B84B]" />
+                  <h2 className="text-base font-bold text-white">Funding Your Partnership</h2>
+                </div>
+                <p className="text-xs" style={{ color: 'rgba(255,255,255,0.7)' }}>
+                  TDI researches, writes and submits funding applications on your behalf, so more of your staff get access without more coming out of your budget.
+                </p>
+              </div>
+
+              <div className="p-6 space-y-5">
+                {funding.amountPursued != null && (
+                  <div>
+                    <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">We are pursuing</p>
+                    <p className="text-2xl font-bold text-[#1e2749]">
+                      ${funding.amountPursued.toLocaleString('en-US')}
+                    </p>
+                  </div>
+                )}
+
+                <div>
+                  <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">Where things stand</p>
+                  <p className="text-sm text-gray-700 leading-relaxed">{funding.stage}</p>
+                </div>
+
+                <div className="rounded-lg bg-gray-50 border border-gray-100 p-4">
+                  <p className="text-sm text-gray-700 leading-relaxed">
+                    Your base contract is guaranteed regardless of what funding comes through. Anything we win expands what your team gets, it does not replace what you already have.
+                  </p>
+                  <p className="text-sm text-gray-700 leading-relaxed mt-3">
+                    Grant timelines sit with the funders, not with us, so we will not guess at dates. When a decision lands we will tell you directly rather than leaving you to spot it here.
+                  </p>
+                </div>
+
+                <a
+                  href="mailto:hello@teachersdeserveit.com?subject=Funding%20question"
+                  className="inline-flex items-center gap-2 text-sm font-semibold text-[#1e2749] hover:underline"
+                >
+                  <Mail className="w-4 h-4" />
+                  Ask us about your funding
+                </a>
+              </div>
+            </div>
+          </div>
+        )}
+
         {activeTab === 'next-year' && (
           <div role="tabpanel" id="panel-next-year" aria-labelledby="tab-next-year" className="space-y-4 md:space-y-6">
             {/* Roosevelt School Pilot gets custom PilotNextYearTab */}
