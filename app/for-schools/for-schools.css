@@ -139,14 +139,6 @@
 .fs-faq .fs-ans{padding:0 0 22px; color:var(--muted); font-size:1rem; max-width:70ch}
 .fs-faq .fs-ans p:last-child{margin-bottom:0}
 
-/* ---------- downloads ---------- */
-.fs-dl-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:18px; margin-top:40px}
-@media(max-width:880px){.fs-dl-grid{grid-template-columns:1fr}}
-.fs-dl{display:block; text-decoration:none; background:#fff; border:1px solid var(--line); border-left:4px solid var(--c,var(--gold)); border-radius:10px; padding:20px 22px}
-.fs-dl:hover{border-color:var(--navy); border-left-color:var(--c,var(--gold))}
-.fs-dl b{display:block; font-family:"Source Serif 4",serif; font-size:1.1rem; margin-bottom:4px}
-.fs-dl span{font-size:.9rem; color:var(--muted)}
-
 /* ---------- final cta ---------- */
 .fs-finale{background:var(--navy); color:#E7EEF2; padding:88px 0}
 .fs-finale h2{color:#fff; max-width:18ch}
@@ -184,9 +176,9 @@
 }
 .fs-page h1,h2,h3,h4{font-family:'Inter',system-ui,sans-serif; font-weight:700; letter-spacing:-.02em}
 .fs-page h1{letter-spacing:-.03em}
-.fs-offer .fs-price,.fs-blueprint-band .fs-price,.fs-stat b,.fs-phase b,.fs-faq summary,thead th,.fs-dl b,.fs-result .fs-rec b{font-family:'Inter',system-ui,sans-serif}
+.fs-offer .fs-price,.fs-blueprint-band .fs-price,.fs-stat b,.fs-phase b,.fs-faq summary,thead th,.fs-result .fs-rec b{font-family:'Inter',system-ui,sans-serif}
 .fs-offer .fs-price,.fs-blueprint-band .fs-price,.fs-stat b{font-weight:800}
-.fs-faq summary,thead th,.fs-dl b,.fs-result .fs-rec b{font-weight:700}
+.fs-faq summary,thead th,.fs-result .fs-rec b{font-weight:700}
 .fs-faq summary:after{font-family:'Inter',sans-serif}
 /* surface flip: page is white, alternating band is gray */
 .fs-sec-white{background:var(--paper)}
@@ -255,10 +247,6 @@ ul.fs-ican li:before{content:"";position:absolute;left:0;top:15px;width:8px;heig
 .fs-page .fs-tablewrap table{table-layout:fixed}
 .fs-page .fs-tablewrap thead th:first-child{width:16%}
 .fs-page .fs-tablewrap thead th:not(:first-child){width:21%}
-
-/* four one-pagers in a two by two, not a three-across with an orphan */
-.fs-page .fs-dl-grid{grid-template-columns:repeat(2,1fr); gap:20px}
-@media(max-width:880px){.fs-page .fs-dl-grid{grid-template-columns:1fr}}
 
 /* --- Love Note, carried over from the retired /how-we-partner --- */
 .fs-page .fs-lovenote{
