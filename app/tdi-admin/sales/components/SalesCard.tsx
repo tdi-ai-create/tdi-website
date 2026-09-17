@@ -29,10 +29,43 @@ const TYPE_COLORS: Record<string, string> = {
   reactivation: '#2563EB',
 }
 
-const TIER_STYLES: Record<string, { bg: string; color: string; dot: string }> = {
-  T1: { bg: '#D1FAE5', color: '#065F46', dot: '#10B981' },
-  T2: { bg: '#FEF3C7', color: '#854D0E', dot: '#F59E0B' },
-  T3: { bg: '#F3F4F6', color: '#374151', dot: '#9CA3AF' },
+export type MuckBand = 'light' | 'moderate' | 'heavy'
+
+const BAND_FILL: Record<MuckBand, number> = { light: 1, moderate: 2, heavy: 3 }
+
+/**
+ * Muck reads as bars, not a dot.
+ *
+ * The heat pill on this card already owns the coloured dot. A second dot beside
+ * it would read as another version of the same measurement rather than a
+ * different one, so magnitude is shown as a filling meter instead.
+ */
+function MuckPill({ total, band }: { total: number; band: MuckBand }) {
+  const filled = BAND_FILL[band]
+  const heights = [4, 6.5, 9]
+  return (
+    <span
+      title={`Muck points: how much work this lead is predicted to take. ${band === 'heavy' ? 'Heavy, top fifth of the board.' : band === 'moderate' ? 'Moderate.' : 'Light.'} Open the lead to see what made it this heavy.`}
+      style={{
+        fontSize: 9, fontWeight: 700, padding: '1px 5px 1px 4px', borderRadius: 4,
+        background: '#EEF1F8', color: '#1e2749',
+        display: 'inline-flex', alignItems: 'center', gap: 4,
+      }}
+    >
+      <span style={{ display: 'inline-flex', alignItems: 'flex-end', gap: 1.5, height: 9 }}>
+        {heights.map((h, i) => (
+          <span
+            key={i}
+            style={{
+              width: 2.5, height: h, borderRadius: 0.5, display: 'block',
+              background: i < filled ? '#1e2749' : '#C3CADB',
+            }}
+          />
+        ))}
+      </span>
+      {total}
+    </span>
+  )
 }
 
 export interface SalesCardOpp {
@@ -52,8 +85,8 @@ export interface SalesCardOpp {
   contract_year?: string | null
   city?: string | null
   state?: string | null
-  leadScore?: number | null
-  tier?: 'T1' | 'T2' | 'T3' | null
+  /** Muck points. Null total means the offering is unknown, not that it is light. */
+  muck?: { total: number | null; band: MuckBand | null } | null
 }
 
 function extractSubtitle(opp: SalesCardOpp): string {
@@ -213,11 +246,8 @@ export function SalesCard({ opp, onClick, draggable = false, onContextMenu, onFi
           <span style={{ color: '#6B7280', fontWeight: 400, marginLeft: 6 }}>&middot; ${(factored / 1000).toFixed(0)}K factored</span>
         </span>
         <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
-          {opp.tier && TIER_STYLES[opp.tier] && (
-            <span title="Tier 1 = highest priority, best fit. Tier 2 = good fit, worth pursuing. Tier 3 = lower fit, consider parking." style={{ fontSize: 9, fontWeight: 700, padding: '1px 5px', borderRadius: 4, background: TIER_STYLES[opp.tier].bg, color: TIER_STYLES[opp.tier].color, display: 'inline-flex', alignItems: 'center', gap: 3 }}>
-              <span style={{ width: 5, height: 5, borderRadius: '50%', background: TIER_STYLES[opp.tier].dot, display: 'inline-block' }} />
-              {opp.tier}
-            </span>
+          {opp.muck?.total != null && opp.muck.band && (
+            <MuckPill total={opp.muck.total} band={opp.muck.band} />
           )}
           {opp.needs_invoice && (
             <span style={{ fontSize: 9, padding: '1px 5px', borderRadius: 4, background: '#FEE2E2', color: '#991B1B', fontWeight: 600 }}>invoice</span>
