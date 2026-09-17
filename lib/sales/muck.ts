@@ -89,12 +89,17 @@ export function travelTier(state: string | null | undefined): TravelTier | null 
 }
 
 /**
- * Travel only ever applies to an offering that puts a person in a building.
- * Three of the four reach staff through their inbox, so they carry none.
+ * Travel scores on every lead, not only the ones predicted to be a Blueprint.
+ *
+ * An earlier version gated it on the offering, since The Blueprint is the only
+ * one that puts a person in a building. That was wrong twice over. It fired on
+ * three leads out of 201, which is not a dimension. And the offering itself is a
+ * prediction at this stage, so gating travel behind it made a school in Texas
+ * look free right up until the moment it became expensive.
+ *
+ * Distance is a fact about the school and does not depend on what they buy.
+ * Rae, 17 September 2026.
  */
-export function travelApplies(offering: Offering | null): boolean {
-  return offering === 'BLUEPRINT'
-}
 
 /**
  * Drag is measured against the median for the lead's OWN stage.
@@ -182,9 +187,22 @@ export function scoreLead(input: MuckInput, stageMedian: number): MuckScore {
   const grant = input.grantConfirmed ? MUCK_MAX.grant : 0
   const drag = dragPoints(input.noteCount, stageMedian)
 
+  /**
+   * Travel is scored from distance on every lead, then weighted by how likely
+   * somebody actually goes. The Blueprint puts a person in a building, so it
+   * carries the full cost. An unknown offering also carries full cost, because
+   * the safe assumption about an unknown is not that it is cheap. The other
+   * three reach staff through the inbox, so they carry half: a real cost, since
+   * any of them can grow into a visit, but not the same cost as one that
+   * already is. Rae, 17 September 2026, "if we did".
+   */
   const tier = travelTier(input.state)
-  const travel =
-    known && travelApplies(offering) && tier ? TRAVEL_POINTS[tier] : 0
+  const visitLikely = offering === 'BLUEPRINT' || offering === null
+  const travel = tier
+    ? visitLikely
+      ? TRAVEL_POINTS[tier]
+      : Math.round(TRAVEL_POINTS[tier] / 2)
+    : 0
 
   const breakdown: MuckBreakdown = { delivery, grant, drag, travel }
   const total = known ? delivery + grant + drag + travel : null
