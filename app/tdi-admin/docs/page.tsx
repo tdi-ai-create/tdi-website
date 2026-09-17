@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useTDIAdmin } from '@/lib/tdi-admin/context';
 import { Search, Download, Printer, ExternalLink } from 'lucide-react';
 
-type DocId = 'admin-guide' | 'data-flow' | 'workflow' | 'billing-sop' | 'funding' | 'funding-launch' | 'grant-application-spec' | 'grant-workflow-sop' | 'hub-engagement' | 'engagement-workflow' | 'hub-content-standards' | 'hub-content-creation' | 'course-upload-sop' | 'course-checkins-sop' | 'creator-feedback-sop' | 'creator-recruitment-sop' | 'creator-dormancy-sop' | 'communication-map' | 'swag-fulfillment' | 'leadership-workflow';
+type DocId = 'admin-guide' | 'data-flow' | 'workflow' | 'billing-sop' | 'funding' | 'funding-launch' | 'grant-application-spec' | 'grant-workflow-sop' | 'hub-engagement' | 'engagement-workflow' | 'hub-content-standards' | 'hub-content-creation' | 'course-upload-sop' | 'course-checkins-sop' | 'creator-feedback-sop' | 'creator-recruitment-sop' | 'creator-dormancy-sop' | 'communication-map' | 'swag-fulfillment' | 'leadership-workflow' | 'observation-day-sop';
 
 interface Doc {
   id: DocId;
@@ -59,6 +59,15 @@ const DOC_GROUPS: DocGroup[] = [
         relatedSections: [
           { label: 'Leadership Dashboard', href: '/tdi-admin/leadership' },
           { label: 'Sales Pipeline', href: '/tdi-admin/sales' },
+        ],
+      },
+      {
+        id: 'observation-day-sop',
+        label: 'Observation Day SOP',
+        desc: 'How we run an on-campus visit, from calendar hold to Love Notes to dashboard',
+        tags: ['observation', 'sop', 'love notes', 'visit', 'on-campus', 'classroom', 'strategy tags', 'baseline', 'goals', 'partnership', 'paras'],
+        relatedSections: [
+          { label: 'Leadership Dashboard', href: '/tdi-admin/leadership' },
         ],
       },
       {

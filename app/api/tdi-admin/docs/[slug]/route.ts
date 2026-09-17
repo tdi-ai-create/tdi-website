@@ -35,6 +35,7 @@ export async function GET(
     'course-checkins-sop': 'course-checkins-sop.html',
     'swag-fulfillment': 'swag-fulfillment.html',
     'leadership-workflow': 'leadership-workflow.html',
+    'observation-day-sop': 'observation-day-sop.html',
   };
 
   const filename = allowedDocs[slug];
