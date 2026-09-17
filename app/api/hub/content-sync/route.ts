@@ -945,7 +945,7 @@ export async function POST(request: NextRequest) {
     // a way to change your mind in between. Without this the only way to stop a
     // scheduled item is to break it.
     if (action === 'unschedule') {
-      const { id, reason } = body
+      const { id, reason, actor } = body
       if (!id) return NextResponse.json({ error: 'id is required' }, { status: 400 })
 
       const { data: qw, error: fetchErr } = await supabase
@@ -961,12 +961,26 @@ export async function POST(request: NextRequest) {
         }, { status: 400 })
       }
 
+      // The reason used to be accepted, echoed back, and thrown away, while the
+      // date, who scheduled it and when were all cleared. On 16 September two
+      // reviewed student-support Quick Wins came off the September calendar at
+      // 03:34 and 03:35 for a good reason, policy holds them for a credentialed
+      // human sign-off, and nothing in the database said so. It read as content
+      // silently vanishing from a month.
+      //
+      // Not required yet. Agents calling this today do not all send a reason or
+      // an actor, and refusing them would stop the safety action that pulls
+      // unreviewed work off the calendar. Absence is stored as null, which reads
+      // as "nobody said", and is the thing to chase rather than to guess at.
       const { error: clearErr } = await supabase
         .from('hub_quick_wins')
         .update({
           scheduled_publish_date: null,
           scheduled_by: null,
           scheduled_at: null,
+          unscheduled_at: new Date().toISOString(),
+          unscheduled_by: typeof actor === 'string' && actor.trim() ? actor.trim() : null,
+          unschedule_reason: typeof reason === 'string' && reason.trim() ? reason.trim() : null,
           updated_at: new Date().toISOString(),
         })
         .eq('id', id)
@@ -979,6 +993,12 @@ export async function POST(request: NextRequest) {
         slug: qw.slug,
         was_scheduled_for: qw.scheduled_publish_date,
         reason: reason?.trim() || null,
+        // Say plainly when nothing was recorded, so a caller that forgot finds
+        // out from the response rather than from someone asking months later.
+        recorded: Boolean(reason?.trim()),
+        warning: reason?.trim()
+          ? undefined
+          : 'No reason was given, so this piece now has no date and no explanation. Send a reason.',
       })
     }
 
