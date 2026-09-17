@@ -249,6 +249,25 @@ describe("the content calendar page", () => {
     expect(out.hub).toEqual(hub);
   });
 
+  it("carries finished Hub work that has no date", async () => {
+    const hubUnplaced = [
+      { id: "u1", slug: "s", title: "Signs You're Seeing", category: "Classroom Management",
+        status: "reviewed", reviewed_at: "2026-09-11",
+        unscheduled: { at: "2026-09-16T03:35:30Z", by: null, reason: null } },
+    ];
+    const { harness } = harnessWith((url) =>
+      url.includes("/plan")
+        ? { status: 200, body: { month: "2026-09", slots: [], standards: [], hub: [], hubUnplaced } }
+        : { status: 200, body: { items: [] } },
+    );
+    await plugin.definition.setup(harness.ctx);
+
+    // The worker rebuilds this response field by field, which is where hub was
+    // dropped the first time. Assert the whole shape, not that something exists.
+    const out = await harness.getData<{ hubUnplaced: typeof hubUnplaced }>("plan", { month: "2026-09" });
+    expect(out.hubUnplaced).toEqual(hubUnplaced);
+  });
+
   it("still returns a month when the Hub half is missing", async () => {
     const { harness } = harnessWith((url) =>
       url.includes("/plan")
