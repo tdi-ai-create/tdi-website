@@ -53,7 +53,17 @@ export function CreatorMirror({
   onRequestRevision?: (milestoneKey: string, stepName: string, recordId: string) => void;
   onToggleComplete?: (milestoneKey: string, stepName: string, rawStatus: string, recordId: string) => void;
 }) {
-  if (!journey || journey.stages.length === 0) {
+  // Only a null journey means there is no active project. An empty stages array
+  // does not: a creator who has not chosen a path yet gets stages: [] and a
+  // populated openStep on purpose, because there is no road to draw until the
+  // path is picked. Treating that as "no active project" hid the one step they
+  // are actually sitting on, and reported a healthy creator as having nothing.
+  //
+  // Rebecca Blahus is why this was found. Her board read "no active project"
+  // while the same API response carried openStep "Confirm Your Path". Nothing
+  // below reads journey.stages, so an empty one renders fine, and a null step
+  // is already handled three ways further down.
+  if (!journey) {
     return (
       <div className="rounded-xl border border-gray-200 bg-white p-5">
         <p className="text-sm text-gray-500">
