@@ -42,7 +42,20 @@ styled the same as them, so it read as a badge rather than an action. Rae's word
   Supabase session and the extension's Chrome profile has an expired one.
 - Verify after deploy: https://www.teachersdeserveit.com/partners/saunemin-ccsd-438
 
-**The new "Open Learning Hub" button in the sticky nav is unverified.** It lives on
+## Deferred pass CLOSED, 16 September 2026
+
+Observed on production in a screenshot Rae sent of
+https://www.teachersdeserveit.com/partners/saunemin-ccsd-438 after deploy. I did not
+drive the browser myself, so this is her observation relayed, not mine.
+
+- Saw: the sticky nav renders "Open Learning Hub" with a book icon as an outlined
+  secondary button, immediately left of the gold "Schedule Session" button
+- Saw: the hero no longer carries a Learning Hub chip
+- Saw: "Your TDI Journey" renders Phase 2 ACCELERATE with a "You Are Here" pill under it,
+  confirming the ACCELERATE phase change reached the partner view
+
+Original note, now resolved:
+**The new "Open Learning Hub" button in the sticky nav was unverified at merge.** It lives on
 `/partners/[dashboardSlug]`, which requires a Supabase session, and the Chrome profile
 the extension controls has an expired one. `Example-Dashboard` renders the hero but not
 that nav, so it could not exercise the button.

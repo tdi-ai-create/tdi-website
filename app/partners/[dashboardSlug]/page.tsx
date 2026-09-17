@@ -680,7 +680,32 @@ export default function PartnerDashboard() {
           setStaffStats(data.staffStats || { total: 0, hubLoggedIn: 0 });
           setMetricSnapshots(data.metricSnapshots || []);
           setApiBuildings(data.buildings || []);
-          setTimelineEvents(data.timelineEvents || []);
+          // The timeline_events table stores event_title and event_date, but this
+          // component and the report generators all read .title and .date. Without
+          // this mapping every event rendered as an empty bullet with no name and no
+          // date, and the generated reports listed blank lines. Normalise once here
+          // rather than at the eight call sites that consume it.
+          setTimelineEvents(
+            (data.timelineEvents || []).map(
+              (e: {
+                id: string;
+                event_title?: string | null;
+                title?: string | null;
+                event_date?: string | null;
+                date?: string | null;
+                event_type: string;
+                status: 'completed' | 'in_progress' | 'upcoming';
+                notes?: string | null;
+              }) => ({
+                id: e.id,
+                title: e.event_title ?? e.title ?? '',
+                date: e.event_date ?? e.date ?? undefined,
+                event_type: e.event_type,
+                status: e.status,
+                notes: e.notes ?? undefined,
+              })
+            )
+          );
           setTeacherQuotes(data.teacherQuotes || []);
           setSessionRecords(data.sessionRecords || []);
           setRecentActivity(data.activityLog || []);
