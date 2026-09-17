@@ -56,7 +56,14 @@ principal who believes he has been funded would be worse than showing nothing. T
 exposes only the amount pursued and a plain-language stage, and the reasoning is written
 into the route file so the next person does not widen it by accident.
 
-## What I could NOT verify
+## Deferred pass
+
+- Deferred: the partner dashboard authenticates against a Supabase session scoped to the
+  live domain. The Chrome profile the extension controls holds an expired token for
+  rae@teachersdeserveit.com (expires_at 1789493966, ~30 hours stale), and I will not
+  handle a password to re-establish it. A local server renders the route as an empty
+  body, so the tab cannot be reached or signed in to here.
+- Verify after deploy: https://www.teachersdeserveit.com/partners/saunemin-ccsd-438
 
 **The Funding tab itself is unverified in the browser.** It renders on
 `/partners/[dashboardSlug]`, which requires a Supabase session, and the Chrome profile the

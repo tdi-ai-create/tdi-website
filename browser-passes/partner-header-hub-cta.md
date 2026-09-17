@@ -36,7 +36,11 @@ The Learning Hub chip was also the only clickable item in a row of two status la
 styled the same as them, so it read as a badge rather than an action. Rae's words:
 "why does it even have the learning hub thing there? it doesnt make sense."
 
-## What I could NOT verify
+## Deferred pass
+
+- Deferred: same reason as the Funding tab. `/partners/[dashboardSlug]` needs a live
+  Supabase session and the extension's Chrome profile has an expired one.
+- Verify after deploy: https://www.teachersdeserveit.com/partners/saunemin-ccsd-438
 
 **The new "Open Learning Hub" button in the sticky nav is unverified.** It lives on
 `/partners/[dashboardSlug]`, which requires a Supabase session, and the Chrome profile
