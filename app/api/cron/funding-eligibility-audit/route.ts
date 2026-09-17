@@ -7,6 +7,7 @@ import { closePathWithReason, cancelWorkOnClosedPath } from '@/lib/funding-path-
 import { readTdiFacts, answeredCredential, missingCredentials } from '@/lib/funding/tdi-facts'
 import { buildDecisionBrief, renderDecisionBrief } from '@/lib/funding-decision-brief'
 import { readFunderViability, viabilityOf } from '@/lib/funding-funder-viability'
+import { answeredBefore } from '@/lib/funding-answer-to-fact'
 import {
   screenPath,
   isPastDrafting,
@@ -169,6 +170,12 @@ export async function GET(request: NextRequest) {
     const changes: Change[] = []
     const questionsToRaise: { school: string; path: string; question: string; because: string }[] = []
     const questionsExisting: string[] = []
+    // Questions not asked because this school already answered them. Reported
+    // rather than dropped: silence here is indistinguishable from having had
+    // nothing to ask.
+    const alreadyAnswered: {
+      school: string; path: string; question: string; answeredOn: string; answer: string | null
+    }[] = []
     // Window questions handed to the research agent instead of to a person.
     const questionsDeferredToAgent: string[] = []
     const questionsFailed: { school: string; path: string; question: string; because: string; error: string }[] = []
@@ -279,7 +286,49 @@ export async function GET(request: NextRequest) {
 
         if (already) {
           questionsExisting.push(`${school.district_name} · ${opp.name}`)
-        } else {
+          continue
+        }
+
+        // Ask once. The check above only sees a question that is still open, so
+        // once a school answered, the row went terminal and the next monthly
+        // run asked them again. Six of the eight approaches we made to one
+        // superintendent were repeats of two questions he had already answered.
+        //
+        // Keyed on the school rather than the grant, because these are facts
+        // about the school. His union membership does not change between
+        // grants, so re-raising it on the next grant is the same question
+        // wearing a different name.
+        const { prior, error: priorErr } = await answeredBefore(
+          supabase,
+          opp.pursuit_id,
+          title,
+        )
+        if (priorErr) {
+          // Failing to find a prior answer and failing to look are opposite
+          // things. Treating the second as the first is what produced the
+          // seventh asking, so this is reported rather than assumed clear.
+          console.error('[eligibility-audit] Could not check for a prior answer:', priorErr)
+          questionsFailed.push({
+            school: school.district_name ?? '',
+            path: opp.name ?? '',
+            question: title,
+            because: 'Could not check whether this was already answered',
+            error: priorErr,
+          })
+          continue
+        }
+        if (prior) {
+          alreadyAnswered.push({
+            school: school.district_name ?? '',
+            path: opp.name ?? '',
+            question: title,
+            answeredOn: prior.answeredAt ? String(prior.answeredAt).slice(0, 10) : 'unknown',
+            answer: prior.answer,
+          })
+          continue
+        }
+
+        {
           // What the agent found, when she has already looked.
           //
           // A window question only reaches a person after the research agent
@@ -468,6 +517,8 @@ export async function GET(request: NextRequest) {
       questionsRaised: questionsToRaise.length,
       questions: questionsToRaise,
       questionsAlreadyOpen: questionsExisting.length,
+      questionsNotReAsked: alreadyAnswered.length,
+      alreadyAnswered,
       // Surfaced in the response, never only in a log. A silent write failure
       // is indistinguishable from success to whoever reads this.
       questionsFailed: questionsFailed.length,
