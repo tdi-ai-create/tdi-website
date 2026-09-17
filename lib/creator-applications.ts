@@ -350,6 +350,68 @@ function fail(decision: Decision, application: DecisionResult['application'], er
 // Accept
 // ---------------------------------------------------------------------------
 
+/**
+ * Guarantee the creator has an active project row.
+ *
+ * The path selector writes the chosen path to creator_projects, not to the
+ * creator, because one creator can hold two answers. But nothing here ever
+ * created that row: the only code that inserts one is the create-new-project
+ * route, which is the "changed my mind after holding off" flow. The rows that
+ * exist today were backfilled by hand on 26 August.
+ *
+ * So the first creator accepted after that backfill reached Select your path,
+ * picked one, and got "We could not find the project to save your choice
+ * against" with no way past it. That was Rebecca Blahus, and it would have been
+ * every creator accepted from here on.
+ *
+ * Both accept branches call this, including the reopen branch: a creator who
+ * was closed before the projects table existed comes back without one.
+ * Idempotent, so reopening someone who already has an active project is a noop.
+ */
+async function ensureActiveProject(
+  supabase: DbClient,
+  creatorId: string
+): Promise<void> {
+  const { data: existingProject, error: lookupError } = await supabase
+    .from('creator_projects')
+    .select('id')
+    .eq('creator_id', creatorId)
+    .eq('status', 'active')
+    .limit(1)
+    .maybeSingle();
+
+  if (lookupError) {
+    console.error('[accept] Could not check for an active project for', creatorId, lookupError.message);
+    return;
+  }
+  if (existingProject) return;
+
+  // Number above whatever they already have, so a reopened creator carrying a
+  // completed project #1 gets #2 rather than colliding with it.
+  const { data: highest } = await supabase
+    .from('creator_projects')
+    .select('project_number')
+    .eq('creator_id', creatorId)
+    .order('project_number', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  const { error: insertError } = await supabase
+    .from('creator_projects')
+    .insert({
+      creator_id: creatorId,
+      project_number: (highest?.project_number ?? 0) + 1,
+      status: 'active',
+    });
+
+  // Not fatal. The creator and their steps are real by this point and must not
+  // be rolled back over this, but it is logged loudly because the symptom shows
+  // up much later, as a dead button on the path step.
+  if (insertError) {
+    console.error('[accept] Active project NOT created for', creatorId, insertError.message);
+  }
+}
+
 async function acceptApplication(
   supabase: DbClient,
   app: Record<string, any>,
@@ -416,6 +478,7 @@ async function acceptApplication(
       .eq('id', existing.id);
     if (error) return fail('accept', application, error.message);
     creatorId = existing.id;
+    await ensureActiveProject(supabase, creatorId);
     effect = `Reopened the existing creator ${existing.name || email}. Their previous work is untouched.`;
   } else {
     const { data: created, error } = await supabase
@@ -443,6 +506,7 @@ async function acceptApplication(
     }
     creatorId = created.id;
 
+    await ensureActiveProject(supabase, creatorId);
     const seeded = await seedMilestones(supabase, creatorId, now);
     effect = `Created the creator and seeded ${seeded} steps.`;
   }

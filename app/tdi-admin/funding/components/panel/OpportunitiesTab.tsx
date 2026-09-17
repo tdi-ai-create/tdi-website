@@ -835,6 +835,26 @@ function NarrativeControl({ opp, gateOpen, onRequestDraft, onApprove, onSendBack
             <span style={{ fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 4, background: '#D1FAE5', color: '#065F46' }}>
               Approved
             </span>
+            {/* Reading an approved narrative was the one thing this state could
+                not do. showReader has always included 'ready', but the only two
+                controls that set showContent lived in the approval and qa_review
+                branches, so the toggle was unreachable here and the reader was
+                dead code. The URL fallback below could not cover it either: it
+                requires !hasContent, and an approved narrative has content by
+                definition. Net effect was that at the exact moment before a
+                narrative reaches a school, the card offered no way to read it.
+                Bella went to her Drive for the Cox Charities draft because the
+                page left her nothing to click. */}
+            {hasUrl && (
+              <a href={opp.narrative_url} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} style={{ fontSize: 10, color: '#8B5CF6', textDecoration: 'underline' }}>
+                Open doc
+              </a>
+            )}
+            {hasContent && (
+              <button onClick={() => setShowContent(!showContent)} style={{ fontSize: 9, padding: '1px 6px', borderRadius: 3, border: '1px solid #E5E7EB', background: 'white', color: '#6B7280', cursor: 'pointer' }}>
+                {showContent ? 'Hide' : 'Read inline'}
+              </button>
+            )}
             {opp.forwarding_email_status === 'sent' ? (
               <span style={{ fontSize: 10, color: '#6B7280' }}>Sent to the school</span>
             ) : (
