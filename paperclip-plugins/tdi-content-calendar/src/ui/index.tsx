@@ -87,6 +87,8 @@ type Standard = {
  * but the same month. September 2026 has 26 of these against two dated pieces
  * in the queue, so a calendar that hides them is not showing the month.
  */
+type Unscheduled = { at: string; by: string | null; reason: string | null };
+
 type HubItem = {
   id: string;
   slug: string | null;
@@ -95,6 +97,18 @@ type HubItem = {
   quick_win_type: string | null;
   is_published: boolean;
   day: string | null;
+  unscheduled?: Unscheduled | null;
+};
+
+/** Finished Hub work with no date. Drafts are deliberately not in here. */
+type HubUnplaced = {
+  id: string;
+  slug: string | null;
+  title: string | null;
+  category: string | null;
+  status: string;
+  reviewed_at: string | null;
+  unscheduled?: Unscheduled | null;
 };
 
 /** A board approval holding one or more Hub pieces. */
@@ -112,6 +126,8 @@ type Plan = {
   standards: Standard[];
   hub?: HubItem[];
   hubError?: string | null;
+  hubUnplaced?: HubUnplaced[];
+  hubUnplacedError?: string | null;
   error?: string | null;
 };
 
@@ -515,6 +531,7 @@ export function ContentCalendarPage(_props: PluginWidgetProps) {
 
   const hubItems = plan?.hub ?? [];
   const hubApprovals = approvalsData?.byItem ?? {};
+  const hubUnplaced = plan?.hubUnplaced ?? [];
   const openHub = hubItems.find((h) => h.id === openHubId) ?? null;
   const hubByDay = useMemo(() => {
     const map = new Map<string, HubItem[]>();
@@ -933,6 +950,43 @@ export function ContentCalendarPage(_props: PluginWidgetProps) {
           })}
         </div>
       </div>
+
+      {hubUnplaced.length > 0 && (
+        <div style={{ marginTop: 20, border: "1px solid #96631A", borderRadius: 6, background: "#FFFDF8", padding: 14 }}>
+          <strong>Hub work finished with nowhere to go ({hubUnplaced.length})</strong>
+          <p style={{ color: "#5A6472", margin: "4px 0 10px", maxWidth: "72ch" }}>
+            These cleared review and have no release date, so they sit on no day
+            and appear in no month. Drafts are not counted here: work nobody has
+            finished yet is not a problem.
+          </p>
+          <div style={{ display: "grid", gap: 8 }}>
+            {hubUnplaced.map((q) => (
+              <div key={q.id} style={{ border: "1px solid #E3E7EC", borderLeft: `3px solid ${chan("hub").dot}`, borderRadius: 3, padding: "8px 10px", background: "#fff", fontSize: 12 }}>
+                <div style={{ fontWeight: 600 }}>{q.title || "(untitled)"}</div>
+                <div style={{ color: "#5A6472", fontSize: 11, marginTop: 2 }}>
+                  {q.category ? `${q.category} · ` : ""}
+                  {q.status === "pending_review" ? "never reviewed" : "reviewed"}
+                  {q.reviewed_at ? ` ${String(q.reviewed_at).slice(0, 10)}` : ""}
+                </div>
+                {q.unscheduled ? (
+                  <div style={{ marginTop: 6, color: "#5A431A", fontSize: 11.5 }}>
+                    Pulled off the calendar {String(q.unscheduled.at).slice(0, 10)}
+                    {q.unscheduled.by ? ` by ${q.unscheduled.by}` : ""}.{" "}
+                    {q.unscheduled.reason ?? "No reason was recorded."}
+                  </div>
+                ) : (
+                  // Distinguishing "never had a date" from "had one and lost it"
+                  // matters: the second is somebody's decision and the first is
+                  // nobody's.
+                  <div style={{ marginTop: 6, color: "#7A8494", fontSize: 11.5 }}>
+                    No record of it ever being scheduled or pulled.
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {undated.length > 0 && (
         <div style={{ marginTop: 20, border: "1px solid #D8DDE3", borderRadius: 6, background: "#fff", padding: 14 }}>

@@ -115,3 +115,34 @@ config key intact.
 So the calendar can show that sixteen Hub pieces are held and cannot release
 any of them. That is a host limit, not a design choice, and it is written here
 rather than hidden behind a button that looks like it works.
+
+## Fourth pass, v0.8.0: finished Hub work with nowhere to go
+
+Rae asked how many unpublished pieces have no scheduled date. Two of the three
+had been pulled off the September calendar overnight and had become invisible.
+
+- Opened the calendar on v0.8.0.
+- Saw a new rail headed "Hub work finished with nowhere to go (3)", with the
+  line "These cleared review and have no release date, so they sit on no day and
+  appear in no month. Drafts are not counted here: work nobody has finished yet
+  is not a problem."
+- Read the three entries off the screen:
+  "3 Tiny Wellness Habits That Actually Help Educators Feel Better,
+  Self-Care, never reviewed 2026-08-24";
+  "Signs You're Seeing: When to Refer, Not Diagnose,
+  Classroom Management, reviewed 2026-09-11";
+  "Noticing Your Own Compassion Fatigue, Self-Care, reviewed 2026-09-15".
+- Each says "No record of it ever being scheduled or pulled." That is correct
+  and deliberate: the columns that record a pull were added today, after these
+  two were pulled, so there is genuinely nothing to show. A row that had been
+  pulled since would read "Pulled off the calendar <date> by <who>" and the
+  reason.
+- Confirmed the 30 drafts do not appear. They have no date because nobody has
+  finished them, which is not a problem to surface.
+
+## What I did not press
+
+Nothing in this rail is actionable yet. Rescheduling a Hub piece means writing
+`scheduled_publish_date`, which is what the automatic publisher reads, and the
+two pieces here are deliberately held for a credentialed human sign-off. Putting
+a date back on them from a calendar would undo a safety decision.

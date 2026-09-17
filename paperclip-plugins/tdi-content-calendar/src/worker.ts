@@ -251,6 +251,8 @@ const plugin = definePlugin({
           standards: r.json.standards ?? [],
           hub: r.json.hub ?? [],
           hubError: r.json.hubError ?? null,
+          hubUnplaced: r.json.hubUnplaced ?? [],
+          hubUnplacedError: r.json.hubUnplacedError ?? null,
           error: null,
         };
       } catch (e) {
