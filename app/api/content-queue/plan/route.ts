@@ -105,7 +105,7 @@ export async function GET(request: NextRequest) {
   // would be publishing rather than planning.
   const { data: hub, error: hubError } = await supabase
     .from('hub_quick_wins')
-    .select('id, slug, title, category, quick_win_type, status, is_published, scheduled_publish_date, published_at')
+    .select('id, slug, title, category, quick_win_type, status, is_published, scheduled_publish_date, published_at, unscheduled_at, unscheduled_by, unschedule_reason')
     .or(`and(published_at.gte.${from},published_at.lt.${to}),and(published_at.is.null,scheduled_publish_date.gte.${from},scheduled_publish_date.lt.${to})`)
     .order('scheduled_publish_date', { ascending: true })
 
@@ -123,7 +123,35 @@ export async function GET(request: NextRequest) {
     // 106 live pieces still say "reviewed" and 34 still say "pending_review",
     // so showing it would put a word on screen that means nothing.
     day: q.published_at ? String(q.published_at).slice(0, 10) : q.scheduled_publish_date,
+    // Why it left the calendar, when it did. A piece that loses its date and
+    // says nothing reads as content vanishing; two did exactly that on
+    // 16 September for a good reason nobody could see.
+    unscheduled: q.unscheduled_at
+      ? {
+          at: q.unscheduled_at,
+          by: q.unscheduled_by ?? null,
+          reason: q.unschedule_reason ?? null,
+        }
+      : null,
   }))
+
+  // Finished Hub work with no date at all.
+  //
+  // An unscheduled piece has neither published_at nor scheduled_publish_date, so
+  // it falls out of every month and off the calendar completely. That is how two
+  // reviewed student-support pieces became invisible on 16 September: correctly
+  // pulled from the schedule, and then gone.
+  //
+  // Drafts are excluded on purpose. Thirty of them have no date because nobody
+  // has finished them, which is not a problem to surface. Work that cleared
+  // review and has nowhere to sit is.
+  const { data: unplaced, error: unplacedError } = await supabase
+    .from('hub_quick_wins')
+    .select('id, slug, title, category, status, reviewed_at, unscheduled_at, unscheduled_by, unschedule_reason')
+    .eq('is_published', false)
+    .is('scheduled_publish_date', null)
+    .in('status', ['reviewed', 'pending_review'])
+    .order('reviewed_at', { ascending: true })
 
   return NextResponse.json({
     month,
@@ -131,6 +159,18 @@ export async function GET(request: NextRequest) {
     standards: standards ?? [],
     hub: hubItems,
     hubError: hubError ? hubError.message : null,
+    hubUnplaced: (unplaced ?? []).map((q) => ({
+      id: q.id,
+      slug: q.slug,
+      title: q.title,
+      category: q.category,
+      status: q.status,
+      reviewed_at: q.reviewed_at,
+      unscheduled: q.unscheduled_at
+        ? { at: q.unscheduled_at, by: q.unscheduled_by ?? null, reason: q.unschedule_reason ?? null }
+        : null,
+    })),
+    hubUnplacedError: unplacedError ? unplacedError.message : null,
   })
 }
 
