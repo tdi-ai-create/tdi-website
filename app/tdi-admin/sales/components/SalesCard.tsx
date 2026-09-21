@@ -86,7 +86,13 @@ export interface SalesCardOpp {
   city?: string | null
   state?: string | null
   /** Muck points. Null total means the offering is unknown, not that it is light. */
-  muck?: { total: number | null; band: MuckBand | null } | null
+  muck?: {
+    total: number | null
+    band: MuckBand | null
+    /** Best prediction of the deal value. A contract figure once signed. */
+    value?: number | null
+    valuePredicted?: boolean
+  } | null
 }
 
 function extractSubtitle(opp: SalesCardOpp): string {
@@ -128,7 +134,11 @@ export function SalesCard({ opp, onClick, draggable = false, onContextMenu, onFi
 }) {
   const heat = HEAT_STYLES[opp.heat || 'warm'] || HEAT_STYLES.warm
   const typeColor = TYPE_COLORS[opp.type] || '#6B7280'
-  const factored = (opp.value || 0) * (opp.probability || 0) / 100
+  // Until a contract exists the deal value is a prediction, so the board shows
+  // the predicted figure rather than a stale import. Rae, 17 September 2026.
+  const shownValue = opp.muck?.value ?? opp.value
+  const predicted = Boolean(opp.muck?.valuePredicted)
+  const factored = (shownValue || 0) * (opp.probability || 0) / 100
   const subtitle = extractSubtitle(opp)
 
   function handleSaved(field: string, newValue: any) {
@@ -237,12 +247,20 @@ export function SalesCard({ opp, onClick, draggable = false, onContextMenu, onFi
           <InlineText
             oppId={opp.id}
             field="value"
-            value={opp.value}
+            value={shownValue}
             onSaved={handleSaved}
             format="currency"
             placeholder="$0"
             style={{ fontSize: 12, fontWeight: 600 }}
           />
+          {predicted && (
+            <span
+              title="No contract yet, so this is a prediction. Where the recorded figure contradicted the offering it falls back to list price."
+              style={{ marginLeft: 5, fontSize: 8, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em', background: '#FFF4D6', color: '#7A5A00', padding: '1px 4px', borderRadius: 3 }}
+            >
+              pred
+            </span>
+          )}
           <span style={{ color: '#6B7280', fontWeight: 400, marginLeft: 6 }}>&middot; ${(factored / 1000).toFixed(0)}K factored</span>
         </span>
         <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>

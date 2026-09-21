@@ -55,6 +55,26 @@ rather than a login screen. The muck figures still rendered because
   and confirm the four dimension rows show their numbers and reasons, and check
   that no T1 badge remains anywhere.
 
+### Completed after deploy, 17 September 2026
+
+- Opened: https://www.teachersdeserveit.com/tdi-admin/sales
+- Saw: the board loaded 166 active leads and the top bar read "1052 muck
+  &middot; 20 heavy" over "1036 you &middot; 16 Bella", matching the route and
+  the dry run exactly.
+- Saw: zoomed into the Sharon City SD card. The muck pill rendered as a two bar
+  meter with "16" beside it, sitting next to the red "hot" pill. No T1 badge on
+  it or on any other card. The filter rows read "DEAL TYPE:" and "SOURCE:" only.
+- Pressed: the Sharon City SD (PA) card
+- Saw: the panel opened and the muck breakdown rendered "16" with "LIGHT" and
+  "Muck points, out of 100", "156 per point" and "$2,500 PREDICTED" on the
+  right, "Yours 16" and "Bella's 0" beneath. The four rows read "Delivery load,
+  The Pulse, 8", "Grant, Not confirmed, 0", "Relationship drag, 3 notes, stage
+  median 3, 0" and "Travel, Flight and hotel, 8".
+- Saw, and this is the finding: the same panel's VALUE tile read "$18,000" with
+  "FACTORED $8,100" while the muck header four inches away read "$2,500
+  PREDICTED". The rule was applied in one half of the screen and not the other.
+  That is what the follow-up change fixes.
+
 ## What I did not press
 
 Nothing was pressed. This change adds a read only display and removes a retired

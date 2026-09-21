@@ -249,7 +249,14 @@ function toCardOpp(opp: Opportunity, muckById: Record<string, MuckCardScore>): S
     contract_year: opp.contract_year,
     city: opp.city,
     state: opp.state,
-    muck: muckById[opp.supabase_id] ?? null,
+    muck: muckById[opp.supabase_id]
+      ? {
+          total: muckById[opp.supabase_id].total,
+          band: muckById[opp.supabase_id].band,
+          value: muckById[opp.supabase_id].value,
+          valuePredicted: muckById[opp.supabase_id].valuePredicted,
+        }
+      : null,
   }
 }
 
@@ -1155,19 +1162,23 @@ export default function SalesPage() {
   const stats = useMemo(() => {
     const pipelineOpps = activeOpps.filter(o => o.stage !== 'targeting')
     const callSheetOpps = activeOpps.filter(o => o.onCallSheet)
+    // The headline follows the same rule as every card under it: until a
+    // contract exists the figure is a prediction, so a stale import does not
+    // get counted as money. This moved the total down by roughly 210,000.
+    const dealValue = (o: Opportunity) => muckById[o.supabase_id]?.value ?? o.value ?? 0
     return {
-      totalPipeline: pipelineOpps.reduce((s, o) => s + (o.value ?? 0), 0),
+      totalPipeline: pipelineOpps.reduce((s, o) => s + dealValue(o), 0),
       activeCount: pipelineOpps.length,
       hotCount: pipelineOpps.filter(o => o.heat === 'hot').length,
       invoiceCount: opportunities.filter(o => o.needs_invoice && !o.deleted_at && !o.grantSupport).length,
       callSheetCount: callSheetOpps.length,
-      callSheetValue: callSheetOpps.reduce((s, o) => s + (o.value ?? 0), 0),
+      callSheetValue: callSheetOpps.reduce((s, o) => s + dealValue(o), 0),
       factoredMuck: muckRollup?.factoredMuck ?? 0,
       muckRae: muckRollup?.rae ?? 0,
       muckBella: muckRollup?.bella ?? 0,
       heavyCount: muckRollup?.heavy ?? 0,
     }
-  }, [activeOpps, opportunities, muckRollup])
+  }, [activeOpps, opportunities, muckRollup, muckById])
 
   const stagesToShow = showAllStages ? ALL_ACTIVE_STAGES : DEFAULT_KANBAN_STAGES
 
