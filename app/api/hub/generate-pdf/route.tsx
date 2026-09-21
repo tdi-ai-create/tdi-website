@@ -182,6 +182,21 @@ export async function POST(request: NextRequest) {
         }, { status: 400 })
       }
 
+      // Checked here rather than discovered inside the renderer. A missing
+      // sections array throws a TypeError mid-render and surfaces as a 500,
+      // which tells the caller nothing about what to fix. This page is the one
+      // a teacher reaches for in a crisis, so it fails with a sentence instead.
+      if (supportPage) {
+        const sections = (supportPage as { sections?: unknown }).sections
+        if (!supportPage.title || !Array.isArray(sections) || sections.length === 0) {
+          return NextResponse.json({
+            error: 'support_page needs a title and at least one section. '
+              + 'Each section takes a heading and a fields array, where a field is { label, type } '
+              + 'and type is line, lines, box or small_box. It holds blanks only: no guidance, no scripts.',
+          }, { status: 400 })
+        }
+      }
+
       let pdfBuffer: Buffer
       if (tool_type === 'checklist') {
         pdfBuffer = await renderToBuffer(<ChecklistPDF data={{ ...(tool_content as ChecklistData), lang }} />)
