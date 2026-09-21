@@ -378,7 +378,11 @@ export function OpportunityDetailPanel({
   if (!opportunityId) return null
 
   const prob = opp ? (STAGE_PROBABILITY[opp.stage] ?? 0) : 0
-  const factored = opp?.value ? Math.round(opp.value * prob / 100) : null
+  // Until a contract exists the deal value is a prediction, so this tile shows
+  // the same figure the card and the pipeline headline show.
+  const shownValue = muck?.value ?? opp?.value ?? null
+  const valuePredicted = Boolean(muck?.valuePredicted)
+  const factored = shownValue ? Math.round(shownValue * prob / 100) : null
   const o = opp as any
 
   return (
@@ -557,7 +561,15 @@ export function OpportunityDetailPanel({
                             title="Expected deal value. Click to edit."
                             style={{ fontSize: 22, fontWeight: 800, color: '#1B2A4A', cursor: 'text' }}
                           >
-                            {opp.value ? `$${opp.value.toLocaleString()}` : '$0'}
+                            {shownValue ? `$${shownValue.toLocaleString()}` : '$0'}
+                            {valuePredicted && (
+                              <span
+                                title="No contract yet, so this is a prediction. Where the recorded figure contradicted the offering it falls back to list price."
+                                style={{ marginLeft: 6, fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', background: '#FFF4D6', color: '#7A5A00', padding: '1px 5px', borderRadius: 4, verticalAlign: 'middle' }}
+                              >
+                                predicted
+                              </span>
+                            )}
                           </div>
                         )}
                       </div>

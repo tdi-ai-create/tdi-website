@@ -220,8 +220,21 @@ export function scoreLead(input: MuckInput, stageMedian: number): MuckScore {
    */
   const contracted = input.stage === 'signed' || input.stage === 'paid'
   const hasOwnValue = input.value != null && input.value > 0
-  const value =
-    contracted && hasOwnValue
+
+  /**
+   * Which prediction to trust on an unsigned lead.
+   *
+   * A recorded figure within 1.5x of list is somebody's deliberate number and
+   * is kept. One far outside that range is the stale pre-restructure import,
+   * and falls back to list. Both still read as predicted, because neither is a
+   * contract.
+   */
+  const plausible =
+    known && hasOwnValue && (input.value as number) <= OFFERING_PRICE[offering] * 1.5
+
+  const value = contracted && hasOwnValue
+    ? (input.value as number)
+    : plausible
       ? (input.value as number)
       : known
         ? OFFERING_PRICE[offering]
