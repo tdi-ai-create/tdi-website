@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   usePluginAction,
   usePluginData,
@@ -417,6 +417,15 @@ export function ContentCalendarPage(_props: PluginWidgetProps) {
   const [openHubId, setOpenHubId] = useState<string | null>(null);
 
   /**
+   * The open piece renders below the whole month, the finished-Hub list and the
+   * undated rail, which on a full month is several screens down. Without this
+   * the panel opens off screen and clicking a piece looks like it did nothing.
+   * Reported by Kristin, 21 September: "I am not able to click on anything".
+   */
+  const queuePanelRef = useRef<HTMLDivElement | null>(null);
+  const hubPanelRef = useRef<HTMLDivElement | null>(null);
+
+  /**
    * Which piece is being dragged, and which day is under it.
    *
    * Only queue work can be dragged. A Hub Quick Win carries its own release
@@ -533,6 +542,25 @@ export function ContentCalendarPage(_props: PluginWidgetProps) {
   const hubApprovals = approvalsData?.byItem ?? {};
   const hubUnplaced = plan?.hubUnplaced ?? [];
   const openHub = hubItems.find((h) => h.id === openHubId) ?? null;
+
+  // Bring the panel into view whenever a different piece is opened. Guarded on
+  // the element existing so it is a no-op on the render where nothing is open.
+  // Two panels, two refs. Both can be open at once because opening one does not
+  // close the other, so a single shared ref would scroll to whichever mounted
+  // last rather than to the piece just clicked.
+  //
+  // Instant, not smooth. Verified against the live board on 21 September:
+  // smooth is silently a no-op inside this scroll container and leaves
+  // scrollTop at 0, which is the same do-nothing behaviour we are fixing.
+  useEffect(() => {
+    if (!openId && !reviewingId) return;
+    queuePanelRef.current?.scrollIntoView({ block: "start" });
+  }, [openId, reviewingId]);
+
+  useEffect(() => {
+    if (!openHubId) return;
+    hubPanelRef.current?.scrollIntoView({ block: "start" });
+  }, [openHubId]);
   const hubByDay = useMemo(() => {
     const map = new Map<string, HubItem[]>();
     for (const h of hubItems) {
@@ -1019,7 +1047,7 @@ export function ContentCalendarPage(_props: PluginWidgetProps) {
         const held = hubApprovals[openHub.id];
         const others = held ? held.covers.length - 1 : 0;
         return (
-          <div style={{ marginTop: 20, border: "1px solid #D8DDE3", borderRadius: 6, background: "#fff", padding: 18 }}>
+          <div ref={hubPanelRef} style={{ marginTop: 20, border: "1px solid #D8DDE3", borderRadius: 6, background: "#fff", padding: 18 }}>
             <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", alignItems: "baseline" }}>
               <h2 style={{ fontSize: 17, fontWeight: 600, margin: 0 }}>{openHub.title || "(untitled)"}</h2>
               <span style={{ fontSize: 12, color: "#5A6472" }}>
@@ -1092,7 +1120,7 @@ export function ContentCalendarPage(_props: PluginWidgetProps) {
       })()}
 
       {open && (
-        <div style={{ marginTop: 20, border: "1px solid #D8DDE3", borderRadius: 6, background: "#fff", padding: 18 }}>
+        <div ref={queuePanelRef} style={{ marginTop: 20, border: "1px solid #D8DDE3", borderRadius: 6, background: "#fff", padding: 18 }}>
           <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", alignItems: "baseline" }}>
             <h2 style={{ fontSize: 17, fontWeight: 600, margin: 0 }}>{open.title || "(untitled)"}</h2>
             <span style={{ fontSize: 12, color: "#5A6472" }}>
