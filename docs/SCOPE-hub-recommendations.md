@@ -56,11 +56,31 @@ Three further faults behind that one:
 Educator Type distribution: architect 42, strategist 35, connector 35,
 anchor 24, innovator 18. Balanced, unlike role.
 
+## The second bug (Measured, 21 Sep 2026)
+
+`getRecommendations()` has exactly one caller, `app/hub/page.tsx:511`. Its
+result is written to the `recommendations` and `showRecommendations` state
+hooks. Neither is read by any JSX in that file. The dashboard has been running
+these queries on every load and discarding the answer.
+
+So repairing the scorer is necessary and not sufficient. Without a render site,
+steps 1a, 1b and 2 all ship correct logic into a dead end and the measured
+outcome stays zero people helped. This is the unreachable-code trap in section
+4 of CLAUDE.md.
+
+Rae brought the render site into scope on 21 Sep, amending the original
+"no dashboard changes" boundary. That boundary still holds for everything else
+on the page: this adds one band, it does not redesign anything around it.
+
 ## In scope
 
 - **1a** `lib/hub/recommendations.ts`: fix category matching, rebuild
   `roleToCategoryMap` against real role values, repair the stress rule,
   replace the false popularity label.
+- **1c** `app/hub/page.tsx`: render the recommendations that already load.
+  Ships in the same PR as 1a, because neither half delivers anything alone.
+  Also retire the "Set a goal to get personalised recommendations" empty state,
+  which points at a table with zero rows.
 - **1b** `lib/hub/recommendations.ts`: add `hub_quiz_results` as a scoring signal.
 - **2** `lib/hub/quizRecommendations.ts`: add the `educator_type` mapping,
   all five result keys.
@@ -81,13 +101,31 @@ Anything below goes in `PARKED.md` with a note. None of it enters the diff.
 
 ## Done means
 
-A person who has taken quizzes sees course recommendations that change based on
-their results, and the before/after is shown with a query, not described.
+A person who has taken quizzes **opens the Hub home page and sees** course
+recommendations that change based on their results. Proven by a query for the
+scoring and by a browser pass for the surface, not described in either case.
+
+## Gates this work has to clear
+
+- `npm run typecheck`, checked by exit code, never by empty output.
+- `npm run check:reachable`. 1c exists because this branch would otherwise fail
+  the spirit of that check: logic reaching a state hook nothing reads.
+- `npm run check:schema` after the query changes in 1a and 1b.
+- `npm run check:browserpass`. 1c touches a screen people operate, so it needs
+  a record under `browser-passes/` with a figure or quoted text in it.
+
+Preview deployments return 500 on every route, so there is nowhere safe to
+click this before production. Try local first. If the Hub home page cannot be
+signed in to locally, record a deferred pass naming the production URL, ship,
+then open that URL and write the `Pressed:` and `Saw:` lines into the same
+file. One deferral is sequencing. A second one pays for the first.
 
 ## Rules for this work
 
-1. One PR per step. An unexpected file in the diff is the drift signal.
+1. One PR per step, except 1a and 1c which ship together because neither half
+   delivers anything alone. An unexpected file in the diff is the drift signal.
 2. Every step exits on a measured result, not a described one.
 3. Hard stop and report between steps. Do not roll into the next one.
 4. Scope changes come back to Rae. They are not decided in the worktree.
 5. No claim ships without a tier: Measured, Derived, or Unverified.
+6. One detail per report, then wait. Not a wall of sections.
