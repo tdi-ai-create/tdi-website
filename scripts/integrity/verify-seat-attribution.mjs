@@ -89,22 +89,40 @@ for (const p of partnerships ?? []) if (p.slug) slugToId.set(p.slug, String(p.id
 // sales_deal 0 of 1. The signal lives in those three.
 const SELF_SERVE_SOURCES = ['stripe'];
 
+// A seat with a future expiry is a deliberate, time limited comp, and having no
+// partnership is the point of it. Seven arrived on 21 Sep from the BRCC keynote,
+// all expiring 30 Nov exactly as the talk promised, and every one of them read
+// as a broken link.
+//
+// Keyed on the expiry rather than on the source, so the next conference or
+// campaign passes without anyone editing this file. The distinction that
+// matters is not which campaign granted it, it is whether somebody set an end
+// date. A comp with no end date is indistinguishable from a link that broke,
+// which is what Dawn Bridges at IASA turned out to be: granted by a sales deal
+// in July, the deal later deleted, the access left running forever.
+const now = Date.now();
+const isLiveComp = (s) => s.expires_at && new Date(s.expires_at).getTime() > now;
+
 const { data: seats, error: sErr } = await hub
   .from('hub_memberships')
-  .select('user_id, partnership_id, source')
+  .select('user_id, partnership_id, source, expires_at')
   .eq('tier', 'all_access')
   .eq('status', 'active');
 die('hub_memberships', sErr);
 
 const selfServe = (seats ?? []).filter((s) => SELF_SERVE_SOURCES.includes(s.source)).length;
-const districtSeats = (seats ?? []).filter((s) => !SELF_SERVE_SOURCES.includes(s.source));
+const comped = (seats ?? []).filter((s) => !SELF_SERVE_SOURCES.includes(s.source) && isLiveComp(s)).length;
+const districtSeats = (seats ?? []).filter(
+  (s) => !SELF_SERVE_SOURCES.includes(s.source) && !isLiveComp(s)
+);
 
 const orphanIds = districtSeats.filter((s) => !liveIds.has(String(s.partnership_id))).map((s) => s.user_id);
 
 if (orphanIds.length === 0) {
   console.log(
     `\nAll ${districtSeats.length} district all-access seats trace to a partnership` +
-      `${selfServe ? `, and ${selfServe} self-serve seat(s) correctly have none` : ''}.\n`
+      `${selfServe ? `, ${selfServe} self-serve seat(s) correctly have none` : ''}` +
+      `${comped ? `, and ${comped} comp seat(s) with an end date correctly have none` : ''}.\n`
   );
   process.exit(0);
 }
@@ -124,7 +142,8 @@ if (stillOrphaned.length === 0) {
   console.log(
     `\nAll ${districtSeats.length} district all-access seats trace to a partnership, ` +
       `${unique.length} via the slug fallback` +
-      `${selfServe ? `, and ${selfServe} self-serve seat(s) correctly have none` : ''}.\n`
+      `${selfServe ? `, ${selfServe} self-serve seat(s) correctly have none` : ''}` +
+      `${comped ? `, and ${comped} comp seat(s) with an end date correctly have none` : ''}.\n`
   );
   process.exit(0);
 }
