@@ -85,6 +85,7 @@ came out of Rae's own findings the same day.
 | **School appropriate.** Could a principal hand this to any teacher on staff without a conversation first? See below | Human |
 | **Read-through.** Logged yes or no: would a teacher use this at 9pm on a Tuesday | Human |
 | **Distinct actions.** A situation card carries at least three actions that answer different situations. Procedure cards are counted differently. See below | Human |
+| **Local support page.** The four highest-risk student-support topics carry a second page of school and district specific blanks. See below | Human |
 | **Rubric version stamp.** Every review records `rubric-v2` in `qa_notes` | Code |
 
 Zero *published* items carry a stamp yet, so no audit can tell what standard any
@@ -265,6 +266,49 @@ Her hypothesis is that "boring to read" is a voice and tone gap the rubric does
 not score at all. A sixth rubric item for voice was drafted and never added,
 because it raises the bar for every future item and needs Rae's sign-off.
 **Still open.**
+
+### The local support page
+
+Added 2026-09-21. Rae's call while reading the revised suicidal-ideation card.
+Applies to the four highest-risk student-support topics: self-harm, suicidal
+ideation, abuse disclosure, and grief following a death. Those four already
+cannot publish on agent QA alone, and this is the second thing they now need.
+
+**Every card on those four topics carries a second page of school and district
+specific support resources.** Without it the card does not publish, whatever
+else it passes.
+
+**What forced it.** The suicidal-ideation card tells a teacher to escort the
+student to "your school's designated crisis contact". A teacher in a crisis does
+not necessarily know who that is, where they sit, or who covers their class
+while they walk a student down the corridor. Every card in this set has the same
+shape of hole: we write the half we can know, and leave the half that decides
+what actually happens as a blank the teacher fills under pressure. The sourcing
+can be perfect and the card still fails the person holding it.
+
+**The page is blanks, not guidance.** Labelled fields a teacher or their
+administrator completes once and keeps. At minimum: who our designated crisis
+contact is and where they sit; who to call after hours; what our reporting
+procedure actually is, since ASCA asks for the building's procedure rather than
+the state law behind it; who covers my class while I walk a student down; and
+what happens after the handoff, including whether the teacher is told anything.
+Then a short block of questions to ask leadership, for the ones a teacher cannot
+answer alone.
+
+**Its value is that it is empty.** Nothing on page two is written by us. No
+clinical content, no scripts, no advice. The moment it fills up with more of our
+guidance it has become another page of the card and stopped doing its job.
+
+**Why this is not just a nice addition.** It moves the unanswerable part of a
+crisis out of the moment and into a staff meeting. A teacher who has filled this
+in once is not learning their building's procedure at 2pm on a Tuesday with a
+student in front of them.
+
+**The same shape answers a different defect.** The compassion-fatigue card
+failed distinct actions because its only route out was an Employee Assistance
+Program that many buildings do not have. A local page is the honest fix there
+too. Not required outside the four topics yet, but reach for it before writing a
+referral instruction that assumes a service exists.
 
 ## 3. Visual design bar
 
