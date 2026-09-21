@@ -4,8 +4,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { renderToBuffer } from '@react-pdf/renderer'
 import { QuickWinPDF, type QuickWinSections } from '@/lib/pdf/quick-win-template'
 import { ChecklistPDF, type ChecklistData } from '@/lib/pdf/quick-win-checklist'
-import { FormPDF, type FormData } from '@/lib/pdf/quick-win-form'
-import { ReferencePDF, type ReferenceData } from '@/lib/pdf/quick-win-reference'
+import { FormPDF, FormPage, type FormData } from '@/lib/pdf/quick-win-form'
+import { ReferencePDF, ReferencePage, type ReferenceData } from '@/lib/pdf/quick-win-reference'
+import { Document } from '@react-pdf/renderer'
 import { ToolkitPDF, type ToolkitData } from '@/lib/pdf/quick-win-toolkit'
 import React from 'react'
 import { retireReviewStamp } from '@/lib/hub/replace-file'
@@ -161,13 +162,56 @@ export async function POST(request: NextRequest) {
       )
       if (toolGuard.refuse) return toolGuard.refuse
 
+      // TEA-768. An optional second page of school and district blanks, for the
+      // four highest-risk student-support topics. Generated here rather than
+      // merged by the caller: a page made outside this route is outside the
+      // brand rules and outside the weight test, and it drifts the first time
+      // somebody assembles one by hand.
+      const supportPage = safeContent(body.support_page) as FormData | null
+
+      // Only reference_card composes today, because that is what all four of
+      // those cards are. Refuse the rest rather than ignore the field. A
+      // parameter that is silently dropped is how upload_pdf spent months
+      // accepting a `target` it never honoured, returning 200 while writing the
+      // wrong file.
+      if (supportPage && tool_type !== 'reference_card') {
+        return NextResponse.json({
+          error: `support_page is only supported for reference_card today, not ${tool_type}. `
+            + 'Extract a Page component from that template the way quick-win-reference.tsx does, then add it here. '
+            + 'Refusing rather than dropping it, so nobody gets a 200 and a one-page file.',
+        }, { status: 400 })
+      }
+
+      // Checked here rather than discovered inside the renderer. A missing
+      // sections array throws a TypeError mid-render and surfaces as a 500,
+      // which tells the caller nothing about what to fix. This page is the one
+      // a teacher reaches for in a crisis, so it fails with a sentence instead.
+      if (supportPage) {
+        const sections = (supportPage as { sections?: unknown }).sections
+        if (!supportPage.title || !Array.isArray(sections) || sections.length === 0) {
+          return NextResponse.json({
+            error: 'support_page needs a title and at least one section. '
+              + 'Each section takes a heading and a fields array, where a field is { label, type } '
+              + 'and type is line, lines, box or small_box. It holds blanks only: no guidance, no scripts.',
+          }, { status: 400 })
+        }
+      }
+
       let pdfBuffer: Buffer
       if (tool_type === 'checklist') {
         pdfBuffer = await renderToBuffer(<ChecklistPDF data={{ ...(tool_content as ChecklistData), lang }} />)
       } else if (tool_type === 'form') {
         pdfBuffer = await renderToBuffer(<FormPDF data={{ ...(tool_content as FormData), lang }} />)
       } else if (tool_type === 'reference_card') {
-        pdfBuffer = await renderToBuffer(<ReferencePDF data={{ ...(tool_content as ReferenceData), lang }} />)
+        const card = { ...(tool_content as ReferenceData), lang }
+        pdfBuffer = supportPage
+          ? await renderToBuffer(
+              <Document title={card.title} author="Teachers Deserve It">
+                <ReferencePage data={card} />
+                <FormPage data={{ ...supportPage, lang }} />
+              </Document>
+            )
+          : await renderToBuffer(<ReferencePDF data={card} />)
       } else if (tool_type === 'toolkit') {
         pdfBuffer = await renderToBuffer(<ToolkitPDF data={{ ...(tool_content as ToolkitData), lang }} />)
       } else {
