@@ -84,7 +84,7 @@ came out of Rae's own findings the same day.
 | **Title-promise match.** If the title says toolkit, more than one tool ships | Human |
 | **School appropriate.** Could a principal hand this to any teacher on staff without a conversation first? See below | Human |
 | **Read-through.** Logged yes or no: would a teacher use this at 9pm on a Tuesday | Human |
-| **Distinct actions.** A reference card carries at least three actions that answer different situations. See below | Human |
+| **Distinct actions.** A situation card carries at least three actions that answer different situations. Procedure cards are counted differently. See below | Human |
 | **Rubric version stamp.** Every review records `rubric-v2` in `qa_notes` | Code |
 
 Zero *published* items carry a stamp yet, so no audit can tell what standard any
@@ -213,6 +213,49 @@ takes to read them.
 **Scope.** Reference cards. The other tool types have their own shapes and the
 sample is not there yet: a checklist that repeats one idea fails specificity
 already, and forms were not part of this read.
+
+### Procedure cards are counted differently
+
+Added 2026-09-21, hours after the rule above, from Julie Lynn's first pass over
+the unpublished library. She found the rule as written would fail a card Rae had
+approved that same morning.
+
+**Two shapes of reference card exist and the count only fits one of them.**
+
+A *situation card* offers choices. If this happens do one thing, if that happens
+do another, and a teacher picks the row that matches the moment in front of
+them. The dyslexia card is one. Three distinct actions is the right bar, because
+a card of that shape with one action has padded a single idea into a page.
+
+A *procedure card* is one process in order. A student discloses something, and
+the teacher keeps their face neutral, declines to promise secrecy, then walks it
+to the counselor. Those are not three situations a teacher chooses between. They
+are three steps of one situation, and the order is the content. "The Reporting
+Conversation" (`b8f7cd65`) is built this way, and counting situations would fail
+it for being correctly shaped.
+
+**So procedure cards are exempt from the three-situation count**, and carry
+their own bar instead.
+
+- **Every step tells the teacher something to do.** A step that only explains, or
+  that restates the step above it, is the same padding the original rule exists
+  to catch.
+- **The card runs to the handoff.** It does not stop at "tell the counselor"
+  without saying when, or to whom, or what the teacher says while doing it. A
+  procedure that ends before the process does is thin no matter how many steps
+  it lists.
+
+**The shape is not the writer's to declare.** A card is a procedure card only if
+its steps genuinely have to happen in that order. If the sections could be
+reordered without harming the reader, it is a situation card wearing a sequence,
+and it is counted. Without this guard the exemption is a relabel away from being
+a loophole, which is how a floor stops being a floor.
+
+**Why this was not obvious when the rule was written.** The rule came out of two
+cards that both failed the same way, and both happened to be situation cards. A
+sample of two agreed with itself. Julie read eight more within the hour and the
+second shape appeared immediately. Worth remembering the next time a rule is
+written from the cases that prompted it.
 
 ### The open sixth rule
 
