@@ -68,11 +68,16 @@ export interface ReferenceData {
   lang?: Lang
 }
 
-export function ReferencePDF({ data }: { data: ReferenceData }) {
+/**
+ * The page on its own, without a Document around it. See `FormPage` in
+ * quick-win-form.tsx for why: TEA-768 needs a reference card and a fillable
+ * page inside one document, and a `<Document>` cannot nest in another.
+ * `ReferencePDF` below is unchanged in behaviour.
+ */
+export function ReferencePage({ data }: { data: ReferenceData }) {
   const L = getLabels(data.lang ?? 'en')
   return (
-    <Document title={data.title} author="Teachers Deserve It">
-      <Page size="LETTER" style={s.page}>
+    <Page size="LETTER" style={s.page}>
         <View style={s.banner}>
           <Text style={s.brandLabel}>Teachers Deserve It</Text>
           <Text style={s.title}>{data.title}</Text>
@@ -137,7 +142,14 @@ export function ReferencePDF({ data }: { data: ReferenceData }) {
           <Text style={s.footerText}>Teachers Deserve It</Text>
           <Text style={s.footerText}>teachersdeserveit.com</Text>
         </View>
-      </Page>
+    </Page>
+  )
+}
+
+export function ReferencePDF({ data }: { data: ReferenceData }) {
+  return (
+    <Document title={data.title} author="Teachers Deserve It">
+      <ReferencePage data={data} />
     </Document>
   )
 }
