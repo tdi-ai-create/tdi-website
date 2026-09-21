@@ -84,6 +84,7 @@ came out of Rae's own findings the same day.
 | **Title-promise match.** If the title says toolkit, more than one tool ships | Human |
 | **School appropriate.** Could a principal hand this to any teacher on staff without a conversation first? See below | Human |
 | **Read-through.** Logged yes or no: would a teacher use this at 9pm on a Tuesday | Human |
+| **Distinct actions.** A reference card carries at least three actions that answer different situations. See below | Human |
 | **Rubric version stamp.** Every review records `rubric-v2` in `qa_notes` | Code |
 
 Zero *published* items carry a stamp yet, so no audit can tell what standard any
@@ -165,6 +166,53 @@ what it governs: a reward appears unannounced on someone's phone, while a Hub
 tool is something a teacher went looking for and chose to open. Different
 consent, different bar. Do not apply the Pulse list here, and do not apply this
 one there.
+
+### Distinct actions
+
+Added 2026-09-21, from Rae's own read of eight student-support reference cards
+in one sitting. Section 7 had deferred a substance floor until the sample was
+real. It is now.
+
+The test: **count the actions that answer different situations, not the
+bullets.** A reference card needs at least three.
+
+Two of the three cards Rae sent back that day failed on the same shape, and
+neither failed on sourcing, lane or format.
+
+- The dyslexia card offered two moves: warn a student before calling on them to
+  read aloud, and do not correct their reading errors in front of the class.
+  Both are good. Both answer the same situation, which is a student being
+  embarrassed while reading out loud. That is **one action written twice**, so a
+  teacher who wanted to help on Monday had nothing else on the card.
+- The compassion-fatigue card gave three ways to notice it in yourself and then
+  one route out, ask about your Employee Assistance Program. **One door**, and a
+  reader in a building without a usable EAP reaches the end of the card with
+  nowhere to go.
+
+**Count situations, not sentences.** Three bullets that all say be gentle about
+reading aloud is one action. Warn before calling on them, give extra time on a
+written task, and accept an answer out loud is three, because a teacher in three
+different moments can use three different ones.
+
+**Where a card refers on, it names more than one destination.** A single named
+referral route is the same failure in a different costume. The counselor, the
+reading specialist, the EAP: each of those exists in some buildings and not
+others, and a card that offers one has offered none to the teacher whose
+building lacks it.
+
+**Why three.** Below three there is no card, only a rule with an example. Three
+is also where the reference-card format starts earning the page it takes up, and
+it is low enough that a genuinely narrow topic can still clear it honestly
+rather than by padding. A card that cannot reach three distinct actions is
+usually a section of a larger card rather than a card of its own.
+
+**Why this is human and not code.** Nothing mechanical can tell whether two
+instructions answer the same situation. A reviewer can, in about the time it
+takes to read them.
+
+**Scope.** Reference cards. The other tool types have their own shapes and the
+sample is not there yet: a checklist that repeats one idea fails specificity
+already, and forms were not part of this read.
 
 ### The open sixth rule
 
@@ -355,13 +403,24 @@ would reject good writing. Specificity now has a usable test, in section 2, but
 it is a human read rather than a check. No machine can tell whether a sentence
 would work in a different tool.
 
-**A substance floor is deliberately absent.** The obvious next rule is a minimum
-per tool type, so a reference card with one script cannot pass. That is not
-written because the evidence is not there yet. Measuring the 32 tools that have
-passed a real read gives 6 checklists, 8 forms and only 2 reference cards, and
-the 16 self_contained ones could not be measured at all. A floor set on eight
-forms and two cards would be precise about the wrong thing. 160 downloads are
-still unread. Set it when the sample is real.
+**A substance floor existed as a gap until 2026-09-21, and now covers reference
+cards only.** The original note here said a floor could not be written because
+the evidence was not there: 32 tools had passed a real read, of which 6 were
+checklists, 8 forms and only 2 reference cards, so a floor set on that sample
+would have been precise about the wrong thing. The condition it set was to write
+the rule when the sample was real.
+
+It became real on 2026-09-21, when Rae read eight student-support reference
+cards in one sitting and sent three back. Two of the three failed the same way,
+on actions rather than on sourcing, lane or format, which is what turned a
+suspicion into a rule a reviewer can apply. The **distinct actions** rule in
+section 2 is the result. It is human-enforced for the same reason specificity
+is: no machine can tell whether two instructions answer the same situation.
+
+**The floor still does not cover checklists, forms or self-contained tools.**
+That is deliberate and the original reasoning holds for them. The reference-card
+sample is now ten read properly; the others are not. Extend it per tool type as
+each sample arrives, not by assuming this number travels.
 
 Changing the lane rules changes what comes off the live site, so
 `npx tsx scripts/score-published-dryrun.ts --selftest` covers all four lanes with
