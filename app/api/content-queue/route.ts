@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js'
 import { notifyApproved, notifyWaiting } from '@/lib/content-queue/notify'
 import { parseSlides, carouselProblems } from '@/lib/content-queue/carousel'
 import { summariseHistory } from '@/lib/content-queue/history'
+import { findBlockedTerms, blockedTermsMessage, TERM_CHECKED_ACTIONS, type BlockedTerm } from '@/lib/content-queue/blocked-terms'
 import {
   TRANSITIONS, OWNER_OF, actorHoldsRole, isSelfReview, legalFrom, canRequestChanges, canFlagBlocked,
   isTransition, hasContent, canRecordBoardDecision, canSetDate,
@@ -399,6 +400,36 @@ export async function POST(request: NextRequest) {
         }, { status: 400 })
       }
     }
+    // Retired references never move forward. The list is in the database so it
+    // can change without a deploy; see lib/content-queue/blocked-terms.ts for
+    // why three human reviewers were not enough on their own.
+    if ((TERM_CHECKED_ACTIONS as readonly string[]).includes(action)) {
+      const { data: termRows, error: termErr } = await supabase
+        .from('content_queue_blocked_terms')
+        .select('term, reason')
+      if (termErr) {
+        // Refuse rather than wave it through. A check that silently stops
+        // checking is how the Facebook-group line reached subscribers.
+        return NextResponse.json({
+          success: false, refusedBy: 'blocked terms',
+          error: `Cannot ${action}: the blocked-term list could not be read, so this copy has not been checked. ${termErr.message}`,
+        }, { status: 503 })
+      }
+      const terms = (termRows ?? []) as BlockedTerm[]
+      const copy = [
+        typeof body.body === 'string' ? body.body : item.body,
+        item.title,
+      ].filter(Boolean).join('\n')
+      const hits = findBlockedTerms(copy, terms)
+      if (hits.length > 0) {
+        return NextResponse.json({
+          success: false, refusedBy: 'blocked terms', id, action,
+          terms: hits.map(h => h.term),
+          error: blockedTermsMessage(hits),
+        }, { status: 422 })
+      }
+    }
+
     if (rule.needsNote && !note) {
       return NextResponse.json({ error: `${action} requires a note saying why.` }, { status: 400 })
     }
