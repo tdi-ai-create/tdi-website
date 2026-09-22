@@ -86,7 +86,7 @@ export function pickTheOneThing(opportunities: any[], actionItems: any[]) {
       title: overdue.a.client_label || overdue.a.title,
       why: overdue.a.description || '',
       actionId: overdue.a.id,
-      owner: overdue.a.owner_type === 'client' ? ('school' as Owner) : ('you' as Owner),
+      owner: isSchoolOwned(overdue.a) ? ('school' as Owner) : ('you' as Owner),
     }
   }
 

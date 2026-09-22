@@ -2,6 +2,7 @@
 
 import { ReactNode } from 'react'
 import { daysSince, daysUntil, isLivePath } from './lib'
+import { isSchoolOwned } from '@/lib/funding-ownership'
 
 const C = {
   ink: '#0a0f1e', ink2: '#4b5164', ink3: '#8b91a3',
@@ -89,7 +90,7 @@ export function WorkGroup({ title, count, tone, children }: { title: string; cou
 export function TaskRow({ item, onOpen }: { item: any; onOpen: () => void }) {
   const late = daysUntil(item.due_date)
   const overdue = late !== null && late < 0
-  const pip = overdue ? C.red : item.owner_type === 'client' ? C.amber : C.ink3
+  const pip = overdue ? C.red : isSchoolOwned(item) ? C.amber : C.ink3
   return (
     <div onClick={onOpen} style={{
       display: 'flex', alignItems: 'flex-start', gap: 11, padding: '10px 14px',
