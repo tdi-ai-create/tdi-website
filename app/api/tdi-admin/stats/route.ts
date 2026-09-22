@@ -172,6 +172,42 @@ export async function GET() {
       }));
     }
 
+    // Most enrolled courses.
+    //
+    // The partner dashboard has always read `topCourses` off this response to
+    // build the Strategy Spotlight week of the Newsletter Ready report, and
+    // this route has never returned the key. So every school's newsletter
+    // recommended the same four hard coded course titles from the client side
+    // fallback, for every week of every month, which is the opposite of the
+    // "recommendations matched to your team" the report promises.
+    const { data: enrolmentRows } = await supabase
+      .from('hub_enrollments')
+      .select('course_id');
+
+    const courseCounts: Record<string, number> = {};
+    (enrolmentRows || []).forEach((e: { course_id: string | null }) => {
+      if (e.course_id) courseCounts[e.course_id] = (courseCounts[e.course_id] || 0) + 1;
+    });
+    const topCourseIds = Object.entries(courseCounts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 6);
+
+    let topCourses: { title: string; enrollments: number }[] = [];
+    if (topCourseIds.length > 0) {
+      const { data: courseNames } = await supabase
+        .from('hub_courses')
+        .select('id, title')
+        .in('id', topCourseIds.map(c => c[0]));
+
+      const courseMap: Record<string, string> = {};
+      (courseNames || []).forEach((c: { id: string; title: string }) => { courseMap[c.id] = c.title; });
+      // Drop anything we cannot name. A course id in a staff newsletter is
+      // worse than one fewer recommendation.
+      topCourses = topCourseIds
+        .filter(([id]) => courseMap[id])
+        .map(([id, count]) => ({ title: courseMap[id], enrollments: count }));
+    }
+
     // Recent activity (last 10 actions)
     const { data: recentActivity } = await supabase
       .from('hub_activity_log')
@@ -226,6 +262,7 @@ export async function GET() {
       recentSignups: recentSignups || 0,
       todaySignups: todaySignups || 0,
       topQuickWins,
+      topCourses,
       recentActivity: recentActivity || [],
       growthChart,
       roleBreakdown,
