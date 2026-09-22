@@ -193,13 +193,20 @@ export function goalProgress(kpi: {
   target_unit?: string | null;
 }): { pct: number; display: string; awaitingBaseline: boolean } {
   const target = Number(kpi.target_value ?? 0);
-  const current = Number(kpi.current_value ?? 0);
   const unit = kpi.target_unit ?? '';
 
-  if (!(target > 0)) {
+  // Null and zero mean different things and the card must not flatten them.
+  // Null is "nobody has measured this yet", which is the honest state of a
+  // goal whose baseline is still being collected. Zero is a real measurement
+  // that happens to be zero, which a school is entitled to see as zero. The
+  // old code coalesced null to 0 and rendered both as failure.
+  const neverMeasured = kpi.current_value === null || kpi.current_value === undefined;
+
+  if (!(target > 0) || neverMeasured) {
     return { pct: 0, display: 'Soon', awaitingBaseline: true };
   }
 
+  const current = Number(kpi.current_value);
   return {
     pct: Math.min((current / target) * 100, 100),
     display: `${current}${unit}`,
