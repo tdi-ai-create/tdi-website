@@ -117,6 +117,15 @@ jobs:
         # unused-file backlog does not block unrelated work.
         run: npm run check:reachable
 
+      - name: Goal wording matches the tile educators pressed
+        # Onboarding offers twelve goal cards. The dashboard shows a chip naming
+        # the goal that earned someone a course. Those lists lived in two files
+        # and drifted: the tile said "Grow as a leader", the chip said "grow
+        # your team", so a chip named a goal the educator never chose. The
+        # comment telling the next person to keep them in sync was the first
+        # fix. This is the second.
+        run: npm run check:goals
+
       - name: Upserts name a conflict target that exists
         # `.upsert(row, { onConflict: 'a,b' })` needs a unique index on exactly
         # those columns. Five call sites named targets that do not exist, four

@@ -1,4 +1,5 @@
 import { getHubSupabase as getSupabase } from '@/lib/supabase-hub';
+import { GOAL_TO_CATEGORY, goalLabel, type GoalKey } from '@/lib/hub/goals';
 
 export interface RecommendedCourse {
   id: string;
@@ -120,45 +121,12 @@ export async function getRecommendations(userId: string): Promise<Recommendation
   const onboardingData = profile?.onboarding_data as Record<string, unknown> | undefined;
   const userGoals = (onboardingData?.goals as string[] | undefined) ?? [];
 
-  // Map goals to categories.
+  // Goal wording and goal-to-category both live in lib/hub/goals.ts now.
   //
-  // The keys are the snake_case values onboarding stores. The previous map
-  // keyed on Title Case prose ('Reduce Stress'), which this Hub has never
-  // written, so even against the right table nothing would have matched.
-  //
-  // role_support (129 people) and figure_out_whats_next (89) are deliberately
-  // absent. Neither points at one category honestly, so those readers fall
-  // through to the role rule or to curation rather than being handed a guess.
-  // Approved by Rae, 21 Sep 2026.
-  const goalToCategoryMap: Record<string, string> = {
-    reduce_stress: 'stress-&-wellness',
-    find_joy: 'stress-&-wellness',
-    feel_like_myself: 'stress-&-wellness',
-    make_it_to_summer: 'stress-&-wellness',
-    all_of_the_above: 'stress-&-wellness',
-    save_time: 'time-savers',
-    stop_bringing_work_home: 'time-savers',
-    classroom_management: 'classroom-management',
-    fresh_ideas: 'classroom-management',
-    better_parent_communication: 'communication',
-    team_growth: 'leadership',
-  };
-
-  // Goals are stored as keys, so they need a label before a person reads one.
-  const goalLabels: Record<string, string> = {
-    reduce_stress: 'reduce stress',
-    find_joy: 'find joy again',
-    feel_like_myself: 'feel like yourself again',
-    make_it_to_summer: 'make it to summer',
-    all_of_the_above: 'all of the above',
-    save_time: 'save time',
-    stop_bringing_work_home: 'stop bringing work home',
-    classroom_management: 'classroom management',
-    fresh_ideas: 'find fresh ideas',
-    better_parent_communication: 'communicate better with families',
-    team_growth: 'grow your team',
-  };
-
+  // They used to be hand-written here, and the wording drifted: this file
+  // called `team_growth` "grow your team" while the tile the educator actually
+  // pressed said "Grow as a leader", so a chip named a goal they never chose.
+  // Quoting their own words back to them is the point, so there is one source.
   // Map roles to categories.
   //
   // The keys are the six values the onboarding and profile pickers actually
@@ -194,11 +162,12 @@ export async function getRecommendations(userId: string): Promise<Recommendation
 
     // Rule 2: Match to user's goals
     for (const goal of userGoals) {
-      const matchedCategory = goalToCategoryMap[goal];
+      const matchedCategory = GOAL_TO_CATEGORY[goal as GoalKey];
       if (matchedCategory && courseCategory === normalizeCategory(matchedCategory)) {
         score += 50;
         if (!reason) {
-          reason = `Toward your goal to ${goalLabels[goal] ?? goal}`;
+          // Their own words, not a paraphrase of them.
+          reason = `Your goal: ${goalLabel(goal)}`;
           signal = 'goal';
         }
         break; // Only count one goal match per course

@@ -77,13 +77,30 @@ on the page, which is the defect this change fixes: the dashboard has been
 calling `getRecommendations()` on every load and writing the result into state
 that no JSX reads.
 
-## What I did not press
-
-Nothing on production yet. The deploy has not happened.
-
 ## What I could not verify
 
-Everything on the list above, until this ships. Also unverified in any browser:
-the Spanish rendering of the new band, and the "From the Hub library" heading
-that a reader with no role, goals or Vibe Check data would see. Both were
-confirmed at the function level only.
+Still unverified in any browser: the Spanish rendering of the new band, and the
+"From the Hub library" heading a reader with no role, goals or Vibe Check data
+would see. Both were confirmed at the function level only, against the account
+`cbc68a9f-bb02-4825-a7ec-bb4fd155ebff`, which returned `personalized: false`
+and three cards all reasoned "Chosen from the Hub library".
+
+Reaching either state in a browser needs an account that is not Rae's, so it
+waits for someone who can sign in as one.
+
+## Follow-up pass after the label fix deployed (22 Sep 2026)
+
+Deploy `teachersdeserveit-nwcj5gnvt`, Ready.
+
+- Opened: https://www.teachersdeserveit.com/hub signed in as Rae
+- Saw: the middle card's category now reads "CLASSROOM MANAGEMENT" with a space,
+  matching "CLASSROOM MANAGEMENT" in New this month directly beneath it. The
+  hyphenated slug is gone.
+- Saw: the chips still read "Toward your goal to grow your team", which is the
+  separate wording defect. The tile Rae actually pressed says "Grow as a
+  leader". Fixed on `fix/hub-goal-chip-labels`, not yet deployed at the time of
+  this observation.
+
+## What I did not press
+
+The Vibe Check overlay, again. No answer submitted.
