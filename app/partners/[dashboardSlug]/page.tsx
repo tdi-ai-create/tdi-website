@@ -3759,7 +3759,17 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                           ${partnershipKpis.length > 0 ? `
                             <div class="section">
                               <div class="section-title">Key Performance Indicators</div>
-                              ${partnershipKpis.map(k => `<p style="font-size:14px;margin:6px 0;"><strong>${k.kpi_label}:</strong> ${k.current_value}${k.target_unit} of ${k.target_value}${k.target_unit} target</p>`).join('')}
+                              ${partnershipKpis.map(k => {
+                                // The on screen card already refuses to print a
+                                // zero it cannot justify. This report did not,
+                                // and printed "null% of 70% target" for any goal
+                                // whose baseline has not been collected yet.
+                                const p = goalProgress(k);
+                                const readout = p.awaitingBaseline
+                                  ? `baseline not collected yet, target ${k.target_value ?? 'to be agreed'}${k.target_value ? k.target_unit : ''}`
+                                  : `${k.current_value}${k.target_unit} of ${k.target_value}${k.target_unit} target`;
+                                return `<p style="font-size:14px;margin:6px 0;"><strong>${k.kpi_label}:</strong> ${readout}</p>`;
+                              }).join('')}
                             </div>
                           ` : ''}
                           <div class="footer">
@@ -6735,7 +6745,10 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                     link.download = `engagement-summary-${new Date().toISOString().slice(0,10)}.csv`; link.click();
                   }},
                   { label: 'KPI Summary', icon: Target, action: () => {
-                    const csv = 'KPI,Current,Target,Unit\n' + partnershipKpis.map(k => `${k.kpi_label},${k.current_value},${k.target_value},${k.target_unit}`).join('\n');
+                    // An empty cell is an honest "not measured yet". The word
+                    // null in a spreadsheet a school opens is not.
+                    const cell = (v: number | null) => (v === null || v === undefined ? '' : String(v));
+                    const csv = 'KPI,Current,Target,Unit\n' + partnershipKpis.map(k => `${k.kpi_label},${cell(k.current_value)},${cell(k.target_value)},${k.target_unit}`).join('\n');
                     const blob = new Blob([csv], { type: 'text/csv' });
                     const link = document.createElement('a'); link.href = URL.createObjectURL(blob);
                     link.download = `kpi-summary-${new Date().toISOString().slice(0,10)}.csv`; link.click();
