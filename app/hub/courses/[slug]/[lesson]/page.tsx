@@ -62,6 +62,7 @@ interface Lesson {
   module_id: string | null;
   transcript: string | null;
   transcript_es: string | null;
+  correction_note: string | null;
 }
 
 interface Module {
@@ -894,7 +895,7 @@ export default function LessonPage({ params }: LessonPageProps) {
         const { data: lessonsData } = moduleIds.length > 0
           ? await supabase
               .from('hub_lessons')
-              .select('id, slug, title, content, estimated_minutes, duration_seconds, type, sort_order, module_id, transcript, transcript_es')
+              .select('id, slug, title, content, estimated_minutes, duration_seconds, type, sort_order, module_id, transcript, transcript_es, correction_note')
               .in('module_id', moduleIds)
               .order('sort_order', { ascending: true })
           : { data: [] as Lesson[] };
@@ -1482,6 +1483,34 @@ export default function LessonPage({ params }: LessonPageProps) {
                   {durationStr ? ` . ${durationStr}` : ''}
                 </div>
               </div>
+
+              {/* A correction for something the recording says that is no longer
+                  true. Deliberately above the video rather than in the collapsed
+                  transcript: a member who never opens the transcript is exactly
+                  the one who would otherwise act on the retired claim. */}
+              {currentLesson.correction_note && (
+                <div style={{
+                  background: dark ? '#2A2417' : '#FFF8E7',
+                  border: '1px solid #E8B84B',
+                  borderRadius: 12,
+                  padding: '14px 18px',
+                  marginBottom: 16,
+                }}>
+                  <div style={{
+                    fontSize: 12, fontWeight: 700, letterSpacing: '0.04em',
+                    textTransform: 'uppercase' as const,
+                    color: dark ? '#E8B84B' : '#8A6A12', marginBottom: 6,
+                  }}>
+                    {tUI('Correction')}
+                  </div>
+                  <p style={{
+                    fontSize: 14, lineHeight: 1.6, margin: 0,
+                    color: theme.text, whiteSpace: 'pre-line' as const,
+                  }}>
+                    {tUI(currentLesson.correction_note)}
+                  </p>
+                </div>
+              )}
 
               {/* Video or Resource */}
               {videoId ? (
