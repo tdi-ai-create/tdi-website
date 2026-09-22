@@ -51,3 +51,26 @@ still. `tUI` translates arbitrary strings on demand and caches them in
 `hub_ui_translations` in the main database, which is the database that route
 reads, so the wiring is right. But zero of these strings have cache rows, so no
 Spanish reader has loaded this band and nobody has seen it in Spanish.
+
+---
+
+### Deferral closed after deploy, 22 September 2026
+
+- Opened: https://www.teachersdeserveit.com/hub, signed in as Rae.
+- Saw: the band heading reads "Next for you" over "Chosen from what you have
+  told us so far.", which is the signal-carrying heading rather than the
+  "From the Hub library" fallback.
+- Saw: all three cards carry a chip. "Mentoring Made Simple - How to Guide
+  Educators" reads "Your goal: Grow as a leader", "Executive Functioning Made
+  Simple: Tools for K-5 Classrooms" reads "Recommended for your role", and
+  "How to Grow Your Personal Brand as a Teacher (Hint: It Landed Me a TED
+  Talk)" reads "Your goal: Grow as a leader". That matches the table above for
+  Rae's account: goal, role, goal, all chipped.
+- Pressed: Escape, to clear the Vibe Check modal that opened over the band.
+- Saw: the modal stayed up, still asking "How connected do you feel to your
+  school community today?" with "Skip for today" in its corner. Read the band
+  from the rendered page instead rather than answer a real check-in on Rae's
+  account. Worth noting on its own: Escape does not dismiss that modal.
+
+Still not verified, and unchanged from above: the no-signal reader who should
+get no chips at all. That needs an account that is not Rae's.
