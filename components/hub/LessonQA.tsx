@@ -4,12 +4,14 @@ import { useState, useEffect, useCallback } from 'react'
 import { MessageCircle, Send, ChevronDown, ChevronUp, ThumbsUp, Flag, Bookmark, Pin } from 'lucide-react'
 import { useTranslation } from '@/lib/hub/useTranslation'
 import EducatorBadge from '@/components/hub/EducatorBadge'
+import TdiVoiceChip from '@/components/hub/TdiVoiceChip'
 
 interface Author {
   name: string
   role: string | null
   avatar_url: string | null
   educator_type?: string | null
+  is_tdi_voice?: boolean | null
 }
 
 interface QAReply {
@@ -398,6 +400,7 @@ export default function LessonQA({ contentId, userId, isAdmin, apiBasePath }: Le
                         <span className="text-sm font-semibold" style={{ color: '#2B3A67', fontFamily: "'DM Sans', sans-serif" }}>
                           {q.author.name}
                         </span>
+                        <TdiVoiceChip isTdiVoice={q.author.is_tdi_voice} />
                         {q.author.educator_type && (
                           <EducatorBadge educatorType={q.author.educator_type} />
                         )}
@@ -458,6 +461,7 @@ export default function LessonQA({ contentId, userId, isAdmin, apiBasePath }: Le
                               <span className="text-sm font-semibold" style={{ color: '#2B3A67', fontFamily: "'DM Sans', sans-serif" }}>
                                 {r.author.name}
                               </span>
+                              <TdiVoiceChip isTdiVoice={r.author.is_tdi_voice} />
                               {r.author.educator_type && (
                                 <EducatorBadge educatorType={r.author.educator_type} />
                               )}

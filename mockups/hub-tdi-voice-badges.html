@@ -1,0 +1,368 @@
+<title>TDI Voice Badges</title>
+<style>
+  :root {
+    --ground: #EEF1F6;
+    --surface: #FFFFFF;
+    --surface-sunk: #F7F8FB;
+    --line: #DFE4ED;
+    --line-soft: #EDF0F5;
+    --ink: #1B2A4A;
+    --ink-soft: #55617A;
+    --ink-faint: #8A94A8;
+    --navy: #2B3A67;
+    --gold: #E8B84B;
+    --teal: #2A9D8F;
+    --sky: #7BB6D9;
+    --shadow: 0 1px 2px rgba(27, 42, 74, .06), 0 8px 24px rgba(27, 42, 74, .06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #111722;
+      --surface: #1A2231;
+      --surface-sunk: #151C29;
+      --line: #2A3446;
+      --line-soft: #232C3C;
+      --ink: #E8ECF4;
+      --ink-soft: #AAB4C8;
+      --ink-faint: #7C8699;
+      --navy: #8FA6E0;
+      --gold: #E8B84B;
+      --teal: #4CC4B4;
+      --sky: #7BB6D9;
+      --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 8px 24px rgba(0, 0, 0, .28);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #111722;
+    --surface: #1A2231;
+    --surface-sunk: #151C29;
+    --line: #2A3446;
+    --line-soft: #232C3C;
+    --ink: #E8ECF4;
+    --ink-soft: #AAB4C8;
+    --ink-faint: #7C8699;
+    --navy: #8FA6E0;
+    --gold: #E8B84B;
+    --teal: #4CC4B4;
+    --sky: #7BB6D9;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 8px 24px rgba(0, 0, 0, .28);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: "Avenir Next", "Helvetica Neue", system-ui, -apple-system, sans-serif;
+    font-size: 16px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 56px 24px 96px;
+    display: flex;
+    flex-direction: column;
+    gap: 44px;
+  }
+
+  .eyebrow {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin: 0;
+  }
+
+  h1 {
+    font-size: 30px;
+    line-height: 1.2;
+    font-weight: 700;
+    letter-spacing: -.02em;
+    margin: 6px 0 0;
+    text-wrap: balance;
+  }
+
+  .lede {
+    margin: 14px 0 0;
+    color: var(--ink-soft);
+    max-width: 62ch;
+  }
+
+  .rule { height: 1px; background: var(--line); border: 0; margin: 0; }
+
+  .option { display: flex; flex-direction: column; gap: 16px; }
+
+  .option-head { display: flex; flex-direction: column; gap: 4px; }
+
+  .option-head h2 {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -.01em;
+    margin: 0;
+  }
+
+  .option-head p { margin: 0; color: var(--ink-soft); font-size: 15px; max-width: 62ch; }
+
+  /* Hub panel replica */
+  .panel {
+    background: var(--surface-sunk);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .tabs { display: flex; gap: 0; border-bottom: 1px solid var(--line); margin-bottom: 2px; }
+  .tab {
+    font-size: 13px;
+    font-weight: 600;
+    padding: 8px 14px;
+    color: var(--ink-faint);
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+  }
+  .tab.on { color: var(--ink); border-bottom-color: var(--gold); }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--line-soft);
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    box-shadow: var(--shadow);
+  }
+  .accent { width: 4px; flex: 0 0 4px; background: var(--teal); }
+  .accent.sky { background: var(--sky); }
+  .accent.navy { background: var(--navy); }
+  .card-body { padding: 16px 18px; display: flex; flex-direction: column; gap: 8px; flex: 1; min-width: 0; }
+
+  .tag {
+    align-self: flex-start;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 5px;
+    background: color-mix(in srgb, var(--teal) 14%, transparent);
+    color: var(--teal);
+  }
+  .tag.sky { background: color-mix(in srgb, var(--sky) 18%, transparent); color: var(--sky); }
+  .tag.question { background: color-mix(in srgb, var(--gold) 20%, transparent); color: #9A7414; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .tag.question { color: var(--gold); } }
+  :root[data-theme="dark"] .tag.question { color: var(--gold); }
+
+  .byline { font-size: 12px; color: var(--ink-faint); display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .byline strong { color: var(--ink-soft); font-weight: 600; }
+
+  .post { font-size: 14.5px; color: var(--ink-soft); margin: 0; }
+
+  .actions { font-size: 12px; color: var(--ink-faint); display: flex; gap: 14px; padding-top: 4px; }
+
+  /* Badge treatments */
+  .chip {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: var(--navy);
+    color: #fff;
+  }
+  :root[data-theme="dark"] .chip { color: #0F1520; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .chip { color: #0F1520; } }
+
+  .strip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 18px;
+    background: color-mix(in srgb, var(--navy) 10%, transparent);
+    border-bottom: 1px solid var(--line-soft);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--navy);
+  }
+  .stack { flex-direction: column; }
+
+  .host {
+    background: var(--navy);
+    border-radius: 12px;
+    padding: 18px 20px;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  :root[data-theme="dark"] .host { background: #243049; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .host { background: #243049; } }
+  .host .host-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+  .host .host-q { font-size: 16px; font-weight: 600; margin: 0; line-height: 1.45; }
+  .host .host-by { font-size: 12px; color: rgba(255,255,255,.72); margin: 0; }
+  .host .host-cta {
+    align-self: flex-start;
+    margin-top: 2px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #1B2A4A;
+    background: var(--gold);
+    border-radius: 8px;
+    padding: 7px 14px;
+  }
+
+  .note {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    border-left: 2px solid var(--gold);
+    padding: 2px 0 2px 14px;
+    font-size: 14px;
+    color: var(--ink-soft);
+  }
+  .note b { color: var(--ink); font-weight: 600; }
+
+  .foot { font-size: 13.5px; color: var(--ink-soft); }
+  .foot b { color: var(--ink); }
+</style>
+
+<div class="wrap">
+
+  <header>
+    <p class="eyebrow">Learning Hub, conversation tab</p>
+    <h1>Three ways a TDI voice can appear on a tool page</h1>
+    <p class="lede">Same posting rules in all three. A TDI voice asks, prompts, and answers, and every second post ends in a question. It never claims a classroom moment that did not happen. What changes below is only how obvious it is that the account is ours. Sample posts, not real ones. Fonts are a stand in for DM Sans.</p>
+  </header>
+
+  <hr class="rule" />
+
+  <section class="option">
+    <div class="option-head">
+      <h2>Option 1. A chip beside the name</h2>
+      <p>The card is unchanged. A small navy chip sits next to the author name, the same place the educator badge already goes.</p>
+    </div>
+
+    <div class="panel">
+      <div class="tabs"><span class="tab on">Conversation</span><span class="tab">Q&amp;A</span></div>
+
+      <div class="card">
+        <div class="accent navy"></div>
+        <div class="card-body">
+          <span class="tag question">Question</span>
+          <p class="byline"><strong>Dana Whitfield</strong> <span class="chip">TDI</span> <span>· Instructional coach · 2 days ago</span></p>
+          <p class="post">Coaches keep telling us the transition script falls apart in a 40 minute period. If that is your schedule, what did you cut to make it fit?</p>
+          <div class="actions"><span>Helpful 6</span><span>Reply</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="accent"></div>
+        <div class="card-body">
+          <span class="tag">Tried it</span>
+          <p class="byline"><strong>Jan Bell</strong> <span>· Classroom teacher · 1 day ago</span></p>
+          <p class="post">I dropped the second modeling round and kept the countdown. Still got them seated, and it gave me back about three minutes.</p>
+          <div class="actions"><span>Helpful 3</span><span>Reply</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="note">
+      <span><b>What it gets you.</b> Smallest change to the page. The room reads as teachers talking, with one chip that tells the truth about who started it.</span>
+      <span><b>What it costs.</b> The chip is easy to miss on a fast scroll, so it leans hardest on the posts themselves staying honest.</span>
+    </div>
+  </section>
+
+  <hr class="rule" />
+
+  <section class="option">
+    <div class="option-head">
+      <h2>Option 2. A labelled strip on the card</h2>
+      <p>TDI posts get their own header strip and a navy rail, so they are a different object from a member post before you read a word.</p>
+    </div>
+
+    <div class="panel">
+      <div class="tabs"><span class="tab on">Conversation</span><span class="tab">Q&amp;A</span></div>
+
+      <div class="card stack">
+        <div class="strip">From the TDI team</div>
+        <div style="display:flex">
+          <div class="accent navy"></div>
+          <div class="card-body">
+            <span class="tag question">Question</span>
+            <p class="byline"><strong>Dana Whitfield</strong> <span>· TDI instructional coach · 2 days ago</span></p>
+            <p class="post">Across the schools using this, the piece people rewrite most is the opener. What would you change about it for your grade?</p>
+            <div class="actions"><span>Helpful 6</span><span>Reply</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="accent sky"></div>
+        <div class="card-body">
+          <span class="tag sky">Still trying</span>
+          <p class="byline"><strong>Susan A.</strong> <span>· Classroom teacher · 4 hours ago</span></p>
+          <p class="post">My openers die because students trickle in over ten minutes. I am trying a version that works whether four kids are there or twenty.</p>
+          <div class="actions"><span>Helpful 1</span><span>Reply</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="note">
+      <span><b>What it gets you.</b> Nobody can mistake it, at any scroll speed, and it makes a TDI answer feel like support rather than a stranger's opinion.</span>
+      <span><b>What it costs.</b> The heavier the TDI card looks, the more the page reads as us talking, which is the opposite of the goal on tools where we are the only voice.</span>
+    </div>
+  </section>
+
+  <hr class="rule" />
+
+  <section class="option">
+    <div class="option-head">
+      <h2>Option 3. One host question above the room</h2>
+      <p>TDI does not post in the feed at all. It opens the tool with a single question pinned above it, and every card below is a member.</p>
+    </div>
+
+    <div class="panel">
+      <div class="tabs"><span class="tab on">Conversation</span><span class="tab">Q&amp;A</span></div>
+
+      <div class="host">
+        <span class="host-label">This week's question from TDI</span>
+        <p class="host-q">What did you have to change to make this work in your room?</p>
+        <p class="host-by">Asked by Dana Whitfield, TDI instructional coach. She reads every answer.</p>
+        <span class="host-cta">Answer this</span>
+      </div>
+
+      <div class="card">
+        <div class="accent"></div>
+        <div class="card-body">
+          <span class="tag">Adapted it</span>
+          <p class="byline"><strong>James Guerra</strong> <span>· Paraprofessional · 3 days ago</span></p>
+          <p class="post">I run this in twenty minute pull outs, so I split it over two sessions. Same steps, half the pace, and the second day is when it lands.</p>
+          <div class="actions"><span>Helpful 8</span><span>Reply</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="note">
+      <span><b>What it gets you.</b> The feed stays entirely real, so nothing we post can ever be read as a customer review. One question per tool per week is also the least writing of the three.</span>
+      <span><b>What it costs.</b> A tool with no member answers shows an empty room under the question, and that emptiness is visible rather than papered over.</span>
+    </div>
+  </section>
+
+  <hr class="rule" />
+
+  <p class="foot"><b>Worth knowing before you pick.</b> Options 1 and 2 can run on all 285 published tools this week. Option 3 needs someone to answer what comes back, which is the part that has not existed so far. Fifty one questions in the Q&amp;A tab have been sitting unanswered since May.</p>
+
+</div>
