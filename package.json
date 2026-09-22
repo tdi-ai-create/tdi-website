@@ -33,7 +33,8 @@
     "check:queueorder": "npx tsx scripts/integrity/outreach-queue-order-selftest.ts",
     "check:answers": "npx tsx scripts/integrity/verify-answer-actions.mts",
     "check:reachable": "node scripts/check-reachable.mjs",
-    "check:browserpass": "node scripts/check-browser-pass.mjs"
+    "check:browserpass": "node scripts/check-browser-pass.mjs",
+    "check:goals": "node scripts/check-goal-labels.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.78.0",
