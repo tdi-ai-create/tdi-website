@@ -5854,6 +5854,60 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                     </div>
                   </div>
 
+                  {/* Who has actually been in.
+                      api/partners/dashboard already returned every educator with a
+                      name, a role and hubActive, and the page loaded it into
+                      staffRoster and rendered none of it. A principal got three
+                      totals and no way to tell which of her staff to go and talk
+                      to, which is the single thing she opens this tab to find out.
+                      The people who have not been in are listed first, because
+                      that is the list she acts on. */}
+                  {staffRoster.length > 0 && (() => {
+                    const notIn = staffRoster.filter(m => !m.hubActive)
+                    const beenIn = staffRoster.filter(m => m.hubActive)
+                    const nameOf = (m: { name: string }) => m.name?.trim() || 'Name not on file'
+                    return (
+                      <div className="mt-3 rounded-xl border border-gray-100 overflow-hidden">
+                        {notIn.length > 0 && (
+                          <div className="bg-amber-50 border-b border-amber-100 px-4 py-3">
+                            <p className="text-xs font-bold text-amber-900 mb-2">
+                              Has not been in yet
+                            </p>
+                            <div className="flex flex-wrap gap-1.5">
+                              {notIn.map(m => (
+                                <span key={m.id} className="inline-flex items-center gap-1.5 bg-white border border-amber-200 rounded-full px-2.5 py-1 text-xs text-amber-900">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                                  {nameOf(m)}
+                                </span>
+                              ))}
+                            </div>
+                            <p className="text-[10px] text-amber-700 mt-2">
+                              Their accounts are live and waiting. They just need the link.
+                            </p>
+                          </div>
+                        )}
+                        {beenIn.length > 0 && (
+                          <div className="px-4 py-3 bg-white">
+                            <p className="text-xs font-bold text-gray-700 mb-2">Has been in</p>
+                            <div className="flex flex-wrap gap-1.5">
+                              {beenIn.map(m => (
+                                <span key={m.id} className="inline-flex items-center gap-1.5 bg-gray-50 border border-gray-200 rounded-full px-2.5 py-1 text-xs text-gray-600">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                                  {nameOf(m)}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                        {notIn.length === 0 && (
+                          <div className="px-4 py-3 bg-green-50 border-t border-green-100">
+                            <p className="text-xs font-semibold text-green-900">Everyone on your roster has been in at least once.</p>
+                          </div>
+                        )}
+                      </div>
+                    )
+                  })()}
+
                   {/* New school year roster update prompt */}
                   <div className="mt-3 rounded-xl bg-blue-50 border border-blue-100 p-4 flex items-start gap-3">
                     <div className="w-2 h-2 rounded-full bg-blue-400 flex-shrink-0 mt-1.5" />
