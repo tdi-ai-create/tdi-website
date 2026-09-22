@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { guardCron } from '@/lib/cron-guard';
+import { MAILABLE_COLUMNS, MAILABLE_STATUSES, splitMailable } from '@/lib/partnerships/mailable';
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
 
@@ -16,14 +18,18 @@ const RESEND_API_KEY = process.env.RESEND_API_KEY;
  */
 export async function GET(request: NextRequest) {
   try {
-    const authHeader = request.headers.get('authorization');
-    const cronSecret = process.env.CRON_SECRET;
-    if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
-      const isVercelCron = request.headers.get('x-vercel-cron') === '1';
-      if (!isVercelCron) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    // This job runs daily and can send a six step sequence, so it is the one
+    // with the largest blast radius on this table. The old inline check was
+    // `if (cronSecret && ...)`, which authorizes nothing when CRON_SECRET is
+    // unset. guardCron fails closed and parses ?dryRun=1 in the same step.
+    const guard = guardCron(request);
+    if (!guard.ok) return NextResponse.json({ error: guard.error }, { status: guard.status });
+    const { dryRun } = guard;
 
-    if (!RESEND_API_KEY) return NextResponse.json({ error: 'Resend not configured' }, { status: 500 });
+    // A dry run never calls Resend, so it must not require the key.
+    if (!dryRun && !RESEND_API_KEY) {
+      return NextResponse.json({ error: 'Resend not configured' }, { status: 500 });
+    }
 
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -33,14 +39,26 @@ export async function GET(request: NextRequest) {
 
     const now = new Date();
     let sent = 0;
+    // What a dry run would have sent, in the order the job decides it.
+    const wouldSend: Array<{ to: string; subject: string; kind: string }> = [];
 
-    // Get all active partnerships
-    const { data: partnerships } = await supabase
+    // Partnerships that may be mailed as clients.
+    //
+    // This read `status = 'active'` alone. Two unsigned prospect records sat at
+    // that status through September 2026 and reached this job; they escaped the
+    // sequence only because `invite_sent_at` was null on both, and the admin
+    // create form sets that field. The next hand made prospect would have
+    // received all six emails, re-checked every day. See lib/partnerships/mailable.ts.
+    const { data: candidates } = await supabase
       .from('partnerships')
-      .select('id, contact_name, contact_email, slug, org_name, status, invite_sent_at, invite_accepted_at, staff_enrolled, observation_days_total, virtual_sessions_total, executive_sessions_total')
-      .eq('status', 'active');
+      .select(`${MAILABLE_COLUMNS}, slug, invite_sent_at, invite_accepted_at, staff_enrolled, observation_days_total, virtual_sessions_total, executive_sessions_total`)
+      .in('status', MAILABLE_STATUSES);
 
-    if (!partnerships) return NextResponse.json({ success: true, sent: 0 });
+    const { mailable: partnerships, skipped } = splitMailable(candidates || []);
+
+    if (partnerships.length === 0) {
+      return NextResponse.json({ success: true, sent: 0, skipped });
+    }
 
     // A partner is "onboarded" when they have actually uploaded a roster, not
     // when invite_accepted_at happens to be set. That field has proven
@@ -209,7 +227,9 @@ The TDI Team`
           };
         }
 
-        if (reminderEmail && !alreadySent) {
+        if (reminderEmail && !alreadySent && dryRun) {
+          wouldSend.push({ to: p.contact_email.toLowerCase(), subject: reminderEmail.subject, kind: reminderKey });
+        } else if (reminderEmail && !alreadySent) {
           const resp = await fetch('https://api.resend.com/emails', {
             method: 'POST',
             headers: { 'Authorization': `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' },
@@ -306,6 +326,11 @@ The TDI Team`;
 
             if (existing && existing.length > 0) continue;
 
+            if (dryRun) {
+              wouldSend.push({ to: p.contact_email.toLowerCase(), subject, kind: reminderType });
+              continue;
+            }
+
             const resp = await fetch('https://api.resend.com/emails', {
               method: 'POST',
               headers: { 'Authorization': `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' },
@@ -364,6 +389,15 @@ The TDI Team`;
         const dashboardUrl = `https://www.teachersdeserveit.com/partners/${p.slug}`;
         const loginCount = staffWithLogins.length;
 
+        if (dryRun) {
+          wouldSend.push({
+            to: p.contact_email.toLowerCase(),
+            subject: `${firstName}, your team is starting to use the Hub`,
+            kind: 'first_hub_login_notification',
+          });
+          continue;
+        }
+
         const resp = await fetch('https://api.resend.com/emails', {
           method: 'POST',
           headers: { 'Authorization': `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' },
@@ -402,7 +436,17 @@ The TDI Team`, schoolName, dashboardUrl),
       }
     }
 
-    return NextResponse.json({ success: true, sent });
+    if (dryRun) {
+      return NextResponse.json({
+        success: true,
+        dryRun: true,
+        wouldSend: wouldSend.length,
+        recipients: wouldSend,
+        skipped,
+      });
+    }
+
+    return NextResponse.json({ success: true, sent, skipped });
   } catch (error) {
     console.error('[partner-onboarding-reminders] Error:', error);
     return NextResponse.json({ error: String(error) }, { status: 500 });
