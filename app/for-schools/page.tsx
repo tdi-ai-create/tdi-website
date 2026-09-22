@@ -144,7 +144,7 @@ export default function ForSchoolsPage() {
           </div>
           <div className="fs-offer-grid">
 
-            <article className="fs-offer" style={{"--c": "var(--pulse)"} as React.CSSProperties}>
+            <article id="pulse" className="fs-offer" style={{"--c": "var(--pulse)"} as React.CSSProperties}>
               <h3>The Pulse</h3>
               <BandFigure shape="pulse" name="Before the music" caption="asking what they would even want to play" />
               <p className="fs-who">For the leader who cannot tell how staff are actually doing until someone resigns.</p>
@@ -158,7 +158,7 @@ export default function ForSchoolsPage() {
               <div className="fs-foot"><a className="fs-go" href="/get-started">Request a quote</a></div>
             </article>
 
-            <article className="fs-offer" style={{"--c": "var(--focus)"} as React.CSSProperties}>
+            <article id="focus" className="fs-offer" style={{"--c": "var(--focus)"} as React.CSSProperties}>
               <h3>The Focus</h3>
               <BandFigure shape="focus" name="The marching band" caption="same part, same time, same direction" />
               <p className="fs-who">For the district already committed to an initiative with nothing practical behind it.</p>
@@ -172,7 +172,7 @@ export default function ForSchoolsPage() {
               <div className="fs-foot"><a className="fs-go" href="/get-started">Request a quote</a></div>
             </article>
 
-            <article className="fs-offer" style={{"--c": "var(--cohort)"} as React.CSSProperties}>
+            <article id="cohort" className="fs-offer" style={{"--c": "var(--cohort)"} as React.CSSProperties}>
               <h3>The Cohort</h3>
               <BandFigure shape="cohort" name="The a cappella group" caption="different parts, one instrument, everybody's voice" />
               <p className="fs-who">For the group carrying the most and getting the least. Paras, new teachers, whoever you would name.</p>
@@ -187,7 +187,7 @@ export default function ForSchoolsPage() {
             </article>
           </div>
 
-          <div className="fs-blueprint-band">
+          <div id="blueprint" className="fs-blueprint-band">
             <div>
               <h3>The Blueprint</h3>
               <p className="fs-per" style={{"margin": "6px 0 14px"}}>Scoped to your district</p>

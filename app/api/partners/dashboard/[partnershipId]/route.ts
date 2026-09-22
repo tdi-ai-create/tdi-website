@@ -37,9 +37,13 @@ export async function GET(
     const supabase = getServiceSupabase();
 
     // Get partnership (for staff_enrolled count)
+    // Service counts come back with the partnership because the goal cards use
+    // them to decide what sharper measurement to offer a school. A Hub only
+    // partnership is measured by asking teachers; one with observation days is
+    // measured by watching classrooms, and the tooltip says so either way.
     const { data: partnership } = await supabase
       .from('partnerships')
-      .select('staff_enrolled')
+      .select('staff_enrolled, observation_days_total, virtual_sessions_total, executive_sessions_total')
       .eq('id', partnershipId)
       .single();
 
@@ -61,7 +65,7 @@ export async function GET(
     // Get partnership KPIs (if set)
     const { data: kpis } = await supabase
       .from('partnership_kpis')
-      .select('kpi_key, kpi_label, target_value, target_unit, current_value, benchmark_low, benchmark_high, benchmark_label, how_tdi_delivers, status')
+      .select('kpi_key, kpi_label, target_value, target_unit, current_value, benchmark_low, benchmark_high, benchmark_label, data_source, how_tdi_delivers, deeper_measurement, suggested_offering, status')
       .eq('partnership_id', partnershipId)
       .eq('status', 'active')
       .order('sort_order');
@@ -147,6 +151,11 @@ export async function GET(
       teacherQuotes: teacherQuotes || [],
       sessionRecords: sessionRecords || [],
       kpis: kpis || [],
+      contract: {
+        observation_days_total: partnership?.observation_days_total ?? 0,
+        virtual_sessions_total: partnership?.virtual_sessions_total ?? 0,
+        executive_sessions_total: partnership?.executive_sessions_total ?? 0,
+      },
     });
   } catch (error) {
     console.error('Error getting dashboard data:', error);

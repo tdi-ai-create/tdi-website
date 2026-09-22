@@ -8,6 +8,7 @@ import RosterAccessManager from '@/components/partners/RosterAccessManager';
 import Link from 'next/link';
 import FooterSymbol from '@/components/FooterSymbol';
 import { offeringLabel } from '@/lib/partnerships/offerings';
+import { goalMeasurement, goalProgress, type Offering, type ContractShape } from '@/lib/partners/goal-measurement';
 import {
   Calendar,
   Users,
@@ -386,7 +387,12 @@ export default function PartnerDashboard() {
   const [viewerIsAdmin, setViewerIsAdmin] = useState(false);
   const [organization, setOrganization] = useState<Organization | null>(null);
   const [actionItems, setActionItems] = useState<ActionItem[]>([]);
-  const [partnershipKpis, setPartnershipKpis] = useState<{ kpi_key: string; kpi_label: string; target_value: number; target_unit: string; current_value: number; benchmark_low: number; benchmark_high: number; how_tdi_delivers: string; status: string }[]>([]);
+  const [partnershipKpis, setPartnershipKpis] = useState<{ kpi_key: string; kpi_label: string; target_value: number | null; target_unit: string; current_value: number; benchmark_low: number; benchmark_high: number; benchmark_label: string | null; data_source: string | null; how_tdi_delivers: string; deeper_measurement: string | null; suggested_offering: Offering | null; status: string }[]>([]);
+  // What this school bought, which is what decides the sharper measurement each
+  // goal card offers. Defaults to zeros so a school reads as unobserved rather
+  // than observed if the load fails.
+  const [contract, setContract] = useState<ContractShape>({ observation_days_total: 0, virtual_sessions_total: 0, executive_sessions_total: 0 });
+  const [openGoalInfo, setOpenGoalInfo] = useState<string | null>(null);
   const [staffStats, setStaffStats] = useState<StaffStats>({ total: 0, hubLoggedIn: 0 });
   const [metricSnapshots, setMetricSnapshots] = useState<MetricSnapshot[]>([]);
   const [apiBuildings, setApiBuildings] = useState<Building[]>([]);
@@ -711,6 +717,7 @@ export default function PartnerDashboard() {
           setRecentActivity(data.activityLog || []);
           setStaffRoster(data.staffMembers || []);
           if (data.kpis) setPartnershipKpis(data.kpis);
+          if (data.contract) setContract(data.contract);
         }
       }
 
@@ -2200,12 +2207,19 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
         <div style="background: white; border-radius: 12px; padding: 24px; border: 1px solid #f3f4f6; box-shadow: 0 1px 4px rgba(0,0,0,0.04);">
           <p style="font-size: 13px; font-weight: 700; color: #1e2749; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.5px;">Partnership Goals</p>
           ${partnershipKpis.map(k => {
-            const pct = k.target_value > 0 ? Math.min((k.current_value / k.target_value) * 100, 100) : 0;
+            // A goal with no target yet is awaiting its baseline, not sitting
+            // at zero. Printing "0% / %" in a board report is worse than
+            // saying plainly that the number is not in yet.
+            const progress = goalProgress(k);
+            const readout = progress.awaitingBaseline
+              ? 'Baseline not set yet'
+              : `${k.current_value}${k.target_unit} / ${k.target_value}${k.target_unit}`;
+            const pct = progress.pct;
             return `
             <div style="margin-bottom: 16px;">
               <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
                 <span style="font-size: 13px; font-weight: 600; color: #1e2749;">${k.kpi_label}</span>
-                <span style="font-size: 13px; font-weight: 700; color: #7C3AED;">${k.current_value}${k.target_unit} / ${k.target_value}${k.target_unit}</span>
+                <span style="font-size: 13px; font-weight: 700; color: ${progress.awaitingBaseline ? '#9CA3AF' : '#7C3AED'};">${readout}</span>
               </div>
               <div style="height: 8px; background: #F3F4F6; border-radius: 4px; overflow: hidden;">
                 <div style="width: ${pct}%; height: 100%; background: linear-gradient(90deg, #8B5CF6, #7C3AED); border-radius: 4px;"></div>
@@ -3571,13 +3585,19 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                             stress_reduction: '#EC4899', retention_intent: '#10B981',
                             hub_engagement: '#E8B84B', custom_course_mandate: '#1e2749',
                           }
-                          const pct = kpi.target_value > 0 ? Math.min((kpi.current_value / kpi.target_value) * 100, 100) : 0
+                          // A goal whose target is deliberately not set yet used
+                          // to divide by zero and draw an empty ring reading 0%.
+                          // Four of those in a row reads as a school failing at
+                          // everything when it only means we have not measured
+                          // them yet.
+                          const progress = goalProgress(kpi)
                           return {
-                            value: pct,
+                            value: progress.pct,
                             label: kpi.kpi_label.length > 25 ? kpi.kpi_label.slice(0, 22) + '...' : kpi.kpi_label,
-                            display: `${kpi.current_value}${kpi.target_unit}`,
-                            color: kpiColors[kpi.kpi_key] || '#1e2749',
+                            display: progress.display,
+                            color: progress.awaitingBaseline ? '#9CA3AF' : (kpiColors[kpi.kpi_key] || '#1e2749'),
                             max: 100,
+                            info: { id: kpi.kpi_key, title: kpi.kpi_label, ...goalMeasurement(kpi, contract) },
                           }
                         })
                       : [
@@ -3586,8 +3606,22 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                           { value: wellnessScore ? (wellnessScore / 5) * 100 : (staffStats.total > 0 ? (staffStats.hubLoggedIn / staffStats.total) * 100 : 0), label: wellnessScore ? (metricsRange === 'month' ? '30-Day Wellness' : 'Team Wellness') : 'Staff Active', display: wellnessScore ? `${wellnessScore}` : `${staffStats.hubLoggedIn}`, color: '#2A9D8F', max: 100 },
                           { value: (phaseNum / 3) * 100, label: 'Current Phase', display: `${phaseNum}/3`, color: '#1e2749', max: 100 },
                         ]
-                    ).map((gauge, i) => (
-                      <div key={i} className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 flex flex-col items-center">
+                    ).map((gauge, i) => {
+                      const info = 'info' in gauge ? gauge.info : null
+                      const isOpen = !!info && openGoalInfo === info.id
+                      return (
+                      <div key={i} className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 flex flex-col items-center relative">
+                        {info && (
+                          <button
+                            type="button"
+                            onClick={() => setOpenGoalInfo(isOpen ? null : info.id)}
+                            aria-expanded={isOpen}
+                            aria-label={`How we measure ${info.title}`}
+                            className="absolute top-2.5 right-2.5 w-6 h-6 rounded-full border border-gray-200 text-gray-400 hover:text-[#1e2749] hover:border-[#1e2749] transition-colors flex items-center justify-center text-[11px] font-bold"
+                          >
+                            i
+                          </button>
+                        )}
                         <div className="relative w-20 h-20 mb-3">
                           <svg className="w-full h-full transform -rotate-90" viewBox="0 0 80 80">
                             <circle cx="40" cy="40" r="34" fill="none" stroke="#F3F4F6" strokeWidth="6" />
@@ -3595,12 +3629,49 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                               strokeDasharray={`${gauge.value * 2.136} ${(100 - gauge.value) * 2.136}`} strokeLinecap="round" />
                           </svg>
                           <div className="absolute inset-0 flex items-center justify-center">
-                            <span className="text-xl font-bold" style={{ color: gauge.color }}>{gauge.display}</span>
+                            <span className={`font-bold ${gauge.display.length > 4 ? 'text-sm' : 'text-xl'}`} style={{ color: gauge.color }}>{gauge.display}</span>
                           </div>
                         </div>
-                        <p className="text-[11px] text-gray-500 font-medium">{gauge.label}</p>
+                        <p className="text-[11px] text-gray-500 font-medium text-center">{gauge.label}</p>
+
+                        {isOpen && info && (
+                          <div className="absolute z-30 top-full left-0 right-0 mt-2 mx-1 bg-white rounded-xl shadow-xl border border-gray-200 p-4 text-left">
+                            <p className="text-xs font-bold text-[#1e2749] mb-2">{info.title}</p>
+                            {info.how && (
+                              <>
+                                <p className="text-[10px] font-bold uppercase tracking-wide text-gray-400 mb-1">How we measure this</p>
+                                <p className="text-[11px] text-gray-600 leading-relaxed mb-3">{info.how}</p>
+                              </>
+                            )}
+                            <p className="text-[10px] font-bold uppercase tracking-wide text-gray-400 mb-1">{info.deeperHeading}</p>
+                            <p className="text-[11px] text-gray-600 leading-relaxed">{info.deeper}</p>
+                            {info.offer && (
+                              <div className="mt-3 pt-3 border-t border-gray-100">
+                                <p className="text-[11px] text-gray-600 leading-relaxed mb-2">
+                                  <strong className="text-[#1e2749]">{info.offer.name}</strong> is built for this. {info.offer.why}
+                                </p>
+                                <a
+                                  href={info.offer.href}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-[11px] font-semibold text-[#1e2749] underline underline-offset-2 hover:text-[#38618C]"
+                                >
+                                  Read about {info.offer.name}
+                                </a>
+                              </div>
+                            )}
+                            <button
+                              type="button"
+                              onClick={() => setOpenGoalInfo(null)}
+                              className="mt-3 text-[10px] font-semibold text-gray-400 hover:text-gray-600"
+                            >
+                              Close
+                            </button>
+                          </div>
+                        )}
                       </div>
-                    ))}
+                      )
+                    })}
                   </div>
 
                   {/* Principal Goal Setting -- show when no KPIs set yet */}
