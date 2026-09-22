@@ -38,6 +38,14 @@ interface Row {
   orgName: string;
   slug: string | null;
   phase: string | null;
+  /**
+   * Null means nobody has signed. Shown as an Unsigned badge rather than left
+   * to be inferred from the phase, because a prospect record sitting at
+   * status 'active' looks identical to a client on this table. Two of them did
+   * through September 2026, and the partner email crons mailed one of their
+   * contacts twice before anyone noticed.
+   */
+  contractStart: string | null;
   seatsContracted: number;
   seatsProvisioned: number;
   activeEducators: number;
@@ -269,8 +277,18 @@ export default function OnboardingMatrix({ userEmail }: { userEmail: string | nu
               <tr key={row.id} className="group hover:bg-gray-50 transition-colors">
                 <td className="px-5 py-3 border-b border-gray-100 sticky left-0 bg-white group-hover:bg-gray-50 transition-colors">
                   <Link href={`/tdi-admin/leadership/${row.id}`} className="block">
-                    <span className="block text-[13px] font-bold text-[#2B3A67] group-hover:text-[#2563EB] transition-colors">
-                      {row.orgName}
+                    <span className="flex items-center gap-1.5">
+                      <span className="text-[13px] font-bold text-[#2B3A67] group-hover:text-[#2563EB] transition-colors">
+                        {row.orgName}
+                      </span>
+                      {!row.contractStart && (
+                        <span
+                          className="shrink-0 rounded px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide bg-amber-100 text-amber-800"
+                          title="No contract start date. This is a prospect record, not a signed partnership, and it is excluded from client email."
+                        >
+                          Unsigned
+                        </span>
+                      )}
                     </span>
                     <span className="block text-[10px] text-gray-400 font-mono mt-0.5">
                       {row.phase ?? 'no phase'} / {row.seatsProvisioned} of {row.seatsContracted} seats
