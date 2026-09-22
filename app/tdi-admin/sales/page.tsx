@@ -1124,41 +1124,61 @@ export default function SalesPage() {
       .map(([s]) => s)
   }, [activeOpps])
 
+  /**
+   * One predicate per chip, used for both the filtering and the counts, so a
+   * chip cannot advertise a number the board then fails to show. The old
+   * source chips did exactly that: the count came from `activeOpps` and the
+   * filter matched on `opp.source` after a fallback to 'Other', so any lead
+   * with a null source was counted under a chip that could not select it.
+   */
+  const matchesFilterKey = useCallback((opp: Opportunity, key: string): boolean => {
+    const m = muckById[opp.supabase_id]
+    switch (key) {
+      case 'band:light':
+      case 'band:moderate':
+      case 'band:heavy':
+        return m?.band === key.slice(5)
+      case 'not_valued':
+        // No offering recorded, so no score and no value per point. Not the
+        // same as light, which is the mistake the retired fit tier made.
+        return m?.value == null
+      case 'needs_outreach': {
+        if (!opp.lastActivityAt) return true
+        const days = Math.floor((Date.now() - new Date(opp.lastActivityAt).getTime()) / 86400000)
+        return days >= 14
+      }
+      case 'renewal':
+        return opp.type === 'renewal'
+      default:
+        return false
+    }
+  }, [muckById])
+
+  const filterCounts = useMemo(() => {
+    const keys = ['band:light', 'band:moderate', 'band:heavy', 'not_valued', 'needs_outreach', 'renewal']
+    const counts: Record<string, number> = {}
+    for (const k of keys) counts[k] = activeOpps.filter(o => matchesFilterKey(o, k)).length
+    return counts
+  }, [activeOpps, matchesFilterKey])
+
   // Apply filters
   const filtered = useMemo(() => {
     return boardOpps.filter(opp => {
       const f = activeFilters
       if (f.search) {
         const q = f.search.toLowerCase()
-        const searchable = [opp.name, opp.contactName, opp.contactEmail, opp.city, opp.state, opp.notes].filter(Boolean).join(' ').toLowerCase()
+        const searchable = [opp.name, opp.contactName, opp.contactEmail, opp.city, opp.state, opp.source, opp.notes].filter(Boolean).join(' ').toLowerCase()
         if (!searchable.includes(q)) return false
       }
-      if (f.deal_types.length > 0 && !f.deal_types.includes(opp.type)) return false
-      if (f.sources.length > 0 && !f.sources.includes(opp.source || 'Other')) return false
+      // Chips within the row are AND'd, matching how the old row behaved and
+      // how the stage columns already read: each chip narrows further.
+      if (f.keys.length > 0 && !f.keys.every(k => matchesFilterKey(opp, k))) return false
       if (showCallSheetOnly && !opp.onCallSheet) return false
       return true
     })
-  }, [boardOpps, activeFilters, showCallSheetOnly])
+  }, [boardOpps, activeFilters, showCallSheetOnly, matchesFilterKey])
 
   // Counts for filter chips
-  const dealTypeCounts = useMemo(() => {
-    const counts: Record<string, number> = {}
-    activeOpps.forEach(o => {
-      const t = o.type || 'Unknown'
-      counts[t] = (counts[t] || 0) + 1
-    })
-    return counts
-  }, [activeOpps])
-
-  const sourceCounts = useMemo(() => {
-    const counts: Record<string, number> = {}
-    activeOpps.forEach(o => {
-      const src = o.source || 'Other'
-      counts[src] = (counts[src] || 0) + 1
-    })
-    return counts
-  }, [activeOpps])
-
   // Stats for sticky top bar (exclude Targeting from pipeline totals — cold outbound, 5% probability)
   const stats = useMemo(() => {
     const pipelineOpps = activeOpps.filter(o => o.stage !== 'targeting')
@@ -1186,8 +1206,6 @@ export default function SalesPage() {
       callSheetCount: callSheetOpps.length,
       callSheetValue: callSheetOpps.reduce((s, o) => s + dealValue(o), 0),
       factoredMuck: muckRollup?.factoredMuck ?? 0,
-      muckRae: muckRollup?.rae ?? 0,
-      muckBella: muckRollup?.bella ?? 0,
       heavyCount: muckRollup?.heavy ?? 0,
     }
   }, [activeOpps, opportunities, muckRollup, muckById])
@@ -1539,9 +1557,7 @@ export default function SalesPage() {
               <FilterPanel
                 activeFilters={activeFilters}
                 setActiveFilters={setActiveFilters}
-                sources={uniqueSources}
-                dealTypeCounts={dealTypeCounts}
-                sourceCounts={sourceCounts}
+                counts={filterCounts}
               />
 
               {/* KANBAN VIEW */}

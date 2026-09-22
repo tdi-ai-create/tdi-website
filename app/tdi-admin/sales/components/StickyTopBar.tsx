@@ -10,10 +10,10 @@ interface TopBarStats {
   invoiceCount: number
   callSheetCount: number
   callSheetValue: number
-  /** Factored muck across the board, and how it splits between Rae and Bella. */
+  /** Factored muck across the board. Deliberately not split by person: Rae's
+   *  rule of 15 September 2026 is that Bella and Rae are one role, and this bar
+   *  read "N you" off the Rae field no matter who was signed in. */
   factoredMuck?: number
-  muckRae?: number
-  muckBella?: number
   heavyCount?: number
 }
 
@@ -96,7 +96,7 @@ export function StickyTopBar({
               )}
             </div>
             <div style={{ fontSize: 11, color: '#6B7280' }}>
-              {stats.muckRae ?? 0} you &middot; {stats.muckBella ?? 0} Bella
+              TDI admin load, factored by stage
             </div>
           </div>
         )}

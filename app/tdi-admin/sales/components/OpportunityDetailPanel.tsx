@@ -93,7 +93,35 @@ const STAGE_PROBABILITY: Record<string, number> = {
   in_conversation: 55, likely_yes: 65, proposal_sent: 80, signed: 95, paid: 100, lost: 0,
 }
 
-const LOST_REASONS = ['Not a fit', 'Budget', 'Timing', 'Competitor', 'No response', 'Other']
+/**
+ * Why a district is not moving now.
+ *
+ * This used to be a "lost" reason list. Rae's rule of 14 August 2026: a no in
+ * K-12 is almost always a not-this-budget-year, districts that pass in August
+ * are often live again the following spring, and marking them lost takes them
+ * out of view until the relationship has gone cold. So the control records a
+ * reason, a date to come back, and leaves the lead in the engaged stage, which
+ * is where a not-now belongs.
+ *
+ * "Not a fit" and "Competitor" are kept because they are real and they are not
+ * timing, but they still do not close the record.
+ */
+const PAUSE_REASONS = [
+  'Budget year, not this one',
+  'No budget at all',
+  'Leadership transition',
+  'Already committed elsewhere',
+  'Not a fit',
+  'No response',
+  'Other',
+]
+
+/** Sensible default: most timing passes come back at the next budget cycle. */
+function defaultRevisitDate(): string {
+  const d = new Date()
+  d.setMonth(d.getMonth() + 4)
+  return d.toISOString().slice(0, 10)
+}
 
 const TYPE_BADGE_COLORS: Record<string, { bg: string; color: string }> = {
   system: { bg: '#2A9D8F', color: 'white' },
@@ -137,8 +165,9 @@ export function OpportunityDetailPanel({
   const [intelOpen, setIntelOpen] = useState(false)
 
   // Lost modal
-  const [showLostModal, setShowLostModal] = useState(false)
-  const [lostReason, setLostReason] = useState('Not a fit')
+  const [showPauseModal, setShowPauseModal] = useState(false)
+  const [pauseReason, setPauseReason] = useState('Budget year, not this one')
+  const [revisitOn, setRevisitOn] = useState(defaultRevisitDate())
 
   // Partnership modal state (from PanelFooter)
   const [showPartnershipModal, setShowPartnershipModal] = useState(false)
@@ -317,11 +346,38 @@ export function OpportunityDetailPanel({
     onClose()
   }
 
-  async function markLost() {
-    const result = await patchOpp({ stage: 'lost', deletion_reason: lostReason } as any)
+  /**
+   * Not this year. The replacement for "Mark as Lost".
+   *
+   * Moves the lead to engaged rather than lost, stores the date to come back,
+   * and writes the reason into the note history so the next person to open the
+   * card can see why without asking anyone.
+   */
+  async function markNotThisYear() {
+    if (!opp) return
+    const pretty = new Date(revisitOn + 'T00:00:00').toLocaleDateString('en-US', {
+      month: 'long', day: 'numeric', year: 'numeric',
+    })
+    const result = await patchOpp({ stage: 'engaged', revisit_on: revisitOn } as any)
     if (result === false) return
-    showToast(`Deal marked as Lost (${lostReason})`, 'success')
-    setShowLostModal(false)
+    // The note is the part the rule actually asks for, so it is not optional
+    // and it is not silent: if it fails the toast says so rather than implying
+    // the reason was recorded.
+    const noted = await fetch(`/api/sales/opportunities/${opp.id}/notes`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        note_text: `Not this year: ${pauseReason}. Reach back out on ${pretty}. Moved to Engaged rather than closed.`,
+        note_type: 'update',
+      }),
+    }).then(r => r.ok).catch(() => false)
+    showToast(
+      noted
+        ? `Paused until ${pretty}`
+        : `Paused until ${pretty}, but the note did not save. Add it by hand.`,
+      noted ? 'success' : 'error',
+    )
+    setShowPauseModal(false)
     onClose()
   }
 
@@ -886,11 +942,11 @@ export function OpportunityDetailPanel({
               )}
               {opp.stage !== 'lost' && (
                 <button
-                  onClick={() => setShowLostModal(true)}
-                  title="This lead is no longer pursuing. Record why."
-                  style={{ fontSize: 12, color: '#EF4444', fontWeight: 600, background: 'none', border: 'none', cursor: 'pointer' }}
+                  onClick={() => setShowPauseModal(true)}
+                  title="They are not moving forward right now. Record why and pick a date to come back. The lead stays in Engaged rather than being closed."
+                  style={{ fontSize: 12, color: '#B45309', fontWeight: 600, background: 'none', border: 'none', cursor: 'pointer' }}
                 >
-                  Mark as Lost
+                  Not this year
                 </button>
               )}
               {onDelete && (
@@ -907,34 +963,49 @@ export function OpportunityDetailPanel({
         )}
       </div>
 
-      {/* Lost modal */}
-      {showLostModal && (
+      {/* Not this year. Deliberately not a "lost" modal; see PAUSE_REASONS. */}
+      {showPauseModal && (
         <div className="fixed inset-0 bg-black/40 z-[60] flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-5 space-y-4">
-            <h3 className="font-semibold text-gray-900">Mark as Lost</h3>
+            <h3 className="font-semibold text-gray-900">Not this year</h3>
             <p className="text-sm text-gray-600 truncate">{opp?.name}</p>
+            <p className="text-xs text-gray-500">
+              They stay in Engaged. Nothing is closed, and they keep getting the educator emails.
+            </p>
             <div>
-              <label className="text-xs text-gray-500 font-medium">Reason</label>
+              <label className="text-xs text-gray-500 font-medium">Why not now</label>
               <select
-                value={lostReason}
-                onChange={e => setLostReason(e.target.value)}
+                value={pauseReason}
+                onChange={e => setPauseReason(e.target.value)}
                 className="mt-1 block w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-400"
               >
-                {LOST_REASONS.map(r => <option key={r} value={r}>{r}</option>)}
+                {PAUSE_REASONS.map(r => <option key={r} value={r}>{r}</option>)}
               </select>
+            </div>
+            <div>
+              <label className="text-xs text-gray-500 font-medium">Reach back out on</label>
+              <input
+                type="date"
+                value={revisitOn}
+                onChange={e => setRevisitOn(e.target.value)}
+                className="mt-1 block w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-400"
+              />
+              <p className="mt-1 text-[11px] text-gray-400">
+                Defaults to four months out, which is roughly the next budget conversation.
+              </p>
             </div>
             <div className="flex gap-3">
               <button
-                onClick={() => setShowLostModal(false)}
+                onClick={() => setShowPauseModal(false)}
                 className="flex-1 text-sm border border-gray-200 text-gray-600 py-2 rounded-xl hover:bg-gray-50"
               >
                 Cancel
               </button>
               <button
-                onClick={markLost}
-                className="flex-1 text-sm bg-red-600 text-white py-2 rounded-xl hover:bg-red-700 font-medium"
+                onClick={markNotThisYear}
+                className="flex-1 text-sm bg-amber-600 text-white py-2 rounded-xl hover:bg-amber-700 font-medium"
               >
-                Confirm Lost
+                Save and pause
               </button>
             </div>
           </div>
