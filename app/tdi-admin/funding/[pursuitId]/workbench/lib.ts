@@ -8,9 +8,12 @@
 // rather than patching that instance of it.
 
 import { isPersonOwned, isSchoolOwned } from '@/lib/funding-ownership'
+import { isWindowOpen } from '@/lib/funding-rules'
 
 export const CLOSED_STATUSES = ['denied', 'awarded', 'closed', 'cancelled']
 export const DEAD_ITEM_STATUSES = ['done', 'skipped', 'cancelled']
+/** Already with the funder. Not closed, but nothing left for us to send. */
+export const FILED_STATUSES = ['applied', 'submitted']
 
 export type Owner = 'you' | 'school' | 'agent'
 
@@ -108,16 +111,108 @@ export function pickTheOneThing(opportunities: any[], actionItems: any[]) {
 }
 
 /** Work split by who has to move, which is the only grouping that changes what you do next. */
+/** A path that will not move until a named person does one named thing. */
+export interface StuckPath {
+  id: string
+  name: string
+  /** Why it stopped, in a sentence Bella can act on. */
+  reason: string
+  /** How long it has been sitting, in days. */
+  since: number | null
+  /** Ordering weight. Lower sorts first. */
+  weight: number
+}
+
+/**
+ * The paths that need a person, which the three work lists never showed.
+ *
+ * `groupWork` grouped by who holds something: you, the school, or an agent. A
+ * narrative in `escalated`, `approval` or `ready` belongs to a person and
+ * matched none of those, so it appeared nowhere. QA could give up on a grant
+ * and hand it to Bella with nothing on her screen saying so, and a finished
+ * application could sit unsent for a fortnight without a word.
+ *
+ * Measured 22 September 2026: three escalations and two finished-but-unsent
+ * narratives were live across the three pursuits, and not one of them was
+ * visible in the work summary on this page.
+ *
+ * `ready` is here deliberately even though it has no time limit in the SLA
+ * table. Never going loud is not the same as never being shown, and Cox
+ * Charities reached nine days from its deadline, written and approved, because
+ * nothing ever mentioned it.
+ */
+export function stuckPaths(opportunities: any[]): StuckPath[] {
+  const out: StuckPath[] = []
+
+  for (const o of opportunities ?? []) {
+    if (!isLivePath(o)) continue
+    const since = daysSince(o.narrative_status_changed_at)
+    const esc = o.qa_escalation || {}
+
+    if (o.narrative_status === 'escalated' && !esc.awaiting_client) {
+      out.push({
+        id: o.id, name: o.name, since, weight: 0,
+        reason: 'QA stopped after three tries. Open it to choose what happens next.',
+      })
+      continue
+    }
+
+    if (o.narrative_status === 'approval' || (o.narrative_status === 'qa_review' && o.qa_passed === true)) {
+      out.push({
+        id: o.id, name: o.name, since, weight: 1,
+        reason: 'Passed QA. Approve it, or send it back with a note.',
+      })
+      continue
+    }
+
+    // Written, approved, and nobody has sent it.
+    //
+    // `applied` and a recorded client submission both mean it has already gone,
+    // and the narrative simply stays `ready` afterwards. Allenwood's NEA grant
+    // was filed in June and still reads `ready` today, so without this check the
+    // group would have told Bella to send something the funder already has.
+    if (o.narrative_status === 'ready' && !FILED_STATUSES.includes(o.status) && o.client_submitted !== true) {
+      out.push({
+        id: o.id, name: o.name, since, weight: 2,
+        reason: 'Written and approved. It does nothing for the school until somebody sends it.',
+      })
+      continue
+    }
+
+    // Requested, but no agent can pick it up. The old grouping showed these as
+    // "queued for a writer", which was untrue: the queue filters on an open
+    // window, so nobody was ever going to see it.
+    if (o.narrative_status === 'requested' && !isWindowOpen(o)) {
+      out.push({
+        id: o.id, name: o.name, since, weight: 3,
+        reason: 'Marked as being written, but the application window is not open, so no writer can see it. Reopen the window or drop the path.',
+      })
+    }
+  }
+
+  return out.sort((a, b) => a.weight - b.weight || (b.since ?? 0) - (a.since ?? 0))
+}
+
 export function groupWork(actionItems: any[], opportunities: any[]) {
   const live = (actionItems ?? []).filter(isLiveItem)
+  const stuck = stuckPaths(opportunities)
+  const stuckIds = new Set(stuck.map(s => s.id))
   return {
+    // Paths that stopped and need a person. Listed first because everything
+    // else on this page is either moving or somebody else's.
+    stuck,
     // This page already had the right rule. The board's school card had a
     // second one that demoted seven of Bella's items to an agent's. Both now
     // call the same helper so a third answer cannot appear.
     you: live.filter(isPersonOwned),
     school: live.filter(isSchoolOwned),
+    // Genuinely moving. A requested path nobody can see is no longer counted
+    // here, because saying it is with a writer when no writer can reach it is
+    // the thing that let these sit for weeks.
     agent: (opportunities ?? []).filter(o =>
-      ['requested', 'qa_review'].includes(o.narrative_status) && isLivePath(o)),
+      ['requested', 'qa_review'].includes(o.narrative_status)
+      && isLivePath(o)
+      && !stuckIds.has(o.id)),
     finished: (actionItems ?? []).filter(a => !isLiveItem(a)),
   }
 }

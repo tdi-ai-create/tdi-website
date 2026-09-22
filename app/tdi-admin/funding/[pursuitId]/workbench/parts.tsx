@@ -111,6 +111,38 @@ export function TaskRow({ item, onOpen }: { item: any; onOpen: () => void }) {
   )
 }
 
+/**
+ * A path that stopped, with the reason and a way in.
+ *
+ * Deliberately louder than AgentRow. A row in this group is the only kind on
+ * the page that will not advance on its own.
+ */
+export function StuckRow({ item, onOpen }: { item: { id: string; name: string; reason: string; since: number | null }; onOpen: () => void }) {
+  return (
+    <div
+      onClick={onOpen}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onOpen() } }}
+      style={{
+        display: 'flex', alignItems: 'flex-start', gap: 11, padding: '11px 14px',
+        borderBottom: `1px solid ${C.rule2}`, cursor: 'pointer',
+      }}
+    >
+      <span style={{ width: 7, height: 7, borderRadius: '50%', background: C.red, flexShrink: 0, marginTop: 5 }} />
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ fontSize: 13, color: C.ink, fontWeight: 550 }}>{item.name}</div>
+        <div style={{ fontSize: 11, color: C.ink3, marginTop: 2 }}>{item.reason}</div>
+      </div>
+      {item.since !== null && (
+        <span style={{ fontSize: 10.5, color: item.since >= 3 ? C.red : C.ink3, whiteSpace: 'nowrap', fontVariantNumeric: 'tabular-nums', flexShrink: 0, marginTop: 2 }}>
+          {item.since}d
+        </span>
+      )}
+    </div>
+  )
+}
+
 export function AgentRow({ opp }: { opp: any }) {
   const label: Record<string, string> = {
     requested: 'queued for a writer', qa_review: 'with Julie for review',
