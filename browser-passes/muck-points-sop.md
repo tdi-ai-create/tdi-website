@@ -36,6 +36,39 @@ prove a person can find the document or that the iframe renders it.
 Nothing was withheld by choice. No control on this change sends anything or
 writes to the database. It adds a static document and one sidebar entry.
 
+## Production pass, 22 September 2026
+
+Deferral closed. Opened in Chrome signed in as rae@teachersdeserveit.com, after
+PR #562 merged and deployed.
+
+- Opened: https://www.teachersdeserveit.com/tdi-admin/docs
+- Saw: a `SALES` group in the sidebar reading "Muck Points" with the subtitle
+  "The effort score on the sales board: what it measures and how it is
+  calculated", sitting directly above `FUNDING`. The frame at that point was
+  still on the default, src ending `/docs/admin-guide`.
+- Pressed: "Muck Points" in the sidebar
+- Saw: the iframe src changed to
+  `https://www.teachersdeserveit.com/api/tdi-admin/docs/muck-points-sop`, the
+  framed document title read "Muck Points SOP", its h1 read "Muck Points", and
+  the body carried 5351 characters. So the id and the slug agree and the frame
+  is not blank, which was the specific failure this pass existed to rule out.
+- Saw, read out of the rendered frame: the band rule "Heaviest fifth = heavy",
+  the freeze line "frozen until 28 September 2026. No new dimensions and no
+  weight changes before then.", and the measurement
+  "0.038. Correlation of deliverables to note volume was 0.745."
+- Saw: one related-section chip above the frame, text "Sales Board", href
+  `/tdi-admin/sales`.
+
+One thing worth recording because it nearly became a false alarm. The first load
+of `/tdi-admin/docs` rendered the Access Denied screen, naming the signed-in
+account as rae@teachersdeserveit.com. That is a race, not a permission problem.
+`AdminLayoutContent` renders `LoadingState` while `adminLoading` is true and
+`AccessDenied` the moment it is false and `hasAccess` is falsy, so a read taken
+before access resolves looks identical to a genuine refusal. Waiting produced
+the full portal. Rae's row in `tdi_team_members` is owner and active, and her
+`auth.users` id matches it, so nothing was actually wrong. If this screen is
+seen again, wait for it to settle before believing it.
+
 ## What I could not verify
 
 - Deferred: the `/tdi-admin/docs` page itself cannot be loaded here. It returns
