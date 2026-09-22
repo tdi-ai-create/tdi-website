@@ -95,10 +95,11 @@ function formatGoalName(goal: string): string {
 // GET - Comprehensive analytics endpoint
 export async function GET(request: NextRequest) {
   try {
-    try {
-      const auth = await requireAdminAuth();
-      if (auth instanceof NextResponse) console.warn('[Analytics] Auth check failed, proceeding');
-    } catch {}
+    // The gate blocks. It used to log the failure and carry on, on the theory
+    // that a page level guard protected access. A page guard protects the
+    // page; the route is addressable on its own, so this answered anybody.
+    const auth = await requireAdminAuth();
+    if (auth instanceof NextResponse) return auth;
 
     const supabase = getSupabaseAdmin();
     const { searchParams } = new URL(request.url);

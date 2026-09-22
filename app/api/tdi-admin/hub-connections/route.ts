@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAdminAuth } from '@/lib/tdi-admin/auth';
 import { createClient } from '@supabase/supabase-js';
 
 // Hub Supabase client (read-only for admin portal connections)
@@ -632,6 +633,11 @@ async function getOperationsData(hub: ReturnType<typeof createClient>) {
 }
 
 export async function GET(request: NextRequest) {
+  // Every caller of this route is an admin page behind a signed in session,
+  // and no cron reaches it. It previously had no gate at all.
+  const __auth = await requireAdminAuth();
+  if (__auth instanceof NextResponse) return __auth;
+
   try {
     const section = request.nextUrl.searchParams.get('section') as Section;
     if (!section) {

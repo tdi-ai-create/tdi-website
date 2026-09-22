@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAdminAuth } from '@/lib/tdi-admin/auth';
 import { createClient } from '@supabase/supabase-js';
 
 function getHubServiceSupabase() {
@@ -25,6 +26,11 @@ function generateSlug(title: string): string {
  * Videos are never copied -- video_id is set to null on duplicated lessons.
  */
 export async function POST(request: NextRequest) {
+  // Every caller of this route is an admin page behind a signed in session,
+  // and no cron reaches it. It previously had no gate at all.
+  const __auth = await requireAdminAuth();
+  if (__auth instanceof NextResponse) return __auth;
+
   try {
     const body = await request.json();
     const { sourceCourseId, newTitle, includeContent } = body;

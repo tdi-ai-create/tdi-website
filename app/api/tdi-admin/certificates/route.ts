@@ -24,10 +24,11 @@ function getSupabaseAdmin() {
 // GET - Fetch all certificates with user and course data (bypasses RLS)
 export async function GET() {
   try {
-    try {
-      const auth = await requireAdminAuth();
-      if (auth instanceof NextResponse) console.warn('[Certificates] Auth check failed, proceeding');
-    } catch {}
+    // The gate blocks. It used to log the failure and carry on, on the theory
+    // that a page level guard protected access. A page guard protects the
+    // page; the route is addressable on its own, so this answered anybody.
+    const auth = await requireAdminAuth();
+    if (auth instanceof NextResponse) return auth;
 
     const supabase = getSupabaseAdmin();
 

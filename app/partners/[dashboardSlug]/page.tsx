@@ -1516,17 +1516,23 @@ export default function PartnerDashboard() {
     const totalDel = (partnership.observation_days_total || 0) + (partnership.virtual_sessions_total || 0);
     const completedDel = (partnership.observation_days_completed || 0) + (partnership.virtual_sessions_completed || 0);
 
-    // Fetch live popular content from Hub
+    // Fetch live popular content from the Hub.
+    //
+    // This used to read api/tdi-admin/stats, which answers with the entire
+    // internal gauge: total users, the paid against free split, and a
+    // breakdown naming every client school with its seat count. None of that
+    // belongs in front of a school leader. partners/popular-content returns
+    // the two title lists this report actually uses and nothing else.
     let popularTools: string[] = [];
     let popularCourses: string[] = [];
     try {
-      const statsResp = await fetch('/api/tdi-admin/stats');
-      if (statsResp.ok) {
-        const statsData = await statsResp.json();
-        popularTools = (statsData.topQuickWins || []).slice(0, 6).map((q: { title: string }) => q.title);
-        popularCourses = (statsData.topCourses || []).slice(0, 6).map((c: { title: string }) => c.title);
+      const contentResp = await fetch('/api/partners/popular-content');
+      if (contentResp.ok) {
+        const content = await contentResp.json();
+        popularTools = (content.topQuickWins || []).slice(0, 6);
+        popularCourses = (content.topCourses || []).slice(0, 6);
       }
-    } catch { /* non-fatal */ }
+    } catch { /* non-fatal, the report has fallback copy */ }
 
     // Fallback if API didn't return data
     if (popularTools.length === 0) {

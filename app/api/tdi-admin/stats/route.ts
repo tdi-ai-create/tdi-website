@@ -25,15 +25,11 @@ function getSupabaseAdmin() {
 // GET - Fetch admin stats (bypasses RLS)
 export async function GET() {
   try {
-    // Auth check -- log failures but don't block (page-level guard protects access)
-    try {
-      const auth = await requireAdminAuth();
-      if (auth instanceof NextResponse) {
-        console.warn('[Admin Stats] Auth check failed, proceeding (page guard protects)');
-      }
-    } catch (authErr) {
-      console.warn('[Admin Stats] Auth error:', authErr);
-    }
+    // The gate blocks. It used to log the failure and carry on, on the theory
+    // that a page level guard protected access. A page guard protects the
+    // page; the route is addressable on its own, so this answered anybody.
+    const auth = await requireAdminAuth();
+    if (auth instanceof NextResponse) return auth;
 
     const supabase = getSupabaseAdmin();
 

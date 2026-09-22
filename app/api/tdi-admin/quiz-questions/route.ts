@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { requireAdminAuth } from '@/lib/tdi-admin/auth';
 import { createClient } from '@supabase/supabase-js';
 
 function getHubServiceSupabase() {
@@ -13,6 +14,11 @@ function getHubServiceSupabase() {
  * Fetch all quiz questions for a lesson
  */
 export async function GET(request: Request) {
+  // Every caller of this route is an admin page behind a signed in session,
+  // and no cron reaches it. It previously had no gate at all.
+  const __auth = await requireAdminAuth();
+  if (__auth instanceof NextResponse) return __auth;
+
   try {
     const supabase = getHubServiceSupabase();
     const { searchParams } = new URL(request.url);
@@ -49,6 +55,11 @@ export async function GET(request: Request) {
  * Create a new quiz question
  */
 export async function POST(request: Request) {
+  // Every caller of this route is an admin page behind a signed in session,
+  // and no cron reaches it. It previously had no gate at all.
+  const __auth = await requireAdminAuth();
+  if (__auth instanceof NextResponse) return __auth;
+
   try {
     const supabase = getHubServiceSupabase();
     const body = await request.json();
@@ -118,6 +129,11 @@ export async function POST(request: Request) {
  * Update a quiz question
  */
 export async function PATCH(request: Request) {
+  // Every caller of this route is an admin page behind a signed in session,
+  // and no cron reaches it. It previously had no gate at all.
+  const __auth = await requireAdminAuth();
+  if (__auth instanceof NextResponse) return __auth;
+
   try {
     const supabase = getHubServiceSupabase();
     const body = await request.json();
@@ -165,6 +181,11 @@ export async function PATCH(request: Request) {
  * Delete a quiz question
  */
 export async function DELETE(request: Request) {
+  // Every caller of this route is an admin page behind a signed in session,
+  // and no cron reaches it. It previously had no gate at all.
+  const __auth = await requireAdminAuth();
+  if (__auth instanceof NextResponse) return __auth;
+
   try {
     const supabase = getHubServiceSupabase();
     const { searchParams } = new URL(request.url);
