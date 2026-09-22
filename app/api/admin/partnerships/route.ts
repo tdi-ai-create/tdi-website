@@ -163,7 +163,25 @@ export async function POST(request: NextRequest) {
         virtual_sessions_total: virtual_sessions_total || 0,
         executive_sessions_total: executive_sessions_total || 0,
         status: 'invited',
-        invite_sent_at: new Date().toISOString(),
+        // invite_sent_at is deliberately NOT stamped here.
+        //
+        // This route sends nothing. It creates the row and hands back an
+        // invite URL for a person to copy and send themselves, so stamping
+        // "invite sent" records something that has not happened. Every other
+        // writer of this column stamps it after a real send: send-login-link,
+        // send-onboarding-batch, send-scheduled-onboarding and
+        // leadership/invite. This was the only one claiming it up front.
+        //
+        // Two things went wrong because of that. `invite-status` reads the
+        // column to tell an admin whether the leader was invited, so the
+        // screen said yes for leaders nobody had written to. And
+        // partner-onboarding-reminders counts the six step drip from this
+        // timestamp, so a record made here and later flipped to active would
+        // start mailing its contact from whichever step the elapsed days
+        // landed on. A prospect record made months ago would open on the
+        // day 45 email.
+        //
+        // Null until someone actually sends. See lib/partnerships/mailable.ts.
       })
       .select()
       .single();
