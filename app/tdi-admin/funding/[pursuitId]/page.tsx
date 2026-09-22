@@ -10,7 +10,7 @@ import { ActionsTab } from '../components/panel/ActionsTab'
 import { EmailsTab } from '../components/panel/EmailsTab'
 import { RecordTab } from '../components/panel/RecordTab'
 import { pickTheOneThing, groupWork, isLivePath } from './workbench/lib'
-import { C, Panel, KV, TheOneThing, WorkGroup, TaskRow, AgentRow, PathRow } from './workbench/parts'
+import { C, Panel, KV, TheOneThing, WorkGroup, TaskRow, AgentRow, StuckRow, PathRow } from './workbench/parts'
 import { awardedAmountOf } from '@/lib/funding-award'
 
 /**
@@ -268,6 +268,10 @@ export default function PursuitPage() {
         <div style={{ minWidth: 0 }}>
           <TheOneThing pick={pick} onOpen={() => reveal(pick?.kind === 'funder' ? 'paths' : 'actions')} />
 
+          <WorkGroup title="Stopped, needs you" count={work.stuck.length} tone={C.red}>
+            {work.stuck.map(sp => <StuckRow key={sp.id} item={sp} onOpen={() => reveal('paths')} />)}
+          </WorkGroup>
+
           <WorkGroup title="Waiting on you" count={work.you.length} tone={C.red}>
             {work.you.map(a => <TaskRow key={a.id} item={a} onOpen={() => reveal('actions')} />)}
           </WorkGroup>
@@ -276,7 +280,7 @@ export default function PursuitPage() {
             {work.school.map(a => <TaskRow key={a.id} item={a} onOpen={() => reveal('actions')} />)}
           </WorkGroup>
 
-          <WorkGroup title="Running by itself" count={work.agent.length} tone={C.ink3}>
+          <WorkGroup title="Moving on its own" count={work.agent.length} tone={C.ink3}>
             {work.agent.map(o => <AgentRow key={o.id} opp={o} />)}
           </WorkGroup>
 
