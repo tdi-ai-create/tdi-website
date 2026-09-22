@@ -879,6 +879,22 @@ export default function AdminPartnershipDetailPage() {
               </p>
             </div>
             <div className="flex items-center gap-3">
+              {/* Unsigned badge.
+                  Sits before the phase badge because the phase is meaningless
+                  until someone has signed. A prospect record left at
+                  status 'active' is indistinguishable from a client here
+                  otherwise, which is how Morenci and Crowley ISD sat on this
+                  screen for weeks while the partner email crons mailed one of
+                  their contacts twice. */}
+              {!partnership.contract_start && (
+                <span
+                  className="px-3 py-1.5 rounded-full text-xs font-bold"
+                  style={{ background: '#FDE68A', color: '#92400E' }}
+                  title="No contract start date. This is a prospect record, not a signed partnership, and it is excluded from client email."
+                >
+                  UNSIGNED
+                </span>
+              )}
               {/* Phase badge */}
               <span
                 className="px-3 py-1.5 rounded-full text-xs font-bold"

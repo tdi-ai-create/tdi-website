@@ -132,6 +132,43 @@
     <p><strong>So:</strong> size was cut from the model entirely. What we agreed to deliver predicts the work. How big the district is does not.</p>
   </div>
 
+  <h2>How it updates</h2>
+
+  <p>It is not a score somebody sets. <strong>Nothing is stored.</strong> The whole thing is recalculated from the record every time the board loads, so there is no refresh to run and no way for it to go stale.</p>
+
+  <p>It reads five fields and nothing else:</p>
+
+  <table>
+    <thead>
+      <tr><th>Input</th><th>Read from</th><th>Changes when</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Delivery load, 40</td><td>The offering on the lead</td><td>Somebody sets or changes the offering</td></tr>
+      <tr><td>Grant, 25</td><td>The grant support flag</td><td>Somebody confirms the school needs funding help</td></tr>
+      <tr><td>Relationship drag, 20</td><td>The <strong>number</strong> of notes</td><td>Any note is added</td></tr>
+      <tr><td>Travel, 15</td><td>The state on the lead</td><td>The state is filled in or corrected</td></tr>
+      <tr><td>Value per point</td><td>The deal value and the stage</td><td>The value is edited, or the deal signs</td></tr>
+    </tbody>
+  </table>
+
+  <div class="card card-amber">
+    <p><strong>Notes count, but nobody reads them.</strong> Drag is driven by how many notes a lead has, never by what they say. Logging a call adds one whether the call went brilliantly or nobody picked up. Write notes for the humans who need them, not to move the score.</p>
+  </div>
+
+  <h3>The two fields that actually need you</h3>
+
+  <p><strong>Offering</strong> and <strong>grant support</strong>, together worth 65 of the 100 points. Both are set by a person and neither is ever guessed.</p>
+
+  <p>Grant in particular is only counted once somebody has confirmed the school needs funding help. Until then it reads <code>Not confirmed</code> and scores zero. Tick it and the lead gains 25 points immediately, which will usually move it down the chase order. That is deliberate: a predicted grant need was the input most likely to be wrong, so the model waits to be told.</p>
+
+  <h3>One thing that surprises people</h3>
+
+  <div class="card card-red">
+    <p><strong>A lead's drag can change without anything happening to that lead.</strong></p>
+    <p>Drag compares a lead's note count to the median for its own stage, and that median is recalculated across the whole board on every load. A lead showing <code>3 notes, stage median 11</code> scores zero drag today. If the other leads in its stage go quiet and the median falls, the same three notes can start scoring.</p>
+    <p>This is intended. Note counts climb with stage, measured at 9.4 in Quote Sent against 3.6 in Targeting on 15 September, so comparing a lead to the whole board would mostly measure how far along it is rather than how demanding it is. The cost of getting that right is that drag is relative, and relative things move.</p>
+  </div>
+
   <h2>What it is not</h2>
 
   <div class="rule"><p><span class="cond">It is not a capacity plan.</span> It does not know who is free this week or how many leads one person can carry.</p></div>
