@@ -101,15 +101,30 @@ using the board. That needs rows, and rows need the production session.
 - Restored the address to `wendy.gonzaba@leanderisd.org` afterward. The row is
   as it was apart from `updated_at`.
 
-## Still not pressed
+## City and State, driven differently
 
-City and State. Partway through, a browser extension took focus over the page
-and every further click, keypress and screenshot returned "Cannot access a
-chrome-extension:// URL of different extension", so the City field could not be
-blurred and never saved. The route half of that fix is measured, from the
-temporary row above: `city` and `state` now persist where the whitelist used to
-drop them. The panel half is not, and it goes through the same `patchOpp` call
-the email edit just proved.
+The first attempt could not be finished by hand. A browser extension opens its
+own autofill menu when a field in this panel takes focus, and from that moment
+every click, keypress and screenshot returned "Cannot access a
+chrome-extension:// URL of different extension". Typing worked once, blurring
+the field never did, so nothing saved and the tab had to be reloaded to get
+control back.
 
-Left for the next pass on this screen: type a city and a state into a lead,
-click away, reload, and confirm both are still there.
+So the second attempt drove the same field from inside the page instead. Say
+plainly what that means: the value was set on the real input and a real
+`focusout` was dispatched, which is the event React maps to the panel's
+`onBlur`, so the component's own handler and the live route both ran. A mouse
+was not involved.
+
+- Saw: the City field on the Wendy Gonzaba panel read "Leander" after the
+  value was set.
+- Saw: the row in the database read `city = Leander`, `updated_at` 16:37:26,
+  where it had read null. This is the edit that used to be dropped in silence.
+- Saw: blanking the same field wrote `city = null` at 16:38:41, so clearing a
+  field now clears it rather than being ignored.
+- Restored: the lead is back as it was. Email `wendy.gonzaba@leanderisd.org`,
+  phone `+15125707800`, city null, state TX. Only `updated_at` differs.
+
+One thing worth knowing for the next pass on this screen: that extension makes
+this panel hard to drive by hand. It is not a defect in the page, and a person
+typing normally is unaffected.
