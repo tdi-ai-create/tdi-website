@@ -57,3 +57,32 @@ export function blockedTermsMessage(hits: BlockedTerm[]): string {
   const list = hits.map(h => `"${h.term}" (${h.reason})`).join('; ')
   return `Retired reference, rewrite it before this moves on: ${list}.`
 }
+
+/* ------------------------------------------------------------------ */
+
+export type BlockedChannel = { channel: string; reason: string }
+
+/**
+ * A retired destination, checked alongside the terms.
+ *
+ * The terms guard reads the copy. It has never read the channel, which is how
+ * four posts reached a Facebook group TDI no longer runs: three before the
+ * terms table was populated, and a fourth afterwards that simply never used
+ * the phrase. Blocking the word was never going to be enough, because the
+ * problem was never the word. It was the destination.
+ *
+ * Case-insensitive and trimmed, because `channel` is free text on the column
+ * rather than an enum, so "Facebook" and "facebook " both exist in principle.
+ */
+export function findBlockedChannel(
+  channel: string | null | undefined,
+  blocked: BlockedChannel[],
+): BlockedChannel | null {
+  const c = (channel ?? '').trim().toLowerCase()
+  if (!c) return null
+  return blocked.find(b => b.channel.trim().toLowerCase() === c) ?? null
+}
+
+export function blockedChannelMessage(hit: BlockedChannel): string {
+  return `"${hit.channel}" is a retired destination, so this piece has nowhere to go: ${hit.reason}`
+}
