@@ -89,8 +89,10 @@ export async function POST(request: NextRequest) {
       userId = authUser.user.id;
       isNewUser = true;
 
-      // Create hub_profile
-      await hub.from('hub_profiles').upsert({
+      // Create hub_profile. A failure here leaves an auth user with no
+      // profile, which is an account that exists and cannot be used, so it
+      // must not pass silently.
+      const { error: profileError } = await hub.from('hub_profiles').upsert({
         id: userId,
         email,
         display_name: name || email.split('@')[0],
@@ -98,6 +100,14 @@ export async function POST(request: NextRequest) {
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       }, { onConflict: 'id' });
+
+      if (profileError) {
+        console.error('[GrantAccess] hub_profiles upsert failed:', profileError.message);
+        return NextResponse.json(
+          { error: `Account was created but its profile could not be saved: ${profileError.message}` },
+          { status: 500 }
+        );
+      }
     }
 
     // Create or update membership via RPC (bypasses PostgREST schema cache)

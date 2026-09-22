@@ -237,13 +237,29 @@ export async function POST(request: NextRequest) {
                 }
 
                 const userId = authData.user.id
-                await supabase.from('hub_profiles').insert({ id: userId, email: sub.email, display_name: sub.name || null })
-                await supabase.from('hub_memberships').insert({
+                // Counted as imported only if both writes land. An auth user
+                // with no profile or no membership is an account that exists
+                // and cannot be used, and reporting it as imported is how a
+                // failed import reads as a clean one.
+                const { error: profileError } = await supabase
+                  .from('hub_profiles')
+                  .insert({ id: userId, email: sub.email, display_name: sub.name || null })
+                const { error: membershipError } = await supabase.from('hub_memberships').insert({
                   user_id: userId,
                   tier: sub.isPaid ? 'essentials' : 'free',
                   source: sub.isPaid ? 'substack_paid' : 'substack_free',
                   status: 'active',
                 })
+
+                if (profileError || membershipError) {
+                  results.errors++
+                  if (results.error_details.length < 50) {
+                    results.error_details.push(
+                      `${sub.email}: ${profileError?.message || membershipError?.message}`
+                    )
+                  }
+                  continue
+                }
                 results.new_profiles++
               } catch {
                 results.errors++

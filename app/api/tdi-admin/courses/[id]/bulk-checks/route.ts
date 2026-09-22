@@ -475,10 +475,17 @@ export async function POST(
           .in('lesson_id', lessonIds)
 
         if (existing && existing.length > 0) {
-          await supabase
+          // Retiring the old questions must succeed before new ones are
+          // inserted. If it silently fails the lesson ends up serving both
+          // sets, which reads to a learner as duplicated questions.
+          const { error: retireError } = await supabase
             .from('hub_quiz_questions')
             .update({ is_active: false })
             .in('id', existing.map((q) => q.id))
+
+          if (retireError) {
+            throw new Error(`Could not retire the existing questions: ${retireError.message}`)
+          }
         }
 
         const rows = gateLessons.flatMap((lesson, i) =>

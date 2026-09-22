@@ -221,10 +221,21 @@ export async function DELETE(request: NextRequest) {
     // Remove resource fields from content
     const { resource_url, resource_filename, resource_content_type, resource_file_size, resource_storage_path, ...cleanContent } = content;
 
-    await supabase
+    // The file is already gone from storage by this point. If the lesson row
+    // still references it the lesson renders a dead download, so a failure
+    // here is reported rather than answered with success.
+    const { error: lessonError } = await supabase
       .from('hub_lessons')
       .update({ content: cleanContent })
       .eq('id', lessonId);
+
+    if (lessonError) {
+      console.error('[resources/upload] lesson update failed:', lessonError.message);
+      return NextResponse.json(
+        { error: `File was removed but the lesson still points at it: ${lessonError.message}` },
+        { status: 500 }
+      );
+    }
 
     return NextResponse.json({ success: true });
   } catch (error) {

@@ -156,6 +156,8 @@ export async function POST(
       video_id: string
       status: 'generated' | 'already_exists' | 'started' | 'failed'
       transcript?: string
+      /** Why it failed. A failed row with no reason tells the operator nothing. */
+      error?: string
     }> = []
 
     for (const lesson of needsTranscript) {
@@ -209,12 +211,25 @@ export async function POST(
         }
 
         if (transcript) {
-          // Save transcript to the lesson
+          // Save transcript to the lesson. Reported as generated only if the
+          // row actually took it, otherwise the run looks successful and the
+          // lesson still has no transcript.
           const updateCol = lang === 'es' ? 'transcript_es' : 'transcript'
-          await supabase
+          const { error: saveError } = await supabase
             .from('hub_lessons')
             .update({ [updateCol]: transcript })
             .eq('id', lesson.id)
+
+          if (saveError) {
+            results.push({
+              lesson_id: lesson.id,
+              lesson_title: lesson.title,
+              video_id: videoId,
+              status: 'failed',
+              error: `Transcript was generated but could not be saved: ${saveError.message}`,
+            })
+            continue
+          }
 
           results.push({
             lesson_id: lesson.id,
@@ -327,10 +342,20 @@ ${enTranscript.substring(0, 30000)}`,
         .trim()
 
       if (translatedText && translatedText.length > 50) {
-        await supabase
+        const { error: saveError } = await supabase
           .from('hub_lessons')
           .update({ transcript_es: translatedText })
           .eq('id', lesson.id)
+
+        if (saveError) {
+          results.push({
+            lesson_id: lesson.id,
+            lesson_title: lesson.title,
+            status: 'failed',
+            error: `Translation succeeded but could not be saved: ${saveError.message}`,
+          })
+          continue
+        }
 
         results.push({
           lesson_id: lesson.id,
