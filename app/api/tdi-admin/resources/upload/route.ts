@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAdminAuth } from '@/lib/tdi-admin/auth';
 import { createClient } from '@supabase/supabase-js';
 
 export const maxDuration = 60;
@@ -34,6 +35,11 @@ const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25MB
  * This keeps large files off the serverless function (Vercel 4.5MB body limit).
  */
 export async function POST(request: NextRequest) {
+  // Every caller of this route is an admin page behind a signed in session,
+  // and no cron reaches it. It previously had no gate at all.
+  const __auth = await requireAdminAuth();
+  if (__auth instanceof NextResponse) return __auth;
+
   try {
     const body = await request.json();
     const { lesson_id, filename, content_type, file_size } = body;
@@ -103,6 +109,11 @@ export async function POST(request: NextRequest) {
  * After client uploads directly to Supabase Storage, save metadata to lesson record
  */
 export async function PATCH(request: NextRequest) {
+  // Every caller of this route is an admin page behind a signed in session,
+  // and no cron reaches it. It previously had no gate at all.
+  const __auth = await requireAdminAuth();
+  if (__auth instanceof NextResponse) return __auth;
+
   try {
     const body = await request.json();
     const { lesson_id, storage_path, filename, content_type, file_size } = body;
@@ -170,6 +181,11 @@ export async function PATCH(request: NextRequest) {
  * Remove a resource file from a lesson
  */
 export async function DELETE(request: NextRequest) {
+  // Every caller of this route is an admin page behind a signed in session,
+  // and no cron reaches it. It previously had no gate at all.
+  const __auth = await requireAdminAuth();
+  if (__auth instanceof NextResponse) return __auth;
+
   try {
     const { searchParams } = new URL(request.url);
     const lessonId = searchParams.get('lesson_id');

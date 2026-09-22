@@ -21,21 +21,19 @@ function getHubAdmin() {
  * Page-level admin context guard is the primary access control.
  */
 export async function POST(request: NextRequest) {
-  // Auth check — log but don't block (page guard protects)
-  let adminEmail = 'unknown';
-  try {
-    const auth = await requireAdminAuth();
-    if (auth instanceof NextResponse) {
-      console.warn('[GrantAccess] Server auth check failed, proceeding (page guard protects)');
-    } else {
-      adminEmail = auth.user.email;
-    }
-  } catch {}
+  // The gate blocks. It used to log the failure and carry on, which meant an
+  // unauthenticated caller could grant Hub access and the audit trail recorded
+  // them as 'unknown'.
+  const auth = await requireAdminAuth();
+  if (auth instanceof NextResponse) return auth;
+  const adminEmail = auth.user.email;
 
   try {
-    const { email, name, tier, durationDays, customExpiry, grantedBy } = await request.json();
-    // Use server-verified email if available, fall back to client-provided
-    if (adminEmail === 'unknown' && grantedBy) adminEmail = grantedBy;
+    const { email, name, tier, durationDays, customExpiry } = await request.json();
+    // grantedBy used to be accepted from the request body as a fallback when
+    // the server could not identify the caller. The caller is now always
+    // identified, and an audit trail a client can write its own name into is
+    // not an audit trail, so the field is ignored.
 
     if (!email || !tier) {
       return NextResponse.json({ error: 'Email and tier are required' }, { status: 400 });

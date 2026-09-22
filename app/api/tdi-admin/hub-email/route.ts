@@ -1,9 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAdminAuth } from '@/lib/tdi-admin/auth';
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
 
 // POST -- send a test email via Resend
 export async function POST(request: NextRequest) {
+  // Every caller of this route is an admin page behind a signed in session,
+  // and no cron reaches it. It previously had no gate at all.
+  const __auth = await requireAdminAuth();
+  if (__auth instanceof NextResponse) return __auth;
+
   try {
     if (!RESEND_API_KEY) {
       return NextResponse.json({ error: 'Resend API key not configured' }, { status: 500 });

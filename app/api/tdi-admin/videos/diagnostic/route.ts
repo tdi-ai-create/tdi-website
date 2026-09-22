@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { requireAdminAuth } from '@/lib/tdi-admin/auth';
 
 /**
  * GET /api/tdi-admin/videos/diagnostic
@@ -7,6 +8,11 @@ import { NextResponse } from 'next/server';
  * Tests token validity and checks storage usage.
  */
 export async function GET() {
+  // Every caller of this route is an admin page behind a signed in session,
+  // and no cron reaches it. It previously had no gate at all.
+  const __auth = await requireAdminAuth();
+  if (__auth instanceof NextResponse) return __auth;
+
   const cfToken = process.env.CLOUDFLARE_STREAM_API_TOKEN;
   const cfAccountId = process.env.CF_ACCOUNT_ID;
 

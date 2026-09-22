@@ -1,3 +1,4 @@
+import { requireAdminAuth } from '@/lib/tdi-admin/auth';
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
@@ -29,6 +30,11 @@ interface ImportResults {
 }
 
 export async function POST(request: NextRequest) {
+  // Every caller of this route is an admin page behind a signed in session,
+  // and no cron reaches it. It previously had no gate at all.
+  const __auth = await requireAdminAuth();
+  if (__auth instanceof NextResponse) return __auth;
+
   try {
     const body = await request.json()
     const subscribers: SubstackSubscriber[] = body.subscribers

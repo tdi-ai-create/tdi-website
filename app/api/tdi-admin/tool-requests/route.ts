@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAdminAuth } from '@/lib/tdi-admin/auth';
 import { createClient } from '@supabase/supabase-js';
 
 const hubUrl = process.env.LEARNING_HUB_SUPABASE_URL || process.env.NEXT_PUBLIC_LEARNING_HUB_SUPABASE_URL;
@@ -11,6 +12,11 @@ const hubKey = process.env.LEARNING_HUB_SUPABASE_SERVICE_KEY;
  * PATCH - Update status or admin_notes
  */
 export async function GET() {
+  // Every caller of this route is an admin page behind a signed in session,
+  // and no cron reaches it. It previously had no gate at all.
+  const __auth = await requireAdminAuth();
+  if (__auth instanceof NextResponse) return __auth;
+
   if (!hubUrl || !hubKey) {
     return NextResponse.json({ error: 'Hub not configured' }, { status: 500 });
   }
@@ -53,6 +59,11 @@ export async function GET() {
 }
 
 export async function PATCH(request: NextRequest) {
+  // Every caller of this route is an admin page behind a signed in session,
+  // and no cron reaches it. It previously had no gate at all.
+  const __auth = await requireAdminAuth();
+  if (__auth instanceof NextResponse) return __auth;
+
   if (!hubUrl || !hubKey) {
     return NextResponse.json({ error: 'Hub not configured' }, { status: 500 });
   }
