@@ -1239,8 +1239,16 @@ export default function HubDashboard() {
                     {course.title}
                   </span>
                   {/* No chip on the curated default. A reason is only shown
-                      when a rule actually chose this course. */}
-                  {recsPersonalized && course.reason !== 'Chosen from the Hub library' && (
+                      when a rule actually chose this course.
+
+                      This branches on the signal, not on the reason text. It
+                      used to compare `course.reason` against the exact prose of
+                      the fallback string defined in lib/hub/recommendations.ts,
+                      which is the same two-files-one-hardcoded-string shape as
+                      the category bug that made this whole band dead in the
+                      first place. Rewording the fallback would have started
+                      labelling filler as a reason, silently. */}
+                  {course.signal !== 'default' && (
                     <span style={{ marginTop: 'auto', display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                       <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 20, background: '#E8F0FD', color: '#2C4A8A' }}>
                         {tUI(course.reason)}

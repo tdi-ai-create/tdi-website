@@ -62,13 +62,25 @@ export const GOAL_LABELS: Record<GoalKey, string> = {
  * points at one category honestly, so those readers fall through to the role
  * rule or to curation rather than being handed a guess. Rae chose this on
  * 21 Sep 2026 over mapping all thirteen.
+ *
+ * `all_of_the_above` is absent because an entry for it could never be reached.
+ * Pressing that tile stores every individual goal as well, measured on all 55
+ * people who picked it, and the scorer breaks on the first goal that matches
+ * while `all_of_the_above` sorts last. It previously had an entry here, which
+ * did nothing and carried a comment claiming it served those 55.
+ *
+ * Note for later, not a code problem: because those 55 have every goal, every
+ * category matches, so the goal slot goes to whichever course scored highest
+ * and the chip names whatever goal that course happened to match. Measured on
+ * one such account, a coach at stress 4 gets "Your goal: Grow as a leader",
+ * which is really their role and their stress talking. Naming a single goal for
+ * someone who picked all of them is arbitrary however it is done.
  */
 export const GOAL_TO_CATEGORY: Partial<Record<GoalKey, string>> = {
   reduce_stress: 'stress-&-wellness',
   find_joy: 'stress-&-wellness',
   feel_like_myself: 'stress-&-wellness',
   make_it_to_summer: 'stress-&-wellness',
-  all_of_the_above: 'stress-&-wellness',
   save_time: 'time-savers',
   stop_bringing_work_home: 'time-savers',
   classroom_management: 'classroom-management',

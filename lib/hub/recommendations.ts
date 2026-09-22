@@ -11,6 +11,18 @@ export interface RecommendedCourse {
   estimated_minutes: number;
   thumbnail_url?: string;
   reason: string;
+  /**
+   * Which rule chose this course, or 'default' for curated filler.
+   *
+   * The home page needs to know whether a card has a real reason behind it, and
+   * it used to work that out by comparing `reason` against the exact prose of
+   * the fallback string defined in this file. Two files, one hardcoded English
+   * sentence, nothing connecting them: the same defect shape as comparing
+   * category prose against stored slugs, which is what this whole file was
+   * rewritten to remove. Editing the fallback wording would have silently
+   * started labelling filler as a reason.
+   */
+  signal: Signal;
 }
 
 export interface RecommendationsResult {
@@ -44,7 +56,7 @@ function normalizeCategory(value: string | null | undefined): string {
 }
 
 /** Which rule chose a course. 'default' means none did. */
-type Signal = 'stress' | 'goal' | 'role' | 'default';
+export type Signal = 'stress' | 'goal' | 'role' | 'default';
 
 /**
  * The order slots are filled in. Stress first so a reader having a hard week
@@ -127,6 +139,7 @@ export async function getRecommendations(userId: string): Promise<Recommendation
   // called `team_growth` "grow your team" while the tile the educator actually
   // pressed said "Grow as a leader", so a chip named a goal they never chose.
   // Quoting their own words back to them is the point, so there is one source.
+
   // Map roles to categories.
   //
   // The keys are the six values the onboarding and profile pickers actually
@@ -246,6 +259,7 @@ export async function getRecommendations(userId: string): Promise<Recommendation
     courses: topCourses.map((sc) => ({
       ...sc.course,
       reason: sc.reason,
+      signal: sc.signal,
     })),
     reasons: topCourses.map((sc) => sc.reason),
     personalized,
