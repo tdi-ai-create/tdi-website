@@ -1166,10 +1166,21 @@ export default function SalesPage() {
     // The headline follows the same rule as every card under it: until a
     // contract exists the figure is a prediction, so a stale import does not
     // get counted as money. This moved the total down by roughly 210,000.
-    const dealValue = (o: Opportunity) => muckById[o.supabase_id]?.value ?? o.value ?? 0
+    //
+    // It used to fall back to `o.value` when the model could not score a lead,
+    // which put the stale figure straight back into the total it was meant to
+    // remove. Measured on the live board: 19 leads with no offering recorded
+    // contributed 369,879 that way, and 18 of the 19 were the pre-restructure
+    // 18,000 and 30,000 imports. A lead the model cannot value now counts as
+    // zero, and `unvaluedCount` says how many so the drop is visible rather
+    // than silent. The recorded value stays on the record either way; it is
+    // only excluded from this total.
+    const dealValue = (o: Opportunity) => muckById[o.supabase_id]?.value ?? 0
+    const unvalued = pipelineOpps.filter(o => muckById[o.supabase_id]?.value == null)
     return {
       totalPipeline: pipelineOpps.reduce((s, o) => s + dealValue(o), 0),
       activeCount: pipelineOpps.length,
+      unvaluedCount: unvalued.length,
       hotCount: pipelineOpps.filter(o => o.heat === 'hot').length,
       invoiceCount: opportunities.filter(o => o.needs_invoice && !o.deleted_at && !o.grantSupport).length,
       callSheetCount: callSheetOpps.length,
