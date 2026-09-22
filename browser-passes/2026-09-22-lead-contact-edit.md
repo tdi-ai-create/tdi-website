@@ -75,3 +75,41 @@ using the board. That needs rows, and rows need the production session.
      These are the edits that were being discarded.
   4. Blank the phone field, click away, reload, and confirm it cleared rather
      than coming back.
+
+---
+
+### Deferral closed after deploy, 22 September 2026
+
+- Opened: https://www.teachersdeserveit.com/tdi-admin/sales, signed in as Rae.
+- Saw: the board loads 166 active leads, "$0.78M pipeline", "51 hot",
+  "1157 muck · 21 heavy".
+- Pressed: the "Wendy Gonzaba" card in Targeting, a row its own note calls
+  "DATA 7 Sep 2026. DUPLICATE SCHOOL", chosen so nothing here touches a client
+  we are actively working.
+- Saw: the Contact block now shows "wendy.gonzaba@leanderisd.org" inside a
+  field with "Email" as a separate link to its right, and "+15125707800" in a
+  field with "Call" beside it. Before this change both were bare links with no
+  field behind them.
+- Pressed: into the email field, selected the address, typed
+  "Wendy.Gonzaba@leanderisd.org", and clicked away. Chose a capitalisation
+  change rather than a different address so nothing could misdeliver in the
+  window before it was put back.
+- Saw: the row in the database read `Wendy.Gonzaba@leanderisd.org` with
+  `updated_at` 16:27:13, where it had read `wendy.gonzaba@leanderisd.org` and
+  2026-08-17. Reloaded the board, reopened the card, and the panel header and
+  the field both showed the new address, so it survived the round trip.
+- Restored the address to `wendy.gonzaba@leanderisd.org` afterward. The row is
+  as it was apart from `updated_at`.
+
+## Still not pressed
+
+City and State. Partway through, a browser extension took focus over the page
+and every further click, keypress and screenshot returned "Cannot access a
+chrome-extension:// URL of different extension", so the City field could not be
+blurred and never saved. The route half of that fix is measured, from the
+temporary row above: `city` and `state` now persist where the whitelist used to
+drop them. The panel half is not, and it goes through the same `patchOpp` call
+the email edit just proved.
+
+Left for the next pass on this screen: type a city and a state into a lead,
+click away, reload, and confirm both are still there.
