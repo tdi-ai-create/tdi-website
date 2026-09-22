@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { guardCron } from '@/lib/cron-guard';
+import { MAILABLE_COLUMNS, MAILABLE_STATUSES, splitMailable } from '@/lib/partnerships/mailable';
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
 
@@ -15,14 +17,18 @@ const RESEND_API_KEY = process.env.RESEND_API_KEY;
  */
 export async function GET(request: NextRequest) {
   try {
-    const authHeader = request.headers.get('authorization');
-    const cronSecret = process.env.CRON_SECRET;
-    if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
-      const isVercelCron = request.headers.get('x-vercel-cron') === '1';
-      if (!isVercelCron) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    // The old inline check was `if (cronSecret && ...)`, which skips
+    // authorization entirely when CRON_SECRET is unset. On an environment
+    // missing that variable any unauthenticated GET could mail every partner.
+    // guardCron fails closed and parses ?dryRun=1 in the same step.
+    const guard = guardCron(request);
+    if (!guard.ok) return NextResponse.json({ error: guard.error }, { status: guard.status });
+    const { dryRun } = guard;
 
-    if (!RESEND_API_KEY) return NextResponse.json({ error: 'Resend not configured' }, { status: 500 });
+    // A dry run never calls Resend, so it must not require the key.
+    if (!dryRun && !RESEND_API_KEY) {
+      return NextResponse.json({ error: 'Resend not configured' }, { status: 500 });
+    }
 
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -32,16 +38,22 @@ export async function GET(request: NextRequest) {
 
     const month = new Date().getMonth(); // 0-indexed: 0=Jan, 6=Jul
 
-    const { data: partnerships } = await supabase
+    // Partnerships that may be mailed as clients. This ran on `status = 'active'`
+    // alone, and on 15 Sep 2026 that sent Jennifer Morales at Morenci a partner
+    // email while her proposal was still unsigned. See lib/partnerships/mailable.ts.
+    const { data: candidates } = await supabase
       .from('partnerships')
-      .select('id, contact_name, contact_email, contract_phase, staff_enrolled, slug, org_name, observation_days_total, executive_sessions_total, virtual_sessions_total')
-      .eq('status', 'active');
+      .select(`${MAILABLE_COLUMNS}, contract_phase, staff_enrolled, slug, observation_days_total, executive_sessions_total, virtual_sessions_total`)
+      .in('status', MAILABLE_STATUSES);
 
-    if (!partnerships || partnerships.length === 0) {
-      return NextResponse.json({ success: true, sent: 0, message: 'No active partnerships.' });
+    const { mailable: partnerships, skipped } = splitMailable(candidates || []);
+
+    if (partnerships.length === 0) {
+      return NextResponse.json({ success: true, sent: 0, skipped, message: 'No mailable partnerships.' });
     }
 
     let sent = 0;
+    const wouldSend: Array<{ to: string; subject: string }> = [];
 
     for (const p of partnerships) {
       if (!p.contact_email) continue;
@@ -54,6 +66,11 @@ export async function GET(request: NextRequest) {
       const email = getSeasonalEmail(month, firstName, schoolName, dashboardUrl, hubUrl, p);
 
       if (!email) continue; // No email for this month (Jun)
+
+      if (dryRun) {
+        wouldSend.push({ to: p.contact_email.toLowerCase(), subject: email.subject });
+        continue;
+      }
 
       const emailResponse = await fetch('https://api.resend.com/emails', {
         method: 'POST',
@@ -89,7 +106,18 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    return NextResponse.json({ success: true, sent, total: partnerships?.length || 0, month: month + 1 });
+    if (dryRun) {
+      return NextResponse.json({
+        success: true,
+        dryRun: true,
+        wouldSend: wouldSend.length,
+        recipients: wouldSend,
+        skipped,
+        month: month + 1,
+      });
+    }
+
+    return NextResponse.json({ success: true, sent, total: partnerships.length, skipped, month: month + 1 });
   } catch (error) {
     console.error('[seasonal-partner-email] Error:', error);
     return NextResponse.json({ error: String(error) }, { status: 500 });

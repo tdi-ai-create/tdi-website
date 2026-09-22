@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { monthlyTools, roleLabel, leadershipSubject, trim } from '@/lib/hub/monthly-tools';
+import { MAILABLE_COLUMNS, MAILABLE_STATUSES, splitMailable } from '@/lib/partnerships/mailable';
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
 
@@ -49,14 +50,19 @@ export async function GET(request: NextRequest) {
       { auth: { autoRefreshToken: false, persistSession: false } }
     );
 
-    // Get all active partnerships with contact emails
-    const { data: partnerships } = await supabase
+    // Partnerships that may be mailed as clients. `status = 'active'` alone is
+    // not that test: it was also being set on unsigned prospects so their Hub
+    // data would show on leadership screens, and this email went to them.
+    // See lib/partnerships/mailable.ts.
+    const { data: candidates } = await supabase
       .from('partnerships')
-      .select('id, contact_name, contact_email, contract_phase, staff_enrolled, slug')
-      .eq('status', 'active');
+      .select(`${MAILABLE_COLUMNS}, contract_phase, staff_enrolled, slug`)
+      .in('status', MAILABLE_STATUSES);
 
-    if (!partnerships || partnerships.length === 0) {
-      return NextResponse.json({ success: true, sent: 0, message: 'No active partnerships.' });
+    const { mailable: partnerships, skipped } = splitMailable(candidates || []);
+
+    if (partnerships.length === 0) {
+      return NextResponse.json({ success: true, sent: 0, skipped, message: 'No mailable partnerships.' });
     }
 
     // Fetched once, not per partner: every leader gets the same month.
@@ -212,6 +218,7 @@ Rae`;
         dryRun: true,
         wouldSend: wouldSend.length,
         recipients: wouldSend,
+        skipped,
         month: released?.monthLabel ?? null,
         toolsThisMonth: released?.total ?? 0,
         categories: released?.groups.map(g => ({ category: g.category, count: g.tools.length })) ?? [],
@@ -227,6 +234,7 @@ Rae`;
       success: sendFailures.length === 0 && logFailures.length === 0,
       sent,
       total: partnerships.length,
+      skipped,
       sendFailures,
       logFailures,
     });
