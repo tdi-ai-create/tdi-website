@@ -664,6 +664,24 @@ export async function POST(request: NextRequest) {
       if (!id) return NextResponse.json({ error: 'id is required' }, { status: 400 })
       if (!pdf_base64) return NextResponse.json({ error: 'pdf_base64 is required' }, { status: 400 })
 
+      // TEA-768. This action has only ever written the guide, file_url. It also
+      // destructured exactly three fields, so a caller passing `target: 'tool'`
+      // got a 200, an untouched tool PDF, and a silently overwritten guide.
+      // Two agents read that as a working parameter and built on it.
+      //
+      // Refused rather than implemented, because uploading a raw PDF to the
+      // tool slot is the thing we decided not to do: a tool made outside
+      // generate_tool is outside the brand rules and outside the weight test.
+      // Saying so is the fix. Quietly accepting the word was the bug.
+      if (body.target !== undefined && body.target !== 'guide') {
+        return NextResponse.json({
+          error: `upload_pdf writes the guide (file_url) and nothing else. It received target="${body.target}". `
+            + 'It never honoured this parameter, it simply ignored it, so any earlier call believing otherwise overwrote the guide. '
+            + 'For the tool PDF use generate_tool, which renders it from tool_content so it carries the house styling. '
+            + 'A second page goes on that same call as support_page.',
+        }, { status: 400 })
+      }
+
       const { data: qw, error: fetchErr } = await supabase
         .from('hub_quick_wins')
         .select('id, slug, qa_notes, reviewed_at, reviewed_by')

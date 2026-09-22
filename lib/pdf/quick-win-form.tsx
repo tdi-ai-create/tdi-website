@@ -60,10 +60,23 @@ export interface FormData {
   lang?: Lang
 }
 
-export function FormPDF({ data }: { data: FormData }) {
+/**
+ * The page on its own, without a Document around it.
+ *
+ * Split out for TEA-768. The four highest-risk student-support cards each carry
+ * a second page of school and district blanks, and a `<Document>` cannot nest
+ * inside another one, so a composed two-page file needs the pages rather than
+ * the documents. `FormPDF` below is unchanged in behaviour: it is this page
+ * wrapped in the Document it always had.
+ *
+ * Generating the appendix rather than merging a separate file is deliberate.
+ * A merged page is outside the generator, which means outside the brand rules
+ * and outside the weight test, and it would drift the first time somebody made
+ * one by hand.
+ */
+export function FormPage({ data }: { data: FormData }) {
   return (
-    <Document title={data.title} author="Teachers Deserve It">
-      <Page size="LETTER" style={s.page}>
+    <Page size="LETTER" style={s.page}>
         <View style={s.banner}>
           <Text style={s.brandLabel}>Teachers Deserve It</Text>
           <Text style={s.title}>{data.title}</Text>
@@ -107,7 +120,14 @@ export function FormPDF({ data }: { data: FormData }) {
           <Text style={s.footerText}>Teachers Deserve It</Text>
           <Text style={s.footerText}>teachersdeserveit.com</Text>
         </View>
-      </Page>
+    </Page>
+  )
+}
+
+export function FormPDF({ data }: { data: FormData }) {
+  return (
+    <Document title={data.title} author="Teachers Deserve It">
+      <FormPage data={data} />
     </Document>
   )
 }
