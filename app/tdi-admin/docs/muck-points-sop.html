@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Muck Points SOP</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'DM Sans', -apple-system, sans-serif; color: #1e2749; background: #F8F9FA; line-height: 1.6; }
+  .page { max-width: 900px; margin: 0 auto; padding: 32px 24px 80px; }
+  h1 { font-size: 28px; font-weight: 700; margin-bottom: 4px; }
+  h2 { font-size: 20px; font-weight: 700; margin: 40px 0 16px; padding-bottom: 8px; border-bottom: 2px solid #E5E7EB; }
+  h3 { font-size: 16px; font-weight: 700; margin: 20px 0 8px; }
+  .subtitle { color: #6B7280; font-size: 14px; margin-bottom: 8px; }
+  .updated { color: #9CA3AF; font-size: 12px; margin-bottom: 32px; }
+  p, li { font-size: 14px; margin-bottom: 8px; }
+  ul, ol { margin: 8px 0 16px 24px; }
+  .card { background: white; border-radius: 12px; padding: 20px; margin-bottom: 16px; border: 1px solid #E5E7EB; }
+  .card-navy { background: #1e2749; color: white; border: none; }
+  .card-navy p, .card-navy li { color: #E5E7EB; }
+  .card-amber { background: #FFFBEB; border-color: #FDE68A; }
+  .card-red { background: #FEF2F2; border-color: #FECACA; }
+  .card-green { background: #F0FDF4; border-color: #BBF7D0; }
+  .flow { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin: 16px 0; }
+  .flow-step { background: white; border: 1px solid #E5E7EB; border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; }
+  .flow-arrow { color: #E8B84B; font-weight: 700; font-size: 16px; }
+  table { width: 100%; border-collapse: collapse; margin: 12px 0 20px; font-size: 13px; }
+  th { text-align: left; padding: 10px 12px; background: #1e2749; color: white; font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; }
+  td { padding: 10px 12px; border-bottom: 1px solid #F3F4F6; vertical-align: top; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  code { background: #F3F4F6; padding: 1px 5px; border-radius: 3px; font-size: 12px; }
+  .lede { font-size: 15px; color: #4B5563; margin-bottom: 20px; }
+  .rule { border-left: 3px solid #E8B84B; padding-left: 14px; margin: 14px 0; }
+  .rule .cond { font-weight: 700; }
+  .weight { display: inline-block; background: #1e2749; color: white; border-radius: 6px; padding: 2px 8px; font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <h1>Muck Points</h1>
+  <p class="subtitle">The effort score on the sales board. What it measures, how it is calculated, and what it deliberately does not do.</p>
+  <p class="updated">Live on the sales board since 21 September 2026. Designed 15 to 17 September.</p>
+
+  <p class="lede">A muck point is a unit of predicted work. It answers one question: given two leads, which one should we pick up first. It is a prediction made before anyone has done the work, so it is a guide to sequencing and never a promise about a particular school.</p>
+
+  <div class="card card-navy">
+    <h3 style="color:white">Where to see it</h3>
+    <p><strong>Sales board, <code>/tdi-admin/sales</code>.</strong> Every lead carries a muck score. The board and the Outreach Queue both sort by <strong>value per muck point</strong>, with the deal value and the score shown side by side so you can always see what produced the order.</p>
+    <p>Open any lead and the detail panel shows one summary line. <strong>"What makes this score"</strong> expands it into the four dimensions.</p>
+  </div>
+
+  <div class="card card-navy">
+    <h3 style="color:white">Where the model actually lives</h3>
+    <p><code>lib/sales/muck.ts</code>, served by <code>/api/sales/muck</code>. That file is the source, this page is the explanation. If the two ever disagree, the file is right and this page is stale, so fix the page.</p>
+  </div>
+
+  <h2>The four dimensions</h2>
+
+  <p>One hundred points, split four ways. A heavier score means more predicted work, so a low score is a lead that is cheap to serve.</p>
+
+  <table>
+    <thead>
+      <tr><th>Dimension</th><th class="num">Weight</th><th>What it reads</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Delivery load</strong></td>
+        <td class="num">40</td>
+        <td>The offering on the record, and nothing else. Fixed per offering, not estimated per school.</td>
+      </tr>
+      <tr>
+        <td><strong>Grant work</strong></td>
+        <td class="num">25</td>
+        <td>Whether this school needs funding help. Counted <strong>only</strong> once a person has confirmed it. Never predicted.</td>
+      </tr>
+      <tr>
+        <td><strong>Relationship drag</strong></td>
+        <td class="num">20</td>
+        <td>How much back and forth this lead has taken, measured against the median for its own stage rather than against the whole board.</td>
+      </tr>
+      <tr>
+        <td><strong>Travel</strong></td>
+        <td class="num">15</td>
+        <td>Taken from the state on the record, measured from the western Chicago suburbs. Full weight on a Blueprint or an unknown offering, half otherwise.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Delivery load by offering</h3>
+
+  <table>
+    <thead>
+      <tr><th>Offering</th><th class="num">Points</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Pulse</td><td class="num">8</td></tr>
+      <tr><td>Focus</td><td class="num">12</td></tr>
+      <tr><td>Cohort</td><td class="num">20</td></tr>
+      <tr><td>Blueprint</td><td class="num">40</td></tr>
+    </tbody>
+  </table>
+
+  <p>This is the largest single input, which means <strong>the offering field decides most of the score</strong>. A lead with no offering recorded cannot be ranked at all, and the board says so rather than guessing.</p>
+
+  <h2>How a lead gets called heavy</h2>
+
+  <p>By <strong>rank, never by a fixed cutoff</strong>. The board sorts every valued lead by score and then bands them.</p>
+
+  <div class="flow">
+    <span class="flow-step">Heaviest fifth = heavy</span><span class="flow-arrow">&rarr;</span>
+    <span class="flow-step">Next 30 percent = moderate</span><span class="flow-arrow">&rarr;</span>
+    <span class="flow-step">The rest = light</span>
+  </div>
+
+  <div class="card card-amber">
+    <p><strong>This is the whole defence against what killed the old score.</strong> The retired T1 fit score used fixed thresholds, and the result was that 41 percent of the board sat in the top tier while exactly one lead was T3. A label that applies to nearly half the board tells you nothing. Banding by rank means heavy always means heavy relative to everything else we are carrying right now.</p>
+  </div>
+
+  <h2>Two findings that changed the model</h2>
+
+  <div class="card card-green">
+    <h3>A deal value before signature is a prediction</h3>
+    <p>Rae, 17 September: the deal number is in the contract when it is signed, and until then it is all a prediction.</p>
+    <p>Measured across 58 unsigned leads carrying both a value and an offering: 42 were more than 1.5 times list price, and not one of the 35 Pulse values was plausible, the highest being 18,000 against a 2,500 list price. Most predate the offering restructure.</p>
+    <p><strong>So:</strong> a recorded figure within 1.5 times list is kept, because somebody chose it deliberately. Anything beyond that falls back to list. The board headline moved from 1.59M to 1.24M on that change alone.</p>
+  </div>
+
+  <div class="card card-green">
+    <h3>District size does not predict effort</h3>
+    <p>Measured across the nine partnerships that carry any notes. Correlation of staff count to note volume was <strong>0.038</strong>. Correlation of deliverables to note volume was <strong>0.745</strong>.</p>
+    <p><strong>So:</strong> size was cut from the model entirely. What we agreed to deliver predicts the work. How big the district is does not.</p>
+  </div>
+
+  <h2>What it is not</h2>
+
+  <div class="rule"><p><span class="cond">It is not a capacity plan.</span> It does not know who is free this week or how many leads one person can carry.</p></div>
+
+  <div class="rule"><p><span class="cond">It is not pricing.</span> A heavy lead is not a lead we should charge more for. It is a lead that will cost us more to serve at whatever price we agreed.</p></div>
+
+  <div class="rule"><p><span class="cond">It is not a quality or fit judgement.</span> A heavy school can be a wonderful partner. The score has no opinion about whether we want them.</p></div>
+
+  <div class="rule"><p><span class="cond">It is not split by owner.</span> The board reads "TDI admin load, factored by stage". Human work here is one role, not two people's queues.</p></div>
+
+  <h2>Reading the board</h2>
+
+  <table>
+    <thead>
+      <tr><th>What you see</th><th>What it means</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>$/pt pill</strong> in the Outreach Queue</td><td>Deal value divided by muck points. The queue is ordered by this, highest first.</td></tr>
+      <tr><td><strong>"20 / 40"</strong> in the panel</td><td>Points scored out of the points available for that dimension.</td></tr>
+      <tr><td><strong>Travel: not known</strong></td><td>No state on the record. Distinct from zero, which would wrongly read as local.</td></tr>
+      <tr><td><strong>Cannot be ranked yet</strong></td><td>Grouped at the bottom of the queue. Almost always a missing offering.</td></tr>
+      <tr><td><strong>How heavy</strong> filter</td><td>light, moderate, heavy, not valued.</td></tr>
+      <tr><td><strong>Where it stands</strong> filter</td><td>needs outreach, renewal.</td></tr>
+      <tr><td><strong>Not this year</strong> button</td><td>Replaces the old Mark as Lost. Takes a reason and a date, moves the lead to engaged, writes the note. We do not mark leads lost.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Changing the model</h2>
+
+  <div class="card card-red">
+    <p><strong><code>lib/sales/muck.ts</code> is frozen until 28 September 2026.</strong> No new dimensions and no weight changes before then. Bug fixes outside that file are fine.</p>
+    <p>The freeze exists so the first week of real use is measured against one stable model. A score that moves while people are learning to read it teaches nobody anything.</p>
+    <p><strong>Where the queue order felt wrong to you is the actual input to the 28 September review.</strong> Write those down as they happen and bring them. That is more useful than a weight opinion in the abstract.</p>
+  </div>
+
+</div>
+</body>
+</html>

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useTDIAdmin } from '@/lib/tdi-admin/context';
 import { Search, Download, Printer, ExternalLink } from 'lucide-react';
 
-type DocId = 'admin-guide' | 'data-flow' | 'workflow' | 'billing-sop' | 'funding' | 'funding-launch' | 'grant-application-spec' | 'grant-workflow-sop' | 'hub-engagement' | 'engagement-workflow' | 'hub-content-standards' | 'hub-content-creation' | 'course-upload-sop' | 'course-checkins-sop' | 'creator-feedback-sop' | 'creator-recruitment-sop' | 'creator-dormancy-sop' | 'communication-map' | 'swag-fulfillment' | 'leadership-workflow';
+type DocId = 'admin-guide' | 'data-flow' | 'workflow' | 'billing-sop' | 'funding' | 'funding-launch' | 'grant-application-spec' | 'grant-workflow-sop' | 'hub-engagement' | 'engagement-workflow' | 'hub-content-standards' | 'hub-content-creation' | 'course-upload-sop' | 'course-checkins-sop' | 'creator-feedback-sop' | 'creator-recruitment-sop' | 'creator-dormancy-sop' | 'communication-map' | 'swag-fulfillment' | 'leadership-workflow' | 'muck-points-sop';
 
 interface Doc {
   id: DocId;
@@ -87,6 +87,21 @@ const DOC_GROUPS: DocGroup[] = [
         relatedSections: [
           { label: 'Billing', href: '/tdi-admin/billing' },
           { label: 'Lead Dashboard', href: '/tdi-admin/leadership' },
+        ],
+      },
+    ],
+  },
+  {
+    name: 'Sales',
+    color: '#B45309',
+    docs: [
+      {
+        id: 'muck-points-sop',
+        label: 'Muck Points',
+        desc: 'The effort score on the sales board: what it measures and how it is calculated',
+        tags: ['muck', 'muck points', 'effort', 'score', 'sales', 'board', 'queue', 'outreach', 'prioritisation', 'prioritization', 'which lead first', 'delivery load', 'travel', 'drag', 'grant', 'offering', 'pulse', 'focus', 'cohort', 'blueprint', 'value per point', 'fit score', 'T1'],
+        relatedSections: [
+          { label: 'Sales Board', href: '/tdi-admin/sales' },
         ],
       },
     ],
