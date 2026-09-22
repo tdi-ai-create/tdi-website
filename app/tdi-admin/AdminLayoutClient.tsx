@@ -5,7 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { getSupabase } from '@/lib/supabase';
 import { TDIAdminProvider, useTDIAdmin } from '@/lib/tdi-admin/context';
-import { ShieldAlert, LogOut, Settings } from 'lucide-react';
+import { ShieldAlert, LogOut, Settings, RefreshCw, WifiOff } from 'lucide-react';
 import type { User } from '@supabase/supabase-js';
 
 // Portal accent colors - Approved color system v2.0
@@ -454,6 +454,79 @@ function AccessDenied({ userEmail }: { userEmail?: string }) {
   );
 }
 
+/**
+ * The check did not finish. We do not know whether this person has access.
+ *
+ * Deliberately NOT the Access Denied screen, and deliberately without a sign
+ * out button. On 22 September 2026 a timed-out check showed Rae the refusal
+ * screen for her own company, and the most prominent control on it was the one
+ * action that would have made an unresolved session worse.
+ */
+function AccessCheckFailed({ onRetry }: { onRetry: () => void }) {
+  const [retrying, setRetrying] = useState(false);
+
+  const handleRetry = async () => {
+    setRetrying(true);
+    try {
+      await onRetry();
+    } finally {
+      setRetrying(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen" style={{ backgroundColor: '#FAFAF8' }}>
+      <MinimalAdminHeader />
+      <div className="flex items-center justify-center p-4" style={{ minHeight: 'calc(100vh - 64px)' }}>
+        <div className="text-center max-w-md">
+          <div
+            className="w-16 h-16 rounded-full mx-auto mb-6 flex items-center justify-center"
+            style={{ backgroundColor: '#FEF3C7' }}
+          >
+            <WifiOff size={32} style={{ color: '#B45309' }} />
+          </div>
+          <h1
+            className="font-bold mb-3"
+            style={{
+              fontFamily: "'Source Serif 4', Georgia, serif",
+              fontSize: '24px',
+              color: '#2B3A67',
+            }}
+          >
+            We could not check your access
+          </h1>
+          <p
+            className="mb-6"
+            style={{
+              fontFamily: "'DM Sans', sans-serif",
+              fontSize: '15px',
+              color: '#6B7280',
+            }}
+          >
+            This is not a refusal. The check did not finish, which usually means a slow
+            or dropped connection. Your account has not changed. Try again.
+          </p>
+          <button
+            onClick={handleRetry}
+            disabled={retrying}
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-colors"
+            style={{
+              backgroundColor: '#E8B84B',
+              color: '#2B3A67',
+              fontFamily: "'DM Sans', sans-serif",
+              opacity: retrying ? 0.6 : 1,
+              cursor: retrying ? 'default' : 'pointer',
+            }}
+          >
+            <RefreshCw size={16} />
+            {retrying ? 'Checking...' : 'Try again'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function LoadingState() {
   return (
     <div
@@ -474,7 +547,7 @@ function LoadingState() {
 
 function AdminLayoutContent({ children, user }: { children: React.ReactNode; user: User }) {
   const pathname = usePathname();
-  const { isLoading: adminLoading, hasAccess } = useTDIAdmin();
+  const { isLoading: adminLoading, hasAccess, accessState, refreshTeamMember } = useTDIAdmin();
 
   // Determine active accent color for the top bar
   const activeItem = NAV_ITEMS.find(item => pathname.startsWith(item.href))
@@ -484,8 +557,14 @@ function AdminLayoutContent({ children, user }: { children: React.ReactNode; use
     ? PORTAL_COLORS.team.accent
     : activeItem?.accent ?? PORTAL_COLORS.intelligence.accent;
 
-  if (adminLoading) {
+  // Three answers, three screens. Anything that is not a completed refusal must
+  // never render as one.
+  if (adminLoading || accessState === 'checking') {
     return <LoadingState />;
+  }
+
+  if (accessState === 'unavailable') {
+    return <AccessCheckFailed onRetry={refreshTeamMember} />;
   }
 
   if (!hasAccess) {
