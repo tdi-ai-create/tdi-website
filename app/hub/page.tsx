@@ -321,6 +321,8 @@ export default function HubDashboard() {
   const [trackerEligibility, setTrackerEligibility] = useState<TrackerEligibility | null>(null);
   const [recommendations, setRecommendations] = useState<RecommendedCourse[]>([]);
   const [showRecommendations, setShowRecommendations] = useState(false);
+  // Whether a real rule picked these, which decides the band heading below.
+  const [recsPersonalized, setRecsPersonalized] = useState(false);
   const [savedCourses, setSavedCourses] = useState<SavedCourse[]>([]);
   const [showCelebrateModal, setShowCelebrateModal] = useState(false);
   const [celebrateCopied, setCelebrateCopied] = useState(false);
@@ -511,6 +513,7 @@ export default function HubDashboard() {
           const recs = await getRecommendations(user.id);
           if (recs.courses.length > 0) {
             setRecommendations(recs.courses);
+            setRecsPersonalized(recs.personalized);
             setShowRecommendations(true);
           }
         }
@@ -1189,6 +1192,63 @@ export default function HubDashboard() {
           )}
         </div>
       </section>
+
+      {/* ============ NEXT FOR YOU (COURSES) ============ */}
+      {/*
+        getRecommendations() has run on every dashboard load since it was
+        written, and until now its result went into state that no JSX read.
+        The scorer was also comparing Title Case category literals against the
+        slugs hub_courses actually stores, so every rule failed and every
+        reader received the same arbitrary three courses under a label that
+        claimed they were popular. Both halves are fixed; this is the surface.
+
+        The heading is adaptive for the same reason the popularity bands below
+        switch to "Written for": a reader we know nothing about yet gets
+        curation, labelled as curation.
+      */}
+      {showRecommendations && recommendations.length > 0 && (
+        <div style={{ maxWidth: 1100, margin: '0 auto', padding: '28px 32px 0' }}>
+          <div style={{ marginBottom: 30 }}>
+            <h2 style={{ fontSize: 19, fontWeight: 700, color: '#1e2749', margin: 0 }}>
+              {recsPersonalized ? tUI('Next for you') : tUI('From the Hub library')}
+            </h2>
+            <p style={{ fontSize: 13.5, color: '#6B7684', margin: '4px 0 14px' }}>
+              {recsPersonalized
+                ? tUI('Chosen from what you have told us so far.')
+                : tUI('Worth a look while we learn what you need.')}
+            </p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 12 }}>
+              {recommendations.map((course) => (
+                <Link
+                  key={course.id}
+                  href={`/hub/courses/${course.slug}`}
+                  style={{
+                    background: 'white', border: '1px solid #E3E8EE', borderRadius: 9,
+                    padding: '13px 14px 14px', textDecoration: 'none',
+                    display: 'flex', flexDirection: 'column', gap: 6, minHeight: 108,
+                  }}
+                >
+                  <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#8A94A2' }}>
+                    {tUI(course.category)}
+                  </span>
+                  <span style={{ fontSize: 14.5, fontWeight: 700, color: '#1e2749', lineHeight: 1.3 }}>
+                    {course.title}
+                  </span>
+                  {/* No chip on the curated default. A reason is only shown
+                      when a rule actually chose this course. */}
+                  {recsPersonalized && course.reason !== 'Chosen from the Hub library' && (
+                    <span style={{ marginTop: 'auto', display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                      <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 20, background: '#E8F0FD', color: '#2C4A8A' }}>
+                        {tUI(course.reason)}
+                      </span>
+                    </span>
+                  )}
+                </Link>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ============ NEW THIS MONTH, POPULAR, NEW TO YOU ============ */}
       {/*
