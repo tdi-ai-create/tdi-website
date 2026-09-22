@@ -133,15 +133,45 @@ export async function POST(
       }
       const deliverableType = serviceTypeMap[sessionType]
       if (deliverableType) {
-        const { data: nextDeliverable } = await supabase
+        // Which line this stamps decides whether the session gets billed, so the
+        // order is not cosmetic. Ordering on sequence_number alone left ties: 11 of
+        // the 14 partnership and service combinations on 22 September 2026 had two
+        // or more scheduled lines sharing the lowest number, and Allenwood's
+        // observations had four. Postgres returns any one of them, so a session
+        // could land on a line nobody chose.
+        //
+        // Complimentary first is the expensive version of that. Saunemin, Oak Grove
+        // and St Peter Chanel each carry a free executive session at the same
+        // sequence number as a paid one, so logging a paid session marked the free
+        // line delivered and left $6,000 of real work sitting as scheduled.
+        //
+        // is_complimentary ascending puts false before true, so a paid line is never
+        // passed over while one is open. line_item_index and id break the remaining
+        // ties, so the same session always picks the same line.
+        //
+        // funding_hold is deliberately not filtered. A grant held line was still
+        // delivered. The hold governs billing, not whether the work happened.
+        const { data: nextDeliverable, error: nextDeliverableError } = await supabase
           .from('contract_deliverables')
           .select('id')
           .eq('partnership_id', id)
           .eq('service_type', deliverableType)
           .eq('delivery_state', 'scheduled')
+          .order('is_complimentary', { ascending: true })
           .order('sequence_number', { ascending: true })
+          .order('line_item_index', { ascending: true })
+          .order('id', { ascending: true })
           .limit(1)
-          .single()
+          .maybeSingle()
+
+        if (nextDeliverableError) {
+          console.error('[complete-session] could not read the next deliverable:', nextDeliverableError.message);
+        } else if (!nextDeliverable) {
+          // Not an error. It means the contract has no scheduled line of this type
+          // left, so the session was delivered outside the contract or the line was
+          // already marked by hand in Billing.
+          console.warn(`[complete-session] no scheduled ${deliverableType} line open for partnership ${id}`);
+        }
 
         if (nextDeliverable) {
           const { error: deliverableError } = await supabase
