@@ -58,5 +58,5 @@ condition the 17 and 21 September passes recorded, for the same reason.
 
 ## What I did not press
 
-Nothing that writes. No Draft Email button, since that posts a note to the
-opportunity and opens a mail client. No inline value editor.
+Nothing that writes. No Draft Email button on any row, since it posts a note to
+the opportunity and opens a mail client.
