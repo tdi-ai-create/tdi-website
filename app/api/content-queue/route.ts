@@ -3,7 +3,7 @@ import { createClient } from '@supabase/supabase-js'
 import { notifyApproved, notifyWaiting } from '@/lib/content-queue/notify'
 import { parseSlides, carouselProblems } from '@/lib/content-queue/carousel'
 import { summariseHistory } from '@/lib/content-queue/history'
-import { findBlockedTerms, blockedTermsMessage, TERM_CHECKED_ACTIONS, type BlockedTerm } from '@/lib/content-queue/blocked-terms'
+import { findBlockedTerms, blockedTermsMessage, findBlockedChannel, blockedChannelMessage, TERM_CHECKED_ACTIONS, type BlockedTerm, type BlockedChannel } from '@/lib/content-queue/blocked-terms'
 import {
   TRANSITIONS, OWNER_OF, actorHoldsRole, isSelfReview, legalFrom, canRequestChanges, canFlagBlocked,
   isTransition, hasContent, canRecordBoardDecision, canSetDate,
@@ -426,6 +426,26 @@ export async function POST(request: NextRequest) {
           success: false, refusedBy: 'blocked terms', id, action,
           terms: hits.map(h => h.term),
           error: blockedTermsMessage(hits),
+        }, { status: 422 })
+      }
+
+      // The other half. Terms catch a retired word; this catches a retired
+      // destination, which is what actually got past everyone in September.
+      const { data: chanRows, error: chanErr } = await supabase
+        .from('content_queue_blocked_channels')
+        .select('channel, reason')
+      if (chanErr) {
+        return NextResponse.json({
+          success: false, refusedBy: 'blocked channel',
+          error: `Cannot ${action}: the retired-destination list could not be read, so this piece has not been checked. ${chanErr.message}`,
+        }, { status: 503 })
+      }
+      const deadChannel = findBlockedChannel(item.channel, (chanRows ?? []) as BlockedChannel[])
+      if (deadChannel) {
+        return NextResponse.json({
+          success: false, refusedBy: 'blocked channel', id, action,
+          channel: deadChannel.channel,
+          error: blockedChannelMessage(deadChannel),
         }, { status: 422 })
       }
     }
