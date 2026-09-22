@@ -57,3 +57,49 @@ merged on the strength of a typecheck the way a smaller change would be.
 
 Nothing, on any environment. That is the point of the deferral above rather
 than something to paper over.
+
+### Deferral closed after deploy, 21 September 2026
+
+- Opened: https://www.teachersdeserveit.com/tdi-admin/sales
+- Saw: the filter row reads "HOW HEAVY: Light · 54, Moderate · 32, Heavy · 21,
+  Not valued · 96" and "WHERE IT STANDS: Needs outreach · 163, Renewal · 7".
+  No Deal Type row and no Source row. The search placeholder now ends
+  "city, source...".
+- Saw: the top bar reads "1164 muck · 21 heavy" over "TDI admin load, factored
+  by stage". The line that read "1148 you · 16 Bella" is gone.
+- Pressed: the "Addison SD4" card in Likely Yes, the lead from Rae's
+  screenshot.
+- Saw: the panel opens with the score collapsed to one line, "65 HEAVY / Top
+  fifth of the board" on the left and "$154 per muck point" over "$10,000
+  PREDICTED" on the right. No "Yours 40 / Bella's 25". The note box and the
+  first two history entries are visible without scrolling, where before the
+  four dimension bars filled that space.
+- Pressed: "What makes this score".
+- Saw: the four dimensions expand reading "20 / 40", "25 / 25", "20 / 20" and,
+  for Travel, "not known" against the reason "No state recorded, so distance
+  is unknown". The link becomes "Hide what makes this score".
+- Pressed: "Not this year" in the panel footer, where "Mark as Lost" used to
+  be.
+- Saw: a dialog headed "Not this year" saying "They stay in Engaged. Nothing is
+  closed, and they keep getting the educator emails.", a "Why not now" select
+  defaulting to "Budget year, not this one", and a "Reach back out on" date
+  prefilled 01/22/2027, which is four months out.
+- Pressed: "Cancel".
+- Saw: the dialog close. Confirmed in the database that nothing was written:
+  Addison SD4 is still stage `likely_yes` with `revisit_on` null and
+  `updated_at` unchanged at 2026-09-14, so the cancel path does not touch the
+  record.
+
+## Known wrinkle, not a defect
+
+"Not valued · 96" in the filter row and "74 not valued" in the top bar count
+different populations. The top bar excludes Targeting, as it always has for the
+pipeline figure; the filter counts the whole board. 74 + 22 unscored Targeting
+leads = 96. Both numbers are right and they are labelled the same, which will
+read as a contradiction to anyone who has not been told. Worth reconciling.
+
+## What I did not press
+
+"Save and pause", because exercising it means changing a live record, and
+Addison is not a lead anyone has decided to pause. That path is still
+unexercised end to end: the cancel path is verified, the write path is not.
