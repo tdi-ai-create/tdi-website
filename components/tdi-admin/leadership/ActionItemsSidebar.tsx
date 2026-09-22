@@ -1,13 +1,20 @@
 'use client'
 
 import { useState } from 'react'
-import { CheckCircle2, Circle, Clock, Eye, EyeOff, Trash2, Plus, ChevronDown, Target } from 'lucide-react'
+import { CheckCircle2, Circle, Clock, CircleSlash, PauseCircle, Eye, EyeOff, Trash2, Plus, ChevronDown, Target } from 'lucide-react'
 import { SectionGuide, GUIDE_CONTENT } from '@/components/tdi-admin/InlineGuide'
-
-const CATEGORY_COLORS: Record<string, string> = {
-  general: '#6B7280', onboarding: '#8B5CF6', hub: '#3B82F6',
-  coaching: '#F59E0B', billing: '#EF4444', follow_up: '#10B981',
-}
+import {
+  ACTION_ITEM_CATEGORIES,
+  ActionItemCategory,
+  CATEGORY_LABELS,
+  DEFAULT_CATEGORY,
+  STATUS_GROUPS,
+  categoryColor,
+  categoryLabel,
+  isKnownStatus,
+  isOpen,
+  isOverdue,
+} from '@/lib/leadership/action-items'
 
 interface ActionItemsSidebarProps {
   partnershipId: string
@@ -18,17 +25,19 @@ interface ActionItemsSidebarProps {
 
 export default function ActionItemsSidebar({ partnershipId, actionItems, onActionItemsChange, showToast }: ActionItemsSidebarProps) {
   const [showAddAction, setShowAddAction] = useState(false)
-  const [newAction, setNewAction] = useState({ title: '', description: '', due_date: '', category: 'general', visible_to_partner: false })
+  const [newAction, setNewAction] = useState({ title: '', description: '', due_date: '', category: DEFAULT_CATEGORY, visible_to_partner: false })
   const [savingAction, setSavingAction] = useState(false)
   const [expandedActionId, setExpandedActionId] = useState<string | null>(null)
   const [editingActionField, setEditingActionField] = useState<{ id: string; field: string } | null>(null)
   const [editingActionValue, setEditingActionValue] = useState('')
-  const [showCompletedActions, setShowCompletedActions] = useState(false)
+  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({})
   const [deletingActionId, setDeletingActionId] = useState<string | null>(null)
 
   const statusIcon = (status: string) => {
     if (status === 'completed') return <CheckCircle2 size={16} style={{ color: '#10B981' }} />
     if (status === 'in_progress') return <Clock size={16} style={{ color: '#EAB308' }} />
+    if (status === 'paused') return <PauseCircle size={16} style={{ color: '#6B7280' }} />
+    if (status === 'not_applicable') return <CircleSlash size={16} style={{ color: '#9CA3AF' }} />
     return <Circle size={16} style={{ color: '#9CA3AF' }} />
   }
 
@@ -39,11 +48,16 @@ export default function ActionItemsSidebar({ partnershipId, actionItems, onActio
       const res = await fetch(`/api/tdi-admin/leadership/${partnershipId}/action-items`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id, ...fields }),
+        body: JSON.stringify({ itemId: id, ...fields }),
       })
-      if (res.ok) {
-        onActionItemsChange(actionItems.map(a => a.id === id ? { ...a, ...fields } : a))
+      if (!res.ok) {
+        // Without this the panel moved the item on screen while the database
+        // kept the old value, and the edit came back on the next reload.
+        const body = await res.json().catch(() => ({}))
+        showToast(body.error || 'Failed to update', 'error')
+        return
       }
+      onActionItemsChange(actionItems.map(a => a.id === id ? { ...a, ...fields } : a))
     } catch { showToast('Failed to update', 'error') }
   }
 
@@ -52,25 +66,38 @@ export default function ActionItemsSidebar({ partnershipId, actionItems, onActio
       const res = await fetch(`/api/tdi-admin/leadership/${partnershipId}/action-items`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id }),
+        body: JSON.stringify({ itemId: id }),
       })
-      if (res.ok) {
-        onActionItemsChange(actionItems.filter(a => a.id !== id))
-        setDeletingActionId(null)
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}))
+        showToast(body.error || 'Failed to delete', 'error')
+        return
       }
+      onActionItemsChange(actionItems.filter(a => a.id !== id))
+      setDeletingActionId(null)
     } catch { showToast('Failed to delete', 'error') }
   }
 
-  const inProgress = actionItems.filter(a => a.status === 'in_progress')
-  const pending = actionItems.filter(a => a.status === 'pending')
-  const completed = actionItems.filter(a => a.status === 'completed')
+  // Groups come from STATUS_GROUPS so that a status added to the vocabulary
+  // gets somewhere to appear. Anything the vocabulary does not know still
+  // renders, under Other, because a row that is counted must be visible.
+  const groups = [
+    ...STATUS_GROUPS.map(g => ({
+      key: g.status as string,
+      label: g.label,
+      collapsed: g.collapsed,
+      items: actionItems.filter(a => a.status === g.status),
+    })),
+    {
+      key: 'unknown',
+      label: 'Other',
+      collapsed: false,
+      items: actionItems.filter(a => !isKnownStatus(a.status)),
+    },
+  ].filter(g => g.items.length > 0)
 
   const renderItem = (item: any) => {
-    // due_date is a date column, so new Date() parses it as midnight UTC. In
-    // Chicago that made an item overdue from 7pm the evening before it was due.
-    // T23:59:59 local gives it the whole of its due day.
-    const isOverdue =
-      item.status !== 'completed' && item.due_date && new Date(`${item.due_date}T23:59:59`) < new Date()
+    const overdue = isOverdue(item)
     return (
       <div key={item.id} className="group flex items-start gap-2 py-1.5 px-1 rounded-lg hover:bg-gray-50 transition" style={{ borderBottom: '1px solid #F9FAFB' }}>
         <button
@@ -101,7 +128,7 @@ export default function ActionItemsSidebar({ partnershipId, actionItems, onActio
             ) : (
               <span
                 className="text-xs font-medium text-gray-900 cursor-pointer hover:text-blue-600 truncate"
-                style={item.status === 'completed' ? { textDecoration: 'line-through', color: '#9CA3AF' } : isOverdue ? { color: '#DC2626' } : {}}
+                style={item.status === 'completed' ? { textDecoration: 'line-through', color: '#9CA3AF' } : overdue ? { color: '#DC2626' } : {}}
                 onClick={() => { setEditingActionField({ id: item.id, field: 'title' }); setEditingActionValue(item.title) }}
               >
                 {item.title}
@@ -124,7 +151,7 @@ export default function ActionItemsSidebar({ partnershipId, actionItems, onActio
             ) : (
               <span
                 className="text-[10px] cursor-pointer hover:text-blue-500"
-                style={{ color: isOverdue ? '#DC2626' : '#9CA3AF' }}
+                style={{ color: overdue ? '#DC2626' : '#9CA3AF' }}
                 onClick={() => { setEditingActionField({ id: item.id, field: 'due_date' }); setEditingActionValue(item.due_date || '') }}
               >
                 {item.due_date ? new Date(item.due_date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'No due date'}
@@ -132,11 +159,23 @@ export default function ActionItemsSidebar({ partnershipId, actionItems, onActio
             )}
             <span
               className="text-[9px] font-medium px-1 py-0.5 rounded-full"
-              style={{ background: (CATEGORY_COLORS[item.category] || '#6B7280') + '18', color: CATEGORY_COLORS[item.category] || '#6B7280' }}
+              style={{ background: categoryColor(item.category) + '18', color: categoryColor(item.category) }}
             >
-              {(item.category || 'general').replace('_', '-')}
+              {categoryLabel(item.category)}
             </span>
           </div>
+          {/* A paused or not applicable row is only honest if the reason for it
+              is on screen next to it. Without this the row reads as ignored. */}
+          {(item.status === 'paused' || item.status === 'not_applicable') && item.paused_reason && (
+            <p className="text-[10px] text-gray-500 mt-0.5 leading-snug">
+              {item.paused_reason}
+              {item.status === 'paused' && item.resurface_at && (
+                <span className="text-gray-400">
+                  {' '}Back on {new Date(item.resurface_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}.
+                </span>
+              )}
+            </p>
+          )}
         </div>
 
         <div className="flex items-center gap-0.5 flex-shrink-0 mt-0.5">
@@ -171,7 +210,7 @@ export default function ActionItemsSidebar({ partnershipId, actionItems, onActio
           <Target size={14} style={{ color: '#1e2749' }} />
           <h3 className="text-sm font-bold text-gray-900">Action Items</h3>
           {actionItems.length > 0 && (
-            <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">{actionItems.filter(a => a.status !== 'completed').length} open</span>
+            <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">{actionItems.filter(isOpen).length} open</span>
           )}
         </div>
         <button
@@ -210,15 +249,12 @@ export default function ActionItemsSidebar({ partnershipId, actionItems, onActio
               />
               <select
                 value={newAction.category}
-                onChange={e => setNewAction({ ...newAction, category: e.target.value })}
+                onChange={e => setNewAction({ ...newAction, category: e.target.value as ActionItemCategory })}
                 className="text-[10px] border border-gray-200 rounded-md px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-blue-400"
               >
-                <option value="general">General</option>
-                <option value="onboarding">Onboarding</option>
-                <option value="hub">Hub</option>
-                <option value="coaching">Coaching</option>
-                <option value="billing">Billing</option>
-                <option value="follow_up">Follow-up</option>
+                {ACTION_ITEM_CATEGORIES.map(c => (
+                  <option key={c} value={c}>{CATEGORY_LABELS[c]}</option>
+                ))}
               </select>
               <label className="flex items-center gap-1 text-[10px] text-gray-600 cursor-pointer">
                 <input
@@ -232,7 +268,7 @@ export default function ActionItemsSidebar({ partnershipId, actionItems, onActio
             </div>
             <div className="flex gap-2 justify-end pt-1">
               <button
-                onClick={() => { setShowAddAction(false); setNewAction({ title: '', description: '', due_date: '', category: 'general', visible_to_partner: false }) }}
+                onClick={() => { setShowAddAction(false); setNewAction({ title: '', description: '', due_date: '', category: DEFAULT_CATEGORY, visible_to_partner: false }) }}
                 className="text-[10px] px-2.5 py-1.5 rounded-md text-gray-500 hover:bg-gray-100"
               >
                 Cancel
@@ -247,12 +283,16 @@ export default function ActionItemsSidebar({ partnershipId, actionItems, onActio
                       headers: { 'Content-Type': 'application/json' },
                       body: JSON.stringify(newAction),
                     })
-                    if (res.ok) {
-                      const data = await res.json()
-                      onActionItemsChange([data.item || data, ...actionItems])
-                      setNewAction({ title: '', description: '', due_date: '', category: 'general', visible_to_partner: false })
-                      setShowAddAction(false)
+                    if (!res.ok) {
+                      const body = await res.json().catch(() => ({}))
+                      showToast(body.error || 'Failed to create action item', 'error')
+                      setSavingAction(false)
+                      return
                     }
+                    const data = await res.json()
+                    onActionItemsChange([data.item || data, ...actionItems])
+                    setNewAction({ title: '', description: '', due_date: '', category: DEFAULT_CATEGORY, visible_to_partner: false })
+                    setShowAddAction(false)
                   } catch { showToast('Failed to create action item', 'error') }
                   setSavingAction(false)
                 }}
@@ -272,30 +312,23 @@ export default function ActionItemsSidebar({ partnershipId, actionItems, onActio
       )}
 
       <div>
-        {inProgress.length > 0 && (
-          <div className="mb-1">
-            <p className="text-[9px] font-semibold uppercase tracking-wider text-gray-400 mb-0.5 px-1">In Progress</p>
-            {inProgress.map(renderItem)}
-          </div>
-        )}
-        {pending.length > 0 && (
-          <div className="mb-1">
-            <p className="text-[9px] font-semibold uppercase tracking-wider text-gray-400 mb-0.5 px-1">Pending</p>
-            {pending.map(renderItem)}
-          </div>
-        )}
-        {completed.length > 0 && (
-          <div className="mt-1">
+        {groups.map(group => group.collapsed ? (
+          <div key={group.key} className="mt-1">
             <button
-              onClick={() => setShowCompletedActions(!showCompletedActions)}
+              onClick={() => setOpenGroups({ ...openGroups, [group.key]: !openGroups[group.key] })}
               className="flex items-center gap-1 text-[9px] font-semibold uppercase tracking-wider text-gray-400 mb-0.5 px-1 hover:text-gray-600"
             >
-              <ChevronDown size={10} style={{ transform: showCompletedActions ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s' }} />
-              Completed ({completed.length})
+              <ChevronDown size={10} style={{ transform: openGroups[group.key] ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s' }} />
+              {group.label} ({group.items.length})
             </button>
-            {showCompletedActions && completed.map(renderItem)}
+            {openGroups[group.key] && group.items.map(renderItem)}
           </div>
-        )}
+        ) : (
+          <div key={group.key} className="mb-1">
+            <p className="text-[9px] font-semibold uppercase tracking-wider text-gray-400 mb-0.5 px-1">{group.label}</p>
+            {group.items.map(renderItem)}
+          </div>
+        ))}
       </div>
     </div>
   )

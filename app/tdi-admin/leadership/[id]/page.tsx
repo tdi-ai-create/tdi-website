@@ -34,6 +34,7 @@ import YourPeoplePanel from '@/components/tdi-admin/leadership/YourPeoplePanel'
 import LogSessionPanel from '@/components/tdi-admin/leadership/LogSessionPanel'
 import ObservationPanel from '@/components/tdi-admin/leadership/ObservationPanel'
 import { formatDateOnly } from '@/lib/format-date';
+import { ActionItem, isOpen, isOverdue } from '@/lib/leadership/action-items';
 
 const NOTE_TYPE_COLORS: Record<string, string> = {
   general: 'bg-gray-100 text-gray-700',
@@ -83,7 +84,7 @@ export default function AdminPartnershipDetailPage() {
   const [partnership, setPartnership] = useState<any>(null)
   const [organization, setOrganization] = useState<any>(null)
   const [timelineEvents, setTimelineEvents] = useState<TimelineEvent[]>([])
-  const [actionItems, setActionItems] = useState<any[]>([])
+  const [actionItems, setActionItems] = useState<ActionItem[]>([])
   const [defaults, setDefaults] = useState<Record<string, string>>(STATIC_DEFAULTS)
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([])
   const [suggestions, setSuggestions] = useState<TDISuggestion[]>([])
@@ -624,7 +625,7 @@ export default function AdminPartnershipDetailPage() {
     }
 
     // Overdue action items
-    const overdueCount = actionItems.filter(a => a.status !== 'completed' && a.due_date && new Date(a.due_date) < new Date()).length
+    const overdueCount = actionItems.filter(a => isOverdue(a)).length
     if (overdueCount > 0) {
       actions.push({
         label: `${overdueCount} overdue item${overdueCount > 1 ? 's' : ''}`,
@@ -681,11 +682,15 @@ export default function AdminPartnershipDetailPage() {
     })
 
     // Completed action items as system entries
-    actionItems.filter(a => a.status === 'completed' && a.completed_at).forEach(a => {
+    actionItems.forEach(a => {
+      // The old form filtered on completed_at and then fell back to
+      // updated_at and created_at, which the filter had already made
+      // unreachable. An early return says the same thing and typechecks.
+      if (a.status !== 'completed' || !a.completed_at) return
       entries.push({
         id: `action-${a.id}`,
         type: 'system',
-        date: a.completed_at || a.updated_at || a.created_at,
+        date: a.completed_at,
         author: 'System',
         content: `Action item completed: ${a.title}`,
         meta: { category: a.category },
@@ -719,7 +724,7 @@ export default function AdminPartnershipDetailPage() {
     }
 
     // Items due
-    const pendingItems = actionItems.filter(a => a.status !== 'completed').length
+    const pendingItems = actionItems.filter(a => isOpen(a)).length
     metrics.push({ label: 'Items Due', value: String(pendingItems), color: pendingItems > 5 ? '#EF4444' : pendingItems > 2 ? '#EAB308' : '#10B981' })
 
     // Provisioned. This read staff_enrolled over member_count, which is
