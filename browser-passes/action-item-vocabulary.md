@@ -49,6 +49,26 @@ prove the mismatch rather than assume it. The shape the panel sends returned
 500 "Failed to update action item". The shape the route expected returned 200
 "success: true" while updating nothing.
 
+Then the migration, 150_action_items_not_applicable.sql, applied after a dry
+run in a transaction that was allowed to roll back.
+
+- Saw, before committing: the dry run reported pending 48, completed 10,
+  in_progress 3, not_applicable 2, totalling the same 63 rows, and `paused`
+  left with none. The SQL model predicted exactly 2 rows, named as "Virtual
+  sessions content preparation" and "Upload roster photos". The two agreed.
+- Saw, after the rollback: `paused` back at 2 rows and `not_applicable` absent,
+  so the dry run really was dry.
+- Opened the page again after applying it for real.
+- Saw: the header now reads "Items Due 3" where it read 4, the banner still
+  reads "1 overdue item", and the panel badge reads "3 open".
+- Pressed: the NOT APPLICABLE (1) heading.
+- Saw: "Virtual sessions content preparation" with a slashed circle icon, a
+  grey "Sep 11", and its full reason still on screen. The decision is visible
+  and no longer counted, which is the whole point of the status.
+- Saw, when I tried to set a row to a status the constraint does not allow:
+  "violates check constraint action_items_status_check". The constraint can
+  still fail, so it is still a constraint.
+
 ## What I did not press
 
 - The ACCELERATE, Prep for Next Call and Client Dashboard controls. None are
