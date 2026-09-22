@@ -75,3 +75,56 @@ using the board. That needs rows, and rows need the production session.
      These are the edits that were being discarded.
   4. Blank the phone field, click away, reload, and confirm it cleared rather
      than coming back.
+
+---
+
+### Deferral closed after deploy, 22 September 2026
+
+- Opened: https://www.teachersdeserveit.com/tdi-admin/sales, signed in as Rae.
+- Saw: the board loads 166 active leads, "$0.78M pipeline", "51 hot",
+  "1157 muck · 21 heavy".
+- Pressed: the "Wendy Gonzaba" card in Targeting, a row its own note calls
+  "DATA 7 Sep 2026. DUPLICATE SCHOOL", chosen so nothing here touches a client
+  we are actively working.
+- Saw: the Contact block now shows "wendy.gonzaba@leanderisd.org" inside a
+  field with "Email" as a separate link to its right, and "+15125707800" in a
+  field with "Call" beside it. Before this change both were bare links with no
+  field behind them.
+- Pressed: into the email field, selected the address, typed
+  "Wendy.Gonzaba@leanderisd.org", and clicked away. Chose a capitalisation
+  change rather than a different address so nothing could misdeliver in the
+  window before it was put back.
+- Saw: the row in the database read `Wendy.Gonzaba@leanderisd.org` with
+  `updated_at` 16:27:13, where it had read `wendy.gonzaba@leanderisd.org` and
+  2026-08-17. Reloaded the board, reopened the card, and the panel header and
+  the field both showed the new address, so it survived the round trip.
+- Restored the address to `wendy.gonzaba@leanderisd.org` afterward. The row is
+  as it was apart from `updated_at`.
+
+## City and State, driven differently
+
+The first attempt could not be finished by hand. A browser extension opens its
+own autofill menu when a field in this panel takes focus, and from that moment
+every click, keypress and screenshot returned "Cannot access a
+chrome-extension:// URL of different extension". Typing worked once, blurring
+the field never did, so nothing saved and the tab had to be reloaded to get
+control back.
+
+So the second attempt drove the same field from inside the page instead. Say
+plainly what that means: the value was set on the real input and a real
+`focusout` was dispatched, which is the event React maps to the panel's
+`onBlur`, so the component's own handler and the live route both ran. A mouse
+was not involved.
+
+- Saw: the City field on the Wendy Gonzaba panel read "Leander" after the
+  value was set.
+- Saw: the row in the database read `city = Leander`, `updated_at` 16:37:26,
+  where it had read null. This is the edit that used to be dropped in silence.
+- Saw: blanking the same field wrote `city = null` at 16:38:41, so clearing a
+  field now clears it rather than being ignored.
+- Restored: the lead is back as it was. Email `wendy.gonzaba@leanderisd.org`,
+  phone `+15125707800`, city null, state TX. Only `updated_at` differs.
+
+One thing worth knowing for the next pass on this screen: that extension makes
+this panel hard to drive by hand. It is not a defect in the page, and a person
+typing normally is unaffected.

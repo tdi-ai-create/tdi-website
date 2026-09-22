@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { guardCron } from '@/lib/cron-guard';
+import { MAILABLE_COLUMNS, MAILABLE_STATUSES, splitMailable } from '@/lib/partnerships/mailable';
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
 const HUB_URL = 'https://www.teachersdeserveit.com/hub';
@@ -17,14 +19,16 @@ const HUB_URL = 'https://www.teachersdeserveit.com/hub';
  */
 export async function GET(request: NextRequest) {
   try {
-    const authHeader = request.headers.get('authorization');
-    const cronSecret = process.env.CRON_SECRET;
-    if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
-      const isVercelCron = request.headers.get('x-vercel-cron') === '1';
-      if (!isVercelCron) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    // Fails closed, and parses ?dryRun=1. The old inline check authorized
+    // nothing when CRON_SECRET was unset.
+    const guard = guardCron(request);
+    if (!guard.ok) return NextResponse.json({ error: guard.error }, { status: guard.status });
+    const { dryRun } = guard;
 
-    if (!RESEND_API_KEY) return NextResponse.json({ error: 'Resend not configured' }, { status: 500 });
+    // A dry run never calls Resend, so it must not require the key.
+    if (!dryRun && !RESEND_API_KEY) {
+      return NextResponse.json({ error: 'Resend not configured' }, { status: 500 });
+    }
 
     const portalSupabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -43,15 +47,19 @@ export async function GET(request: NextRequest) {
       auth: { autoRefreshToken: false, persistSession: false },
     });
 
-    // Get active partnerships
-    const { data: partnerships } = await portalSupabase
+    // Partnerships that may be mailed as clients, and that have accepted their
+    // invite. The accepted-invite test is this job's own rule and stays; the
+    // signed test is shared. See lib/partnerships/mailable.ts.
+    const { data: candidates } = await portalSupabase
       .from('partnerships')
-      .select('id, slug, contact_name, contact_email, org_name, contract_phase, staff_enrolled, invite_accepted_at')
-      .eq('status', 'active')
+      .select(`${MAILABLE_COLUMNS}, slug, contract_phase, staff_enrolled, invite_accepted_at`)
+      .in('status', MAILABLE_STATUSES)
       .not('invite_accepted_at', 'is', null);
 
-    if (!partnerships || partnerships.length === 0) {
-      return NextResponse.json({ success: true, sent: 0, message: 'No partnerships with active logins yet' });
+    const { mailable: partnerships, skipped } = splitMailable(candidates || []);
+
+    if (partnerships.length === 0) {
+      return NextResponse.json({ success: true, sent: 0, skipped, message: 'No partnerships with active logins yet' });
     }
 
     // Get curated Quick Wins for the "Share With Your Team" section
@@ -125,6 +133,9 @@ export async function GET(request: NextRequest) {
       : { type: 'For Your Staff', text: staffChallenges[Math.floor(weekNum / 2) % staffChallenges.length] };
 
     let sent = 0;
+    const wouldSend: Array<{ to: string; subject: string }> = [];
+    // A send that happened but was never recorded is a duplicate next run.
+    const logFailures: Array<{ to: string; reason: string }> = [];
 
     for (const p of partnerships) {
       if (!p.contact_email) continue;
@@ -291,6 +302,11 @@ export async function GET(request: NextRequest) {
         ? `This Week from TDI: ${featured.title}`
         : 'This Week from TDI: New tools for your team';
 
+      if (dryRun) {
+        wouldSend.push({ to: p.contact_email, subject });
+        continue;
+      }
+
       const resp = await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' },
@@ -303,18 +319,38 @@ export async function GET(request: NextRequest) {
       });
 
       if (resp.ok) {
-        await portalSupabase.from('activity_log').insert({
+        // This row is the dedupe for the week. The email has already gone, so a
+        // lost row means this partner gets a second copy on the next run rather
+        // than a missing record. Surfaced, not swallowed.
+        const { error: logError } = await portalSupabase.from('activity_log').insert({
           partnership_id: p.id,
           action: weekKey,
           details: { featured: featured?.title, challenge: challenge.type, sent_to: p.contact_email },
         });
+        if (logError) {
+          console.error(
+            `[partner-weekly-digest] SENT ${weekKey} to ${p.contact_email} but failed to record it. ` +
+            `This partner may receive a duplicate:`, logError.message
+          );
+          logFailures.push({ to: p.contact_email, reason: logError.message });
+        }
         sent++;
       } else {
         console.error(`[weekly-digest] Failed for ${p.contact_email}:`, await resp.text());
       }
     }
 
-    return NextResponse.json({ success: true, sent, total: partnerships.length });
+    if (dryRun) {
+      return NextResponse.json({
+        success: true,
+        dryRun: true,
+        wouldSend: wouldSend.length,
+        recipients: wouldSend,
+        skipped,
+      });
+    }
+
+    return NextResponse.json({ success: logFailures.length === 0, sent, total: partnerships.length, skipped, logFailures });
   } catch (error) {
     console.error('[partner-weekly-digest] Error:', error);
     return NextResponse.json({ error: String(error) }, { status: 500 });
