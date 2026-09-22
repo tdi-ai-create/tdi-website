@@ -3,10 +3,15 @@ import { getServiceSupabase } from '@/lib/supabase'
 import { leadStageChanged } from '@/lib/sales-slack'
 import { getClientNotes } from '@/lib/sales/client-notes'
 
+// Every key here must be a real column on sales_opportunities. 'contact_title'
+// sat in this list with no column behind it, so any save carrying it failed the
+// whole patch. 'city', 'state' and 'grant_support' are the reverse case: the
+// panel has edited them for months and the whitelist dropped them in silence.
 const ALLOWED_PATCH_FIELDS = new Set([
   'name', 'stage', 'value', 'heat', 'assigned_to_email', 'offering',
   'source', 'type', 'is_contact_only', 'partnership_status',
-  'contact_name', 'contact_title', 'contact_email', 'contact_phone',
+  'contact_name', 'contact_email', 'contact_phone',
+  'city', 'state', 'grant_support',
   'expected_close_date', 'deletion_reason',
   // Fit scoring fields (old model)
   'fit_district_size', 'fit_turnover_signal', 'fit_pd_investment',
@@ -76,10 +81,19 @@ export async function PATCH(
     return NextResponse.json({ error: 'Not found' }, { status: 404 })
   }
 
-  // Whitelist fields
+  // Whitelist fields. A dropped key used to return 200 with the edit gone, which
+  // is how city and state looked saved in the panel and were never written.
   const updateFields: Record<string, unknown> = { updated_at: new Date().toISOString() }
+  const rejected: string[] = []
   for (const key of Object.keys(rawFields)) {
     if (ALLOWED_PATCH_FIELDS.has(key)) updateFields[key] = rawFields[key]
+    else rejected.push(key)
+  }
+  if (rejected.length > 0) {
+    return NextResponse.json(
+      { error: `Not editable here: ${rejected.join(', ')}` },
+      { status: 400 }
+    )
   }
 
   // Auto-set stage_entered_at when stage changes (non-blocking -- column may not exist yet)

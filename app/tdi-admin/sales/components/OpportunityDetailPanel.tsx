@@ -681,40 +681,48 @@ export function OpportunityDetailPanel({
                   <div style={{ marginBottom: 8 }}>
                     <label style={{ fontSize: 10, color: '#9CA3AF', fontWeight: 600 }}>Name</label>
                     <input
+                      key={`contact_name-${opp.id}`}
                       defaultValue={o.contact_name ?? ''}
-                      onBlur={e => { if (e.target.value !== (o.contact_name ?? '')) patchOpp({ contact_name: e.target.value } as any) }}
+                      onBlur={e => { if (e.target.value.trim() !== (o.contact_name ?? '')) patchOpp({ contact_name: e.target.value.trim() || null } as any) }}
                       style={{ display: 'block', width: '100%', fontSize: 13, color: '#374151', borderBottom: '1px solid #E5E7EB', border: 'none', borderBottomWidth: 1, borderBottomStyle: 'solid', borderBottomColor: '#E5E7EB', outline: 'none', padding: '4px 0', background: 'transparent' }}
                       placeholder="Contact name..."
                     />
                   </div>
 
-                  {/* Email */}
+                  {/* Email. Always an input: a filled email used to render as a
+                      mailto link only, so a typo in a contact's address could
+                      never be corrected from the panel. The link moved beside
+                      the field instead of replacing it. */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: '#4B5563', marginBottom: 6 }}>
                     <span style={{ width: 16, textAlign: 'center', color: '#9CA3AF', fontSize: 12 }}>&#9993;</span>
-                    {o.contact_email ? (
-                      <a href={`mailto:${o.contact_email}`} style={{ color: '#2A9D8F', textDecoration: 'none' }}>{o.contact_email}</a>
-                    ) : (
-                      <input
-                        defaultValue=""
-                        onBlur={e => { if (e.target.value) patchOpp({ contact_email: e.target.value } as any) }}
-                        style={{ flex: 1, fontSize: 13, color: '#374151', border: 'none', borderBottom: '1px solid #E5E7EB', outline: 'none', padding: '2px 0', background: 'transparent' }}
-                        placeholder="email@example.com"
-                      />
+                    <input
+                      key={`contact_email-${opp.id}`}
+                      type="email"
+                      defaultValue={o.contact_email ?? ''}
+                      onBlur={e => { if (e.target.value.trim() !== (o.contact_email ?? '')) patchOpp({ contact_email: e.target.value.trim() || null } as any) }}
+                      style={{ flex: 1, fontSize: 13, color: '#374151', border: 'none', borderBottom: '1px solid #E5E7EB', outline: 'none', padding: '2px 0', background: 'transparent' }}
+                      placeholder="email@example.com"
+                      title="Click to edit. Blank the field to clear it."
+                    />
+                    {o.contact_email && (
+                      <a href={`mailto:${o.contact_email}`} title="Send an email" style={{ color: '#2A9D8F', textDecoration: 'none', fontSize: 12, whiteSpace: 'nowrap' }}>Email</a>
                     )}
                   </div>
 
                   {/* Phone */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: '#4B5563', marginBottom: 6 }}>
                     <span style={{ width: 16, textAlign: 'center', color: '#9CA3AF', fontSize: 12 }}>&#9742;</span>
-                    {o.contact_phone ? (
-                      <a href={`tel:${o.contact_phone}`} style={{ color: '#2A9D8F', textDecoration: 'none' }}>{o.contact_phone}</a>
-                    ) : (
-                      <input
-                        defaultValue=""
-                        onBlur={e => { if (e.target.value) patchOpp({ contact_phone: e.target.value } as any) }}
-                        style={{ flex: 1, fontSize: 13, color: '#374151', border: 'none', borderBottom: '1px solid #E5E7EB', outline: 'none', padding: '2px 0', background: 'transparent' }}
-                        placeholder="Phone number"
-                      />
+                    <input
+                      key={`contact_phone-${opp.id}`}
+                      type="tel"
+                      defaultValue={o.contact_phone ?? ''}
+                      onBlur={e => { if (e.target.value.trim() !== (o.contact_phone ?? '')) patchOpp({ contact_phone: e.target.value.trim() || null } as any) }}
+                      style={{ flex: 1, fontSize: 13, color: '#374151', border: 'none', borderBottom: '1px solid #E5E7EB', outline: 'none', padding: '2px 0', background: 'transparent' }}
+                      placeholder="Phone number"
+                      title="Click to edit. Blank the field to clear it."
+                    />
+                    {o.contact_phone && (
+                      <a href={`tel:${o.contact_phone}`} title="Call this contact" style={{ color: '#2A9D8F', textDecoration: 'none', fontSize: 12, whiteSpace: 'nowrap' }}>Call</a>
                     )}
                   </div>
 
@@ -722,15 +730,17 @@ export function OpportunityDetailPanel({
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: '#4B5563', marginBottom: 6 }}>
                     <span style={{ width: 16, textAlign: 'center', color: '#9CA3AF', fontSize: 12 }}>&#9679;</span>
                     <input
+                      key={`city-${opp.id}`}
                       defaultValue={o.city ?? ''}
-                      onBlur={e => { if (e.target.value !== (o.city ?? '')) patchOpp({ city: e.target.value } as any) }}
+                      onBlur={e => { if (e.target.value.trim() !== (o.city ?? '')) patchOpp({ city: e.target.value.trim() || null } as any) }}
                       style={{ width: 100, fontSize: 13, color: '#374151', border: 'none', borderBottom: '1px solid #E5E7EB', outline: 'none', padding: '2px 0', background: 'transparent' }}
                       placeholder="City"
                     />
                     <span style={{ color: '#D1D5DB' }}>,</span>
                     <input
+                      key={`state-${opp.id}`}
                       defaultValue={o.state ?? ''}
-                      onBlur={e => { if (e.target.value !== (o.state ?? '')) patchOpp({ state: e.target.value } as any) }}
+                      onBlur={e => { if (e.target.value.trim() !== (o.state ?? '')) patchOpp({ state: e.target.value.trim().toUpperCase() || null } as any) }}
                       style={{ width: 40, fontSize: 13, color: '#374151', border: 'none', borderBottom: '1px solid #E5E7EB', outline: 'none', padding: '2px 0', background: 'transparent' }}
                       placeholder="ST"
                     />
