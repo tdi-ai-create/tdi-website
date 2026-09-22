@@ -9,13 +9,25 @@ defined in `lib/hub/recommendations.ts`.
 
 ## What I did
 
-- Opened: http://localhost:3000/hub
-- Deferred: localhost bounces to `/hub/login?returnUrl=%2Fhub` and cannot be
-  signed in to. Rae confirmed 21 Sep 2026 that local sign-in never works, and I
-  will not handle her password. The earlier deferral from
-  `2026-09-21-hub-next-for-you.md` was paid off on production before this one
-  was opened, so this is not a second unpaid deferral.
-- Verify after deploy: https://www.teachersdeserveit.com/hub
+Paid off on production on 22 September 2026, signed in as Rae.
+
+- Opened: https://www.teachersdeserveit.com/hub
+- Saw: the band heading "Next for you" with the subtitle "Chosen from what you
+  have told us so far.", which is the signal-carrying heading rather than the
+  "From the Hub library" fallback.
+- Saw: three cards, all three chipped, reading in order "Your goal: Grow as a
+  leader" on Mentoring Made Simple, "Recommended for your role" on Executive
+  Functioning Made Simple, and "Your goal: Grow as a leader" on How to Grow
+  Your Personal Brand as a Teacher.
+- That is goal, role, goal, all chipped, which is exactly what the table below
+  predicted for this account. For Rae the correct observation is that nothing
+  changes, and nothing changed.
+
+- Pressed: nothing. A Vibe Check modal, "How connected do you feel to your
+  school community today?", was open over the band. Answering it writes a
+  check-in as Rae and "Skip for today" consumes her prompt for the day, so I
+  read the band out of the DOM behind the modal instead of clearing it. The
+  band was also visible on screen either side of the modal.
 
 ## What the pass can and cannot prove
 
@@ -42,7 +54,9 @@ function output only, not by anyone looking at it.
 
 ## What I did not press
 
-Nothing yet, the deploy has not happened.
+The Vibe Check, per above. Any card in the band, since the modal was over it.
+The EN/ES toggle, which would have answered the Spanish question below but
+persists a language preference on Rae's account.
 
 ## What I could not verify
 

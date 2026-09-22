@@ -48,7 +48,7 @@ interface TimelineEvent {
 
 interface ActionItem {
   status: string
-  priority: string
+  priority?: string | null
   title: string
 }
 
