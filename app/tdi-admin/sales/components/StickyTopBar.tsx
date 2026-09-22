@@ -3,6 +3,9 @@
 interface TopBarStats {
   totalPipeline: number
   activeCount: number
+  /** Leads the muck model cannot value, because no offering is recorded. They
+   *  count as zero in totalPipeline, so the count is shown alongside it. */
+  unvaluedCount?: number
   hotCount: number
   invoiceCount: number
   callSheetCount: number
@@ -56,6 +59,11 @@ export function StickyTopBar({
         </div>
         <div style={{ fontSize: 12, color: '#6B7280', marginTop: 4 }}>
           {stats.activeCount} active
+          {stats.unvaluedCount ? (
+            <span title="No offering recorded, so there is nothing to predict a value from. These count as zero above rather than pulling in a figure from before the offering restructure." style={{ marginLeft: 8, color: '#9CA3AF' }}>
+              {stats.unvaluedCount} not valued
+            </span>
+          ) : null}
         </div>
       </div>
 

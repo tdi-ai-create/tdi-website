@@ -23,6 +23,7 @@ import {
 } from '@/components/tdi-admin/ui/design-tokens'
 import { HorizontalBarChart, DonutChart, DonutLegend, LiveSectionHeader } from '@/components/tdi-admin/hub-charts/HubCharts'
 import { OFFERINGS, OFFERING_LABELS, OFFERING_HINTS, offeringLabel } from '@/lib/partnerships/offerings'
+import { chaseOrder } from '@/lib/sales/muck'
 
 interface MuckCardScore {
   total: number | null
@@ -1165,10 +1166,21 @@ export default function SalesPage() {
     // The headline follows the same rule as every card under it: until a
     // contract exists the figure is a prediction, so a stale import does not
     // get counted as money. This moved the total down by roughly 210,000.
-    const dealValue = (o: Opportunity) => muckById[o.supabase_id]?.value ?? o.value ?? 0
+    //
+    // It used to fall back to `o.value` when the model could not score a lead,
+    // which put the stale figure straight back into the total it was meant to
+    // remove. Measured on the live board: 19 leads with no offering recorded
+    // contributed 369,879 that way, and 18 of the 19 were the pre-restructure
+    // 18,000 and 30,000 imports. A lead the model cannot value now counts as
+    // zero, and `unvaluedCount` says how many so the drop is visible rather
+    // than silent. The recorded value stays on the record either way; it is
+    // only excluded from this total.
+    const dealValue = (o: Opportunity) => muckById[o.supabase_id]?.value ?? 0
+    const unvalued = pipelineOpps.filter(o => muckById[o.supabase_id]?.value == null)
     return {
       totalPipeline: pipelineOpps.reduce((s, o) => s + dealValue(o), 0),
       activeCount: pipelineOpps.length,
+      unvaluedCount: unvalued.length,
       hotCount: pipelineOpps.filter(o => o.heat === 'hot').length,
       invoiceCount: opportunities.filter(o => o.needs_invoice && !o.deleted_at && !o.grantSupport).length,
       callSheetCount: callSheetOpps.length,
@@ -1304,107 +1316,189 @@ export default function SalesPage() {
       {/* Outreach Queue Tab */}
       {pageTab === 'outreach' && (() => {
         const now = Date.now()
-        const staleLeads = activeOpps
+        const queued = activeOpps
           .filter(o => !o.deleted_at && o.stage !== 'lost' && o.stage !== 'paid' && o.contactEmail)
           .map(o => {
             const daysSince = o.lastActivityAt ? Math.floor((now - new Date(o.lastActivityAt).getTime()) / 86400000) : 999
-            // Light leads are cheap to chase, so they rank ahead of heavy ones
-            // when everything else is equal. This used to weight by the retired
-            // fit tier, which never updated after the lead was created.
-            const band = muckById[o.supabase_id]?.band ?? null
-            const muckWeight = band === 'light' ? 30 : band === 'moderate' ? 20 : band === 'heavy' ? 10 : 15
-            const priority = muckWeight + Math.min(daysSince, 60) + Math.min((o.value || 0) / 5000, 10)
+            const m = muckById[o.supabase_id]
             let action = 'Initial outreach'
             if (daysSince < 7) action = 'Follow up if no response'
             else if (daysSince < 14) action = 'Follow-up email -- been a week'
             else if (daysSince < 30) action = 'Re-engagement needed'
             else if (daysSince >= 30) action = 'Dormant -- re-engage or archive'
             if (!o.lastActivityAt) action = 'No contact yet -- initial outreach'
-            return { ...o, daysSince, priority, action, band, muckTotal: muckById[o.supabase_id]?.total ?? null, needsOutreach: daysSince >= 14 || !o.lastActivityAt }
+            return {
+              ...o,
+              daysSince,
+              action,
+              band: m?.band ?? null,
+              muckTotal: m?.total ?? null,
+              perPoint: m?.perPoint ?? null,
+              // The predicted value, which is what the card and the panel show.
+              // The raw o.value is the pre-restructure import on much of the
+              // board, so ordering or displaying it here contradicted the card
+              // sitting beside it.
+              muckValue: m?.value ?? null,
+              valuePredicted: m?.valuePredicted ?? false,
+              needsOutreach: daysSince >= 14 || !o.lastActivityAt,
+            }
           })
           .filter(o => o.needsOutreach)
-          .sort((a, b) => b.priority - a.priority)
+
+        /**
+         * Ordered by chaseOrder, the same function the dry run uses, rather than
+         * by a formula local to this component.
+         *
+         * The formula this replaces was `band weight + min(daysSince, 60) +
+         * min(rawValue / 5000, 10)`, which was wrong three ways. Staleness could
+         * contribute 60 against muck's 30 and value's 10, so the queue was a
+         * staleness sort with a muck tiebreak and the dormant cohort pinned the
+         * top permanently. An unscored lead scored 15 and therefore outranked a
+         * known-heavy one at 10, which is the same defect that killed the
+         * retired fit tier: unknown reading as favourable. And it ranked on the
+         * raw value, so a lead whose card read $2,500 PRED was ordered as though
+         * it were the stale $18,000.
+         *
+         * Staleness still decides who appears at all, through the needsOutreach
+         * filter above. Once a lead is in the queue, the question is which to
+         * call first, and that is value per muck point.
+         */
+        const byId = new Map(queued.map(o => [o.supabase_id, o]))
+        const ordered = chaseOrder(
+          queued.map(o => {
+            const m = muckById[o.supabase_id]
+            return {
+              id: o.supabase_id,
+              name: o.name,
+              total: m?.total ?? null,
+              breakdown: m?.breakdown ?? { delivery: 0, grant: 0, drag: 0, travel: 0 },
+              rae: m?.rae ?? 0,
+              bella: m?.bella ?? 0,
+              travel: m?.travelTier ?? null,
+              value: m?.value ?? null,
+              valuePredicted: m?.valuePredicted ?? false,
+              perPoint: m?.perPoint ?? null,
+            }
+          }),
+          Object.fromEntries(queued.map(o => [o.supabase_id, { heat: o.heat, lastActivityAt: o.lastActivityAt }]))
+        )
+          .map(s => byId.get(s.id))
+          .filter((l): l is NonNullable<typeof l> => Boolean(l))
+
+        // chaseOrder sorts unrankable leads to the end. They are shown in their
+        // own group rather than buried under the ranked ones, because there are
+        // more of them than there are ranked leads and a lead nobody can rank is
+        // still a lead nobody has called.
+        const ranked = ordered.filter(l => l.perPoint != null)
+        const unranked = ordered.filter(l => l.perPoint == null)
+
+        const renderRow = (lead: (typeof ordered)[number], showPerPoint: boolean) => (
+          <div
+            key={lead.supabase_id}
+            onClick={() => setDetailPanelOppId(lead.supabase_id)}
+            style={{
+              background: 'white', border: '1px solid #E5E7EB', borderRadius: 10, padding: '12px 16px',
+              cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+              borderLeft: `3px solid ${lead.band === 'light' ? '#10B981' : lead.band === 'moderate' ? '#F59E0B' : lead.band === 'heavy' ? '#1e2749' : '#D1D5DB'}`,
+              transition: 'border-color 0.1s',
+            }}
+            onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.borderColor = '#0a0f1e' }}
+            onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.borderColor = '#E5E7EB' }}
+          >
+            <div style={{ flex: 1 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span style={{ fontSize: 14, fontWeight: 600, color: '#0a0f1e' }}>{lead.name}</span>
+                {lead.band && (
+                  <span title="Muck points: how much work this lead is predicted to take." style={{ fontSize: 9, fontWeight: 700, padding: '1px 5px', borderRadius: 4, background: '#EEF1F8', color: '#1e2749' }}>{lead.muckTotal} muck</span>
+                )}
+                {lead.muckValue != null && (
+                  <span style={{ fontSize: 11, color: '#6B7280' }}>
+                    ${(lead.muckValue / 1000).toFixed(1)}K{lead.valuePredicted ? ' PRED' : ''}
+                  </span>
+                )}
+                {showPerPoint && lead.perPoint != null && (
+                  <span title="Deal value per muck point. The order of this queue." style={{ fontSize: 9, fontWeight: 700, padding: '1px 5px', borderRadius: 4, background: '#0a0f1e', color: 'white' }}>${lead.perPoint}/pt</span>
+                )}
+              </div>
+              <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 2 }}>
+                {lead.contactName || 'No contact'} {lead.contactEmail ? `-- ${lead.contactEmail}` : ''} {lead.state ? `(${lead.state})` : ''}
+              </div>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0, marginLeft: 16 }}>
+              <div style={{ textAlign: 'right' }}>
+                <div style={{ fontSize: 11, fontWeight: 600, color: lead.daysSince >= 30 ? '#EF4444' : lead.daysSince >= 14 ? '#F59E0B' : '#6B7280' }}>
+                  {lead.daysSince === 999 ? 'Never contacted' : `${lead.daysSince}d ago`}
+                </div>
+                <div style={{ fontSize: 10, color: '#9CA3AF', marginTop: 2 }}>{lead.action}</div>
+              </div>
+              {lead.contactEmail && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    const templateType = lead.daysSince >= 30 ? 're_engagement' as const : lead.daysSince >= 14 ? 'follow_up' as const : 'initial' as const
+                    const email = generateOutreachEmail({
+                      name: lead.name,
+                      contactName: lead.contactName,
+                      state: lead.state,
+                      city: lead.city,
+                    }, templateType)
+                    const mailto = `mailto:${lead.contactEmail}?subject=${encodeURIComponent(email.subject)}&body=${encodeURIComponent(email.body)}`
+                    window.open(mailto, '_blank')
+                    // Auto-log the outreach
+                    fetch(`/api/sales/opportunities/${lead.supabase_id}/notes`, {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        note_text: `Drafted ${templateType} email to ${lead.contactEmail}: "${email.subject}"`,
+                        note_type: 'email',
+                      }),
+                    }).catch(() => {})
+                  }}
+                  style={{
+                    fontSize: 10, fontWeight: 600, padding: '4px 10px', borderRadius: 6,
+                    background: '#4F46E5', color: 'white', border: 'none', cursor: 'pointer',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  Draft Email
+                </button>
+              )}
+            </div>
+          </div>
+        )
 
         return (
           <div style={{ marginTop: 16 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
               <div>
                 <h2 style={{ fontSize: 18, fontWeight: 700, color: '#0a0f1e', margin: 0 }}>Outreach Queue</h2>
-                <p style={{ fontSize: 12, color: '#6B7280', margin: '2px 0 0' }}>{staleLeads.length} leads needing outreach, sorted by priority. Muck, staleness and value.</p>
+                <p style={{ fontSize: 12, color: '#6B7280', margin: '2px 0 0' }}>
+                  {ordered.length} leads needing outreach. Ordered by deal value per muck point.
+                </p>
               </div>
             </div>
-            {staleLeads.length === 0 ? (
+            {ordered.length === 0 ? (
               <div style={{ textAlign: 'center', padding: 40, color: '#9CA3AF' }}>All leads are contacted. Nice work.</div>
             ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                {staleLeads.slice(0, 30).map(lead => (
-                  <div
-                    key={lead.supabase_id}
-                    onClick={() => setDetailPanelOppId(lead.supabase_id)}
-                    style={{
-                      background: 'white', border: '1px solid #E5E7EB', borderRadius: 10, padding: '12px 16px',
-                      cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                      borderLeft: `3px solid ${lead.band === 'light' ? '#10B981' : lead.band === 'moderate' ? '#F59E0B' : lead.band === 'heavy' ? '#1e2749' : '#D1D5DB'}`,
-                      transition: 'border-color 0.1s',
-                    }}
-                    onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.borderColor = '#0a0f1e' }}
-                    onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.borderColor = '#E5E7EB' }}
-                  >
-                    <div style={{ flex: 1 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <span style={{ fontSize: 14, fontWeight: 600, color: '#0a0f1e' }}>{lead.name}</span>
-                        {lead.band && (
-                          <span title="Muck points: how much work this lead is predicted to take." style={{ fontSize: 9, fontWeight: 700, padding: '1px 5px', borderRadius: 4, background: '#EEF1F8', color: '#1e2749' }}>{lead.muckTotal} muck</span>
-                        )}
-                        {lead.value && <span style={{ fontSize: 11, color: '#6B7280' }}>${(lead.value / 1000).toFixed(0)}K</span>}
-                      </div>
-                      <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 2 }}>
-                        {lead.contactName || 'No contact'} {lead.contactEmail ? `-- ${lead.contactEmail}` : ''} {lead.state ? `(${lead.state})` : ''}
-                      </div>
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0, marginLeft: 16 }}>
-                      <div style={{ textAlign: 'right' }}>
-                        <div style={{ fontSize: 11, fontWeight: 600, color: lead.daysSince >= 30 ? '#EF4444' : lead.daysSince >= 14 ? '#F59E0B' : '#6B7280' }}>
-                          {lead.daysSince === 999 ? 'Never contacted' : `${lead.daysSince}d ago`}
-                        </div>
-                        <div style={{ fontSize: 10, color: '#9CA3AF', marginTop: 2 }}>{lead.action}</div>
-                      </div>
-                      {lead.contactEmail && (
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            const templateType = lead.daysSince >= 30 ? 're_engagement' as const : lead.daysSince >= 14 ? 'follow_up' as const : 'initial' as const
-                            const email = generateOutreachEmail({
-                              name: lead.name,
-                              contactName: lead.contactName,
-                              state: lead.state,
-                              city: lead.city,
-                            }, templateType)
-                            const mailto = `mailto:${lead.contactEmail}?subject=${encodeURIComponent(email.subject)}&body=${encodeURIComponent(email.body)}`
-                            window.open(mailto, '_blank')
-                            // Auto-log the outreach
-                            fetch(`/api/sales/opportunities/${lead.supabase_id}/notes`, {
-                              method: 'POST',
-                              headers: { 'Content-Type': 'application/json' },
-                              body: JSON.stringify({
-                                note_text: `Drafted ${templateType} email to ${lead.contactEmail}: "${email.subject}"`,
-                                note_type: 'email',
-                              }),
-                            }).catch(() => {})
-                          }}
-                          style={{
-                            fontSize: 10, fontWeight: 600, padding: '4px 10px', borderRadius: 6,
-                            background: '#4F46E5', color: 'white', border: 'none', cursor: 'pointer',
-                            whiteSpace: 'nowrap',
-                          }}
-                        >
-                          Draft Email
-                        </button>
-                      )}
+              <>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  {ranked.slice(0, 30).map(lead => renderRow(lead, true))}
+                </div>
+                {unranked.length > 0 && (
+                  <div style={{ marginTop: 24 }}>
+                    <h3 style={{ fontSize: 13, fontWeight: 700, color: '#0a0f1e', margin: '0 0 2px' }}>
+                      Cannot be ranked yet ({unranked.length})
+                    </h3>
+                    <p style={{ fontSize: 11, color: '#6B7280', margin: '0 0 8px' }}>
+                      No offering recorded, so there is no muck score and no value per point. Record what
+                      you expect they will buy and they join the ranked queue above.
+                    </p>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                      {unranked.slice(0, 15).map(lead => renderRow(lead, false))}
                     </div>
                   </div>
-                ))}
-              </div>
+                )}
+              </>
             )}
           </div>
         )
