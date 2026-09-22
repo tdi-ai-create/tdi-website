@@ -1229,7 +1229,11 @@ export default function HubDashboard() {
                   }}
                 >
                   <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#8A94A2' }}>
-                    {tUI(course.category)}
+                    {/* hub_courses.category stores slugs, so this printed
+                        "CLASSROOM-MANAGEMENT" directly above a band showing
+                        "CLASSROOM MANAGEMENT". Quick Wins store prose, which is
+                        why only this band had the problem. */}
+                    {tUI(course.category.replace(/-/g, ' '))}
                   </span>
                   <span style={{ fontSize: 14.5, fontWeight: 700, color: '#1e2749', lineHeight: 1.3 }}>
                     {course.title}
