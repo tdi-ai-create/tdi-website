@@ -40,6 +40,32 @@ It was filed with the funder in June. The first version of this change listed it
 as needing to be sent, which would have told Bella to send something the funder
 has had for 53 days. If Allenwood shows a group, the filed-status guard is wrong.
 
+## The pass, run on production (22 Sep 2026)
+
+Deploy `teachersdeserveit-91l836305`, created four seconds after the merge, Ready.
+
+- Opened: https://www.teachersdeserveit.com/tdi-admin/funding/162d06e0-0ce2-4fa2-b3a9-271041d5245a signed in as Rae
+- Saw: a group headed "STOPPED, NEEDS YOU" with a count of 4, sitting above
+  "WAITING ON YOU". Rows, in order: "Entergy Louisiana Foundation" 0d, "QA
+  stopped after three tries. Open it to choose what happens next."; "E.J. and
+  Marjory B. Ourso Family Foundation" 0d, "Passed QA. Approve it, or send it
+  back with a note."; "Cox Charities Fund Educators" 7d, "Written and approved.
+  It does nothing for the school until somebody sends it."; "Baton Rouge Area
+  Foundation - Competitive Grants" 19d, "Marked as being written, but the
+  application window is not open, so no writer can see it."
+- Saw: four rows against a predicted three. The extra is the Ourso path, which
+  entered `approval` at 20:11 UTC, more than two hours after the prediction was
+  written. Not a defect. It is also the first live exercise of the `approval`
+  branch, which had no example in the data when this was verified at the
+  function level.
+
+- Opened: https://www.teachersdeserveit.com/tdi-admin/funding/b69c6219-0e41-4717-9c7a-94dfe8e4570e
+- Saw: no stopped group at all, which was the real test. Allenwood's NEA grant
+  sits in `ready` and is otherwise identical to Cox Charities, but the funder has
+  had it since 16 June. The filed-status guard held. The page surfaces it through
+  the correct mechanism instead, a banner reading "WITH THE FUNDER 98 DAYS, NEA
+  Learning & Leadership Grant has had no decision recorded".
+
 ## What I will press
 
 The Baton Rouge row on St. Peter Chanel, which should open the Grant paths
