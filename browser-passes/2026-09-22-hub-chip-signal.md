@@ -40,9 +40,24 @@ Measured at the function level instead, on three real accounts:
 The third row is the case this change exists for, and it is verified by
 function output only, not by anyone looking at it.
 
+## The pass, run on production after deploy (22 Sep 2026)
+
+Deploy `teachersdeserveit-7xwiferdw`, Ready.
+
+- Opened: https://www.teachersdeserveit.com/hub signed in as Rae
+- Saw: the band unchanged, which is the correct outcome here. Heading
+  "Next for you" over "Chosen from what you have told us so far." Three cards:
+  Mentoring Made Simple chipped "Your goal: Grow as a leader", Executive
+  Functioning Made Simple chipped "Recommended for your role", How to Grow Your
+  Personal Brand chipped "Your goal: Grow as a leader". Categories read
+  "LEADERSHIP" and "CLASSROOM MANAGEMENT" with a space.
+- Pressed: nothing. There is no new control on this change, and the card link
+  was already pressed and followed in the 21 Sep record.
+
 ## What I did not press
 
-Nothing yet, the deploy has not happened.
+The Vibe Check overlay, which today asked "Today I feel..." with two options.
+No answer submitted.
 
 ## What I could not verify
 
