@@ -474,9 +474,18 @@ export async function GET(request: NextRequest) {
           item.research_task === 'confirm_window'
             ? `Establish whether ${item.name} is currently open to applications, and when it closes. ` +
               `Confirm from the funder's own site or published guidelines, not a directory. ` +
-              `Then set window_status to open or closed_missed and fill application_closes. ` +
-              `If it cannot be established, say so and leave it unknown rather than guessing: ` +
-              `a wrong deadline is worse than an absent one, because the portal will chase it.`
+              `Answer in fields, not prose: a note describing the window is not an answer, ` +
+              `because nothing reads it. Always send window_status, one of three ways. ` +
+              `Confirmed open: window_status 'open' AND application_closes, both, since an ` +
+              `open window with no closing date is not an established window. ` +
+              `Confirmed shut: window_status 'closed_missed' and window_closes. ` +
+              `Could not establish it: send window_status 'unknown' explicitly. ` +
+              `Do not omit the field: omitting it leaves window_checked_at unstamped and this ` +
+              `same question returns to you every heartbeat for ever. Sending 'unknown' is a ` +
+              `real answer and earns a fourteen day pause. ` +
+              `Never guess a date to fill the gap, and never mention another funder's dates in ` +
+              `this note: a wrong deadline is worse than an absent one, because the portal will ` +
+              `chase it.`
             : `Find local funding sources for this school and create a real opportunity for each ` +
               `verified candidate. Confirm each is real and currently open before adding it.`,
         ...item,
