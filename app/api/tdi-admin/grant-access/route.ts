@@ -21,21 +21,19 @@ function getHubAdmin() {
  * Page-level admin context guard is the primary access control.
  */
 export async function POST(request: NextRequest) {
-  // Auth check — log but don't block (page guard protects)
-  let adminEmail = 'unknown';
-  try {
-    const auth = await requireAdminAuth();
-    if (auth instanceof NextResponse) {
-      console.warn('[GrantAccess] Server auth check failed, proceeding (page guard protects)');
-    } else {
-      adminEmail = auth.user.email;
-    }
-  } catch {}
+  // The gate blocks. It used to log the failure and carry on, which meant an
+  // unauthenticated caller could grant Hub access and the audit trail recorded
+  // them as 'unknown'.
+  const auth = await requireAdminAuth();
+  if (auth instanceof NextResponse) return auth;
+  const adminEmail = auth.user.email;
 
   try {
-    const { email, name, tier, durationDays, customExpiry, grantedBy } = await request.json();
-    // Use server-verified email if available, fall back to client-provided
-    if (adminEmail === 'unknown' && grantedBy) adminEmail = grantedBy;
+    const { email, name, tier, durationDays, customExpiry } = await request.json();
+    // grantedBy used to be accepted from the request body as a fallback when
+    // the server could not identify the caller. The caller is now always
+    // identified, and an audit trail a client can write its own name into is
+    // not an audit trail, so the field is ignored.
 
     if (!email || !tier) {
       return NextResponse.json({ error: 'Email and tier are required' }, { status: 400 });
@@ -91,8 +89,10 @@ export async function POST(request: NextRequest) {
       userId = authUser.user.id;
       isNewUser = true;
 
-      // Create hub_profile
-      await hub.from('hub_profiles').upsert({
+      // Create hub_profile. A failure here leaves an auth user with no
+      // profile, which is an account that exists and cannot be used, so it
+      // must not pass silently.
+      const { error: profileError } = await hub.from('hub_profiles').upsert({
         id: userId,
         email,
         display_name: name || email.split('@')[0],
@@ -100,6 +100,14 @@ export async function POST(request: NextRequest) {
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       }, { onConflict: 'id' });
+
+      if (profileError) {
+        console.error('[GrantAccess] hub_profiles upsert failed:', profileError.message);
+        return NextResponse.json(
+          { error: `Account was created but its profile could not be saved: ${profileError.message}` },
+          { status: 500 }
+        );
+      }
     }
 
     // Create or update membership via RPC (bypasses PostgREST schema cache)

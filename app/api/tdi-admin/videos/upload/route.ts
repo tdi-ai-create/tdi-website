@@ -1,3 +1,4 @@
+import { requireAdminAuth } from '@/lib/tdi-admin/auth';
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
@@ -25,6 +26,11 @@ function getHubSupabase() {
  * which fails on some networks with SSL errors.
  */
 export async function POST(request: Request) {
+  // Every caller of this route is an admin page behind a signed in session,
+  // and no cron reaches it. It previously had no gate at all.
+  const __auth = await requireAdminAuth();
+  if (__auth instanceof NextResponse) return __auth;
+
   try {
     const body = await request.json();
     const step = body.step || 'upload';
@@ -138,6 +144,11 @@ export async function POST(request: Request) {
  * GET /api/tdi-admin/videos/upload?uid=VIDEO_UID
  */
 export async function GET(request: Request) {
+  // Every caller of this route is an admin page behind a signed in session,
+  // and no cron reaches it. It previously had no gate at all.
+  const __auth = await requireAdminAuth();
+  if (__auth instanceof NextResponse) return __auth;
+
   try {
     const cfToken = process.env.CLOUDFLARE_STREAM_API_TOKEN;
     const cfAccountId = process.env.CF_ACCOUNT_ID;
@@ -184,6 +195,11 @@ export async function GET(request: Request) {
  * DELETE /api/tdi-admin/videos/upload?uid=VIDEO_UID
  */
 export async function DELETE(request: Request) {
+  // Every caller of this route is an admin page behind a signed in session,
+  // and no cron reaches it. It previously had no gate at all.
+  const __auth = await requireAdminAuth();
+  if (__auth instanceof NextResponse) return __auth;
+
   try {
     const cfToken = process.env.CLOUDFLARE_STREAM_API_TOKEN;
     const cfAccountId = process.env.CF_ACCOUNT_ID;

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { requireAdminAuth } from '@/lib/tdi-admin/auth'
 import { createClient } from '@supabase/supabase-js'
 import Anthropic from '@anthropic-ai/sdk'
 
@@ -31,6 +32,11 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  // Every caller of this route is an admin page behind a signed in session,
+  // and no cron reaches it. It previously had no gate at all.
+  const __auth = await requireAdminAuth();
+  if (__auth instanceof NextResponse) return __auth;
+
   try {
     const { id } = await params
     const supabase = getHubServiceSupabase()
@@ -348,6 +354,11 @@ export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  // Every caller of this route is an admin page behind a signed in session,
+  // and no cron reaches it. It previously had no gate at all.
+  const __auth = await requireAdminAuth();
+  if (__auth instanceof NextResponse) return __auth;
+
   try {
     const { id } = await params
     const supabase = getHubServiceSupabase()
@@ -464,10 +475,17 @@ export async function POST(
           .in('lesson_id', lessonIds)
 
         if (existing && existing.length > 0) {
-          await supabase
+          // Retiring the old questions must succeed before new ones are
+          // inserted. If it silently fails the lesson ends up serving both
+          // sets, which reads to a learner as duplicated questions.
+          const { error: retireError } = await supabase
             .from('hub_quiz_questions')
             .update({ is_active: false })
             .in('id', existing.map((q) => q.id))
+
+          if (retireError) {
+            throw new Error(`Could not retire the existing questions: ${retireError.message}`)
+          }
         }
 
         const rows = gateLessons.flatMap((lesson, i) =>

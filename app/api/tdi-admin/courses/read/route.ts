@@ -1,3 +1,4 @@
+import { requireAdminAuth } from '@/lib/tdi-admin/auth';
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
@@ -10,6 +11,11 @@ import { createClient } from '@supabase/supabase-js'
  * Write operations still use the auth-protected /api/tdi-admin/courses/[id] endpoint.
  */
 export async function GET(request: NextRequest) {
+  // Every caller of this route is an admin page behind a signed in session,
+  // and no cron reaches it. It previously had no gate at all.
+  const __auth = await requireAdminAuth();
+  if (__auth instanceof NextResponse) return __auth;
+
   try {
     const id = request.nextUrl.searchParams.get('id')
     if (!id) return NextResponse.json({ error: 'id required' }, { status: 400 })

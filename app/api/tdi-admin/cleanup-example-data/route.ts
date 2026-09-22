@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { requireAdminAuth } from '@/lib/tdi-admin/auth';
 import { createClient } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
 import { createServerClient } from '@supabase/ssr';
@@ -52,6 +53,11 @@ async function isOwner(userId: string, email: string): Promise<boolean> {
 }
 
 export async function DELETE() {
+  // Every caller of this route is an admin page behind a signed in session,
+  // and no cron reaches it. It previously had no gate at all.
+  const __auth = await requireAdminAuth();
+  if (__auth instanceof NextResponse) return __auth;
+
   try {
     // Check authentication
     const user = await getCurrentUser();

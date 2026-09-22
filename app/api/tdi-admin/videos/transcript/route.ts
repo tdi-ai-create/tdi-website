@@ -1,3 +1,4 @@
+import { requireAdminAuth } from '@/lib/tdi-admin/auth';
 import { NextRequest, NextResponse } from 'next/server'
 
 /**
@@ -6,6 +7,11 @@ import { NextRequest, NextResponse } from 'next/server'
  * Fetch auto-generated captions/transcript from Cloudflare Stream.
  */
 export async function GET(request: NextRequest) {
+  // Every caller of this route is an admin page behind a signed in session,
+  // and no cron reaches it. It previously had no gate at all.
+  const __auth = await requireAdminAuth();
+  if (__auth instanceof NextResponse) return __auth;
+
   try {
     const uid = request.nextUrl.searchParams.get('uid')
     const lang = request.nextUrl.searchParams.get('lang') || 'en'
@@ -112,6 +118,11 @@ export async function GET(request: NextRequest) {
  * Body: { uid, lang?: 'en' | 'es' }
  */
 export async function POST(request: NextRequest) {
+  // Every caller of this route is an admin page behind a signed in session,
+  // and no cron reaches it. It previously had no gate at all.
+  const __auth = await requireAdminAuth();
+  if (__auth instanceof NextResponse) return __auth;
+
   try {
     const { uid, lang = 'en' } = await request.json()
     if (!uid) return NextResponse.json({ error: 'uid required' }, { status: 400 })
