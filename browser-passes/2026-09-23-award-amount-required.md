@@ -13,6 +13,26 @@ Confirm is disabled until a real number is entered.
   scoped to the live domain, so a local server answers with a login screen.
 - Verify after deploy: https://www.teachersdeserveit.com/tdi-admin/funding/83a8932b-66dc-4c67-b815-65c19358b123
 
+### Verified on production, 23 September 2026
+
+- Opened: https://www.teachersdeserveit.com/tdi-admin/funding/83a8932b-66dc-4c67-b815-65c19358b123
+- Saw: the header reads "PIPELINE $15,552" and "AWARDED $500". The backfill is
+  live and the school is no longer showing zero awarded.
+- Pressed: "Grant paths (14)" to expand the paths list
+- Saw: the Walmart Spark Good Grant card reads "$500" beside its title, status
+  "waiting", "Deadline: Aug 31 (passed)", phase "Awarded", and a submission line
+  "Spark Good Local Grant to Facility #1386 Received – Application ID 92518893"
+  dated Aug 4. It does not say "amount not recorded", which is the half of the
+  prediction that is confirmed.
+- Pressed: "Record award" in the OUTCOME row of that card
+- Saw: the panel opened with "Awarded amount ($)" **pre-filled with 500**,
+  "Decision date" 09/23/2026, and "Confirm award" rendered green and clickable
+  next to "Cancel". The predicted empty field, the grey hint "We asked for $X.
+  Enter what they actually gave", and the disabled Confirm did not appear.
+- Pressed: "Cancel"
+- Saw: the panel closed and the card returned to showing "$500" with the
+  "Record award" and "Record denial" buttons. Nothing was written.
+
 ## The defect, measured
 
 Two faults in one control.
@@ -62,6 +82,32 @@ The Walmart card should read $500 rather than "amount not recorded", and the
 schools screen should show $500 of $15,552 for Saunemin with its progress bar
 off zero.
 
+## The pass, part one: the backfill is live (23 September 2026)
+
+- Opened: https://www.teachersdeserveit.com/tdi-admin/funding/83a8932b-66dc-4c67-b815-65c19358b123 signed in as Rae, expanded "Grant paths (14)".
+- Saw: the Walmart Spark Good Grant card reads "AWARDED $500 on Sep 11, 2026", with "ALLOCATIONS $500 awarded, $0 allocated, $500 to allocate" beneath it. The $500 appears in three places on that card and the figure at the top of the row reads $500, not the $5,000 the timeline once claimed.
+
+## The pass, part two: the control itself is NOT yet verified
+
+- Opened: https://www.teachersdeserveit.com/tdi-admin/funding/b69c6219-0e41-4717-9c7a-94dfe8e4570e, Allenwood, the only school with a grant still in `applied` and therefore the only place this control appears.
+- Pressed: "Record award" on the NEA Learning & Leadership Grant.
+- Saw: the OUTCOME panel opened with "Awarded amount ($)" **pre-filled with 5000** and a green, enabled "Confirm award" button. That is the old behaviour, exactly what this change removes.
+
+**That is not a failure of the fix. It has not deployed.** The newest production
+build was created 09:09 local and PR #603 merged at 08:51 local, so the merge
+missed that build by eighteen minutes and no deploy has run since. The page is
+correctly serving the previous code.
+
+This grant is also the perfect demonstration of why the change exists: $5,000 is
+what we asked NEA for, the funder has not decided in 99 days, and one click on a
+green button would have recorded the ask as money received.
+
+- Pressed: "Cancel".
+- Confirmed in the database rather than from the screen: `awarded_amount` on that grant is still null. Nothing was written.
+
+**Still owed:** re-open that same control once a deploy carrying #603 is live,
+and confirm the field is empty and Confirm award is grey until a number is typed.
+
 ## What I will not press
 
 Confirm award on a real grant. The two live candidates belong to real schools and
@@ -89,3 +135,12 @@ be the same bug in different clothes.
 Whether any other code path writes `awarded_amount` without going through this
 control. The sync API accepts the field, so an agent could in principle set it
 directly. Not checked.
+
+**Second look on Saunemin, 23 September, agrees with part two above.** Walmart
+Spark Good is in `waiting`, and pressing Record award there also opened a
+pre-filled field with an enabled Confirm. That is the same old behaviour seen on
+Allenwood, and it has the same cause: the fix has not deployed. Saunemin is a
+weaker test than Allenwood either way, because Walmart's ask and its award are
+both $500, so seeding from the ask and seeding from the existing award look
+identical there. Allenwood, where the ask is $5,000 and no award exists, remains
+the grant to re-check once a build carrying #603 is live.

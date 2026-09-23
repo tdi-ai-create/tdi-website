@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { OFFERINGS, OFFERING_LABELS, OFFERING_COLORS, offeringLabel, isOffering } from '@/lib/partnerships/offerings';
+import { OFFERINGS, SELLABLE_OFFERINGS, OFFERING_LABELS, OFFERING_COLORS, offeringLabel, isOffering } from '@/lib/partnerships/offerings';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -1042,7 +1042,7 @@ export default function AdminPartnershipsPage() {
                   Offering
                 </label>
                 <div className="grid grid-cols-2 gap-2">
-                  {OFFERINGS.map((o) => (
+                  {SELLABLE_OFFERINGS.map((o) => (
                     <button
                       key={o}
                       type="button"

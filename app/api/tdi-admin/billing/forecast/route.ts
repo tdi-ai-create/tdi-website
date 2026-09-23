@@ -79,7 +79,10 @@ export async function GET(_request: NextRequest) {
     client: rows.filter((r) => r.ledger === 'client').reduce((s, r) => s + r.amount, 0),
     grant: rows.filter((r) => r.ledger === 'grant').reduce((s, r) => s + r.amount, 0),
     complimentaryLines: rows.filter((r) => r.ledger === 'complimentary').length,
-    datedClient: rows.filter((r) => r.ledger === 'client' && r.readyOn).reduce((s, r) => s + r.amount, 0),
+    datedClientConfirmed: rows.filter((r) => r.ledger === 'client' && r.readyOn && !r.held).reduce((s, r) => s + r.amount, 0),
+    // Held apart from confirmed, because a pencilled date reported as revenue
+    // is how a forecast turns into a promise nobody made.
+    datedClientHeld: rows.filter((r) => r.ledger === 'client' && r.readyOn && r.held).reduce((s, r) => s + r.amount, 0),
     // Always zero while anything is held: a grant line cannot be dated until
     // the award clears funding_hold, at which point it stops counting as grant.
     datedGrant: rows.filter((r) => r.ledger === 'grant' && r.readyOn).reduce((s, r) => s + r.amount, 0),

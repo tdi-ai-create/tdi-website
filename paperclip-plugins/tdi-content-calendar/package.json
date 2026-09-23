@@ -1,6 +1,6 @@
 {
   "name": "tdi-content-calendar",
-  "version": "0.8.1",
+  "version": "0.8.2",
   "type": "module",
   "private": true,
   "description": "Plan and approve TDI content, by month, without leaving the board.",

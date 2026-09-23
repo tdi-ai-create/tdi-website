@@ -45,6 +45,14 @@ export const DELIVERY_LOAD: Record<Offering, number> = {
   FOCUS: 12,
   COHORT: 20,
   BLUEPRINT: 40,
+  /**
+   * A legacy Hub pilot is the one thing that sits below The Pulse. The rule
+   * that nothing is ever free comes from all four offerings carrying three
+   * exec sessions; a pilot carries none, no observation days and no virtual
+   * sessions either. It is not zero because the account still needs onboarding
+   * and check-ins, which is real time. Rae, 23 September 2026.
+   */
+  PILOT: 5,
 }
 
 /**
@@ -56,7 +64,18 @@ export const DELIVERY_LOAD: Record<Offering, number> = {
  * makes a Blueprint look worse per muck point than it is, which is the safer
  * direction to be wrong in.
  */
-export const OFFERING_PRICE: Record<Offering, number> = {
+/**
+ * Partial on purpose. PILOT has no list price because a legacy Hub pilot was a
+ * one-off, not a package, and the next one will not have cost what the last one
+ * did. Rae, 23 September 2026: "this may change so we dont need to put an offer
+ * price for now."
+ *
+ * A missing price is not a price of zero. An offering with no entry here never
+ * has a value invented for it: the lead shows no value at all until somebody
+ * records the real contract number. That reads as a gap on the board, which is
+ * the intended behaviour rather than a bug.
+ */
+export const OFFERING_PRICE: Partial<Record<Offering, number>> = {
   PULSE: 2500,
   FOCUS: 6200,
   COHORT: 9500,
@@ -229,15 +248,23 @@ export function scoreLead(input: MuckInput, stageMedian: number): MuckScore {
    * and falls back to list. Both still read as predicted, because neither is a
    * contract.
    */
+  /**
+   * Not every offering has a list price. PILOT deliberately has none, so there
+   * is nothing to test a recorded figure against and nothing to fall back to.
+   * Guarding on null rather than assuming a number keeps `undefined * 1.5` out
+   * of the comparison, which would silently make every value implausible.
+   */
+  const listPrice = offering !== null ? OFFERING_PRICE[offering] ?? null : null
+
   const plausible =
-    known && hasOwnValue && (input.value as number) <= OFFERING_PRICE[offering] * 1.5
+    known && hasOwnValue && listPrice != null && (input.value as number) <= listPrice * 1.5
 
   const value = contracted && hasOwnValue
     ? (input.value as number)
     : plausible
       ? (input.value as number)
-      : known
-        ? OFFERING_PRICE[offering]
+      : listPrice != null
+        ? listPrice
         : null
 
   return {
