@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js'
 import { requireAdminAuth } from '@/lib/tdi-admin/auth'
 import { fundingFlag } from '@/lib/funding-flags'
 import { awardedAmountOf } from '@/lib/funding-award'
+import { isLive } from '@/lib/funding-status'
 
 export const dynamic = 'force-dynamic'
 
@@ -89,7 +90,7 @@ export async function GET() {
       earned: recorded.length > 0 ? recorded.reduce((a, b) => a + b, 0) : null,
       grantsWon: won.length,
       grantsWonWithoutAnAmount: won.length - recorded.length,
-      livePaths: mine.filter(o => !['closed', 'denied', 'awarded', 'cancelled'].includes(o.status)).length,
+      livePaths: mine.filter(o => isLive(o.status)).length,
     }
   })
 
