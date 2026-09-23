@@ -1,0 +1,235 @@
+/* Scoped to .wi-page, which also carries .fs-page so the palette, type and
+   button styles come from for-schools.css rather than being restated here.
+   Do not add unscoped selectors to this file. */
+
+.wi-page .wi-arealist {
+  display: flex;
+  flex-direction: column;
+}
+.wi-page .wi-arow {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 12px;
+  align-items: baseline;
+  padding: 11px 0 11px 14px;
+  border-top: 1px solid #2a4661;
+  position: relative;
+  text-decoration: none;
+  color: inherit;
+}
+.wi-page .wi-arow:first-child { border-top: none; }
+.wi-page .wi-arow:before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 17px;
+  width: 6px;
+  height: 6px;
+  border-radius: 2px;
+  background: var(--a);
+}
+.wi-page .wi-arow b { color: #fff; font-weight: 500; font-size: .95rem; white-space: nowrap; }
+.wi-page .wi-arow span { color: #93aabc; font-size: .86rem; line-height: 1.45; }
+.wi-page .wi-arow:hover b { text-decoration: underline; }
+@media (max-width: 560px) {
+  .wi-page .wi-arow { grid-template-columns: 1fr; gap: 2px; }
+  .wi-page .wi-arow b { white-space: normal; }
+}
+
+/* ---------- a problem block ---------- */
+
+.wi-page .wi-block { border-top: 1px solid var(--line); padding: 52px 0; scroll-margin-top: 24px; }
+.wi-page .wi-block:first-of-type { border-top: none; padding-top: 4px; }
+.wi-page .wi-block-grid {
+  display: grid;
+  grid-template-columns: .88fr 1.12fr;
+  gap: 56px;
+  align-items: start;
+}
+@media (max-width: 940px) {
+  .wi-page .wi-block-grid { grid-template-columns: 1fr; gap: 26px; }
+}
+.wi-page .wi-block h3 { font-size: 1.75rem; letter-spacing: -.01em; max-width: 19ch; }
+.wi-page .wi-why { font-size: 1rem; color: var(--muted); margin-top: 14px; max-width: 46ch; }
+.wi-page .wi-via {
+  margin-top: 20px;
+  font-size: .86rem;
+  color: var(--muted);
+  border-left: 3px solid var(--c);
+  padding-left: 14px;
+  line-height: 1.5;
+  max-width: 44ch;
+}
+.wi-page .wi-via b {
+  color: var(--ink);
+  font-weight: 700;
+  display: block;
+  font-size: .78rem;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  margin-bottom: 3px;
+}
+
+/* ---------- the four shown at rest ---------- */
+
+.wi-page .wi-items {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-top: 4px solid var(--c);
+  border-radius: 12px;
+  padding: 6px 26px;
+}
+.wi-page .wi-items ul { list-style: none; margin: 0; padding: 0; }
+.wi-page .wi-items li {
+  padding: 15px 0 15px 20px;
+  position: relative;
+  border-bottom: 1px solid #edf2f4;
+}
+.wi-page .wi-items li:last-child { border-bottom: none; }
+.wi-page .wi-items li:before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 22px;
+  width: 7px;
+  height: 7px;
+  border-radius: 2px;
+  background: var(--c);
+}
+.wi-page .wi-title-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; }
+.wi-page .wi-items b { font-size: 1rem; font-weight: 700; color: var(--ink); line-height: 1.35; }
+.wi-page .wi-items p { font-size: .93rem; color: var(--muted); line-height: 1.5; margin: 3px 0 0; }
+
+.wi-page .wi-badge {
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: #fcf6e8;
+  border: 1px solid #ebd9ae;
+  color: #6b551f;
+  white-space: nowrap;
+}
+
+/* ---------- everything else ---------- */
+
+.wi-page .wi-more { margin-top: 18px; border-top: 1px solid var(--line); }
+.wi-page .wi-more summary {
+  cursor: pointer;
+  list-style: none;
+  padding: 16px 0;
+  font-family: "Source Serif 4", Georgia, serif;
+  font-size: 1.08rem;
+  font-weight: 600;
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: baseline;
+}
+.wi-page .wi-more summary::-webkit-details-marker { display: none; }
+.wi-page .wi-more summary:after {
+  content: "+";
+  color: var(--gold);
+  font-family: "DM Sans", sans-serif;
+  font-weight: 700;
+  font-size: 1.4rem;
+  line-height: 1;
+}
+.wi-page .wi-more[open] summary:after { content: "\2013"; }
+.wi-page .wi-full { columns: 2; column-gap: 36px; padding: 0 0 20px; margin: 0; list-style: none; }
+@media (max-width: 720px) { .wi-page .wi-full { columns: 1; } }
+.wi-page .wi-full li {
+  break-inside: avoid;
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: baseline;
+  padding: 8px 0;
+  border-bottom: 1px solid #edf2f4;
+  font-size: .94rem;
+  color: var(--ink);
+}
+.wi-page .wi-kind {
+  flex: none;
+  font-size: .7rem;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.wi-page .wi-kind-course { color: var(--c); }
+
+/* ---------- partner requests ---------- */
+
+.wi-page .wi-requestband {
+  background: #fcf6e8;
+  border: 1px solid #ebd9ae;
+  border-radius: 10px;
+  padding: 26px 28px;
+  margin-top: 48px;
+  max-width: 76ch;
+}
+.wi-page .wi-requestband h4 { margin-bottom: 8px; }
+.wi-page .wi-requestband p { font-size: 1rem; color: #5a4a22; margin: 0; }
+
+/* ---------- print ---------- */
+
+.wi-page .wi-printrow { margin-top: 26px; }
+.wi-page .wi-printbtn {
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--muted);
+  font-family: inherit;
+  font-size: .9rem;
+  font-weight: 600;
+  padding: 9px 18px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.wi-page .wi-printbtn:hover { border-color: var(--ink); color: var(--ink); }
+
+@media print {
+  .wi-page .wi-hero-actions,
+  .wi-page .wi-printrow,
+  .wi-page .wi-areacard,
+  .wi-page .fs-btnrow { display: none !important; }
+
+  .wi-page .fs-hero,
+  .wi-page .wi-finale {
+    background: #fff !important;
+    color: #000 !important;
+    padding: 0 0 18px !important;
+  }
+  .wi-page .fs-hero h1,
+  .wi-page .wi-finale h2 { color: #000 !important; }
+  .wi-page .fs-hero p,
+  .wi-page .wi-finale p { color: #222 !important; }
+  .wi-page .fs-hero-grid { grid-template-columns: 1fr !important; }
+
+  .wi-page { background: #fff !important; font-size: 11pt; }
+  .wi-page .wi-block { break-inside: avoid; padding: 18px 0; }
+  .wi-page .wi-block-grid { grid-template-columns: 1fr !important; gap: 10px !important; }
+  .wi-page .wi-items { border-top-width: 2px; padding: 2px 14px; }
+  .wi-page .wi-more summary { display: none; }
+  .wi-page .wi-full { columns: 2; }
+  .wi-page .wi-printlink { display: block !important; margin-top: 10px; font-size: 10pt; }
+}
+
+.wi-page .wi-printlink { display: none; }
+
+/* ---------- finale ---------- */
+
+.wi-page .wi-finale { background: var(--navy); color: #e7eef2; padding: 84px 0; }
+.wi-page .wi-finale h2 { color: #fff; max-width: 18ch; }
+.wi-page .wi-finale p { color: #a9becd; max-width: 52ch; font-size: 1.12rem; }
+.wi-page .wi-legend {
+  font-size: .85rem;
+  color: #8fa7b8;
+  margin-top: 34px;
+  padding-top: 20px;
+  border-top: 1px solid #2e4a69;
+  max-width: 74ch;
+  line-height: 1.8;
+}
