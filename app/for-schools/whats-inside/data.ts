@@ -25,10 +25,10 @@ const MOST_USED_MIN_OPENERS = 20;
 const POPULAR_MIN_OPENERS = 8;
 const TRENDING_MIN_OPENERS = 3;
 
-export type ItemKind = 'Tool' | 'Quiz' | 'Game' | 'Activity' | 'Course';
-export type Badge = 'Start here' | 'Most used' | 'Trending' | 'Popular' | 'New';
+type ItemKind = 'Tool' | 'Quiz' | 'Game' | 'Activity' | 'Course';
+type Badge = 'Start here' | 'Most used' | 'Trending' | 'Popular' | 'New';
 
-export type Item = {
+type Item = {
   id: string;
   title: string;
   description: string;

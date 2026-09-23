@@ -836,6 +836,10 @@ export default function LessonPage({ params }: LessonPageProps) {
   // UI state
   const [transcriptOpen, setTranscriptOpen] = useState(false);
   const [transcriptLang, setTranscriptLang] = useState<'en' | 'es'>('en');
+  // Set when the learner chooses to go back to the video from the check-in
+  // screen. Without it there is no way back: the check-in replaces the video,
+  // and a question you cannot re-watch the lesson for is a trap.
+  const [rewatching, setRewatching] = useState(false);
   const [bottomSheetOpen, setBottomSheetOpen] = useState(false);
 
   // Video auto-completion
@@ -1054,6 +1058,28 @@ export default function LessonPage({ params }: LessonPageProps) {
 
   const currentGateQuestions = gates.get(currentIndex) || null;
   const isGateActive = currentGateQuestions !== null && !isGateCleared(currentGateQuestions);
+
+  /**
+   * The check-in gets the screen to itself once the lesson is done.
+   *
+   * It used to render underneath the video, which meant the question sat below
+   * the player, the controls and the mobile outline button, so answering it
+   * was a scroll away from watching and the two competed for the same column.
+   * Replacing the video removes the scroll entirely: there is nothing below to
+   * reach for.
+   *
+   * Gated on isComplete rather than on the gate alone, so arriving at a lesson
+   * never hides the video you came to watch.
+   */
+  const showCheckInScreen =
+    isGateActive && currentGateQuestions !== null && !!user && isComplete && !rewatching;
+
+  // Rewatching is about one lesson, so it must not follow the learner to the
+  // next one. Without this, choosing Rewatch on lesson 3 would also hide the
+  // check-in waiting on lesson 6.
+  useEffect(() => {
+    setRewatching(false);
+  }, [currentLessonId]);
   const currentGateNumber = currentGateQuestions ? gateIndices.indexOf(currentIndex) + 1 : 0;
   const answeredQuestionIds = new Set(
     courseQuestions.filter(isQuestionAnswered).map((q) => q.id)
@@ -1512,6 +1538,10 @@ export default function LessonPage({ params }: LessonPageProps) {
                 </div>
               )}
 
+              {/* Video, controls and outline are all hidden while the check-in
+                  owns the screen. They come back via "Rewatch". */}
+              {!showCheckInScreen && (
+              <>
               {/* Video or Resource */}
               {videoId ? (
                 <>
@@ -1817,10 +1847,31 @@ export default function LessonPage({ params }: LessonPageProps) {
                   {tUI('Course Outline')}
                 </button>
               </div>
+              </>
+              )}
 
-              {/* Check-in: renders BELOW the lesson content, not replacing it */}
+              {/* The way back to the video. Only on the check-in screen, since
+                  that is the only place the video is not already on screen. */}
+              {showCheckInScreen && (
+                <button
+                  onClick={() => setRewatching(true)}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 6,
+                    padding: '8px 0', marginBottom: 4,
+                    background: 'none', border: 'none', cursor: 'pointer',
+                    fontFamily: "'DM Sans', sans-serif", fontSize: 13, fontWeight: 600,
+                    color: dark ? '#80A4ED' : '#1E2749',
+                  }}
+                >
+                  <ArrowLeft size={14} />
+                  {tUI('Rewatch')} {currentLesson.title}
+                </button>
+              )}
+
+              {/* The check-in. On its own screen once the lesson is complete,
+                  otherwise below the video as before. */}
               {isGateActive && currentGateQuestions && user && (
-                <div style={{ marginTop: 24 }}>
+                <div style={{ marginTop: showCheckInScreen ? 0 : 24 }}>
                   <GateSequence
                     questions={currentGateQuestions}
                     gateNumber={currentGateNumber}
