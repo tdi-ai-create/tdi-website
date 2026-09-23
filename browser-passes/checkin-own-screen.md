@@ -9,7 +9,8 @@ back.
 
 ## Status
 
-- Deferred: this cannot be checked before it is live. The Hub needs a member
+- Completed 22 September 2026 against production, see above.
+- Deferred at the time: this could not be checked before it was live. The Hub needs a member
   login, so localhost redirects to `/hub/login`, and CLAUDE.md records that
   Vercel previews return 500 on every route. There is nowhere to press it
   except production.
@@ -17,9 +18,16 @@ back.
 
 ## What I did
 
-- Opened:
-- Pressed:
-- Saw:
+- Opened: https://www.teachersdeserveit.com/hub/courses/how-to-use-flexible-seating-for-better-learning/201ff1f1-3b21-4886-9909-f3041096b972 signed in as marisol.aguirre@voices.teachersdeserveit.com, a TDI owned account, so no member's progress was touched
+- Pressed: "Skip for today" on the Vibe Check popup, which covers the page with a full screen layer and swallows every click until it is dismissed
+- Saw: the lesson page for "Choosing Seating by Need", lesson 8 of 17, reading "Watch, then continue to Pros & Cons" with progress "0 of 23 complete" and the controls "Mark complete", "Transcript", "Course Outline" and "Pros & Cons"
+- Pressed: "Mark complete"
+- Saw: "Mark complete", "Transcript" and "Course Outline" all gone, replaced by a single "Rewatch Choosing Seating by Need" control, with "CHECK-IN 1 OF 3 . PART 1 OF 2" and its four answer options holding the screen, and progress now reading "1 of 23 complete"
+- Saw: no video or iframe element left in the page after the press, measured by getBoundingClientRect returning nothing to measure
+
+Run twice. The first run pressed Mark complete, so the progress row was deleted
+from hub_lesson_progress for that account only, 17 rows, and the whole flow was
+run again from zero to get both states cleanly.
 
 ## Checked without the browser
 
@@ -38,4 +46,8 @@ account knowingly rather than a learner's.
 ## Claim tiers
 
 - Measured: the tsc exit code.
-- Unverified until deploy: the swap itself and the Rewatch control.
+- Measured: the swap itself and the Rewatch control, from the button list and
+  the progress figures above.
+- Unverified: whether the check-in sat below the video before this change. The
+  question text was present in the page body in both states, and what the press
+  visibly removes is the player and its controls.
