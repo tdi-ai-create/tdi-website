@@ -387,6 +387,56 @@ export async function GET() {
     issues.push(`Whats-inside section check failed: ${String(err)}`);
   }
 
+  // Check 5b: a lesson carrying far more checks than anyone designed.
+  //
+  // The approved design is three check-ins per course, each one a comprehension
+  // question plus a reflection, so a lesson that holds a gate has two active
+  // questions and every other lesson has none. On 22 September the Hub held
+  // 5,820 active questions across 366 lessons, one course asked a member to
+  // work through 273 items, and the same question appeared five times in a row.
+  //
+  // The cause was the Auto-Generate button appending rather than replacing.
+  // That is fixed, so this exists to prove it stays fixed. The failure mode is
+  // silent and slow: nobody notices five copies until a member is halfway
+  // through a course, which is exactly how it ran for months.
+  //
+  // Eight, not three, so an intentionally richer lesson does not nag every day.
+  // Anything at or above this is drift, not design.
+  try {
+    const { data, error } = await supabase
+      .from('hub_quiz_questions')
+      .select('lesson_id')
+      .eq('is_active', true);
+
+    if (error) {
+      issues.push(`Check-in drift check failed: ${error.message}`);
+    } else if (data) {
+      const perLesson = new Map<string, number>();
+      for (const row of data) {
+        const id = row.lesson_id as string;
+        perLesson.set(id, (perLesson.get(id) ?? 0) + 1);
+      }
+      const CHECK_IN_CEILING = 8;
+      const over = [...perLesson.entries()]
+        .filter(([, n]) => n >= CHECK_IN_CEILING)
+        .sort((a, b) => b[1] - a[1]);
+
+      if (over.length > 0) {
+        const worst = over.slice(0, 5).map(([id, n]) => `${id} (${n})`).join(', ');
+        const more = over.length > 5 ? `, and ${over.length - 5} more` : '';
+        issues.push(
+          `${over.length} lesson${over.length === 1 ? '' : 's'} ` +
+          `${over.length === 1 ? 'has' : 'have'} ${CHECK_IN_CEILING} or more active check-in questions, ` +
+          `against a design of two per lesson that carries a gate. This is how the ` +
+          `duplicate check-in problem started, so it is worth looking at before it grows: ` +
+          `${worst}${more}. Rebuild a course with scripts/rebuild-course-checkins.mjs --course=<slug>.`
+        );
+      }
+    }
+  } catch (err) {
+    issues.push(`Check-in drift check failed: ${String(err)}`);
+  }
+
   // Check 6: Clean up video staging files older than 1 hour
   let stagingCleaned = 0;
   try {

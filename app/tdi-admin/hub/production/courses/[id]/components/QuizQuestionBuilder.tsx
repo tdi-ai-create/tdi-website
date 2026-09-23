@@ -77,6 +77,9 @@ export default function QuizQuestionBuilder({
   const [error, setError] = useState<string | null>(null);
   const [generating, setGenerating] = useState(false);
   const [generateStatus, setGenerateStatus] = useState('');
+  // Generating replaces whatever is already on the lesson. When there is
+  // something to lose, the button asks first rather than doing it quietly.
+  const [confirmReplace, setConfirmReplace] = useState(false);
 
   // Fetch questions on mount
   const fetchQuestions = useCallback(async () => {
@@ -99,6 +102,7 @@ export default function QuizQuestionBuilder({
 
   // AI-generate engagement checks
   const handleGenerate = async () => {
+    setConfirmReplace(false);
     setGenerating(true);
     setGenerateStatus('Analyzing lesson content...');
     setError(null);
@@ -116,7 +120,11 @@ export default function QuizQuestionBuilder({
         return;
       }
 
-      setGenerateStatus(`Created ${data.count} engagement checks`);
+      setGenerateStatus(
+        data.retired > 0
+          ? `Replaced ${data.retired} with ${data.count} new checks`
+          : `Created ${data.count} engagement checks`
+      );
       // Refresh the question list
       await fetchQuestions();
       setTimeout(() => setGenerateStatus(''), 3000);
@@ -493,7 +501,7 @@ export default function QuizQuestionBuilder({
           Engagement Checks ({questions.length})
         </p>
         <button
-          onClick={handleGenerate}
+          onClick={() => (questions.length > 0 && !confirmReplace ? setConfirmReplace(true) : handleGenerate())}
           disabled={generating}
           className="text-xs font-medium disabled:opacity-50 flex items-center gap-1.5 px-2.5 py-1 rounded-md transition-colors"
           style={{
@@ -506,9 +514,31 @@ export default function QuizQuestionBuilder({
           ) : (
             <Zap size={11} />
           )}
-          {generating ? (generateStatus || 'Generating...') : 'Auto-Generate'}
+          {generating
+            ? (generateStatus || 'Generating...')
+            : confirmReplace
+              ? `Replace ${questions.length}?`
+              : questions.length > 0
+                ? 'Regenerate'
+                : 'Auto-Generate'}
         </button>
       </div>
+      {confirmReplace && !generating && (
+        <div className="flex items-start gap-2 p-2 bg-amber-50 rounded text-xs text-amber-800">
+          <AlertCircle size={12} className="mt-0.5 shrink-0" />
+          <span>
+            This retires the {questions.length} check{questions.length === 1 ? '' : 's'} already on
+            this lesson and writes a new set. Answers educators have already given are kept.
+            Press again to go ahead.
+          </span>
+          <button
+            onClick={() => setConfirmReplace(false)}
+            className="ml-auto shrink-0 text-amber-700 hover:text-amber-900"
+          >
+            cancel
+          </button>
+        </div>
+      )}
       {generateStatus && !generating && (
         <p className="text-xs text-green-600 font-medium">{generateStatus}</p>
       )}

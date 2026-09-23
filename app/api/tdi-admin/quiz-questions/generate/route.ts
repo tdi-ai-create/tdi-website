@@ -151,15 +151,57 @@ Return ONLY the JSON array, no markdown fences, no explanation.`;
       );
     }
 
-    // Get current max sort_order for this lesson
-    const { data: existing } = await supabase
+    // Retire what is already on this lesson before writing the new set.
+    //
+    // This button used to append. It read the highest sort_order and carried on
+    // from there, so every press left the previous set in place and stacked a
+    // new one on top. Pressed five times across a few months, a lesson ended up
+    // with five copies of the same question, and by 22 September 2026 the Hub
+    // held 5,820 active questions across 366 lessons. One course asked a member
+    // to complete 273 items and put the identical question in front of them five
+    // times in a row. Every bloated lesson held an exact multiple of five,
+    // which is how the cause was found.
+    //
+    // Retired, never deleted: educators have already answered these and
+    // hub_quiz_responses references question_id. This is the same approach
+    // bulk-checks and scripts/rebuild-course-checkins.mjs already take.
+    const { data: existingActive, error: existingError } = await supabase
       .from('hub_quiz_questions')
-      .select('sort_order')
+      .select('id')
       .eq('lesson_id', lesson_id)
-      .order('sort_order', { ascending: false })
-      .limit(1);
+      .eq('is_active', true);
 
-    let nextSortOrder = existing && existing.length > 0 ? existing[0].sort_order + 1 : 0;
+    if (existingError) {
+      console.error('[generate] Could not read existing questions:', existingError);
+      return NextResponse.json(
+        { error: `Could not read the questions already on this lesson, so nothing was changed: ${existingError.message}` },
+        { status: 500 }
+      );
+    }
+
+    const toRetire = existingActive ?? [];
+
+    if (toRetire.length > 0) {
+      // Retiring has to succeed before anything new is inserted. If this fails
+      // silently the lesson serves both sets at once, which a learner reads as
+      // the same question asked twice, and that is the bug this whole change
+      // exists to stop.
+      const { error: retireError } = await supabase
+        .from('hub_quiz_questions')
+        .update({ is_active: false })
+        .in('id', toRetire.map((q) => q.id));
+
+      if (retireError) {
+        console.error('[generate] Retire failed:', retireError);
+        return NextResponse.json(
+          { error: `Could not retire the ${toRetire.length} existing checks, so no new ones were written: ${retireError.message}` },
+          { status: 500 }
+        );
+      }
+    }
+
+    // sort_order restarts at 0 because the previous set is no longer active.
+    let nextSortOrder = 0;
 
     // Insert all questions
     const insertRows = questions.map((q: Record<string, unknown>) => ({
@@ -183,9 +225,13 @@ Return ONLY the JSON array, no markdown fences, no explanation.`;
       return NextResponse.json({ error: insertError.message }, { status: 500 });
     }
 
+    // retired is reported so the page can say what it replaced rather than
+    // only what it made. "Created 5" beside a lesson that silently lost 25 is
+    // how this went unnoticed for months.
     return NextResponse.json({
       questions: created,
       count: created?.length || 0,
+      retired: toRetire.length,
     });
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : 'Unknown error';
