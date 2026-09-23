@@ -672,6 +672,19 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
    *
    * Fire and forget on purpose. A failed log must never stop a teacher getting
    * the file, so this never awaits and never blocks the navigation.
+   *
+   * Fire and forget still has to fire. This shipped as `void supabase.from(...)
+   * .insert(...)`, and a Supabase query builder is lazy: it is a thenable, and
+   * the request is only sent when something calls `then` on it. `void` throws
+   * the builder away, so the insert was never sent once. Between 2026-09-09,
+   * when this shipped, and 2026-09-23 it produced 0 rows against 99 logged
+   * views. The view logger three functions up has always worked, and the only
+   * difference is that it ends in `.then(() => {})`.
+   *
+   * So the terminal `then` below is load bearing, not decoration. Both
+   * callbacks are given deliberately: the second swallows a rejected insert,
+   * which is what keeps a failed log from surfacing to the reader, and without
+   * it this would trade a silent no-op for an unhandled rejection.
    */
   const logDownload = (target: 'tool' | 'guide', url: string | null | undefined) => {
       // target is derived from the data, not assumed. When an item has no
@@ -681,7 +694,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
       if (!quickWin || !user || !url) return;
       try {
         const supabase = getSupabase();
-        void supabase.from('hub_activity_log').insert({
+        supabase.from('hub_activity_log').insert({
           user_id: user.id,
           action: 'quick_win_downloaded',
           metadata: {
@@ -690,7 +703,7 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
             target,
             downloaded_at: new Date().toISOString(),
           },
-        });
+        }).then(() => {}, () => {});
       } catch {
         // Never let instrumentation break the download itself.
       }
