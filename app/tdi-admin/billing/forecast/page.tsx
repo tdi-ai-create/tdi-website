@@ -147,10 +147,15 @@ export default function ForecastPage() {
         ))
       )}
 
-      <p style={S.foot}>
-        Every date here is the day a line becomes <b>ready</b> to invoice. Nothing sends itself. Drafts wait in the
-        Outbox until someone presses Send.
-      </p>
+      <div style={S.footRow}>
+        <p style={S.foot}>
+          Every date here is the day a line becomes <b>ready</b> to invoice. Nothing sends itself. Drafts wait in the
+          Outbox until someone presses Send.
+        </p>
+        <a href="/api/tdi-admin/billing/export?view=forecast" style={S.dl} download>
+          Export this as a spreadsheet
+        </a>
+      </div>
     </Frame>
   );
 }
@@ -199,5 +204,10 @@ const S: Record<string, React.CSSProperties> = {
     background: '#EFF6FF', border: '1px solid #BFDBFE', borderRadius: 12,
     padding: '13px 16px', marginBottom: 18, color: '#1E3A8A', fontSize: 13,
   },
-  foot: { color: '#64748B', fontSize: 12.5, maxWidth: 760 },
+  foot: { color: '#64748B', fontSize: 12.5, maxWidth: 620, margin: 0 },
+  footRow: { display: 'flex', gap: 18, alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap' },
+  dl: {
+    background: '#0B1120', color: '#fff', border: 0, borderRadius: 7,
+    padding: '8px 14px', fontSize: 12.5, fontWeight: 650, textDecoration: 'none', whiteSpace: 'nowrap',
+  },
 };
