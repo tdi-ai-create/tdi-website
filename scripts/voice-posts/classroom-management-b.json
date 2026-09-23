@@ -1,0 +1,162 @@
+{
+  "category": "Classroom Management (second half)",
+  "note": "Posts from TDI-owned voice accounts. Comments describe the tool, what to change, or who it suits. None claims a classroom moment.",
+  "tools": [
+    { "slug": "inclusive-classroom-culture-quiz", "posts": [
+      ["Nadia Belhassen", "from_tdi", "Answer it about the room you have on an ordinary Tuesday. Answering about your intentions produces a result you cannot act on."],
+      ["Bettina Kowalczyk", "from_tdi", "Relationships tends to score highest and instruction lowest, which is worth knowing before you read your own result as a verdict."],
+      ["Priya Raghunathan", "question", "Which of the areas did you score lowest on, and was it the one you expected?"],
+      ["Rosalie Dunne", "question", "What does inclusive instruction look like in your subject specifically?"]
+    ]},
+    { "slug": "locker-room-supervision-checklist", "posts": [
+      ["Gus Halvorsen", "from_tdi", "Active monitoring is the phrase doing the work. Standing in a locker room is not the same as supervising it, and the checklist is specific about the difference."],
+      ["Lorna Stimpson", "from_tdi", "Written for paras as well as PE staff, which matters because supervision often falls to whoever is free rather than whoever planned it."],
+      ["Deshawn Pryor", "question", "What is the blind spot in your space, and has anything been done about it?"],
+      ["Everett Crane", "question", "Who covers this where you are when the usual person is out?"]
+    ]},
+    { "slug": "middle-school-engagement-audit", "posts": [
+      ["Tobias Rennert", "from_tdi", "Autonomy is the section most middle school teachers underrate, and it is usually the cheapest one to change."],
+      ["Marcus Oyelaran", "from_tdi", "Comprehensive means long. Do one section a week rather than sitting down to the whole thing, or it will not get finished."],
+      ["Ravi Chandrasekar", "question", "Which section of this would your students answer differently from you?"],
+      ["Camille Thibodeaux", "question", "What is one thing you changed about engagement that actually worked at this age?"]
+    ]},
+    { "slug": "morning-meeting-framework", "posts": [
+      ["Simone Ashcroft", "from_tdi", "The structure is the point. Morning meeting without a fixed shape drifts into news from home and then into nothing."],
+      ["Callum Ferreira", "from_tdi", "Keep it the same length every day, even on the days it is going well. Predictability is most of what it teaches."],
+      ["Ofelia Marchetti", "question", "What part of your morning meeting do the children ask for when you skip it?"],
+      ["Marisol Aguirre", "question", "How do you run this when a quarter of the class arrives after it starts?"]
+    ]},
+    { "slug": "music-concert-prep-logistics-checklist", "posts": [
+      ["Aurelia Nkemdirim", "from_tdi", "Repertoire lock at three weeks is the deadline that makes everything after it possible. Moving it moves everything."],
+      ["Gus Halvorsen", "from_tdi", "Load-out is on here because it is the part that is always somebody's problem at ten at night and nobody's problem in the plan."],
+      ["Ingrid Vasquez-Lund", "question", "What goes wrong at your concerts that a timeline could have prevented?"],
+      ["Wendell Prosser", "question", "Who helps you on the night, and are they asked or volunteered?"]
+    ]},
+    { "slug": "musical-trust-builders", "posts": [
+      ["Aurelia Nkemdirim", "from_tdi", "These work in a general classroom as well as a music room. Nobody needs to play anything."],
+      ["Simone Ashcroft", "from_tdi", "Trust builders tend to fail when they are introduced during a bad week. Use them while things are fine and they will hold when things are not."],
+      ["Bettina Kowalczyk", "question", "Which of these would your most self-conscious student tolerate?"],
+      ["Callum Ferreira", "question", "Has anyone used these with staff rather than students? I would expect the same activities to land quite differently."]
+    ]},
+    { "slug": "new-student-intake-checklist", "posts": [
+      ["Marisol Aguirre", "from_tdi", "Paperwork and schedule first, then the first-week check-ins. The check-ins are the part that gets skipped and the part that decides how the term goes."],
+      ["Nadia Belhassen", "from_tdi", "If the new student is also new to the language, the first week timeline here is too fast. Stretch it."],
+      ["Hana Sugimoto", "question", "How long does it usually take before a mid-year arrival stops looking lost in your room?"],
+      ["Trevon Baptiste", "question", "What do you wish the previous school had sent with the student?"]
+    ]},
+    { "slug": "new-student-welcome-protocol", "posts": [
+      ["Yolanda Betts", "from_tdi", "The buddy choice matters more than the protocol. Pick for kindness rather than for confidence, or the new student gets a tour guide instead of a friend."],
+      ["Ofelia Marchetti", "from_tdi", "Learning needs within 48 hours is ambitious and worth aiming at anyway. Even a partial picture beats waiting for records."],
+      ["Deshawn Pryor", "question", "How do you pick a buddy, and have you ever got it wrong?"],
+      ["Rosalie Dunne", "question", "What do you do when the new student arrives with no records at all?"]
+    ]},
+    { "slug": "new-to-the-building-mid-year-transfer", "posts": [
+      ["Trevon Baptiste", "from_tdi", "The section on what records might not tell you is the honest part. A transfer file describes a school as much as it describes a student."],
+      ["Jarrod Levins", "from_tdi", "Mid-year transfers often arrive for a reason nobody has written down. Assume the first fortnight is not representative."],
+      ["Camille Thibodeaux", "question", "What is the first thing you try to find out about a student who arrives mid-year?"],
+      ["Marcus Oyelaran", "question", "How do you introduce them to the class without making an event of it?"]
+    ]},
+    { "slug": "peer-exclusion-not-bullying-not-nothing", "posts": [
+      ["Bettina Kowalczyk", "from_tdi", "This covers the gap most policies leave. Exclusion is rarely reportable and it is rarely nothing, and the card is about what you can do in between."],
+      ["Rosalie Dunne", "from_tdi", "Watch the pattern rather than the incident. One lunchtime tells you little, three weeks of the same seating tells you a lot."],
+      ["Yolanda Betts", "question", "Where does the line sit for you between a friendship group and exclusion?"],
+      ["Nadia Belhassen", "question", "Have you found a way to change this without naming it in front of the class?"]
+    ]},
+    { "slug": "whole-room-reset-regulation", "posts": [
+      ["Everett Crane", "from_tdi", "Whole-room escalation is a different problem from one student escalating, and the moves that work for one make the other worse. That is why this is its own card."],
+      ["Simone Ashcroft", "from_tdi", "Do not try to teach in the first two minutes. The card is built around that, and most of us try anyway."],
+      ["Gus Halvorsen", "question", "What brings your room back fastest after something has rattled everyone?"],
+      ["Priya Raghunathan", "question", "For coaches, what do you advise a teacher to do with the rest of the lesson after this?"]
+    ]},
+    { "slug": "sel-strategy-selector", "posts": [
+      ["Marisol Aguirre", "from_tdi", "It matches to your context rather than ranking strategies, which is why two teachers in the same building can get different answers and both be right."],
+      ["Callum Ferreira", "from_tdi", "Answer for the class that is hardest right now, not for your roster generally."],
+      ["Hana Sugimoto", "question", "Which strategy did it give you, and had you already tried it?"],
+      ["Ofelia Marchetti", "question", "What SEL approach have you dropped because it did not fit your room?"]
+    ]},
+    { "slug": "sensory-break-regulation-checklist", "posts": [
+      ["Rosalie Dunne", "from_tdi", "The early signs section is the one to learn. By the time a break is obviously needed the break is much less effective."],
+      ["Lorna Stimpson", "from_tdi", "Confirming the break worked is the step people skip. A break that did not help is information, not a failure."],
+      ["Deshawn Pryor", "question", "What is the earliest sign you have learned to spot in a student you know well?"],
+      ["Everett Crane", "question", "What do you do when the right break is not available in your space?"]
+    ]},
+    { "slug": "shared-space-closing-checklist-paras-specialists", "posts": [
+      ["Lorna Stimpson", "from_tdi", "Five minutes, and it is a handover rather than a tidy. The next adult in the room is the audience."],
+      ["Ofelia Marchetti", "from_tdi", "Worth agreeing with the person you hand to rather than doing it at them. A shared standard beats a good unilateral one."],
+      ["Yolanda Betts", "question", "How many people use your space in a day, and does anyone actually know the full list?"],
+      ["Deshawn Pryor", "question", "What is always left out for you that you wish was not?"]
+    ]},
+    { "slug": "five-second-reset", "posts": [
+      ["Tobias Rennert", "from_tdi", "Five seconds without stopping instruction is the constraint that makes this different from most redirects. If you have to pause the lesson it is a different tool."],
+      ["Marcus Oyelaran", "from_tdi", "Repeatable matters more than clever. The same small move done identically is what makes students stop noticing it."],
+      ["Ravi Chandrasekar", "question", "What is your five second move, and did you choose it or inherit it?"],
+      ["Camille Thibodeaux", "question", "Does this hold up with a student who is looking for the reaction?"]
+    ]},
+    { "slug": "art-room-reset-plan", "posts": [
+      ["Aurelia Nkemdirim", "from_tdi", "Specials rooms have a movement and materials problem that a standard management plan does not account for, which is the whole reason this exists separately."],
+      ["Gus Halvorsen", "from_tdi", "Reset at a natural boundary, a new unit or a term, rather than mid-project. Half a room in wet clay is not the moment."],
+      ["Simone Ashcroft", "question", "What is the hardest part of managing a room where everyone is standing up?"],
+      ["Bettina Kowalczyk", "question", "For specialists seeing every class in the school, how do you keep a reset consistent across all of them?"]
+    ]},
+    { "slug": "calm-corner-passport", "posts": [
+      ["Callum Ferreira", "from_tdi", "The structure is what stops a calm corner becoming somewhere to go instead of working. The passport gives the visit a shape and an end."],
+      ["Ofelia Marchetti", "from_tdi", "Gamified is doing light work here. It is mostly a sequence a four year old can follow without an adult narrating it."],
+      ["Simone Ashcroft", "question", "How do you handle the child who wants the calm corner constantly?"],
+      ["Marisol Aguirre", "question", "What is in your calm corner that earns its space?"]
+    ]},
+    { "slug": "engagement-relay", "posts": [
+      ["Gus Halvorsen", "from_tdi", "Team based, so pick teams deliberately. Letting students choose is the fastest way to make this about something other than the content."],
+      ["Marcus Oyelaran", "from_tdi", "The peer accountability part only works if the academic challenge is genuinely doable by everyone on the team."],
+      ["Hana Sugimoto", "question", "How do you build teams for something like this without it being obvious why?"],
+      ["Trevon Baptiste", "question", "What subject content have you run this with that worked better than you expected?"]
+    ]},
+    { "slug": "first-few-minutes-student-loses-it", "posts": [
+      ["Everett Crane", "from_tdi", "Safety, then you, then the student. The card puts your own regulation second on purpose, because it is the step most of us skip and the one everything else depends on."],
+      ["Rosalie Dunne", "from_tdi", "Nothing here is about consequences. That conversation belongs to a later card and a later hour."],
+      ["Yolanda Betts", "question", "What do you do with the rest of the class in those first minutes?"],
+      ["Lorna Stimpson", "question", "How do you come down yourself afterwards, when the lesson just carries on?"]
+    ]},
+    { "slug": "proximity-redirect", "posts": [
+      ["Tobias Rennert", "from_tdi", "Movement alone, no words, is the discipline of this one. The moment you add a sentence it becomes an ordinary redirect with walking attached."],
+      ["Ravi Chandrasekar", "from_tdi", "Works less well in a room where you are already always moving, because the signal needs a background of stillness to read against."],
+      ["Marcus Oyelaran", "question", "Which students does this not work on in your room?"],
+      ["Wendell Prosser", "question", "How do you use proximity in a lab or workshop where you are constantly circulating anyway?"]
+    ]},
+    { "slug": "student-re-entry-conversation-card", "posts": [
+      ["Rosalie Dunne", "from_tdi", "Sixty seconds, and it happens before the student sits down. Re-entry conversations held at the end of the lesson are a different thing entirely."],
+      ["Everett Crane", "from_tdi", "The script deliberately does not relitigate what happened. That is the mistake it exists to prevent."],
+      ["Priya Raghunathan", "question", "What do you say first to a student walking back in after a removal?"],
+      ["Bettina Kowalczyk", "question", "Does your building give the student any support before they come back, or do they just reappear?"]
+    ]},
+    { "slug": "recurring-conflict-same-two-students", "posts": [
+      ["Marcus Oyelaran", "from_tdi", "A repeat conflict is a pattern rather than a series of incidents, and the card starts by asking you to check which one you actually have."],
+      ["Nadia Belhassen", "from_tdi", "Seating changes are the usual first move and the usual failed move. Worth reading the rest before reaching for it."],
+      ["Camille Thibodeaux", "question", "Have you ever successfully turned around two students who kept clashing? What shifted it?"],
+      ["Jarrod Levins", "question", "At what point does this stop being a classroom problem and become a building one?"]
+    ]},
+    { "slug": "transitions-and-routine-changes-planning-card", "posts": [
+      ["Ofelia Marchetti", "from_tdi", "Fill it in for a known disruption before it happens. Used afterwards it is just a record of what went wrong."],
+      ["Lorna Stimpson", "from_tdi", "Substitutes are on the list of disruptions, which is right and is rarely how we think about them."],
+      ["Deshawn Pryor", "question", "Which routine change hits your students hardest? Mine is anything that moves lunch."],
+      ["Simone Ashcroft", "question", "How far in advance do you tell students about a change, and does earlier actually help?"]
+    ]},
+    { "slug": "two-students-one-fight-teacher-response", "posts": [
+      ["Everett Crane", "from_tdi", "The what not to do section is the important half. Most of what goes wrong here is an adult doing something instinctive."],
+      ["Gus Halvorsen", "from_tdi", "Know your building's expectation about physical intervention before you are in the moment, because this card cannot tell you that."],
+      ["Jarrod Levins", "question", "What does your school actually expect of a teacher in that moment, and is it written down anywhere?"],
+      ["Marcus Oyelaran", "question", "How do you handle the crowd that forms before you get there?"]
+    ]},
+    { "slug": "management-style-quiz", "posts": [
+      ["Priya Raghunathan", "from_tdi", "The value is in the second half, the strategies outside your default. The label itself is the least useful part of the result."],
+      ["Tobias Rennert", "from_tdi", "Answer as you are on a hard day. Answering as your best self gives you a result about somebody else."],
+      ["Ingrid Vasquez-Lund", "question", "What did it say you were, and would your students agree?"],
+      ["Hana Sugimoto", "question", "Which style is hardest for you to borrow from when you need to?"]
+    ]},
+    { "slug": "student-shutdown-response-card", "posts": [
+      ["Rosalie Dunne", "from_tdi", "Shutting down reads as compliance from the front of the room, which is exactly why it gets missed for weeks at a time."],
+      ["Nadia Belhassen", "from_tdi", "The what not to push section matters most here. Pressure is the instinctive response and almost always the wrong one."],
+      ["Yolanda Betts", "question", "How do you tell a student who has checked out from one who is just quiet?"],
+      ["Callum Ferreira", "question", "What has worked to bring a student back in, days later rather than in the moment?"]
+    ]}
+  ]
+}

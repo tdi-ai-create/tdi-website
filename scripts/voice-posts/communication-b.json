@@ -1,0 +1,144 @@
+{
+  "category": "Communication (second half)",
+  "note": "Posts from TDI-owned voice accounts. Comments describe the tool, what to change, or who it suits. None claims a classroom moment and none cites an internal number.",
+  "tools": [
+    { "slug": "parent-email-templates-4-pack", "posts": [
+      ["Ingrid Vasquez-Lund", "from_tdi", "Four covers most weeks. The concern email is the one worth reading twice before you adapt it, because tone carries further in writing than people expect."],
+      ["Marisol Aguirre", "from_tdi", "Keep the positive one ready to send rather than saved for a reason. It is the one that gets used least and earns most."],
+      ["Tobias Rennert", "question", "Which of the four do you reach for most, and which have you never needed?"],
+      ["Nadia Belhassen", "question", "How do you adjust these for a family you have not met yet?"]
+    ]},
+    { "slug": "parent-homework-support-strategies", "posts": [
+      ["Hana Sugimoto", "from_tdi", "Judgment-free is the design requirement. Any homework advice that implies the family is doing it wrong stops being read at the second line."],
+      ["Callum Ferreira", "from_tdi", "Send two or three, not the whole set. A list of strategies reads as a list of expectations."],
+      ["Marcus Oyelaran", "question", "What do families most often ask you about homework?"],
+      ["Aurelia Nkemdirim", "question", "What do you say to a parent who is doing the homework themselves?"]
+    ]},
+    { "slug": "parent-letter-template-classroom-ai-policy", "posts": [
+      ["Trevon Baptiste", "from_tdi", "Plain language is the whole job here. Families do not need to know how the tools work, they need to know what is allowed and what happens if it is not."],
+      ["Ravi Chandrasekar", "from_tdi", "Send it before an incident, not in response to one. The same letter reads completely differently in each case."],
+      ["Wendell Prosser", "question", "What have families asked you about AI that you were not ready for?"],
+      ["Ingrid Vasquez-Lund", "question", "Does your policy differ from the building's, and does the letter say so?"]
+    ]},
+    { "slug": "parent-teacher-conference-prep-sheet", "posts": [
+      ["Camille Thibodeaux", "from_tdi", "Prepare your questions as carefully as your talking points. A conference where only the teacher asks anything is a report, not a meeting."],
+      ["Priya Raghunathan", "from_tdi", "Bring one piece of data, not four. The second and third get argued about and the first gets remembered."],
+      ["Bettina Kowalczyk", "question", "What question do you ask families that opens the conversation up?"],
+      ["Jarrod Levins", "question", "How long are your conference slots, and is that long enough to be honest in?"]
+    ]},
+    { "slug": "phone-call-meeting-prep-checklist", "posts": [
+      ["Tobias Rennert", "from_tdi", "The point is to know your first two sentences and your last one. The middle mostly takes care of itself."],
+      ["Ofelia Marchetti", "from_tdi", "Check what time is actually reachable for the family before you call. Three missed calls reads as avoidance in both directions."],
+      ["Deshawn Pryor", "question", "What time of day do you make hard calls, and why that time?"],
+      ["Rosalie Dunne", "question", "Do you prepare differently for a meeting you called versus one the family asked for?"]
+    ]},
+    { "slug": "pitch-it-with-confidence-tdi", "posts": [
+      ["Jarrod Levins", "from_tdi", "Lead with the problem in your building rather than the product. An administrator hears a pitch as another initiative unless it is attached to something they already worry about."],
+      ["Priya Raghunathan", "from_tdi", "The funding section is the part most people skip and the part that decides whether the conversation continues."],
+      ["Deacon Mwangi", "question", "What does your administrator actually need to hear before they will look at anything new?"],
+      ["Wendell Prosser", "question", "Who makes this kind of decision in your building, and is it who you would expect?"]
+    ]},
+    { "slug": "professional-email-practices-quick-reference", "posts": [
+      ["Ingrid Vasquez-Lund", "from_tdi", "Tone is the section worth rereading. Clarity is easy to fix later and tone is not."],
+      ["Camille Thibodeaux", "from_tdi", "Write the hard email, then leave it unsent overnight. Nothing in here beats that."],
+      ["Ravi Chandrasekar", "question", "What is your rule for when an email should have been a conversation?"],
+      ["Marisol Aguirre", "question", "Have you ever sent one you wish you had not? What would have stopped you?"]
+    ]},
+    { "slug": "restorative-circles-starter-guide", "posts": [
+      ["Bettina Kowalczyk", "from_tdi", "Starter is accurate. Circles run badly do more damage than not running them, and the guide is honest about the preparation involved."],
+      ["Everett Crane", "from_tdi", "Do not run your first circle about the worst thing that has happened. Practice on something small and boring first."],
+      ["Marcus Oyelaran", "question", "Has a circle ever gone wrong for you? What went wrong?"],
+      ["Rosalie Dunne", "question", "What do you do when a student refuses to take part?"]
+    ]},
+    { "slug": "sped-feedback-formula", "posts": [
+      ["Rosalie Dunne", "from_tdi", "The formula exists because feedback in a specialist setting has to be usable by a student who may not read tone. Specific and warm are not in tension here."],
+      ["Yolanda Betts", "from_tdi", "Works for support staff giving feedback too, which matters when the para is the one with the student most of the day."],
+      ["Lorna Stimpson", "question", "How do you give corrective feedback without it landing as failure?"],
+      ["Deshawn Pryor", "question", "Who gives feedback in your setting, and is anyone coached on how?"]
+    ]},
+    { "slug": "structured-parent-observation-protocol", "posts": [
+      ["Jarrod Levins", "from_tdi", "Set the expectations before the visit, in writing. Almost every observation that goes badly does so because nobody agreed what it was for."],
+      ["Ingrid Vasquez-Lund", "from_tdi", "Give the parent something to look for. An observer with no task watches their own child and nothing else."],
+      ["Priya Raghunathan", "question", "How often do parents observe where you are, and who arranges it?"],
+      ["Bettina Kowalczyk", "question", "What would you want said to your class before a parent walked in?"]
+    ]},
+    { "slug": "supporting-communication-differences-day-to-day", "posts": [
+      ["Rosalie Dunne", "from_tdi", "Pairing speech with visuals is the single change with the widest effect here, and it costs nothing."],
+      ["Nadia Belhassen", "from_tdi", "The AAC section deserves care. A device that is not within reach is not available, whatever the plan says."],
+      ["Ofelia Marchetti", "question", "What have you changed about how you speak that made the most difference?"],
+      ["Yolanda Betts", "question", "How do you make sure everyone who works with the student is doing the same thing?"]
+    ]},
+    { "slug": "teacher-para-communication-kit", "posts": [
+      ["Everett Crane", "from_tdi", "Role clarity is the part that actually changes days. Most teacher and para friction is about unclear roles rather than unwillingness."],
+      ["Lorna Stimpson", "from_tdi", "Use the planning templates together, once, at the start. Filled in separately they describe two different jobs."],
+      ["Yolanda Betts", "question", "For teachers, do you know what your para thinks their role is?"],
+      ["Deshawn Pryor", "question", "For paras, what would you change about how the day is planned if you were asked?"]
+    ]},
+    { "slug": "connection-builders-daily-checklist", "posts": [
+      ["Marisol Aguirre", "from_tdi", "Daily and small is the design. A relationship strategy that needs a spare twenty minutes will not survive a normal week."],
+      ["Simone Ashcroft", "from_tdi", "Track which students you have not spoken to individually. That is the list this is really for."],
+      ["Callum Ferreira", "question", "Which student in your room have you spoken to least this week?"],
+      ["Hana Sugimoto", "question", "What is your smallest habit that students seem to notice most?"]
+    ]},
+    { "slug": "feedback-openness-audit", "posts": [
+      ["Deacon Mwangi", "from_tdi", "Being open to feedback and being good at giving it are different skills, and most people score very differently on the two halves."],
+      ["Priya Raghunathan", "from_tdi", "Answer about the last piece of feedback you actually received rather than in general. The general answer is always kinder."],
+      ["Camille Thibodeaux", "question", "When did you last change something because a colleague told you to?"],
+      ["Jarrod Levins", "question", "For leaders, how do you know whether your staff feel able to give you feedback?"]
+    ]},
+    { "slug": "language-playbook", "posts": [
+      ["Tobias Rennert", "from_tdi", "Precise rather than scripted. The difference matters, because reciting a line you do not mean is worse than the clumsy sentence you would have said."],
+      ["Everett Crane", "from_tdi", "Pick two or three and use them until they are yours. Trying to use all of it makes you sound like somebody else."],
+      ["Marcus Oyelaran", "question", "What is a phrase you use constantly that works, and where did you get it?"],
+      ["Bettina Kowalczyk", "question", "Which situation in here do you still not have good words for?"]
+    ]},
+    { "slug": "pushback-script-card", "posts": [
+      ["Camille Thibodeaux", "from_tdi", "Three audiences, and the colleague scripts are the hardest to use because you have to keep working with them afterwards."],
+      ["Ingrid Vasquez-Lund", "from_tdi", "Firm is not the same as final. The scripts leave the door open on purpose."],
+      ["Trevon Baptiste", "question", "Whose pushback do you find hardest, students, families or colleagues?"],
+      ["Priya Raghunathan", "question", "What do you say when you are being pushed on something you privately agree with?"]
+    ]},
+    { "slug": "sentence-starter-guide", "posts": [
+      ["Nadia Belhassen", "from_tdi", "Sentence starters are scaffolding, which means they are meant to come away. Worth planning when that happens rather than leaving them up all year."],
+      ["Aurelia Nkemdirim", "from_tdi", "The peer feedback starters are the most useful set here, because that is the one students have least language for."],
+      ["Marcus Oyelaran", "question", "At what point do you take the starters away, and how do you know?"],
+      ["Hana Sugimoto", "question", "Which starter do your students use most, and does it show up in their writing too?"]
+    ]},
+    { "slug": "staff-celebration-playbook", "posts": [
+      ["Jarrod Levins", "from_tdi", "Beyond pizza is the right framing. Food is easy to arrange and easy to read as the least anyone could do."],
+      ["Deacon Mwangi", "from_tdi", "Specific beats generous. Being named for a particular thing lands harder than a gift card that went to everyone."],
+      ["Priya Raghunathan", "question", "What recognition have you received that actually meant something?"],
+      ["Gus Halvorsen", "question", "What gets celebrated in your building, and what gets missed entirely?"]
+    ]},
+    { "slug": "teacher-para-partnership-planner", "posts": [
+      ["Lorna Stimpson", "from_tdi", "Intentional is the operative word. Most teacher and para partnerships are assembled out of whatever the timetable did, and this is an attempt to choose instead."],
+      ["Ofelia Marchetti", "from_tdi", "Revisit it in November. The roles agreed in August rarely describe what is actually happening by then."],
+      ["Everett Crane", "question", "How much planning time do you get together, honestly?"],
+      ["Rosalie Dunne", "question", "What is the thing you have never managed to say to your teaching partner?"]
+    ]},
+    { "slug": "virtual-connection-card", "posts": [
+      ["Ravi Chandrasekar", "from_tdi", "Built for hybrid as much as fully remote, which is the harder case because half the room is present and half is not."],
+      ["Trevon Baptiste", "from_tdi", "Cameras off is not disengagement. The card assumes that, and it is worth assuming."],
+      ["Wendell Prosser", "question", "What actually works to reach a student you only ever see on a screen?"],
+      ["Camille Thibodeaux", "question", "How do you run a discussion where some students are in the room and some are not?"]
+    ]},
+    { "slug": "weekly-communication-checklist", "posts": [
+      ["Marisol Aguirre", "from_tdi", "Weekly rather than daily, because the point is to catch what slipped rather than to add another daily task."],
+      ["Tobias Rennert", "from_tdi", "Do it on the same day every week. Friday is the obvious choice and the worst one, because Friday is when nothing gets done."],
+      ["Ofelia Marchetti", "question", "Which of the three, families, team or admin, slips first for you?"],
+      ["Nadia Belhassen", "question", "What day do you do yours, and did you arrive at that deliberately?"]
+    ]},
+    { "slug": "class-newsletter-template", "posts": [
+      ["Simone Ashcroft", "from_tdi", "Weekly or monthly is a real choice, not a preference. Monthly and actually sent beats weekly and abandoned in October."],
+      ["Callum Ferreira", "from_tdi", "Lead with what is coming rather than what happened. Families act on the first and skim the second."],
+      ["Aurelia Nkemdirim", "question", "Do families read yours? Have you ever found out?"],
+      ["Marisol Aguirre", "question", "What do you include that takes the least time and gets the most response?"]
+    ]},
+    { "slug": "communication-style-quiz", "posts": [
+      ["Priya Raghunathan", "from_tdi", "The four types are about hard conversations specifically, not conversation generally. People often score as something they would not recognise socially."],
+      ["Deacon Mwangi", "from_tdi", "The useful move afterwards is to borrow from the style you scored lowest on, in one specific situation, and see what happens."],
+      ["Ingrid Vasquez-Lund", "question", "Which of the four did you come out as, and did it feel fair?"],
+      ["Bettina Kowalczyk", "question", "Which style do you find hardest to be on the receiving end of?"]
+    ]}
+  ]
+}

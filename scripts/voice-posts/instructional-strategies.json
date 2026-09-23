@@ -1,0 +1,197 @@
+{
+  "category": "Instructional Strategies",
+  "tools": [
+    { "slug": "para-what-to-do-when", "posts": [
+      ["Deshawn Pryor", "from_tdi", "This is sorted by situation rather than by strategy name, because in the moment you are not thinking in strategy names. Print it, fold it, keep it in a pocket rather than a binder on a shelf."],
+      ["Yolanda Betts", "from_tdi", "Read it once when nothing is happening. The wording only helps if it is already half familiar by the time the situation lands on you."],
+      ["Everett Crane", "question", "Which situation on here comes up most in your week, and does the suggested response match what you already do?"],
+      ["Lorna Stimpson", "question", "Paras, what situation is missing from this that you deal with constantly and have never had any words for in the moment?"]
+    ]},
+    { "slug": "at-a-glance-iep-504-card", "posts": [
+      ["Rosalie Dunne", "from_tdi", "The wording on here is the language that already appears in most plans, so you are matching the paperwork rather than inventing your own phrasing. That matters when someone asks you to show the accommodation was delivered."],
+      ["Yolanda Betts", "from_tdi", "It is a memory aid, not the plan. Keep reading the actual document for the students you support, because this covers common language and your students will have lines that are theirs alone."],
+      ["Deshawn Pryor", "question", "Paras, were you ever shown the plans for the students you support, or did you piece it together from what teachers mentioned?"],
+      ["Jarrod Levins", "question", "Which piece of accommodation language on here do staff most often misread in practice, and what does the misreading look like?"]
+    ]},
+    { "slug": "beyond-stop-that", "posts": [
+      ["Everett Crane", "from_tdi", "Telling a child to stop says the behaviour is wrong and nothing else. Every line in here names what to do instead, which is the part that actually changes the next thirty seconds."],
+      ["Deshawn Pryor", "from_tdi", "Pick two phrases and use only those for a fortnight. Trying to swap your whole redirection vocabulary at once means you fall back on old habits the moment a room gets loud."],
+      ["Lorna Stimpson", "question", "Paras, what redirection line of your own works reliably and is not on this list, and where did you pick it up?"],
+      ["Ofelia Marchetti", "question", "Which of these feels unnatural coming out of your mouth, and did it get easier with use or did you drop it?"]
+    ]},
+    { "slug": "bilingual-reference-cards", "posts": [
+      ["Nadia Belhassen", "from_tdi", "These cover the routine sentences you repeat daily, not instruction. If a family conversation is about placement, services or anything a parent has to agree to, that still needs a real interpreter."],
+      ["Marisol Aguirre", "from_tdi", "Print a set for the adults in the room as much as the students. A card in a volunteer's hand is often the difference between a family being greeted and being walked past."],
+      ["Callum Ferreira", "question", "Which phrases did you have to add for your own building, and are they specific to you or useful to everyone?"],
+      ["Nadia Belhassen", "question", "For anyone in a school with several home languages, how do you handle the families the printed cards do not cover?"]
+    ]},
+    { "slug": "creative-ideas-classroom-computers", "posts": [
+      ["Wendell Prosser", "from_tdi", "This is aimed squarely at the machines that only ever get used for typing and testing. Six uses, all low prep, all written assuming the desktop is old and slow rather than new."],
+      ["Hana Sugimoto", "from_tdi", "Start with the idea that needs no accounts. Anything requiring a fresh login for every student stalls before it starts, and then the computers go back to being furniture."],
+      ["Ravi Chandrasekar", "question", "What do the computers in your room actually get used for in a normal week, and is that what you would choose if the timetable allowed?"],
+      ["Marcus Oyelaran", "question", "Has anyone made a station out of a single desktop rather than a full class set, and did it hold up?"]
+    ]},
+    { "slug": "creative-ideas-classroom-tablets", "posts": [
+      ["Hana Sugimoto", "from_tdi", "The fluency check is the one worth trying first, because it gives you something you would otherwise gather one child at a time while the rest of the room waits."],
+      ["Simone Ashcroft", "from_tdi", "Tablets are a small group tool more than a whole class tool. Six devices used well at a station beats thirty used badly, and these ideas are written for the smaller number."],
+      ["Marisol Aguirre", "question", "How many tablets do you actually have working on a given day, and does that number shape what you plan for the week?"],
+      ["Aurelia Nkemdirim", "question", "Which of these six would survive in your room with no charging trolley, no tech support and half the devices flat?"]
+    ]},
+    { "slug": "creative-ideas-school-library", "posts": [
+      ["Camille Thibodeaux", "from_tdi", "Every idea in here uses what the library already owns. No purchase request, no new subscription, just the shelves and the space you can book."],
+      ["Priya Raghunathan", "from_tdi", "Bring your librarian in before you plan the lesson rather than after. They will know which of these six the collection can actually support this term."],
+      ["Trevon Baptiste", "question", "What does your school library actually get used for beyond book exchange, and who decides what else happens in that space?"],
+      ["Camille Thibodeaux", "question", "For schools without a staffed library, has anyone made these work in a shared space or a corridor of shelves?"]
+    ]},
+    { "slug": "executive-functioning-educator-guide", "posts": [
+      ["Priya Raghunathan", "from_tdi", "The guide separates skills that look identical from the front of the room. A student who cannot start and a student who cannot stop need opposite support, and calling both of them unfocused gets you nowhere."],
+      ["Bettina Kowalczyk", "from_tdi", "The hard part is that these skills are still developing well into adulthood, so the support is not a temporary scaffold you remove by winter. Plan for it to stay."],
+      ["Deacon Mwangi", "question", "Which executive functioning skill do you find hardest to support without ending up doing the task for the student, and what have you tried?"],
+      ["Tobias Rennert", "question", "What does a task initiation problem look like in your subject, and how do you tell it apart from not wanting to?"]
+    ]},
+    { "slug": "executive-functioning-pa-guide", "posts": [
+      ["Deshawn Pryor", "from_tdi", "Same ideas as the educator guide, written for the person sitting beside the student rather than the one at the board. The prompts are shorter because you are usually working mid task."],
+      ["Yolanda Betts", "from_tdi", "The skipped step is agreeing with the teacher which prompts you will both use. If the two adults cue differently, the student spends their energy working out which of you to listen to."],
+      ["Ofelia Marchetti", "question", "Paras, how do you support a student who freezes at the start without ending up reading the instructions to them every time?"],
+      ["Everett Crane", "question", "What cue do you use to help a student move on when they will not leave a task alone and the lesson has already moved past it?"]
+    ]},
+    { "slug": "flexible-grouping-quick-guide", "posts": [
+      ["Deacon Mwangi", "from_tdi", "The guide is honest that tables of four forever is a seating plan, not grouping. Groups that never change become labels, and students work out the ranking long before anyone says it out loud."],
+      ["Hana Sugimoto", "from_tdi", "Decide what the group is for before you decide who is in it. Purpose first means the composition changes on its own, which is the entire point of flexible."],
+      ["Marisol Aguirre", "question", "How often do the groups in your room actually change, and what triggers it, a piece of data or a feeling that something is not working?"],
+      ["Tobias Rennert", "question", "What is your method for moving students into new groups without losing ten minutes to furniture and arguments about who sits where?"]
+    ]},
+    { "slug": "group-experiment-role-assignment-card", "posts": [
+      ["Ingrid Vasquez-Lund", "from_tdi", "Printed roles exist so the confident student does not end up holding every piece of equipment while three others watch. Assign the jobs before the materials come out, not after."],
+      ["Ravi Chandrasekar", "from_tdi", "Rotate the roles across the term or you have simply made the recorder permanent. The student who always writes is the student who never handles the kit."],
+      ["Aurelia Nkemdirim", "question", "Which role in a lab group is hardest to make genuinely useful rather than decorative, and how did you fix it?"],
+      ["Ingrid Vasquez-Lund", "question", "Do you assign the roles yourself or let groups sort it out, and which produced better work once the equipment was on the bench?"]
+    ]},
+    { "slug": "instructional-rounds-planning-guide", "posts": [
+      ["Priya Raghunathan", "from_tdi", "The guide keeps the focus on one question about learning, agreed before anyone walks in. Without that, rounds drift into judging the teacher and staff stop volunteering their rooms."],
+      ["Jarrod Levins", "from_tdi", "The step people skip is deciding what happens to the notes. If observers cannot say where the record goes and who reads it, the visit lands as evaluation whatever you call it."],
+      ["Deacon Mwangi", "question", "What question did your team look at during rounds, and was it narrow enough to actually observe in twenty minutes?"],
+      ["Jarrod Levins", "question", "For leaders, how do you take part in rounds without the room changing the moment you walk through the door?"]
+    ]},
+    { "slug": "modeling-that-sticks", "posts": [
+      ["Marisol Aguirre", "from_tdi", "These moves are about showing the thinking, not the finished product. A perfect example on the board teaches students what good looks like and nothing at all about how to get there."],
+      ["Callum Ferreira", "from_tdi", "Model the parts where you get stuck and correct yourself. Students copying a flawless demonstration learn that the real version should feel easy, which sets them up to quit."],
+      ["Camille Thibodeaux", "question", "What is something you model that you were never taught to model, and only realised students needed once you saw them stuck?"],
+      ["Hana Sugimoto", "question", "How do you decide when to stop modelling a skill and let students attempt it cold, and what tells you that you called it too early?"]
+    ]},
+    { "slug": "new-teacher-checkin-protocol", "posts": [
+      ["Deacon Mwangi", "from_tdi", "The template is weekly on purpose. Monthly check ins arrive after the problem has already hardened into a habit, and by then you are undoing rather than supporting."],
+      ["Priya Raghunathan", "from_tdi", "Ask the questions in the order given. Opening with what went well is not a nicety, it is how you get an honest answer to the harder question that follows it."],
+      ["Jarrod Levins", "question", "Coaches, what do you do when a new teacher says everything is fine for five weeks running and you can see that it is not?"],
+      ["Bettina Kowalczyk", "question", "For anyone in year one or two, what would you actually want asked in a weekly check in that nobody asks you?"]
+    ]},
+    { "slug": "no-hands-up-help-systems", "posts": [
+      ["Bettina Kowalczyk", "from_tdi", "Hands up sorts a room by confidence rather than by need. Every system in here lets a student flag that they are stuck without performing it in front of everyone."],
+      ["Tobias Rennert", "from_tdi", "Whichever signal you choose, you have to answer it reliably for the first fortnight. A cue that gets ignored twice is a cue students quietly stop using."],
+      ["Rosalie Dunne", "question", "Which of these systems works for a student who would rather sit stuck than draw any attention at all, even quietly?"],
+      ["Trevon Baptiste", "question", "Has anyone run a help signal with older students without it being treated as a joke for the first week?"]
+    ]},
+    { "slug": "pa-quick-wins-menu", "posts": [
+      ["Yolanda Betts", "from_tdi", "It is a menu so you take one thing, not the whole list. Paras get handed improvement plans written for teachers and none of it fits the job, which is what this avoids."],
+      ["Deshawn Pryor", "from_tdi", "Choose the one that needs nobody else to agree to it. Anything that requires a teacher to change their plan is a conversation, not a quick win."],
+      ["Lorna Stimpson", "question", "Paras, which one did you pick, and did it hold up past the first genuinely busy day or quietly disappear?"],
+      ["Ofelia Marchetti", "question", "What is your own quick win that is not on this menu, the small thing you started doing that made the day work better?"]
+    ]},
+    { "slug": "para-partnership-pulse", "posts": [
+      ["Everett Crane", "from_tdi", "Both adults take it separately and then compare. The gap between the two sets of answers is the useful part, and it usually opens up around who decides what the para does during instruction."],
+      ["Rosalie Dunne", "from_tdi", "If the results are uncomfortable, that is the tool working. Do not run it the week before a review, because nobody answers honestly when the answers feel like evidence."],
+      ["Deshawn Pryor", "question", "Paras, did your answers line up with your teacher's, and if they split, was it over direction, planning time or something else?"],
+      ["Yolanda Betts", "question", "What made a teacher and para partnership work for you, other than both people simply being nice to each other?"]
+    ]},
+    { "slug": "pre-k-para-toolkit", "posts": [
+      ["Ofelia Marchetti", "from_tdi", "Pre-K para work is mostly transitions, floor time and the routines that never appear in any job description. This gathers strategies for those rather than for academics."],
+      ["Simone Ashcroft", "from_tdi", "The toolkit assumes you are on the floor, not at a table. Start with the arrival and departure sections, because those two windows set the tone for everything between them."],
+      ["Deshawn Pryor", "question", "For Pre-K paras, what part of the day were you left to work out entirely on your own, with nobody to ask?"],
+      ["Callum Ferreira", "question", "Which strategy in here would you hand to someone on their first morning in a Pre-K room, before anything else?"]
+    ]},
+    { "slug": "pre-k-scenario-pack", "posts": [
+      ["Simone Ashcroft", "from_tdi", "Tell or ask is the whole thing. Adults default to telling small children what to do, and the scenarios here are chosen because the telling version and the asking version both sound reasonable."],
+      ["Ofelia Marchetti", "from_tdi", "Work through these with the adults you share a room with. Doing the scenarios alone gives you an answer, doing them together gives you a shared response when it happens for real."],
+      ["Callum Ferreira", "question", "Which scenario in the pack split your team, and what did you land on once you had argued it through?"],
+      ["Simone Ashcroft", "question", "Where is asking the wrong call in a Pre-K room, and how do you know that in the moment rather than afterwards?"]
+    ]},
+    { "slug": "pre-k-teaching-moves", "posts": [
+      ["Callum Ferreira", "from_tdi", "It is sized for a lanyard because these moves are needed while you are crouched at child height with your hands full, not while you are sat planning."],
+      ["Simone Ashcroft", "from_tdi", "The moves are deliberately short. If a prompt takes longer to say than a four year old will stand still for, it does not belong on the card."],
+      ["Ofelia Marchetti", "question", "Which move on the card do you use most, and did it come naturally or did you have to practise it?"],
+      ["Simone Ashcroft", "question", "What Pre-K teaching move would you add that you only learned from watching another adult in the room rather than from training?"]
+    ]},
+    { "slug": "prompting-with-purpose-student-ai-prompt-worksheet-9-12", "posts": [
+      ["Wendell Prosser", "from_tdi", "The worksheet treats prompt writing as a specificity exercise, which is why it still works if your school changes tools next year. Vague in, vague out is the lesson underneath."],
+      ["Trevon Baptiste", "from_tdi", "Set your own boundary on approved work before handing this out. It teaches students to prompt well, it does not decide for you which assignments they may prompt for."],
+      ["Ingrid Vasquez-Lund", "question", "What does your school actually permit students to use AI for, and is it written down anywhere students can read?"],
+      ["Wendell Prosser", "question", "For anyone teaching 9 to 12, what changed in the work once students got better at prompting, if anything changed at all?"]
+    ]},
+    { "slug": "questions-that-make-kids-think", "posts": [
+      ["Camille Thibodeaux", "from_tdi", "Most of these moves happen after the first answer, not before it. The question that does the work is the one you ask second, once a student has said something you could have accepted."],
+      ["Marcus Oyelaran", "from_tdi", "Wait time is the part people skip because silence in a room feels expensive. Nothing else on this list survives without it, so build the pause in before you add anything new."],
+      ["Trevon Baptiste", "question", "What is your go to follow up when a student gives an answer that is correct but shallow and you do not want to embarrass them?"],
+      ["Aurelia Nkemdirim", "question", "Which question here would fall flat in your subject, and what do you ask instead to get students past a surface answer?"]
+    ]},
+    { "slug": "scaffolding-without-spoon-feeding", "posts": [
+      ["Rosalie Dunne", "from_tdi", "The line this draws is between reducing the difficulty of the thinking and reducing everything around it. Shortening a text is support, working through the question alongside the student is not."],
+      ["Marisol Aguirre", "from_tdi", "Plan how the scaffold comes off at the same time you put it on. Support with no removal date turns into the way that student does the subject forever."],
+      ["Yolanda Betts", "question", "How do you tell in the moment whether you are helping a student think or quietly doing the thinking for them?"],
+      ["Deacon Mwangi", "question", "What scaffold did you find hardest to take away once students had got used to having it there, and how did you phase it out?"]
+    ]},
+    { "slug": "small-group-support-toolkit-paras", "posts": [
+      ["Deshawn Pryor", "from_tdi", "The planning templates assume you were handed the group ten minutes ago with no plan attached, which is how it usually goes. Fill in the top section even if that is all you manage."],
+      ["Yolanda Betts", "from_tdi", "Agree with the teacher what the group is meant to achieve, in one sentence, before you take them out. Without that you end up supervising rather than teaching."],
+      ["Everett Crane", "question", "Paras, how much notice do you usually get before you are asked to run a small group, and does that ever change?"],
+      ["Ofelia Marchetti", "question", "What do you do when the group you are handed has too wide a spread of levels to teach as one?"]
+    ]},
+    { "slug": "sped-para-toolkit", "posts": [
+      ["Rosalie Dunne", "from_tdi", "The IEP section is here because paras are expected to deliver goals they are often never shown. Knowing what a goal was written to measure changes what you write down."],
+      ["Lorna Stimpson", "from_tdi", "Take the data part seriously even though it reads like paperwork. The notes a para keeps are frequently the only record of what a student can do on an ordinary day."],
+      ["Everett Crane", "question", "Paras in special education, what data are you asked to collect, and were you ever shown how, or did you invent a system?"],
+      ["Deshawn Pryor", "question", "Which part of this toolkit do you wish you had been given in your first month, and who eventually told you?"]
+    ]},
+    { "slug": "sped-scenario-pack", "posts": [
+      ["Rosalie Dunne", "from_tdi", "Run these as a team including paras, not as a teacher only exercise. Half the scenarios turn on what the adult nearest the student does, and that is rarely the teacher."],
+      ["Everett Crane", "from_tdi", "Feedback level up is the harder half of the pack. Saying a student did well is easy, naming which part and why while they are still working is the skill being practised."],
+      ["Lorna Stimpson", "question", "Which scenario did your team disagree on most, and did you reach a shared answer or agree to differ in the end?"],
+      ["Rosalie Dunne", "question", "For special education teams, when is telling a student what to do the right call rather than asking them a question?"]
+    ]},
+    { "slug": "student-talk-ratio-tracker", "posts": [
+      ["Tobias Rennert", "from_tdi", "Have someone else run the tracker while you teach, or record the lesson. Counting your own talk while talking changes the very lesson you are trying to measure."],
+      ["Priya Raghunathan", "from_tdi", "The number is not the point, the pattern is. Look at where in the lesson your talk clusters, because that usually marks the part you have not planned tightly enough."],
+      ["Marcus Oyelaran", "question", "What ratio did you expect before you tracked a lesson, and how far off was the number you actually got?"],
+      ["Deacon Mwangi", "question", "Coaches, how do you share a talk ratio number with a teacher without it landing as a verdict on their teaching?"]
+    ]},
+    { "slug": "supporting-english-learners", "posts": [
+      ["Nadia Belhassen", "from_tdi", "These strategies sit alongside your existing instruction rather than replacing it. Nothing here asks you to build a separate lesson, which is the reason it gets used at all."],
+      ["Marisol Aguirre", "from_tdi", "Silence is not the same as not understanding. The guide is clear that a quiet period is a stage, and treating it as a comprehension problem leads you to the wrong support."],
+      ["Trevon Baptiste", "question", "Which of these strategies did you find helped the whole class, not just your English learners, and did you keep it for everyone?"],
+      ["Nadia Belhassen", "question", "For teachers with one or two English learners rather than a large group, what is hardest to sustain over a full year?"]
+    ]},
+    { "slug": "discussion-protocol-playbook", "posts": [
+      ["Marcus Oyelaran", "from_tdi", "Protocols exist because an open discussion is a competition the same three students win. Structure is not about control, it is about handing out the airtime deliberately."],
+      ["Camille Thibodeaux", "from_tdi", "Teach the protocol on content students already know. Learning the structure and the material at once means both go badly, and you walk away deciding protocols do not work."],
+      ["Trevon Baptiste", "question", "Which protocol in here worked best with a class that had gone quiet on you, and how long did it take to take hold?"],
+      ["Marcus Oyelaran", "question", "How long did it take before running a protocol stopped feeling artificial to students, or did you drop it before then?"]
+    ]},
+    { "slug": "ell-empathy-audit", "posts": [
+      ["Nadia Belhassen", "from_tdi", "The audit walks you through a day the way a student still acquiring the language experiences it. It is uncomfortable by design, and it is not meant to be done to anyone else."],
+      ["Bettina Kowalczyk", "from_tdi", "Do it on an ordinary day rather than a showcase lesson. The point is to notice the small moments where meaning quietly disappears, and those do not happen when everything is staged."],
+      ["Marisol Aguirre", "question", "What did the audit make you notice that you had walked past for years without registering it as a problem?"],
+      ["Nadia Belhassen", "question", "Which part of the school day came out as hardest in the audit, and was it the lesson itself or everything around it?"]
+    ]},
+    { "slug": "visual-cue-card-starter-pack", "posts": [
+      ["Ofelia Marchetti", "from_tdi", "Print two sets. One lives with the adult and one stays where the student is, because a card in a drawer on the other side of the room is not a communication system."],
+      ["Rosalie Dunne", "from_tdi", "Introduce the cards when things are calm. A card first seen during a hard moment reads as a demand, and then the student associates the whole set with being told off."],
+      ["Deshawn Pryor", "question", "Which cards did you end up needing that were not in the starter set, and did you make them yourself?"],
+      ["Yolanda Betts", "question", "For transitions specifically, does the card work better held up from a distance or handed to the student directly, in your experience?"]
+    ]},
+    { "slug": "para-what-to-do-now", "posts": [
+      ["Lorna Stimpson", "from_tdi", "This is for the stretch where the teacher is teaching and nobody has told you what your job is. It gives you a default action for each part of a lesson so you are not stood at the back deciding."],
+      ["Deshawn Pryor", "from_tdi", "Show it to the teacher rather than using it quietly. Most of this gets settled in a two minute conversation that neither adult knows how to start."],
+      ["Everett Crane", "question", "Paras, what do you do during whole class instruction when you have been given no direction at all that morning?"],
+      ["Ofelia Marchetti", "question", "How did you and your teacher work out the signal for when you should step in, or is it still guesswork?"]
+    ]}
+  ]
+}

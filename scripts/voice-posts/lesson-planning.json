@@ -1,0 +1,104 @@
+{
+  "category": "Lesson Planning",
+  "tools": [
+    {
+      "slug": "accommodation-vs-modification-quick-guide",
+      "posts": [
+        ["Rosalie Dunne", "from_tdi", "The line is whether the learning target moved. Change how a student gets there and it is an accommodation. Change what they are being asked to know and you have modified, and that belongs in the paperwork."],
+        ["Yolanda Betts", "from_tdi", "Keep this where you actually work rather than in a file. A para asked to read a passage aloud partway through a lesson needs to know in that moment which side of the line that sits on."],
+        ["Nadia Belhassen", "question", "Which of the two gets confused most often where you are, and does the confusion come from staff or from the way the plan is written?"],
+        ["Priya Raghunathan", "question", "Has anyone found out partway through a unit that something everyone treated as an accommodation had quietly become a modification?"]
+      ]
+    },
+    {
+      "slug": "emergency-lesson-plans-survival-week",
+      "posts": [
+        ["Camille Thibodeaux", "from_tdi", "These are built for the week you cannot think straight, so nothing in them needs printing, prepping or a login. If a plan sends you hunting for anything, it has failed its own brief."],
+        ["Marcus Oyelaran", "from_tdi", "Put them somewhere a colleague can reach without you. A survival plan sitting in your own drive is no use on the morning you are not there to open it."],
+        ["Hana Sugimoto", "question", "What does a survival week look like for you, illness, something at home, or just the stretch where it all lands at once?"],
+        ["Trevon Baptiste", "question", "Has anyone worked out how to leave plans like these for a class that does not cope well with anything unfamiliar?"]
+      ]
+    },
+    {
+      "slug": "first-year-teachers-first-unit-builder",
+      "posts": [
+        ["Deacon Mwangi", "from_tdi", "It starts at the end on purpose. A first unit usually goes wrong because activities got chosen before anyone decided what students had to walk away able to do."],
+        ["Marisol Aguirre", "from_tdi", "Build one unit with it, not a term's worth. The point is learning the sequence once so the next one takes half as long, not filling a planner for the whole year in a weekend."],
+        ["Priya Raghunathan", "question", "First years, which step slowed you down most, the outcomes, the assessment, or working out how many lessons the thing actually needs?"],
+        ["Callum Ferreira", "question", "For anyone mentoring a new teacher this year, what do you wish someone had handed you before your own first unit?"]
+      ]
+    },
+    {
+      "slug": "know-your-learners-student-profile-builder",
+      "posts": [
+        ["Rosalie Dunne", "from_tdi", "Start with the students you find hardest to plan for. Doing the whole register in one sitting turns it into admin, and the profiles that matter end up getting the least thought."],
+        ["Deshawn Pryor", "from_tdi", "Paras hold half of what belongs on these. Who works with whom, who needs warning before a change, who goes quiet rather than asks. Ask before you write."],
+        ["Nadia Belhassen", "question", "What is one thing about a learner you only found out by accident, and would something like this have caught it sooner?"],
+        ["Bettina Kowalczyk", "question", "How do you keep a profile current once the student changes, or do you end up rewriting from scratch every year?"]
+      ]
+    },
+    {
+      "slug": "lesson-flow-checklist",
+      "posts": [
+        ["Deacon Mwangi", "from_tdi", "Run it while planning, not afterwards. Used as a review it becomes a scorecard, and the whole value is catching the missing transition before you are standing in front of anyone."],
+        ["Tobias Rennert", "from_tdi", "Lessons break at the joins more often than in the middle. The checklist gives more space to the handovers between parts than to the parts themselves, and that is deliberate."],
+        ["Hana Sugimoto", "question", "Which end of your lesson consistently runs over, the opening or the close, and what have you tried to protect the other one?"],
+        ["Camille Thibodeaux", "question", "Does anyone plan the close first? Curious whether that fixes the lessons that end with a bell and no landing."]
+      ]
+    },
+    {
+      "slug": "science-fair-project-planning-template",
+      "posts": [
+        ["Aurelia Nkemdirim", "from_tdi", "The sequence matters more than the form. Question, then method, then materials, because a student who picks materials first ends up bending the question to fit whatever is in the cupboard."],
+        ["Ravi Chandrasekar", "from_tdi", "The printable sheet is for the student to fill in, not for you to complete on their behalf. Hand it over early so the gaps are visible while there is still time to close them."],
+        ["Ingrid Vasquez-Lund", "question", "Where does it usually fall apart in your room, choosing a question, or the stretch between having a method and actually collecting anything?"],
+        ["Marisol Aguirre", "question", "How do you handle the project that clearly arrived built by a parent, without punishing the student for it?"]
+      ]
+    },
+    {
+      "slug": "standards-clarity-toolkit",
+      "posts": [
+        ["Priya Raghunathan", "from_tdi", "Pull the verb out before anything else. Most alignment arguments are really arguments about whether students are meant to identify something or explain it, and the standard usually already says."],
+        ["Tobias Rennert", "from_tdi", "Take one standard through the whole toolkit rather than a strand. Unpacking twelve in an afternoon produces a tidy document nobody opens again."],
+        ["Deacon Mwangi", "question", "Which standard in your subject is worded so loosely that two teachers down the same corridor teach it differently?"],
+        ["Trevon Baptiste", "question", "Do your assessments get written from the standard or from the lesson? Honest answers more useful than tidy ones here."]
+      ]
+    },
+    {
+      "slug": "stem-station-rotation-planning-sheet",
+      "posts": [
+        ["Ravi Chandrasekar", "from_tdi", "Time the slowest station, not the average one. Rotations collapse when a station needs twelve minutes and the timer says eight, and every group after that is behind."],
+        ["Aurelia Nkemdirim", "from_tdi", "The materials column exists so you discover you are three sets short while planning rather than while thirty students wait. Count for the largest group, not the typical one."],
+        ["Ingrid Vasquez-Lund", "question", "Do you keep groups fixed across the whole rotation or reshuffle between stations, and what made you settle on that?"],
+        ["Everett Crane", "question", "What do you do with the station that really needs an adult on it when there is only one of you in the room?"]
+      ]
+    },
+    {
+      "slug": "substitute-teacher-day-plan-template",
+      "posts": [
+        ["Marcus Oyelaran", "from_tdi", "Write the routines as though the reader has never met the class, because they have not. Naming which student holds the door is worth more than a paragraph about how you like the room to feel."],
+        ["Lorna Stimpson", "from_tdi", "Say plainly who the substitute can ask for help. Someone who does not know which room next door is a friendly one will guess, and it is usually the wrong door."],
+        ["Everett Crane", "question", "What do you always leave off a sub plan and regret, and what is on there that has never once been read?"],
+        ["Gus Halvorsen", "question", "Specialists, how do you brief a substitute for a lesson that lives in a gym or a lab rather than a room with a seating chart?"]
+      ]
+    },
+    {
+      "slug": "instant-relevance-lesson-audit",
+      "posts": [
+        ["Marcus Oyelaran", "from_tdi", "Relevance is not a reference to something popular dropped into the third slide. The audit is checking whether the content connects to something a student already carries, which is a harder test to pass."],
+        ["Trevon Baptiste", "from_tdi", "Run it on a lesson you think is fine. Auditing the one you already dislike tells you nothing you did not know before you started."],
+        ["Camille Thibodeaux", "question", "Which lesson of yours would fail this audit and still be one you would defend? Interested in where people put that line."],
+        ["Bettina Kowalczyk", "question", "When a student asks why this matters, do you have an answer ready, or do you find yourself building one on the spot?"]
+      ]
+    },
+    {
+      "slug": "writing-learning-objectives",
+      "posts": [
+        ["Priya Raghunathan", "from_tdi", "An objective that could sit on the board for any lesson in the unit is not steering anything. The test is whether it would change what you do in the next forty minutes."],
+        ["Hana Sugimoto", "from_tdi", "Write it once you know what evidence of learning will look like. Objectives written before that tend to describe the activity, and then the activity quietly becomes the point."],
+        ["Tobias Rennert", "question", "Does anyone actually use their posted objective during the lesson, or does it go up and then get ignored until someone walks through?"],
+        ["Marisol Aguirre", "question", "How do you word an objective for a lesson that is mostly practice of something taught last week, without it reading as a repeat?"]
+      ]
+    }
+  ]
+}

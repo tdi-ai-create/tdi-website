@@ -1,0 +1,231 @@
+{
+  "category": "Leadership",
+  "note": "Posts from TDI-owned voice accounts. Comments describe the tool, what to change, or who it suits. None claims a classroom moment. Questions invite a member to answer.",
+  "tools": [
+    {
+      "slug": "ai-policy-staff-meeting-discussion-cheat-sheet",
+      "posts": [
+        ["Jarrod Levins", "from_tdi", "Twenty minutes is the whole design. It is long enough to surface the real disagreement and short enough that nobody can filibuster, so resist the urge to let it run on to forty."],
+        ["Trevon Baptiste", "from_tdi", "Send the framing questions out before the meeting rather than reading them aloud on the day. Staff who arrive cold spend the first ten minutes working out whether they are allowed to be honest."],
+        ["Priya Raghunathan", "question", "When AI comes up in a staff meeting, does the room split by subject area or by years of experience?"],
+        ["Marisol Aguirre", "question", "What is the question your staff actually wants answered underneath the policy talk, and has anyone in leadership said it out loud yet?"]
+      ]
+    },
+    {
+      "slug": "building-a-school-wide-ai-policy-toolkit",
+      "posts": [
+        ["Jarrod Levins", "from_tdi", "The draft is the easy half. Adoption stalls at the point where someone has to write down what happens when a student breaks the policy, so take that section early rather than last."],
+        ["Ingrid Vasquez-Lund", "from_tdi", "Decide who the policy is for before you write a word. A document aimed at staff and one aimed at families read nothing alike, and trying to serve both at once leaves you with something vague."],
+        ["Deacon Mwangi", "question", "Who ended up holding the pen on your AI policy, and looking back, was that the right person to be writing it?"],
+        ["Wendell Prosser", "question", "Has anyone got an AI policy that survived contact with a real incident, and what did you end up changing afterwards?"]
+      ]
+    },
+    {
+      "slug": "building-culture-walkthrough-checklist",
+      "posts": [
+        ["Jarrod Levins", "from_tdi", "The signals list is the part that earns its place. Bulletin boards tell you what somebody had time to laminate, not whether adults in the building speak to each other in the corridor."],
+        ["Yolanda Betts", "from_tdi", "If you walk this with a colleague, agree beforehand that nothing gets written down about individual staff. The moment it smells like evaluation, the culture you came to look at changes shape."],
+        ["Priya Raghunathan", "question", "What small signal tells you most about a building in the first five minutes, before anyone has shown you a classroom?"],
+        ["Camille Thibodeaux", "question", "For anyone who has been walked through, what did the leader notice, and what did you wish they had asked about instead?"]
+      ]
+    },
+    {
+      "slug": "building-walkthrough-guide",
+      "posts": [
+        ["Jarrod Levins", "from_tdi", "Keeping it to a single sheet is deliberate. A first-week walkthrough that generates two pages of notes turns into a document you now owe somebody a meeting about, which is not what this is for."],
+        ["Deacon Mwangi", "from_tdi", "Use it to spot patterns along a corridor, not to reach a verdict on one room. The form stops being useful the second it gets attached to anyone's file."],
+        ["Hana Sugimoto", "question", "What would you want a leader to say to you after an informal walkthrough, and is saying nothing better or worse?"],
+        ["Jarrod Levins", "question", "How early in the year do you start walkthroughs, and does beginning in week one help or simply spook people?"]
+      ]
+    },
+    {
+      "slug": "classroom-observation-debrief-template",
+      "posts": [
+        ["Priya Raghunathan", "from_tdi", "The opening question carries the whole thing. Ask what the teacher noticed before you offer what you noticed, or the rest of the conversation is just them waiting for the grade."],
+        ["Trevon Baptiste", "from_tdi", "Drop the compliment sandwich if it feels false. Teachers can hear a structure, and once they do, the feedback gets listened to as a shape rather than as anything about their teaching."],
+        ["Rosalie Dunne", "question", "What has a debrief actually changed in your practice, and what made that one different from all the others?"],
+        ["Deacon Mwangi", "question", "How long after the observation do you debrief, and does a day or two of gap help the conversation or drain it?"]
+      ]
+    },
+    {
+      "slug": "coaching-conversation-starters",
+      "posts": [
+        ["Deacon Mwangi", "from_tdi", "You are not meant to use all ten. Choose the two or three that suit the person in front of you, because working down the list turns a first conversation into an intake form."],
+        ["Priya Raghunathan", "from_tdi", "These are open on purpose, which means being comfortable with the silence that follows one. If you fill the pause, you have answered your own question and learned nothing."],
+        ["Marcus Oyelaran", "question", "What is the question a coach once asked you that you are still turning over, and did they know it landed?"],
+        ["Bettina Kowalczyk", "question", "For the first meeting of the year, would you rather have a coach who asks or a coach who offers, and does that change later on?"]
+      ]
+    },
+    {
+      "slug": "coaching-cycle-planner",
+      "posts": [
+        ["Deacon Mwangi", "from_tdi", "Map the whole cycle before the pre-conference, including how it ends. Cycles with no formal exit quietly become a standing meeting that nobody feels able to cancel."],
+        ["Priya Raghunathan", "from_tdi", "The dates are the commitment. A cycle without the observation and debrief slots already in the calendar collapses into good intentions by about week three."],
+        ["Jarrod Levins", "question", "How many coaching cycles can one person realistically hold at once where you are, and what happens to the last one on the list?"],
+        ["Ravi Chandrasekar", "question", "Did your last coaching cycle end with something you kept doing, or did the change fade out once the meetings stopped?"]
+      ]
+    },
+    {
+      "slug": "data-conversation-starter-kit",
+      "posts": [
+        ["Priya Raghunathan", "from_tdi", "The framing sentence at the top decides everything that follows. Open with what the team is trying to find out together and the same slide lands as curiosity rather than as a report card."],
+        ["Hana Sugimoto", "from_tdi", "Bring the data the team asked about, not the data you found interesting. Nothing empties a room faster than a chart answering a question nobody sitting there had."],
+        ["Tobias Rennert", "question", "What makes you defensive in a data meeting, and is it the numbers themselves or the way they arrive on the screen?"],
+        ["Deacon Mwangi", "question", "Who presents the data in your team meetings, and would the same numbers land differently coming from someone else in the room?"]
+      ]
+    },
+    {
+      "slug": "funding-pd-that-works-expert-team",
+      "posts": [
+        ["Jarrod Levins", "from_tdi", "Start from the professional learning you already want to run, then go looking for money that fits it. Building the plan around whatever funding exists is how buildings end up with training nobody asked for."],
+        ["Priya Raghunathan", "from_tdi", "The section on writing the need statement is where most of the work sits. Funders are reading for whether you understand your own problem, not for how enthusiastic you sound about solving it."],
+        ["Deacon Mwangi", "question", "Where has the money for professional development come from in your building, and who was the person who actually went looking for it?"],
+        ["Wendell Prosser", "question", "If you had a fully funded day of professional development with no strings attached, what would you spend it on and who would lead it?"]
+      ]
+    },
+    {
+      "slug": "funding-dream-classroom",
+      "posts": [
+        ["Marisol Aguirre", "from_tdi", "The creative sourcing section is worth more to most people than the grant section. Small local asks move on a timescale you control, while grant cycles run on a calendar that has nothing to do with yours."],
+        ["Aurelia Nkemdirim", "from_tdi", "Check what your building requires before you post a public ask. Approval rules for donor platforms vary a lot, and finding out after the page is live makes for an awkward conversation."],
+        ["Wendell Prosser", "question", "What is the one thing your room needs that no budget line ever seems to cover, and how long has it been on your list?"],
+        ["Simone Ashcroft", "question", "For anyone who has run a donor page for a classroom project, what made people actually give, and what did you expect to work but did not?"]
+      ]
+    },
+    {
+      "slug": "leadership-team-meeting-agenda-template",
+      "posts": [
+        ["Jarrod Levins", "from_tdi", "The updates block is capped on purpose. If your leadership meeting is mostly people reporting in turn, you are reading a newsletter out loud and the decisions all get pushed to next time."],
+        ["Deacon Mwangi", "from_tdi", "Name the decision owner in the agenda itself, before anyone walks in. Items that arrive in a meeting without an owner tend to leave without one too."],
+        ["Priya Raghunathan", "question", "How much of your leadership meeting is genuinely decision making, and which standing item would you cut first if you could?"],
+        ["Marcus Oyelaran", "question", "Who sits in your leadership team meeting, and is there a role in the building that should be in that room and is not?"]
+      ]
+    },
+    {
+      "slug": "mastery-learning-tdi-pd-model",
+      "posts": [
+        ["Priya Raghunathan", "from_tdi", "The link it draws is a simple one. If you believe students need repeated attempts to reach mastery, then one-shot training for adults becomes hard to defend, and the explainer makes that contradiction difficult to look away from."],
+        ["Jarrod Levins", "from_tdi", "Short enough to be read by a leadership team before a planning conversation. It is a framing document rather than an implementation plan, so do not expect it to tell you what Tuesday looks like."],
+        ["Deacon Mwangi", "question", "Where does your current professional development give adults a second attempt at anything, or is one session still the whole offer?"],
+        ["Rosalie Dunne", "question", "Does mastery learning language land with your staff, or does it read as a student framework being borrowed for the adults?"]
+      ]
+    },
+    {
+      "slug": "new-teacher-mentoring-conversation-guide",
+      "posts": [
+        ["Deacon Mwangi", "from_tdi", "The ten weeks are chosen because the wobble usually arrives around week six, not week one. A mentoring plan that front loads everything into August misses the moment it was built for."],
+        ["Marisol Aguirre", "from_tdi", "The early prompts are deliberately practical. New teachers rarely open with what is frightening them, and asking about photocopying and duty rotas gets you further than asking how they are feeling."],
+        ["Jarrod Levins", "question", "What did your mentor do in your first term that you still copy now, without really thinking about where it came from?"],
+        ["Camille Thibodeaux", "question", "What do new teachers in your building most need that has never been officially assigned to anybody, so it only happens by luck?"]
+      ]
+    },
+    {
+      "slug": "pa-observation-guide",
+      "posts": [
+        ["Jarrod Levins", "from_tdi", "Observing a para is not observing a lesson. This keeps the focus on the support being given and the handoffs with the teacher, which is the part that genuinely varies between rooms."],
+        ["Everett Crane", "from_tdi", "Tell the para what you are looking at before you walk in. Being observed against criteria you have never seen is the quickest way to make a capable person freeze."],
+        ["Lorna Stimpson", "question", "Has anyone ever observed you as a para, and did the feedback come back to you or only to the teacher?"],
+        ["Priya Raghunathan", "question", "Who observes paraprofessionals where you work, and is there time actually set aside for it or does it happen in passing?"]
+      ]
+    },
+    {
+      "slug": "pa-onboarding-protocol",
+      "posts": [
+        ["Jarrod Levins", "from_tdi", "The thirty days are staged so that almost nothing lands on the first morning. Paras handed the behaviour policy, the schedule and three student profiles at once retain none of it."],
+        ["Ofelia Marchetti", "from_tdi", "The week one items look almost too small written down. They are what decides whether somebody feels like staff or like a visitor, so do not drop them for being obvious."],
+        ["Deshawn Pryor", "question", "What did you have to work out on your own in your first month as a para that somebody could simply have told you?"],
+        ["Yolanda Betts", "question", "Who was the first person to properly explain your role to you, and how many weeks into the job was that?"]
+      ]
+    },
+    {
+      "slug": "para-onboarding-orientation-checklist",
+      "posts": [
+        ["Ofelia Marchetti", "from_tdi", "The column covering the days before someone starts is the one that gets skipped, and it costs nothing. Keys, a working login and a named person to ask are most of the battle."],
+        ["Jarrod Levins", "from_tdi", "This belongs to the supervising teacher or the leader, not to the para. Hand it to the new starter to complete themselves and you have given them a chore list instead of an induction."],
+        ["Lorna Stimpson", "question", "What would you add to a para orientation list that leaders never think to include, because they have never done the job?"],
+        ["Everett Crane", "question", "Did anyone tell you who to go to on a hard day, or did you find that person entirely by accident?"]
+      ]
+    },
+    {
+      "slug": "para-quick-start-confidence-kit",
+      "posts": [
+        ["Deshawn Pryor", "from_tdi", "The communication half matters more than the classroom basics. Most of the uncertainty in a new para role is about when to speak up to the teacher, not about where the supplies live."],
+        ["Yolanda Betts", "from_tdi", "Returning paras get treated as though they need nothing at all. Hand them this anyway, because the room, the teacher and the expectations have usually all changed over the summer."],
+        ["Ofelia Marchetti", "question", "What was the thing that finally made you feel confident in a new classroom, and how many weeks in did that happen?"],
+        ["Rosalie Dunne", "question", "Teachers, what do you wish a para would ask you in the first week, rather than working it out quietly on their own?"]
+      ]
+    },
+    {
+      "slug": "plc-data-protocol-one-pager",
+      "posts": [
+        ["Deacon Mwangi", "from_tdi", "The protocol exists to keep the talk on what was taught rather than on who taught it. Once a name gets attached to a low column, the group stops learning and starts defending."],
+        ["Hana Sugimoto", "from_tdi", "Resist bolting an agenda onto it. A protocol that has to be explained before it can be used eats exactly the time it was written to protect."],
+        ["Tobias Rennert", "question", "Does your PLC spend its time on instructional moves, or does it mostly end up listing which students are struggling and why?"],
+        ["Priya Raghunathan", "question", "What does your group actually do when the data shows one class well ahead of the others, and does anyone ask why?"]
+      ]
+    },
+    {
+      "slug": "plc-facilitation-cheat-sheet",
+      "posts": [
+        ["Priya Raghunathan", "from_tdi", "Set the norms in the first meeting or you will be retrofitting them halfway through an argument in the fourth. That sequence is what the cheat sheet is built around."],
+        ["Deacon Mwangi", "from_tdi", "Choosing the protocol is a real decision and not a formality. Match it to what the group has brought, because one designed for looking at student work does nothing useful with a planning question."],
+        ["Marcus Oyelaran", "question", "Who facilitates your PLC, and is it the same person every week or does the role move around the group?"],
+        ["Camille Thibodeaux", "question", "What norm has actually held in your group across a full year, and which one quietly died by about November?"]
+      ]
+    },
+    {
+      "slug": "staff-meeting-agenda-template",
+      "posts": [
+        ["Jarrod Levins", "from_tdi", "The times beside each item are a promise to the room. Publish them and then hold them, because the first meeting of the year is where staff learn whether your timings mean anything."],
+        ["Marcus Oyelaran", "from_tdi", "Anything that is purely information should have been an email, and filling this in makes that painfully clear. Most first drafts lose half their length once you apply that test."],
+        ["Gus Halvorsen", "question", "What is the one thing you want covered in the first all-staff meeting, and what could be cut entirely without anybody missing it?"],
+        ["Priya Raghunathan", "question", "Does the first meeting of the year set a tone that actually holds, or has whatever it set worn off by October?"]
+      ]
+    },
+    {
+      "slug": "staff-meeting-energy-audit",
+      "posts": [
+        ["Jarrod Levins", "from_tdi", "Run it before you write the agenda, never after. Used the other way round it becomes a survey that justifies a meeting you had already decided to hold."],
+        ["Bettina Kowalczyk", "from_tdi", "Expect an uncomfortable answer and work out now what you will do with it. Asking staff how the last meeting felt and then changing nothing is worse than never asking."],
+        ["Trevon Baptiste", "question", "If you could change one thing about how staff meetings run where you are, what would it be and who would need to agree?"],
+        ["Deacon Mwangi", "question", "What time of day do your staff meetings happen, and how much of the mood in the room is simply down to that?"]
+      ]
+    },
+    {
+      "slug": "staff-meeting-ice-breaker-kit",
+      "posts": [
+        ["Jarrod Levins", "from_tdi", "Ten minutes is the ceiling here. An opener earns goodwill when it finishes early and loses all of it the moment staff can feel that the meeting could already have started."],
+        ["Gus Halvorsen", "from_tdi", "Favour the ones that ask nobody to disclose anything personal. These work because they give quieter people a way into the room, not because they make anyone perform."],
+        ["Simone Ashcroft", "question", "What ice breaker have you sat through that genuinely worked, and what made it different from the ones people quietly resent?"],
+        ["Camille Thibodeaux", "question", "Does your staff actually want an opener, or would most of them rather start straight on the agenda and finish early?"]
+      ]
+    },
+    {
+      "slug": "teacher-retention-conversation-starters",
+      "posts": [
+        ["Jarrod Levins", "from_tdi", "These are for the person who has gone quiet, not the person who is complaining. Complaining is a form of engagement, and the harder case is somebody who has stopped bothering."],
+        ["Priya Raghunathan", "from_tdi", "Have the conversation somewhere that is not your office and without a form in front of you. The setting tells people whether this is care or documentation before you say a word."],
+        ["Rosalie Dunne", "question", "At the point you were closest to leaving, what would somebody have had to ask you, and would you have answered honestly?"],
+        ["Marcus Oyelaran", "question", "Can you usually tell when a colleague has quietly checked out, and does anyone in the building ever act on it?"]
+      ]
+    },
+    {
+      "slug": "culture-first-leadership",
+      "posts": [
+        ["Jarrod Levins", "from_tdi", "The argument is that a programme laid over a poor culture gets performed rather than used. Read the sequencing section closely, because that is where the framework earns its name."],
+        ["Deacon Mwangi", "from_tdi", "It will not tell you which programme to buy, and that is deliberate. Leaders hunting for an implementation order will find it frustrating, leaders rethinking their order will not."],
+        ["Ingrid Vasquez-Lund", "question", "What tells you a school has a real culture rather than a stated one, within your first term of working there?"],
+        ["Priya Raghunathan", "question", "Has a new initiative ever landed genuinely well in your building, and what was already true about the place before it arrived?"]
+      ]
+    },
+    {
+      "slug": "coaching-stance-quiz",
+      "posts": [
+        ["Priya Raghunathan", "from_tdi", "The four stances come from Lipton and Wellman, and the useful part is that none of them is the best one. Coaches get stuck by using their favourite stance on every teacher regardless."],
+        ["Deacon Mwangi", "from_tdi", "Answer as you coach on a busy week, not as you coached in the conversation you are proudest of. The result is only worth anything if it catches your default."],
+        ["Hana Sugimoto", "question", "Which stance would you want from a coach, and does it change depending on what you are stuck on?"],
+        ["Jarrod Levins", "question", "Did your result match the stance your colleagues would say you use, or is there a gap between the two?"]
+      ]
+    }
+  ]
+}

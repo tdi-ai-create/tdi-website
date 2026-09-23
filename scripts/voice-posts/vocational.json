@@ -1,0 +1,95 @@
+{
+  "category": "Vocational",
+  "tools": [
+    {
+      "slug": "principal-walkthrough-vocational-sites",
+      "posts": [
+        ["Jarrod Levins", "from_tdi", "Five minutes is the honest limit when your sites sit across town from each other. The protocol is short because a walkthrough you keep doing beats a thorough one you manage twice a year."],
+        ["Wendell Prosser", "from_tdi", "What a leader looks for in a shop is not what they look for in a classroom. Watch whether students can say what they are making and why it is being made that way, before counting anyone on task."],
+        ["Lorna Stimpson", "question", "For anyone leading sites spread out like this, how often do you reach the furthest one, and what slips when you cannot?"],
+        ["Ravi Chandrasekar", "question", "Does your walkthrough feedback get back to the teacher the same day, or does it wait for a scheduled conversation?"]
+      ]
+    },
+    {
+      "slug": "classroom-management-quick-card-industry-to-classroom",
+      "posts": [
+        ["Wendell Prosser", "from_tdi", "Coming off a job site, the instinct is to take the tool, fix the problem and move on. In a shop that is the one instinct worth unlearning, because the fix is the lesson."],
+        ["Jarrod Levins", "from_tdi", "Six moves, because a card carrying twenty stays in a drawer. Pick the two that match what is going wrong this month and leave the others until they are needed."],
+        ["Lorna Stimpson", "question", "For those who came in from a trade, what surprised you most in the first term, and was it the students or everything around them?"],
+        ["Ingrid Vasquez-Lund", "question", "What is the hardest habit to shake from a previous career, and did anyone warn you about it before you started?"]
+      ]
+    },
+    {
+      "slug": "cosmetology-lab-3-strand-lift-test",
+      "posts": [
+        ["Wendell Prosser", "from_tdi", "Three strands rather than one, because a single result has nothing to sit against. The formula is held constant so time is the only variable, and lift becomes something students watch rather than take on trust."],
+        ["Ingrid Vasquez-Lund", "from_tdi", "Most students read the orange stage as a failed formula. It is an incomplete lift, and a strand test is where they learn to tell underlying pigment from a mistake, rather than learning it on a client."],
+        ["Lorna Stimpson", "question", "Does anyone dry each strand before judging it? Colour reads darker while wet and I would like to know how others fit that into a sixty minute slot."],
+        ["Jarrod Levins", "question", "How are you sourcing enough hair for three strands per student, and has the cost ever been the reason a lab got cut?"]
+      ]
+    },
+    {
+      "slug": "cosmetology-lesson-developer-volume-level-lift",
+      "posts": [
+        ["Wendell Prosser", "from_tdi", "The subtraction is the easy half. Students go wrong assessing the natural level at the root, and a level read one step light makes the developer choice wrong before any maths has happened."],
+        ["Ingrid Vasquez-Lund", "from_tdi", "Thirty five minutes covers the formula and nothing else, so teach it on uncoloured hair. Previously coloured hair is a separate lesson, because colour will not lift colour and that fact will derail this one."],
+        ["Lorna Stimpson", "question", "Do your students work the formula from a swatch ring or from a real head, and where does the jump between the two get hard?"],
+        ["Ravi Chandrasekar", "question", "How do you handle the student who has memorised the developer chart but cannot say why forty volume is not the answer to everything?"]
+      ]
+    },
+    {
+      "slug": "cte-employer-partnership-starter-kit",
+      "posts": [
+        ["Wendell Prosser", "from_tdi", "The outreach email is short on purpose. Employers answer a specific ask with a date attached, not a paragraph about what your programme believes in."],
+        ["Jarrod Levins", "from_tdi", "Take the one page overview to the site visit rather than sending it ahead. Something you can leave on a desk outlives an attachment nobody opened."],
+        ["Ravi Chandrasekar", "question", "Who made the first approach where you are, the teacher, the principal, or someone in the district office, and did that change how it went?"],
+        ["Lorna Stimpson", "question", "What do employers ask for that programmes are not ready to answer, insurance, supervision, hours, or something else entirely?"]
+      ]
+    },
+    {
+      "slug": "cte-safety-sign-off-quick-card",
+      "posts": [
+        ["Wendell Prosser", "from_tdi", "Sign off before every lab, including the one they have run four times already. Familiarity is where people get hurt, and a card signed at the bench costs under a minute."],
+        ["Jarrod Levins", "from_tdi", "It is written trade agnostic so the routine transfers. A student who has signed off in your shop understands what the ritual means the first time they meet it on a real site, and that habit outlasts your programme."],
+        ["Ingrid Vasquez-Lund", "question", "What sits on your card that is specific to your trade, and what did you learn to add only after a near miss?"],
+        ["Lorna Stimpson", "question", "How do you deal with a student refusing the protective equipment, without it becoming a standoff in front of everyone?"]
+      ]
+    },
+    {
+      "slug": "industry-certification-countdown-planner",
+      "posts": [
+        ["Wendell Prosser", "from_tdi", "Work backwards from the exam date rather than forwards from today. The weeks that get squeezed are always the practical hours, and going backwards shows you that while there is still room to move something."],
+        ["Lorna Stimpson", "from_tdi", "Students sitting a certification often need the admin more than the content. Registration deadlines, identification, fees. The planner carries those alongside the study weeks for a reason."],
+        ["Jarrod Levins", "question", "How far out do you start the countdown for your certification, and have you ever begun so early that momentum went before the exam did?"],
+        ["Ravi Chandrasekar", "question", "What happens with a student who is clearly not ready two weeks out? Interested in how others make that call and who makes it."]
+      ]
+    },
+    {
+      "slug": "standards-translator-credential-to-classroom",
+      "posts": [
+        ["Wendell Prosser", "from_tdi", "Credential language is written for assessors, not for a Tuesday morning. The translator exists to turn a competency statement into something a student can be seen doing at a bench."],
+        ["Ingrid Vasquez-Lund", "from_tdi", "Do one competency at a time and keep the original wording beside your version. When someone asks how you covered it, that pairing is the whole answer."],
+        ["Jarrod Levins", "question", "Where do your state standards and the industry credential pull in different directions, and which one wins when they do?"],
+        ["Lorna Stimpson", "question", "Has anyone had a credential rewritten partway through the year, and how much of your planning survived it?"]
+      ]
+    },
+    {
+      "slug": "welding-lab-3-coupon-heat-input",
+      "posts": [
+        ["Wendell Prosser", "from_tdi", "Three coupons because one weld proves nothing. Volts and amps stay locked and only travel speed moves, otherwise the student has run three separate experiments and concluded that welding is unpredictable."],
+        ["Ingrid Vasquez-Lund", "from_tdi", "They have to time the pass and measure the bead rather than estimate it. Travel speed is the denominator, so a guessed number leaves the whole calculation decorative."],
+        ["Ravi Chandrasekar", "question", "How do you stop students reading the slowest coupon as the best one? A wider bead looks convincing right up until you get to distortion."],
+        ["Jarrod Levins", "question", "Do your students section and etch the coupons to look at the heat affected zone, or is that beyond what your setup allows?"]
+      ]
+    },
+    {
+      "slug": "welding-lesson-heat-input-travel-speed",
+      "posts": [
+        ["Wendell Prosser", "from_tdi", "Two worked examples, one quick pass and one slow, so the number moves in a direction students can see. A single example turns the formula into arithmetic with nothing attached to it."],
+        ["Ravi Chandrasekar", "from_tdi", "Units are where this falls over. Inches per minute going in, kilojoules per inch coming out, and the division by one thousand is the step that gets dropped most."],
+        ["Ingrid Vasquez-Lund", "question", "Do you teach this before students weld, or after they have felt the difference in a bead? Curious which order lands better."],
+        ["Lorna Stimpson", "question", "For students who find the maths hard, what have you used that did not water the formula down to a rule of thumb?"]
+      ]
+    }
+  ]
+}
