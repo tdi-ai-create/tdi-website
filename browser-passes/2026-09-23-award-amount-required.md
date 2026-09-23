@@ -1,0 +1,91 @@
+# Browser pass
+
+## What this change touches
+
+The Outcome panel on the funding pursuit page, `OpportunitiesTab.tsx`. Recording
+an award now requires an amount. The field no longer pre-fills with the ask, and
+Confirm is disabled until a real number is entered.
+
+## What I did
+
+- Opened: http://localhost:3000/tdi-admin/funding
+- Deferred: the admin portal authenticates against a Supabase session cookie
+  scoped to the live domain, so a local server answers with a login screen.
+- Verify after deploy: https://www.teachersdeserveit.com/tdi-admin/funding/83a8932b-66dc-4c67-b815-65c19358b123
+
+## The defect, measured
+
+Two faults in one control.
+
+The amount field was seeded with `String(opp.amount || '')`, which is what we
+**asked** for. So the fastest path through the form recorded the ask as the
+award, and pressing Confirm without touching the field looked like a decision.
+This is the bug Bella found on 14 September: "the email says $500 but our site
+shows $5,000."
+
+And the handler read `parseFloat(awardedAmt) || 0`, so an empty field, a stray
+character or a typed minus sign all wrote a **zero**. A zero here cannot be told
+apart from a grant that was never won.
+
+Measured 23 September: two grants marked awarded across the three live schools,
+neither carrying an amount, so `total_awarded` read 0 for every school and no
+allocation row existed anywhere.
+
+## Backfill, from the funder rather than from us
+
+Walmart Spark Good for Saunemin is now recorded at **$500**, decided
+11 September.
+
+That figure is from Walmart's own email, forwarded by Gary on 11 September:
+"Your Spark Good Local Grant request to Facility #1386 for Saunemin Elem School,
+in the amount of $500 has been recommended for approval." Application ID
+92518893.
+
+Our own record could not be trusted for this. `funding_pursuit_timeline` holds
+"Awarded: Walmart Spark Good Grant, $5,000" on 11 September and "Awarded:
+Walmart Spark Good Grant, $0" twice on 15 September, while the `amount` column
+says 500. Three different numbers for one grant, which is exactly why the rule
+is that a database row is a record and not reality.
+
+**Title II-A is deliberately left alone.** It is marked awarded with an amount
+of 0 and no external record says what it was worth. Writing a number there would
+be a guess, and a guess is what this change exists to prevent.
+
+## The prediction
+
+Open the Saunemin pursuit page, find a grant in `applied` or `waiting`, and press
+Record award. The amount field should be **empty**, with a grey hint reading
+"We asked for $X. Enter what they actually gave." Confirm award should be grey
+and unclickable until a number above zero is typed.
+
+The Walmart card should read $500 rather than "amount not recorded", and the
+schools screen should show $500 of $15,552 for Saunemin with its progress bar
+off zero.
+
+## What I will not press
+
+Confirm award on a real grant. The two live candidates belong to real schools and
+recording an outcome for either would be a false record. The disabled state and
+the empty field are both observable without submitting.
+
+## Six unchecked writes in the same file, fixed here
+
+`check:fetch` surfaced six fetches in `OpportunitiesTab.tsx` that fired and never
+looked at the answer, so a refused write refreshed the list and looked exactly
+like a successful one. They predate this change and the ratchet only judges
+files a pull request touches, which is why they surfaced now.
+
+They are the override control, adding a grant path, editing one, and all three
+allocation controls: add, hand off, and delete. The allocation ones matter most
+here, because recording a real award is what makes allocation reachable at all.
+
+Fixed rather than allowlisted. A shared `writeOrThrow` throws on a non-ok
+response, and each caller surfaces the message. The allocation errors render in
+a red strip inside the panel, because setting error state nobody displays would
+be the same bug in different clothes.
+
+## What I could not verify
+
+Whether any other code path writes `awarded_amount` without going through this
+control. The sync API accepts the field, so an agent could in principle set it
+directly. Not checked.
