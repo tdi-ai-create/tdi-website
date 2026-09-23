@@ -25,6 +25,7 @@ export const shortDate = (d?: string | null) =>
 
 const TABS = [
   ['/tdi-admin/billing', 'Contracts'],
+  ['/tdi-admin/billing/forecast', 'Ready to invoice'],
   ['/tdi-admin/billing/money', 'Money'],
   ['/tdi-admin/billing/documents', 'Documents'],
   ['/tdi-admin/billing/outbox', 'Outbox'],
