@@ -136,20 +136,11 @@ Whether any other code path writes `awarded_amount` without going through this
 control. The sync API accepts the field, so an agent could in principle set it
 directly. Not checked.
 
-**The main claim of this change is still unproven, and the test case for it does
-not exist on this school.** The prediction was written for a grant in `applied`
-or `waiting` with no award yet. Walmart Spark Good is in `waiting` but has
-already been awarded, and its ask and its award are both $500, so a field
-pre-filled with 500 is indistinguishable between the fixed behaviour, seeding
-from the existing award, which is reasonable, and the bug, seeding from the ask,
-which is what this change exists to stop. Every other path on Saunemin reads
-`researching` or `closed`.
-
-So one of two things is true and this pass cannot say which: either the fix
-works and I tested it on the one grant where it cannot be seen, or the seeding
-is still wrong. It needs re-checking on a school with a grant in `applied` or
-`waiting` that has never been awarded, where the ask and the award differ.
-
-The absent grey hint is the stronger signal. "We asked for $X. Enter what they
-actually gave" did not render at all, and that hint should not depend on whether
-an award already exists.
+**Second look on Saunemin, 23 September, agrees with part two above.** Walmart
+Spark Good is in `waiting`, and pressing Record award there also opened a
+pre-filled field with an enabled Confirm. That is the same old behaviour seen on
+Allenwood, and it has the same cause: the fix has not deployed. Saunemin is a
+weaker test than Allenwood either way, because Walmart's ask and its award are
+both $500, so seeding from the ask and seeding from the existing award look
+identical there. Allenwood, where the ask is $5,000 and no award exists, remains
+the grant to re-check once a build carrying #603 is live.
