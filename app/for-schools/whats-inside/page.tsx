@@ -3,7 +3,7 @@ import './whats-inside.css';
 
 import PrintButton from './PrintButton';
 import { getWhatsInside } from './data';
-import { AREA_BLURB, SECTIONS } from './sections';
+import { SECTIONS } from './sections';
 
 /**
  * What's inside the Hub. A buyer facing catalogue of the Learning Hub.
@@ -34,48 +34,44 @@ export default async function WhatsInsidePage() {
 
   return (
     <div className="fs-page wi-page">
-      <header className="fs-hero">
-        <div className="fs-wrap fs-hero-grid">
-          <div>
-            <p className="fs-kicker" style={{ color: '#a9becd' }}>The Learning Hub</p>
-            <h1>What your staff would actually get</h1>
-            <p className="fs-sub">
-              The Hub is the library behind every TDI offering. This page shows what is in it before
-              you sign anything, sorted by the problem it solves rather than by the department it
-              came from.
-            </p>
-            <div className="fs-btnrow wi-hero-actions">
-              <a className="fs-btn fs-btn-gold" href={BOOKING_LINK}>Book twenty minutes</a>
-              <a className="fs-btn fs-btn-ghost" href="#areas">See what is in there</a>
-            </div>
-            <p className="fs-hero-note">
-              Every tool is built to be printed and handed to someone on a Tuesday, with no training
-              first.
-            </p>
-            <p className="wi-printlink">Book twenty minutes at {BOOKING_LINK}</p>
+      <header className="fs-hero wi-hero">
+        <div className="fs-wrap">
+          <p className="fs-kicker" style={{ color: '#a9becd' }}>The Learning Hub</p>
+          <h1>What your staff would actually get</h1>
+          <p className="fs-sub">
+            The Hub is the library behind every TDI offering. This page shows what is in it before
+            you sign anything, sorted by the problem it solves rather than by the department it
+            came from.
+          </p>
+          <div className="fs-btnrow wi-hero-actions">
+            <a className="fs-btn fs-btn-gold" href={BOOKING_LINK}>Book twenty minutes</a>
+            <a className="fs-btn fs-btn-ghost" href="#areas">See what is in there</a>
           </div>
+          <p className="wi-printlink">Book twenty minutes at {BOOKING_LINK}</p>
+        </div>
+      </header>
 
-          <div className="fs-yearcard wi-areacard">
-            <h4>What schools keep asking us for</h4>
-            <p className="fs-cap">
-              Each one is a working part of the Hub, not a category invented for this page.
-            </p>
-            <div className="wi-arealist">
-              {SECTIONS.map((section) => (
+      {/* The eight areas as their own band. They were in the hero and it read as
+          clutter, partly because every blurb said again what the section below
+          says properly. Label only here, and they behave like buttons. */}
+      <nav className="wi-jump" aria-label="Jump to an area">
+        <div className="fs-wrap">
+          <p className="wi-jump-lead">What schools keep asking us for</p>
+          <ul className="wi-tiles">
+            {SECTIONS.map((section) => (
+              <li key={section.slug}>
                 <a
-                  key={section.slug}
-                  className="wi-arow"
+                  className="wi-tile"
                   href={`#${section.slug}`}
                   style={{ ['--a' as string]: section.accent }}
                 >
-                  <b>{section.label}</b>
-                  <span>{AREA_BLURB[section.slug]}</span>
+                  {section.label}
                 </a>
-              ))}
-            </div>
-          </div>
+              </li>
+            ))}
+          </ul>
         </div>
-      </header>
+      </nav>
 
       <section className="fs-sec fs-sec-white">
         <div className="fs-wrap">

@@ -2,38 +2,67 @@
    button styles come from for-schools.css rather than being restated here.
    Do not add unscoped selectors to this file. */
 
-.wi-page .wi-arealist {
+/* ---------- hero ---------- */
+/* Lighter than the sales page hero. This one carries a headline and two
+   buttons, nothing else. The eight areas used to sit beside it in a card and
+   read as clutter, because each one repeated the line the section states
+   properly further down. */
+
+.wi-page .wi-hero { padding: 66px 0 58px; }
+.wi-page .wi-hero h1 { max-width: 20ch; text-wrap: balance; }
+.wi-page .wi-hero p.fs-sub { max-width: 54ch; }
+
+/* ---------- jump tiles ---------- */
+
+.wi-page .wi-jump { background: #fff; border-bottom: 1px solid var(--line); padding: 30px 0 34px; }
+.wi-page .wi-jump-lead {
+  font-size: .82rem;
+  font-weight: 700;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0 0 16px;
+}
+.wi-page .wi-tiles {
+  list-style: none;
+  margin: 0;
+  padding: 0;
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
+  gap: 10px;
 }
-.wi-page .wi-arow {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 4px 12px;
-  align-items: baseline;
-  padding: 11px 0 11px 14px;
-  border-top: 1px solid #2a4661;
-  position: relative;
+.wi-page .wi-tile {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
   text-decoration: none;
-  color: inherit;
+  background: #fff;
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 11px 20px;
+  font-size: .95rem;
+  font-weight: 600;
+  line-height: 1;
+  transition: border-color .15s ease, transform .15s ease, box-shadow .15s ease;
 }
-.wi-page .wi-arow:first-child { border-top: none; }
-.wi-page .wi-arow:before {
+.wi-page .wi-tile:before {
   content: "";
-  position: absolute;
-  left: 0;
-  top: 17px;
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
   border-radius: 2px;
   background: var(--a);
+  flex: none;
 }
-.wi-page .wi-arow b { color: #fff; font-weight: 500; font-size: .95rem; white-space: nowrap; }
-.wi-page .wi-arow span { color: #93aabc; font-size: .86rem; line-height: 1.45; }
-.wi-page .wi-arow:hover b { text-decoration: underline; }
+.wi-page .wi-tile:hover {
+  border-color: var(--a);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 10px rgba(30, 42, 74, .08);
+  text-decoration: none;
+}
 @media (max-width: 560px) {
-  .wi-page .wi-arow { grid-template-columns: 1fr; gap: 2px; }
-  .wi-page .wi-arow b { white-space: normal; }
+  .wi-page .wi-tiles { gap: 8px; }
+  .wi-page .wi-tile { padding: 10px 16px; font-size: .9rem; }
 }
 
 /* ---------- a problem block ---------- */
@@ -193,7 +222,7 @@
 @media print {
   .wi-page .wi-hero-actions,
   .wi-page .wi-printrow,
-  .wi-page .wi-areacard,
+  .wi-page .wi-jump,
   .wi-page .fs-btnrow { display: none !important; }
 
   .wi-page .fs-hero,
@@ -206,7 +235,6 @@
   .wi-page .wi-finale h2 { color: #000 !important; }
   .wi-page .fs-hero p,
   .wi-page .wi-finale p { color: #222 !important; }
-  .wi-page .fs-hero-grid { grid-template-columns: 1fr !important; }
 
   .wi-page { background: #fff !important; font-size: 11pt; }
   .wi-page .wi-block { break-inside: avoid; padding: 18px 0; }
