@@ -154,6 +154,12 @@ export default function BillingPage() {
           ] as const).map(([k, label]) => (
             <button key={k} onClick={() => setFilter(k)} style={filter === k ? S.chipOn : S.chip}>{label}</button>
           ))}
+          {/* Every line with its delivery and billing position, as a workbook.
+              Client money and grant money are on separate sheets, so the two
+              cannot be summed together by accident. */}
+          <a href="/api/tdi-admin/billing/export?view=lines" style={S.dl} download>
+            Export as a spreadsheet
+          </a>
         </div>
 
         {contracts.length === 0 && <div style={{ padding: 36, textAlign: 'center', color: '#64748B' }}>Nothing matches that filter.</div>}
@@ -591,7 +597,11 @@ const S: Record<string, React.CSSProperties> = {
   info: { background: '#EFF6FF', border: '1px solid #BFDBFE', borderRadius: 12, padding: '13px 16px', marginBottom: 18, color: '#1E3A8A', fontSize: 13.5 },
   bad: { background: '#FEF2F2', border: '1px solid #FECACA', borderRadius: 10, padding: '12px 14px', color: '#7F1D1D', fontSize: 13, marginBottom: 12 },
   card: { background: '#fff', border: '1px solid #E2E8F0', borderRadius: 12, overflow: 'hidden' },
-  filters: { display: 'flex', gap: 7, padding: '11px 14px', borderBottom: '1px solid #E2E8F0', flexWrap: 'wrap', background: '#FCFCFD' },
+  filters: { display: 'flex', gap: 7, padding: '11px 14px', borderBottom: '1px solid #E2E8F0', flexWrap: 'wrap', background: '#FCFCFD', alignItems: 'center' },
+  dl: {
+    marginLeft: 'auto', background: '#0B1120', color: '#fff', borderRadius: 7,
+    padding: '6px 12px', fontSize: 12.5, fontWeight: 650, textDecoration: 'none', whiteSpace: 'nowrap',
+  },
   chip: { border: '1px solid #CBD5E1', background: '#fff', borderRadius: 20, padding: '5px 12px', fontSize: 12.5, color: '#64748B', cursor: 'pointer' },
   chipOn: { border: '1px solid #0B1120', background: '#0B1120', color: '#fff', borderRadius: 20, padding: '5px 12px', fontSize: 12.5, fontWeight: 650, cursor: 'pointer' },
   row: { display: 'flex', alignItems: 'center', gap: 14, padding: '13px 16px', width: '100%', border: 0, cursor: 'pointer', font: 'inherit', color: 'inherit' },
