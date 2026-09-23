@@ -6,7 +6,7 @@ const supabase = createClient(
   process.env.LEARNING_HUB_SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
-const VALID_TYPES = ['tried_it', 'adapted_it', 'still_trying', 'got_stuck', 'didnt_land'] as const
+const VALID_TYPES = ['tried_it', 'adapted_it', 'still_trying', 'got_stuck', 'didnt_land', 'question', 'from_tdi'] as const
 type ContributionType = typeof VALID_TYPES[number]
 
 // GET /api/hub/lessons/[lessonId]/conversation
@@ -33,6 +33,8 @@ export async function GET(
       still_trying: 0,
       got_stuck: 0,
       didnt_land: 0,
+      question: 0,
+      from_tdi: 0,
     }
     let totalContributions = 0
     for (const row of pulseRows || []) {

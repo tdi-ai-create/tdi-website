@@ -100,7 +100,7 @@ export async function POST(request: NextRequest) {
         try {
           const { data: originalAuthor } = await supabase
             .from('hub_profiles')
-            .select('display_name, email')
+            .select('display_name, email, is_tdi_voice')
             .eq('id', parent.user_id)
             .single()
 
@@ -114,7 +114,9 @@ export async function POST(request: NextRequest) {
             sourceUserId: user_id,
           });
 
-          if (originalAuthor?.email) {
+          // TDI voice accounts have no inbox. The reply still lands in the
+          // thread and in the admin queue, it just does not bounce an email.
+          if (originalAuthor?.email && !originalAuthor.is_tdi_voice) {
             await sendReplyNotificationEmail(
               parent.user_id,
               originalAuthor.email,

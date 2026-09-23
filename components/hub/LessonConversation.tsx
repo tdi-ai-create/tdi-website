@@ -8,7 +8,7 @@ import TdiVoiceChip from '@/components/hub/TdiVoiceChip'
 
 // ─── TYPES ──────────────────────────────────────────────────────────────────
 
-export type ContributionType = 'tried_it' | 'adapted_it' | 'still_trying' | 'got_stuck' | 'didnt_land'
+export type ContributionType = 'tried_it' | 'adapted_it' | 'still_trying' | 'got_stuck' | 'didnt_land' | 'question' | 'from_tdi'
 
 interface ConversationReply {
   id: string
@@ -41,6 +41,8 @@ interface PulseCounts {
   still_trying: number
   got_stuck: number
   didnt_land: number
+  question: number
+  from_tdi: number
 }
 
 interface ConversationData {
@@ -57,13 +59,20 @@ const CONTRIBUTION_TYPES: {
   label: string
   description: string
   color: string
+  // false for posts only TDI writes, so they stay out of the member composer,
+  // the pulse bar and the filter chips while still rendering on a card
+  memberFacing?: boolean
 }[] = [
   { id: 'tried_it', label: 'Tried it', description: 'Used the lesson as written', color: '#2A9D8F' },
   { id: 'adapted_it', label: 'Adapted it', description: 'Changed something to make it work', color: '#F4C430' },
   { id: 'still_trying', label: 'Still trying', description: 'In progress, not yet finished', color: '#7BB6D9' },
   { id: 'got_stuck', label: 'Got stuck', description: 'Hit a wall, need a second brain', color: '#F4A28C' },
   { id: 'didnt_land', label: "Didn't land", description: "Tried it, didn't work, here's why", color: '#64748B' },
+  { id: 'question', label: 'Question', description: 'Ask the room something', color: '#E8B84B' },
+  { id: 'from_tdi', label: 'From TDI', description: 'A note from the team', color: '#2B3A67', memberFacing: false },
 ]
+
+const MEMBER_FACING_TYPES = CONTRIBUTION_TYPES.filter(t => t.memberFacing !== false)
 
 function getTypeConfig(type: ContributionType) {
   return CONTRIBUTION_TYPES.find(t => t.id === type) || CONTRIBUTION_TYPES[0]
@@ -94,7 +103,7 @@ function Pulse({ pulse, total, tUI }: { pulse: PulseCounts; total: number; tUI: 
       </p>
 
       <div className="space-y-3">
-        {CONTRIBUTION_TYPES.map((type, typeIdx) => {
+        {MEMBER_FACING_TYPES.map((type, typeIdx) => {
           const count = pulse[type.id]
           const widthPct = maxCount > 0 ? (count / maxCount) * 100 : 0
 
@@ -152,7 +161,7 @@ function FilterChips({
       >
         {tUI('All')} {total}
       </button>
-      {CONTRIBUTION_TYPES.map(type => {
+      {MEMBER_FACING_TYPES.map(type => {
         const count = pulse[type.id]
         const isActive = activeFilter === type.id
         return (
@@ -511,7 +520,7 @@ function ComposeModal({
         <div className="p-5 space-y-5">
           {/* Type selector */}
           <div className="space-y-2">
-            {CONTRIBUTION_TYPES.map(type => {
+            {MEMBER_FACING_TYPES.map(type => {
               const isSelected = selectedType === type.id
               return (
                 <label
