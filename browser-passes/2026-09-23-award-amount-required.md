@@ -13,6 +13,26 @@ Confirm is disabled until a real number is entered.
   scoped to the live domain, so a local server answers with a login screen.
 - Verify after deploy: https://www.teachersdeserveit.com/tdi-admin/funding/83a8932b-66dc-4c67-b815-65c19358b123
 
+### Verified on production, 23 September 2026
+
+- Opened: https://www.teachersdeserveit.com/tdi-admin/funding/83a8932b-66dc-4c67-b815-65c19358b123
+- Saw: the header reads "PIPELINE $15,552" and "AWARDED $500". The backfill is
+  live and the school is no longer showing zero awarded.
+- Pressed: "Grant paths (14)" to expand the paths list
+- Saw: the Walmart Spark Good Grant card reads "$500" beside its title, status
+  "waiting", "Deadline: Aug 31 (passed)", phase "Awarded", and a submission line
+  "Spark Good Local Grant to Facility #1386 Received – Application ID 92518893"
+  dated Aug 4. It does not say "amount not recorded", which is the half of the
+  prediction that is confirmed.
+- Pressed: "Record award" in the OUTCOME row of that card
+- Saw: the panel opened with "Awarded amount ($)" **pre-filled with 500**,
+  "Decision date" 09/23/2026, and "Confirm award" rendered green and clickable
+  next to "Cancel". The predicted empty field, the grey hint "We asked for $X.
+  Enter what they actually gave", and the disabled Confirm did not appear.
+- Pressed: "Cancel"
+- Saw: the panel closed and the card returned to showing "$500" with the
+  "Record award" and "Record denial" buttons. Nothing was written.
+
 ## The defect, measured
 
 Two faults in one control.
@@ -115,3 +135,12 @@ be the same bug in different clothes.
 Whether any other code path writes `awarded_amount` without going through this
 control. The sync API accepts the field, so an agent could in principle set it
 directly. Not checked.
+
+**Second look on Saunemin, 23 September, agrees with part two above.** Walmart
+Spark Good is in `waiting`, and pressing Record award there also opened a
+pre-filled field with an enabled Confirm. That is the same old behaviour seen on
+Allenwood, and it has the same cause: the fix has not deployed. Saunemin is a
+weaker test than Allenwood either way, because Walmart's ask and its award are
+both $500, so seeding from the ask and seeding from the existing award look
+identical there. Allenwood, where the ask is $5,000 and no award exists, remains
+the grant to re-check once a build carrying #603 is live.
