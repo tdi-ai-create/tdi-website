@@ -15,12 +15,17 @@ and every course page. It is removed.
 That is what the block looks like before the change. The database was already
 clean at this point, which is how the hardcoded copy became visible.
 
-## What I could not verify
+## Completed on production, 23 September 2026
 
-The pages with the block gone. That needs this deployed.
+- Opened: https://www.teachersdeserveit.com/hub/quick-wins/calm-response-scripts
+- Saw: no "What educators are saying" heading anywhere in the page body, and none of the invented quotes. The conversation section is now the only thing under the tool, showing "All 1" and "Question 1" with our two posts carrying the TDI chip.
+- Opened: https://www.teachersdeserveit.com/hub/quick-wins/shift-kit
+- Saw: h1 "The Shift Kit", two TDI chips, tags rendering "Question" and "From TDI", and no testimonial heading or invented quote.
+- Opened: https://www.teachersdeserveit.com/hub/quick-wins/sustainable-teaching-reset
+- Saw: h1 "Sustainable Teaching Reset Guide" and no testimonial heading or invented quote.
 
-- Deferred: the removal is in the page source and not in production yet.
-- Verify after deploy: https://www.teachersdeserveit.com/hub/quick-wins/calm-response-scripts should show no "What educators are saying" heading at all, and the same for a course page and a game page.
+Checked by reading document.body.innerText for the heading and for three of the
+invented quotes, rather than by looking at a screenshot.
 
 ## What I did not press
 
