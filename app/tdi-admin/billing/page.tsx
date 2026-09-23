@@ -12,6 +12,7 @@ type Line = {
   unit_price: string; total_amount: string; is_complimentary: boolean;
   delivery_state: string | null; billing_state: string | null; funding_hold: boolean;
   delivery_date: string | null; delivered_by: string | null;
+  planned_date: string | null; planned_confidence: string | null;
   invoice: { id: string; invoice_number: string; status: string; amount: string; due_date: string | null } | null;
   mismatch: boolean;
 };
@@ -32,6 +33,19 @@ const money = (n: number) =>
   n.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
 const money2 = (n: number | string) =>
   Number(n).toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 });
+
+// A date-only string is not a moment in time. new Date('2026-10-07') parses as
+// UTC midnight, which renders as the 6th anywhere west of Greenwich, and a
+// planned date that displays a day early is a forecast nobody will trust.
+const dateParts = (iso: string) => iso.split('-').map(Number);
+const shortDate = (iso: string) => {
+  const [y, m, d] = dateParts(iso);
+  return new Date(y, m - 1, d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+};
+const longDate = (iso: string) => {
+  const [y, m, d] = dateParts(iso);
+  return new Date(y, m - 1, d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+};
 
 export default function BillingPage() {
   const { teamMember } = useTDIAdmin();
@@ -274,6 +288,30 @@ function ActionFor({ a, onCancel, run }: {
     );
   }
 
+  if (a.kind === 'set_planned_date') {
+    const held = l.planned_confidence === 'held' || !l.planned_confidence;
+    return (
+      <ActionDialog
+        title={l.planned_date ? 'Change planned date' : 'Set planned date'}
+        subtitle={`${l.label}, ${a.client}`}
+        confirmLabel={l.planned_date ? 'Change date' : 'Set date'}
+        fields={[
+          { name: 'planned_date', label: 'Planned for', type: 'date', required: true, value: l.planned_date ?? '',
+            hint: 'The day the service is expected to happen, not the day it gets invoiced.' },
+          { name: 'planned_confidence', label: 'How firm is it', type: 'select', required: true,
+            options: ['held', 'confirmed'], value: held ? 'held' : 'confirmed',
+            hint: 'Held means we are keeping the date so it does not get taken. Confirmed means the client has agreed it.' },
+        ]}
+        effects={[
+          'Records when the work is expected. Nothing is billed and no delivery is recorded.',
+          'Held dates are shown apart from confirmed ones and are never forecast as booked.',
+        ]}
+        onCancel={onCancel}
+        onConfirm={(v) => run({ action: 'set_planned_date', deliverable_id: l.id, ...v })}
+      />
+    );
+  }
+
   if (a.kind === 'create_invoice') {
     return (
       <ActionDialog
@@ -371,8 +409,12 @@ function LineRow({ l, onAction }: { l: Line; onAction: (kind: string) => void })
           </span>
         </span>
         <span style={{ flex: '0 0 132px' }}>
+          {/* Held and confirmed must never render alike, or the distinction dies
+              the first time someone screenshots this screen. */}
           {delivered ? <Pill tone="blue">{l.delivery_date ? new Date(l.delivery_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : 'Delivered'}</Pill>
-            : <Pill tone="none">no record</Pill>}
+            : l.planned_date && l.planned_confidence === 'confirmed' ? <Pill tone="slate">{shortDate(l.planned_date)}</Pill>
+            : l.planned_date ? <Pill tone="none">{shortDate(l.planned_date)} held</Pill>
+            : <Pill tone="none">no date</Pill>}
         </span>
         <span style={{ flex: '0 0 132px' }}>
           {l.mismatch ? <Pill tone="red">Mismatch</Pill>
@@ -412,6 +454,23 @@ function LineRow({ l, onAction }: { l: Line; onAction: (kind: string) => void })
                     <Pill tone="none">Never recorded</Pill>
                     <div style={{ fontSize: 12.5, color: '#64748B', marginTop: 8 }}>
                       Nobody has confirmed this work happened. Marking it delivered is what makes it billable.
+                    </div>
+                    <div style={{ marginTop: 11, paddingTop: 11, borderTop: '1px dashed #E2E8F0' }}>
+                      <KV k="Planned for" v={
+                        l.planned_date
+                          ? `${longDate(l.planned_date)}${l.planned_confidence === 'held' ? ', held' : ''}`
+                          : 'not set'
+                      } />
+                      <div style={{ fontSize: 12.5, color: '#64748B', margin: '6px 0 9px' }}>
+                        {l.planned_date
+                          ? l.planned_confidence === 'held'
+                            ? 'A date being kept so it does not get taken. The client has not agreed it, so it is not forecast as booked.'
+                            : 'Agreed with the client. This is what the invoice forecast runs on.'
+                          : 'Nothing forecasts this line until it has a date.'}
+                      </div>
+                      <ActionButton tone="dark" onClick={() => onAction('set_planned_date')}>
+                        {l.planned_date ? 'Change planned date' : 'Set planned date'}
+                      </ActionButton>
                     </div>
                   </>}
             </Pane>
