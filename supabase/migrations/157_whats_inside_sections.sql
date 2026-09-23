@@ -1,4 +1,9 @@
--- 155: Section assignment for the buyer facing "What's inside the Hub" page.
+-- Applied to the Learning Hub project on 2026-09-22, recorded there under the
+-- earlier name 155_whats_inside_sections. Renumbered to 157 in the repo after
+-- main took 155 and 156. Supabase keys migrations by timestamp, so the two
+-- numbers differing is cosmetic and there is nothing to re-run.
+--
+-- 157: Section assignment for the buyer facing "What's inside the Hub" page.
 --
 -- The page at /for-schools/whats-inside renders ONLY rows that a person has
 -- assigned to a section. Tag based sorting was tried and misfiles material:

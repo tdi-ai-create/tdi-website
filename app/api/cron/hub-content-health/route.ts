@@ -350,6 +350,43 @@ export async function GET() {
     issues.push(`Pipeline heartbeat check failed: ${String(err)}`);
   }
 
+  // Check 5e: recently published items that never reached the buyer facing page.
+  //
+  // /for-schools/whats-inside renders only rows with hub_section set, which is
+  // what keeps misfiled material off a sales page. The cost of that choice is a
+  // silent one: an item nobody assigns simply never appears, and the page looks
+  // complete either way.
+  //
+  // Scoped to the last 14 days on purpose. Roughly 40 older items are
+  // deliberately unassigned, the CTE and lab material and a few written for
+  // people already inside, so alerting on every null would nag forever and
+  // teach everyone to ignore this email.
+  try {
+    const since = new Date(Date.now() - 14 * 86_400_000).toISOString();
+    const { data, error } = await supabase
+      .from('hub_quick_wins')
+      .select('title, published_at')
+      .eq('is_published', true)
+      .is('hub_section', null)
+      .gte('published_at', since)
+      .order('published_at', { ascending: false });
+
+    if (error) {
+      issues.push(`Whats-inside section check failed: ${error.message}`);
+    } else if (data && data.length > 0) {
+      const titles = data.slice(0, 5).map(r => r.title).join(', ');
+      const more = data.length > 5 ? `, and ${data.length - 5} more` : '';
+      issues.push(
+        `${data.length} Quick Win${data.length === 1 ? '' : 's'} published in the last 14 days ` +
+        `${data.length === 1 ? 'has' : 'have'} no hub_section, so ${data.length === 1 ? 'it is' : 'they are'} ` +
+        `missing from /for-schools/whats-inside: ${titles}${more}. ` +
+        `Fix with content-sync action set_section.`
+      );
+    }
+  } catch (err) {
+    issues.push(`Whats-inside section check failed: ${String(err)}`);
+  }
+
   // Check 6: Clean up video staging files older than 1 hour
   let stagingCleaned = 0;
   try {

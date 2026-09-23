@@ -38,6 +38,42 @@ Counts read from the served HTML: 8 section blocks, 32 featured items, 8 hero
 card rows, 243 rows across the expanded lists. Badges rendered: 2 Most used,
 3 Trending, 4 Popular, 1 New.
 
+### The new content-sync action and the health check
+
+- Called: `POST /api/hub/content-sync` with
+  `{"action":"set_section","slug":"first-10-minutes-framework","hub_section":"first_weeks","hub_section_pin":1,"dryRun":true}`
+- Saw: `"dryRun": true` with `before.hub_section_pin: null` and
+  `would_set: {hub_section: "first_weeks", hub_section_pin: 1}`. Queried the
+  table afterwards: 0 rows had a pin, so the dry run wrote nothing.
+- Called: the same request without `dryRun`.
+- Saw: `"verified": true`, and the table then had exactly 1 row with a pin.
+- Called: `set_section` with `hub_section: "behaviour"`, the British spelling.
+- Saw: `"hub_section must be one of: behavior, instructional_planning, paras,
+  first_weeks, families, leading, teacher_load, ai_technology. Got
+  \"behaviour\"."`
+- Called: `set_section` with `hub_badge: "most_used"`.
+- Saw: it was refused, with "Most used, Trending, Popular and New are computed
+  from real usage and cannot be set by hand."
+- Pinned "Friday Take-Home Folder Checklist", which was not in the top four, and
+  reloaded the page.
+- Saw: the first weeks section read The First 10 Minutes Framework, Friday
+  Take-Home Folder Checklist, The Noise Level System, Back-to-School Overwhelm
+  Reset. It had moved into second place.
+- Unpinned it and reloaded.
+- Saw: it dropped out of the four again. Both directions work, so the pin is
+  doing the ordering rather than coinciding with it.
+- Opened: `http://localhost:3000/api/cron/hub-content-health`
+- Saw: "6 Quick Wins published in the last 14 days have no hub_section, so they
+  are missing from /for-schools/whats-inside", naming Creative Ideas for Working
+  With Rigid Seating and Creative Ideas for Construction Paper among them. The
+  same query in SQL also returned 6.
+- That was a real fault in my own curation, not a false positive. The exclusion
+  list is written around trade and material tags and had swallowed the whole
+  Creative Ideas series. Assigned those to instructional planning and ran the
+  check again.
+- Saw: zero whats-inside issues. The check clears when the problem is fixed, so
+  it can both fail and pass.
+
 ## What I did not press
 
 The real print dialog. `window.print` was replaced with a counter first, because
@@ -47,6 +83,11 @@ exercised by dispatching the event and re-reading the DOM.
 
 Nothing on this page writes, sends, or opens a document, so there was nothing
 else to leave alone.
+
+The health check email. `.env.local` carries no `RESEND_API_KEY`, only a webhook
+secret, so the send branch was skipped on the first run. The second run was
+started with a deliberately fake key in the shell environment, which takes
+precedence over the env file. No alert reached Rae from either run.
 
 ## What I could not verify
 
