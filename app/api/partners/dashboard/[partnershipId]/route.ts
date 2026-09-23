@@ -18,6 +18,86 @@ function getServiceSupabase() {
   });
 }
 
+/**
+ * The Learning Hub, where activity actually happens. Separate database from the
+ * portal, so staff are matched across by email.
+ */
+function getHubSupabase() {
+  const url =
+    process.env.LEARNING_HUB_SUPABASE_URL ||
+    process.env.NEXT_PUBLIC_LEARNING_HUB_SUPABASE_URL;
+  const key =
+    process.env.LEARNING_HUB_SUPABASE_SERVICE_KEY ||
+    process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!url || !key) return null;
+
+  return createClient(url, key, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  });
+}
+
+/**
+ * Who has ever actually used the Hub, read live rather than from a copy.
+ *
+ * `staff_members.hub_login_date` is written once a day by
+ * `/api/cron/sync-hub-login-dates` at 10:30 UTC. That cron works, but a teacher
+ * who signs in at 15:10 is invisible until the following morning. On 23 Sep two
+ * Roosevelt teachers signed in during the onboarding call and their own
+ * principal's dashboard showed them as never having logged in, next to an
+ * aggregate percentage that already counted them, because the percentage comes
+ * from the Hub live and the per-person list did not. One screen, two answers.
+ *
+ * Returns a set of lower-cased emails with any Hub activity ever, excluding
+ * `account_provisioned`, which is us creating the account rather than them using
+ * it.
+ *
+ * Returns null, not an empty set, when the Hub cannot be reached. An empty set
+ * would render as "nobody has ever logged in", which is the same shape of lie
+ * this function exists to remove.
+ */
+async function emailsActiveInHub(emails: string[]): Promise<Set<string> | null> {
+  const wanted = emails.map(e => e.toLowerCase()).filter(Boolean);
+  if (wanted.length === 0) return new Set();
+
+  const hub = getHubSupabase();
+  if (!hub) return null;
+
+  const { data: profiles, error: profileError } = await hub
+    .from('hub_profiles')
+    .select('id, email')
+    .in('email', wanted);
+
+  if (profileError) {
+    console.error('[partners/dashboard] hub profile lookup failed:', profileError.message);
+    return null;
+  }
+
+  const idToEmail = new Map<string, string>();
+  for (const p of profiles || []) {
+    if (p.id && p.email) idToEmail.set(p.id, String(p.email).toLowerCase());
+  }
+  if (idToEmail.size === 0) return new Set();
+
+  const { data: activity, error: activityError } = await hub
+    .from('hub_activity_log')
+    .select('user_id')
+    .in('user_id', Array.from(idToEmail.keys()))
+    .neq('action', 'account_provisioned');
+
+  if (activityError) {
+    console.error('[partners/dashboard] hub activity lookup failed:', activityError.message);
+    return null;
+  }
+
+  const active = new Set<string>();
+  for (const row of activity || []) {
+    const email = idToEmail.get(row.user_id as string);
+    if (email) active.add(email);
+  }
+  return active;
+}
+
 // GET - Get all dashboard data for a partnership
 export async function GET(
   request: NextRequest,
@@ -73,15 +153,28 @@ export async function GET(
     // Get staff login stats (for hub_login tracking)
     const { data: staffMembers } = await supabase
       .from('staff_members')
-      .select('id, first_name, last_name, role_title, hub_enrolled, hub_login_date')
+      .select('id, first_name, last_name, email, role_title, hub_enrolled, hub_login_date')
       .eq('partnership_id', partnershipId);
+
+    // Live from the Hub. Null means the Hub could not be reached, in which case
+    // we fall back to the once-a-day column rather than claiming nobody is active.
+    const activeEmails = await emailsActiveInHub(
+      (staffMembers || []).map(s => s.email).filter(Boolean) as string[]
+    );
+
+    const isActive = (s: { email?: string | null; hub_login_date?: string | null }) =>
+      activeEmails
+        ? activeEmails.has((s.email || '').toLowerCase())
+        : !!s.hub_login_date;
 
     // Use actual staff_members count for total (not staff_enrolled from partnership table)
     // staff_enrolled is the contract number, staff_members is the actual roster
     const staffStats = {
       total: staffMembers?.length || 0,
-      hubLoggedIn: staffMembers?.filter(s => s.hub_login_date).length || 0,
+      hubLoggedIn: (staffMembers || []).filter(isActive).length,
       contractedTotal: partnership?.staff_enrolled || 0,
+      // So a reader can tell a real zero from the Hub being unreachable.
+      hubLoginSource: activeEmails ? 'live' : 'daily_sync',
     };
 
     // Get latest metric snapshots
@@ -143,7 +236,7 @@ export async function GET(
       organization,
       actionItems: actionItems || [],
       staffStats,
-      staffMembers: (staffMembers || []).map(s => ({ id: s.id, name: `${s.first_name || ''} ${s.last_name || ''}`.trim(), role: s.role_title, hubActive: !!s.hub_login_date })),
+      staffMembers: (staffMembers || []).map(s => ({ id: s.id, name: `${s.first_name || ''} ${s.last_name || ''}`.trim(), role: s.role_title, hubActive: isActive(s) })),
       metricSnapshots: Object.values(latestMetrics),
       buildings: buildings || [],
       activityLog: activityLog || [],

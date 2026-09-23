@@ -632,7 +632,7 @@ export default function PartnerDashboard() {
         if (response.ok) {
           resurfacedIds.push(item.id);
           // Log the resurface activity
-          await fetch('/api/partners/log-activity', {
+          const logRes1 = await fetch('/api/partners/log-activity', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -646,6 +646,12 @@ export default function PartnerDashboard() {
               },
             }),
           });
+          if (!logRes1.ok) {
+            // Not shown to the visitor, deliberately: a failed log must not
+            // interrupt them. But it must not vanish either, because
+            // activity_log is what the absent-principal warning is built on.
+            console.warn('[partner dashboard] log-activity failed:', logRes1.status);
+          }
         }
       } catch (error) {
         console.error('Error resurfacing item:', error);
@@ -781,7 +787,7 @@ export default function PartnerDashboard() {
     if (viewerIsAdmin) return;
 
     try {
-      await fetch('/api/partners/track-view', {
+      const logRes2 = await fetch('/api/partners/track-view', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -791,6 +797,12 @@ export default function PartnerDashboard() {
           duration_seconds: Math.round(duration / 1000),
         }),
       });
+      if (!logRes2.ok) {
+        // Not shown to the visitor, deliberately: a failed log must not
+        // interrupt them. But it must not vanish either, because
+        // activity_log is what the absent-principal warning is built on.
+        console.warn('[partner dashboard] track-view failed:', logRes2.status);
+      }
     } catch (error) {
       console.error('Error tracking view:', error);
     }
@@ -879,7 +891,7 @@ export default function PartnerDashboard() {
         await loadDashboardData(authData.partnership.id);
 
         // Log activity
-        await fetch('/api/partners/log-activity', {
+        const logRes3 = await fetch('/api/partners/log-activity', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -888,6 +900,12 @@ export default function PartnerDashboard() {
             details: { tab: 'overview' },
           }),
         });
+        if (!logRes3.ok) {
+          // Not shown to the visitor, deliberately: a failed log must not
+          // interrupt them. But it must not vanish either, because
+          // activity_log is what the absent-principal warning is built on.
+          console.warn('[partner dashboard] log-activity failed:', logRes3.status);
+        }
       } catch (error) {
         console.error('Error in auth check:', error);
         setErrorMessage('Failed to load dashboard');
@@ -1546,8 +1564,11 @@ export default function PartnerDashboard() {
       schoolName,
       phase: partnership.contract_phase || 'IGNITE',
       staffTotal: staffStats.total,
-      // staff_members.hub_login_date has no writer, so staffStats.hubLoggedIn is always 0.
-      // Reports read this in nine places, which produced lines like
+      // staff_members.hub_login_date IS written, by /api/cron/sync-hub-login-dates
+      // at 10:30 UTC daily, so an earlier note here calling it unwritten is wrong.
+      // It is a day behind, which is worse than useless for a live figure: on
+      // 23 Sep two teachers signed in during a call and the column still said
+      // never. Reports read it in nine places, which produced lines like
       // "0 of 16 educators actively using the Learning Hub (25%)". Use the real Hub count.
       staffLoggedIn: hubStats?.logins_this_month ?? staffStats.hubLoggedIn,
       hubLoginPct: hubPctVal,
@@ -3098,11 +3119,23 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                           };
                           return { kpi_key: key, kpi_label: labels[key] || key, target_value: target, target_unit: '%', current_value: 0, status: 'draft' };
                         });
-                        await fetch(`/api/tdi-admin/leadership/${partnership.id}/kpis`, {
+                        const res = await fetch(`/api/tdi-admin/leadership/${partnership.id}/kpis`, {
                           method: 'POST',
                           headers: { 'Content-Type': 'application/json' },
                           body: JSON.stringify({ kpis }),
                         });
+                        if (!res.ok) {
+                          // This modal used to close and reload regardless, so a
+                          // refusal looked exactly like a save. Measured 26 Aug:
+                          // zero rows in partnership_kpis across all nine
+                          // partnerships, and nobody knew.
+                          const detail = await res.text().catch(() => '');
+                          setToastMessage(
+                            `Your goals were not saved. ${detail.slice(0, 160) || `The server returned ${res.status}.`}`
+                          );
+                          setTimeout(() => setToastMessage(''), 8000);
+                          return;
+                        }
                         setShowGoalWizard(false);
                         setGoalStep(0);
                         window.location.reload();
@@ -5764,11 +5797,19 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                           staff.push({ first_name: fn, last_name: ln, email: em, role_title: rlIdx >= 0 ? vals[rlIdx] : '' });
                         }
                         if (staff.length > 0) {
-                          await fetch('/api/partners/roster', {
+                          const rosterRes = await fetch('/api/partners/roster', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ partnershipId: partnership.id, staff }),
                           });
+                          if (!rosterRes.ok) {
+                            const detail = await rosterRes.text().catch(() => '');
+                            setToastMessage(
+                              `We could not save that roster. ${detail.slice(0, 160) || `The server returned ${rosterRes.status}.`}`
+                            );
+                            setTimeout(() => setToastMessage(''), 8000);
+                            return;
+                          }
                           window.location.reload();
                         }
                       }}
@@ -5825,7 +5866,12 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                                       formData.append('partnershipId', partnership.id);
                                       formData.append('itemId', 'staff-photos');
                                       formData.append('userId', userId || '');
-                                      await fetch('/api/partners/upload-evidence', { method: 'POST', body: formData });
+                                      const uploadRes = await fetch('/api/partners/upload-evidence', { method: 'POST', body: formData });
+                                      if (!uploadRes.ok) {
+                                        setToastMessage(`One of those photos did not upload. The server returned ${uploadRes.status}.`);
+                                        setTimeout(() => setToastMessage(''), 8000);
+                                        return;
+                                      }
                                     }
                                     setToastMessage(`${files.length} file${files.length > 1 ? 's' : ''} uploaded -- we'll match photos to your roster`);
                                   }
