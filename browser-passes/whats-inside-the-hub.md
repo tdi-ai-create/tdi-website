@@ -91,13 +91,29 @@ precedence over the env file. No alert reached Rae from either run.
 
 ## What I could not verify
 
-The printed output itself. I verified that every section is expanded when print
+The printed output itself. Locally I confirmed all 8 sections open before print
 is called and that the print stylesheet exists, but I have not seen a rendered
 PDF or a sheet of paper, so the page breaks and the dropped navy background are
-unproven.
+unproven. In production I could not re-check the expand-before-print step,
+because the real dialog froze the renderer before I could read the DOM back.
 
-Production. Vercel previews still return 500, so this pass is local only.
-Verify after deploy: https://www.teachersdeserveit.com/for-schools/whats-inside
+Production, now done. Deployed 22 September 2026.
+
+- Opened: https://www.teachersdeserveit.com/for-schools/whats-inside
+- Saw: HTTP 200, all eight sections in order from "Behavior, and the minute it
+  actually happens" through "AI, before it becomes a problem", 32 featured items,
+  8 hero card rows, and 249 rows across the expanded lists. 249 rather than the
+  243 seen locally, because the six Creative Ideas items were assigned in between.
+- Saw: badges live, 2 Most used, 3 Trending, 4 Popular, 1 New.
+- Pressed: "Everything in this section" in the paras section.
+- Saw: it opened, first row "Professional Email Practices Quick Reference Guide
+  Tool", under the heading "The staff who get the least support" with
+  "PA Quick Wins Menu" as the first featured item.
+- Pressed: "Print this page with every tool listed".
+- Saw: the renderer stopped responding, and the screenshot call timed out. That
+  is the signature of the native print dialog, so the button does call print in
+  production. My stub did not take effect here, unlike locally, so this was the
+  real dialog. Closed the tab to dismiss it.
 
 Spanish. This page does not go through `tUI()`. Neither does the rest of
 `/for-schools`, which it sits under and matches, so this is consistent with the
