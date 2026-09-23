@@ -4,7 +4,7 @@ import { requireAdminAuth } from '@/lib/tdi-admin/auth'
 import { fundingFlag } from '@/lib/funding-flags'
 import { awardedAmountOf } from '@/lib/funding-award'
 import { isLive } from '@/lib/funding-status'
-import { readSchoolProfile } from '@/lib/funding/school-profile'
+import { readSchoolProfile, profileFieldNeedsSource } from '@/lib/funding/school-profile'
 
 export const dynamic = 'force-dynamic'
 
@@ -30,8 +30,15 @@ function db() {
  */
 const SOURCE_KEY_SUFFIX = '_source'
 
-/** Fields that are labels rather than claims, so they need no source. */
-const NOT_A_CLAIM = new Set(['district', 'school_name', 'address', 'budget_holder', 'ein', 'nces_id'])
+/**
+ * Keys that describe another fact rather than being one.
+ *
+ * The editor writes a source, a checked-at date and, when a value is
+ * corrected, the superseded value and when it was replaced. All of that is
+ * provenance hanging off a fact, and listing them as facts in their own right
+ * would triple the size of this screen with rows nobody can act on.
+ */
+const META_SUFFIXES = ['_source', '_checked_at', '_superseded', '_superseded_at']
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const auth = await requireAdminAuth()
@@ -80,14 +87,21 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   const raw = readSchoolProfile(p.school_profile) as Record<string, unknown>
 
   const facts = Object.entries(raw)
-    .filter(([k]) => !k.endsWith(SOURCE_KEY_SUFFIX) && k !== 'proficiency_caveat')
+    .filter(([k]) => !META_SUFFIXES.some(suffix => k.endsWith(suffix)) && k !== 'proficiency_caveat')
     .map(([key, value]) => {
       const source = raw[`${key}${SOURCE_KEY_SUFFIX}`]
+      const checkedAt = raw[`${key}_checked_at`]
+      const superseded = raw[`${key}_superseded`]
       return {
         key,
         value: value === null || value === undefined ? '' : String(value),
         source: typeof source === 'string' && source.trim() ? source : null,
-        needsSource: !NOT_A_CLAIM.has(key) && !(typeof source === 'string' && source.trim()),
+        checkedAt: typeof checkedAt === 'string' ? checkedAt : null,
+        // Kept so a corrected figure can show what it replaced. Deleting the
+        // old value would leave no answer if a funder asks why an application
+        // said something else.
+        superseded: superseded === null || superseded === undefined ? null : String(superseded),
+        needsSource: profileFieldNeedsSource(key) && !(typeof source === 'string' && source.trim()),
       }
     })
     .sort((a, b) => Number(b.needsSource) - Number(a.needsSource) || a.key.localeCompare(b.key))

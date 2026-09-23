@@ -22,7 +22,7 @@ import {
   TYPE_SMALL,
 } from '@/components/tdi-admin/ui/design-tokens'
 import { HorizontalBarChart, DonutChart, DonutLegend, LiveSectionHeader } from '@/components/tdi-admin/hub-charts/HubCharts'
-import { OFFERINGS, OFFERING_LABELS, OFFERING_HINTS, offeringLabel } from '@/lib/partnerships/offerings'
+import { SELLABLE_OFFERINGS, OFFERING_LABELS, OFFERING_HINTS, offeringLabel } from '@/lib/partnerships/offerings'
 import { chaseOrder } from '@/lib/sales/muck'
 
 interface MuckCardScore {
@@ -1920,7 +1920,7 @@ export default function SalesPage() {
             <div style={{ marginBottom: 16 }}>
               <label style={{ fontSize: 11, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase' }}>Offering</label>
               <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 6 }}>
-                {OFFERINGS.map(o => (
+                {SELLABLE_OFFERINGS.map(o => (
                   <button
                     key={o}
                     type="button"

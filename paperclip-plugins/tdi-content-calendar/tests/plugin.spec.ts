@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { createTestHarness } from "@paperclipai/plugin-sdk/testing";
 import manifest from "../src/manifest.js";
 import plugin from "../src/worker.js";
-import { badgesFor } from "../src/ui/index.js";
+import { localDay, badgesFor } from "../src/ui/index.js";
 
 const CONFIG = { apiBase: "https://example.invalid", calendarKey: "test-key" };
 
@@ -379,6 +379,28 @@ describe("the content calendar page", () => {
   });
 });
 
+describe("localDay", () => {
+  // The two pieces that were sitting on the wrong square on 23 September.
+  // Both went out in the Central evening, which is already the next day in UTC.
+  it("places an evening Central publish on the day it actually went out", () => {
+    expect(localDay("2026-09-22T03:26:29.484+00:00")).toBe("2026-09-21");
+    expect(localDay("2026-09-22T02:24:49.298+00:00")).toBe("2026-09-21");
+  });
+
+  it("leaves a morning publish where it already was", () => {
+    // 09:26 Central, same date either way. These seven were never wrong.
+    expect(localDay("2026-09-21T14:26:56.717+00:00")).toBe("2026-09-21");
+  });
+
+  it("does not shift a timestamp that is already mid-afternoon Central", () => {
+    expect(localDay("2026-09-15T18:13:19.503+00:00")).toBe("2026-09-15");
+  });
+
+  it("falls back to the raw date rather than dropping an unparseable value", () => {
+    expect(localDay("not-a-timestamp")).toBe("not-a-time");
+  });
+});
+
 describe("badgesFor", () => {
   const base = { status: "brief", scheduled_for: null as string | null, approver: null as string | null };
 
@@ -400,8 +422,7 @@ describe("badgesFor", () => {
   });
 
   it("drops that badge once a day exists, which is what the cadence does for Substack", () => {
-    const b = badgesFor({ ...base, status: "approved", scheduled_for: "2026-09-28" });
-    expect(b[0].label).not.toBe("Needs a day");
+    expect(badgesFor({ ...base, status: "approved", scheduled_for: "2026-09-28" })[0].label).not.toBe("Needs a day");
   });
 
   it("never asks for a decision and a day at the same time", () => {

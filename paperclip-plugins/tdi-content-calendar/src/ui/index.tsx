@@ -42,6 +42,34 @@ type QueueItem = {
 export const STALE_AFTER_DAYS = 3;
 
 /**
+ * The day a timestamp belongs to, in the timezone TDI actually works in.
+ *
+ * `published_at` is a UTC timestamp. Slicing the raw string takes the UTC date,
+ * so anything published after 7pm Central landed on the next day's square: on
+ * 23 September two of the nine published pieces were sitting on the wrong day,
+ * both of them evening posts. `scheduled_for` is a plain date column with no
+ * time in it and must not be passed through here, because it is already the day
+ * somebody chose.
+ *
+ * en-CA is used only because it formats as YYYY-MM-DD, which is what the rest of
+ * the calendar compares against.
+ */
+export const CALENDAR_TZ = "America/Chicago";
+
+export function localDay(ts: string): string {
+  const parsed = new Date(ts);
+  // A string we cannot parse is better shown on its raw date than dropped off
+  // the calendar entirely.
+  if (Number.isNaN(parsed.getTime())) return ts.slice(0, 10);
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: CALENDAR_TZ,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(parsed);
+}
+
+/**
  * Approved, and still not out.
  *
  * Nothing has ever published through this system, so the first time approved
@@ -383,7 +411,7 @@ function MixStrip({ items, hub, month }: { items: QueueItem[]; hub: HubItem[]; m
   // regardless of month, so counting it raw made August report "10 pieces in
   // this month" when August has none. Found by pressing Previous.
   const inMonth = (i: QueueItem) => {
-    const day = i.published_at ? i.published_at.slice(0, 7) : i.scheduled_for?.slice(0, 7);
+    const day = i.published_at ? localDay(i.published_at).slice(0, 7) : i.scheduled_for?.slice(0, 7);
     return day === month;
   };
 
@@ -531,7 +559,7 @@ export function ContentCalendarPage(_props: PluginWidgetProps) {
   const byDay = useMemo(() => {
     const map = new Map<string, QueueItem[]>();
     for (const it of items) {
-      const day = it.published_at ? it.published_at.slice(0, 10) : it.scheduled_for;
+      const day = it.published_at ? localDay(it.published_at) : it.scheduled_for;
       if (!day) continue;
       const list = map.get(day) ?? [];
       list.push(it);
