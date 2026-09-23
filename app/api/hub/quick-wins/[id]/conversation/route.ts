@@ -42,7 +42,11 @@ export async function GET(
       if (row.contribution_type in pulse) {
         pulse[row.contribution_type]++
       }
-      totalContributions++
+      // The heading over the bars reads "N teachers in the conversation", so a
+      // note written by TDI must not be counted as one of them.
+      if (row.contribution_type !== 'from_tdi') {
+        totalContributions++
+      }
     }
 
     // Fetch posts (without hub_profiles join since it may not be accessible)
