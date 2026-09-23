@@ -13,6 +13,26 @@ Confirm is disabled until a real number is entered.
   scoped to the live domain, so a local server answers with a login screen.
 - Verify after deploy: https://www.teachersdeserveit.com/tdi-admin/funding/83a8932b-66dc-4c67-b815-65c19358b123
 
+### Verified on production, 23 September 2026
+
+- Opened: https://www.teachersdeserveit.com/tdi-admin/funding/83a8932b-66dc-4c67-b815-65c19358b123
+- Saw: the header reads "PIPELINE $15,552" and "AWARDED $500". The backfill is
+  live and the school is no longer showing zero awarded.
+- Pressed: "Grant paths (14)" to expand the paths list
+- Saw: the Walmart Spark Good Grant card reads "$500" beside its title, status
+  "waiting", "Deadline: Aug 31 (passed)", phase "Awarded", and a submission line
+  "Spark Good Local Grant to Facility #1386 Received – Application ID 92518893"
+  dated Aug 4. It does not say "amount not recorded", which is the half of the
+  prediction that is confirmed.
+- Pressed: "Record award" in the OUTCOME row of that card
+- Saw: the panel opened with "Awarded amount ($)" **pre-filled with 500**,
+  "Decision date" 09/23/2026, and "Confirm award" rendered green and clickable
+  next to "Cancel". The predicted empty field, the grey hint "We asked for $X.
+  Enter what they actually gave", and the disabled Confirm did not appear.
+- Pressed: "Cancel"
+- Saw: the panel closed and the card returned to showing "$500" with the
+  "Record award" and "Record denial" buttons. Nothing was written.
+
 ## The defect, measured
 
 Two faults in one control.
@@ -115,3 +135,21 @@ be the same bug in different clothes.
 Whether any other code path writes `awarded_amount` without going through this
 control. The sync API accepts the field, so an agent could in principle set it
 directly. Not checked.
+
+**The main claim of this change is still unproven, and the test case for it does
+not exist on this school.** The prediction was written for a grant in `applied`
+or `waiting` with no award yet. Walmart Spark Good is in `waiting` but has
+already been awarded, and its ask and its award are both $500, so a field
+pre-filled with 500 is indistinguishable between the fixed behaviour, seeding
+from the existing award, which is reasonable, and the bug, seeding from the ask,
+which is what this change exists to stop. Every other path on Saunemin reads
+`researching` or `closed`.
+
+So one of two things is true and this pass cannot say which: either the fix
+works and I tested it on the one grant where it cannot be seen, or the seeding
+is still wrong. It needs re-checking on a school with a grant in `applied` or
+`waiting` that has never been awarded, where the ask and the award differ.
+
+The absent grey hint is the stronger signal. "We asked for $X. Enter what they
+actually gave" did not render at all, and that hint should not depend on whether
+an award already exists.
