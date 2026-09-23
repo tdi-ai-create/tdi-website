@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import type { FullOpportunity } from '../OpportunityDetailPanel'
-import { OFFERINGS, OFFERING_LABELS } from '@/lib/partnerships/offerings'
+import { SELLABLE_OFFERINGS, OFFERING_LABELS } from '@/lib/partnerships/offerings'
 
 const HEAT_OPTIONS = [
   { id: 'hot', label: 'Hot', color: '#EF4444' },
@@ -169,7 +169,7 @@ export function PanelHeader({ opp, onClose, onPatch }: Props) {
             title="Which of the four offerings we are pitching. Leave blank until it has actually been discussed."
           >
             <option value="">Offering</option>
-            {OFFERINGS.map(o => (
+            {SELLABLE_OFFERINGS.map(o => (
               <option key={o} value={o}>{OFFERING_LABELS[o]}</option>
             ))}
           </select>
