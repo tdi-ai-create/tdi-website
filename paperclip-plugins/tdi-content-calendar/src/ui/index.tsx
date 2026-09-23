@@ -151,6 +151,19 @@ const CHANNEL: Record<string, { label: string; dot: string }> = {
 };
 const chan = (c: string) => CHANNEL[c] ?? { label: c, dot: "#8A94A2" };
 
+/**
+ * Destinations you can still plan work for.
+ *
+ * facebook stays in CHANNEL because nine pieces already went out on it and the
+ * calendar has to keep rendering them with a proper label. It is gone from here
+ * because TDI no longer runs a Facebook group, so planning a new slot for it
+ * would be planning work with nowhere to go. The content queue refuses the
+ * channel server side as of 22 September 2026; this keeps the picker honest so
+ * nobody reaches that refusal by surprise.
+ */
+const RETIRED_CHANNELS = new Set(["facebook"]);
+const PLANNABLE = Object.keys(CHANNEL).filter((c) => !RETIRED_CHANNELS.has(c));
+
 const WAITING: Record<string, string> = {
   brief: "not written yet",
   drafting: "being written",
@@ -814,7 +827,7 @@ export function ContentCalendarPage(_props: PluginWidgetProps) {
             <label style={{ color: "#5A6472" }}>Channel</label>
             <select value={slotChannel} onChange={(e) => setSlotChannel(e.target.value)}
               style={{ padding: "7px 8px", border: "1px solid #D8DDE3", borderRadius: 4 }}>
-              {Object.keys(CHANNEL).map((k) => <option key={k} value={k}>{CHANNEL[k].label}</option>)}
+              {PLANNABLE.map((k) => <option key={k} value={k}>{CHANNEL[k].label}</option>)}
             </select>
 
             <label style={{ color: "#5A6472" }}>For</label>
