@@ -6,10 +6,34 @@ Two new screens in the admin portal, `/tdi-admin/funding/schools` and
 `/tdi-admin/funding/schools/[id]`, plus the two API routes behind them. Nothing
 existing is modified. No control on any current page changes.
 
-## What I did
+## What I did, completed against production 23 Sep 2026
 
-- Opened: http://localhost:3000/tdi-admin/funding/schools
-- Deferred: the admin portal authenticates against a Supabase session cookie
+Completed by a later session, signed in as Rae, with `funding_config.new_pages`
+turned on for the check and turned off again immediately after.
+
+- Opened: https://www.teachersdeserveit.com/tdi-admin/funding/schools
+- Saw: three schools. Allenwood "nothing awarded yet" of $56,372.8, 6 live paths.
+  Saunemin **"2 won, amount not recorded"** in amber of $15,552, 6 live paths.
+  St. Peter Chanel "nothing awarded yet" of $15,750, 9 live paths. The
+  prediction's key claim holds: Saunemin does not read "$0".
+- Pressed: the Saunemin row. Saw it open
+  `/tdi-admin/funding/schools/83a8932b-66dc-4c67-b815-65c19358b123` on the Log
+  tab, newest first, topmost "Illinois Prairie Community Foundation passed QA
+  (julie)" at "22 Sept, 16:24".
+- Pressed: the "Profile (8 unsourced)" tab. Saw educator count 23, FRL pct 59%
+  and IEP students 29, each in a red bordered card reading "No source recorded",
+  exactly as predicted.
+
+### Two things to look at, neither blocking
+
+- The goal renders as "of $56,372.8", an unformatted trailing decimal. The
+  prediction itself wrote it as $56,373.
+- The row link did not navigate on a synthetic click via the accessibility
+  reference; a click at its coordinates did. The same happened on the Hub course
+  curriculum earlier the same evening, so it may be one shared cause rather than
+  two. Not established.
+
+- Original deferral: the admin portal authenticates against a Supabase session cookie
   scoped to the live domain, so a local server answers every `/tdi-admin` page
   with a login screen.
 - Verify after deploy: https://www.teachersdeserveit.com/tdi-admin/funding/schools
