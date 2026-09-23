@@ -46,11 +46,11 @@ export async function handleQAGet(contentType: string, contentId: string) {
       ]),
     ]
 
-    let profileMap: Record<string, { name: string; role: string | null; avatar_url: string | null; educator_type: string | null }> = {}
+    let profileMap: Record<string, { name: string; role: string | null; avatar_url: string | null; educator_type: string | null; is_tdi_voice: boolean }> = {}
     if (allUserIds.length > 0) {
       const { data: profiles } = await supabase
         .from('hub_profiles')
-        .select('id, display_name, role, avatar_url, educator_type')
+        .select('id, display_name, role, avatar_url, educator_type, is_tdi_voice')
         .in('id', allUserIds)
 
       if (profiles) {
@@ -60,6 +60,7 @@ export async function handleQAGet(contentType: string, contentId: string) {
             role: p.role,
             avatar_url: p.avatar_url,
             educator_type: p.educator_type || null,
+            is_tdi_voice: p.is_tdi_voice === true,
           }
         }
       }
@@ -76,13 +77,13 @@ export async function handleQAGet(contentType: string, contentId: string) {
       body: q.body,
       helpful_count: q.helpful_count,
       posted_at: q.created_at,
-      author: profileMap[q.user_id] || { name: 'Teacher', role: null, avatar_url: null },
+      author: profileMap[q.user_id] || { name: 'Teacher', role: null, avatar_url: null, educator_type: null, is_tdi_voice: false },
       replies: (replyMap[q.id] || []).map(r => ({
         id: r.id,
         body: r.body,
         helpful_count: r.helpful_count,
         posted_at: r.created_at,
-        author: profileMap[r.user_id] || { name: 'Teacher', role: null, avatar_url: null },
+        author: profileMap[r.user_id] || { name: 'Teacher', role: null, avatar_url: null, educator_type: null, is_tdi_voice: false },
       })),
     }))
 
@@ -127,7 +128,7 @@ export async function handleQAPost(contentType: string, contentId: string, reque
 
     const { data: profile } = await supabase
       .from('hub_profiles')
-      .select('display_name, role, avatar_url')
+      .select('display_name, role, avatar_url, educator_type, is_tdi_voice')
       .eq('id', user_id)
       .single()
 
@@ -181,6 +182,8 @@ export async function handleQAPost(contentType: string, contentId: string, reque
         name: profile?.display_name || 'Teacher',
         role: profile?.role || null,
         avatar_url: profile?.avatar_url || null,
+        educator_type: profile?.educator_type || null,
+        is_tdi_voice: profile?.is_tdi_voice === true,
       },
     }, { status: 201 })
   } catch (err: unknown) {
