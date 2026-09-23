@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { createTestHarness } from "@paperclipai/plugin-sdk/testing";
 import manifest from "../src/manifest.js";
 import plugin from "../src/worker.js";
+import { badgesFor } from "../src/ui/index.js";
 
 const CONFIG = { apiBase: "https://example.invalid", calendarKey: "test-key" };
 
@@ -375,5 +376,44 @@ describe("the content calendar page", () => {
     expect(board.counted).toBe(0);
     expect(board.statesMissed.length).toBe(11);
     expect(calls.length).toBe(0);
+  });
+});
+
+describe("badgesFor", () => {
+  const base = { status: "brief", scheduled_for: null as string | null, approver: null as string | null };
+
+  it("names who has to decide, not just that somebody does", () => {
+    const b = badgesFor({ ...base, status: "pending_approval", approver: "kristin" });
+    expect(b).toHaveLength(1);
+    expect(b[0].label).toBe("Needs Kristin");
+    expect(b[0].tone).toBe("decide");
+  });
+
+  it("falls back to Kristin, because this whole queue is hers", () => {
+    expect(badgesFor({ ...base, status: "pending_approval" })[0].label).toBe("Needs Kristin");
+  });
+
+  it("shows the second wait: approved with nobody having picked a day", () => {
+    const b = badgesFor({ ...base, status: "approved" });
+    expect(b[0].label).toBe("Needs a day");
+    expect(b[0].tone).toBe("schedule");
+  });
+
+  it("drops that badge once a day exists, which is what the cadence does for Substack", () => {
+    const b = badgesFor({ ...base, status: "approved", scheduled_for: "2026-09-28" });
+    expect(b[0].label).not.toBe("Needs a day");
+  });
+
+  it("never asks for a decision and a day at the same time", () => {
+    for (const status of ["pending_approval", "approved", "scheduled", "published", "verified"]) {
+      const labels = badgesFor({ ...base, status }).map((x) => x.label);
+      const asksBoth = labels.some((l) => l.startsWith("Needs ") && l !== "Needs a day")
+        && labels.includes("Needs a day");
+      expect(asksBoth).toBe(false);
+    }
+  });
+
+  it("leaves finished work alone", () => {
+    expect(badgesFor({ ...base, status: "verified", scheduled_for: "2026-09-21" })[0].tone).toBe("done");
   });
 });

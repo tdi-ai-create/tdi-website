@@ -344,7 +344,21 @@ export async function POST(request: NextRequest) {
 
       const { data, error } = await supabase.from('content_queue_items').insert({
         channel, content_type, title: title ?? null, brief: brief ?? null,
-        audience_tag, approver: approver ?? null, scheduled_for: scheduled_for ?? null,
+        audience_tag,
+        // Everything in this queue is Kristin's to approve. Rae approves Hub
+        // content, which moves through content-sync and board approvals, not
+        // here. Rae, 23 September 2026: "Rae only approves content for the hub,
+        // kristin does ALL else including voice."
+        //
+        // Defaulted rather than left null because null meant nobody: every one
+        // of the nineteen items in the queue had no approver, so the board told
+        // whoever opened it that seven pieces were waiting on them, and neither
+        // of them had a list that was actually theirs.
+        //
+        // Rae keeps the capability to approve anything. This is about whose
+        // queue a piece sits in, not about who is allowed.
+        approver: approver ?? 'kristin',
+        scheduled_for: scheduled_for ?? null,
         status: 'brief', owner: OWNER_OF.brief, feedback_log: [entry],
       // Echo the stored date back. A caller that asked for a day and got a 200
       // should be able to see whether the day actually landed.

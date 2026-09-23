@@ -34,6 +34,7 @@ type QueueItem = {
   published_url?: string | null;
   approved_at?: string | null;
   approved_by?: string | null;
+  approver?: string | null;
   updated_at: string;
 };
 
@@ -163,6 +164,66 @@ const chan = (c: string) => CHANNEL[c] ?? { label: c, dot: "#8A94A2" };
  */
 const RETIRED_CHANNELS = new Set(["facebook"]);
 const PLANNABLE = Object.keys(CHANNEL).filter((c) => !RETIRED_CHANNELS.has(c));
+
+/**
+ * What a piece is waiting for, and who from.
+ *
+ * Two separate waits, which the board used to blur into one. A piece can be
+ * waiting for a person to decide it, and then, once decided, waiting for a day
+ * before it can go anywhere. Showing both as "approved, not out yet" hid the
+ * second one entirely: the piece looked finished and simply sat.
+ *
+ * Substack now takes its own day on approval from the cadence rules, so a
+ * Substack piece never shows the second badge. Every other channel still needs
+ * a person to choose, which is exactly what this makes visible.
+ *
+ * Approving is Kristin's across this whole queue. Rae approves Hub content,
+ * which does not move through here.
+ */
+export type Badge = { label: string; tone: "decide" | "schedule" | "done" | "moving" };
+
+export function badgesFor(item: { status: string; scheduled_for: string | null; approver?: string | null }): Badge[] {
+  const out: Badge[] = [];
+
+  if (item.status === "pending_approval") {
+    const who = (item.approver ?? "kristin").trim();
+    out.push({ label: `Needs ${who.charAt(0).toUpperCase()}${who.slice(1)}`, tone: "decide" });
+    return out;
+  }
+
+  // Approved and dateless is the state that used to hide. It is not stalled
+  // yet and nothing is wrong with it; it just cannot go anywhere until somebody
+  // picks a day.
+  if ((item.status === "approved" || item.status === "scheduled") && !item.scheduled_for) {
+    out.push({ label: "Needs a day", tone: "schedule" });
+    return out;
+  }
+
+  const plain = WAITING[item.status] ?? item.status;
+  out.push({ label: plain, tone: item.status === "verified" || item.status === "published" ? "done" : "moving" });
+  return out;
+}
+
+const BADGE_TONE: Record<Badge["tone"], { bg: string; fg: string }> = {
+  decide:   { bg: "#FDF0D5", fg: "#8A5A0B" },
+  schedule: { bg: "#E4ECFA", fg: "#2A4E8A" },
+  done:     { bg: "#E6F2EA", fg: "#1F6B4A" },
+  moving:   { bg: "#EFF1F4", fg: "#5A6472" },
+};
+
+export function BadgeRow({ item }: { item: { status: string; scheduled_for: string | null; approver?: string | null } }) {
+  return (
+    <span style={{ display: "inline-flex", gap: 4, flexWrap: "wrap" }}>
+      {badgesFor(item).map((b) => (
+        <span key={b.label} style={{
+          background: BADGE_TONE[b.tone].bg, color: BADGE_TONE[b.tone].fg,
+          borderRadius: 3, padding: "1px 5px", fontSize: 9.5, fontWeight: 600,
+          whiteSpace: "nowrap",
+        }}>{b.label}</span>
+      ))}
+    </span>
+  );
+}
 
 const WAITING: Record<string, string> = {
   brief: "not written yet",
@@ -912,7 +973,7 @@ export function ContentCalendarPage(_props: PluginWidgetProps) {
                         fontSize: 11, lineHeight: 1.25,
                       }}>
                       <div style={{ fontWeight: 600 }}>{it.status === "verified" ? "✓ " : ""}{it.title || "(untitled)"}</div>
-                      <div style={{ color: "#5A6472", fontSize: 10 }}>{chan(it.channel).label} · {WAITING[it.status] ?? it.status}</div>
+                      <div style={{ color: "#5A6472", fontSize: 10, display: "flex", gap: 4, alignItems: "center", flexWrap: "wrap" }}>{chan(it.channel).label}<BadgeRow item={it} /></div>
                     </button>
                   );
                 })}
@@ -1049,7 +1110,7 @@ export function ContentCalendarPage(_props: PluginWidgetProps) {
                 onClick={() => { setOpenId(it.id); setNote(""); setWhen(it.scheduled_for ?? ""); }}
                 style={{ textAlign: "left", cursor: "grab", border: "1px solid #E3E7EC", borderLeft: `3px solid ${chan(it.channel).dot}`, borderRadius: 3, padding: "6px 8px", background: "#fff", maxWidth: 260, fontSize: 11 }}>
                 <div style={{ fontWeight: 600 }}>{it.title || "(untitled)"}</div>
-                <div style={{ color: "#5A6472", fontSize: 10 }}>{chan(it.channel).label} · {WAITING[it.status] ?? it.status}</div>
+                <div style={{ color: "#5A6472", fontSize: 10, display: "flex", gap: 4, alignItems: "center", flexWrap: "wrap" }}>{chan(it.channel).label}<BadgeRow item={it} /></div>
               </button>
             ))}
           </div>
@@ -1137,7 +1198,7 @@ export function ContentCalendarPage(_props: PluginWidgetProps) {
           <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", alignItems: "baseline" }}>
             <h2 style={{ fontSize: 17, fontWeight: 600, margin: 0 }}>{open.title || "(untitled)"}</h2>
             <span style={{ fontSize: 12, color: "#5A6472" }}>
-              {chan(open.channel).label} · {WAITING[open.status] ?? open.status}
+              {chan(open.channel).label} <BadgeRow item={open} />
               {open.audience_tag ? ` · for ${open.audience_tag}` : ""}
             </span>
           </div>
