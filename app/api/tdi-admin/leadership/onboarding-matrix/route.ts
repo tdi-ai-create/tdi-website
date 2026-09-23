@@ -402,7 +402,37 @@ export async function GET(_request: NextRequest) {
 
     const now = Date.now();
 
-    const result: MatrixRow[] = rows.map((p) => {
+    /**
+   * When a service is actually booked.
+   *
+   * Step seven used to be true only if somebody completed an action item whose
+   * title happened to contain the words observation, session or date. So a
+   * visit could be agreed with the school, dated in Billing, and sitting on the
+   * client's calendar, and this still read as a gap. Allenwood's 18 November
+   * day was exactly that on 23 September 2026.
+   *
+   * contract_deliverables.planned_date is the field that actually means "this
+   * is going to happen on the 7th", so the step reads that. A held date counts
+   * as booked here: we are holding the day, which is more than nothing, and the
+   * evidence line says which dates are only held so nobody reads it as agreed.
+   */
+  const { data: plannedRows, error: plannedErr } = await portal
+    .from('contract_deliverables')
+    .select('partnership_id, planned_date, planned_confidence, delivery_state')
+    .not('planned_date', 'is', null)
+    .eq('delivery_state', 'scheduled');
+  if (plannedErr) console.error('[onboarding-matrix] planned dates:', plannedErr.message);
+
+  const plannedByPartnership = new Map<string, { confirmed: number; held: number }>();
+  for (const r of plannedRows ?? []) {
+    if (!r.partnership_id) continue;
+    const e = plannedByPartnership.get(r.partnership_id) ?? { confirmed: 0, held: 0 };
+    if (r.planned_confidence === 'held') e.held += 1;
+    else e.confirmed += 1;
+    plannedByPartnership.set(r.partnership_id, e);
+  }
+
+  const result: MatrixRow[] = rows.map((p) => {
       const seats = seatUserIds.get(p.id)?.size ?? 0;
       const active = activeByPartnership.get(p.id)?.size ?? 0;
       const roster = rosterByPartnership.get(p.id) ?? 0;
@@ -418,9 +448,12 @@ export async function GET(_request: NextRequest) {
       const kickoffDone = actions.some(
         (a) => a.status === 'completed' && (a.category === 'scheduling' || /kickoff|walkthrough/i.test(a.title))
       );
-      const datesDone = actions.some(
-        (a) => a.status === 'completed' && /observation|session|date/i.test(a.title)
-      );
+      const planned = plannedByPartnership.get(p.id) ?? { confirmed: 0, held: 0 };
+      // The action item test stays as a fallback, because a school booked
+      // before planned_date existed still has its evidence only in an action.
+      const datesDone =
+        planned.confirmed + planned.held > 0 ||
+        actions.some((a) => a.status === 'completed' && /observation|session|date/i.test(a.title));
 
       const daysSinceStart = p.contract_start
         ? Math.floor((now - new Date(p.contract_start).getTime()) / 86_400_000)
@@ -492,7 +525,10 @@ export async function GET(_request: NextRequest) {
           evidence:
             services === 0
               ? 'No observation days, virtual or executive sessions in this contract.'
-              : `${services} contracted service ${services === 1 ? 'day or session' : 'days and sessions'}, none confirmed.`,
+              : planned.confirmed + planned.held > 0
+                ? `${planned.confirmed} date${planned.confirmed === 1 ? '' : 's'} agreed with them` +
+                  (planned.held > 0 ? `, ${planned.held} held and not yet agreed.` : '.')
+                : `${services} contracted service ${services === 1 ? 'day or session' : 'days and sessions'}, none dated.`,
         },
       ];
 
