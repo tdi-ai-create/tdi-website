@@ -21,6 +21,8 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
+import FundingChrome from './FundingChrome'
+import { ESCALATION_OPTIONS } from '@/lib/funding-qa'
 import './funding-home.css'
 
 type EntryKind = 'send' | 'decide' | 'chase' | 'deadline'
@@ -36,6 +38,22 @@ interface Entry {
   confirmed: boolean
   derivation?: string
   detail?: string
+}
+
+interface Grant {
+  id: string
+  name: string
+  status: string
+  narrativeStatus: string
+  attempts: number | null
+  escalation: {
+    summary?: string
+    root_cause?: string
+    recommended_option?: string
+    recommendation_reason?: string
+    awaiting_client?: boolean
+    client_ask?: string
+  } | null
 }
 
 interface School {
@@ -115,12 +133,23 @@ function prettyKey(k: string): string {
 export default function FundingHome() {
   const [view, setView] = useState<'cal' | 'schools' | 'school'>('cal')
 
+  // The board links back here with ?view=schools, because it is its own route
+  // and cannot switch a view it does not have. Read after mount rather than
+  // with useSearchParams, which would force this route to opt out of
+  // prerendering and can fail the build instead of just working.
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get('view') === 'schools') {
+      setView('schools')
+    }
+  }, [])
+
   const today = new Date()
   const [year, setYear] = useState(today.getFullYear())
   const [month, setMonth] = useState(today.getMonth() + 1)
 
   const [entries, setEntries] = useState<Entry[] | null>(null)
   const [coverage, setCoverage] = useState<{ livePaths: number; withDate: number } | null>(null)
+  const [grants, setGrants] = useState<Record<string, Grant>>({})
   const [calError, setCalError] = useState<string | null>(null)
 
   const [schools, setSchools] = useState<School[] | null>(null)
@@ -129,6 +158,9 @@ export default function FundingHome() {
   const [schoolId, setSchoolId] = useState<string | null>(null)
   const [detail, setDetail] = useState<Detail | null>(null)
   const [pane, setPane] = useState<'log' | 'profile'>('log')
+
+  // Bumped after a decision so the month reloads and the entry moves or goes.
+  const [reloadAt, setReloadAt] = useState(0)
 
   useEffect(() => {
     let live = true
@@ -140,11 +172,12 @@ export default function FundingHome() {
         if (!live) return
         if (d.error) { setCalError(d.error); return }
         setEntries(d.entries ?? [])
+        setGrants(d.grants ?? {})
         setCoverage(d.coverage ?? null)
       })
       .catch(() => live && setCalError('The calendar could not be read.'))
     return () => { live = false }
-  }, [year, month])
+  }, [year, month, reloadAt])
 
   useEffect(() => {
     let live = true
@@ -195,18 +228,10 @@ export default function FundingHome() {
 
   return (
     <div className="fh">
-      <header className="top">
-        <div className="brand">TDI Funding <span>/ admin</span></div>
-        <nav>
-          <button data-view="cal" aria-current={view === 'cal'} onClick={() => setView('cal')}>Calendar</button>
-          <button data-view="schools" aria-current={view === 'schools' || view === 'school'} onClick={() => setView('schools')}>Schools</button>
-          {/* The old board keeps every control that changes a grant until those
-              are wired into the popups here. */}
-          {/* Needs its own colour: the admin stylesheet gives anchors a dark
-              ink that is unreadable on the navy chrome. */}
-          <Link className="navlink" href="/tdi-admin/funding/board">Board</Link>
-        </nav>
-      </header>
+      <FundingChrome
+        active={view === 'cal' ? 'cal' : 'schools'}
+        onView={v => { setView(v); setOpenDay(null) }}
+      />
 
       <div className="wrap">
 
@@ -396,23 +421,14 @@ export default function FundingHome() {
                     <h4>{e.label}</h4>
                     {e.detail && <p>{e.detail}</p>}
                     {e.derivation && <div className="why">{e.derivation}</div>}
-                    <div className="act">
-                      {/* The controls that change a grant are not wired into
-                          this popup yet. Rather than show a button that does
-                          nothing, this sends you to the place that can do it. */}
-                      <div className="row">
-                        <Link
-                          className="btn primary"
-                          href={`/tdi-admin/funding/${e.schoolId}`}
-                          style={{ textDecoration: 'none' }}
-                        >
-                          Open this grant
-                        </Link>
-                        <button className="btn" onClick={() => loadSchool(e.schoolId)}>
-                          Open {e.schoolName}
-                        </button>
-                      </div>
-                    </div>
+                    <GrantAction
+                      entry={e}
+                      grant={e.opportunityId ? grants[e.opportunityId] : undefined}
+                      schoolId={e.schoolId}
+                      schoolName={e.schoolName}
+                      onDone={() => setReloadAt(n => n + 1)}
+                      onOpenSchool={() => loadSchool(e.schoolId)}
+                    />
                   </div>
                 </div>
               )
@@ -497,4 +513,201 @@ function ProfileFields({ schoolId, facts, onSaved }: {
       {error && <div className="src warn" style={{ marginTop: 10 }}>{error}</div>}
     </>
   )
+}
+
+/**
+ * The controls the mockup put inside the popup.
+ *
+ * Only decisions live here. Nothing on this screen sends an email: drafting and
+ * sending stay on the board behind their existing review step, because a send
+ * is not something to make one click away from a calendar.
+ *
+ * Every contract here is the one the board already uses, so there is one answer
+ * to what approving or escalating means:
+ *   escalation   POST  /api/funding/escalation  { opportunityId, option, detail }
+ *   approve      PATCH /api/funding/opportunities { id, narrative_status: 'ready' }
+ *   send back    PATCH /api/funding/opportunities { id, narrative_status: 'requested', redraft_guidance }
+ */
+function GrantAction({ entry, grant, schoolId, schoolName, onDone, onOpenSchool }: {
+  entry: Entry
+  grant?: Grant
+  schoolId: string
+  schoolName: string
+  onDone: () => void
+  onOpenSchool: () => void
+}) {
+  const [choice, setChoice] = useState<string>(grant?.escalation?.recommended_option ?? '')
+  const [detail, setDetail] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [done, setDone] = useState<string | null>(null)
+
+  const ns = grant?.narrativeStatus
+  const esc = grant?.escalation ?? null
+
+  // A control appears only on the entry that means it, never on any entry that
+  // happens to share a grant. Found by looking: an action item reading "Ask
+  // BRAF for the Ourso form fields" was offering "Approve and release", purely
+  // because that grant's narrative sat at approval. That is a different
+  // decision, one click away, on the wrong card.
+  const isApprovalEntry = entry.id.startsWith('pred-approve-')
+
+  const escalated = ns === 'escalated' && !!esc && entry.id.startsWith('pred-escalate-')
+  const awaitingClient = escalated && esc?.awaiting_client === true
+  const atApproval = ns === 'approval' && isApprovalEntry
+
+  async function post(url: string, body: unknown, ok: string) {
+    setBusy(true)
+    setError(null)
+    try {
+      const res = await fetch(url, {
+        method: url.includes('escalation') ? 'POST' : 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      })
+      const text = await res.text()
+      let out: Record<string, unknown> = {}
+      try { out = text ? JSON.parse(text) : {} } catch { /* not json, kept below */ }
+      // The route answers 200 with an error body in some paths, so both are
+      // checked. When it fails without one, say what actually came back rather
+      // than a sentence that tells the reader nothing.
+      if (!res.ok || out.error) {
+        const why = typeof out.error === 'string' ? out.error : null
+        setError(why ?? `The server answered ${res.status}. ${text.slice(0, 200) || 'No detail.'}`)
+        return
+      }
+      setDone(typeof out.message === 'string' ? out.message : ok)
+      onDone()
+    } catch {
+      setError('That did not go through.')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  if (done) {
+    return <div className="act"><div className="doneflag">{done}</div></div>
+  }
+
+  const links = (
+    <div className="row">
+      <Link className="btn" href={`/tdi-admin/funding/${schoolId}`} style={{ textDecoration: 'none' }}>
+        Open this grant
+      </Link>
+      <button className="btn" onClick={onOpenSchool}>Open {schoolName}</button>
+    </div>
+  )
+
+  if (awaitingClient) {
+    return (
+      <div className="act">
+        <label>Waiting on the school</label>
+        {esc?.client_ask && <p style={{ margin: 0, fontSize: 12.5 }}>We asked for: {esc.client_ask}</p>}
+        <div className="row">
+          <button
+            className="btn primary"
+            disabled={busy}
+            onClick={() => post('/api/funding/escalation',
+              { opportunityId: grant!.id, option: 'resume_drafting', detail: detail || 'The school replied.' },
+              'Drafting resumed.')}
+          >
+            {busy ? 'Working' : 'The school replied, resume drafting'}
+          </button>
+        </div>
+        {error && <div className="src warn">{error}</div>}
+        {links}
+      </div>
+    )
+  }
+
+  if (escalated) {
+    const selected = ESCALATION_OPTIONS.find(o => o.key === choice)
+    const needsDetail = !!selected?.requires && detail.trim().length < 3
+    return (
+      <div className="act">
+        <label>QA could not get this through{grant?.attempts ? ` after ${grant.attempts} attempts` : ''}</label>
+        {esc?.summary && <p style={{ margin: 0, fontSize: 12.5 }}>{esc.summary}</p>}
+        {esc?.root_cause && <div className="why">Why it keeps failing: {esc.root_cause}</div>}
+
+        <label htmlFor={`opt-${grant!.id}`}>Your decision</label>
+        <select id={`opt-${grant!.id}`} value={choice} onChange={ev => setChoice(ev.target.value)}>
+          <option value="">Choose one</option>
+          {ESCALATION_OPTIONS.map(o => (
+            <option key={o.key} value={o.key}>
+              {o.label}{o.key === esc?.recommended_option ? ' (recommended)' : ''}
+            </option>
+          ))}
+        </select>
+        {selected && (
+          <>
+            <p style={{ margin: 0, fontSize: 12 }}>{selected.whatHappens}</p>
+            {selected.requires && (
+              <>
+                <label htmlFor={`d-${grant!.id}`}>{selected.requires.label}</label>
+                <textarea
+                  id={`d-${grant!.id}`}
+                  value={detail}
+                  placeholder={selected.requires.placeholder}
+                  onChange={ev => setDetail(ev.target.value)}
+                />
+              </>
+            )}
+          </>
+        )}
+        <div className="row">
+          <button
+            className="btn primary"
+            disabled={busy || !choice || needsDetail}
+            onClick={() => post('/api/funding/escalation',
+              { opportunityId: grant!.id, option: choice, detail: detail.trim() },
+              'Decision recorded.')}
+          >
+            {busy ? 'Working' : 'Record this decision'}
+          </button>
+        </div>
+        {error && <div className="src warn">{error}</div>}
+        {links}
+      </div>
+    )
+  }
+
+  if (atApproval) {
+    return (
+      <div className="act">
+        <label>This has passed QA and is waiting on you</label>
+        <label htmlFor={`note-${grant!.id}`}>Note, required to send it back</label>
+        <textarea
+          id={`note-${grant!.id}`}
+          value={detail}
+          placeholder="Lead with the reading results from last spring. The draft buries them."
+          onChange={ev => setDetail(ev.target.value)}
+        />
+        <div className="row">
+          <button
+            className="btn primary"
+            disabled={busy}
+            onClick={() => post('/api/funding/opportunities',
+              { id: grant!.id, narrative_status: 'ready' },
+              'Approved. It is ready to go to the school.')}
+          >
+            {busy ? 'Working' : 'Approve and release'}
+          </button>
+          <button
+            className="btn"
+            disabled={busy || detail.trim().length < 3}
+            onClick={() => post('/api/funding/opportunities',
+              { id: grant!.id, narrative_status: 'requested', redraft_guidance: detail.trim() },
+              'Sent back to the writer with your note.')}
+          >
+            Send back with your direction
+          </button>
+        </div>
+        {error && <div className="src warn">{error}</div>}
+        {links}
+      </div>
+    )
+  }
+
+  // Nothing on this entry is a decision, so it only has to lead somewhere.
+  return <div className="act">{links}</div>
 }

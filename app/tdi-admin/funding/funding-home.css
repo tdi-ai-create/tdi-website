@@ -191,3 +191,9 @@
      shrink below their own content by default and the card clips its action
      row. Cards keep their natural height and the body scrolls instead. */
   .fh .mbody > .card{flex:0 0 auto}
+
+  /* A disabled button that looks enabled reads as a broken page: you press it,
+     nothing happens, and nothing tells you why. Found by pressing "Record this
+     decision" before giving a reason. */
+  .fh .btn:disabled{opacity:.45;cursor:not-allowed}
+  .fh .btn.primary:disabled:hover{opacity:.45}
