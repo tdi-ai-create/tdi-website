@@ -89,6 +89,17 @@ for (const p of partnerships ?? []) if (p.slug) slugToId.set(p.slug, String(p.id
 // sales_deal 0 of 1. The signal lives in those three.
 const SELF_SERVE_SOURCES = ['stripe'];
 
+// The TDI voice accounts are not educators, so the sentence this check prints
+// about each orphan, that it is a real educator on no leadership screen, is
+// untrue of them. They are accounts TDI owns and posts from in the Hub
+// community, they hold all-access so they can open the tools they post on, and
+// they belong to no partnership because there is no school behind them. They
+// carry is_test_account so no email or report counts them either.
+//
+// Excluded by source rather than by domain, so renaming the mailbox does not
+// quietly re-admit them. 24 exist as of 23 Sep 2026.
+const TDI_OWNED_SOURCES = ['tdi_voice'];
+
 // A seat with a future expiry is a deliberate, time limited comp, and having no
 // partnership is the point of it. Seven arrived on 21 Sep from the BRCC keynote,
 // all expiring 30 Nov exactly as the talk promised, and every one of them read
@@ -110,9 +121,12 @@ const { data: seats, error: sErr } = await hub
   .eq('status', 'active');
 die('hub_memberships', sErr);
 
-const selfServe = (seats ?? []).filter((s) => SELF_SERVE_SOURCES.includes(s.source)).length;
-const comped = (seats ?? []).filter((s) => !SELF_SERVE_SOURCES.includes(s.source) && isLiveComp(s)).length;
-const districtSeats = (seats ?? []).filter(
+const inScope = (seats ?? []).filter((s) => !TDI_OWNED_SOURCES.includes(s.source));
+const tdiOwned = (seats ?? []).length - inScope.length;
+
+const selfServe = inScope.filter((s) => SELF_SERVE_SOURCES.includes(s.source)).length;
+const comped = inScope.filter((s) => !SELF_SERVE_SOURCES.includes(s.source) && isLiveComp(s)).length;
+const districtSeats = inScope.filter(
   (s) => !SELF_SERVE_SOURCES.includes(s.source) && !isLiveComp(s)
 );
 
@@ -122,7 +136,8 @@ if (orphanIds.length === 0) {
   console.log(
     `\nAll ${districtSeats.length} district all-access seats trace to a partnership` +
       `${selfServe ? `, ${selfServe} self-serve seat(s) correctly have none` : ''}` +
-      `${comped ? `, and ${comped} comp seat(s) with an end date correctly have none` : ''}.\n`
+      `${comped ? `, ${comped} comp seat(s) with an end date correctly have none` : ''}` +
+      `${tdiOwned ? `, and ${tdiOwned} seat(s) on TDI's own voice accounts are not educators at all` : ''}.\n`
   );
   process.exit(0);
 }
@@ -143,7 +158,8 @@ if (stillOrphaned.length === 0) {
     `\nAll ${districtSeats.length} district all-access seats trace to a partnership, ` +
       `${unique.length} via the slug fallback` +
       `${selfServe ? `, ${selfServe} self-serve seat(s) correctly have none` : ''}` +
-      `${comped ? `, and ${comped} comp seat(s) with an end date correctly have none` : ''}.\n`
+      `${comped ? `, ${comped} comp seat(s) with an end date correctly have none` : ''}` +
+      `${tdiOwned ? `, and ${tdiOwned} seat(s) on TDI's own voice accounts are not educators at all` : ''}.\n`
   );
   process.exit(0);
 }
