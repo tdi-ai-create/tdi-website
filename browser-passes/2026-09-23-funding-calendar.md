@@ -8,7 +8,29 @@ Nothing existing changes. Like the schools screens, it is served only when
 
 ## What I did
 
-- Opened: http://localhost:3000/tdi-admin/funding/calendar
+- Completed against production 23 Sep 2026 by a later session, signed in as Rae,
+  with funding_config.new_pages already on.
+- Opened: https://www.teachersdeserveit.com/tdi-admin/funding/calendar
+- Saw: the line above the grid reads "5 of 21 live grant paths have a confirmed
+  deadline. The rest have no date yet, so they cannot appear here until somebody
+  confirms a window." Word for word what the prediction required, so the screen
+  is not passing off a sparse month as a calm one.
+- Saw: 18 entries in September, counted off the grid. Five decisions bunched on
+  the 15th, Cox Charities on the 18th, the named teacher question on the 22nd,
+  Illinois Prairie and Ourso both closing on the 30th, and the only October
+  entry being Cox Charities closing on the 1st. Every date in the prediction
+  landed where it said it would.
+- Saw: predicted entries render italic and grey, including "IAA Foundation packet
+  to school" on the 10th and both approval-due entries on the 24th.
+- Pressed: the "Illinois Prairie Comm... approval due" entry on 24 September.
+- Saw: a panel headed "PREDICTED, NOT CONFIRMED" for Saunemin CCSD #438 dated
+  2026-09-24, with a "How this date was worked out" box reading "Passed QA on
+  2026-09-22 and waiting on a person. 2 days is the allowance before it reads as
+  stuck." It names the QA date and the two day allowance, exactly as required.
+- Saw: below that, "Nothing is due on this date. A predicted entry never chases
+  anyone and disappears the moment a real date exists."
+
+- Original deferral, kept for the record: http://localhost:3000/tdi-admin/funding/calendar
 - Deferred: the admin portal authenticates against a Supabase session cookie
   scoped to the live domain, so a local server answers with a login screen. The
   flag is also off, so the route returns 404 even after deploy.
