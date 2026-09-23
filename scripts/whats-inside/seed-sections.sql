@@ -1,3 +1,14 @@
+-- SUPERSEDED 23 September 2026 by scripts/whats-inside/score-sections.mjs.
+--
+-- This file is the first pass and it is kept only as a record of what was done.
+-- Do not run it. Its CASE stops at the first matching branch, so the branch
+-- ORDER decided everything: a behavior tool carrying one stress tag landed
+-- under teacher load, which is how Calm Response Scripts, the most opened tool
+-- in the Hub, ended up filed under the reason good teachers leave.
+--
+-- The replacement scores every section and takes the strongest, refuses to move
+-- anything on a tie, and never strips a section a person set by hand.
+--
 -- First pass assignment of hub_section for /for-schools/whats-inside.
 --
 -- Run once against the Learning Hub project (asdwpkcsbcnpknklchdq) on
