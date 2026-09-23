@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js'
 import { notifyApproved, notifyWaiting } from '@/lib/content-queue/notify'
 import { parseSlides, carouselProblems } from '@/lib/content-queue/carousel'
 import { summariseHistory } from '@/lib/content-queue/history'
+import { cadenceFor, nextOpenDay, todayCT } from '@/lib/content-queue/cadence'
 import { findBlockedTerms, blockedTermsMessage, findBlockedChannel, blockedChannelMessage, TERM_CHECKED_ACTIONS, type BlockedTerm, type BlockedChannel } from '@/lib/content-queue/blocked-terms'
 import {
   TRANSITIONS, OWNER_OF, actorHoldsRole, isSelfReview, legalFrom, canRequestChanges, canFlagBlocked,
@@ -81,6 +82,8 @@ type Row = {
   owner: string | null
   approver: string | null
   approved_at: string | null
+  // Read when approving, to leave a date somebody already chose alone.
+  scheduled_for: string | null
   artifact_rendered_at: string | null
   artifact_refs: unknown
   feedback_log: unknown[]
@@ -341,7 +344,21 @@ export async function POST(request: NextRequest) {
 
       const { data, error } = await supabase.from('content_queue_items').insert({
         channel, content_type, title: title ?? null, brief: brief ?? null,
-        audience_tag, approver: approver ?? null, scheduled_for: scheduled_for ?? null,
+        audience_tag,
+        // Everything in this queue is Kristin's to approve. Rae approves Hub
+        // content, which moves through content-sync and board approvals, not
+        // here. Rae, 23 September 2026: "Rae only approves content for the hub,
+        // kristin does ALL else including voice."
+        //
+        // Defaulted rather than left null because null meant nobody: every one
+        // of the nineteen items in the queue had no approver, so the board told
+        // whoever opened it that seven pieces were waiting on them, and neither
+        // of them had a list that was actually theirs.
+        //
+        // Rae keeps the capability to approve anything. This is about whose
+        // queue a piece sits in, not about who is allowed.
+        approver: approver ?? 'kristin',
+        scheduled_for: scheduled_for ?? null,
         status: 'brief', owner: OWNER_OF.brief, feedback_log: [entry],
       // Echo the stored date back. A caller that asked for a day and got a 200
       // should be able to see whether the day actually landed.
@@ -357,7 +374,7 @@ export async function POST(request: NextRequest) {
 
     const { data: row, error: readErr } = await supabase
       .from('content_queue_items')
-      .select('id, title, channel, status, body, owner, approver, approved_at, artifact_rendered_at, artifact_refs, feedback_log')
+      .select('id, title, channel, status, body, owner, approver, approved_at, scheduled_for, artifact_rendered_at, artifact_refs, feedback_log')
       .eq('id', id).single()
 
     if (readErr || !row) return NextResponse.json({ error: 'Item not found' }, { status: 404 })
@@ -520,6 +537,54 @@ export async function POST(request: NextRequest) {
     if (action === 'approve') {
       patch.approved_by = actor
       patch.approved_at = new Date().toISOString()
+
+      // Give it a day, if this channel has a rhythm and nobody has picked one.
+      //
+      // Approving used to say nothing about when. The calendar places work by
+      // date, so an approved piece with no date fell into the "No day yet" rail
+      // and sat there, which is what Rae was asking about when she asked why
+      // approving does not put something on the calendar.
+      //
+      // Three ways this deliberately does nothing. A piece that already has a
+      // date keeps it, because somebody chose it. A channel with no cadence row
+      // is untouched, which is every channel but Substack today. And the whole
+      // thing is behind a flag that is off, so this ships dark and changes
+      // nothing until it is turned on.
+      //
+      // An unreadable flag or a broken cadence table must not silently start
+      // assigning dates, and must not silently stop either, so the outcome goes
+      // into the log entry either way rather than being guessed at.
+      if (!item.scheduled_for && !dryRun) {
+        try {
+          const { data: flagRow, error: flagErr } = await supabase
+            .from('hub_config')
+            .select('value')
+            .eq('key', 'content_cadence_enabled')
+            .maybeSingle()
+
+          if (flagErr) {
+            entry.cadence = `flag unreadable, no date assigned: ${flagErr.message}`
+          } else if (flagRow?.value !== 'true') {
+            entry.cadence = 'off'
+          } else {
+            const cadence = await cadenceFor(supabase, item.channel)
+            if (!cadence) {
+              entry.cadence = `no rhythm set for ${item.channel}, left without a day`
+            } else {
+              // From tomorrow, not today. Approving at 4pm and publishing the
+              // same afternoon gives nobody time to see it first.
+              const day = await nextOpenDay(supabase, cadence, todayCT())
+              patch.scheduled_for = day
+              entry.cadence = `assigned ${day} from the ${item.channel} rhythm`
+              entry.scheduled_for = day
+            }
+          }
+        } catch (err) {
+          // A cadence that throws must not stop an approval. The decision a
+          // person made is the important half; the date is a convenience.
+          entry.cadence = `could not assign a day: ${err instanceof Error ? err.message : String(err)}`
+        }
+      }
       // Tell whoever has to publish it. The outcome goes into the same log entry,
       // so "nobody was told" is a fact on the record rather than a silence.
       const told = await notifyApproved({ id, title: item.title, channel: item.channel, approved_by: actor })
