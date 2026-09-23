@@ -77,6 +77,7 @@ import { TDISuggestions } from '@/components/dashboard/shared/TDISuggestions';
 import { DashboardHeader } from '@/components/dashboard/shared/DashboardHeader';
 import { StatCards } from '@/components/dashboard/shared/StatCards';
 import { generateSuggestions, type TDISuggestion } from '@/lib/dashboard/generateSuggestions';
+import { type ActionItemStatus } from '@/lib/leadership/action-items';
 
 // Types
 interface Partnership {
@@ -139,7 +140,7 @@ interface ActionItem {
   description: string;
   category: string;
   priority: 'high' | 'medium' | 'low';
-  status: 'pending' | 'in_progress' | 'completed' | 'paused';
+  status: ActionItemStatus;
   sort_order: number;
   evidence_file_path?: string;
   completed_at?: string;
@@ -457,6 +458,7 @@ export default function PartnerDashboard() {
   const [blueprintSubTab, setBlueprintSubTab] = useState<'approach' | 'in-person' | 'learning-hub' | 'dashboard' | 'book' | 'results' | 'contract' | 'tools' | 'community'>('approach');
   const [mobileExpandedBlueprint, setMobileExpandedBlueprint] = useState<string | null>('approach');
   const [showPausedItems, setShowPausedItems] = useState(false);
+  const [showNotApplicable, setShowNotApplicable] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [uploadingItemId, setUploadingItemId] = useState<string | null>(null);
   const [savingItemId, setSavingItemId] = useState<string | null>(null);
@@ -1431,6 +1433,12 @@ export default function PartnerDashboard() {
   // Computed values
   const pendingItems = actionItems.filter(i => i.status === 'pending');
   const pausedItems = actionItems.filter(i => i.status === 'paused');
+  // Items TDI has decided do not apply to this contract. They used to be
+  // stored as an indefinite pause, so when they became a status of their own
+  // they stopped matching every filter on this page and simply vanished from
+  // the district's view. An item a school could see should not disappear
+  // without a word.
+  const notApplicableItems = actionItems.filter(i => i.status === 'not_applicable');
   const completedCount = actionItems.filter(i => i.status === 'completed').length;
 
   const hubLoginPct = staffStats.total > 0
@@ -3751,7 +3759,17 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                           ${partnershipKpis.length > 0 ? `
                             <div class="section">
                               <div class="section-title">Key Performance Indicators</div>
-                              ${partnershipKpis.map(k => `<p style="font-size:14px;margin:6px 0;"><strong>${k.kpi_label}:</strong> ${k.current_value}${k.target_unit} of ${k.target_value}${k.target_unit} target</p>`).join('')}
+                              ${partnershipKpis.map(k => {
+                                // The on screen card already refuses to print a
+                                // zero it cannot justify. This report did not,
+                                // and printed "null% of 70% target" for any goal
+                                // whose baseline has not been collected yet.
+                                const p = goalProgress(k);
+                                const readout = p.awaitingBaseline
+                                  ? `baseline not collected yet, target ${k.target_value ?? 'to be agreed'}${k.target_value ? k.target_unit : ''}`
+                                  : `${k.current_value}${k.target_unit} of ${k.target_value}${k.target_unit} target`;
+                                return `<p style="font-size:14px;margin:6px 0;"><strong>${k.kpi_label}:</strong> ${readout}</p>`;
+                              }).join('')}
                             </div>
                           ` : ''}
                           <div class="footer">
@@ -5515,6 +5533,47 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                   </div>
                 )}
 
+                {/* Not needed for this plan */}
+                {notApplicableItems.length > 0 && (
+                  <div className="border-t border-gray-200 pt-4 mt-6">
+                    <button
+                      onClick={() => setShowNotApplicable(!showNotApplicable)}
+                      className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700"
+                    >
+                      <ChevronDown
+                        className={`w-4 h-4 transition-transform ${showNotApplicable ? 'rotate-180' : ''}`}
+                      />
+                      Not Needed For Your Plan
+                      <span className="bg-gray-200 text-gray-600 px-2 py-0.5 rounded-full text-xs">
+                        {notApplicableItems.length}
+                      </span>
+                    </button>
+
+                    {showNotApplicable && (
+                      <div className="mt-3 space-y-2">
+                        {notApplicableItems.map((item) => {
+                          const Icon = categoryIcons[item.category] || FileText;
+
+                          return (
+                            <div
+                              key={item.id}
+                              className="flex items-start gap-3 p-3 bg-gray-100 rounded-lg"
+                            >
+                              <Icon className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
+                              <div className="flex-1 min-w-0">
+                                <span className="text-sm text-gray-600 block line-through">{item.title}</span>
+                                {item.paused_reason && (
+                                  <span className="text-xs text-gray-500 block mt-1">{item.paused_reason}</span>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 {/* All Complete */}
                 {pendingItems.length === 0 && pausedItems.length === 0 && (
                   <div className="text-center py-8">
@@ -6686,7 +6745,10 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                     link.download = `engagement-summary-${new Date().toISOString().slice(0,10)}.csv`; link.click();
                   }},
                   { label: 'KPI Summary', icon: Target, action: () => {
-                    const csv = 'KPI,Current,Target,Unit\n' + partnershipKpis.map(k => `${k.kpi_label},${k.current_value},${k.target_value},${k.target_unit}`).join('\n');
+                    // An empty cell is an honest "not measured yet". The word
+                    // null in a spreadsheet a school opens is not.
+                    const cell = (v: number | null) => (v === null || v === undefined ? '' : String(v));
+                    const csv = 'KPI,Current,Target,Unit\n' + partnershipKpis.map(k => `${k.kpi_label},${cell(k.current_value)},${cell(k.target_value)},${k.target_unit}`).join('\n');
                     const blob = new Blob([csv], { type: 'text/csv' });
                     const link = document.createElement('a'); link.href = URL.createObjectURL(blob);
                     link.download = `kpi-summary-${new Date().toISOString().slice(0,10)}.csv`; link.click();
