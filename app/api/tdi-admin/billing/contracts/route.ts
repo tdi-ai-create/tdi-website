@@ -36,7 +36,7 @@ export async function GET(_request: NextRequest) {
 
   const { data: lines, error: lErr } = await supabase
     .from('contract_deliverables')
-    .select('id, quote_id, district_id, partnership_id, line_item_index, label, service_type, quantity, unit_price, total_amount, is_complimentary, delivery_state, billing_state, funding_hold, delivery_date, delivered_by, delivery_notes, invoice_id, invoiced_at, sequence_number, sequence_total')
+    .select('id, quote_id, district_id, partnership_id, line_item_index, label, service_type, quantity, unit_price, total_amount, is_complimentary, delivery_state, billing_state, funding_hold, delivery_date, delivered_by, delivery_notes, invoice_id, invoiced_at, sequence_number, sequence_total, planned_date, planned_confidence')
     .in('quote_id', quotes.map((q) => q.id))
     .order('line_item_index', { ascending: true });
 

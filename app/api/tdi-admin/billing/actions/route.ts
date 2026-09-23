@@ -41,6 +41,7 @@ export async function POST(request: NextRequest) {
   try {
     switch (action) {
       case 'mark_delivered':   return await markDelivered(supabase, body, email!, dryRun);
+      case 'set_planned_date': return await setPlannedDate(supabase, body, dryRun);
       case 'create_invoice':   return await createInvoice(supabase, body, email!, dryRun);
       case 'record_payment':   return await recordPayment(supabase, body, email!, dryRun);
       case 'void_invoice':     return await voidInvoice(supabase, body, email!, dryRun);
@@ -93,6 +94,73 @@ async function markDelivered(sb: any, b: any, email: string, dryRun: boolean) {
     ` Marked by ${by(delivered_by || email)}.`);
 
   return NextResponse.json({ ok: true, ...plan });
+}
+
+/**
+ * When the work is going to happen. A plan, not a record.
+ *
+ * delivery_date has always been written after the fact, so until now nothing in
+ * the system meant "this is going to happen on the 7th" and Billing could not
+ * say when an invoice was coming. On 22 September 2026 that was 43 lines worth
+ * $152,447 sitting in scheduled with no date between them.
+ *
+ * Held and confirmed are kept apart deliberately. Saunemin's second observation
+ * day is pencilled for 3 March on the superintendent's suggestion, subject to
+ * the district calendar. Forecasting that as booked is how a prediction quietly
+ * becomes a promise.
+ *
+ * No Slack post. A date being pencilled is not a money event, and #financials
+ * earns its attention by staying quiet about things that have not happened.
+ */
+async function setPlannedDate(sb: any, b: any, dryRun: boolean) {
+  const { deliverable_id, planned_date, planned_confidence } = b;
+  if (!deliverable_id || !planned_date) {
+    return NextResponse.json({ error: 'deliverable_id and planned_date are required' }, { status: 400 });
+  }
+  if (!['held', 'confirmed'].includes(planned_confidence)) {
+    return NextResponse.json({ error: 'planned_confidence must be held or confirmed' }, { status: 400 });
+  }
+
+  const { data: line, error: readError } = await sb.from('contract_deliverables')
+    .select('id, label, delivery_state, delivery_date, planned_date, planned_confidence')
+    .eq('id', deliverable_id).maybeSingle();
+  if (readError) throw new Error(readError.message);
+  if (!line) return NextResponse.json({ error: 'Line item not found' }, { status: 404 });
+
+  // A plan for work that already happened is not a plan, and a forecast that
+  // includes delivered lines double counts them.
+  if (line.delivery_state === 'delivered') {
+    return NextResponse.json({
+      error: `${line.label} is already delivered${line.delivery_date ? ` on ${line.delivery_date}` : ''}. A planned date would be forecasting work that is done.`,
+    }, { status: 409 });
+  }
+  if (line.delivery_state === 'cancelled') {
+    return NextResponse.json({ error: `${line.label} is cancelled.` }, { status: 409 });
+  }
+
+  const plan = {
+    line: line.label,
+    from: line.planned_date ? `${line.planned_date} (${line.planned_confidence})` : 'no date',
+    to: `${planned_date} (${planned_confidence})`,
+    changes_billing: false,
+    changes_delivery: false,
+  };
+  if (dryRun) return NextResponse.json({ dry_run: true, plan });
+
+  const { error } = await sb.from('contract_deliverables').update({
+    planned_date,
+    planned_confidence,
+    updated_at: new Date().toISOString(),
+  }).eq('id', deliverable_id);
+  if (error) throw new Error(error.message);
+
+  return NextResponse.json({
+    ok: true,
+    ...plan,
+    message: planned_confidence === 'confirmed'
+      ? `${line.label} is confirmed for ${planned_date}.`
+      : `${line.label} is held for ${planned_date}. Nothing is confirmed with the client.`,
+  });
 }
 
 /** Turn delivered work into a draft invoice. Nothing is emailed. */
