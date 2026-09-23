@@ -102,8 +102,18 @@ async function main() {
     const back = XLSX.readFile(file);
 
     // 1. The ledgers are on their own sheets. This is the whole point.
-    for (const name of ['Read me', 'Client money', 'Grant money', 'Complimentary']) {
+    const required = kind === 'forecast'
+      ? ['Summary', 'Client money', 'Grant money', 'Complimentary']
+      : ['Client money', 'Grant money', 'Complimentary'];
+    for (const name of required) {
       if (!back.SheetNames.includes(name)) fail(`${kind}: no "${name}" sheet. The file has ${back.SheetNames.join(', ')}.`);
+    }
+
+    // 2. It opens on the money. A workbook opens on its first sheet, and this
+    //    one used to open on a page of prose with the figures hidden behind
+    //    tabs. Rae, 23 September 2026: "this is not helpful at all."
+    if (back.SheetNames[0] !== required[0]) {
+      fail(`${kind}: opens on "${back.SheetNames[0]}" rather than "${required[0]}". The first sheet is what someone sees, so it has to carry the numbers.`);
     }
     if (problems.length) continue;
 
@@ -112,7 +122,7 @@ async function main() {
     const grant = sheet('Grant money');
     const comp = sheet('Complimentary');
 
-    // 2. Amounts are numbers. A formatted string looks right and sums to zero.
+    // 3. Amounts are numbers. A formatted string looks right and sums to zero.
     const amountCol = kind === 'forecast' ? 5 : 7;
     for (const [name, rs] of [['Client money', client], ['Grant money', grant]]) {
       const textAmounts = rs.filter((r) => r[amountCol] !== '' && r[amountCol] !== null && typeof r[amountCol] !== 'number');
@@ -121,7 +131,7 @@ async function main() {
       }
     }
 
-    // 3. No grant money leaked onto the client sheet, in either direction.
+    // 4. No grant money leaked onto the client sheet, in either direction.
     if (kind === 'forecast') {
       const sum = (rs) => rs.reduce((s, r) => s + (typeof r[amountCol] === 'number' ? r[amountCol] : 0), 0);
       if (client.length !== expect.clientRows) fail(`forecast: Client money has ${client.length} rows, database says ${expect.clientRows}.`);
@@ -131,12 +141,12 @@ async function main() {
       if (Math.abs(sum(grant) - expect.grant) > 0.005) fail(`forecast: Grant money totals ${money(sum(grant))}, database says ${money(expect.grant)}.`);
       if (sum(comp) !== 0) fail(`forecast: Complimentary totals ${money(sum(comp))}. Complimentary work is never money.`);
 
-      // 4. A grant row can never carry a ready date. Rae, 22 September 2026:
+      // 5. A grant row can never carry a ready date. Rae, 22 September 2026:
       //    funding work is only allowed once funding has been awarded.
       const datedGrant = grant.filter((r) => r[0]);
       if (datedGrant.length) fail(`forecast: ${datedGrant.length} grant row(s) carry a ready date. A grant line cannot be scheduled before the award lands.`);
 
-      // 5. Every undated row says why, or the queue is just an absence.
+      // 6. Every undated row says why, or the queue is just an absence.
       const silent = client.concat(grant).filter((r) => !r[0] && !r[8]);
       if (silent.length) fail(`forecast: ${silent.length} undated row(s) give no reason. An undated line without a reason is not a finding.`);
     }
@@ -158,7 +168,7 @@ async function main() {
   console.log(`  Client money : ${money(expect.client)} across ${expect.clientRows} lines`);
   console.log(`  Grant money  : ${money(expect.grant)} across ${expect.grantRows} lines, none dated`);
   console.log(`  Complimentary: ${expect.compRows} lines, no money`);
-  console.log('  Ledgers are on separate sheets and every amount is a number.');
+  console.log('  Opens on the Summary, ledgers on separate sheets, every amount a number.');
 }
 
 main().catch((err) => {
