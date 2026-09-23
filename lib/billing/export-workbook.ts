@@ -1,5 +1,9 @@
 import * as XLSX from 'xlsx';
 import { forecastLine, isForecastable, type ForecastInput, type ForecastRow, type Ledger } from '@/lib/billing/forecast';
+import {
+  agingTotals, concentration, expectedCashOn, receivables, waterfall,
+  type InvoiceRow, type DeliverableRow,
+} from '@/lib/billing/position';
 
 /**
  * Billing as a workbook.
@@ -46,6 +50,10 @@ export type LineRow = {
 
 export type Lookups = {
   districtName: Map<string, string>;
+  /** Every live invoice with what has been applied to it. Receivables needs
+   *  these whether or not a contract line points at them, because the oldest
+   *  unpaid invoices here belong to no line at all. */
+  invoices?: InvoiceRow[];
   contractStart: Map<string, string | null>;
   quoteNumber: Map<string, string>;
   invoice: Map<string, { invoice_number: string; status: string; amount: string | number; invoice_date: string | null; due_date: string | null }>;
@@ -202,7 +210,7 @@ function summarySheet(rows: { row: ForecastRow; serviceType: string }[], generat
   ws['!cols'] = [
     { wch: 34 }, { wch: 30 }, { wch: 34 }, { wch: 22 }, { wch: 28 }, { wch: 24 },
   ];
-  return ws;
+  return formatMoneyColumns(ws, [1, 2, 3, 5]);
 }
 
 function sheetFrom(headers: string[], rows: unknown[][]) {
@@ -214,7 +222,8 @@ function sheetFrom(headers: string[], rows: unknown[][]) {
     return { wch: Math.min(Math.max(widest + 2, 12), 60) };
   });
   if (rows.length) ws['!autofilter'] = { ref: XLSX.utils.encode_range({ s: { r: 0, c: 0 }, e: { r: rows.length, c: headers.length - 1 } }) };
-  return ws;
+  const moneyCols = headers.reduce<number[]>((acc, h, i) => (/amount|price/.test(h) ? [...acc, i] : acc), []);
+  return formatMoneyColumns(ws, moneyCols);
 }
 
 /** Dated first in date order, then undated with the largest amount at the top. */
@@ -223,6 +232,207 @@ function sortForecast(a: ForecastRow, b: ForecastRow) {
   if (a.readyOn) return -1;
   if (b.readyOn) return 1;
   return b.amount - a.amount || a.client.localeCompare(b.client);
+}
+
+/**
+ * Give the money cells a currency format.
+ *
+ * The values stay real numbers so a spreadsheet still sums them. This only
+ * changes how they read, which matters because a column of bare figures in a
+ * finance file leaves the reader guessing at the unit.
+ *
+ * Applied by column, never to the whole sheet, since complimentary days and
+ * days past due are counts and dressing them as dollars would be worse than
+ * leaving everything plain.
+ */
+const USD = '$#,##0.00';
+function formatMoneyColumns(ws: XLSX.WorkSheet, columns: number[]) {
+  const range = XLSX.utils.decode_range(ws['!ref'] ?? 'A1');
+  for (let r = range.s.r; r <= range.e.r; r++) {
+    for (const c of columns) {
+      const cell = ws[XLSX.utils.encode_cell({ r, c })];
+      if (cell && cell.t === 'n') cell.z = USD;
+    }
+  }
+  return ws;
+}
+
+/**
+ * Sheet one. Where the business stands, before anyone clicks a tab.
+ *
+ * Three tables, in the order a finance director asks the questions: what is the
+ * book worth, how much of it is really ours, and what needs a person today.
+ */
+function positionSheet(lines: LineRow[], lk: Lookups, generatedOn: string) {
+  const invoices = lk.invoices ?? [];
+  const name = (id: string | null) => (id ? lk.districtName.get(id) ?? 'Unknown client' : 'Not a school');
+  const w = waterfall(lines as unknown as DeliverableRow[], invoices);
+  const conc = concentration(lines as unknown as DeliverableRow[], name);
+  const rs = receivables(invoices, name, generatedOn);
+
+  const readyUnbilled = lines
+    .filter((l) => l.delivery_state === 'scheduled' && l.billing_state === 'not_billed' && !l.is_complimentary && !l.funding_hold)
+    .map((l) => forecastLine({
+      ...(l as unknown as ForecastInput),
+      district_name: l.district_id ? lk.districtName.get(l.district_id) ?? null : null,
+      contract_start: l.partnership_id ? lk.contractStart.get(l.partnership_id) ?? null : null,
+    }))
+    .filter((r) => r.readyOn && r.readyOn < generatedOn);
+
+  const body: unknown[][] = [
+    ['Teachers Deserve It, billing position', '', '', ''],
+    [`Generated ${generatedOn}`, '', '', ''],
+    ['', '', '', ''],
+
+    ['THE CONTRACT WATERFALL', '', '', ''],
+    ['', 'Client funded', 'Grant contingent', 'Total'],
+    ['Contracted', w.contractedClient, w.contractedGrant, w.contracted],
+    ['Delivered', w.delivered, 0, w.delivered],
+    ['Invoiced', w.invoiced, 0, w.invoiced],
+    ['Collected', w.collected, 0, w.collected],
+    ['Outstanding, owed to us now', w.outstanding, 0, w.outstanding],
+    ['Not yet delivered', w.notYetDeliveredClient, w.notYetDeliveredGrant, w.notYetDeliveredClient + w.notYetDeliveredGrant],
+    ['', '', '', ''],
+
+    ['CONCENTRATION', '', '', ''],
+    ['Client', 'Contracted', 'Share of book', 'Of which grant contingent'],
+    ...conc.filter((c) => c.contracted > 0).map((c) => [c.client, c.contracted, `${c.share.toFixed(1)}%`, c.grant]),
+    ['', '', '', ''],
+
+    ['NEEDS A DECISION', '', '', ''],
+    ['What', 'Amount', 'Why it is here', ''],
+    ...rs.filter((r) => r.problem).map((r) => [`${r.invoice}, ${r.client}`, r.owed, r.problem, '']),
+    ...readyUnbilled.map((r) => [
+      `${r.client}, ${r.label}`,
+      r.amount,
+      `Ready to invoice since ${r.readyOn} and not billed.`,
+      '',
+    ]),
+    ['', '', '', ''],
+
+    ['Client funded and grant contingent are never added together.', '', '', ''],
+    ['Grant contingent money needs the funder to award it before the work can be scheduled.', '', '', ''],
+    ['Complimentary work is excluded from every figure here, because it will never produce an invoice.', '', '', ''],
+  ];
+
+  const ws = XLSX.utils.aoa_to_sheet(body);
+  ws['!cols'] = [{ wch: 52 }, { wch: 18 }, { wch: 46 }, { wch: 24 }];
+  return formatMoneyColumns(ws, [1, 2, 3]);
+}
+
+/**
+ * Sheet two. Money already invoiced and not yet in the bank.
+ *
+ * Absent from the export entirely until now, which meant a file about billing
+ * never mentioned the $8,332.20 someone owes us today.
+ */
+function receivablesSheet(lk: Lookups, generatedOn: string) {
+  const name = (id: string | null) => (id ? lk.districtName.get(id) ?? 'Unknown client' : 'Not a school');
+  const rs = receivables(lk.invoices ?? [], name, generatedOn);
+  const a = agingTotals(rs);
+
+  const body: unknown[][] = [
+    ['Receivables', '', '', '', '', '', '', '', ''],
+    [`As at ${generatedOn}`, '', '', '', '', '', '', '', ''],
+    ['', '', '', '', '', '', '', '', ''],
+
+    ['AGING', '', '', '', '', '', '', '', ''],
+    ['Current', '1 to 30 days', '31 to 60 days', 'Over 60 days', 'Cannot be aged', 'Total owed', '', '', ''],
+    [a.current, a.d1to30, a.d31to60, a.over60, a.cannotBeAged, a.total, '', '', ''],
+    ['', '', '', '', '', '', '', '', ''],
+
+    ['EVERY INVOICE WITH MONEY AGAINST IT', '', '', '', '', '', '', '', ''],
+    ['Invoice', 'Client', 'Invoiced', 'Paid', 'Owed', 'Invoice date', 'Due date', 'Days past due', 'PO number'],
+    ...rs.map((r) => [
+      r.invoice, r.client, r.invoiced, r.paid, r.owed,
+      r.invoiceDate ?? '', r.dueDate ?? 'not set', r.daysPastDue ?? '', r.po ?? 'none',
+    ]),
+    ['Total', '', rs.reduce((s, r) => s + r.invoiced, 0), rs.reduce((s, r) => s + r.paid, 0), a.total, '', '', '', ''],
+    ['', '', '', '', '', '', '', '', ''],
+
+    ['NEEDS A LOOK', '', '', '', '', '', '', '', ''],
+    ...rs.filter((r) => r.problem).map((r) => [r.invoice, r.client, r.owed, r.problem, '', '', '', '', '']),
+    ['', '', '', '', '', '', '', '', ''],
+    ['A PO number is not decoration. PGCPS will not process an invoice without one.', '', '', '', '', '', '', '', ''],
+  ];
+
+  const ws = XLSX.utils.aoa_to_sheet(body);
+  ws['!cols'] = [{ wch: 16 }, { wch: 34 }, { wch: 13 }, { wch: 12 }, { wch: 13 }, { wch: 14 }, { wch: 14 }, { wch: 15 }, { wch: 14 }];
+  // Columns 0 to 5 on the aging row are money; 2, 3 and 4 are on the detail.
+  return formatMoneyColumns(ws, [0, 1, 2, 3, 4, 5]);
+}
+
+/**
+ * Sheet three. When the money actually arrives.
+ *
+ * The forecast stops at billable. This adds terms, which is the column a cash
+ * forecast is built from, and states its own assumption on the sheet.
+ */
+function cashSheet(rows: { row: ForecastRow }[], lk: Lookups, generatedOn: string) {
+  const name = (id: string | null) => (id ? lk.districtName.get(id) ?? 'Unknown client' : 'Not a school');
+  const rs = receivables(lk.invoices ?? [], name, generatedOn);
+  const owedNow = rs.reduce((s, r) => s + r.owed, 0);
+
+  const dated = rows
+    .filter((r) => r.row.readyOn && r.row.ledger === 'client')
+    .sort((a, b) => (a.row.readyOn as string).localeCompare(b.row.readyOn as string));
+
+  const withCash = dated.map(({ row: r }) => {
+    const ready = r.readyOn as string;
+    const late = ready < generatedOn;
+    return {
+      ready,
+      cash: late ? '' : expectedCashOn(ready),
+      client: r.client,
+      label: r.label,
+      amount: r.amount,
+      certainty: late
+        ? `Ready since ${ready} and not invoiced.`
+        : r.held ? 'held, client has not agreed' : 'confirmed',
+      late,
+    };
+  });
+
+  const months = [...new Set(withCash.filter((r) => r.cash).map((r) => r.cash.slice(0, 7)))].sort();
+
+  const body: unknown[][] = [
+    ['Cash forecast', '', '', '', '', ''],
+    [`Generated ${generatedOn}. Terms are net ${30} days.`, '', '', '', '', ''],
+    ['', '', '', '', '', ''],
+
+    ['ALREADY OWED', '', '', '', '', ''],
+    ['See the Receivables sheet for the detail.', '', '', owedNow, '', ''],
+    ['', '', '', '', '', ''],
+
+    ['BECOMING BILLABLE', '', '', '', '', ''],
+    ['Ready to invoice', 'Expected cash', 'Client', 'Service', 'Amount', 'Certainty'],
+    ...withCash.map((r) => [r.ready, r.cash || 'overdue to raise', r.client, r.label, r.amount, r.certainty]),
+    ['', '', '', '', '', ''],
+
+    ['BY MONTH OF EXPECTED CASH', '', '', '', '', ''],
+    ['Month', 'Confirmed', 'Held, not agreed', 'Overdue to raise', '', ''],
+    ...months.map((m) => {
+      const inM = withCash.filter((r) => r.cash.startsWith(m));
+      return [
+        m,
+        inM.filter((r) => r.certainty === 'confirmed').reduce((s, r) => s + r.amount, 0),
+        inM.filter((r) => r.certainty.startsWith('held')).reduce((s, r) => s + r.amount, 0),
+        0, '', '',
+      ];
+    }),
+    ['Not yet raised', '', '', withCash.filter((r) => r.late).reduce((s, r) => s + r.amount, 0), '', ''],
+    ['', '', '', '', '', ''],
+
+    ['The assumption, stated rather than hidden.', '', '', '', '', ''],
+    [`Net ${30} runs from the day a line becomes ready, which assumes the invoice goes out that day.`, '', '', '', '', ''],
+    ['No invoice has yet been sent through the Outbox, so there is no measured lag to use instead.', '', '', '', '', ''],
+    ['Once a few have gone out, replace this assumption with the real gap between ready and sent.', '', '', '', '', ''],
+    ['Grant funded work is not here at all, because it cannot be scheduled until the award lands.', '', '', '', '', ''],
+  ];
+
+  const ws = XLSX.utils.aoa_to_sheet(body);
+  ws['!cols'] = [{ wch: 20 }, { wch: 20 }, { wch: 34 }, { wch: 52 }, { wch: 14 }, { wch: 34 }];
+  return formatMoneyColumns(ws, [1, 2, 3, 4]);
 }
 
 export function buildForecastWorkbook(lines: LineRow[], lk: Lookups, generatedOn: string) {
@@ -242,7 +452,10 @@ export function buildForecastWorkbook(lines: LineRow[], lk: Lookups, generatedOn
       .map(({ row, serviceType }) => forecastRowCells(row, serviceType));
 
   const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, summarySheet(rows, generatedOn), 'Summary');
+  XLSX.utils.book_append_sheet(wb, positionSheet(lines, lk, generatedOn), 'Position');
+  XLSX.utils.book_append_sheet(wb, receivablesSheet(lk, generatedOn), 'Receivables');
+  XLSX.utils.book_append_sheet(wb, cashSheet(rows, lk, generatedOn), 'Cash forecast');
+  XLSX.utils.book_append_sheet(wb, summarySheet(rows, generatedOn), 'Ready to invoice');
   XLSX.utils.book_append_sheet(wb, sheetFrom(FORECAST_HEADERS, of('client')), 'Client money');
   XLSX.utils.book_append_sheet(wb, sheetFrom(FORECAST_HEADERS, of('grant')), 'Grant money');
   XLSX.utils.book_append_sheet(wb, sheetFrom(FORECAST_HEADERS, of('complimentary')), 'Complimentary');

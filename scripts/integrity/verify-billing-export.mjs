@@ -59,7 +59,7 @@ async function main() {
 
   const pick = (k) => [...new Set(lines.map((l) => l[k]).filter(Boolean))];
   const [districts, partnerships, quotes, invoices] = await Promise.all([
-    sb.from('districts').select('id, name').in('id', pick('district_id')),
+    sb.from('districts').select('id, name'),
     sb.from('partnerships').select('id, contract_start').in('id', pick('partnership_id')),
     sb.from('quotes').select('id, quote_number').in('id', pick('quote_id')),
     pick('invoice_id').length
@@ -67,7 +67,15 @@ async function main() {
       : Promise.resolve({ data: [] }),
   ]);
 
+  const [allInvoices, payments] = await Promise.all([
+    sb.from('intelligence_invoices').select('id, invoice_number, status, amount, invoice_date, due_date, po_number, district_id').neq('status', 'void'),
+    sb.from('billing_payment_applications').select('invoice_id, amount'),
+  ]);
+  const appliedTo = new Map();
+  for (const p of payments.data ?? []) appliedTo.set(p.invoice_id, (appliedTo.get(p.invoice_id) ?? 0) + Number(p.amount));
+
   const lookups = {
+    invoices: (allInvoices.data ?? []).map((i) => ({ ...i, applied: appliedTo.get(i.id) ?? 0 })),
     districtName: new Map((districts.data ?? []).map((d) => [d.id, d.name])),
     contractStart: new Map((partnerships.data ?? []).map((p) => [p.id, p.contract_start])),
     quoteNumber: new Map((quotes.data ?? []).map((q) => [q.id, q.quote_number])),
@@ -103,7 +111,7 @@ async function main() {
 
     // 1. The ledgers are on their own sheets. This is the whole point.
     const required = kind === 'forecast'
-      ? ['Summary', 'Client money', 'Grant money', 'Complimentary']
+      ? ['Position', 'Receivables', 'Cash forecast', 'Ready to invoice', 'Client money', 'Grant money', 'Complimentary']
       : ['Client money', 'Grant money', 'Complimentary'];
     for (const name of required) {
       if (!back.SheetNames.includes(name)) fail(`${kind}: no "${name}" sheet. The file has ${back.SheetNames.join(', ')}.`);
@@ -146,7 +154,16 @@ async function main() {
       const datedGrant = grant.filter((r) => r[0]);
       if (datedGrant.length) fail(`forecast: ${datedGrant.length} grant row(s) carry a ready date. A grant line cannot be scheduled before the award lands.`);
 
-      // 6. Every undated row says why, or the queue is just an absence.
+      // 6. The receivables sheet accounts for every dollar still owed. A
+      //    billing file that omits what a client owes is the gap Rae found.
+      const owedInDb = (allInvoices.data ?? []).reduce((s, i) => s + Math.max(Number(i.amount) - (appliedTo.get(i.id) ?? 0), 0), 0);
+      const recv = XLSX.utils.sheet_to_json(back.Sheets['Receivables'], { header: 1, defval: '' });
+      const anyCellHas = (v) => recv.some((r) => r.some((c) => typeof c === 'number' && Math.abs(c - v) < 0.005));
+      if (owedInDb > 0 && !anyCellHas(owedInDb)) {
+        fail(`forecast / Receivables: the database says ${money(owedInDb)} is owed and no cell on the sheet carries that total.`);
+      }
+
+      // 7. Every undated row says why, or the queue is just an absence.
       const silent = client.concat(grant).filter((r) => !r[0] && !r[8]);
       if (silent.length) fail(`forecast: ${silent.length} undated row(s) give no reason. An undated line without a reason is not a finding.`);
     }
@@ -168,7 +185,7 @@ async function main() {
   console.log(`  Client money : ${money(expect.client)} across ${expect.clientRows} lines`);
   console.log(`  Grant money  : ${money(expect.grant)} across ${expect.grantRows} lines, none dated`);
   console.log(`  Complimentary: ${expect.compRows} lines, no money`);
-  console.log('  Opens on the Summary, ledgers on separate sheets, every amount a number.');
+  console.log('  Opens on Position, ledgers on separate sheets, every amount a number.');
 }
 
 main().catch((err) => {

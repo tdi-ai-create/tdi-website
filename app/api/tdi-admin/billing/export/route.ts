@@ -25,14 +25,28 @@ async function load(sb: ReturnType<typeof getServiceSupabase>) {
   const rows = (lines ?? []) as unknown as LineRow[];
   const ids = (k: keyof LineRow) => [...new Set(rows.map((l) => l[k]).filter(Boolean))] as string[];
 
-  const [districts, partnerships, quotes, invoices] = await Promise.all([
-    ids('district_id').length ? sb.from('districts').select('id, name').in('id', ids('district_id')) : { data: [], error: null },
+  // Every live invoice, not only those a contract line points at. The oldest
+  // unpaid ones belong to no line: three are the 2025-26 Allenwood backfill and
+  // one is a speaking fee that never had a contract. A receivables sheet built
+  // from the lines alone would omit the money most overdue.
+  const [districts, partnerships, quotes, invoices, allInvoices, payments] = await Promise.all([
+    // Every district, not only those a contract line names. An invoice can
+    // belong to a client with no contract line at all, and one does: the
+    // speaking fee. Narrowing this map rendered it as "Unknown client".
+    sb.from('districts').select('id, name'),
     ids('partnership_id').length ? sb.from('partnerships').select('id, contract_start').in('id', ids('partnership_id')) : { data: [], error: null },
     ids('quote_id').length ? sb.from('quotes').select('id, quote_number').in('id', ids('quote_id')) : { data: [], error: null },
     ids('invoice_id').length ? sb.from('intelligence_invoices').select('id, invoice_number, status, amount, invoice_date, due_date').in('id', ids('invoice_id')) : { data: [], error: null },
+    sb.from('intelligence_invoices').select('id, invoice_number, status, amount, invoice_date, due_date, po_number, district_id').neq('status', 'void'),
+    sb.from('billing_payment_applications').select('invoice_id, amount'),
   ]);
-  for (const r of [districts, partnerships, quotes, invoices]) {
+  for (const r of [districts, partnerships, quotes, invoices, allInvoices, payments]) {
     if (r.error) throw new Error(r.error.message);
+  }
+
+  const appliedTo = new Map<string, number>();
+  for (const p of payments.data ?? []) {
+    appliedTo.set((p as any).invoice_id, (appliedTo.get((p as any).invoice_id) ?? 0) + Number((p as any).amount));
   }
 
   const lookups: Lookups = {
@@ -40,6 +54,7 @@ async function load(sb: ReturnType<typeof getServiceSupabase>) {
     contractStart: new Map((partnerships.data ?? []).map((p: any) => [p.id, p.contract_start])),
     quoteNumber: new Map((quotes.data ?? []).map((q: any) => [q.id, q.quote_number])),
     invoice: new Map((invoices.data ?? []).map((i: any) => [i.id, i])),
+    invoices: (allInvoices.data ?? []).map((i: any) => ({ ...i, applied: appliedTo.get(i.id) ?? 0 })),
   };
   return { rows, lookups };
 }
