@@ -20,9 +20,30 @@ video, before the player rather than inside the collapsed transcript panel.
 
 ## What I did
 
-- Opened:
-- Pressed:
-- Saw:
+- Opened: https://www.teachersdeserveit.com/hub/courses/how-to-use-flexible-seating-for-better-learning
+  signed in as Rae, on production, 22 September 2026.
+- Pressed: "Start Learning", then "How This Works" in the lesson sidebar.
+- Saw: the Correction block renders above the video, in a gold bordered
+  callout headed "CORRECTION", reading "This lesson mentions a private Facebook
+  group and weekly office hours. Both have been retired, and Teachers Deserve It
+  no longer runs either one." followed by "You have not lost the support. Email
+  hello@teachersdeserveit.com with anything you are stuck on and a real person
+  will answer you. Every Quick Win in the Hub also has a discussion underneath
+  it where educators share what actually worked in their rooms."
+- Saw: the header reads "Lesson 3 of 17 . 0:30" and the callout sits between the
+  lesson title and the video player, not inside the transcript panel.
+
+Filled in by a later session, 22 September. The change had been live and
+unverified, and the browser pass gate was refusing every further change to these
+screens until somebody looked, which is what it is for.
+
+## A correction to this record's own assumption
+
+This says the lesson sits behind a login nobody but Rae can pass, which is true,
+and it was read as meaning the lesson could not be reached. It could. Lessons 1
+to 8 of this course are open and the first check-in gate falls after lesson 8,
+so "How This Works" needed no quiz and no progress was written beyond enrolling
+and opening it.
 
 ## Checked without the browser
 
