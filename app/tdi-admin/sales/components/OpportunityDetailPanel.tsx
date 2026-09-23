@@ -169,7 +169,7 @@ export function OpportunityDetailPanel({
   const [pauseReason, setPauseReason] = useState('Budget year, not this one')
   const [revisitOn, setRevisitOn] = useState(defaultRevisitDate())
 
-  // Partnership modal state (from PanelFooter)
+  // Partnership modal state
   const [showPartnershipModal, setShowPartnershipModal] = useState(false)
   const [creatingPartnership, setCreatingPartnership] = useState(false)
   const [partnershipCreated, setPartnershipCreated] = useState(false)
@@ -941,6 +941,21 @@ export function OpportunityDetailPanel({
               display: 'flex', justifyContent: 'flex-end', gap: 16, alignItems: 'center',
               background: '#F9FAFB', flexShrink: 0,
             }}>
+              {/* The buyer facing Hub catalogue, here so it can be grabbed while
+                  looking at the deal rather than hunted for or asked after. It is
+                  what to send when a school asks what they would actually be
+                  getting, and it needs no login, so it survives being forwarded
+                  round a district. Pushed left, away from the three controls that
+                  change the deal, because it only opens a tab. */}
+              <a
+                href="/for-schools/whats-inside"
+                target="_blank"
+                rel="noopener noreferrer"
+                title="What is inside the Hub. Opens the page we send a school before they sign. No login needed, so it can go straight into a follow up."
+                style={{ fontSize: 12, color: '#6B7280', fontWeight: 600, textDecoration: 'none', marginRight: 'auto' }}
+              >
+                What is inside the Hub
+              </a>
               {opp.stage !== 'paid' && opp.stage !== 'lost' && (
                 <button
                   onClick={markWon}
