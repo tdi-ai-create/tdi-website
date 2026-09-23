@@ -114,49 +114,94 @@ export function lineRowCells(l: LineRow, lk: Lookups): unknown[] {
 }
 
 /**
- * The first thing the file opens on, so it has to be the money.
+ * The first thing the file opens on, so it has to be the money, in the shape a
+ * CFO can act on.
  *
- * This started life as a page of prose explaining the two ledgers, and opening
- * the workbook landed you on a wall of text with the figures hidden behind
- * tabs. Rae, 23 September 2026: "this is not helpful at all." She was right,
- * and it was the same mistake the screen made by putting its undated queue
- * above its calendar. The explanation comes after the numbers, not before.
+ * Two rounds of Rae's feedback are in here. It first opened on a page of prose
+ * with the figures hidden behind tabs: "this is not helpful at all." Then the
+ * month roll-up that replaced it was still too thin, because it named no client
+ * and drew no line between money that is agreed and money that is pencilled.
+ * Rae, 23 September 2026: "dates and client details vs predicted details is
+ * important."
  *
- * Client and grant are adjacent columns here rather than one, so the month
- * reads at a glance without ever producing a single combined figure.
+ * That distinction is the one that matters most here. Saunemin's second
+ * observation is held for March on the superintendent's suggestion, subject to
+ * the district calendar, and a roll-up that shows $4,500 in March 2027 next to
+ * genuinely agreed money is telling the CFO something untrue.
+ *
+ * So: confirmed and held are separate columns everywhere, grant money keeps its
+ * own column and is never added to either, and the sheet ends with every dated
+ * line named, dated and attributed to a client.
  */
-function summarySheet(rows: { row: ForecastRow }[], generatedOn: string) {
-  const months = [...new Set(rows.map((r) => r.row.readyOn).filter(Boolean).map((d) => (d as string).slice(0, 7)))].sort();
+function summarySheet(rows: { row: ForecastRow; serviceType: string }[], generatedOn: string) {
+  const dated = rows.filter((r) => r.row.readyOn);
+  const undatedRows = rows.filter((r) => !r.row.readyOn);
 
-  const sum = (month: string, ledger: Ledger) =>
-    rows.filter((r) => r.row.readyOn?.startsWith(month) && r.row.ledger === ledger)
+  const money = (rs: typeof rows, ledger: Ledger, held?: boolean) =>
+    rs.filter((r) => r.row.ledger === ledger && (held === undefined || r.row.held === held))
       .reduce((s, r) => s + r.row.amount, 0);
-  const countComp = (month: string) =>
-    rows.filter((r) => r.row.readyOn?.startsWith(month) && r.row.ledger === 'complimentary').length;
-  const undated = (ledger: Ledger) =>
-    rows.filter((r) => !r.row.readyOn && r.row.ledger === ledger).reduce((s, r) => s + r.row.amount, 0);
-  const undatedCount = (ledger: Ledger) =>
-    rows.filter((r) => !r.row.readyOn && r.row.ledger === ledger).length;
+  const count = (rs: typeof rows, ledger: Ledger) => rs.filter((r) => r.row.ledger === ledger).length;
+
+  const months = [...new Set(dated.map((r) => (r.row.readyOn as string).slice(0, 7)))].sort();
+  const clients = [...new Set(rows.map((r) => r.row.client))].sort();
 
   const body: unknown[][] = [
-    ['Teachers Deserve It, ready to invoice', '', '', ''],
-    [`Generated ${generatedOn}`, '', '', ''],
-    ['', '', '', ''],
-    ['Month', 'Client money', 'Grant money', 'Complimentary days'],
-    ...months.map((m) => [m, sum(m, 'client'), sum(m, 'grant'), countComp(m)]),
-    ['', '', '', ''],
-    ['Dated total', months.reduce((s, m) => s + sum(m, 'client'), 0), months.reduce((s, m) => s + sum(m, 'grant'), 0), months.reduce((s, m) => s + countComp(m), 0)],
-    [`Not dated yet (${undatedCount('client')} client, ${undatedCount('grant')} grant lines)`, undated('client'), undated('grant'), undatedCount('complimentary')],
-    ['', '', '', ''],
-    ['These two columns are never added together.', '', '', ''],
-    ['Client money is gated on us delivering the work.', '', '', ''],
-    ['Grant money needs the funder to award it first, and cannot be invoiced until then.', '', '', ''],
-    ['Complimentary work is real delivery that will never produce an invoice, so it is counted in days.', '', '', ''],
-    ['Every date is when a line becomes ready. Nothing sends itself.', '', '', ''],
+    ['Teachers Deserve It, ready to invoice', '', '', '', '', ''],
+    [`Generated ${generatedOn}`, '', '', '', '', ''],
+    ['', '', '', '', '', ''],
+
+    ['BY MONTH', '', '', '', '', ''],
+    ['Month', 'Confirmed', 'Held, not agreed', 'Grant, awaiting award', 'Complimentary days', ''],
+    ...months.map((m) => {
+      const inMonth = dated.filter((r) => (r.row.readyOn as string).startsWith(m));
+      return [m, money(inMonth, 'client', false), money(inMonth, 'client', true), money(inMonth, 'grant'), count(inMonth, 'complimentary'), ''];
+    }),
+    ['Dated total', money(dated, 'client', false), money(dated, 'client', true), money(dated, 'grant'), count(dated, 'complimentary'), ''],
+    ['Not dated yet', money(undatedRows, 'client'), '', money(undatedRows, 'grant'), count(undatedRows, 'complimentary'), ''],
+    ['', '', '', '', '', ''],
+
+    ['BY CLIENT', '', '', '', '', ''],
+    ['Client', 'Confirmed', 'Held, not agreed', 'Grant, awaiting award', 'Complimentary days', 'Client money with no date'],
+    ...clients.map((c) => {
+      const mine = rows.filter((r) => r.row.client === c);
+      const myDated = mine.filter((r) => r.row.readyOn);
+      return [
+        c,
+        money(myDated, 'client', false),
+        money(myDated, 'client', true),
+        money(mine, 'grant'),
+        count(mine, 'complimentary'),
+        money(mine.filter((r) => !r.row.readyOn), 'client'),
+      ];
+    }),
+    ['', '', '', '', '', ''],
+
+    ['EVERY DATED LINE', '', '', '', '', ''],
+    ['Ready to invoice on', 'Client', 'Service', 'Amount', 'Confirmed or held', 'Service happens on'],
+    ...dated
+      .slice()
+      .sort((a, b) => (a.row.readyOn as string).localeCompare(b.row.readyOn as string) || a.row.client.localeCompare(b.row.client))
+      .map(({ row: r }) => [
+        r.readyOn,
+        r.client,
+        r.label,
+        r.ledger === 'complimentary' ? 0 : r.amount,
+        r.ledger === 'grant' ? 'grant, not schedulable' : r.held ? 'held, client has not agreed' : 'confirmed',
+        r.serviceOn ?? '',
+      ]),
+    ['', '', '', '', '', ''],
+
+    ['Confirmed, held and grant are never added together.', '', '', '', '', ''],
+    ['Confirmed means the client has agreed the date. Held means we are keeping a date they have not agreed.', '', '', '', '', ''],
+    ['Grant money needs the funder to award it first, and the work cannot be scheduled until then.', '', '', '', '', ''],
+    ['Complimentary work is real delivery that will never produce an invoice, so it is counted in days.', '', '', '', '', ''],
+    ['Every date is when a line becomes ready. Nothing sends itself.', '', '', '', '', ''],
   ];
 
   const ws = XLSX.utils.aoa_to_sheet(body);
-  ws['!cols'] = [{ wch: 56 }, { wch: 16 }, { wch: 16 }, { wch: 20 }];
+  ws['!cols'] = [
+    { wch: 34 }, { wch: 30 }, { wch: 34 }, { wch: 22 }, { wch: 28 }, { wch: 24 },
+  ];
   return ws;
 }
 

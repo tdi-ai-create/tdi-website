@@ -157,7 +157,14 @@ export function forecastLine(l: ForecastInput): ForecastRow {
 
 export type Month = {
   key: string;
+  /** Client money on a date the client has agreed. */
   client: number;
+  /**
+   * Client money on a date we are holding and they have not agreed. Kept apart
+   * from `client` because a month total that mixes the two reports a pencilled
+   * date as revenue, which is how a forecast quietly becomes a promise.
+   */
+  clientHeld: number;
   grant: number;
   complimentaryLines: number;
   rows: ForecastRow[];
@@ -169,8 +176,8 @@ export function groupByMonth(rows: ForecastRow[]): Month[] {
   for (const r of rows) {
     if (!r.readyOn) continue;
     const key = monthKey(r.readyOn);
-    const m = byMonth.get(key) ?? { key, client: 0, grant: 0, complimentaryLines: 0, rows: [] };
-    if (r.ledger === 'client') m.client += r.amount;
+    const m = byMonth.get(key) ?? { key, client: 0, clientHeld: 0, grant: 0, complimentaryLines: 0, rows: [] };
+    if (r.ledger === 'client') { if (r.held) m.clientHeld += r.amount; else m.client += r.amount; }
     else if (r.ledger === 'grant') m.grant += r.amount;
     else m.complimentaryLines += 1;
     m.rows.push(r);
