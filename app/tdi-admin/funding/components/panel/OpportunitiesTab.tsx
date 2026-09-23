@@ -14,6 +14,35 @@ const PLAN_LABELS: Record<string, string> = {
   C: 'Association / competitive',
   D: 'Corporate / foundation / local (fast, small)',
 }
+/**
+ * A write whose failure is impossible to miss.
+ *
+ * Six fetches in this file fired and never looked at the answer, so a refused
+ * write refreshed the list and looked exactly like a successful one. That is
+ * the defining bug of this codebase: CLAUDE.md names five features broken the
+ * same way in two days, and `check:fetch` exists because writing the rule down
+ * did not hold.
+ *
+ * Throws on a non-ok response so the caller cannot continue as though it
+ * worked. Callers surface it rather than swallowing it.
+ */
+async function writeOrThrow(url: string, init: RequestInit): Promise<void> {
+  let res: Response
+  try {
+    res = await fetch(url, init)
+  } catch {
+    throw new Error('Could not reach the server. Nothing was saved.')
+  }
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({} as Record<string, unknown>))
+    throw new Error(
+      typeof body?.error === 'string' && body.error
+        ? body.error
+        : `The server refused this (${res.status}). Nothing was saved.`
+    )
+  }
+}
+
 const STATUS_OPTIONS = ['not_started', 'researching', 'applied', 'waiting', 'awarded', 'denied', 'stalled', 'backup', 'closed']
 
 const WINDOW_STATUS_OPTIONS = [
@@ -166,16 +195,22 @@ export function OpportunitiesTab({ pursuitId, gateOpen = false, contract2LineIte
   const overrideBlocked = async () => {
     if (!blocked || overrideReason.trim().length < 4) return
     setOverriding(true)
-    await fetch('/api/funding/opportunities', {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        id: blocked.oppId,
-        ...blocked.retry,
-        eligibility_override: true,
-        note: `Stop rule overridden (${blocked.rule ?? 'rule'}): ${overrideReason.trim()}`,
-      }),
-    })
+    try {
+      await writeOrThrow('/api/funding/opportunities', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: blocked.oppId,
+          ...blocked.retry,
+          eligibility_override: true,
+          note: `Stop rule overridden (${blocked.rule ?? 'rule'}): ${overrideReason.trim()}`,
+        }),
+      })
+    } catch (e) {
+      setOverriding(false)
+      setFormError(e instanceof Error ? e.message : 'The override was not saved.')
+      return
+    }
     setOverriding(false)
     setBlocked(null)
     setOverrideReason('')
@@ -216,7 +251,8 @@ export function OpportunitiesTab({ pursuitId, gateOpen = false, contract2LineIte
     setSubmitting(true)
 
     if (formMode === 'add') {
-      await fetch('/api/funding/opportunities', {
+      try {
+      await writeOrThrow('/api/funding/opportunities', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -234,8 +270,14 @@ export function OpportunitiesTab({ pursuitId, gateOpen = false, contract2LineIte
           contactEmail: form.contactEmail || null,
         }),
       })
+      } catch (e) {
+        setSubmitting(false)
+        setFormError(e instanceof Error ? e.message : 'This path was not added.')
+        return
+      }
     } else if (formMode === 'edit' && editId) {
-      await fetch('/api/funding/opportunities', {
+      try {
+      await writeOrThrow('/api/funding/opportunities', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -253,6 +295,11 @@ export function OpportunitiesTab({ pursuitId, gateOpen = false, contract2LineIte
           contact_email: form.contactEmail || null,
         }),
       })
+      } catch (e) {
+        setSubmitting(false)
+        setFormError(e instanceof Error ? e.message : 'The change was not saved.')
+        return
+      }
     }
     setSubmitting(false)
     setFormMode('closed')
@@ -1460,7 +1507,13 @@ function SubmissionPanel({ opp, gateOpen, onPatch }: {
 
 function OutcomePanel({ opp, onPatch }: { opp: any; onPatch: (fields: Record<string, unknown>) => void }) {
   const [mode, setMode] = useState<'idle' | 'award' | 'deny'>('idle')
-  const [awardedAmt, setAwardedAmt] = useState(String(opp.amount || ''))
+  // Deliberately empty rather than pre-filled with `opp.amount`.
+  //
+  // `amount` is what we asked for. Pre-filling it meant the fastest path through
+  // this form recorded the ask as the award, and pressing Confirm without
+  // touching the field looked like a decision. Bella found the result on
+  // 14 September: "the email says $500 but our site shows $5,000".
+  const [awardedAmt, setAwardedAmt] = useState('')
   const [decisionDate, setDecisionDate] = useState(new Date().toISOString().split('T')[0])
   const [denialReason, setDenialReason] = useState('')
 
@@ -1530,13 +1583,37 @@ function OutcomePanel({ opp, onPatch }: { opp: any; onPatch: (fields: Record<str
             <label style={{ fontSize: 9, color: '#6B7280', display: 'block', marginBottom: 2 }}>Decision date</label>
             <input type="date" value={decisionDate} onChange={e => setDecisionDate(e.target.value)} style={{ fontSize: 12, padding: '5px 8px', border: '1px solid #E5E7EB', borderRadius: 4 }} />
           </div>
-          <button onClick={() => { onPatch({ status: 'awarded', awarded_amount: parseFloat(awardedAmt) || 0, decision_date: decisionDate }); setMode('idle') }} style={{ fontSize: 10, fontWeight: 600, padding: '5px 12px', borderRadius: 4, border: 'none', background: '#10B981', color: 'white', cursor: 'pointer' }}>
+          {/* An award with no amount is how every school came to read $0 earned.
+              Measured 23 September 2026: two grants are marked awarded across
+              the three live schools and neither carries an amount, so
+              total_awarded is 0 everywhere and no allocation row exists.
+
+              `parseFloat(awardedAmt) || 0` wrote a zero for an empty field, a
+              stray character, or a typed minus sign, and a zero here is
+              indistinguishable from a grant that was never won. The button is
+              disabled instead. */}
+          <button
+            onClick={() => {
+              const value = Number.parseFloat(awardedAmt)
+              if (!Number.isFinite(value) || value <= 0) return
+              onPatch({ status: 'awarded', awarded_amount: value, decision_date: decisionDate })
+              setMode('idle')
+            }}
+            disabled={!Number.isFinite(Number.parseFloat(awardedAmt)) || Number.parseFloat(awardedAmt) <= 0}
+            title={!Number.isFinite(Number.parseFloat(awardedAmt)) || Number.parseFloat(awardedAmt) <= 0 ? 'Enter what the funder actually gave before confirming' : undefined}
+            style={{ fontSize: 10, fontWeight: 600, padding: '5px 12px', borderRadius: 4, border: 'none', background: (!Number.isFinite(Number.parseFloat(awardedAmt)) || Number.parseFloat(awardedAmt) <= 0) ? '#9CA3AF' : '#10B981', color: 'white', cursor: (!Number.isFinite(Number.parseFloat(awardedAmt)) || Number.parseFloat(awardedAmt) <= 0) ? 'not-allowed' : 'pointer' }}
+          >
             Confirm award
           </button>
           <button onClick={() => setMode('idle')} style={{ fontSize: 10, padding: '5px 8px', borderRadius: 4, border: '1px solid #E5E7EB', background: 'white', color: '#6B7280', cursor: 'pointer' }}>
             Cancel
           </button>
-          {awardedAmt && parseFloat(awardedAmt) < (opp.amount || 0) && (
+          {!awardedAmt && (
+            <span style={{ fontSize: 9, color: '#6B7280' }}>
+              We asked for ${(opp.amount || 0).toLocaleString()}. Enter what they actually gave.
+            </span>
+          )}
+          {awardedAmt && Number.parseFloat(awardedAmt) > 0 && Number.parseFloat(awardedAmt) < (opp.amount || 0) && (
             <span style={{ fontSize: 9, color: '#D97706' }}>Partial award (requested ${(opp.amount || 0).toLocaleString()})</span>
           )}
         </div>
@@ -1580,6 +1657,9 @@ function AllocationPanel({ opp, pursuitId, contract2LineItems, contract2QuotePac
   const [showAdd, setShowAdd] = useState(false)
   const [newLabel, setNewLabel] = useState('')
   const [newAmount, setNewAmount] = useState('')
+  // A refused write has to be visible. Setting state nobody renders would be
+  // the same bug wearing different clothes.
+  const [allocError, setAllocError] = useState<string | null>(null)
 
   // Extract line items from Contract 2 packages
   const c2Items = (contract2LineItems || []).flatMap((pkg: any) =>
@@ -1604,17 +1684,23 @@ function AllocationPanel({ opp, pursuitId, contract2LineItems, contract2QuotePac
   const handleAdd = async () => {
     // If selected from Contract 2 line items, include the package id
     const selectedC2 = c2Items.find(li => li.label === newLabel)
-    await fetch('/api/funding/allocations', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        pursuitId,
-        opportunityId: opp.id,
-        lineItemKey: newLabel,
-        allocatedAmount: parseFloat(newAmount) || 0,
-        quotePackageId: selectedC2?.packageId || contract2QuotePackageId || null,
-      }),
-    })
+    try {
+      await writeOrThrow('/api/funding/allocations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          pursuitId,
+          opportunityId: opp.id,
+          lineItemKey: newLabel,
+          allocatedAmount: parseFloat(newAmount) || 0,
+          quotePackageId: selectedC2?.packageId || contract2QuotePackageId || null,
+        }),
+      })
+    } catch (e) {
+      setAllocError(e instanceof Error ? e.message : 'That allocation was not saved.')
+      return
+    }
+    setAllocError(null)
     setNewLabel('')
     setNewAmount('')
     setShowAdd(false)
@@ -1622,20 +1708,32 @@ function AllocationPanel({ opp, pursuitId, contract2LineItems, contract2QuotePac
   }
 
   const handleHandoff = async (id: string, type: 'trainer' | 'finance') => {
-    await fetch('/api/funding/allocations', {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id, ...(type === 'trainer' ? { handToTrainer: true } : { handToFinance: true }) }),
-    })
+    try {
+      await writeOrThrow('/api/funding/allocations', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, ...(type === 'trainer' ? { handToTrainer: true } : { handToFinance: true }) }),
+      })
+    } catch (e) {
+      setAllocError(e instanceof Error ? e.message : 'That handoff was not recorded.')
+      return
+    }
+    setAllocError(null)
     fetchAllocations()
   }
 
   const handleDelete = async (id: string) => {
-    await fetch('/api/funding/allocations', {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id }),
-    })
+    try {
+      await writeOrThrow('/api/funding/allocations', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id }),
+      })
+    } catch (e) {
+      setAllocError(e instanceof Error ? e.message : 'That allocation was not removed.')
+      return
+    }
+    setAllocError(null)
     fetchAllocations()
   }
 
@@ -1664,6 +1762,14 @@ function AllocationPanel({ opp, pursuitId, contract2LineItems, contract2QuotePac
           {showAdd ? 'Cancel' : '+ Allocate'}
         </button>
       </div>
+
+      {/* A refused write, said out loud. Before this, a failed allocation
+          refreshed the list and looked identical to one that worked. */}
+      {allocError && (
+        <div style={{ fontSize: 11, color: '#991B1B', background: '#FEF2F2', border: '1px solid #FECACA', borderRadius: 4, padding: '6px 9px' }}>
+          {allocError}
+        </div>
+      )}
 
       {/* Progress bar */}
       {awardedAmt > 0 && (
