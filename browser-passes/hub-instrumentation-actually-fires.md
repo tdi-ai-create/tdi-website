@@ -37,6 +37,50 @@ and two writes that could fail silently now tell the person they failed.
 - Ran `npm run check:reachable`: **exited 0**, "Every file you changed is
   imported by something."
 
+## Completed on production, 23 September 21:24 to 21:30 UTC
+
+The deferral below is kept for the record. It is now paid.
+
+PR #618 merged at 21:19:43 UTC. Signed in as Rae Hughart on the live Hub.
+Baseline re-measured immediately before pressing anything, at 21:21:34 UTC:
+**`quick_win_downloaded` 0 rows, `views_total` 940.**
+
+All five previously dead actions were pressed, and all five wrote a row. Each
+count below went from 0 to 1, and the 1 is mine.
+
+- Opened: https://www.teachersdeserveit.com/hub/quick-wins/first-10-minutes-framework
+- Saw: a Vibe Check modal covering the page, "How meaningful does your work feel
+  today?" with a "Skip for today" link. Dismissed it. The gold "Download Tool"
+  button sits top right of the card.
+- Pressed: **Download Tool**
+- Saw: a new tab opened on the PDF itself,
+  `hub-assets/quick-wins/64437434-.../first-10-minutes-framework-resource.pdf`.
+- Confirmed in the database, not from the screen: one row at
+  **21:24:45.127099+00**, title "The First 10 Minutes Framework", target `tool`,
+  quick_win_id `64437434-b026-4a6c-a727-11abf5e5b1af`. This is the first
+  `quick_win_downloaded` row the Hub has ever held.
+
+- Pressed: **I need a moment** in the Hub nav
+- Saw: Moment Mode opened over the page, "Research shows that just 3 minutes of
+  intentional pause can lower cortisol", with four choices.
+- Confirmed in the database: `moment_mode_opened` at **21:25:48.430824+00**.
+
+- Pressed: **Breathing exercise**
+- Saw: the box-breathing square animating, "Hold..." and "Breath 1 of 6".
+- Confirmed in the database: `moment_feature_used` at **21:29:42.912948+00**,
+  `metadata.feature = "breathing"`.
+
+- Pressed: **Back to the Hub** on the "Your 3 minutes are up. Feeling better?"
+  prompt.
+- Confirmed in the database: `moment_mode_completed` at **21:29:53.433242+00**.
+
+- Opened: https://www.teachersdeserveit.com/hub/practice/question-knockout
+- Confirmed in the database: `practice_tool_started` at **21:30:09.278555+00**,
+  `metadata.tool = "question-knockout"`.
+
+The check named below as the falsifier returned a row. The cause was the lazy
+builder, and the fix is the terminal `.then()`.
+
 ## What I did not press
 
 I did not press Download, start a practice tool, or open Moment Mode in a
@@ -65,10 +109,10 @@ point of the change and it is unproven.
 
   If it returns nothing, the fix is wrong and the cause is not the lazy builder.
 
-Also unverified, and worth pressing at the same time since they are on the same
-deploy: opening Moment Mode should now write `moment_mode_opened`, and the two
-new failure messages in Moment Mode have never been seen rendered. They only
-appear when a write genuinely fails, which I could not force from outside.
+Still unverified after the production pass: the two new failure messages in
+Moment Mode. They render only when a write genuinely fails, and I could not
+force a failure from outside the app. The success paths around them were both
+exercised above without error.
 
 ## Why this matters more than a counter
 
