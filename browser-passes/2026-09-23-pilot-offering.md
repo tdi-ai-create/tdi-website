@@ -48,6 +48,46 @@ reading the options answers the question the change is about.
 I also did not press any of the five Action Items. Closing one marks somebody's
 work done on a real account.
 
+## Verified after deploy, 23 September 2026
+
+Production reached `558b50b` at 19:51, three minutes after the merge.
+
+- Opened: https://www.teachersdeserveit.com/tdi-admin/sales, pressed the
+  "Monmouth County Vocatio..." card
+- Saw: the Offering control still lists exactly five entries, the blank
+  "Offering" placeholder plus "The Pulse", "The Focus", "The Cohort" and "The
+  Blueprint". No "Hub Pilot (legacy)". The SELLABLE_OFFERINGS split holds and
+  nothing leaked into a sales screen.
+- Opened: https://www.teachersdeserveit.com/admin/partnerships
+- Saw: the Roosevelt School row carries the offering badge **"Hub Pilot
+  (legacy)"**. Before the deploy the same row read "Not recorded", because the
+  database already said PILOT and the live code did not know the word.
+
+Both post-deploy predictions held.
+
+## A correction to this record
+
+An earlier version of this file claimed, under "What I could not verify", that
+the warning "Principal hasn't logged in for 37 days" was **wrong** and that it
+read `staff_members.hub_login_date`. **Both halves of that were false and the
+claim is withdrawn.**
+
+`last_leader_login` is built in `app/api/tdi-admin/leadership/[id]/route.ts` from
+`activity_log` in the portal, actions `login` and `dashboard_viewed`. That is the
+leader opening their TDI dashboard, which is a different event from using the
+Learning Hub. Jack Lipari's last such row is 17 August, so 37 days was correct on
+23 September, while he was separately active in the Hub that same day. Two
+different logins, both numbers true.
+
+The column I blamed is also not dead. `/api/cron/sync-hub-login-dates` writes it
+on `30 10 * * *`, and its dry run that day was healthy: 240 scanned, 234 matched
+in the Hub, 4 rows pending. It is a day behind, which is what actually caused the
+wrong 12 percent that started this. PR #616 fixed the screens that needed live
+data; the column and its cron stay for the six crons that want a stored value.
+
+Leaving the original claim standing would have sent the next person hunting a bug
+that does not exist, in a file that was working.
+
 ## What I could not verify
 
 **The change itself.** Nothing in this pass ran the new code. The preview build
@@ -57,11 +97,5 @@ impression. After deploy: the sales panel must still list exactly those four,
 and the leadership offering field for Roosevelt must read "Hub Pilot (legacy)"
 rather than "Not recorded".
 
-**A false alert worth its own look.** The page shows "Last Login 37d" and a
-warning reading "Schedule check-in / Principal hasn't logged in for 37 days."
-That is wrong. Jack Lipari has 20 activity events in the Learning Hub with his
-most recent today, 23 September. The widget is reading
-`staff_members.hub_login_date`, the column the partner dashboard code already
-documents as having no writer. This predates my change and I have not touched
-it, but the leadership dashboard is currently telling us a principal is absent
-on the same day he was in the product.
+**The false-alert paragraph that used to sit here has been withdrawn.** See
+the correction above: the warning was accurate and the column has a writer.
