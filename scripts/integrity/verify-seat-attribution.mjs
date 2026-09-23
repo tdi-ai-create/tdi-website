@@ -103,6 +103,24 @@ const SELF_SERVE_SOURCES = ['stripe'];
 const now = Date.now();
 const isLiveComp = (s) => s.expires_at && new Date(s.expires_at).getTime() > now;
 
+// A seat TDI holds itself is not a district seat, so there is no partnership it
+// could trace to. Twenty-four arrived on 23 Sep on voices.teachersdeserveit.com,
+// the accounts that carry TDI's own voice in Hub conversations, and every one
+// read as a broken link to a school that does not exist.
+//
+// Excluded by who holds the seat rather than by how it was created, for the same
+// reason the comp rule above keys on the expiry: the next batch of internal
+// accounts should pass without anyone editing this file. These do not belong in
+// the baseline either, because the baseline is a list of real schools whose link
+// is broken and waiting to be repaired. Filing TDI's own staff there would make
+// the repair list permanently wrong.
+const TDI_OWNED_DOMAINS = new Set([
+  'teachersdeserveit.com',
+  'voices.teachersdeserveit.com',
+]);
+const domainOf = (email) => String(email ?? '').toLowerCase().split('@')[1] ?? '';
+const isTdiOwned = (email) => TDI_OWNED_DOMAINS.has(domainOf(email));
+
 const { data: seats, error: sErr } = await hub
   .from('hub_memberships')
   .select('user_id, partnership_id, source, expires_at')
@@ -136,7 +154,18 @@ die('hub_profiles', prErr);
 
 // A profile carrying a slug that matches a live partnership is attributed by
 // the fallback the matrix route uses, so it is not orphaned.
-const stillOrphaned = (profiles ?? []).filter((p) => !p.partnership_slug || !slugToId.has(p.partnership_slug));
+const attributable = (profiles ?? []).filter((p) => !p.partnership_slug || !slugToId.has(p.partnership_slug));
+
+// TDI's own accounts are dropped here rather than earlier because the email
+// only arrives with the profile. They are counted separately so the run still
+// says out loud how many it set aside: a filter that silently swallows rows is
+// how a real school would slip out of this check unnoticed.
+const tdiOwned = attributable.filter((p) => isTdiOwned(p.email));
+const stillOrphaned = attributable.filter((p) => !isTdiOwned(p.email));
+
+if (tdiOwned.length > 0) {
+  console.log(`\n${tdiOwned.length} seat(s) on TDI's own domains set aside, they belong to no school by design.`);
+}
 
 if (stillOrphaned.length === 0) {
   console.log(
