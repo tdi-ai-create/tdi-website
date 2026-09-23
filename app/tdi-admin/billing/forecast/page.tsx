@@ -9,7 +9,7 @@ type Payload = {
   queue: ForecastRow[];
   totals: {
     client: number; grant: number; complimentaryLines: number;
-    datedClient: number; datedGrant: number;
+    datedClientConfirmed: number; datedClientHeld: number; datedGrant: number;
     lines: number; undatedLines: number;
   };
 };
@@ -64,7 +64,8 @@ export default function ForecastPage() {
 
       <MoneyStrip items={[
         { label: 'Client money', value: money(totals.client), note: 'we deliver, then invoice', dot: '#0B1120' },
-        { label: 'Dated', value: money(totals.datedClient), note: 'placed in a month below', dot: '#059669' },
+        { label: 'Confirmed', value: money(totals.datedClientConfirmed), note: 'dated and agreed with the client', dot: '#059669' },
+        { label: 'Held', value: money(totals.datedClientHeld), note: 'dated, not agreed yet', dot: '#94A3B8' },
         { label: 'Grant money', value: money(totals.grant), note: 'waiting on a funder to decide', dot: '#7C3AED' },
         { label: 'Awarded', value: money(totals.datedGrant), note: 'won, so it can be scheduled', dot: '#7C3AED' },
         { label: 'Undated lines', value: String(totals.undatedLines), note: `of ${totals.lines} ahead of us`, dot: '#D97706' },
@@ -73,10 +74,11 @@ export default function ForecastPage() {
       {/* Two numbers, never one. Adding them tells the CFO that contingent money
           is collectable. */}
       <div style={S.note}>
-        <b style={{ color: '#172554' }}>These two totals are never added together.</b>
+        <b style={{ color: '#172554' }}>Confirmed, held and grant are never added together.</b>
         <span style={{ display: 'block', marginTop: 2 }}>
-          Client money is gated on us delivering. Grant money stays off the calendar until the grant is won,
-          because the work cannot be scheduled before then. Complimentary work appears as days, never as money.
+          Confirmed means the client has agreed the date. Held means we are keeping a date they have not agreed,
+          so it is not money yet. Grant money stays off the calendar until the award lands, because the work cannot
+          be scheduled before then. Complimentary work appears as days, never as money.
         </span>
       </div>
 
@@ -93,7 +95,12 @@ export default function ForecastPage() {
             <div style={S.mhead}>
               <h2 style={S.h2}>{monthName(m.key)}</h2>
               <div style={S.mtotals}>
-                <span style={S.mt}><i style={{ ...S.dot, background: '#0B1120' }} />Client {money(m.client)}</span>
+                <span style={S.mt}><i style={{ ...S.dot, background: '#0B1120' }} />Confirmed {money(m.client)}</span>
+                {m.clientHeld > 0 && (
+                  <span style={{ ...S.mt, color: '#94A3B8' }}>
+                    <i style={{ ...S.dot, background: '#CBD5E1' }} />Held {money(m.clientHeld)}
+                  </span>
+                )}
                 <span style={S.mt}><i style={{ ...S.dot, background: '#7C3AED' }} />Grant {money(m.grant)}</span>
                 {m.complimentaryLines > 0 && (
                   <span style={{ ...S.mt, color: '#94A3B8' }}>
