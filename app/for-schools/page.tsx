@@ -224,6 +224,7 @@ export default function ForSchoolsPage() {
             </table>
           </div>
           <p style={{"fontSize": ".85rem", "color": "var(--muted)", "marginTop": "14px"}}>The outcomes row maps each offering to the list above. It is our reading of which route reaches which outcome, not a contractual guarantee.</p>
+          <p style={{"fontSize": ".98rem", "marginTop": "18px"}}><a className="fs-go" href="/for-schools/whats-inside">See what is inside the Hub</a></p>
         </div>
       </section>
 
