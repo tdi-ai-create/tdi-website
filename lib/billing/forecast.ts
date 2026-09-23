@@ -15,8 +15,18 @@
 
 export type Ledger = 'client' | 'grant' | 'complimentary';
 
-/** Services that happen on a day. Everything else bills on a milestone. */
+/** Services that happen on a day, and become billable once that day is behind us. */
 const VISIT_SHAPED = new Set(['observation', 'virtual_session', 'executive_session', 'pd_day']);
+
+/**
+ * Services that are not a visit and become billable when the contract starts.
+ *
+ * This is what the team already does rather than a rule invented here. Seven Hub
+ * memberships and a book set have been billed, and every one went out within
+ * about a month of its contract start, several of them on the same invoice.
+ * One line even records delivered_by as the words "start of contract".
+ */
+const MILESTONE_SHAPED = new Set(['hub_membership', 'book']);
 
 export type ForecastInput = {
   id: string;
@@ -30,9 +40,8 @@ export type ForecastInput = {
   planned_date: string | null;
   planned_confidence: string | null;
   district_name: string | null;
-  /** From the funding pursuit this line is held against, when it is held. */
-  award_expected_on?: string | null;
-  pursuit_name?: string | null;
+  /** From the partnership. When a membership or a book set becomes billable. */
+  contract_start?: string | null;
 };
 
 export type ForecastRow = {
@@ -46,7 +55,6 @@ export type ForecastRow = {
   /** Why it cannot be placed. Null when it can. */
   blockedBy: string | null;
   serviceOn: string | null;
-  awardOn: string | null;
   held: boolean;
 };
 
@@ -76,32 +84,35 @@ export function isForecastable(l: ForecastInput): boolean {
 /**
  * The rule, in one place so the screen and any export cannot drift apart.
  *
- * Client money: the day after the service. That leaves room for the wrap up
- * email and dashboard update already promised within 24 hours, and means an
- * invoice never lands before the Love Notes do.
+ * Client money on a visit: the day after the service. That leaves room for the
+ * wrap up email and dashboard update already promised within 24 hours, and
+ * means an invoice never lands before the Love Notes do.
  *
- * Grant money: not on the calendar until the grant is awarded. Rae,
- * 22 September 2026, gave two rules together. The award date is the gate, and
- * funding work is only allowed once funding has been awarded. Taken together
- * the award always precedes the visit, so placing a grant line on its award
- * date would show money a month or more before anything could be billed, and
- * createInvoice would refuse it anyway for having no delivery record.
+ * Client money on a milestone: the contract start date. Memberships and book
+ * sets are not a day someone turns up, they are access that begins when the
+ * contract does, and that is already how every one of them has been billed.
  *
- * So a held line waits in the queue carrying its expected decision date, which
- * is the honest statement of where that money stands. The moment the grant
- * lands, funding_hold flips and the line becomes ordinary work: ready the day
- * after its visit, exactly like money a school is paying directly.
+ * Grant money: not on the calendar at all until the grant is awarded. Rae,
+ * 22 September 2026: funding work is only allowed once funding has been
+ * awarded. So a held line waits in the queue saying exactly that. The moment
+ * the grant lands, funding_hold clears and the line becomes ordinary work,
+ * taking whichever client rule fits its service type.
  *
- * Anything not visit shaped has no date here at all. Hub memberships bill on
- * activation and books bill when they ship, and inventing a visit for them
- * would be worse than admitting we do not model their trigger yet.
+ * Nothing here reads the funding pursuit. Rae, 23 September 2026: funding and
+ * billing are separate systems. funding_hold lives on the contract line itself
+ * and is all billing needs to know, so there is no cross-system join to go
+ * stale, and no field that only the other system can fill.
  */
 export function forecastLine(l: ForecastInput): ForecastRow {
   const ledger = ledgerOf(l);
   const amount = Number(l.total_amount ?? 0);
-  const serviceOn = l.planned_date;
-  const awardOn = ledger === 'grant' ? (l.award_expected_on ?? null) : null;
   const visitShaped = VISIT_SHAPED.has(l.service_type);
+  const milestoneShaped = MILESTONE_SHAPED.has(l.service_type);
+
+  // What day the service itself happens. For a visit that is the date someone
+  // planned. For a membership it is the day access begins, which is the
+  // contract start and needs nobody to plan it.
+  const serviceOn = milestoneShaped ? (l.contract_start ?? null) : l.planned_date;
 
   const base = {
     id: l.id,
@@ -110,31 +121,38 @@ export function forecastLine(l: ForecastInput): ForecastRow {
     ledger,
     amount,
     serviceOn,
-    awardOn,
     held: l.planned_confidence === 'held',
   };
 
   // A grant line cannot be scheduled, let alone billed, until the funder says
-  // yes. It belongs in the queue with its decision date, not in a month.
+  // yes. It waits in the queue saying so, whatever its service type.
   if (ledger === 'grant') {
     return {
       ...base,
       readyOn: null,
-      blockedBy: awardOn
-        ? `Waiting on the grant decision, expected ${awardOn}. Work cannot be scheduled until it is awarded.`
-        : 'Waiting on a grant with no expected decision date, so there is nothing to forecast against.',
+      blockedBy: 'Waiting on the grant to be awarded. Work cannot be scheduled until it is.',
     };
   }
-  if (!visitShaped) {
-    return { ...base, readyOn: null, blockedBy: `${l.service_type.replace(/_/g, ' ')} bills on a milestone, not a visit. Not modelled yet.` };
+
+  if (milestoneShaped) {
+    return serviceOn
+      ? { ...base, readyOn: serviceOn, blockedBy: null }
+      : { ...base, readyOn: null, blockedBy: 'No contract start date, so there is nothing to bill this from.' };
   }
+
+  if (!visitShaped) {
+    return {
+      ...base,
+      readyOn: null,
+      blockedBy: `${l.service_type.replace(/_/g, ' ')} has no billing trigger in the system yet.`,
+    };
+  }
+
   if (!serviceOn) {
     return { ...base, readyOn: null, blockedBy: 'No planned date. Nobody has booked this line.' };
   }
 
-  const readyAfterVisit = addDays(serviceOn, 1);
-
-  return { ...base, readyOn: readyAfterVisit, blockedBy: null };
+  return { ...base, readyOn: addDays(serviceOn, 1), blockedBy: null };
 }
 
 export type Month = {
