@@ -18,6 +18,7 @@ export const maxDuration = 60
  * - Upload a PDF resource (upload_pdf)
  * - Upload a thumbnail image (upload_thumbnail)
  * - Record that QA passed (mark_reviewed)  <- required before publish
+ * - Place an item on the buyer facing catalogue (set_section)
  * - Publish a Quick Win (publish)
  * - Repair metadata on an already-published Quick Win (backfill_published)
  *
@@ -36,6 +37,77 @@ export const maxDuration = 60
 // which is how 21 Quick Wins shipped with a blank lift badge.
 const VALID_LIFT = ['LOW', 'MED', 'HIGH'] as const
 const VALID_DOMAINS = ['1-planning', '2-environment', '3-instruction', '4-professional'] as const
+
+// Sections on the buyer facing page at /for-schools/whats-inside. An item
+// without one of these does not appear there at all, which is the intended
+// failure: tag inference misfiles material, so a person assigns this during QA.
+// Kept in step with app/for-schools/whats-inside/sections.ts.
+//
+// Not yet required, on purpose. Requiring it here would break every agent skill
+// that does not send it, and enforcement must never outrun the callers. The
+// weekly unassigned report is what surfaces the gap in the meantime.
+const VALID_SECTIONS = [
+  'behavior',
+  'instructional_planning',
+  'paras',
+  'first_weeks',
+  'families',
+  'leading',
+  'teacher_load',
+  'ai_technology',
+] as const
+
+const VALID_BADGES = ['start_here'] as const
+
+type SectionFields = { hub_section?: string; hub_section_pin?: number | null; hub_badge?: string | null }
+
+/**
+ * Validate and collect the section fields from a request body.
+ *
+ * Returns either the columns to write or a human readable error. Callers that
+ * omit every field get an empty object, so this is safe to spread into any
+ * update without changing behaviour for existing callers.
+ */
+function sectionFieldsFrom(body: Record<string, unknown>): { fields: SectionFields } | { error: string } {
+  const fields: SectionFields = {}
+
+  if (body.hub_section !== undefined && body.hub_section !== null) {
+    const value = String(body.hub_section)
+    if (!(VALID_SECTIONS as readonly string[]).includes(value)) {
+      return { error: `hub_section must be one of: ${VALID_SECTIONS.join(', ')}. Got "${value}".` }
+    }
+    fields.hub_section = value
+  }
+
+  if (body.hub_section_pin !== undefined) {
+    if (body.hub_section_pin === null) {
+      fields.hub_section_pin = null
+    } else {
+      const pin = Number(body.hub_section_pin)
+      if (!Number.isInteger(pin) || pin < 1) {
+        return { error: 'hub_section_pin must be a whole number of 1 or more, or null to unpin.' }
+      }
+      fields.hub_section_pin = pin
+    }
+  }
+
+  if (body.hub_badge !== undefined) {
+    if (body.hub_badge === null || body.hub_badge === '') {
+      fields.hub_badge = null
+    } else {
+      const badge = String(body.hub_badge)
+      if (!(VALID_BADGES as readonly string[]).includes(badge)) {
+        return {
+          error: `hub_badge must be one of: ${VALID_BADGES.join(', ')}, or null. ` +
+            `Most used, Trending, Popular and New are computed from real usage and cannot be set by hand.`,
+        }
+      }
+      fields.hub_badge = badge
+    }
+  }
+
+  return { fields }
+}
 
 // The standard an item was checked against, stamped into qa_notes on every
 // review. Without it an audit cannot tell a properly reviewed item from one
@@ -830,6 +902,11 @@ export async function POST(request: NextRequest) {
       const stampLine = `${reviewedAt.slice(0, 10)} reviewed against ${RUBRIC_VERSION} by ${reviewed_by.trim()}` +
         (notes?.trim() ? `: ${notes.trim()}` : '')
 
+      // Which section of /for-schools/whats-inside this belongs to. Optional for
+      // now, because requiring it would break agent skills that do not send it.
+      const section = sectionFieldsFrom(body)
+      if ('error' in section) return NextResponse.json({ error: section.error }, { status: 400 })
+
       const { error: reviewErr } = await supabase
         .from('hub_quick_wins')
         .update({
@@ -838,6 +915,7 @@ export async function POST(request: NextRequest) {
           reviewed_at: reviewedAt,
           qa_notes: qw.qa_notes ? `${qw.qa_notes}\n${stampLine}` : stampLine,
           updated_at: reviewedAt,
+          ...section.fields,
         })
         .eq('id', id)
 
@@ -858,10 +936,81 @@ export async function POST(request: NextRequest) {
         )
       }
 
+      const assignedSection = section.fields.hub_section ?? qw.hub_section ?? null
+
       return NextResponse.json({
         success: true, verified: true, id, slug: qw.slug,
         status: 'reviewed', rubric_version: RUBRIC_VERSION,
+        hub_section: assignedSection,
+        ...(assignedSection ? {} : {
+          note: `No hub_section set, so this item will not appear on /for-schools/whats-inside. ` +
+            `Pass hub_section as one of: ${VALID_SECTIONS.join(', ')}.`,
+        }),
       })
+    }
+
+    // ── set_section: place an item on /for-schools/whats-inside ──
+    //
+    // Separate from mark_reviewed because that one refuses live rows by design,
+    // and most of the library is already live. This writes nothing except the
+    // three section columns, so it cannot disturb published content.
+    if (action === 'set_section') {
+      const { id, slug, content_type } = body
+      const isCourse = content_type === 'course'
+      const table = isCourse ? 'hub_courses' : 'hub_quick_wins'
+
+      if (!id && !slug) return NextResponse.json({ error: 'id or slug is required' }, { status: 400 })
+      if (isCourse && !id) {
+        return NextResponse.json({ error: 'id is required for a course' }, { status: 400 })
+      }
+
+      const section = sectionFieldsFrom(body)
+      if ('error' in section) return NextResponse.json({ error: section.error }, { status: 400 })
+      if (Object.keys(section.fields).length === 0) {
+        return NextResponse.json({
+          error: `Nothing to set. Pass hub_section (one of: ${VALID_SECTIONS.join(', ')}), ` +
+            `hub_section_pin, or hub_badge.`,
+        }, { status: 400 })
+      }
+
+      const lookup = supabase.from(table).select('id, title, hub_section, hub_section_pin, hub_badge')
+      const { data: row, error: fetchErr } = await (id ? lookup.eq('id', id) : lookup.eq('slug', slug)).maybeSingle()
+
+      if (fetchErr) return NextResponse.json({ error: fetchErr.message }, { status: 500 })
+      if (!row) return NextResponse.json({ error: `${isCourse ? 'Course' : 'Quick Win'} not found` }, { status: 404 })
+
+      if (body.dryRun) {
+        return NextResponse.json({
+          success: true, dryRun: true, id: row.id, title: row.title,
+          before: { hub_section: row.hub_section, hub_section_pin: row.hub_section_pin, hub_badge: row.hub_badge },
+          would_set: section.fields,
+        })
+      }
+
+      const { error: updateErr } = await supabase
+        .from(table)
+        .update(section.fields)
+        .eq('id', row.id)
+
+      if (updateErr) return NextResponse.json({ error: updateErr.message }, { status: 500 })
+
+      // Read back. A write that reported success and did not land is the
+      // defining bug of this codebase, so the row is the proof, not the 200.
+      const { data: after, error: afterErr } = await supabase
+        .from(table)
+        .select('hub_section, hub_section_pin, hub_badge')
+        .eq('id', row.id)
+        .single()
+
+      if (afterErr) return NextResponse.json({ error: afterErr.message }, { status: 500 })
+      if (section.fields.hub_section && after?.hub_section !== section.fields.hub_section) {
+        return NextResponse.json(
+          { error: `Section did not stick. Asked for "${section.fields.hub_section}", row reads "${after?.hub_section}".` },
+          { status: 500 },
+        )
+      }
+
+      return NextResponse.json({ success: true, verified: true, id: row.id, title: row.title, ...after })
     }
 
     // ── publish: validate and publish a Quick Win ──
