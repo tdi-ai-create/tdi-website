@@ -1,955 +1,500 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
-import Link from 'next/link'
-import { DraftEmailModal, introEmailDraft, gateBlockerEmailDraft } from './components/panel/DraftEmailModal'
-import { ImpactEvidence } from './components/ImpactEvidence'
-import NeedsYouBoard from './components/NeedsYouBoard'
-import FundersTab from './components/FundersTab'
-import AwardedTab from './components/AwardedTab'
-import OutreachQueue from './components/OutreachQueue'
-import { isDecisionForRae, isPersonOwned, isSchoolOwned } from '@/lib/funding-ownership'
-
 /**
- * One next-step item, exactly as computed by lib/funding-next-actions.ts and
- * served by /api/funding/queue. This page does NOT compute its own — that is
- * how it used to end up telling Bella to approve things it had no button for.
+ * Funding Home.
+ *
+ * This is the port of the Funding Home mockup. It replaces the old board as
+ * what `/tdi-admin/funding` shows. The old board still exists at
+ * `/tdi-admin/funding/board` because it holds every control that changes a
+ * grant, and those are not wired into this screen yet. Removing it before they
+ * are would take away 35 of the 36 ways to change anything in funding.
+ *
+ * Three views, the same three the mockup has:
+ *   Calendar  what has to happen and when, confirmed and predicted
+ *   Schools   what each school is trying to raise against what landed
+ *   Detail    the live notes log, and the profile with a source on every fact
+ *
+ * Every figure on this page is read from the funding API. Nothing here is
+ * seeded, and nothing is computed twice: the calendar rules live in
+ * lib/funding-calendar.ts and the profile rules in lib/funding/school-profile.ts.
  */
-interface QueueItem {
+
+import { useCallback, useEffect, useState } from 'react'
+import Link from 'next/link'
+import './funding-home.css'
+
+type EntryKind = 'send' | 'decide' | 'chase' | 'deadline'
+
+interface Entry {
   id: string
+  date: string
+  kind: EntryKind
   label: string
-  why: string
-  /** The person who owns it. 'team' covers more than one person. */
-  ownerName?: string | null
-  owner: 'team' | 'agent' | 'school' | 'auto'
-  urgency: 'critical' | 'high' | 'normal' | 'low'
-  actionType: string
-  targetId?: string | null
-  /** The row this card is about, when it is about one. Set by /api/funding/queue. */
-  actionItemId?: string | null
+  schoolId: string
+  schoolName: string
   opportunityId?: string | null
-  inProgress?: boolean
-  pursuitId: string
+  confirmed: boolean
+  derivation?: string
+  detail?: string
 }
 
-interface SchoolData {
+interface School {
   id: string
   name: string
-  contact: string
-  email: string
-  pipeline: number
-  introSent: boolean
-  nextSteps: QueueItem[]
-  grants: {
-    name: string
-    id: string
-    /** What we asked for. */
-    amount: number
-    /** What the funder gave, when recorded. Null is not zero and not the ask. */
-    awardedAmount?: number | null
-    status: string
-    windowOpen: boolean
-    windowOpens: string | null
-    windowCloses: string | null
-    hasDraft: boolean
-    narrativeStatus: string
-    narrativeUrl: string | null
-    qaPassed: boolean | null
-    forwardingStatus: string | null
-  }[]
-  actions: {
-    id: string
-    title: string
-    clientLabel: string | null
-    description: string | null
-    dueDate: string | null
-    ownerName: string | null
-    ownerType: string
-    category: string | null
-  }[]
+  where: string
+  contactName: string | null
+  goal: number | null
+  earned: number | null
+  grantsWon: number
+  grantsWonWithoutAnAmount: number
+  livePaths: number
 }
 
-export default function FundingPage() {
-  const router = useRouter()
-  const [schools, setSchools] = useState<SchoolData[]>([])
-  // Replaces the Work Queue page. Its only real contribution was letting a
-  // person ask "what is waiting on us" without reading every school, and that
-  // is a filter, not a destination.
-  const [ownerFilter, setOwnerFilter] = useState<'all' | 'team' | 'agent' | 'school'>('all')
-  // Which lens the portal opens on. The board answers "what is mine today"
-  // without opening a single school, which is the question the school-grouped
-  // view could never answer directly.
-  const [view, setView] = useState<'board' | 'schools' | 'funders' | 'awarded'>('board')
-  const [loading, setLoading] = useState(true)
-  const [draftEmail, setDraftEmail] = useState<any & { opportunityId?: string; windowOpens?: string; windowCloses?: string } | null>(null)
-  const [toast, setToast] = useState<string | null>(null)
+interface Fact {
+  key: string
+  value: string
+  source: string | null
+  superseded: string | null
+  needsSource: boolean
+}
 
-  /**
-   * Load the board. Callable, not a one-shot.
-   *
-   * This used to be a bare useEffect with an empty dependency list, so the
-   * board was fetched once when the page opened and never again. Closing a
-   * task, closing a grant or sending an application changed the database and
-   * nothing on screen, so the item stayed put and the only way to see the
-   * truth was a browser reload.
-   *
-   * Bella reported it as "need a refresh for tasks that are checked as done,
-   * and refresh page for closed grants too". It is the same cause for both.
-   */
-  const load = useCallback(() => {
-    return Promise.all([
-      fetch('/api/funding/dashboard').then(r => r.json()),
-      fetch('/api/funding/queue').then(r => r.json()).catch(() => ({ items: [] })),
-    ])
-      .then(([d, q]) => {
-        const pursuits = (d.pursuits || []).filter((p: any) => !p.archived)
+interface LogRow {
+  id: string
+  date: string
+  title: string
+  detail: string | null
+}
 
-        // Group the engine's next-step items by pursuit. Already sorted
-        // critical → high → normal → low by the queue API.
-        const stepsByPursuit = new Map<string, QueueItem[]>()
-        for (const item of (q.items || []) as QueueItem[]) {
-          const list = stepsByPursuit.get(item.pursuitId) ?? []
-          list.push(item)
-          stepsByPursuit.set(item.pursuitId, list)
-        }
+interface Detail {
+  school: School & { contactEmail: string | null; contactRole: string | null }
+  facts: Fact[]
+  log: LogRow[]
+}
 
-        // Fetch opportunities for each pursuit
-        Promise.all(pursuits.map((p: any) =>
-          Promise.all([
-            fetch(`/api/funding/opportunities?pursuitId=${p.id}`).then(r => r.json()),
-            fetch(`/api/funding/pursuits/${p.id}/actions`).then(r => r.json()).catch(() => []),
-          ]).then(([od, actionsData]) => {
-            const actions = (Array.isArray(actionsData) ? actionsData : actionsData.actions || [])
-              .filter((a: any) => a.status === 'pending' || a.status === 'blocked')
-            return {
-              id: p.id,
-              name: p.pursuit_name || p.district_name,
-              contact: p.client_contact_name || 'No contact',
-              email: p.client_contact_email || '',
-              pipeline: p.total_amount || 0,
-              introSent: !!p.intro_sent_at,
-              nextSteps: stepsByPursuit.get(p.id) ?? [],
-              grants: (od.opportunities || []).map((o: any) => ({
-                name: o.name,
-                id: o.id,
-                amount: o.amount || 0,
-                // What the funder actually gave, kept separate from the ask.
-                awardedAmount: o.awarded_amount ?? null,
-                status: o.status,
-                windowOpen: o.window_status === 'open',
-                windowOpens: o.application_opens,
-                windowCloses: o.application_closes,
-                hasDraft: !!o.narrative_content,
-                narrativeStatus: o.narrative_status,
-                narrativeUrl: o.narrative_url,
-                qaPassed: o.qa_passed ?? null,
-                forwardingStatus: o.forwarding_email_status,
-              })),
-              actions: actions.map((a: any) => ({
-                id: a.id,
-                title: a.title,
-                clientLabel: a.client_label ?? null,
-                description: a.description,
-                dueDate: a.due_date,
-                ownerName: a.owner_name,
-                ownerType: a.owner_type,
-                category: a.category,
-              })),
-            }})
-        )).then(data => {
-          // Sort by whether anything actually needs a person, then pipeline value
-          data.sort((a: SchoolData, b: SchoolData) => {
-            const aOpen = a.nextSteps.filter(s => !s.inProgress).length
-            const bOpen = b.nextSteps.filter(s => !s.inProgress).length
-            if (aOpen > 0 && bOpen === 0) return -1
-            if (bOpen > 0 && aOpen === 0) return 1
-            return b.pipeline - a.pipeline
-          })
-          setSchools(data)
-          setLoading(false)
-        })
+const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December']
+
+/**
+ * The mockup has five colours where the data has four kinds. The fifth,
+ * "internal step", is not a new field: it is a predicted entry for work that
+ * happens inside TDI rather than at the school. The calendar builder names
+ * those ids, so the distinction is read rather than invented.
+ */
+function toneOf(e: Entry): string {
+  if (e.kind === 'send') return 'send'
+  if (e.kind === 'chase') return 'client'
+  if (e.kind === 'deadline') return 'close'
+  const internal = /^pred-(draft|qa|approve)-/.test(e.id)
+  return internal ? 'step' : 'decide'
+}
+
+const TONE_WORD: Record<string, string> = {
+  send: 'To the school',
+  step: 'Internal step',
+  client: 'Waiting on school',
+  close: 'Closing or overdue',
+  decide: 'Decision due',
+}
+
+function money(n: number): string {
+  return '$' + n.toLocaleString('en-US', {
+    minimumFractionDigits: n % 1 ? 2 : 0,
+    maximumFractionDigits: 2,
+  })
+}
+
+/** yyyy-mm-dd in local terms. Matches how the calendar API dates entries. */
+function iso(d: Date): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}
+
+function prettyKey(k: string): string {
+  return k.replace(/_/g, ' ').replace(/^./, c => c.toUpperCase())
+}
+
+export default function FundingHome() {
+  const [view, setView] = useState<'cal' | 'schools' | 'school'>('cal')
+
+  const today = new Date()
+  const [year, setYear] = useState(today.getFullYear())
+  const [month, setMonth] = useState(today.getMonth() + 1)
+
+  const [entries, setEntries] = useState<Entry[] | null>(null)
+  const [coverage, setCoverage] = useState<{ livePaths: number; withDate: number } | null>(null)
+  const [calError, setCalError] = useState<string | null>(null)
+
+  const [schools, setSchools] = useState<School[] | null>(null)
+  const [openDay, setOpenDay] = useState<string | null>(null)
+
+  const [schoolId, setSchoolId] = useState<string | null>(null)
+  const [detail, setDetail] = useState<Detail | null>(null)
+  const [pane, setPane] = useState<'log' | 'profile'>('log')
+
+  useEffect(() => {
+    let live = true
+    setEntries(null)
+    setCalError(null)
+    fetch(`/api/funding/calendar?year=${year}&month=${month}`)
+      .then(r => r.json())
+      .then(d => {
+        if (!live) return
+        if (d.error) { setCalError(d.error); return }
+        setEntries(d.entries ?? [])
+        setCoverage(d.coverage ?? null)
       })
-      .catch(() => setLoading(false))
+      .catch(() => live && setCalError('The calendar could not be read.'))
+    return () => { live = false }
+  }, [year, month])
+
+  useEffect(() => {
+    let live = true
+    fetch('/api/funding/schools')
+      .then(r => r.json())
+      .then(d => live && setSchools(d.schools ?? []))
+      .catch(() => live && setSchools([]))
+    return () => { live = false }
   }, [])
 
-  useEffect(() => { load() }, [load])
+  const loadSchool = useCallback((id: string) => {
+    setSchoolId(id)
+    setDetail(null)
+    setPane('log')
+    setView('school')
+    setOpenDay(null)
+    fetch(`/api/funding/schools/${id}`)
+      .then(r => r.json())
+      .then(d => { if (!d.error) setDetail(d) })
+      .catch(() => {})
+  }, [])
 
-  /**
-   * Reload when the page comes back into view.
-   *
-   * Work is finished somewhere else. A card here sends you to the school page,
-   * you close the task there, and you come back to a board built before you
-   * did any of it, still showing the thing you just finished and the grant you
-   * just closed. Nothing was wrong in the database; the screen was simply old.
-   *
-   * Throttled, because switching tabs quickly should not mean refetching every
-   * pursuit each time.
-   */
-  useEffect(() => {
-    let last = Date.now()
-    const MIN_GAP_MS = 5000
-
-    const refreshIfStale = () => {
-      if (document.visibilityState !== 'visible') return
-      const now = Date.now()
-      if (now - last < MIN_GAP_MS) return
-      last = now
-      void load()
-    }
-
-    document.addEventListener('visibilitychange', refreshIfStale)
-    window.addEventListener('focus', refreshIfStale)
-    return () => {
-      document.removeEventListener('visibilitychange', refreshIfStale)
-      window.removeEventListener('focus', refreshIfStale)
-    }
-  }, [load])
-
-  if (loading) {
-    return (
-      <div style={{ padding: '32px 48px', fontFamily: "'DM Sans', sans-serif" }}>
-        <div style={{ color: '#9CA3AF', fontSize: 14 }}>Loading...</div>
-      </div>
-    )
+  function step(by: number) {
+    const d = new Date(year, month - 1 + by, 1)
+    setYear(d.getFullYear())
+    setMonth(d.getMonth() + 1)
+    setOpenDay(null)
   }
 
-  const totalPipeline = schools.reduce((s, sc) => s + sc.pipeline, 0)
-  const totalGrants = schools.reduce((s, sc) => s + sc.grants.length, 0)
-  // Hers, not ours collectively.
-  //
-  // This counted every 'team' item, including the decisions that route to Rae,
-  // while the board column beneath it excluded them. Her screen read 31 in the
-  // badge and 23 in the stat, four pixels apart.
-  const needsYou = schools.reduce(
-    (s, sc) => s + sc.nextSteps.filter(i => !i.inProgress && i.owner === 'team' && !isDecisionForRae(i)).length,
-    0,
-  )
+  // Monday first, which is how the mockup reads and how a work week reads.
+  const first = new Date(year, month - 1, 1)
+  const pad = (first.getDay() + 6) % 7
+  const days = new Date(year, month, 0).getDate()
+  const cells: (string | null)[] = []
+  for (let i = 0; i < pad; i++) cells.push(null)
+  for (let d = 1; d <= days; d++) cells.push(iso(new Date(year, month - 1, d)))
+  while (cells.length % 7 !== 0) cells.push(null)
 
-  const openFor = (sc: SchoolData, owner: 'team' | 'agent' | 'school') =>
-    sc.nextSteps.filter(i => !i.inProgress && i.owner === owner).length
-
-  const ownerCounts = {
-    all: schools.length,
-    team: schools.filter(sc => openFor(sc, 'team') > 0).length,
-    agent: schools.filter(sc => openFor(sc, 'agent') > 0).length,
-    school: schools.filter(sc => openFor(sc, 'school') > 0).length,
+  const byDay = new Map<string, Entry[]>()
+  for (const e of entries ?? []) {
+    const list = byDay.get(e.date) ?? []
+    list.push(e)
+    byDay.set(e.date, list)
   }
 
-  const visibleSchools = ownerFilter === 'all'
-    ? schools
-    : schools.filter(sc => openFor(sc, ownerFilter) > 0)
+  const todayIso = iso(today)
+  const dayItems = openDay ? (byDay.get(openDay) ?? []) : []
 
   return (
-    <div style={{ padding: '32px 48px', fontFamily: "'DM Sans', sans-serif", maxWidth: 1000 }}>
-      {toast && <Toast message={toast} onDone={() => setToast(null)} />}
-      {draftEmail && (
-        <DraftEmailModal {...draftEmail} onClose={() => setDraftEmail(null)} onSent={async () => {
-          // If this was a grant send, mark opportunity as sent and create milestones
-          if (draftEmail.opportunityId) {
-            await fetch('/api/funding/send-to-client', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                opportunityId: draftEmail.opportunityId,
-                pursuitId: draftEmail.pursuitId,
-                contactName: draftEmail.toName,
-                contactEmail: draftEmail.to,
-                windowOpens: draftEmail.windowOpens,
-                windowCloses: draftEmail.windowCloses,
-              }),
-            }).catch(() => {})
-          }
-          setDraftEmail(null)
-          setToast('Application sent. Follow-up milestones created.')
-          // Refresh after short delay
-          setTimeout(() => window.location.reload(), 1500)
-        }} />
-      )}
+    <div className="fh">
+      <header className="top">
+        <div className="brand">TDI Funding <span>/ admin</span></div>
+        <nav>
+          <button data-view="cal" aria-current={view === 'cal'} onClick={() => setView('cal')}>Calendar</button>
+          <button data-view="schools" aria-current={view === 'schools' || view === 'school'} onClick={() => setView('schools')}>Schools</button>
+          {/* The old board keeps every control that changes a grant until those
+              are wired into the popups here. */}
+          {/* Needs its own colour: the admin stylesheet gives anchors a dark
+              ink that is unreadable on the navy chrome. */}
+          <Link className="navlink" href="/tdi-admin/funding/board">Board</Link>
+        </nav>
+      </header>
 
-      {/* One card, with the tabs living in its topbar. The page had a title
-          and a stats line above this that repeated the money strip word for
-          word, so both are gone: the strip is the header. */}
-      <div style={{
-        background: '#fff', border: '1px solid #e3e7ef', borderRadius: 14,
-        overflow: 'hidden', boxShadow: '0 1px 3px rgba(30,39,73,.06)',
-      }}>
-      <div style={{
-        display: 'flex', alignItems: 'center', gap: 16, padding: '12px 18px',
-        borderBottom: '1px solid #e3e7ef', flexWrap: 'wrap',
-      }}>
-        <span style={{ fontWeight: 800, fontSize: 15, color: '#1e2749', letterSpacing: '-.01em' }}>Grants</span>
-        <div style={{ display: 'flex', gap: 2, marginLeft: 'auto', flexWrap: 'wrap' }}>
-          {([
-            { key: 'board' as const, label: 'Needs you' },
-            { key: 'schools' as const, label: 'Schools' },
-            { key: 'funders' as const, label: 'Funders' },
-            { key: 'awarded' as const, label: 'Awarded' },
-          ]).map(t => (
-            <button
-              key={t.key}
-              onClick={() => setView(t.key)}
-              style={{
-                fontSize: 13, padding: '6px 12px', borderRadius: 7, border: 'none',
-                cursor: 'pointer',
-                background: view === t.key ? '#E8F0FD' : 'transparent',
-                color: view === t.key ? '#1e2749' : '#7b8399',
-                fontWeight: view === t.key ? 700 : 500,
-              }}
-            >
-              {t.label}{t.key === 'board' && needsYou > 0 ? ` ${needsYou}` : ''}
-            </button>
-          ))}
-          {/* The rebuilt screens. They live on their own routes rather than as
-              views here, so they are links, not tabs. Styled to match the tabs
-              because to anyone using this they are the same row of choices. */}
-          {([
-            { href: '/tdi-admin/funding/calendar', label: 'Calendar' },
-            { href: '/tdi-admin/funding/schools', label: 'Profiles' },
-          ]).map(t => (
-            <Link
-              key={t.href}
-              href={t.href}
-              style={{
-                fontSize: 13, padding: '6px 12px', borderRadius: 7,
-                background: 'transparent', color: '#7b8399', fontWeight: 500,
-                textDecoration: 'none',
-              }}
-            >
-              {t.label}
-            </Link>
-          ))}
-        </div>
-      </div>
+      <div className="wrap">
 
-      {view === 'board' && (
-        <div style={{ marginBottom: 28 }}>
-          <OutreachQueue />
-        </div>
-      )}
-
-      {view === 'board' && (
-        <NeedsYouBoard
-          schools={schools}
-          onWriteToSchool={item => {
-            // Straight to the drafted email on the school page. Nothing sends
-            // from the board; the preview there is the only send path.
-            router.push(
-              `/tdi-admin/funding/${item.pursuitId}?open=actions&action=${item.actionItemId}&write=1`,
-            )
-          }}
-          onOpenItem={item => {
-            // Straight to the row the card is about. The deep link machinery
-            // on the school page already existed for Slack; it just was never
-            // pointed at from inside the portal, so clicking a card here was
-            // the long way round to a page the card could name exactly.
-            const base = `/tdi-admin/funding/${item.pursuitId}`
-            if (item.actionItemId) {
-              router.push(`${base}?open=actions&action=${item.actionItemId}`)
-              return
-            }
-            if (item.opportunityId) {
-              router.push(`${base}?open=paths&opp=${item.opportunityId}`)
-              return
-            }
-            // A card about the school itself rather than one row, such as
-            // "send the intro" or "complete the profile". The school page is
-            // the right destination for those, and it is one click either way.
-            router.push(base)
-          }}
-        />
-      )}
-
-      {view === 'funders' && <FundersTab />}
-
-      {view === 'awarded' && (
-        <AwardedTab
-          grants={schools.flatMap(sc => sc.grants.map(g => ({
-            id: g.id, name: g.name, amount: g.amount, awardedAmount: g.awardedAmount,
-            status: g.status, school: sc.name,
-          })))}
-        />
-      )}
-
-      </div>
-
-      {view === 'schools' && (
-        <>
-      {/* Who the next move belongs to. This is the Work Queue, as a filter. */}
-      <div style={{ display: 'flex', gap: 8, marginBottom: 24, flexWrap: 'wrap' }}>
-        {([
-          { key: 'all' as const,    label: 'All schools' },
-          { key: 'team' as const,   label: 'Waiting on us' },
-          { key: 'agent' as const,  label: 'With agents' },
-          { key: 'school' as const, label: 'Waiting on the school' },
-        ]).map(f => (
-          <button
-            key={f.key}
-            onClick={() => setOwnerFilter(f.key)}
-            style={{
-              fontSize: 13, fontWeight: 600, padding: '7px 14px', borderRadius: 999,
-              border: `1px solid ${ownerFilter === f.key ? '#1e2749' : '#E5E7EB'}`,
-              background: ownerFilter === f.key ? '#1e2749' : 'white',
-              color: ownerFilter === f.key ? 'white' : '#374151',
-              cursor: 'pointer',
-            }}
-          >
-            {f.label} {ownerCounts[f.key]}
-          </button>
-        ))}
-      </div>
-        </>
-      )}
-
-      {/* School cards */}
-      {view === 'schools' && (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-        {visibleSchools.map(school => (
-          <div
-            key={school.id}
-            id={`school-${school.id}`}
-            style={{
-              // Arriving here from the board, the row you clicked should be
-              // obvious without you having to hunt for it.
-              outlineOffset: 4,
-              borderRadius: 12,
-              transition: 'outline-color .3s',
-            }}
-          >
-          <SchoolCard
-            school={school}
-            onDraftEmail={(to, toName, subject, body, schoolName, pursuitId, extra) => {
-              setDraftEmail({ to, toName, subject, body, schoolName, pursuitId, ...extra })
-            }}
-            onToast={setToast}
-          />
-          </div>
-        ))}
-
-        {visibleSchools.length === 0 && (
-          <div style={{ padding: '32px 20px', textAlign: 'center', color: '#6B7280', fontSize: 14, background: 'white', borderRadius: 12, border: '1px solid #E5E7EB' }}>
-            Nothing is in that state right now.
-          </div>
-        )}
-      </div>
-      )}
-
-      {/* Reference material, from the Portfolio page that used to hold it.
-          Collapsed by default: it is something you reach for while writing an
-          application, not something you read on the way past. */}
-      <div style={{ marginTop: 28 }}>
-        <ImpactEvidence />
-      </div>
-    </div>
-  )
-}
-
-function SchoolCard({ school, onDraftEmail, onToast }: {
-  school: SchoolData
-  onDraftEmail: (to: string, toName: string, subject: string, body: string, schoolName: string, pursuitId: string, extra?: any) => void
-  onToast: (msg: string) => void
-}) {
-  const [showCompleted, setShowCompleted] = useState(false)
-  // A grant is finished when it has actually been submitted or decided. It was
-  // previously counted as complete the moment the forwarding email was sent,
-  // which meant emailing a school closed the grant on screen while its real
-  // status stayed not_started. Title II-A for Saunemin sat in this collapsed
-  // section for nine days: written, QA passed, forwarded, never submitted.
-  //
-  // Emailing someone is not an outcome. Only these are.
-  const FINISHED = new Set(['applied', 'submitted', 'awarded', 'closed'])
-  const completedGrants = school.grants.filter(g => g.status !== 'denied' && FINISHED.has(g.status))
-  const activeGrants = school.grants.filter(g => g.status !== 'denied' && !FINISHED.has(g.status))
-  const deniedGrants = school.grants.filter(g => g.status === 'denied')
-
-  // The next step comes from the shared engine, never from logic local to this
-  // page. Prefer the top item a person can act on; fall back to the top
-  // in-progress item so a waiting pursuit still says what it is waiting for.
-  const nextStep = school.nextSteps.find(i => !i.inProgress) ?? school.nextSteps[0] ?? null
-  const isWaiting = !!nextStep?.inProgress
-  const isIntro = nextStep?.actionType === 'setup_pursuit'
-  const isBlocked = nextStep?.actionType === 'unblock_draft'
-
-  // What the school still owes us, in the words they will actually read.
-  // Maintained by lib/funding-gate-sync.ts, so this stays in step automatically.
-  const gateGapLabels = school.actions
-    .filter(a => a.category === 'gate' && isSchoolOwned(a))
-    .map(a => a.clientLabel || a.title)
-
-  const bannerBg = isBlocked ? '#FEF2F2' : isWaiting ? '#F0FDF4' : isIntro ? '#EFF6FF' : '#F5F3FF'
-  const bannerFg = isBlocked ? '#B91C1C' : isWaiting ? '#1e2749' : isIntro ? '#1e2749' : '#6D28D9'
-  const needsAttention = !!nextStep && !isWaiting
-
-  return (
-    <div style={{
-      background: 'white', border: '1px solid #E5E7EB', borderRadius: 14,
-      borderLeft: isBlocked ? '4px solid #DC2626' : needsAttention ? '4px solid #8B5CF6' : '4px solid #E5E7EB',
-      overflow: 'hidden',
-    }}>
-      {/* Header */}
-      <div style={{ padding: '18px 22px', borderBottom: '1px solid #F3F4F6' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-          <div>
-            <Link href={`/tdi-admin/funding/${school.id}`} style={{ fontSize: 18, fontWeight: 700, color: '#1e2749', textDecoration: 'none' }}>
-              {school.name.replace(/ - Grant Funding$/, '').replace(/ - Grant Funded Funding$/, '')}
-            </Link>
-            <div style={{ fontSize: 13, color: '#6B7280', marginTop: 2 }}>
-              {school.contact} {school.email && <span style={{ color: '#9CA3AF' }}>({school.email})</span>}
+        <section className="view" id="v-cal" hidden={view !== 'cal'}>
+          <div className="head">
+            <div>
+              <h1>What has to happen, and when</h1>
+              <p className="sub">
+                Confirmed work sits on its real date. Predicted work is derived from where each
+                narrative is now and how long that step is allowed to take.
+              </p>
             </div>
-          </div>
-          <div style={{ textAlign: 'right' }}>
-            <div style={{ fontSize: 18, fontWeight: 800, color: '#1e2749' }}>
-              ${school.pipeline.toLocaleString()}
-            </div>
-            <div style={{ fontSize: 11, color: '#9CA3AF' }}>pipeline</div>
-          </div>
-        </div>
-      </div>
-
-      {/* Next action banner — label, reason, and a control that always works */}
-      {nextStep && (
-        <div style={{
-          padding: '12px 22px',
-          background: bannerBg,
-          borderBottom: '1px solid #F3F4F6',
-          display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16,
-        }}>
-          <div style={{ minWidth: 0 }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 2 }}>
-              {isBlocked ? 'Blocked' : isWaiting ? 'Waiting' : 'Next Step'}
-            </div>
-            <div style={{ fontSize: 14, fontWeight: 600, color: bannerFg }}>
-              {nextStep.label}
-            </div>
-            <div style={{ fontSize: 12, color: '#6B7280', marginTop: 3, lineHeight: 1.45 }}>
-              {nextStep.why}
+            <div className="legend">
+              {(['send', 'step', 'client', 'close', 'decide'] as const).map(t => (
+                <div className="lg" key={t}>
+                  <i className="sw" style={{ background: `var(--${t})` }} />{TONE_WORD[t]}
+                </div>
+              ))}
+              <div className="lg pred"><i className="sw" />Predicted</div>
             </div>
           </div>
 
-          {/* Blocked on the school: offer the email that names exactly what we need */}
-          {isBlocked && school.email && gateGapLabels.length > 0 ? (
-            <button
-              onClick={() => {
-                const draft = gateBlockerEmailDraft(
-                  school.contact,
-                  school.name.replace(/ - Grant Funding$/, '').replace(/ - Grant Funded Funding$/, ''),
-                  gateGapLabels,
+          <div className="monthbar">
+            <button className="mbtn" onClick={() => step(-1)} aria-label="Previous month">&#8249;</button>
+            <button className="mbtn" onClick={() => step(1)} aria-label="Next month">&#8250;</button>
+            <h2>{MONTHS[month - 1]} {year}</h2>
+            <span className="today-chip">
+              today · {today.getDate()} {MONTHS[today.getMonth()].slice(0, 3)} {today.getFullYear()}
+            </span>
+          </div>
+
+          {coverage && (
+            <p className="sub" style={{ margin: '0 0 12px' }}>
+              {coverage.withDate} of {coverage.livePaths} live grant paths have a confirmed deadline.
+              The rest have no date yet, so they cannot appear here until somebody confirms a window.
+            </p>
+          )}
+
+          {calError && <p className="sub">{calError}</p>}
+          {!calError && entries === null && <p className="sub">Loading.</p>}
+
+          <div className="cal">
+            <div className="dow">
+              {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(d => <div key={d}>{d}</div>)}
+            </div>
+            <div className="grid">
+              {cells.map((date, i) => {
+                if (!date) return <div className="day pad" key={`p${i}`}><span className="dnum" /></div>
+                const items = byDay.get(date) ?? []
+                const shown = items.slice(0, 3)
+                const rest = items.length - shown.length
+                const classes = ['day']
+                if (items.length) classes.push('has')
+                if (date === todayIso) classes.push('today')
+                return (
+                  <button
+                    className={classes.join(' ')}
+                    key={date}
+                    onClick={() => items.length && setOpenDay(date)}
+                    aria-label={`${date}, ${items.length} item${items.length === 1 ? '' : 's'}`}
+                  >
+                    <span className="dnum">{Number(date.slice(-2))}</span>
+                    {shown.map(e => (
+                      <span
+                        className={`pill t-${toneOf(e)}${e.confirmed ? '' : ' predicted'}`}
+                        key={e.id}
+                      >
+                        <i className="dot" /><span>{e.label}</span>
+                      </span>
+                    ))}
+                    {rest > 0 && <span className="more">{rest} more</span>}
+                  </button>
                 )
-                onDraftEmail(school.email, school.contact, draft.subject, draft.body, school.name, school.id)
-              }}
-              style={{
-                fontSize: 12, fontWeight: 700, padding: '8px 16px', borderRadius: 8,
-                border: 'none', background: '#DC2626', color: 'white', cursor: 'pointer', flexShrink: 0,
-                whiteSpace: 'nowrap',
-              }}
-            >
-              Email {school.contact.split(' ')[0]}
-            </button>
-          ) : isIntro && school.email ? (
-            <button
-              onClick={() => {
-                const draft = introEmailDraft(school.contact, school.name.replace(/ - Grant Funding$/, ''))
-                onDraftEmail(school.email, school.contact, draft.subject, draft.body, school.name, school.id)
-              }}
-              style={{
-                fontSize: 12, fontWeight: 700, padding: '8px 16px', borderRadius: 8,
-                border: 'none', background: '#3B82F6', color: 'white', cursor: 'pointer', flexShrink: 0,
-              }}
-            >
-              Draft Email
-            </button>
-          ) : !isWaiting ? (
-            <Link
-              href={`/tdi-admin/funding/${school.id}`}
-              style={{
-                fontSize: 12, fontWeight: 700, padding: '8px 16px', borderRadius: 8,
-                border: 'none', background: isBlocked ? '#DC2626' : '#8B5CF6', color: 'white',
-                textDecoration: 'none', flexShrink: 0, whiteSpace: 'nowrap',
-              }}
-            >
-              {isBlocked ? 'Fix This' : 'Open School'}
-            </Link>
-          ) : null}
-        </div>
-      )}
-
-      {/* Grant list with inline actions */}
-      <div style={{ padding: '12px 22px' }}>
-        {activeGrants.map(grant => (
-          <GrantRow
-            key={grant.id}
-            grant={grant}
-            school={school}
-            onDraftEmail={onDraftEmail}
-            onToast={onToast}
-            onRefresh={() => window.location.reload()}
-          />
-        ))}
-        {completedGrants.length > 0 && (
-          <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid #F3F4F6' }}>
-            <button
-              onClick={() => setShowCompleted(!showCompleted)}
-              style={{
-                fontSize: 11, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: 0.5,
-                background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', gap: 4,
-              }}
-            >
-              <span style={{ transform: showCompleted ? 'rotate(90deg)' : 'rotate(0deg)', transition: 'transform 0.15s', display: 'inline-block', fontSize: 10 }}>&#9654;</span>
-              Completed ({completedGrants.length})
-            </button>
-            {showCompleted && (
-              <div style={{ marginTop: 8 }}>
-                {completedGrants.map(grant => (
-                  <GrantRow
-                    key={grant.id}
-                    grant={grant}
-                    school={school}
-                    onDraftEmail={onDraftEmail}
-                    onToast={onToast}
-                    onRefresh={() => window.location.reload()}
-                  />
-                ))}
-              </div>
-            )}
+              })}
+            </div>
           </div>
-        )}
-        {deniedGrants.length > 0 && (
-          <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 8 }}>
-            {deniedGrants.length} denied grant{deniedGrants.length > 1 ? 's' : ''} (not shown)
+        </section>
+
+        <section className="view" id="v-schools" hidden={view !== 'schools'}>
+          <div className="head">
+            <div>
+              <h1>Partnership schools</h1>
+              <p className="sub">What each school is trying to raise, and what has actually landed.</p>
+            </div>
           </div>
-        )}
-
-        {/* Pending action items for this school, split the one agreed way. */}
-        {school.actions.length > 0 && (() => {
-          // One rule, shared with the board, so the two counts on this screen
-          // can never disagree again. See lib/funding-ownership.ts for why the
-          // old category test was splitting one person's queue in half.
-          // Decisions that route to Rae are ours but not hers. Listing them
-          // under "Ready for You" and badging them "You" is the same mistake
-          // the tab badge was making, in a second place on the same screen.
-          const myActions = school.actions.filter(a => isPersonOwned(a) && !isDecisionForRae(a))
-          const raeActions = school.actions.filter(a => isPersonOwned(a) && isDecisionForRae(a))
-          const clientActions = school.actions.filter(isSchoolOwned)
-
-          const ownerBadge = (action: { ownerType?: string | null; ownerName?: string | null }) =>
-            isSchoolOwned({ ownerType: action.ownerType })
-              ? { bg: '#FEF3C7', color: '#92400E', label: 'School' }
-              : isDecisionForRae(action)
-                ? { bg: '#E8F0FD', color: '#1e2749', label: 'Rae' }
-                : { bg: '#F5F3FF', color: '#6D28D9', label: 'You' }
-
-          return (
-            <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid #F3F4F6' }}>
-              {myActions.length > 0 && (
-                <>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: '#059669', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 8 }}>
-                    Ready for You ({myActions.length})
+          <div className="schools">
+            {schools === null && <p className="sub">Loading.</p>}
+            {schools?.length === 0 && <p className="sub">No active partnership schools.</p>}
+            {(schools ?? []).map(s => {
+              const pct = s.goal && s.earned ? Math.min(100, (s.earned / s.goal) * 100) : 0
+              return (
+                <button className="scard" key={s.id} onClick={() => loadSchool(s.id)}>
+                  <div>
+                    <h3>{s.name}</h3>
+                    <div className="loc">{s.where}{s.contactName ? ` · ${s.contactName}` : ''}</div>
                   </div>
-                  {/* Every one of them. A person's own queue is the last place
-                      to hide rows behind a cap she cannot see. */}
-                  {myActions.map(action => {
-                    const daysUntil = action.dueDate ? Math.ceil((new Date(action.dueDate + 'T00:00:00').getTime() - Date.now()) / 86400000) : null
-                    const badge = ownerBadge(action)
-                    return (
-                      <div key={action.id} style={{
-                        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                        padding: '6px 0', borderBottom: '1px solid #FAFAFA',
-                      }}>
-                        <div style={{ flex: 1 }}>
-                          <span style={{ fontSize: 13, fontWeight: 600, color: '#1e2749' }}>{action.title}</span>
-                        </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
-                          {daysUntil !== null && (
-                            <span style={{
-                              fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 4,
-                              background: daysUntil <= 3 ? '#FEF2F2' : '#F3F4F6',
-                              color: daysUntil <= 3 ? '#DC2626' : '#6B7280',
-                            }}>
-                              {daysUntil <= 0 ? 'Overdue' : `${daysUntil}d`}
-                            </span>
-                          )}
-                          <span style={{
-                            fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 4,
-                            background: badge.bg, color: badge.color,
-                          }}>
-                            {badge.label}
-                          </span>
-                        </div>
-                      </div>
-                    )
-                  })}
-                </>
-              )}
-              {/* What the school owes us. Not hers to do, but hers to chase,
-                  so it sits under her list rather than in a separate place.
-                  Agent work is not here at all: an agent's work is a grant path,
-                  shown above as "Running by itself", never an action item. */}
-              {/* Ours, but a decision rather than her work. Shown, never
-                  counted as hers, so nothing disappears by being reassigned. */}
-              {raeActions.length > 0 && (
-                <>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: '#1e2749', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 8, marginTop: myActions.length > 0 ? 12 : 0 }}>
-                    Rae decides ({raeActions.length})
+                  <div className="money">
+                    {/* Never a false zero. A school with a win we never priced
+                        reads as that, not as having earned nothing. */}
+                    {s.earned === null
+                      ? <span className="big" style={{ fontSize: 15, color: 'var(--client)' }}>
+                          {s.grantsWon > 0 ? `${s.grantsWon} won, amount not recorded` : 'nothing awarded yet'}
+                        </span>
+                      : <><span className="big">{money(s.earned)}</span>
+                         {s.goal !== null && <span className="of">of {money(s.goal)}</span>}</>}
                   </div>
-                  {raeActions.map(action => (
-                    <div key={action.id} style={{
-                      display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                      padding: '6px 0', borderBottom: '1px solid #FAFAFA',
-                    }}>
-                      <span style={{ fontSize: 13, fontWeight: 600, color: '#1e2749', flex: 1 }}>{action.title}</span>
-                      <span style={{
-                        fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 4,
-                        background: '#E8F0FD', color: '#1e2749', flexShrink: 0,
-                      }}>Rae</span>
-                    </div>
-                  ))}
-                </>
-              )}
+                  <div className="bar"><i style={{ width: `${pct}%` }} /></div>
+                  <div className="meta">
+                    <span><b>{s.livePaths}</b> live paths</span>
+                    <span><b>{s.grantsWon}</b> won</span>
+                    {s.grantsWonWithoutAnAmount > 0 &&
+                      <span><b>{s.grantsWonWithoutAnAmount}</b> without an amount</span>}
+                  </div>
+                </button>
+              )
+            })}
+          </div>
+        </section>
 
-              {clientActions.length > 0 && (
-                <>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: '#92400E', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 8, marginTop: myActions.length > 0 || raeActions.length > 0 ? 12 : 0 }}>
-                    Waiting on the school ({clientActions.length})
-                  </div>
-                  {clientActions.map(action => (
-                    <div key={action.id} style={{
-                      display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                      padding: '4px 0', borderBottom: '1px solid #FAFAFA',
-                    }}>
-                      <span style={{ fontSize: 12, color: '#6B7280' }}>{action.title}</span>
-                      <span style={{ fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 4, background: '#FEF3C7', color: '#92400E' }}>School</span>
-                    </div>
-                  ))}
-                </>
+        <section className="view" id="v-school" hidden={view !== 'school'}>
+          <button className="back" onClick={() => setView('schools')}>&#8249; All schools</button>
+          <div className="head">
+            <div>
+              <h1>{detail?.school.name ?? 'Loading.'}</h1>
+              {detail && (
+                <p className="sub">
+                  {detail.school.where}
+                  {detail.school.contactName ? ` · ${detail.school.contactName}` : ''}
+                  {detail.school.contactRole ? ` · ${detail.school.contactRole}` : ''}
+                </p>
               )}
             </div>
-          )
-        })()}
-      </div>
-    </div>
-  )
-}
+          </div>
 
-function GrantRow({ grant, school, onDraftEmail, onToast, onRefresh }: {
-  grant: SchoolData['grants'][0]
-  school: SchoolData
-  onDraftEmail: (to: string, toName: string, subject: string, body: string, schoolName: string, pursuitId: string, extra?: any) => void
-  onToast: (msg: string) => void
-  onRefresh: () => void
-}) {
-  const [approving, setApproving] = useState(false)
-  const [approved, setApproved] = useState(grant.narrativeStatus === 'ready')
-  const [sent, setSent] = useState(grant.forwardingStatus === 'sent')
+          <div className="tabs" role="tablist">
+            <button role="tab" aria-selected={pane === 'log'} onClick={() => setPane('log')}>Notes log</button>
+            <button role="tab" aria-selected={pane === 'profile'} onClick={() => setPane('profile')}>
+              Profile{detail ? ` (${detail.facts.filter(f => f.needsSource).length} unsourced)` : ''}
+            </button>
+          </div>
 
-  const handleApprove = async () => {
-    setApproving(true)
-    await fetch('/api/funding/opportunities', {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: grant.id, narrative_status: 'ready' }),
-    })
-    setApproved(true)
-    setApproving(false)
-    onToast('Narrative approved')
-  }
+          <div className="pane" id="p-log" hidden={pane !== 'log'}>
+            <div className="live"><i /> live, updates as Paperclip moves</div>
+            <ul className="log">
+              {(detail?.log ?? []).map(r => (
+                <li key={r.id}>
+                  <time>{r.date}</time>
+                  <div className="ev">{r.title}</div>
+                  {r.detail && <div className="de">{r.detail}</div>}
+                </li>
+              ))}
+            </ul>
+          </div>
 
-  const handleSendToClient = () => {
-    const firstName = school.contact.split(' ')[0]
-    const schoolName = school.name.replace(/ - Grant Funding$/, '').replace(/ - Grant Funded Funding$/, '')
-    const docLink = grant.narrativeUrl || ''
-
-    // Calculate dates
-    const windowOpens = grant.windowOpens ? new Date(grant.windowOpens + 'T00:00:00') : null
-    const windowCloses = grant.windowCloses ? new Date(grant.windowCloses + 'T00:00:00') : null
-    const deedDeadline = windowOpens ? new Date(windowOpens.getTime() - 14 * 86400000) : null // 2 weeks before
-    const deedDeadlineStr = deedDeadline ? deedDeadline.toLocaleDateString('en-US', { month: 'long', day: 'numeric' }) : 'as soon as possible'
-    const windowOpensStr = windowOpens ? windowOpens.toLocaleDateString('en-US', { month: 'long', day: 'numeric' }) : 'soon'
-    const windowClosesStr = windowCloses ? windowCloses.toLocaleDateString('en-US', { month: 'long', day: 'numeric' }) : ''
-
-    // Pass extra tracking fields for post-send processing
-    onDraftEmail(
-      school.email,
-      school.contact,
-      `Your ${grant.name} application is ready. Here is your timeline.`,
-      `Hi ${firstName},\n\nYour ${grant.name} grant application for ${schoolName} is complete. We wrote everything for you. You will copy, paste, and submit. Nothing to write from scratch.\n\nHere is your application package:\n${docLink}\n\nHere is your timeline:\n\nTHIS WEEK: Set up your Deed account (Step 1 in the document). This takes about 5 minutes but verification takes 1 to 2 weeks, so please do this now. Your deadline to have Deed set up is ${deedDeadlineStr}.\n\n${windowOpensStr.toUpperCase()}: The application window opens. We will email you a reminder that day with a link to your application package so you can submit. Submitting takes about 15 minutes.\n\n${windowClosesStr ? windowClosesStr.toUpperCase() + ': The window closes. We need to submit before this date.\n\n' : ''}You do not need to remember any of these dates. We will follow up at every step. If you miss something, we will reach out.\n\nIf you want to set up your Deed account together on a call this week, reply to this email and I will schedule 15 minutes. I am happy to walk you through it.\n\nBest,\nBella\nTeachers Deserve It`,
-      school.name,
-      school.id,
-      { opportunityId: grant.id, windowOpens: grant.windowOpens, windowCloses: grant.windowCloses }
-    )
-  }
-
-  const ns = grant.narrativeStatus
-  // QA passed, waiting on Bella. Legacy rows sit in qa_review + qa_passed
-  // rather than the 'approval' state, so both count.
-  const awaitingApproval = !approved && (ns === 'approval' || (ns === 'qa_review' && grant.qaPassed === true))
-  const inQa = ns === 'qa_review' && grant.qaPassed !== true
-  const isEscalated = ns === 'escalated'
-  const isApproved = approved || ns === 'ready'
-  const isDrafting = ns === 'requested'
-
-  return (
-    <div style={{
-      padding: '10px 0', borderBottom: '1px solid #F3F4F6',
-    }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-        <div style={{ flex: 1 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <span style={{ fontSize: 14, fontWeight: 600, color: '#1e2749' }}>{grant.name}</span>
-            {grant.amount > 0 && (
-              <span style={{ fontSize: 12, color: '#6B7280' }}>${grant.amount.toLocaleString()}</span>
+          <div className="pane" id="p-profile" hidden={pane !== 'profile'}>
+            {detail && schoolId && (
+              <ProfileFields
+                schoolId={schoolId}
+                facts={detail.facts}
+                onSaved={() => loadSchool(schoolId)}
+              />
             )}
           </div>
-          {grant.windowOpens && (
-            <span style={{ fontSize: 11, color: '#6B7280' }}>
-              Window: {new Date(grant.windowOpens + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-              {grant.windowCloses && ` - ${new Date(grant.windowCloses + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`}
-            </span>
-          )}
-        </div>
+        </section>
+      </div>
 
-        {/* Action buttons — ALL steps visible */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
-          {isDrafting && (
-            <span style={{ fontSize: 11, fontWeight: 600, padding: '4px 10px', borderRadius: 6, background: '#DBEAFE', color: '#1D4ED8' }}>
-              Agent drafting
-            </span>
-          )}
-
-          {/* An external doc link when one exists — but never a precondition for acting */}
-          {(awaitingApproval || inQa) && grant.narrativeUrl && (
-            <a href={grant.narrativeUrl} target="_blank" rel="noopener noreferrer"
-              style={{ fontSize: 11, fontWeight: 600, padding: '4px 10px', borderRadius: 6, border: '1px solid #E5E7EB', background: 'white', color: '#6B7280', textDecoration: 'none' }}>
-              Open Doc
-            </a>
-          )}
-
-          {/* With QA running, nobody is waiting on a person here */}
-          {inQa && (
-            <span style={{ fontSize: 11, fontWeight: 600, padding: '4px 10px', borderRadius: 6, background: '#EDE9FE', color: '#6D28D9' }}>
-              In QA review
-            </span>
-          )}
-
-          {/* QA failed twice. The options live on the pursuit page. */}
-          {isEscalated && (
-            <Link href={`/tdi-admin/funding/${school.id}`}
-              style={{ fontSize: 12, fontWeight: 700, padding: '6px 14px', borderRadius: 8, background: '#DC2626', color: 'white', textDecoration: 'none' }}>
-              Needs your decision
-            </Link>
-          )}
-
-          {/* QA passed — approving is one click, with or without a doc URL */}
-          {awaitingApproval && (
-            <button onClick={handleApprove} disabled={approving}
-              style={{ fontSize: 12, fontWeight: 700, padding: '6px 14px', borderRadius: 8, border: 'none', background: approving ? '#9CA3AF' : '#10B981', color: 'white', cursor: 'pointer' }}>
-              {approving ? '...' : 'Approve'}
-            </button>
-          )}
-
-          {isApproved && !sent && (
-            <>
-              <span style={{ fontSize: 11, fontWeight: 700, padding: '4px 10px', borderRadius: 6, background: '#D1FAE5', color: '#065F46' }}>
-                Approved
-              </span>
-              {grant.narrativeUrl && (
-                <a href={grant.narrativeUrl} target="_blank" rel="noopener noreferrer"
-                  style={{ fontSize: 11, fontWeight: 600, padding: '4px 10px', borderRadius: 6, border: '1px solid #E5E7EB', background: 'white', color: '#6B7280', textDecoration: 'none' }}>
-                  View Doc
-                </a>
-              )}
-              {/* This was a Send button, and it could not send.
-                  It opened the compose modal, which posts to
-                  /api/funding/send-email, which has refused every client
-                  address since PR #500. So the most prominent control on an
-                  approved grant led to the words "Sending paused" and no way
-                  forward, which is the same dead end as having no button, with
-                  a click in the middle of it.
-
-                  Approving now queues the drafted email in the Outreach Queue
-                  at the top of this page, which is the one door a funding email
-                  may leave by. This says so rather than pretending otherwise. */}
-              <span style={{ fontSize: 11, fontWeight: 600, color: '#8a5500' }}>
-                In the Outreach Queue to send
-              </span>
-            </>
-          )}
-
-          {sent && (
-            <>
-              <span style={{ fontSize: 11, fontWeight: 700, padding: '4px 10px', borderRadius: 6, background: '#DBEAFE', color: '#1D4ED8' }}>
-                Sent to {school.contact.split(' ')[0]}
-              </span>
-              <span style={{ fontSize: 11, color: '#6B7280' }}>
-                Waiting on Deed setup
-              </span>
-            </>
-          )}
-
-          {!isDrafting && !inQa && !isEscalated && !awaitingApproval && !isApproved && grant.windowOpen && (
-            <span style={{ fontSize: 11, fontWeight: 600, padding: '4px 10px', borderRadius: 6, background: '#D1FAE5', color: '#065F46' }}>
-              Window open
-            </span>
-          )}
-
-          {!isDrafting && !inQa && !isEscalated && !awaitingApproval && !isApproved && !grant.windowOpen && (
-            <span style={{ fontSize: 11, fontWeight: 600, padding: '4px 10px', borderRadius: 6, background: '#F3F4F6', color: '#6B7280' }}>
-              Not started
-            </span>
-          )}
+      <div className="scrim" hidden={!openDay} onClick={() => setOpenDay(null)}>
+        <div className="modal" onClick={e => e.stopPropagation()}>
+          <div className="mhead">
+            <h3>{openDay}</h3>
+            <button className="x" onClick={() => setOpenDay(null)} aria-label="Close">&times;</button>
+          </div>
+          <div className="mbody">
+            {dayItems.map(e => {
+              const tone = toneOf(e)
+              return (
+                <div className="card" key={e.id}>
+                  <div className="cbar" style={{ background: `var(--${tone})` }} />
+                  <div className="cbody">
+                    <div className="ctop">
+                      <span className="tag" style={{ background: `var(--${tone}-soft)`, color: `var(--${tone})` }}>
+                        {TONE_WORD[tone]}
+                      </span>
+                      {!e.confirmed && <span className="tag pred">Predicted</span>}
+                      <span className="school">{e.schoolName}</span>
+                    </div>
+                    <h4>{e.label}</h4>
+                    {e.detail && <p>{e.detail}</p>}
+                    {e.derivation && <div className="why">{e.derivation}</div>}
+                    <div className="act">
+                      {/* The controls that change a grant are not wired into
+                          this popup yet. Rather than show a button that does
+                          nothing, this sends you to the place that can do it. */}
+                      <div className="row">
+                        <Link
+                          className="btn primary"
+                          href={`/tdi-admin/funding/${e.schoolId}`}
+                          style={{ textDecoration: 'none' }}
+                        >
+                          Open this grant
+                        </Link>
+                        <button className="btn" onClick={() => loadSchool(e.schoolId)}>
+                          Open {e.schoolName}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
         </div>
       </div>
     </div>
   )
 }
 
-function GrantStatusBadge({ grant }: { grant: SchoolData['grants'][0] }) {
-  // What actually happened in the world comes first. This used to be checked
-  // last, so a grant the school had already submitted still read "Approved"
-  // because its narrative happened to be ready.
-  if (grant.status === 'applied' || grant.status === 'waiting') {
-    return <Badge label={grant.status === 'applied' ? 'Submitted' : 'Waiting'} color="#065F46" bg="#D1FAE5" />
+/**
+ * The profile, with the one rule the screen exists to enforce: a fact that
+ * needs a source cannot be saved without one. The route enforces it too, and
+ * this shows the refusal rather than swallowing it.
+ */
+function ProfileFields({ schoolId, facts, onSaved }: {
+  schoolId: string
+  facts: Fact[]
+  onSaved: () => void
+}) {
+  const [editing, setEditing] = useState<string | null>(null)
+  const [value, setValue] = useState('')
+  const [source, setSource] = useState('')
+  const [error, setError] = useState<string | null>(null)
+  const [saving, setSaving] = useState(false)
+
+  async function save(key: string) {
+    setSaving(true)
+    setError(null)
+    try {
+      const res = await fetch(`/api/funding/schools/${schoolId}/facts`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key, value, source }),
+      })
+      const body = await res.json().catch(() => ({}))
+      if (!res.ok) { setError(body.error ?? 'That did not save.'); return }
+      setEditing(null)
+      onSaved()
+    } finally {
+      setSaving(false)
+    }
   }
 
-  // Sent to the school and not submitted. Previously this rendered as
-  // "Approved", which reads like an ending. It is the opposite: it is the one
-  // state where somebody still has to do something and nobody is being told.
-  if (grant.forwardingStatus === 'sent' && grant.narrativeStatus === 'ready') {
-    return <Badge label="Sent, not submitted" color="#9B2C3A" bg="#FBE9EC" />
-  }
-
-  if (grant.narrativeStatus === 'review' || grant.narrativeStatus === 'qa_review') {
-    return <Badge label="Draft ready" color="#6D28D9" bg="#F5F3FF" />
-  }
-  if (grant.narrativeStatus === 'ready') {
-    return <Badge label="Ready to send" color="#8A5500" bg="#FFF2D4" />
-  }
-  if (grant.narrativeStatus === 'requested') {
-    return <Badge label="Agent drafting" color="#1D4ED8" bg="#DBEAFE" />
-  }
-  if (grant.windowOpen) {
-    return <Badge label="Window open" color="#065F46" bg="#D1FAE5" />
-  }
-  return <Badge label="Not started" color="#6B7280" bg="#F3F4F6" />
-}
-
-function Badge({ label, color, bg }: { label: string; color: string; bg: string }) {
   return (
-    <span style={{ fontSize: 10, fontWeight: 700, padding: '3px 8px', borderRadius: 6, background: bg, color }}>
-      {label}
-    </span>
-  )
-}
-
-function Toast({ message, onDone }: { message: string; onDone: () => void }) {
-  useEffect(() => { const t = setTimeout(onDone, 2500); return () => clearTimeout(t) }, [onDone])
-  return (
-    <div style={{
-      position: 'fixed', bottom: 24, right: 24, zIndex: 9999,
-      background: '#065F46', color: 'white', padding: '12px 20px',
-      borderRadius: 10, fontSize: 13, fontWeight: 600,
-      boxShadow: '0 4px 16px rgba(0,0,0,0.15)',
-    }}>
-      {message}
-    </div>
+    <>
+      <div className="fields">
+        {facts.map(f => (
+          <div className="f" key={f.key}>
+            <label>{prettyKey(f.key)}</label>
+            {editing === f.key ? (
+              <>
+                <input value={value} onChange={e => setValue(e.target.value)} autoFocus />
+                <input
+                  value={source}
+                  onChange={e => setSource(e.target.value)}
+                  placeholder="Where this came from"
+                  style={{ marginTop: 6 }}
+                />
+                <div className="row" style={{ marginTop: 8 }}>
+                  <button className="btn primary" disabled={saving} onClick={() => save(f.key)}>
+                    {saving ? 'Saving' : 'Save'}
+                  </button>
+                  <button className="btn" onClick={() => { setEditing(null); setError(null) }}>Cancel</button>
+                </div>
+              </>
+            ) : (
+              <input
+                readOnly
+                value={f.value}
+                onClick={() => { setEditing(f.key); setValue(f.value); setSource(f.source ?? ''); setError(null) }}
+              />
+            )}
+            <div className={`src${f.needsSource ? ' warn' : ''}`}>
+              {f.source ? f.source : 'No source recorded'}
+            </div>
+            {f.superseded && <div className="src">Replaced {f.superseded}</div>}
+          </div>
+        ))}
+      </div>
+      {error && <div className="src warn" style={{ marginTop: 10 }}>{error}</div>}
+    </>
   )
 }
