@@ -62,11 +62,18 @@ export default function DeliverablesList({ partnershipId, userEmail }: { partner
                 <div className="flex-1 min-w-0">
                   <div className="text-xs font-medium text-gray-800 truncate">{d.label}</div>
                   <div className="text-[10px] text-gray-400 mt-0.5">
+                    {/* A planned date exists now, and until 23 Sep 2026 only Billing
+                        could see it. A coach looking at a visit booked for next month
+                        read "Not yet delivered", which is true and useless. Held is
+                        said out loud, because a date we are keeping is not a date the
+                        client has agreed. */}
                     {d.delivery_date && `Delivered ${formatDateOnly(d.delivery_date, { month: 'short', day: 'numeric' })}`}
                     {d.delivered_by && ` by ${d.delivered_by.split('@')[0]}`}
-                    {!d.delivery_date && d.is_complimentary && 'Complimentary'}
-                    {!d.delivery_date && !d.is_complimentary && !d.funding_hold && d.delivery_state !== 'delivered' && 'Not yet delivered'}
                     {!d.delivery_date && d.funding_hold && 'Waiting on grant funding'}
+                    {!d.delivery_date && !d.funding_hold && d.planned_date &&
+                      `Planned for ${formatDateOnly(d.planned_date, { month: 'short', day: 'numeric' })}${d.planned_confidence === 'held' ? ', not confirmed with them yet' : ''}`}
+                    {!d.delivery_date && !d.funding_hold && !d.planned_date && d.is_complimentary && 'Complimentary, no date yet'}
+                    {!d.delivery_date && !d.funding_hold && !d.planned_date && !d.is_complimentary && d.delivery_state !== 'delivered' && 'No date yet'}
                   </div>
                 </div>
                 <div className="flex items-center gap-2 flex-shrink-0">

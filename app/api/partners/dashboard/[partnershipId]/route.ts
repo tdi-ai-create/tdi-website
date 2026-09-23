@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { clientFacingServiceName, plannedDateNote } from '@/lib/partnerships/service-names';
 import { createClient } from '@supabase/supabase-js';
 
 // Service Supabase client
@@ -210,11 +211,48 @@ export async function GET(
       .limit(10);
 
     // Get timeline events from dedicated table
-    const { data: timelineEvents } = await supabase
+    const { data: timelineEvents, error: timelineError } = await supabase
       .from('timeline_events')
       .select('*')
       .eq('partnership_id', partnershipId)
       .order('sort_order', { ascending: true });
+    if (timelineError) console.error('[partners/dashboard] timeline:', timelineError.message);
+
+    /**
+     * The dates a school is waiting to hear.
+     *
+     * Planned dates live on contract_deliverables and, until 23 September 2026,
+     * were visible only in Billing. A school looking at their own dashboard saw
+     * "Dates will appear here as they are confirmed" while the visit sat booked
+     * in our system. Rae asked for every client to see their dates.
+     *
+     * These are built rather than written into timeline_events, so the contract
+     * line stays the single source of truth and a date changed in Billing shows
+     * here immediately instead of drifting from a copy.
+     *
+     * Grant held lines are excluded by having no planned date at all, which is
+     * correct: the work cannot be scheduled until the award lands, and putting
+     * it in front of a school would promise something no funder has agreed.
+     */
+    const { data: plannedLines, error: plannedError } = await supabase
+      .from('contract_deliverables')
+      .select('id, service_type, planned_date, planned_confidence, sequence_number, sequence_total, delivery_state')
+      .eq('partnership_id', partnershipId)
+      .eq('delivery_state', 'scheduled')
+      .not('planned_date', 'is', null)
+      .order('planned_date', { ascending: true });
+    if (plannedError) console.error('[partners/dashboard] planned dates:', plannedError.message);
+
+    const plannedEvents = (plannedLines ?? []).map((l, i) => ({
+      id: `planned-${l.id}`,
+      // Never the contract label. It carries discounts and internal wording.
+      event_title: clientFacingServiceName(l.service_type, l.sequence_number, l.sequence_total),
+      event_date: l.planned_date,
+      event_type: l.service_type,
+      status: 'upcoming' as const,
+      notes: plannedDateNote(l.planned_confidence),
+      sort_order: 1000 + i,
+    }));
 
     // Get teacher quotes for Our Partnership tab
     const { data: teacherQuotes } = await supabase
@@ -240,7 +278,7 @@ export async function GET(
       metricSnapshots: Object.values(latestMetrics),
       buildings: buildings || [],
       activityLog: activityLog || [],
-      timelineEvents: timelineEvents || [],
+      timelineEvents: [...(timelineEvents || []), ...plannedEvents],
       teacherQuotes: teacherQuotes || [],
       sessionRecords: sessionRecords || [],
       kpis: kpis || [],
