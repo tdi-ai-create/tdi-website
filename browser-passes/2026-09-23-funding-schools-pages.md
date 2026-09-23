@@ -48,6 +48,39 @@ shows educator count 23, free and reduced lunch 59 percent and IEP students 29
 each in a red bordered card reading "No source recorded", because those are the
 three figures QA rejected on attempts 1, 3 and 5 of the same application.
 
+## The pass, run on production (23 September 2026)
+
+The flag was turned on to do this, because both routes 404 while it is off.
+
+- Opened: https://www.teachersdeserveit.com/tdi-admin/funding/schools
+- Saw: three schools in alphabetical order, exactly as predicted. Allenwood
+  "nothing awarded yet" against "of $56,372.8", 6 live paths. Saunemin CCSD #438
+  reading **"2 won, amount not recorded"** in amber against "of $15,552", 6 live
+  paths. St. Peter Chanel "nothing awarded yet" against "of $15,750", 9 live
+  paths. The honest amber line is the thing this screen exists to get right, and
+  it is right.
+- Pressed: the Saunemin row.
+- Saw: its page, headed "2 grants won, amount never recorded of $15,552 · 6 live
+  paths", opening on the Log tab. Newest entry "22 Sept, 16:24, Illinois Prairie
+  Community Foundation passed QA (julie) and needs your approval before it can go
+  to the school", with Julie's full verdict beneath the entry below it.
+- Pressed: the Profile tab.
+- Saw: "Profile (8 unsourced)", and eight red cards, not the three predicted.
+
+## Two things the live look found
+
+**The prediction was wrong, and the truth is worse.** I predicted three
+unsourced facts, being the three QA has rejected. Every one of the eight claims
+on Saunemin's profile is unsourced. The stored record has no per-field sources
+at all. There is a `proficiency_source` key, but the values it would describe
+are stored as `math_proficiency` and `reading_proficiency`, so it attaches to
+neither of them.
+
+**Two cosmetic defects, both fixed in this branch.** A contract of 56372.80
+rendered as "$56,372.8", a lone trailing decimal. And "No source recorded"
+appeared under the address and the EIN, which are labels rather than claims and
+are already excluded from the count, so it named a problem that does not exist.
+
 ## What I will press
 
 The Saunemin row, to confirm it opens its page. Then the Profile tab. Neither

@@ -32,8 +32,9 @@ const C = {
   good: '#1F6B4A', warn: '#b45309',
 }
 
+/** Whole dollars. A contract of 56372.80 read as "$56,372.8" on the live page. */
 function money(n: number): string {
-  return `$${n.toLocaleString('en-US')}`
+  return `$${Math.round(n).toLocaleString('en-US')}`
 }
 
 export default function FundingSchoolsPage() {

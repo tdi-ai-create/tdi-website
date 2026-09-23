@@ -1,0 +1,72 @@
+# Browser pass
+
+## What this change touches
+
+A third new screen, `/tdi-admin/funding/calendar`, and the route behind it.
+Nothing existing changes. Like the schools screens, it is served only when
+`funding_config.new_pages` is on, and that flag is off.
+
+## What I did
+
+- Opened: http://localhost:3000/tdi-admin/funding/calendar
+- Deferred: the admin portal authenticates against a Supabase session cookie
+  scoped to the live domain, so a local server answers with a login screen. The
+  flag is also off, so the route returns 404 even after deploy.
+- Verify after deploy: https://www.teachersdeserveit.com/tdi-admin/funding/calendar
+
+## The prediction
+
+Written before looking, from the engine run against live data.
+
+September 2026 shows **18 entries**, October shows **1**. Across all months there
+are 24, of which 15 are confirmed and 9 predicted.
+
+The confirmed ones sit where the obligations are. Five decisions bunched on
+15 September, all now a week late. Cox Charities on the 18th. The named teacher
+question on the 22nd. Illinois Prairie and Ourso both closing on the 30th, and
+Cox Charities closing on 1 October, which is the only October entry.
+
+The predicted ones are italic and grey. Illinois Prairie and Ourso both show an
+approval due on 24 September, two days after each passed QA. Cox Charities shows
+a packet due to the school on 17 September and the IAA Foundation on
+10 September, both already past, which is the honest picture: those are finished
+applications nobody has sent.
+
+The line above the grid should read that **5 of 21 live grant paths have a
+confirmed deadline**, and say that the rest cannot appear until somebody
+confirms a window. If that line is missing, the screen is quietly pretending a
+sparse month means a calm month.
+
+## What I will press
+
+A predicted entry, which should open a panel headed "Predicted, not confirmed"
+containing a "How this date was worked out" box. For the Illinois Prairie
+approval that box should name the date it passed QA and the two day allowance.
+
+Nothing on this screen writes anything. There are no actions in it yet: the
+popups explain and link to the school, and the controls that complete an action
+come next.
+
+## Checked without the browser
+
+- `npm run typecheck` exits 0.
+- The engine was run directly against the live database twice, before and after
+  routing it through `isLive` and `isSchoolOwned`. Identical both times: 24
+  entries, 15 confirmed, 9 predicted, 18 in September and 1 in October.
+- **Zero predicted entries lack a derivation.** That was the rule this file was
+  written to hold, and it is checked rather than assumed.
+- `check:definitions` caught two places deciding an owned question and both were
+  fixed rather than allowlisted. Staging the files before running the gates is
+  what surfaced it locally this time instead of in CI.
+
+## What I could not verify
+
+How a month with almost nothing in it feels. October has one entry, because
+most grants have no confirmed date. The coverage line is meant to carry that,
+but nobody has looked at an empty grid with one box in it and judged whether the
+explanation lands.
+
+Also unverified: whether a predicted date in the past reads as useful or as
+noise. Two of them are already overdue, which is true and worth knowing, but
+"predicted" sitting on a day that has already gone is a wording nobody has
+tested on a real reader.
