@@ -142,11 +142,14 @@ export default function PracticeToolPage() {
   useEffect(() => {
     if (user?.id && tool) {
       const supabase = getSupabase()
-      void supabase.from('hub_activity_log').insert({
+      // The terminal then is what sends this. A Supabase builder is lazy, so
+      // `void builder` discards it unsent: this logged 0 rows while
+      // practice_tool_completed, which ends in a then, logged 41.
+      supabase.from('hub_activity_log').insert({
         user_id: user.id,
         action: 'practice_tool_started',
         metadata: { tool: slug, started_at: new Date().toISOString() },
-      })
+      }).then(() => {}, () => {})
     }
   }, [user?.id, slug, tool])
 

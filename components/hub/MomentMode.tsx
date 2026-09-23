@@ -108,6 +108,9 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
 
   // Anonymous vent confirmation state
   const [ventSent, setVentSent] = useState(false);
+  // Only true when the vent genuinely did not reach us, so what she wrote
+  // stays on screen instead of being cleared and silently dropped.
+  const [ventError, setVentError] = useState(false);
 
   // Affirmation state
   const [affirmations, setAffirmations] = useState<string[]>(FALLBACK_AFFIRMATIONS);
@@ -120,6 +123,9 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
   const [noteText, setNoteText] = useState('');
   const [isSubmittingNote, setIsSubmittingNote] = useState(false);
   const [noteSent, setNoteSent] = useState(false);
+  // Only true when the write actually failed, so the note stays in the box
+  // and the teacher can decide what to do rather than losing what she wrote.
+  const [noteError, setNoteError] = useState(false);
   const [showNoteForm, setShowNoteForm] = useState(false);
 
   // Access global Moment Mode context to suppress notifications
@@ -203,14 +209,16 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
         sessionStartRef.current = new Date();
 
         const supabase = getSupabase();
-        // Fire and forget, non-blocking
-        void supabase.from('hub_activity_log').insert({
+        // Fire and forget, non-blocking. The terminal then is what sends it:
+        // a Supabase builder is lazy, so `void builder` discards it unsent.
+        // Every action written that way logged 0 rows. Do not remove it.
+        supabase.from('hub_activity_log').insert({
           user_id: user.id,
           action: 'moment_mode_opened',
           metadata: {
             opened_at: new Date().toISOString(),
           },
-        });
+        }).then(() => {}, () => {});
       }
     } else {
       setMomentModeActive(false);
@@ -278,15 +286,17 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
 
       if (durationSeconds >= 30) {
         const supabase = getSupabase();
-        // Fire and forget, non-blocking
-        void supabase.from('hub_activity_log').insert({
+        // Fire and forget, non-blocking. The terminal then is what sends it:
+        // a Supabase builder is lazy, so `void builder` discards it unsent.
+        // Every action written that way logged 0 rows. Do not remove it.
+        supabase.from('hub_activity_log').insert({
           user_id: user.id,
           action: 'moment_mode_completed',
           metadata: {
             duration_seconds: durationSeconds,
             completed_at: new Date().toISOString(),
           },
-        });
+        }).then(() => {}, () => {});
       }
 
       // Reset for next session
@@ -300,8 +310,10 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
     setShowTimerNudge(false);
     setNoteText('');
     setNoteSent(false);
+    setNoteError(false);
     setShowNoteForm(false);
     setVentSent(false);
+    setVentError(false);
     if (timerRef.current) clearInterval(timerRef.current);
     onClose();
   };
@@ -350,10 +362,16 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
     if (!noteText.trim() || isSubmittingNote) return;
 
     setIsSubmittingNote(true);
+    setNoteError(false);
 
     try {
       const supabase = getSupabase();
-      await supabase.from('hub_activity_log').insert({
+      // Supabase reports a rejected insert in `error` rather than by throwing,
+      // so the catch below never saw one. This told a teacher her note had
+      // been sent whether or not a row was written, and cleared the box she
+      // typed it in. A safe space that quietly drops what someone wrote is
+      // worse than one that admits it failed.
+      const { error } = await supabase.from('hub_activity_log').insert({
         user_id: user?.id || null,
         action: 'moment_note',
         metadata: {
@@ -362,11 +380,17 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
         },
       });
 
+      if (error) {
+        setNoteError(true);
+        return;
+      }
+
       setNoteSent(true);
       setNoteText('');
       setShowNoteForm(false);
     } catch {
-      // Silently fail - this is a safe space
+      // A thrown error means the request never reached the database at all.
+      setNoteError(true);
     } finally {
       setIsSubmittingNote(false);
     }
@@ -374,25 +398,39 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
 
   const handleAnonymousSubmit = async () => {
     if (!anonymousVent.trim()) return;
+    setVentError(false);
 
     try {
-      await fetch('/api/hub/anonymous-vent', {
+      // fetch resolves on a 500 as readily as on a 200, so the status has to
+      // be read. Without this, a rejected vent still cleared the box and told
+      // her it had been heard.
+      const res = await fetch('/api/hub/anonymous-vent', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: anonymousVent.trim() }),
       });
 
-      // Log to activity log (without the message content - keep it anonymous)
+      if (!res.ok) {
+        setVentError(true);
+        return;
+      }
+
+      // Log to activity log (without the message content - keep it anonymous).
+      // The vent itself is already safely away, so a failed log must not tell
+      // her otherwise. It is recorded for us, not surfaced to her.
       const supabase = getSupabase();
       if (user?.id) {
-        await supabase.from('hub_activity_log').insert({
+        const { error } = await supabase.from('hub_activity_log').insert({
           user_id: user.id,
           action: 'moment_anonymous_vent',
           metadata: { submitted_at: new Date().toISOString() },
         });
+        if (error) console.error('[MomentMode] anonymous vent log failed:', error.message);
       }
     } catch {
-      // Silent fail - don't stress the user
+      // The request never reached us at all.
+      setVentError(true);
+      return;
     }
 
     setAnonymousVent('');
@@ -563,11 +601,11 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
                   startBreathing();
                   if (user?.id) {
                     const supabase = getSupabase();
-                    void supabase.from('hub_activity_log').insert({
+                    supabase.from('hub_activity_log').insert({
                       user_id: user.id,
                       action: 'moment_feature_used',
                       metadata: { feature: 'breathing', used_at: new Date().toISOString() },
-                    });
+                    }).then(() => {}, () => {});
                   }
                 }}
                 className="w-full flex items-center justify-center gap-3 p-4 rounded-lg transition-all hover:bg-white/20"
@@ -587,11 +625,11 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
                   setState('affirmation');
                   if (user?.id) {
                     const supabase = getSupabase();
-                    void supabase.from('hub_activity_log').insert({
+                    supabase.from('hub_activity_log').insert({
                       user_id: user.id,
                       action: 'moment_feature_used',
                       metadata: { feature: 'affirmation', used_at: new Date().toISOString() },
-                    });
+                    }).then(() => {}, () => {});
                   }
                 }}
                 className="w-full flex items-center justify-center gap-3 p-4 rounded-lg transition-all hover:bg-white/20"
@@ -611,11 +649,11 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
                   setState('gentle');
                   if (user?.id) {
                     const supabase = getSupabase();
-                    void supabase.from('hub_activity_log').insert({
+                    supabase.from('hub_activity_log').insert({
                       user_id: user.id,
                       action: 'moment_feature_used',
                       metadata: { feature: 'gentle_tools', used_at: new Date().toISOString() },
-                    });
+                    }).then(() => {}, () => {});
                   }
                 }}
                 className="w-full flex items-center justify-center gap-3 p-4 rounded-lg transition-all hover:bg-white/20"
@@ -635,11 +673,11 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
                   setState('journal');
                   if (user?.id) {
                     const supabase = getSupabase();
-                    void supabase.from('hub_activity_log').insert({
+                    supabase.from('hub_activity_log').insert({
                       user_id: user.id,
                       action: 'moment_feature_used',
                       metadata: { feature: 'write_it_out', used_at: new Date().toISOString() },
-                    });
+                    }).then(() => {}, () => {});
                   }
                 }}
                 className="w-full flex items-center justify-center gap-3 p-4 rounded-lg transition-all hover:bg-white/20"
@@ -952,11 +990,13 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
                     <span
                       className="text-xs"
                       style={{
-                        color: 'rgba(255, 255, 255, 0.4)',
+                        color: noteError ? '#FFD98A' : 'rgba(255, 255, 255, 0.4)',
                         fontFamily: "'DM Sans', sans-serif",
                       }}
                     >
-                      {noteText.length}/500
+                      {noteError
+                        ? 'That did not send. Your note is still here, try again.'
+                        : `${noteText.length}/500`}
                     </span>
                     <button
                       onClick={handleSubmitNote}
@@ -1260,6 +1300,14 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
                         color: 'white',
                       }}
                     />
+                    {ventError ? (
+                      <p
+                        className="text-xs mb-3"
+                        style={{ color: '#FFD98A', fontFamily: "'DM Sans', sans-serif" }}
+                      >
+                        {tUI('That did not reach us. What you wrote is still here, try again.')}
+                      </p>
+                    ) : null}
                     <button
                       onClick={handleAnonymousSubmit}
                       disabled={!anonymousVent.trim()}
