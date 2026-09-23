@@ -339,6 +339,26 @@ export default function GetStartedPage() {
             ))}
           </div>
 
+          {/* Something to read while they wait. Only on the leader path: the
+              catalogue is written to a buyer, and a teacher who just nominated
+              their school is not the reader it addresses. */}
+          {!isTeacherPath && (
+            <div className="max-w-md mx-auto mb-8">
+              <a
+                href="/for-schools/whats-inside"
+                className="block rounded-2xl p-5 shadow-sm text-left transition-shadow hover:shadow-md"
+                style={{ backgroundColor: '#ffffff' }}
+              >
+                <p className="font-semibold mb-1" style={{ color: '#1e2749' }}>
+                  While you wait, see what is inside the Hub
+                </p>
+                <p className="text-sm" style={{ color: '#4b5563' }}>
+                  Every tool your staff would get, sorted by the problem it solves. No login needed.
+                </p>
+              </a>
+            </div>
+          )}
+
           <button
             onClick={() => {
               setStep(1);
