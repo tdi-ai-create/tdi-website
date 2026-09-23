@@ -87,3 +87,39 @@ person's permissions is not proven by this.
 
 - Measured: every quoted string and figure above, and the revert counts.
 - Unverified: multi month sorting, and paused contract behaviour.
+
+---
+
+# Second pass, after the grant rule changed
+
+Rae, 22 September: funding work is only allowed once funding has been awarded.
+Taken with the award date being the gate, that means the award always precedes
+the visit, so a grant line can never legitimately sit in a month before its
+award. It now waits in the queue with its decision date instead, and becomes
+ordinary work the moment the grant lands.
+
+## What I did
+
+- Opened: http://localhost:3002/tdi-admin/billing/forecast, signed in as Review Admin
+- Pressed: nothing that writes. Saunemin's real 7 October visit had been dated on
+  the school paid line beforehand, which is the first genuine date in the system.
+- Saw: the header now reads "CLIENT MONEY $54,920", "DATED $4,500", "GRANT MONEY
+  $97,527", "AWARDED $0" noted "won, so it can be scheduled", and "UNDATED LINES
+  42 of 43 ahead of us".
+- Saw: the note now reads "Grant money stays off the calendar until the grant is
+  won, because the work cannot be scheduled before then, so it waits in the queue
+  with its decision date."
+- Saw: a month card headed "October 2026" reading "Client $4,500" and "Grant $0",
+  containing "8 Oct, On-Campus Observation & Feedback Visit 1 (50% off), Saunemin
+  CCSD #438 - service 7 Oct". The ready date is the day after the visit.
+- Saw: every grant line sits in the queue, Allenwood's "Learning Hub Membership
+  x75" at $22,425.00 among them, each reading "Waiting on a grant with no
+  expected decision date, so there is nothing to forecast against."
+- Saw: no row anywhere carries the old "award lands before the visit" warning,
+  because that case no longer exists.
+
+## What I could not verify
+
+How a grant line renders once it is actually awarded and funding_hold clears.
+No grant has been won, so there is nothing in that state to look at. The path is
+the same one client money takes, but it has not been seen.

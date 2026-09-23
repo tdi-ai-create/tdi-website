@@ -48,8 +48,6 @@ export type ForecastRow = {
   serviceOn: string | null;
   awardOn: string | null;
   held: boolean;
-  /** The award lands before the visit, so the button would refuse it until the visit. */
-  awaitsVisit: boolean;
 };
 
 const addDays = (iso: string, days: number) => {
@@ -82,12 +80,17 @@ export function isForecastable(l: ForecastInput): boolean {
  * email and dashboard update already promised within 24 hours, and means an
  * invoice never lands before the Love Notes do.
  *
- * Grant money: the award date. Rae, 22 September 2026. A funder deciding is
- * what makes the work billable, so that is the gate. Where the visit falls
- * after the award we keep the award as the gate but flag the row, because
- * createInvoice refuses any line with no delivery record and would reject a
- * date earlier than the visit. Showing it without the flag would put a number
- * in a month that the Create invoice button itself would turn down.
+ * Grant money: not on the calendar until the grant is awarded. Rae,
+ * 22 September 2026, gave two rules together. The award date is the gate, and
+ * funding work is only allowed once funding has been awarded. Taken together
+ * the award always precedes the visit, so placing a grant line on its award
+ * date would show money a month or more before anything could be billed, and
+ * createInvoice would refuse it anyway for having no delivery record.
+ *
+ * So a held line waits in the queue carrying its expected decision date, which
+ * is the honest statement of where that money stands. The moment the grant
+ * lands, funding_hold flips and the line becomes ordinary work: ready the day
+ * after its visit, exactly like money a school is paying directly.
  *
  * Anything not visit shaped has no date here at all. Hub memberships bill on
  * activation and books bill when they ship, and inventing a visit for them
@@ -109,9 +112,19 @@ export function forecastLine(l: ForecastInput): ForecastRow {
     serviceOn,
     awardOn,
     held: l.planned_confidence === 'held',
-    awaitsVisit: false,
   };
 
+  // A grant line cannot be scheduled, let alone billed, until the funder says
+  // yes. It belongs in the queue with its decision date, not in a month.
+  if (ledger === 'grant') {
+    return {
+      ...base,
+      readyOn: null,
+      blockedBy: awardOn
+        ? `Waiting on the grant decision, expected ${awardOn}. Work cannot be scheduled until it is awarded.`
+        : 'Waiting on a grant with no expected decision date, so there is nothing to forecast against.',
+    };
+  }
   if (!visitShaped) {
     return { ...base, readyOn: null, blockedBy: `${l.service_type.replace(/_/g, ' ')} bills on a milestone, not a visit. Not modelled yet.` };
   }
@@ -121,18 +134,7 @@ export function forecastLine(l: ForecastInput): ForecastRow {
 
   const readyAfterVisit = addDays(serviceOn, 1);
 
-  if (ledger !== 'grant') {
-    return { ...base, readyOn: readyAfterVisit, blockedBy: null };
-  }
-  if (!awardOn) {
-    return { ...base, readyOn: null, blockedBy: 'Grant has no expected decision date, so there is nothing to forecast against.' };
-  }
-  return {
-    ...base,
-    readyOn: awardOn,
-    blockedBy: null,
-    awaitsVisit: awardOn < readyAfterVisit,
-  };
+  return { ...base, readyOn: readyAfterVisit, blockedBy: null };
 }
 
 export type Month = {
