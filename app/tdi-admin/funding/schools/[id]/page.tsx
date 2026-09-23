@@ -11,8 +11,11 @@ import Link from 'next/link'
  * September as agents worked. It has simply never been shown as a log.
  *
  * The profile is where grant narratives get their numbers, so a fact with no
- * source is marked. On Saunemin that is three of them, and QA rejected all
- * three on attempts 1, 3 and 5 of the same application.
+ * source is marked. Looking at it live on 23 September was worse than expected:
+ * every one of Saunemin's eight claims is unsourced, not the three QA has
+ * rejected so far. The stored blob has no per-field sources at all. There is a
+ * `proficiency_source` key, but the values it would describe are stored as
+ * `math_proficiency` and `reading_proficiency`, so it attaches to neither.
  */
 
 interface Fact { key: string; value: string; source: string | null; needsSource: boolean }
@@ -31,7 +34,8 @@ const C = {
   accent: '#ffba06',
 }
 
-function money(n: number): string { return `$${n.toLocaleString('en-US')}` }
+/** Whole dollars. A contract of 56372.80 read as "$56,372.8" on the live page. */
+function money(n: number): string { return `$${Math.round(n).toLocaleString('en-US')}` }
 
 function label(key: string): string {
   return key.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
@@ -160,9 +164,15 @@ export default function SchoolPage({ params }: { params: Promise<{ id: string }>
                 <div style={{ fontSize: 16, fontWeight: 700, color: C.ink, marginTop: 3, wordBreak: 'break-word' }}>
                   {f.value || '—'}
                 </div>
-                <div style={{ fontSize: 11.5, marginTop: 4, color: f.needsSource ? C.bad : C.ink2, fontWeight: f.needsSource ? 600 : 400 }}>
-                  {f.source ?? 'No source recorded'}
-                </div>
+                {/* A label like an address or an EIN is not a claim, so it is
+                    not counted as unsourced and must not be nagged about. The
+                    first live look showed "No source recorded" under the EIN,
+                    which reads as a problem where there is none. */}
+                {(f.source || f.needsSource) && (
+                  <div style={{ fontSize: 11.5, marginTop: 4, color: f.needsSource ? C.bad : C.ink2, fontWeight: f.needsSource ? 600 : 400 }}>
+                    {f.source ?? 'No source recorded'}
+                  </div>
+                )}
               </div>
             ))}
           </div>
