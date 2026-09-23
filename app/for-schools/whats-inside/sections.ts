@@ -109,14 +109,3 @@ export const SECTIONS: Section[] = [
   },
 ];
 
-/** Short description of each area, used in the hero card. */
-export const AREA_BLURB: Record<SectionSlug, string> = {
-  behavior: 'The specific minute a student loses it and an adult has to respond',
-  instructional_planning: 'Units, small groups, and assessment you can act on this week',
-  paras: 'The staff handed the hardest students and the least preparation',
-  first_weeks: 'Setup and routines that decide how the rest of the year runs',
-  families: 'Conferences, the difficult call, and the update home',
-  leading: 'Walkthroughs, coaching, and staff meetings worth attending',
-  teacher_load: 'The part that turns into your retention problem in April',
-  ai_technology: 'The question your board is asking that few districts have answered',
-};
