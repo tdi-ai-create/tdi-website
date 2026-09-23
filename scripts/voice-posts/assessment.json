@@ -1,0 +1,194 @@
+{
+  "category": "Assessment",
+  "tools": [
+    {
+      "slug": "one-to-one-student-support-session-log",
+      "posts": [
+        ["Deshawn Pryor", "from_tdi", "One line per session is the whole design. If you try to write a narrative afterwards you will stop filling it in by the third week, and the gaps are what get questioned later."],
+        ["Rosalie Dunne", "from_tdi", "Record what the student did, not what you delivered. When someone asks whether the support is working, the pupil's response is the only part of the log that answers them."],
+        ["Yolanda Betts", "question", "Paras, when do you actually write yours up, during the session itself or in whatever gap comes afterwards? I am curious whether anyone manages it live."],
+        ["Lorna Stimpson", "question", "Does anyone else read your session logs, or do they sit with you until a review meeting comes round and someone suddenly wants the history?"]
+      ]
+    },
+    {
+      "slug": "assessment-data-tracking-log-template",
+      "posts": [
+        ["Hana Sugimoto", "from_tdi", "Decide what a column means before you fill in a single one. Half the trackers that get abandoned died because a skill and a standard were being logged in the same place."],
+        ["Priya Raghunathan", "from_tdi", "It is built to be reused rather than rebuilt each unit, so resist the urge to restyle it. The value comes from rows that look identical in October and in March."],
+        ["Marcus Oyelaran", "question", "How many skills are you tracking at once before the log stops being useful? There must be a point where the columns outnumber what you can hold in your head."],
+        ["Camille Thibodeaux", "question", "Do you keep one log per class or one per skill? Both get defended hard, and I would like to hear what made you settle where you did."]
+      ]
+    },
+    {
+      "slug": "data-meeting-prep-one-pager",
+      "posts": [
+        ["Deacon Mwangi", "from_tdi", "Fill this in before the meeting, not during it. A one pager written live turns into a transcript, and everyone leaves with a summary rather than a decision."],
+        ["Jarrod Levins", "from_tdi", "The section people skip is the one asking what you will do differently. Without it the hour ends as a reading of numbers that the room already had."],
+        ["Priya Raghunathan", "question", "How long do your data meetings actually run, and how much of that goes on getting everyone looking at the same figures?"],
+        ["Marisol Aguirre", "question", "Leaders, does anyone send this out ahead so teachers arrive with their own version filled in, or is the prep expected to stay on your side of the table?"]
+      ]
+    },
+    {
+      "slug": "early-literacy-essentials-teacher-checklist",
+      "posts": [
+        ["Callum Ferreira", "from_tdi", "Read it as a floor, not a wish list. Every item is something that should already be running, so the useful signal is the one or two you cannot tick honestly."],
+        ["Simone Ashcroft", "from_tdi", "It deliberately does not tell you how to teach any of it. The checklist only asks whether the thing exists in the week at all, which is a different question."],
+        ["Marisol Aguirre", "question", "Which item did you tick with hesitation rather than confidence? Those are usually the ones worth saying out loud, and nobody volunteers them unprompted."],
+        ["Ofelia Marchetti", "question", "For anyone in early years, how often would you want to revisit a list like this, termly or once a year?"]
+      ]
+    },
+    {
+      "slug": "exit-ticket-template-pack",
+      "posts": [
+        ["Tobias Rennert", "from_tdi", "Rotating the format is the point. Once pupils can predict the question, an exit ticket measures how well they read your habits rather than what they learnt."],
+        ["Camille Thibodeaux", "from_tdi", "Pick the format when you plan, not at the end of the lesson. Choosing in the moment is how everyone ends up using the same one all year without noticing."],
+        ["Ravi Chandrasekar", "question", "Which of the three formats gives you something you can actually act on the next morning, rather than a pile you feel obliged to read?"],
+        ["Marcus Oyelaran", "question", "Do you read every exit ticket, or sort them into piles and look closely at one? Nobody seems to describe the same method twice."]
+      ]
+    },
+    {
+      "slug": "formative-assessment-decision-tree",
+      "posts": [
+        ["Priya Raghunathan", "from_tdi", "It is built for planning speed, so run it while the lesson is still on the page. Using it afterwards only confirms the check you had already chosen."],
+        ["Hana Sugimoto", "from_tdi", "The first branch asks what you want to find out, and that is where most choices go wrong. Picking the activity first is the habit this is trying to break."],
+        ["Aurelia Nkemdirim", "question", "Where does the tree land you most often, and was that the check you would have reached for anyway? The mismatch is the interesting bit."],
+        ["Tobias Rennert", "question", "Has anyone hit a lesson where none of the branches fitted what they needed to find out? Curious what the lesson was and what you used instead."]
+      ]
+    },
+    {
+      "slug": "grading-turnaround-tracker",
+      "posts": [
+        ["Trevon Baptiste", "from_tdi", "Time the whole loop, from collecting work to handing it back, not just the marking. The gap between finishing a pile and returning it is the part nobody counts."],
+        ["Wendell Prosser", "from_tdi", "Two or three weeks of honest logging beats any estimate you would give from memory. Do not tidy the numbers up because one week went badly."],
+        ["Ingrid Vasquez-Lund", "question", "What does your turnaround look like on a heavy assignment compared with a short one? I suspect the gap is wider than most of us would guess."],
+        ["Marcus Oyelaran", "question", "Has tracking this ever changed what you assign, rather than only how quickly you mark? That seems the more useful outcome and the harder one to reach."]
+      ]
+    },
+    {
+      "slug": "iep-504-accommodation-quick-reference-tracker",
+      "posts": [
+        ["Rosalie Dunne", "from_tdi", "This records what was provided, not what was promised in the plan. Those two are rarely identical, and the distance between them is exactly what the tracker exists to surface."],
+        ["Yolanda Betts", "from_tdi", "Logging who gave the support feels fussy until a pupil moves between four adults in a day. Then it is the only way to see which accommodations quietly stopped happening."],
+        ["Jarrod Levins", "question", "Who is meant to fill this in where you are, the teacher, the para, or whoever happens to be with the pupil at the time?"],
+        ["Lorna Stimpson", "question", "When you set a week of this against the plan on paper, what tends to be the first thing to slip?"]
+      ]
+    },
+    {
+      "slug": "lab-report-template",
+      "posts": [
+        ["Ingrid Vasquez-Lund", "from_tdi", "The structure is doing the teaching here. Pupils who can run an experiment often cannot say what they were testing, and the purpose box makes that visible before any data arrives."],
+        ["Ravi Chandrasekar", "from_tdi", "Younger classes usually need the hypothesis section modelled once before they write their own. Handed out cold, it produces restated instructions rather than a prediction."],
+        ["Aurelia Nkemdirim", "question", "At what age do you stop scaffolding the hypothesis and let pupils write it unaided? I would guess it varies more by class than by year group."],
+        ["Wendell Prosser", "question", "Does anyone use this outside science? The shape looks close to what a workshop or technical write up needs, and I would rather borrow than build."]
+      ]
+    },
+    {
+      "slug": "progress-monitoring-tracker-small-groups",
+      "posts": [
+        ["Deshawn Pryor", "from_tdi", "Built to be written in while the group is running, not afterwards. If it waits until the end of the day, the detail that made it worth recording has already gone."],
+        ["Ofelia Marchetti", "from_tdi", "Track the same thing every time, even in the sessions that go sideways. A tracker with holes in it cannot show whether a child is moving or standing still."],
+        ["Yolanda Betts", "question", "Paras, do you hand this back to the class teacher on a set day, or only when something in the pattern looks off enough to mention?"],
+        ["Rosalie Dunne", "question", "How many sessions do you need before you trust the pattern enough to move a pupil between groups? I have heard everything from three to a full term."]
+      ]
+    },
+    {
+      "slug": "formative-assessment-para-toolkit",
+      "posts": [
+        ["Everett Crane", "from_tdi", "All five are meant to take no extra minutes out of a pull out session. If a strategy is eating teaching time, it is being run as an activity rather than a check."],
+        ["Deshawn Pryor", "from_tdi", "Learn one properly before you touch the others. Paras get handed a lot of new things at once, and this works far better as a slow build."],
+        ["Ofelia Marchetti", "question", "Which of the five sits most naturally in a short session with very young children? Some of them seem to assume more writing than is realistic."],
+        ["Lorna Stimpson", "question", "Paras, what happens to what you notice in these sessions? Does it get back to the teacher in writing, or in passing on the way out?"]
+      ]
+    },
+    {
+      "slug": "real-time-checks-reading-the-room",
+      "posts": [
+        ["Marcus Oyelaran", "from_tdi", "This is about the signals that arrive long before the exit ticket does. By the time you are marking, the moment when you could have changed direction has gone."],
+        ["Bettina Kowalczyk", "from_tdi", "The hard part is not spotting the drift, it is being willing to abandon the plan you prepared last night. That decision is what the guidance is really asking for."],
+        ["Camille Thibodeaux", "question", "What is your earliest tell that a room has stopped following you? The answers to this are always oddly specific and rarely the same twice."],
+        ["Gus Halvorsen", "question", "In a large space the signals look different. Anyone teaching outside a standard classroom, in a gym, a workshop or a lab, what do you watch for?"]
+      ]
+    },
+    {
+      "slug": "running-records-para-cheat-sheet",
+      "posts": [
+        ["Yolanda Betts", "from_tdi", "The notation is the easy half. Getting the record back to the teacher in a form they can act on is where these usually fall over."],
+        ["Deshawn Pryor", "from_tdi", "Keep the marking codes identical to whatever the teacher uses, even if you prefer your own shorthand. A record nobody else can read is just a private note."],
+        ["Callum Ferreira", "question", "Paras, how much training did you get on running records before you were asked to take them? Honest answers would be useful to whoever writes the schedules."],
+        ["Ofelia Marchetti", "question", "Does the teacher you work with want the running record raw, or summarised down to a level and a next step? Worth asking rather than guessing."]
+      ]
+    },
+    {
+      "slug": "small-group-pull-out-session-tracker",
+      "posts": [
+        ["Lorna Stimpson", "from_tdi", "One row per session, filled in the same way every time. The value only shows up across a term, which is exactly why the first fortnight feels pointless."],
+        ["Rosalie Dunne", "from_tdi", "Record who was absent as carefully as who attended. Half the intervention conversations that go nowhere are really about pupils who were never in the room."],
+        ["Everett Crane", "question", "How often does a pull out session get cut short where you are, and do you log it when it happens?"],
+        ["Deacon Mwangi", "question", "For anyone running several groups a week, does one tracker per group hold up, or do the sessions start blurring together by Thursday?"]
+      ]
+    },
+    {
+      "slug": "standardized-testing-week-prep-checklist",
+      "posts": [
+        ["Jarrod Levins", "from_tdi", "Work through it a week out, not the night before. The accommodations section is the one that needs lead time, because it depends on other people confirming things."],
+        ["Nadia Belhassen", "from_tdi", "Check the family communication line early. Language access for test week gets arranged late almost everywhere, and late is the same as never for some families."],
+        ["Ingrid Vasquez-Lund", "question", "What is the thing that always gets missed during testing week where you are? Every building seems to have one predictable failure, and it is rarely the tests themselves."],
+        ["Trevon Baptiste", "question", "How far ahead are you told which pupils have which accommodations, and is that enough time to sort the rooms and the staffing?"]
+      ]
+    },
+    {
+      "slug": "student-behavior-data-collection-abc-tracking",
+      "posts": [
+        ["Everett Crane", "from_tdi", "Write the antecedent as what happened, not why you think it happened. Interpretation in that column is how a tracker ends up confirming the story you already had."],
+        ["Rosalie Dunne", "from_tdi", "Pick one behaviour and define it tightly enough that two adults would record the same event. Loose definitions produce pages of data nobody can act on."],
+        ["Bettina Kowalczyk", "question", "How many days of ABC data do you collect before anyone will sit down and look at it with you?"],
+        ["Yolanda Betts", "question", "Who usually takes this where you are, the adult nearest the pupil or someone observing from outside the lesson? The two produce quite different records."]
+      ]
+    },
+    {
+      "slug": "student-self-assessment-builder",
+      "posts": [
+        ["Bettina Kowalczyk", "from_tdi", "Confidence questions measure mood. These prompts ask pupils to point at something specific they can or cannot yet do, which is harder to answer and far more useful to read."],
+        ["Trevon Baptiste", "from_tdi", "Build two or three prompts and keep them for the whole unit. Rewording them every lesson makes the responses impossible to line up against each other."],
+        ["Marisol Aguirre", "question", "At what age does self assessment start giving you answers you trust? I keep hearing that younger pupils rate themselves high on everything, and I wonder if that holds."],
+        ["Hana Sugimoto", "question", "Do pupils see their own earlier answers when they fill one of these in, or does each self assessment start from a blank page? Both seem defensible."]
+      ]
+    },
+    {
+      "slug": "assessment-audit",
+      "posts": [
+        ["Priya Raghunathan", "from_tdi", "Bring one real assessment to this rather than thinking about them in general. The mismatch only shows up when a specific task sits next to a specific objective."],
+        ["Tobias Rennert", "from_tdi", "Expect to find questions that test reading speed or familiarity with your format rather than the thing you taught. That is the usual outcome and it is not a failure."],
+        ["Ingrid Vasquez-Lund", "question", "Which of your assessments would you least like to put through this, and what is it about that one that makes you hesitate?"],
+        ["Deacon Mwangi", "question", "Has anyone run this across a whole department rather than alone? I would want to know whether it stayed a conversation or turned into a defence of old papers."]
+      ]
+    },
+    {
+      "slug": "the-closure-problem",
+      "posts": [
+        ["Camille Thibodeaux", "from_tdi", "The problem is structural, not a failure of time management. Closure gets cut because it is scheduled last, so the fix is planning it before the middle of the lesson expands."],
+        ["Marcus Oyelaran", "from_tdi", "Protect three minutes and mean it. A closing routine that only happens on the good days teaches pupils it was optional all along."],
+        ["Gus Halvorsen", "question", "Specialists, how do you close a lesson when the bell is the only ending and there is still equipment to put away? The last five minutes are never yours."],
+        ["Simone Ashcroft", "question", "With the youngest children, what does a closing that genuinely consolidates look like? Tidying and lining up seem to swallow the end of the session everywhere."]
+      ]
+    },
+    {
+      "slug": "formative-assessment-toolkit",
+      "posts": [
+        ["Hana Sugimoto", "from_tdi", "Every strategy here replaces something you already do rather than sitting on top of it. If one is adding minutes to the lesson, it has become an activity."],
+        ["Aurelia Nkemdirim", "from_tdi", "Start with the strategy that fits a lesson you teach often. Trying four new checks in one week is how the whole toolkit gets quietly abandoned."],
+        ["Ravi Chandrasekar", "question", "Which of these has survived longest once the novelty wore off? Everything works for a fortnight, so the ones still in use a term later are the interesting ones."],
+        ["Nadia Belhassen", "question", "Which of these hold up with pupils still building the language of the lesson? A few rely on quick spoken answers, which is not a neutral ask for everyone."]
+      ]
+    },
+    {
+      "slug": "retrieval-practice-checklist",
+      "posts": [
+        ["Tobias Rennert", "from_tdi", "Retrieval only works when pupils cannot see the material. The checklist keeps returning to that because the most common version, a quiz with notes open, is just reading."],
+        ["Marisol Aguirre", "from_tdi", "Spacing is the item people quietly drop. Retrieval on the same day as the teaching feels better for everyone in the room and does the least for memory."],
+        ["Wendell Prosser", "question", "How do you fit retrieval in without it eating the first ten minutes of every lesson? The checklist is clear on the why and quieter on the where."],
+        ["Camille Thibodeaux", "question", "Does anyone grade retrieval practice? The argument against is that pupils stop showing what they do not know, and I would like to hear whether that plays out."]
+      ]
+    }
+  ]
+}

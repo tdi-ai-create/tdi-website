@@ -1,0 +1,97 @@
+{
+  "category": "Self-Care",
+  "note": "Posts from TDI-owned voice accounts. Comments describe the tool, what to change, or who it suits. None claims a classroom moment. Questions invite a member to answer.",
+  "tools": [
+    {
+      "slug": "10-low-lift-ways-solution",
+      "id": "ed35fd05-9183-4a40-8e89-538a1391109f",
+      "posts": [
+        ["Deacon Mwangi", "from_tdi", "Ten is more than anyone needs at once. Pick the two that cost you nothing and leave the rest for a month when you have more room."],
+        ["Yolanda Betts", "from_tdi", "Most of these work from a support role as well as from the front of the room, which is not true of everything filed under school culture."],
+        ["Marisol Aguirre", "question", "Which of the ten would be easiest in your building, and which would get a raised eyebrow?"],
+        ["Jarrod Levins", "question", "If you have tried to shift something small in your school, what made people come along with it?"]
+      ]
+    },
+    {
+      "slug": "burnout-early-warning",
+      "id": "b2ca7606-6dc6-4bda-b62f-fe9e2d431ecc",
+      "posts": [
+        ["Bettina Kowalczyk", "from_tdi", "The point of the three types is that the fix is different for each. Workload burnout needs things taken off the list. Disconnect burnout does not, and treating it that way makes it worse."],
+        ["Rosalie Dunne", "from_tdi", "Answer it for the week you are actually in, not the week you wish you were in. A calm week gives you a reading you cannot use."],
+        ["Priya Raghunathan", "question", "Which of the three did you come out as, and did it match what you would have guessed beforehand?"],
+        ["Everett Crane", "question", "For anyone who has come back from one of these, what actually helped, rather than what people told you should help?"],
+        ["Camille Thibodeaux", "question", "Is there a fourth type this misses?"]
+      ]
+    },
+    {
+      "slug": "holiday-break-protection-bundle",
+      "id": "834365f1-d882-449f-8491-e267c0b3be2d",
+      "posts": [
+        ["Ofelia Marchetti", "from_tdi", "Use this before the last week, not during it. By the Friday before break the decisions it asks you to make have usually been made for you."],
+        ["Gus Halvorsen", "from_tdi", "The boundary pieces are the ones people skip and then regret. The time pieces are easier and matter less."],
+        ["Lorna Stimpson", "question", "What is the one thing that always follows you home over a break, and have you found a way to leave it?"],
+        ["Tobias Rennert", "question", "For anyone who has actually protected a break well, what did you say no to?"]
+      ]
+    },
+    {
+      "slug": "reset-without-guilt-reclaim-time-energy",
+      "id": "02cd1390-aa76-4595-9b10-ad43aca458b1",
+      "posts": [
+        ["Simone Ashcroft", "from_tdi", "Three tools, and they are not a sequence. Start with whichever one names the thing currently bothering you and ignore the other two."],
+        ["Nadia Belhassen", "from_tdi", "The guilt part is doing real work here. A time management tool that does not address it tends to get abandoned by week two."],
+        ["Hana Sugimoto", "question", "What do you feel guiltiest about protecting, and who taught you to feel that way about it?"],
+        ["Trevon Baptiste", "question", "Which of the three tools would you hand to a first year teacher?"]
+      ]
+    },
+    {
+      "slug": "7-day-sleep-challenge",
+      "id": "c835c898-0de6-4d5d-82b9-f47eb91add38",
+      "posts": [
+        ["Wendell Prosser", "from_tdi", "Seven days is short on purpose. It is long enough to notice a change and short enough that a bad Wednesday does not end it."],
+        ["Aurelia Nkemdirim", "from_tdi", "The nightly adjustments are deliberately small. Anything that needs a new routine tends to lose to grading."],
+        ["Ravi Chandrasekar", "question", "Which night of the week is hardest for you to protect, and what usually takes it?"],
+        ["Deshawn Pryor", "question", "If you have done something like this before, did the change hold once the challenge ended?"]
+      ]
+    },
+    {
+      "slug": "awesome-audit",
+      "id": "e030e2a6-af8b-493f-952f-9c544fb71700",
+      "posts": [
+        ["Callum Ferreira", "from_tdi", "Starting from what already works is not a softer version of reflection. It is harder, because most of us can list our gaps faster than our strengths."],
+        ["Ingrid Vasquez-Lund", "from_tdi", "Worth doing before an evaluation rather than after. The language you find here is the language you will want in the room."],
+        ["Marcus Oyelaran", "question", "What came up on your audit that you had stopped noticing you did?"],
+        ["Priya Raghunathan", "question", "For coaches, would you use this with a teacher who is struggling, or does it land wrong in that moment?"]
+      ]
+    },
+    {
+      "slug": "friend-audit",
+      "id": "bb4c1184-f93a-46b8-8b11-ff212db886f9",
+      "posts": [
+        ["Bettina Kowalczyk", "from_tdi", "This one gets personal faster than people expect. Do it somewhere you will not be interrupted."],
+        ["Yolanda Betts", "from_tdi", "It is not asking you to cut anybody. It is asking you to notice who you leave lighter than you arrived."],
+        ["Lorna Stimpson", "question", "Did anything on this surprise you, or did it confirm something you already knew and had not said?"],
+        ["Rosalie Dunne", "question", "How do you handle it when the person who drains you is someone you work beside every day?"]
+      ]
+    },
+    {
+      "slug": "sustainable-teaching-self-check",
+      "id": "c7b05ab6-b514-4d87-bcb9-98ea3873c82e",
+      "posts": [
+        ["Camille Thibodeaux", "from_tdi", "Catching a pattern early is the whole idea, so this is worth repeating in October and again in February rather than once."],
+        ["Tobias Rennert", "from_tdi", "The habits it asks about are the ordinary ones. Nothing here requires a change of job or a change of building."],
+        ["Simone Ashcroft", "question", "Which habit did this flag that you would defend anyway, and why is it worth it to you?"],
+        ["Jarrod Levins", "question", "For anyone leading a team, would you ask staff to do this, or does it only work when nobody sees the answers?"]
+      ]
+    },
+    {
+      "slug": "end-of-year-checklist-guilt-free-summer",
+      "id": "6ea69314-7414-46a1-9318-83fc5fb9b417",
+      "posts": [
+        ["Gus Halvorsen", "from_tdi", "Work backwards from the last day rather than forwards from today. The order it gives you only helps if the deadline is fixed."],
+        ["Ofelia Marchetti", "from_tdi", "Half of this is handover rather than tidying. If somebody else has your room or your group next year, that half matters more."],
+        ["Hana Sugimoto", "question", "What is always still on your list in July, no matter how organised June was?"],
+        ["Nadia Belhassen", "question", "What would you add to this for someone leaving a building rather than coming back to it?"]
+      ]
+    }
+  ]
+}

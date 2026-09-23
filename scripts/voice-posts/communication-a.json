@@ -1,0 +1,144 @@
+{
+  "category": "Communication (first half)",
+  "note": "Posts from TDI-owned voice accounts. Comments describe the tool, what to change, or who it suits. None claims a classroom moment.",
+  "tools": [
+    { "slug": "good-news-postcard-template", "posts": [
+      ["Marisol Aguirre", "from_tdi", "One line, and it has to be specific. Great week is a form letter and the family reads it as one."],
+      ["Yolanda Betts", "from_tdi", "Send the first batch to the families who usually only hear from school when something is wrong. That is where this earns the most."],
+      ["Hana Sugimoto", "question", "Who would you send the first one to, and why that student?"],
+      ["Ofelia Marchetti", "question", "Has a note home ever changed how a family dealt with you afterwards?"]
+    ]},
+    { "slug": "five-minute-morning-checkin", "posts": [
+      ["Callum Ferreira", "from_tdi", "Designed for the first month, when you do not know them yet. It works later too but it is answering a different question by then."],
+      ["Simone Ashcroft", "from_tdi", "Keep the reflection question the same for a week at a time. Changing it daily means you are comparing nothing to nothing."],
+      ["Deshawn Pryor", "question", "What question do you ask that gets you a real answer rather than a shrug?"],
+      ["Marcus Oyelaran", "question", "Does five minutes hold, or does it grow once students realise you are actually listening?"]
+    ]},
+    { "slug": "ai-misuse-conversation-script-student-conferences", "posts": [
+      ["Trevon Baptiste", "from_tdi", "One to one, and the script opens without an accusation, because you almost never have proof of the thing you suspect."],
+      ["Ravi Chandrasekar", "from_tdi", "Have the conversation somewhere the rest of the class cannot watch. Most of what goes wrong here is about the audience."],
+      ["Ingrid Vasquez-Lund", "question", "What do you do when the student denies it and you are fairly sure?"],
+      ["Wendell Prosser", "question", "Does your department agree on what happens after this conversation?"]
+    ]},
+    { "slug": "autism-acceptance-directory", "posts": [
+      ["Rosalie Dunne", "from_tdi", "Check who leads each organisation before you partner. Autistic-led and autism-adjacent are different things and families notice which one you brought in."],
+      ["Nadia Belhassen", "from_tdi", "The partnership guide is more useful than the directory if you are starting from nothing."],
+      ["Bettina Kowalczyk", "question", "Has your school partnered with an organisation for this? How did you choose?"],
+      ["Priya Raghunathan", "question", "What went wrong the first time you tried something like this?"]
+    ]},
+    { "slug": "autism-acceptance-toolkit", "posts": [
+      ["Rosalie Dunne", "from_tdi", "Read the parent handouts before sending them. Families of autistic children have usually read a great deal already and can tell immediately whether you have."],
+      ["Ofelia Marchetti", "from_tdi", "The teacher guide assumes a mainstream classroom. If you are in a specialist setting, most of it will be behind where you are."],
+      ["Yolanda Betts", "question", "What would you want said to your class, if you were a parent of an autistic child in it?"],
+      ["Lorna Stimpson", "question", "How do you mark this month without making a single student the exhibit?"]
+    ]},
+    { "slug": "back-to-school-night-prep-checklist", "posts": [
+      ["Tobias Rennert", "from_tdi", "Decide your three sentences before the night rather than during it. Everything else on the checklist is logistics around those three."],
+      ["Marisol Aguirre", "from_tdi", "The families you most want to meet are usually the ones who do not come. Worth planning what happens the next day for them."],
+      ["Camille Thibodeaux", "question", "What is the one thing you make sure to say to every family who walks in?"],
+      ["Jarrod Levins", "question", "For leaders, what makes a good back-to-school night from the building's side rather than the classroom's?"]
+    ]},
+    { "slug": "back-to-school-welcome-letter-template", "posts": [
+      ["Simone Ashcroft", "from_tdi", "The practical details are what families actually keep. The introduction is what they read once."],
+      ["Nadia Belhassen", "from_tdi", "If you send this in more than one language, have a person check it. A machine translation of a welcome letter reads as exactly that."],
+      ["Callum Ferreira", "question", "What do you put in yours that is not in the template?"],
+      ["Trevon Baptiste", "question", "Paper, email, or both? I would expect the answer to differ a lot by building."]
+    ]},
+    { "slug": "building-student-to-student-respect", "posts": [
+      ["Bettina Kowalczyk", "from_tdi", "Concrete moves rather than a values poster, which is the right call. Respect on a wall changes nothing about how students speak to each other."],
+      ["Marcus Oyelaran", "from_tdi", "These work best introduced one at a time. All of them at once reads as a crackdown."],
+      ["Camille Thibodeaux", "question", "Which move here would your class find hardest?"],
+      ["Everett Crane", "question", "What do you do about the student who is respectful to adults and not to peers?"]
+    ]},
+    { "slug": "conversation-starter-cheat-sheet", "posts": [
+      ["Hana Sugimoto", "from_tdi", "Three audiences on one sheet, and the colleague section is the one people are least likely to have thought about."],
+      ["Deshawn Pryor", "from_tdi", "Useful for anyone new to a building, where the problem is not what to say but who to say it to."],
+      ["Ofelia Marchetti", "question", "What is your reliable opener with a student who does not want to talk?"],
+      ["Lorna Stimpson", "question", "What works with a colleague you do not know well and have to work with closely?"]
+    ]},
+    { "slug": "copy-paste-messages-partnering-parents", "posts": [
+      ["Marisol Aguirre", "from_tdi", "Personalise one line at minimum. A message that is entirely template reads as one, and families compare notes."],
+      ["Ingrid Vasquez-Lund", "from_tdi", "The hardest scenarios here are the ones where you need to say something is not working. Those are worth rehearsing rather than sending cold."],
+      ["Tobias Rennert", "question", "Which parent message do you find hardest to write?"],
+      ["Nadia Belhassen", "question", "What have you added to your own copy-paste set that is not in here?"]
+    ]},
+    { "slug": "counselor-check-in-log-template", "posts": [
+      ["Priya Raghunathan", "from_tdi", "One page per check-in keeps a caseload readable. Longer notes feel more thorough and get read less."],
+      ["Rosalie Dunne", "from_tdi", "The follow-up plan is the field that makes the log useful later. Reason and topics alone tell you what happened, not what you owe."],
+      ["Jarrod Levins", "question", "Who else sees these where you work, and does the student know that?"],
+      ["Bettina Kowalczyk", "question", "How do you decide what belongs in the log and what stays between you and the student?"]
+    ]},
+    { "slug": "difficult-conversation-call-script", "posts": [
+      ["Trevon Baptiste", "from_tdi", "The opening matters more than the rest. A call that starts badly cannot really be recovered inside the same call."],
+      ["Camille Thibodeaux", "from_tdi", "Sharing a concern without a verdict attached is the skill this is teaching. Most of us arrive with the verdict already formed."],
+      ["Wendell Prosser", "question", "What is your opening line on a call you are dreading?"],
+      ["Marcus Oyelaran", "question", "Do you call, or do you write first and then call? I suspect that choice decides half of it."]
+    ]},
+    { "slug": "during-conference-live-notes-template", "posts": [
+      ["Ingrid Vasquez-Lund", "from_tdi", "Writing during the conference rather than after it is the point. Notes reconstructed an hour later quietly become your version of the meeting."],
+      ["Hana Sugimoto", "from_tdi", "Tell the family you are taking notes and why. Silent writing across a table reads as something else entirely."],
+      ["Ravi Chandrasekar", "question", "How do you take notes without losing eye contact for the whole meeting?"],
+      ["Priya Raghunathan", "question", "Do you share the agreed next steps back to the family afterwards?"]
+    ]},
+    { "slug": "end-of-year-summary-letter-template", "posts": [
+      ["Aurelia Nkemdirim", "from_tdi", "Name one specific thing per student. Growth this year is what everyone writes and nobody remembers."],
+      ["Callum Ferreira", "from_tdi", "Worth writing in May rather than the last week, when you have more of the year in mind and less to do."],
+      ["Simone Ashcroft", "question", "What do families say back to you about these, if anything?"],
+      ["Yolanda Betts", "question", "How do you write one for a student whose year was genuinely hard?"]
+    ]},
+    { "slug": "family-communication-log", "posts": [
+      ["Jarrod Levins", "from_tdi", "The value of a log is entirely in it being complete. A log with the easy calls in it and not the hard ones is worse than none."],
+      ["Marisol Aguirre", "from_tdi", "Log the attempt as well as the contact. Three unreturned calls is a record that matters later."],
+      ["Ofelia Marchetti", "question", "Has a log of yours ever been asked for? What was it needed for?"],
+      ["Tobias Rennert", "question", "How do you keep this up in a week where everything is behind?"]
+    ]},
+    { "slug": "feedback-framework-quick-reference", "posts": [
+      ["Priya Raghunathan", "from_tdi", "The same framework for students and colleagues is a stronger claim than it looks, and mostly it holds. The pacing is what changes."],
+      ["Deacon Mwangi", "from_tdi", "Feedback that cannot be acted on this week is commentary. That is the filter worth applying to everything here."],
+      ["Camille Thibodeaux", "question", "What feedback have you been given that actually changed something you do?"],
+      ["Ravi Chandrasekar", "question", "Is giving feedback to a colleague harder than to a student, or just different?"]
+    ]},
+    { "slug": "group-project-role-assignment-note-home", "posts": [
+      ["Marcus Oyelaran", "from_tdi", "Telling families the role is what stops a parent doing the whole project for the student who was assigned research."],
+      ["Ravi Chandrasekar", "from_tdi", "Be explicit about what support looks like at home. Families guess, and they guess generously."],
+      ["Wendell Prosser", "question", "What does help at home actually mean for a group project in your subject?"],
+      ["Aurelia Nkemdirim", "question", "How do you handle the group where one student did everything?"]
+    ]},
+    { "slug": "helping-families-navigate-middle-school", "posts": [
+      ["Tobias Rennert", "from_tdi", "Parent-facing, so send it rather than summarising it. The anxiety this addresses is usually about the building and the timetable rather than the work."],
+      ["Marcus Oyelaran", "from_tdi", "Best sent in spring of the year before, not in September. By September the worry has already happened."],
+      ["Camille Thibodeaux", "question", "What do families ask you most about the move up?"],
+      ["Bettina Kowalczyk", "question", "What surprised you about middle school when you first taught it?"]
+    ]},
+    { "slug": "kindergarten-ell-quick-communication-tool", "posts": [
+      ["Nadia Belhassen", "from_tdi", "The visual supports carry most of the load at this age. The words are for the adults."],
+      ["Callum Ferreira", "from_tdi", "Works for any child who is not yet speaking much, not only for language learners. Worth knowing before you file it away."],
+      ["Simone Ashcroft", "question", "What is your first move with a five year old who has no English and has just arrived?"],
+      ["Ofelia Marchetti", "question", "How do you communicate with the family in that first week?"]
+    ]},
+    { "slug": "multi-classroom-communication-log", "posts": [
+      ["Lorna Stimpson", "from_tdi", "Shared is the important word. A log only one person writes in is a diary."],
+      ["Deshawn Pryor", "from_tdi", "Built for people who are in four rooms a day and belong to none of them, which is a communication problem no classroom system solves."],
+      ["Yolanda Betts", "question", "How many rooms are you in during a day, and how do messages reach you now?"],
+      ["Everett Crane", "question", "What gets lost most often between classrooms where you are?"]
+    ]},
+    { "slug": "specialist-session-quick-note", "posts": [
+      ["Rosalie Dunne", "from_tdi", "Fast and fill-in, because a related-service provider finishing a pull-out has the next student waiting in the corridor."],
+      ["Lorna Stimpson", "from_tdi", "The essentials here are what the classroom teacher needs, not what the report needs. Those are two different documents."],
+      ["Deshawn Pryor", "question", "Does the classroom teacher get anything back after a pull-out where you work?"],
+      ["Priya Raghunathan", "question", "What would you want to know as the teacher receiving a student back?"]
+    ]},
+    { "slug": "para-to-teacher-end-of-day-handoff-note", "posts": [
+      ["Everett Crane", "from_tdi", "A short form, handed over, rather than a conversation caught in a doorway. The doorway version is what this replaces and it loses things daily."],
+      ["Yolanda Betts", "from_tdi", "Write the small stuff. The teacher already knows about the big incident, and it is the quiet detail from second period that turns out to matter."],
+      ["Ofelia Marchetti", "question", "How does your handover happen now, and does anything reliably get through?"],
+      ["Lorna Stimpson", "question", "For teachers, what do you most want to know from the person who was with your students while you were not?"]
+    ]},
+    { "slug": "parent-conference-coaching-prep", "posts": [
+      ["Priya Raghunathan", "from_tdi", "Coach-facing, and the deliverable is language the teacher can actually say out loud. A prep session that ends in strategy and no sentences has not worked."],
+      ["Deacon Mwangi", "from_tdi", "Twenty minutes before a hard conference is worth more than an hour afterwards, and it is much harder to schedule."],
+      ["Jarrod Levins", "question", "For coaches, how do you prepare a teacher who is defensive about the conference itself?"],
+      ["Ingrid Vasquez-Lund", "question", "Has anyone ever prepped you before a hard conference? What did they do?"]
+    ]}
+  ]
+}

@@ -1,0 +1,131 @@
+{
+  "category": "Time Savers",
+  "tools": [
+    { "slug": "backwards-design-in-30-minutes", "posts": [
+      ["Marisol Aguirre", "from_tdi", "Start with the evidence you would accept that they understood it, then work backwards. Most planning goes wrong because the activity gets chosen first and the outcome is bent to fit it afterwards."],
+      ["Priya Raghunathan", "from_tdi", "Thirty minutes is enough for one unit, not for a term. Do a single unit properly, see whether the assessment column still makes sense two weeks later, then repeat."],
+      ["Tobias Rennert", "question", "When you work backwards, how often does a favourite activity end up cut because it does not actually evidence the outcome you wrote down?"],
+      ["Camille Thibodeaux", "question", "Do you draft the assessment before the lessons, or write both together and reconcile them afterwards? I am curious which order holds up when time is short."]
+    ]},
+    { "slug": "canva-bulk-create", "posts": [
+      ["Aurelia Nkemdirim", "from_tdi", "Bulk create reads from a spreadsheet, so the work goes into the columns rather than the design. Get your data tidy first and the whole set comes out in one press."],
+      ["Hana Sugimoto", "from_tdi", "The bit that catches people out is naming the spreadsheet headers to match the placeholders exactly. A mismatch quietly produces blank text boxes across the entire batch."],
+      ["Callum Ferreira", "question", "What have you bulk made that was worth the setup time, and what turned out faster to just do by hand?"],
+      ["Simone Ashcroft", "question", "Does anyone keep one master spreadsheet they reuse every year, or do you build a fresh one for each set of materials?"]
+    ]},
+    { "slug": "classroom-celebration-party-planning-checklist", "posts": [
+      ["Simone Ashcroft", "from_tdi", "Allergies sit at the top of this list for a reason. Work down from there, because the volunteer and logistics sections are far easier to fix late than a food list is."],
+      ["Ofelia Marchetti", "from_tdi", "Send the volunteer ask earlier than feels necessary. The families who say yes are usually the ones who had enough notice to arrange the morning off work."],
+      ["Bettina Kowalczyk", "question", "What has gone wrong at one of your celebrations that no checklist would ever have predicted, and did you plan for it the following year?"],
+      ["Yolanda Betts", "question", "How do you handle the children who find the party itself harder than an ordinary day? The noise and the broken routine catch the same few every time."]
+    ]},
+    { "slug": "classroom-supply-inventory-reorder-checklist", "posts": [
+      ["Deshawn Pryor", "from_tdi", "This is built around the things that run out at the worst possible moment, glue sticks, dry erase markers, headphones. Count those monthly and leave everything else to the annual order."],
+      ["Rosalie Dunne", "from_tdi", "Record the lead time beside each item, not just the quantity left. Knowing something takes three weeks to arrive changes the point at which you flag it as low."],
+      ["Ofelia Marchetti", "question", "What is the one supply your room burns through far faster than the people placing the order seem to believe, and do you end up buying it yourself?"],
+      ["Everett Crane", "question", "Who actually does the counting in your building, and does what arrives ever match what was asked for?"]
+    ]},
+    { "slug": "curriculum-mapping-for-real-people", "posts": [
+      ["Deacon Mwangi", "from_tdi", "The premise here is that a map nobody maintains is worse than no map at all. Plan for the version you will still be updating in March, not the beautiful one that dies in October."],
+      ["Marcus Oyelaran", "from_tdi", "Map in weeks rather than fixed dates. Dates break the first time an assembly or a closure lands, and once the document is wrong people stop opening it."],
+      ["Trevon Baptiste", "question", "Does your map live somewhere your team genuinely opens, or in a folder only the coach ever visits?"],
+      ["Ravi Chandrasekar", "question", "How much of your mapping is actually yours to decide, and how much of it arrives already fixed by someone above you?"]
+    ]},
+    { "slug": "daily-para-schedule-assignment-template", "posts": [
+      ["Yolanda Betts", "from_tdi", "This is for the days you are in four rooms before lunch. It names the room, the time and the job, so nobody has to guess where you were meant to be at ten past nine."],
+      ["Everett Crane", "from_tdi", "Fill in the gaps between blocks as well as the blocks themselves. That is where a para gets pulled into something unplanned and arrives late to the next assignment."],
+      ["Lorna Stimpson", "question", "Who writes your daily schedule, how much notice do you get when it changes, and does anyone tell the teachers you were supposed to be with?"],
+      ["Deshawn Pryor", "question", "Do the teachers you support hold a copy of where you are supposed to be, or is it only you carrying it?"]
+    ]},
+    { "slug": "friday-take-home-folder-checklist", "posts": [
+      ["Callum Ferreira", "from_tdi", "The folder only works if it goes out the same way every week. A fixed order means families learn where to look and stop missing the one form that mattered."],
+      ["Ofelia Marchetti", "from_tdi", "Pack it before the last hour rather than during it. Friday afternoon is the worst possible point in the week to be sorting paper while a whole class is packing up."],
+      ["Simone Ashcroft", "question", "What has gone home in one of these folders that absolutely should not have, and how long was it before you found out?"],
+      ["Marisol Aguirre", "question", "Do you still send paper home on a Friday, or has your school moved all of this into an app that families may or may not open?"]
+    ]},
+    { "slug": "library-overdue-return-tracking-template", "posts": [
+      ["Trevon Baptiste", "from_tdi", "Tracking by student rather than by title is the useful part. It shows you the child sitting on six outstanding books instead of six unrelated missing titles."],
+      ["Rosalie Dunne", "from_tdi", "Keep the notice history in there too. Once you can see a family has had three reminders, the conversation shifts from chasing a book to asking what is going on at home."],
+      ["Camille Thibodeaux", "question", "Does your school charge for overdue books, and has a fine ever actually brought one back? I have never seen it work as a motivator."],
+      ["Marisol Aguirre", "question", "How do you handle the child who stops borrowing altogether because they are frightened of losing something?"]
+    ]},
+    { "slug": "pacing-guide-builder", "posts": [
+      ["Hana Sugimoto", "from_tdi", "Build the slack in before you need it. A guide with no spare weeks is fiction by the second week of school, and after that everyone ignores it for the rest of the year."],
+      ["Tobias Rennert", "from_tdi", "Pace the units you know are heavy first and let the lighter ones absorb whatever is left. Working in calendar order tends to leave the hardest content squeezed into the end of the year."],
+      ["Ravi Chandrasekar", "question", "How far into the year does your pacing guide usually survive before you are quietly rewriting it?"],
+      ["Aurelia Nkemdirim", "question", "When you fall behind the guide, what actually gets cut, and is that your call or one made somewhere above you?"]
+    ]},
+    { "slug": "personalized-pd-plan-goal-setting", "posts": [
+      ["Priya Raghunathan", "from_tdi", "Pick the goal first and let it choose the courses, rather than the other way round. Browsing a catalogue and reverse engineering a goal from it is how people end up with unrelated certificates."],
+      ["Deacon Mwangi", "from_tdi", "Two goals is plenty for one year. Written honestly, a single goal will take more of your attention than the plan makes it look."],
+      ["Wendell Prosser", "question", "Is your PD chosen by you, assigned to you, or an uneasy mixture where you pick from a list someone else has already narrowed?"],
+      ["Bettina Kowalczyk", "question", "What is the one thing you would learn this year if nobody was checking a box at the end of it?"]
+    ]},
+    { "slug": "specialist-rotating-schedule-cheat-sheet", "posts": [
+      ["Gus Halvorsen", "from_tdi", "Built for the day where six different grades come through and each one needs a different setup. One page, in the order the classes arrive, so you are not flicking through a planner between groups."],
+      ["Rosalie Dunne", "from_tdi", "Put the equipment and the room on the same line as the class. Anyone who moves all day loses more time fetching things than teaching, and the sheet only earns its place if it stops that."],
+      ["Priya Raghunathan", "question", "For specialists here, how many different groups do you see in a day, and how much turnaround time sits between them?"],
+      ["Everett Crane", "question", "When the timetable rotates, who gets told first, and how often does a class arrive that you were not expecting?"]
+    ]},
+    { "slug": "strategic-planning-teacher-first-tool", "posts": [
+      ["Jarrod Levins", "from_tdi", "Teacher first means the plan starts from what the people doing the work can actually absorb. If the first draft needs a free hour nobody has, it is not a plan yet."],
+      ["Priya Raghunathan", "from_tdi", "Use it on a unit before you use it on a year. The shape is identical and the cost of getting it wrong is two weeks rather than an entire term."],
+      ["Marcus Oyelaran", "question", "When your school plans the year, at what point does a classroom teacher actually get asked anything?"],
+      ["Camille Thibodeaux", "question", "Does a semester plan survive contact with reality better than a year plan, or does the same drift just arrive sooner?"]
+    ]},
+    { "slug": "sub-plan-survival-kit", "posts": [
+      ["Rosalie Dunne", "from_tdi", "The kit is meant to be written once while you are well, not at six in the morning with a temperature. Everything reusable goes in and only the day specifics change."],
+      ["Marisol Aguirre", "from_tdi", "The piece people leave out is the seating and the names of the two children who will need an adult early. Someone can teach almost anything if they know who to watch."],
+      ["Nadia Belhassen", "question", "What do you leave for a sub about your multilingual learners that would never appear in the lesson plan itself?"],
+      ["Yolanda Betts", "question", "From the para side, how much of a sub day ends up resting on you, and does the kit ever acknowledge that?"]
+    ]},
+    { "slug": "ai-brainstorm-buddy-template", "posts": [
+      ["Wendell Prosser", "from_tdi", "This is for the blank page problem, not for finished work. It gets a pile of rough ideas out quickly, and every one of them still needs you to decide whether it is any good."],
+      ["Ravi Chandrasekar", "from_tdi", "Treat anything factual it produces as unverified. It is a reasonable thinking partner for structure and a poor one for content you cannot check yourself."],
+      ["Trevon Baptiste", "question", "What has AI given you that was genuinely useful as a starting point rather than as an answer?"],
+      ["Priya Raghunathan", "question", "Does your district have a stated position on this yet, and does it match what people are actually doing?"]
+    ]},
+    { "slug": "campus-friction-map", "posts": [
+      ["Jarrod Levins", "from_tdi", "Friction is the small recurring cost, the door that is always locked, the form that goes to the wrong person. Map a full week of them before you try to fix a single one."],
+      ["Deshawn Pryor", "from_tdi", "Worth filling in from the bottom of the building as well as the top. What a para hits at eight in the morning rarely reaches a leadership list."],
+      ["Everett Crane", "question", "What is the daily annoyance in your building that everyone has quietly accepted as normal, the kind nobody reports because it has always been that way?"],
+      ["Gus Halvorsen", "question", "Has anything on your campus actually got easier in the past year, and what made that happen?"]
+    ]},
+    { "slug": "friction-free-leadership", "posts": [
+      ["Jarrod Levins", "from_tdi", "The framework is about removing obstacles rather than adding initiatives. If your list of things to start is longer than your list of things to stop, you are not using it."],
+      ["Yolanda Betts", "from_tdi", "From the receiving end, most friction is a decision nobody will make. Waiting three weeks for an answer costs more hours than any process ever did."],
+      ["Lorna Stimpson", "question", "What could someone in your leadership take off your plate tomorrow that would genuinely change the shape of your week, not just your mood?"],
+      ["Marcus Oyelaran", "question", "Has a leader ever removed something for you rather than adding something, and did the removal still hold a term later?"]
+    ]},
+    { "slug": "shared-load-planner", "posts": [
+      ["Deacon Mwangi", "from_tdi", "The planner makes the invisible work visible first and splits it second. Going straight to the split is how one person quietly keeps everything that was never written down."],
+      ["Bettina Kowalczyk", "from_tdi", "Agree what done looks like for each item before it changes hands. Shared load usually collapses back onto one person because the standard was never said out loud."],
+      ["Hana Sugimoto", "question", "On your team, who is holding the job that has never been written down, and does that person know how much rests on it?"],
+      ["Nadia Belhassen", "question", "When work gets shared out where you are, does it stay shared past the first genuinely busy fortnight, or drift back to one person?"]
+    ]},
+    { "slug": "sustainable-leadership-weekly-planning", "posts": [
+      ["Jarrod Levins", "from_tdi", "Block the thinking time before the meetings go in, because meetings will fill whatever is left. A week built in the other order is a week you spend reacting."],
+      ["Priya Raghunathan", "from_tdi", "Leave one afternoon genuinely empty. Something urgent will take it anyway, and on the weeks it does not you get back the work you keep deferring."],
+      ["Deacon Mwangi", "question", "What is the first thing to disappear from your week when it goes wrong, and is that the thing you would have chosen to lose?"],
+      ["Wendell Prosser", "question", "For leaders here, does your weekly plan survive the first crisis, or are you rebuilding it from scratch every Monday?"]
+    ]},
+    { "slug": "two-rabbits-audit", "posts": [
+      ["Marcus Oyelaran", "from_tdi", "The proverb says that chasing two rabbits means catching neither, and this audit is really just an honest count of your rabbits. Most people find more than they expected."],
+      ["Rosalie Dunne", "from_tdi", "Spotting where you are spread thin is not the difficult bit. Naming the thing you will stop is, and an audit that ends with nothing dropped has cost you an hour."],
+      ["Camille Thibodeaux", "question", "How many things are you genuinely running this term, counting the ones you agreed to back in August?"],
+      ["Ingrid Vasquez-Lund", "question", "What have you let go of recently, and did anyone actually notice it was gone, or did the silence tell you something?"]
+    ]},
+    { "slug": "time-saving-prompts-teachers", "posts": [
+      ["Ingrid Vasquez-Lund", "from_tdi", "These are starting points for lesson ideas and first drafts. None of them removes the read through, and anything containing a fact, a date or a source needs checking before it reaches a student."],
+      ["Camille Thibodeaux", "from_tdi", "Give it your constraints, the year group, the time you have, what they already know. A vague prompt returns something generic that takes longer to repair than to write yourself."],
+      ["Ravi Chandrasekar", "question", "Which of these prompts has saved you real time, and which one sounded useful but cost more in editing than it saved?"],
+      ["Nadia Belhassen", "question", "Has anyone found a prompt that genuinely helps with language support rather than just flattening everything? Simplified is not the same as accessible."]
+    ]},
+    { "slug": "transition-timers-routines", "posts": [
+      ["Callum Ferreira", "from_tdi", "The minutes between activities add up quietly, and a timer only helps once the routine behind it has been taught. Teach the routine, then let the timer hold it in place."],
+      ["Simone Ashcroft", "from_tdi", "Pick one changeover and make it reliable before touching any of the others. Changing all of them at once gives you noise and no way of telling what worked."],
+      ["Everett Crane", "question", "Which transition in your day is the one that always falls apart, and have you ever worked out why that one in particular?"],
+      ["Gus Halvorsen", "question", "Does a visible countdown help your group settle, or does it just turn the changeover into a race that ends louder than it started?"]
+    ]}
+  ]
+}

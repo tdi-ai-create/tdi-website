@@ -26,33 +26,6 @@ import { computeGatePositions, countCheckIns, describeCheckIn, summarizeCheckIns
 import type { QuizQuestion, QuizOption, QuizResponse } from '@/lib/hub/quiz';
 
 // Category colors
-// Testimonials pool
-const TESTIMONIALS = [
-  { quote: "I printed this out and taped it to my desk. It's the first thing I look at every morning now.", role: "3rd grade teacher", time: "2 days ago" },
-  { quote: "Shared this with my whole team at our PLC meeting. Three of them started using it that same week.", role: "Instructional coach", time: "4 days ago" },
-  { quote: "As a para, I don't always get tools made for me. This one actually fits how I work.", role: "Paraprofessional, K-2", time: "1 week ago" },
-  { quote: "Simple but powerful. I used this during my first year and it helped me survive December.", role: "1st-year teacher", time: "3 days ago" },
-  { quote: "I adapted this for my high school students and it worked even better than expected.", role: "9th grade ELA teacher", time: "5 days ago" },
-  { quote: "This is exactly what our new teachers needed during onboarding week.", role: "Building mentor", time: "6 days ago" },
-  { quote: "I keep coming back to this one. It's become part of my weekly routine.", role: "5th grade teacher", time: "1 week ago" },
-  { quote: "Used this in my co-taught class and both of us felt more in sync afterward.", role: "Special education teacher", time: "3 days ago" },
-  { quote: "I ran a mini-PD on this at our staff meeting. People loved it.", role: "Teacher leader", time: "5 days ago" },
-  { quote: "Finally something practical that doesn't take 45 minutes to set up.", role: "Middle school science teacher", time: "2 days ago" },
-  { quote: "I brought this to our district PD day. People were asking where to find more.", role: "District curriculum specialist", time: "1 week ago" },
-  { quote: "As a building sub, I need tools that work anywhere. This delivers.", role: "Substitute teacher", time: "4 days ago" },
-];
-
-// Pick 3 testimonials deterministically based on course ID
-function getTestimonials(id: string): typeof TESTIMONIALS {
-  let hash = 0;
-  for (let i = 0; i < id.length; i++) hash = ((hash << 5) - hash + id.charCodeAt(i)) | 0;
-  const idx = Math.abs(hash) % TESTIMONIALS.length;
-  const result = [];
-  for (let i = 0; i < 3; i++) {
-    result.push(TESTIMONIALS[(idx + i) % TESTIMONIALS.length]);
-  }
-  return result;
-}
 
 // Format duration_seconds to m:ss
 function formatDuration(seconds: number | null | undefined): string | null {
@@ -602,7 +575,6 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
     }
   };
 
-  const testimonials = getTestimonials(course.id);
 
   return (
     <div style={{ background: '#F5F7FA', minHeight: '100vh' }}>
@@ -1109,44 +1081,6 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
           </div>
         )}
 
-        {/* ============================================================ */}
-        {/* TESTIMONIALS (below tabs, always visible)                     */}
-        {/* ============================================================ */}
-        <div style={{ marginTop: '32px', marginBottom: '40px' }}>
-          <h2
-            className="font-semibold mb-4"
-            style={{ fontFamily: "'Source Serif 4', Georgia, serif", fontSize: '20px', color: '#1E2749' }}
-          >
-            {tUI('What Educators Are Saying')}
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {testimonials.map((testimonial, i) => (
-              <div
-                key={i}
-                className="bg-white rounded-xl"
-                style={{ padding: '20px', border: '0.5px solid rgba(0,0,0,0.06)' }}
-              >
-                <div
-                  className="mb-2.5"
-                  style={{
-                    fontFamily: "'Source Serif 4', Georgia, serif",
-                    fontStyle: 'italic',
-                    fontSize: '14px',
-                    lineHeight: '1.6',
-                    color: '#374151',
-                    borderLeft: '3px solid #E8B84B',
-                    paddingLeft: '14px',
-                  }}
-                >
-                  &ldquo;{testimonial.quote}&rdquo;
-                </div>
-                <div className="text-xs" style={{ color: '#9CA3AF' }}>
-                  {testimonial.role}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
 
         {/* Related Courses */}
         {relatedCourses.length > 0 && (

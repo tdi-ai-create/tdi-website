@@ -112,137 +112,6 @@ for (const entry of PRACTICE_GAME_REGISTRY) {
 // Game configs now in lib/hub/practice-games.ts. Only add component mappings above.
 
 
-// ─── Game Testimonials ──────────────────────────────────────────────────────
-
-const GAME_TESTIMONIALS: Record<string, { quote: string; role: string }[]> = {
-  'question-knockout': [
-    { quote: "As a para, this completely changed how I talk to students during small group. I catch myself redirecting without telling now.", role: "Paraprofessional, K-2" },
-    { quote: "I thought I was good at asking questions until this game humbled me. I was telling disguised as asking the whole time.", role: "3rd grade teacher" },
-    { quote: "We played this at our PLC and it got SO competitive. My AP kept hitting the buzzer on herself.", role: "Instructional coach" },
-  ],
-  'tell-or-ask': [
-    { quote: "I do redirects all day in small groups. This game made me realize half of them are tells. Working on flipping that.", role: "Paraprofessional, 3-5" },
-    { quote: "The confidence meter is what got me. I was SO sure 'Sound it out' was an ask. It's not.", role: "1st grade teacher" },
-    { quote: "I use this in every new teacher training now. The reveals always spark the best discussions.", role: "Instructional coach" },
-  ],
-  'feedback-level-up': [
-    { quote: "I support a high school math class and thought the feedback I give in small groups was solid. This game showed me I was stuck at Level 2.", role: "Paraprofessional, 9-12" },
-    { quote: "The Level 2 trap is REAL. I fell for it 4 times. Now I catch myself giving vague praise in class.", role: "Middle school math teacher" },
-    { quote: "Our team played this and then rewrote our report card comments. Night and day difference.", role: "Grade-level lead" },
-  ],
-  'feedback-madlibs': [
-    { quote: "As a para who works with the same small group every day, this formula is gold. The kids remember it because they laughed through it first.", role: "Paraprofessional, K-2" },
-    { quote: "The silly rounds had us crying laughing. Then the real rounds hit different because we already had the formula in our heads.", role: "4th grade teacher" },
-    { quote: "Notice, Name, Next Step. I say it in my sleep now. This game drilled it in without feeling like a drill.", role: "New teacher, year 1" },
-  ],
-  'feedback-makeover': [
-    { quote: "I started doing these during my planning breaks. 120 seconds to transform 'Good job' into real feedback. Harder than it sounds but SO good.", role: "Paraprofessional, middle school" },
-    { quote: "The timer makes it real. You can't overthink it. Just Notice, Name, Next Step. Go.", role: "8th grade ELA teacher" },
-    { quote: "I started screenshotting my before/afters and sharing them with my team. We turned it into a weekly challenge.", role: "Department head" },
-  ],
-  'whats-your-move': [
-    { quote: "First year as a para and this game gave me more confidence for Monday morning than anything else. The scenarios are realistic.", role: "Paraprofessional, 9-12" },
-    { quote: "Every scenario felt like something that happened to me last week. The explanations for why the wrong answers don't work -- that's where the real learning is.", role: "Paraprofessional, 3-5" },
-    { quote: "I got 4 out of 6 right and the two I missed completely changed how I think about proximity.", role: "First-year teacher" },
-  ],
-  'classroom-shuffle': [
-    { quote: "I work with a middle school team as a para. The staff meeting scenario tripped me up but now I know -- redirect to private is always the move.", role: "Paraprofessional, 6-8" },
-    { quote: "The parent email scenario -- I've literally been in that exact situation. Wish I had this game before I responded.", role: "6th grade teacher" },
-    { quote: "We use the scenarios as discussion prompts at our staff meetings. The debates are incredible.", role: "Instructional coach" },
-  ],
-  'prioritize-this': [
-    { quote: "Played this with the other paras at lunch. We each ranked silently then compared. The disagreements showed how differently we support our classrooms.", role: "Paraprofessional, K-2" },
-    { quote: "I ranked 'greet students at the door' as #1 every time. The game showed me why that's not always right. Context matters.", role: "High school teacher" },
-    { quote: "We used this at our leadership team retreat. The debates were incredible.", role: "Principal" },
-  ],
-  'energy-budget': [
-    { quote: "Been a para for 20 years. I scored 42% alignment with the experts. Turns out I have been over investing in everyone else's needs for decades.", role: "Paraprofessional, 3-5" },
-    { quote: "I gave personal reset 5 points. The expert gave it 15. That one number told me everything about why I'm burned out.", role: "7th grade science teacher" },
-    { quote: "This is the game that made me actually take a lunch break. Not joking.", role: "3rd grade teacher" },
-  ],
-  'this-or-that': [
-    { quote: "No right answer means no pressure. I was more honest about my instincts than in any other PD I have done.", role: "Paraprofessional, K-2" },
-    { quote: "The 50/50 splits started the best team conversations. We realized we approach the same situations completely differently.", role: "Instructional coach" },
-    { quote: "Seeing that 70% of K-2 teachers agreed with me but only 40% of high school teachers did. That gap taught me more than any lecture.", role: "3rd grade teacher" },
-  ],
-  'sort-it-out': [
-    { quote: "The para responsibilities set should be required for every new para orientation. Finally someone made it clear.", role: "Paraprofessional, K-2" },
-    { quote: "The accommodation vs modification set finally made the difference click. I have been confusing them for years.", role: "Special education teacher" },
-    { quote: "Used the Feedback or Praise set with my lead teacher. We had the best conversation about what we actually say to kids in small group.", role: "Paraprofessional, 3-5" },
-  ],
-  'principal-playbook': [
-    { quote: "I am an AP hoping to get my own building soon. This game showed me how I think under pressure and where my blind spots are.", role: "Assistant principal" },
-    { quote: "The staffing scenarios were the hardest. I kept choosing the empathetic option when the leadership move was to hold the standard.", role: "Principal, year 2" },
-    { quote: "We played this at our leadership retreat and the debates got HEATED. Best PD we have done all year.", role: "District leadership coach" },
-  ],
-  'conversation-compass': [
-    { quote: "I avoid hard conversations with parents. This game helped me see that the right opener changes everything.", role: "3rd grade teacher" },
-    { quote: "The colleague scenarios hit home. I have been avoiding a conversation with my co-teacher for months. Now I have a framework.", role: "Paraprofessional, 6-8" },
-    { quote: "We used this to train new teachers on parent communication. The skill breakdown at the end sparked great coaching conversations.", role: "Instructional coach" },
-  ],
-  'partner-up': [
-    { quote: "Playing both perspectives back to back changed everything. I finally understand why my teacher makes the decisions she does.", role: "Paraprofessional, 3-5" },
-    { quote: "My para and I played this together during our planning period. We learned more in 10 minutes than in 3 months of working together.", role: "4th grade teacher" },
-    { quote: "The insight that connects both perspectives is the real learning moment. That is where co-teaching clicks.", role: "Instructional coach" },
-  ],
-  'boundary-game': [
-    { quote: "I say yes to everything and then wonder why I am exhausted. This game made me see the pattern.", role: "2nd grade teacher" },
-    { quote: "The scenario about staying late to help a colleague pack up their classroom. I felt personally attacked in the best way.", role: "Paraprofessional, K-2" },
-    { quote: "We used this at our wellness PD day. Half the staff had the same boundary blind spots. Now we talk about it openly.", role: "School counselor" },
-  ],
-  'lean-on-tdi': [
-    { quote: "I did not even know half these support options existed. Now I actually use the platform instead of just logging in for PD.", role: "Paraprofessional, 3-5" },
-    { quote: "The role-specific scenarios made it feel personal. The leader scenarios addressed exactly what I deal with.", role: "Principal" },
-    { quote: "Perfect for onboarding. Every new partnership school should play this in their first week.", role: "TDI program coordinator" },
-  ],
-  'reset-roulette': [
-    { quote: "I spin this between 2nd and 3rd period every day now. The grounding exercises are my favorite.", role: "High school teacher" },
-    { quote: "My students saw me doing the breathing exercise and asked to join. Now we spin the wheel together after lunch.", role: "1st grade teacher" },
-    { quote: "The reframing prompts are surprisingly deep for a 2-minute activity. Changed how I process tough moments.", role: "Paraprofessional, 6-8" },
-  ],
-  'first-five-days': [
-    { quote: "I am a new teacher and this game showed me I was focused on all the wrong things for week one. Relationships first, systems second.", role: "1st-year teacher" },
-    { quote: "Played this as a team before school started. We realized we all had completely different priorities. Now we are aligned.", role: "Grade-level team lead" },
-    { quote: "The para version is gold. Nobody ever tells us what OUR first five days should look like. This does.", role: "Paraprofessional, K-2" },
-  ],
-  'plan-your-year': [
-    { quote: "I crammed everything into September and October. The burnout meter called me out immediately.", role: "3rd grade teacher" },
-    { quote: "Seeing my whole year mapped out month by month made me realize I never plan for sustainability. Just survival.", role: "Middle school science teacher" },
-    { quote: "We did this at our August PD and revisit it every quarter. The month-by-month format makes it actually usable.", role: "Instructional coach" },
-  ],
-  'first-conversation': [
-    { quote: "The ripple effect is what got me. I chose the quick reply to a parent email and then watched the trust erode over three timeframes. Changed how I approach every first interaction.", role: "4th grade teacher" },
-    { quote: "As a para, the scenario about meeting your lead teacher for the first time was my actual life. I wish I had this game before my first day.", role: "Paraprofessional, K-2" },
-    { quote: "We played this at our back-to-school PD and half the room hit the 'I have been there' button on every scenario. The solidarity was real.", role: "Instructional coach" },
-  ],
-  'read-the-room': [
-    { quote: "The classroom observation scenario humbled me. I went straight to the head-down student and completely missed the single-writer group. That was my biggest blind spot.", role: "Instructional coach" },
-    { quote: "The recess scenario about the group-hopper broke my heart. I have seen that kid and I never knew what to do. Now I do.", role: "Paraprofessional, 3-5" },
-    { quote: "We played this as a leadership team and discovered that every single one of us would have addressed the honking parent first during dismissal. The cue card collection at the end was eye-opening.", role: "Principal" },
-  ],
-  'the-comeback': [
-    { quote: "The wrong name scenario was my actual first week. I called a student by their sibling's name for days. This game taught me that moving on without apologizing is the worst option. The real story at the end made me cry.", role: "1st-year teacher" },
-    { quote: "I have lost my temper in class before. This game did not judge me for it. It showed me what to do NEXT. That is what makes it different from every other PD I have done on classroom management.", role: "Paraprofessional, 6-8" },
-    { quote: "The speed versus relationship meter is brilliant. Sometimes I choose the fast fix and sacrifice the relationship. Seeing that tradeoff scored changed how I think about recovery.", role: "Instructional coach" },
-  ],
-  'what-would-you-say': [
-    { quote: "Typing my response first was humbling. I wrote something reactive and then saw the reflective option and thought, that is what I WISH I had said. Now I practice saying it before the moment happens.", role: "3rd grade teacher" },
-    { quote: "The parent email scenario was my actual life last Tuesday. I responded defensively. This game showed me exactly why that was wrong and what to say instead. I am keeping the reflective response saved in my phone.", role: "Paraprofessional, 6-8" },
-    { quote: "We played this at our leadership PD and compared our typed responses at the table. The differences were striking. One person wrote 8 words. Another wrote 60. The word count comparison taught us more about communication styles than any lecture.", role: "Instructional coach" },
-  ],
-  'name-that-move': [
-    { quote: "I recognized 12 out of 15 strategies but only marked 4 as 'I use this one.' That gap between knowing and doing was my biggest takeaway. Now I have a list of moves to practice.", role: "4th grade teacher" },
-    { quote: "The 2x10 strategy blew my mind. Two minutes a day for ten days with the same student. I started it Monday. By Thursday, that student was a different kid in my small group.", role: "Paraprofessional, 3-5" },
-    { quote: "We played this at our coaching team meeting and it gave us a shared vocabulary we have been missing. Now when I observe a teacher, I can name exactly what they did well using the strategy names from the game.", role: "Instructional coach" },
-  ],
-};
-
-function getGameTestimonials(slug: string): { quote: string; role: string }[] {
-  return GAME_TESTIMONIALS[slug] || [
-    { quote: "This game changed how I think about my classroom practice.", role: "Educator" },
-  ];
-}
-
 // ─── Breathing Exercise Component ───────────────────────────────────────────
 
 function BreathingExercise() {
@@ -346,37 +215,6 @@ function BreathingExercise() {
 // ─── Constants ──────────────────────────────────────────────────────────────
 
 // Testimonials pool - varied roles across K-12
-const TESTIMONIALS = [
-  { quote: "I printed this out and taped it to my desk. It's the first thing I look at every morning now.", role: "3rd grade teacher", time: "2 days ago" },
-  { quote: "Shared this with my whole team at our PLC meeting. Three of them started using it that same week.", role: "Instructional coach", time: "4 days ago" },
-  { quote: "As a para, I don't always get tools made for me. This one actually fits how I work.", role: "Paraprofessional, K-2", time: "1 week ago" },
-  { quote: "Simple but powerful. I used this during my first year and it helped me survive December.", role: "1st-year teacher", time: "3 days ago" },
-  { quote: "I adapted this for my high school students and it worked even better than expected.", role: "9th grade ELA teacher", time: "5 days ago" },
-  { quote: "Our AP used this in a faculty meeting. Changed the tone of the whole conversation.", role: "Assistant principal", time: "1 week ago" },
-  { quote: "I've been teaching 18 years and this is the first checklist that didn't feel like busywork.", role: "5th grade teacher", time: "6 days ago" },
-  { quote: "Downloaded it on my phone and use it on my commute. Quick and actually useful.", role: "Middle school counselor", time: "3 days ago" },
-  { quote: "My co-teacher and I use this to plan our week. Game changer for our inclusion classroom.", role: "Special education teacher", time: "4 days ago" },
-  { quote: "Wish I had this when I started. Would have saved me months of figuring things out alone.", role: "2nd-year teacher", time: "1 week ago" },
-  { quote: "I keep coming back to this one. It's become part of my routine.", role: "4th grade teacher", time: "2 days ago" },
-  { quote: "Used this to coach a struggling teacher. She said it was the most helpful thing anyone gave her.", role: "Literacy coach", time: "5 days ago" },
-  { quote: "Finally something I can use in 5 minutes between classes. That's real.", role: "High school math teacher", time: "3 days ago" },
-  { quote: "I brought this to our district PD day. People were asking where to find more.", role: "District curriculum specialist", time: "1 week ago" },
-  { quote: "As a building sub, I need tools that work anywhere. This delivers.", role: "Substitute teacher", time: "4 days ago" },
-];
-
-// Pick 1-3 testimonials deterministically based on quick win ID
-function getTestimonials(id: string): typeof TESTIMONIALS {
-  let hash = 0;
-  for (let i = 0; i < id.length; i++) hash = ((hash << 5) - hash + id.charCodeAt(i)) | 0;
-  const idx = Math.abs(hash) % TESTIMONIALS.length;
-  const count = (Math.abs(hash) % 3) + 1; // 1-3 testimonials
-  const result = [];
-  for (let i = 0; i < count; i++) {
-    result.push(TESTIMONIALS[(idx + i) % TESTIMONIALS.length]);
-  }
-  return result;
-}
-
 // ─── Interfaces ─────────────────────────────────────────────────────────────
 
 /**
@@ -671,27 +509,6 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
                   </div>
                 </div>
 
-                {/* Testimonials */}
-                <div className="bg-white rounded-2xl p-5" style={{ border: '0.5px solid rgba(0,0,0,0.06)' }}>
-                  <p
-                    className="mb-3"
-                    style={{ color: '#9CA3AF', fontFamily: "'DM Sans', sans-serif", letterSpacing: '0.05em', textTransform: 'uppercase' as const, fontSize: '11px', fontWeight: 600 }}
-                  >
-                    {lang === 'es' ? 'Lo que dicen los educadores' : 'What educators are saying'}
-                  </p>
-                  <div className="space-y-4">
-                    {getGameTestimonials(slug).map((testimonial, i) => (
-                      <div key={i} className="pl-3" style={{ borderLeft: `3px solid ${gameConfig.color}` }}>
-                        <p className="text-sm mb-1" style={{ fontFamily: "'Source Serif 4', Georgia, serif", fontStyle: 'italic', color: '#374151', lineHeight: 1.5 }}>
-                          &ldquo;{testimonial.quote}&rdquo;
-                        </p>
-                        <p className="text-xs" style={{ color: '#9CA3AF' }}>
-                          {testimonial.role}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
               </div>
             </div>
           </div>
@@ -1809,46 +1626,6 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
               </div>
 
               {/* Testimonials */}
-              {quickWin && (
-                <div
-                  className="bg-white rounded-2xl p-5 mb-4"
-                  style={{ border: '0.5px solid rgba(0,0,0,0.06)' }}
-                >
-                  <p
-                    className="mb-3"
-                    style={{ color: '#9CA3AF', fontFamily: "'DM Sans', sans-serif", letterSpacing: '0.05em', textTransform: 'uppercase' as const, fontSize: '11px', fontWeight: 600 }}
-                  >
-                    {tUI('What educators are saying')}
-                  </p>
-                  <div className="space-y-4">
-                    {getTestimonials(quickWin.id).map((t, i) => (
-                      <div
-                        key={i}
-                        className="pl-3"
-                        style={{ borderLeft: '3px solid #ffba06' }}
-                      >
-                        <p
-                          className="text-sm mb-1"
-                          style={{
-                            fontFamily: "'Source Serif 4', Georgia, serif",
-                            fontStyle: 'italic',
-                            color: '#374151',
-                            lineHeight: '1.5',
-                          }}
-                        >
-                          &ldquo;{t.quote}&rdquo;
-                        </p>
-                        <p
-                          className="text-xs"
-                          style={{ color: '#9CA3AF' }}
-                        >
-                          -- {t.role}, {t.time}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
 
               {/* Report this. Deliberately quiet: a teacher looking for it will
                   find it, and it does not compete with the download. */}

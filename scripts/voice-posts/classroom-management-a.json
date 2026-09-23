@@ -1,0 +1,168 @@
+{
+  "category": "Classroom Management (first half)",
+  "note": "Posts from TDI-owned voice accounts. Comments describe the tool, what to change, or who it suits. None claims a classroom moment.",
+  "tools": [
+    { "slug": "read-the-room-daily-checkin", "posts": [
+      ["Tobias Rennert", "from_tdi", "Non-intrusive is the design constraint here. The moment a check-in feels like being asked to perform a feeling, middle schoolers stop telling you the truth."],
+      ["Bettina Kowalczyk", "from_tdi", "Read it for the shape of the room rather than for individuals. One student having a bad morning is not the signal this is built to catch."],
+      ["Marcus Oyelaran", "question", "How do you handle the student whose check-in says fine every single day?"],
+      ["Rosalie Dunne", "question", "What would you change about this for a class where the group turns over every period?"]
+    ]},
+    { "slug": "academic-integrity-ai-policy-template-9-12", "posts": [
+      ["Wendell Prosser", "from_tdi", "The assignment-by-assignment part is the useful bit. A single blanket policy tends to be either so strict it gets ignored or so vague it settles nothing."],
+      ["Trevon Baptiste", "from_tdi", "Fill it in before the first essay, not after the first suspicion. It is much harder to introduce once a student thinks it is aimed at them."],
+      ["Ingrid Vasquez-Lund", "question", "Where did you land on AI for a first draft? That is the line most departments seem to argue about."],
+      ["Jarrod Levins", "question", "Has your building set a policy above the classroom, and did it help or just add a layer?"]
+    ]},
+    { "slug": "addressing-inappropriate-ai-use-teacher-response-protocol", "posts": [
+      ["Ravi Chandrasekar", "from_tdi", "The point of a protocol is that you are not improvising while annoyed. Read it once now so the order is familiar when you need it."],
+      ["Camille Thibodeaux", "from_tdi", "It deliberately starts with a question rather than an accusation, because detection tools are wrong often enough that certainty is not available to you."],
+      ["Nadia Belhassen", "question", "What is your first sentence to the student in that conversation?"],
+      ["Priya Raghunathan", "question", "For coaches, is this the kind of thing a department should agree on together rather than teacher by teacher?"]
+    ]},
+    { "slug": "after-the-incident-debrief-card", "posts": [
+      ["Everett Crane", "from_tdi", "Fill it in the same day. A debrief written on Friday about Tuesday is a story rather than a record."],
+      ["Rosalie Dunne", "from_tdi", "The section about you is not padding. Most incident forms log the student and skip the adult who was in it."],
+      ["Yolanda Betts", "question", "Does your building already ask for something like this, and does it ask about the adult at all?"],
+      ["Lorna Stimpson", "question", "What do you do with these afterwards, and has anyone ever read one back to you usefully?"]
+    ]},
+    { "slug": "ai-dos-and-donts-reference-card-6-8", "posts": [
+      ["Marcus Oyelaran", "from_tdi", "The split it draws is between AI that builds learning and AI that replaces it. That distinction survives contact with a 13 year old better than a list of banned tools."],
+      ["Tobias Rennert", "from_tdi", "Dense on purpose, so it can live taped inside a folder rather than in a policy document nobody opens."],
+      ["Ravi Chandrasekar", "question", "Which example on the card would your students argue with first?"],
+      ["Hana Sugimoto", "question", "What AI use have you seen that is not on here and should be?"]
+    ]},
+    { "slug": "ai-safety-ground-rules-checklist-k2", "posts": [
+      ["Callum Ferreira", "from_tdi", "Written to be read aloud, so the sentences are shorter than an adult would write. That is deliberate rather than simplified."],
+      ["Simone Ashcroft", "from_tdi", "At this age the honesty habit matters more than the safety rules. The safety part they will mostly get from you standing there."],
+      ["Ofelia Marchetti", "question", "How do you explain what a voice assistant actually is to a five year old who already talks to one at home?"],
+      ["Deshawn Pryor", "question", "For anyone in early years, has this come up from the children before it came up from the adults?"]
+    ]},
+    { "slug": "arts-classroom-culture-checkup", "posts": [
+      ["Aurelia Nkemdirim", "from_tdi", "Creative risk-taking is the hardest of the three to self-assess, because a quiet studio can mean safety or it can mean nobody is trying anything."],
+      ["Bettina Kowalczyk", "from_tdi", "Studio management here means materials and movement rather than behaviour. Worth knowing before you answer."],
+      ["Simone Ashcroft", "question", "What does a room where students take real creative risks actually look like from the doorway?"],
+      ["Priya Raghunathan", "question", "For coaches walking into an arts room, what do you look for that you would not look for elsewhere?"]
+    ]},
+    { "slug": "beat-the-clock-transition", "posts": [
+      ["Gus Halvorsen", "from_tdi", "Set the target time from what your room actually does now, not from what it should do. A target nobody can hit stops being a game in about two days."],
+      ["Deshawn Pryor", "from_tdi", "The ownership part is what makes it last. Once students are beating their own record it stops needing you to run it."],
+      ["Callum Ferreira", "question", "What is your slowest transition of the day, and what makes it slow?"],
+      ["Everett Crane", "question", "Has anyone run this with a group where competition backfires? What did you use instead?"]
+    ]},
+    { "slug": "behavior-bingo", "posts": [
+      ["Yolanda Betts", "from_tdi", "Whole class rather than individual is the choice that makes this work. The individual version turns into a scoreboard for the same three names."],
+      ["Ofelia Marchetti", "from_tdi", "Put expectations on the card that are currently within reach. A card full of things the room cannot do yet just proves it."],
+      ["Hana Sugimoto", "question", "Which expectation would you put in the free square for your room?"],
+      ["Marisol Aguirre", "question", "How long does something like this stay motivating before it needs refreshing?"]
+    ]},
+    { "slug": "behavior-incident-quick-note", "posts": [
+      ["Lorna Stimpson", "from_tdi", "This is the thirty second version. The full debrief card and the parent email are separate on purpose, because trying to do all three in the moment means doing none of them."],
+      ["Everett Crane", "from_tdi", "Write what happened rather than what it means. The interpretation can wait until you are not still holding the room."],
+      ["Rosalie Dunne", "question", "What detail do you always wish you had written down and did not?"],
+      ["Deshawn Pryor", "question", "For paras, do you have anywhere to log something like this, or does it go through the lead teacher?"]
+    ]},
+    { "slug": "behavior-scenario-jenga", "posts": [
+      ["Marcus Oyelaran", "from_tdi", "The tower is doing more work than it looks. Students say things while their hands are busy that they will not say sitting in a circle."],
+      ["Gus Halvorsen", "from_tdi", "Read the prompts before you play. A couple of them land differently depending on what has happened in your room recently."],
+      ["Camille Thibodeaux", "question", "Which scenario would be too close to home for your class right now?"],
+      ["Bettina Kowalczyk", "question", "Has anyone written their own prompts for this? What did you add?"]
+    ]},
+    { "slug": "bip-data-collection", "posts": [
+      ["Rosalie Dunne", "from_tdi", "The templates matter less than picking one and staying with it. Data collected three different ways over a term tells the team nothing."],
+      ["Yolanda Betts", "from_tdi", "Whoever is with the student most is usually the person collecting this, and it is often not the person in the meeting. Worth naming that early."],
+      ["Lorna Stimpson", "question", "Who actually fills these in where you are, and do they get to say anything at the meeting?"],
+      ["Priya Raghunathan", "question", "What makes BIP data useful to a team rather than just complete?"]
+    ]},
+    { "slug": "bullying-what-youre-seeing-what-to-do", "posts": [
+      ["Bettina Kowalczyk", "from_tdi", "The hardest part is the first section, telling it apart from ordinary conflict. Most of the rest follows once that call is made."],
+      ["Nadia Belhassen", "from_tdi", "The in-the-moment language is written to be said in front of other students, which is a different job from what you say afterwards in private."],
+      ["Marisol Aguirre", "question", "What makes you certain it is bullying rather than conflict? I suspect everyone's line sits in a slightly different place."],
+      ["Jarrod Levins", "question", "For anyone in leadership, what do you need from a teacher's report to be able to act on it?"]
+    ]},
+    { "slug": "civil-discourse-roundtable", "posts": [
+      ["Marcus Oyelaran", "from_tdi", "The structure is what makes disagreement safe here. Take the structure away and you have a debate that the confident students win."],
+      ["Trevon Baptiste", "from_tdi", "Pick a topic students actually disagree about. A safe topic produces polite nothing and teaches the format without teaching the skill."],
+      ["Ravi Chandrasekar", "question", "What topic has worked for you, and what topic would you never touch again?"],
+      ["Camille Thibodeaux", "question", "How do you bring in the students who never speak without putting them on the spot?"]
+    ]},
+    { "slug": "class-skipping-intervention-plan", "posts": [
+      ["Wendell Prosser", "from_tdi", "Root cause first is the order that matters. Skipping because of a subject, a person, or a corridor are three different problems wearing the same coat."],
+      ["Jarrod Levins", "from_tdi", "The follow-up tracking is the part that usually gets dropped, and it is the part that tells you whether anything worked."],
+      ["Trevon Baptiste", "question", "What have you found is usually behind it when a student starts skipping one specific class?"],
+      ["Ingrid Vasquez-Lund", "question", "Who owns this where you work, the teacher or the office?"]
+    ]},
+    { "slug": "classroom-ai-use-agreement-3-5", "posts": [
+      ["Marisol Aguirre", "from_tdi", "Plain enough that a nine year old can read it themselves, which is the whole point of having them sign it."],
+      ["Aurelia Nkemdirim", "from_tdi", "Go through it together rather than sending it home. The conversation is the tool, the signature is just the record."],
+      ["Hana Sugimoto", "question", "How did your students react to signing something? Mine take it more seriously than I expect at that age."],
+      ["Callum Ferreira", "question", "What would you add for families who ask what this means at home?"]
+    ]},
+    { "slug": "entry-routine-builder", "posts": [
+      ["Simone Ashcroft", "from_tdi", "Build the routine around what you want the first two minutes to feel like, then work backwards to the steps. Doing it the other way produces a list nobody follows."],
+      ["Callum Ferreira", "from_tdi", "Consistency beats cleverness here. The plainest routine done the same way daily outperforms the better one done sometimes."],
+      ["Tobias Rennert", "question", "What is the first thing your students do when they walk in, and did you choose it or did it just happen?"],
+      ["Deshawn Pryor", "question", "How do you run an entry routine when students arrive across a ten minute window?"]
+    ]},
+    { "slug": "coding-robotics-equipment-checkout-log", "posts": [
+      ["Ravi Chandrasekar", "from_tdi", "The log exists so a missing part has a name attached before it becomes nobody's fault. That is most of its value."],
+      ["Aurelia Nkemdirim", "from_tdi", "Check condition on the way out as well as back. Half of all damage arguments are about whether it was already like that."],
+      ["Wendell Prosser", "question", "What goes missing most often in your room, and did logging it actually reduce it?"],
+      ["Deshawn Pryor", "question", "Who does the checking where you are? This tends to land on support staff."]
+    ]},
+    { "slug": "de-escalation-language-guide", "posts": [
+      ["Everett Crane", "from_tdi", "Say the scripts out loud before you need them. Read silently they sound calm, and said aloud for the first time in a hot moment they often come out wrong."],
+      ["Rosalie Dunne", "from_tdi", "The grade level differences are real. The same sentence that steadies a seven year old can sound like mockery to a fifteen year old."],
+      ["Lorna Stimpson", "question", "Which line here would not sound like you, and what would you say instead?"],
+      ["Marcus Oyelaran", "question", "What is the thing you have learned never to say in that moment?"]
+    ]},
+    { "slug": "device-checkout-digital-citizenship-checklist", "posts": [
+      ["Ravi Chandrasekar", "from_tdi", "Pairing the physical check with the norms review is the idea. Separately both get skipped, together they take about the same time as one."],
+      ["Ingrid Vasquez-Lund", "from_tdi", "The norms half only works if it changes occasionally. Read the same five lines every day and students stop hearing them by October."],
+      ["Nadia Belhassen", "question", "How do you keep the citizenship part from becoming background noise?"],
+      ["Yolanda Betts", "question", "Who hands out the devices in your room, and do they get to run this part?"]
+    ]},
+    { "slug": "emergency-sub-folder-checklist", "posts": [
+      ["Camille Thibodeaux", "from_tdi", "Build it on a day when nothing is wrong. The folder you assemble at 6am with a sick child on your lap is the one that is missing things."],
+      ["Ofelia Marchetti", "from_tdi", "Include who to ask rather than only what to do. A substitute with a name to find is in much better shape than one with perfect instructions."],
+      ["Simone Ashcroft", "question", "What is in your folder that is not on this list?"],
+      ["Trevon Baptiste", "question", "For anyone who has covered a class from somebody else's folder, what was missing that you needed?"]
+    ]},
+    { "slug": "end-of-day-classroom-closing-checklist", "posts": [
+      ["Marisol Aguirre", "from_tdi", "This is the single room version. If you share a space or move between rooms, the handover lines matter more than the tidying ones."],
+      ["Gus Halvorsen", "from_tdi", "Two minutes standing up, at the door. It stops working the moment it becomes something you sit down to do."],
+      ["Hana Sugimoto", "question", "What is the one thing that, left undone, ruins your next morning?"],
+      ["Bettina Kowalczyk", "question", "Do your students do any of this, or is it all on you?"]
+    ]},
+    { "slug": "family-change-what-a-teacher-can-ask", "posts": [
+      ["Nadia Belhassen", "from_tdi", "The cannot side of this is as useful as the can side, and it is the side most of us are less sure about."],
+      ["Rosalie Dunne", "from_tdi", "What you can offer usually matters more to the child than what you know. The card keeps those two apart."],
+      ["Bettina Kowalczyk", "question", "What do you say to a student who tells you something you were not expecting and cannot unhear?"],
+      ["Jarrod Levins", "question", "Where does the line sit in your building between what a teacher holds and what gets passed on?"]
+    ]},
+    { "slug": "field-trip-planning-checklist", "posts": [
+      ["Ingrid Vasquez-Lund", "from_tdi", "The money section is the one that catches people out, usually later than it should. Read that part first."],
+      ["Wendell Prosser", "from_tdi", "Work backwards from the departure date. Forwards from today you will always be surprised by a permission deadline."],
+      ["Aurelia Nkemdirim", "question", "What went wrong on a trip you ran that is not on this list?"],
+      ["Ofelia Marchetti", "question", "How do you handle the students who cannot pay, without it being obvious which ones they are?"]
+    ]},
+    { "slug": "fire-drill-lockdown-quick-reference-card", "posts": [
+      ["Jarrod Levins", "from_tdi", "Built to laminate and live by the door, because the moment you need it is not a moment for finding a document."],
+      ["Lorna Stimpson", "from_tdi", "Write your specific exit and your specific muster point on it. A generic card by the door is decoration."],
+      ["Gus Halvorsen", "question", "Does your substitute actually know your procedure, or do they find out during the drill?"],
+      ["Deshawn Pryor", "question", "What do you do about the student for whom the alarm itself is the emergency?"]
+    ]},
+    { "slug": "first-week-classroom-reset", "posts": [
+      ["Marisol Aguirre", "from_tdi", "Day by day rather than all at once, because the first week does not have a spare afternoon in it anywhere."],
+      ["Simone Ashcroft", "from_tdi", "Relationships before routines is the order it uses. Doing it the other way holds for about a fortnight."],
+      ["Tobias Rennert", "question", "What do you always do in week one that you would defend to anybody?"],
+      ["Priya Raghunathan", "question", "For coaches, what do you see new teachers skip in the first week and regret in October?"]
+    ]},
+    { "slug": "in-the-moment-student-conflict-quick-reference", "posts": [
+      ["Everett Crane", "from_tdi", "Stabilise first, understand later. The card is ordered that way because getting those two the wrong way round is the common mistake."],
+      ["Yolanda Betts", "from_tdi", "The handoff step assumes you have somewhere to hand off to. If you do not, that is worth raising before you need it."],
+      ["Marcus Oyelaran", "question", "What is your first move when two students square up, before you say anything at all?"],
+      ["Rosalie Dunne", "question", "How do you handle the audience? The rest of the room is the part I find hardest."]
+    ]}
+  ]
+}
