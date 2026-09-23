@@ -37,6 +37,48 @@ confirmed deadline**, and say that the rest cannot appear until somebody
 confirms a window. If that line is missing, the screen is quietly pretending a
 sparse month means a calm month.
 
+## The pass, run on production (23 September 2026)
+
+Deploy from overnight, Ready. The flag `funding_config.new_pages` is on.
+
+- Opened: https://www.teachersdeserveit.com/tdi-admin/funding/calendar signed in as Rae
+- Saw: September 2026 with the grid rendering as predicted. Five blue entries
+  stacked on the 15th, reading "Caseys Cash for Classrooms Grant:", "Corn Belt
+  Energy - Education Gran...", "MGM National Harbor / Community F...", "Track NEA
+  application decision" and "Washington Commanders Charitable ...". Cox Charities
+  on the 18th. "NEA and IEA SCORE: get one named ..." on the 22nd. "Send the IEA
+  Foundation SCORE Gra..." on the 23rd, which is highlighted and labelled "23
+  today". Two red entries on the 30th: "E.J. and Marjory B. Ourso... closes" and
+  "Illinois Prairie Communit... closes".
+- Saw: the grey italic predictions where they should be. "IAA Foundation - Illi...
+  packet to school" on the 10th, "Cox Charities Fund Ed... packet to school" on the
+  17th, and on the 24th both "E.J. and Marjory B. O... approval due" and "Illinois
+  Prairie Comm... approval due".
+- Saw: the coverage line above the grid reads "5 of 21 live grant paths have a
+  confirmed deadline. The rest have no date yet, so they cannot appear here until
+  somebody confirms a window." That line is the point of the screen and it is
+  there.
+- Pressed: the grey "Illinois Prairie Comm... approval due" entry on the 24th.
+- Saw: a panel headed "PREDICTED, NOT CONFIRMED", subtitled "Saunemin CCSD #438 ·
+  2026-09-24", with a box headed "HOW THIS DATE WAS WORKED OUT" reading "Passed QA
+  on 2026-09-22 and waiting on a person. 2 days is the allowance before it reads as
+  stuck." Below it: "Nothing is due on this date. A predicted entry never chases
+  anyone and disappears the moment a real date exists." and a link reading "Open
+  Saunemin CCSD #438".
+
+## The routing risk did not materialise
+
+Before deploy, this URL fell through to the dynamic `[pursuitId]` route and tried
+to load a school called "calendar", rendering an error and later hanging. Once
+deployed the static segment wins, as expected. Worth keeping in mind that a build
+failure on this page would resurface as a broken pursuit page rather than a 404.
+
+## What I did not press
+
+Nothing that writes. There are no actions on this screen yet: the popups explain
+and link to the school, and the controls that complete an action are the next
+piece of work.
+
 ## What I will press
 
 A predicted entry, which should open a panel headed "Predicted, not confirmed"
