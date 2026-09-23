@@ -62,6 +62,32 @@ The Walmart card should read $500 rather than "amount not recorded", and the
 schools screen should show $500 of $15,552 for Saunemin with its progress bar
 off zero.
 
+## The pass, part one: the backfill is live (23 September 2026)
+
+- Opened: https://www.teachersdeserveit.com/tdi-admin/funding/83a8932b-66dc-4c67-b815-65c19358b123 signed in as Rae, expanded "Grant paths (14)".
+- Saw: the Walmart Spark Good Grant card reads "AWARDED $500 on Sep 11, 2026", with "ALLOCATIONS $500 awarded, $0 allocated, $500 to allocate" beneath it. The $500 appears in three places on that card and the figure at the top of the row reads $500, not the $5,000 the timeline once claimed.
+
+## The pass, part two: the control itself is NOT yet verified
+
+- Opened: https://www.teachersdeserveit.com/tdi-admin/funding/b69c6219-0e41-4717-9c7a-94dfe8e4570e, Allenwood, the only school with a grant still in `applied` and therefore the only place this control appears.
+- Pressed: "Record award" on the NEA Learning & Leadership Grant.
+- Saw: the OUTCOME panel opened with "Awarded amount ($)" **pre-filled with 5000** and a green, enabled "Confirm award" button. That is the old behaviour, exactly what this change removes.
+
+**That is not a failure of the fix. It has not deployed.** The newest production
+build was created 09:09 local and PR #603 merged at 08:51 local, so the merge
+missed that build by eighteen minutes and no deploy has run since. The page is
+correctly serving the previous code.
+
+This grant is also the perfect demonstration of why the change exists: $5,000 is
+what we asked NEA for, the funder has not decided in 99 days, and one click on a
+green button would have recorded the ask as money received.
+
+- Pressed: "Cancel".
+- Confirmed in the database rather than from the screen: `awarded_amount` on that grant is still null. Nothing was written.
+
+**Still owed:** re-open that same control once a deploy carrying #603 is live,
+and confirm the field is empty and Confirm award is grey until a number is typed.
+
 ## What I will not press
 
 Confirm award on a real grant. The two live candidates belong to real schools and
