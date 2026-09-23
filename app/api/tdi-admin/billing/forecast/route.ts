@@ -79,10 +79,11 @@ export async function GET(_request: NextRequest) {
     grant: rows.filter((r) => r.ledger === 'grant').reduce((s, r) => s + r.amount, 0),
     complimentaryLines: rows.filter((r) => r.ledger === 'complimentary').length,
     datedClient: rows.filter((r) => r.ledger === 'client' && r.readyOn).reduce((s, r) => s + r.amount, 0),
+    // Grant money only reaches a month once the award lands and funding_hold
+    // clears, at which point the line is no longer counted as grant at all.
     datedGrant: rows.filter((r) => r.ledger === 'grant' && r.readyOn).reduce((s, r) => s + r.amount, 0),
     lines: rows.length,
     undatedLines: queue.length,
-    awaitingVisit: rows.filter((r) => r.awaitsVisit).length,
   };
 
   return NextResponse.json({ months, queue, totals });

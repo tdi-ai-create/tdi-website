@@ -10,7 +10,7 @@ type Payload = {
   totals: {
     client: number; grant: number; complimentaryLines: number;
     datedClient: number; datedGrant: number;
-    lines: number; undatedLines: number; awaitingVisit: number;
+    lines: number; undatedLines: number;
   };
 };
 
@@ -56,8 +56,8 @@ export default function ForecastPage() {
       <MoneyStrip items={[
         { label: 'Client money', value: money(totals.client), note: 'we deliver, then invoice', dot: '#0B1120' },
         { label: 'Dated', value: money(totals.datedClient), note: 'placed in a month below', dot: '#059669' },
-        { label: 'Grant money', value: money(totals.grant), note: 'a funder has to decide first', dot: '#7C3AED' },
-        { label: 'Dated', value: money(totals.datedGrant), note: 'has an expected decision date', dot: '#7C3AED' },
+        { label: 'Grant money', value: money(totals.grant), note: 'waiting on a funder to decide', dot: '#7C3AED' },
+        { label: 'Awarded', value: money(totals.datedGrant), note: 'won, so it can be scheduled', dot: '#7C3AED' },
         { label: 'Undated lines', value: String(totals.undatedLines), note: `of ${totals.lines} ahead of us`, dot: '#D97706' },
       ]} />
 
@@ -66,8 +66,9 @@ export default function ForecastPage() {
       <div style={S.note}>
         <b style={{ color: '#172554' }}>These two totals are never added together.</b>
         <span style={{ display: 'block', marginTop: 2 }}>
-          Client money is gated on us delivering. Grant money is gated on a funder deciding, and cannot be
-          invoiced until the award lands whatever the calendar says. Complimentary work appears as days, never as money.
+          Client money is gated on us delivering. Grant money stays off the calendar until the grant is won,
+          because the work cannot be scheduled before then, so it waits in the queue with its decision date.
+          Complimentary work appears as days, never as money.
         </span>
       </div>
 
@@ -85,7 +86,11 @@ export default function ForecastPage() {
             <div key={r.id} style={S.qrow}>
               <span style={{ flex: 1, minWidth: 0 }}>
                 <b style={S.rlabel}>{r.label}</b>
-                <span style={S.rclient}>{r.client}</span>
+                <span style={S.rclient}>
+                  {r.client}
+                  {r.serviceOn && <> &middot; service {dayMonth(r.serviceOn)}{r.held ? ', held' : ''}</>}
+                  {r.awardOn && <> &middot; decision expected {dayMonth(r.awardOn)}</>}
+                </span>
               </span>
               <span style={{ flex: '0 0 150px' }}><LedgerPill ledger={r.ledger} /></span>
               <span style={{ flex: '0 0 110px', textAlign: 'right', fontWeight: 650, fontVariantNumeric: 'tabular-nums' }}>
@@ -136,11 +141,6 @@ export default function ForecastPage() {
                 <span style={{ flex: '0 0 110px', textAlign: 'right', fontWeight: 650, fontVariantNumeric: 'tabular-nums' }}>
                   {r.ledger === 'complimentary' ? <span style={{ color: '#94A3B8' }}>No charge</span> : money2(r.amount)}
                 </span>
-                {r.awaitsVisit && (
-                  <span style={S.flag}>
-                    The award lands before the visit. Nothing can be invoiced until the work is delivered and marked.
-                  </span>
-                )}
               </div>
             ))}
           </div>
@@ -195,7 +195,6 @@ const S: Record<string, React.CSSProperties> = {
   rlabel: { display: 'block', fontSize: 13.5, fontWeight: 600 },
   rclient: { display: 'block', color: '#64748B', fontSize: 11.5 },
   why: { flexBasis: '100%', color: '#94A3B8', fontSize: 12 },
-  flag: { flexBasis: '100%', color: '#7F1D1D', fontSize: 12 },
   note: {
     background: '#EFF6FF', border: '1px solid #BFDBFE', borderRadius: 12,
     padding: '13px 16px', marginBottom: 18, color: '#1E3A8A', fontSize: 13,
