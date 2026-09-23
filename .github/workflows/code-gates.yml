@@ -178,6 +178,34 @@ jobs:
           fi
           npm run check:seats
 
+      - name: Seat holders are on their school roster
+        # The next failure along from the one above. The seat is linked to the
+        # right partnership, the educator is using the Hub, and they are simply
+        # not in staff_members. Nothing errors and the school looks fine, but
+        # that person is absent from the Team tab, from every report, and from
+        # the denominator of every goal.
+        #
+        # Found 22 Sep 2026 onboarding four schools in a day: three of the four
+        # had a roster that did not match their seats, and the person missing at
+        # Glen Ellyn was the most active account in the school. Baselined, so
+        # this fails on somebody newly going invisible rather than on the
+        # known backlog.
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          NEXT_PUBLIC_LEARNING_HUB_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_LEARNING_HUB_SUPABASE_URL }}
+          LEARNING_HUB_SUPABASE_SERVICE_KEY: ${{ secrets.LEARNING_HUB_SUPABASE_SERVICE_KEY }}
+        run: |
+          if [ -z "$SUPABASE_SERVICE_ROLE_KEY" ] || [ -z "$LEARNING_HUB_SUPABASE_SERVICE_KEY" ]; then
+            echo "::warning::Service keys unavailable, so roster coverage was NOT checked."
+            exit 0
+          fi
+          if [ ! -f scripts/integrity/roster-coverage-baseline.json ]; then
+            echo "::error::roster-coverage-baseline.json is missing, so the check would rewrite it and pass. Restore it."
+            exit 1
+          fi
+          npm run check:roster
+
       - name: Admin API auth
         # Every /api/admin route must establish who is calling. 60 do not today,
         # so this is baselined and fails only on a new hole or on a fixed route
