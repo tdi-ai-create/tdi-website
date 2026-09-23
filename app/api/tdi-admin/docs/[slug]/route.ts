@@ -42,6 +42,7 @@ export async function GET(
     'swag-fulfillment': 'swag-fulfillment.html',
     'leadership-workflow': 'leadership-workflow.html',
     'muck-points-sop': 'muck-points-sop.html',
+    'whats-inside-sop': 'whats-inside-sop.html',
   };
 
   const filename = allowedDocs[slug];

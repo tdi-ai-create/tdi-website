@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useTDIAdmin } from '@/lib/tdi-admin/context';
 import { Search, Download, Printer, ExternalLink } from 'lucide-react';
 
-type DocId = 'admin-guide' | 'data-flow' | 'workflow' | 'billing-sop' | 'funding' | 'funding-launch' | 'grant-application-spec' | 'grant-workflow-sop' | 'hub-engagement' | 'engagement-workflow' | 'hub-content-standards' | 'hub-content-creation' | 'course-upload-sop' | 'course-checkins-sop' | 'creator-feedback-sop' | 'creator-recruitment-sop' | 'creator-dormancy-sop' | 'communication-map' | 'swag-fulfillment' | 'leadership-workflow' | 'muck-points-sop';
+type DocId = 'admin-guide' | 'data-flow' | 'workflow' | 'billing-sop' | 'funding' | 'funding-launch' | 'grant-application-spec' | 'grant-workflow-sop' | 'hub-engagement' | 'engagement-workflow' | 'hub-content-standards' | 'hub-content-creation' | 'course-upload-sop' | 'course-checkins-sop' | 'creator-feedback-sop' | 'creator-recruitment-sop' | 'creator-dormancy-sop' | 'communication-map' | 'swag-fulfillment' | 'leadership-workflow' | 'muck-points-sop' | 'whats-inside-sop';
 
 interface Doc {
   id: DocId;
@@ -159,6 +159,16 @@ const DOC_GROUPS: DocGroup[] = [
         tags: ['content', 'standards', 'tagging', 'categories', 'lift', 'PD hours', 'quick wins', 'card design', 'thumbnail', 'category colors', 'danielson'],
         relatedSections: [
           { label: 'Learning Hub', href: '/hub' },
+          { label: 'Hub Admin', href: '/tdi-admin/hub' },
+        ],
+      },
+      {
+        id: 'whats-inside-sop',
+        label: "What's Inside the Hub SOP",
+        desc: 'The buyer facing catalogue we send a school, and how to keep it true',
+        tags: ['whats inside', 'catalogue', 'catalog', 'for schools', 'sales', 'buyer', 'section', 'pin', 'badge', 'quick wins', 'prospect', 'no login', 'table of contents'],
+        relatedSections: [
+          { label: "Open What's Inside the Hub", href: '/for-schools/whats-inside' },
           { label: 'Hub Admin', href: '/tdi-admin/hub' },
         ],
       },
