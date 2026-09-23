@@ -1,5 +1,5 @@
 import * as XLSX from 'xlsx';
-import { forecastLine, isForecastable, type ForecastInput, type ForecastRow } from '@/lib/billing/forecast';
+import { forecastLine, isForecastable, type ForecastInput, type ForecastRow, type Ledger } from '@/lib/billing/forecast';
 
 /**
  * Billing as a workbook.
@@ -114,35 +114,60 @@ export function lineRowCells(l: LineRow, lk: Lookups): unknown[] {
 }
 
 /**
- * The sheet that travels with the file.
+ * The first thing the file opens on, so it has to be the money.
  *
- * An export gets forwarded, and the person who opens it third has not read the
- * screen it came from. Without this they see two columns of money and one
- * obvious thing to do with them.
+ * This started life as a page of prose explaining the two ledgers, and opening
+ * the workbook landed you on a wall of text with the figures hidden behind
+ * tabs. Rae, 23 September 2026: "this is not helpful at all." She was right,
+ * and it was the same mistake the screen made by putting its undated queue
+ * above its calendar. The explanation comes after the numbers, not before.
+ *
+ * Client and grant are adjacent columns here rather than one, so the month
+ * reads at a glance without ever producing a single combined figure.
  */
-function readMeSheet(kind: 'forecast' | 'lines', generatedOn: string) {
-  const rows: unknown[][] = [
-    ['Teachers Deserve It, billing export'],
-    [],
-    ['Generated', generatedOn],
-    ['Contents', kind === 'forecast' ? 'When contracted work becomes ready to invoice' : 'Every contract line with its delivery and billing position'],
-    [],
-    ['Client money and grant money are on separate sheets, and are never added together.'],
-    ['Client money is gated on us delivering the work.'],
-    ['Grant money is gated on a funder awarding it, and cannot be invoiced until the award lands.'],
-    ['Complimentary work is real delivery that will never produce an invoice. It is counted in days, never in money.'],
-    [],
-    ['Every date in this file is when a line becomes ready to invoice.'],
-    ['Nothing sends itself. An invoice leaves only when someone presses Send on a drafted email.'],
+function summarySheet(rows: { row: ForecastRow }[], generatedOn: string) {
+  const months = [...new Set(rows.map((r) => r.row.readyOn).filter(Boolean).map((d) => (d as string).slice(0, 7)))].sort();
+
+  const sum = (month: string, ledger: Ledger) =>
+    rows.filter((r) => r.row.readyOn?.startsWith(month) && r.row.ledger === ledger)
+      .reduce((s, r) => s + r.row.amount, 0);
+  const countComp = (month: string) =>
+    rows.filter((r) => r.row.readyOn?.startsWith(month) && r.row.ledger === 'complimentary').length;
+  const undated = (ledger: Ledger) =>
+    rows.filter((r) => !r.row.readyOn && r.row.ledger === ledger).reduce((s, r) => s + r.row.amount, 0);
+  const undatedCount = (ledger: Ledger) =>
+    rows.filter((r) => !r.row.readyOn && r.row.ledger === ledger).length;
+
+  const body: unknown[][] = [
+    ['Teachers Deserve It, ready to invoice', '', '', ''],
+    [`Generated ${generatedOn}`, '', '', ''],
+    ['', '', '', ''],
+    ['Month', 'Client money', 'Grant money', 'Complimentary days'],
+    ...months.map((m) => [m, sum(m, 'client'), sum(m, 'grant'), countComp(m)]),
+    ['', '', '', ''],
+    ['Dated total', months.reduce((s, m) => s + sum(m, 'client'), 0), months.reduce((s, m) => s + sum(m, 'grant'), 0), months.reduce((s, m) => s + countComp(m), 0)],
+    [`Not dated yet (${undatedCount('client')} client, ${undatedCount('grant')} grant lines)`, undated('client'), undated('grant'), undatedCount('complimentary')],
+    ['', '', '', ''],
+    ['These two columns are never added together.', '', '', ''],
+    ['Client money is gated on us delivering the work.', '', '', ''],
+    ['Grant money needs the funder to award it first, and cannot be invoiced until then.', '', '', ''],
+    ['Complimentary work is real delivery that will never produce an invoice, so it is counted in days.', '', '', ''],
+    ['Every date is when a line becomes ready. Nothing sends itself.', '', '', ''],
   ];
-  const ws = XLSX.utils.aoa_to_sheet(rows);
-  ws['!cols'] = [{ wch: 100 }];
+
+  const ws = XLSX.utils.aoa_to_sheet(body);
+  ws['!cols'] = [{ wch: 56 }, { wch: 16 }, { wch: 16 }, { wch: 20 }];
   return ws;
 }
 
 function sheetFrom(headers: string[], rows: unknown[][]) {
   const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
-  ws['!cols'] = headers.map((h) => ({ wch: Math.min(Math.max(h.length + 2, 12), 52) }));
+  // Size to the widest cell, not just the header. A truncated client name is
+  // the first thing that makes an export look careless.
+  ws['!cols'] = headers.map((h, c) => {
+    const widest = rows.reduce((w, r) => Math.max(w, String(r[c] ?? '').length), h.length);
+    return { wch: Math.min(Math.max(widest + 2, 12), 60) };
+  });
   if (rows.length) ws['!autofilter'] = { ref: XLSX.utils.encode_range({ s: { r: 0, c: 0 }, e: { r: rows.length, c: headers.length - 1 } }) };
   return ws;
 }
@@ -172,7 +197,7 @@ export function buildForecastWorkbook(lines: LineRow[], lk: Lookups, generatedOn
       .map(({ row, serviceType }) => forecastRowCells(row, serviceType));
 
   const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, readMeSheet('forecast', generatedOn), 'Read me');
+  XLSX.utils.book_append_sheet(wb, summarySheet(rows, generatedOn), 'Summary');
   XLSX.utils.book_append_sheet(wb, sheetFrom(FORECAST_HEADERS, of('client')), 'Client money');
   XLSX.utils.book_append_sheet(wb, sheetFrom(FORECAST_HEADERS, of('grant')), 'Grant money');
   XLSX.utils.book_append_sheet(wb, sheetFrom(FORECAST_HEADERS, of('complimentary')), 'Complimentary');
@@ -188,7 +213,6 @@ export function buildLinesWorkbook(lines: LineRow[], lk: Lookups, generatedOn: s
   const of = (ledger: string) => sorted.filter((l) => ledgerOf(l) === ledger).map((l) => lineRowCells(l, lk));
 
   const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, readMeSheet('lines', generatedOn), 'Read me');
   XLSX.utils.book_append_sheet(wb, sheetFrom(LINE_HEADERS, of('client')), 'Client money');
   XLSX.utils.book_append_sheet(wb, sheetFrom(LINE_HEADERS, of('grant')), 'Grant money');
   XLSX.utils.book_append_sheet(wb, sheetFrom(LINE_HEADERS, of('complimentary')), 'Complimentary');

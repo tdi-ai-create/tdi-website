@@ -53,6 +53,15 @@ export default function ForecastPage() {
 
   return (
     <Frame>
+      <div style={S.topbar}>
+        <p style={S.topnote}>
+          Every date here is the day a line becomes <b>ready</b> to invoice. Nothing sends itself.
+        </p>
+        <a href="/api/tdi-admin/billing/export?view=forecast" style={S.dl} download>
+          Export as a spreadsheet
+        </a>
+      </div>
+
       <MoneyStrip items={[
         { label: 'Client money', value: money(totals.client), note: 'we deliver, then invoice', dot: '#0B1120' },
         { label: 'Dated', value: money(totals.datedClient), note: 'placed in a month below', dot: '#059669' },
@@ -70,35 +79,6 @@ export default function ForecastPage() {
           because the work cannot be scheduled before then. Complimentary work appears as days, never as money.
         </span>
       </div>
-
-      {queue.length > 0 && (
-        <div style={S.card}>
-          <div style={S.head}>
-            <h2 style={S.h2}>Not on the calendar yet</h2>
-            <p style={S.blurb}>
-              {queue.length === totals.lines
-                ? 'Every line ahead of us is in here. Until these have dates the calendar below has nothing true to show.'
-                : 'These cannot be placed in a month yet. This queue is the finding, not an empty state.'}
-            </p>
-          </div>
-          {queue.map((r) => (
-            <div key={r.id} style={S.qrow}>
-              <span style={{ flex: 1, minWidth: 0 }}>
-                <b style={S.rlabel}>{r.label}</b>
-                <span style={S.rclient}>
-                  {r.client}
-                  {r.serviceOn && <> &middot; service {dayMonth(r.serviceOn)}{r.held ? ', held' : ''}</>}
-                </span>
-              </span>
-              <span style={{ flex: '0 0 150px' }}><LedgerPill ledger={r.ledger} /></span>
-              <span style={{ flex: '0 0 110px', textAlign: 'right', fontWeight: 650, fontVariantNumeric: 'tabular-nums' }}>
-                {r.ledger === 'complimentary' ? <span style={{ color: '#94A3B8' }}>No charge</span> : money2(r.amount)}
-              </span>
-              <span style={S.why}>{r.blockedBy}</span>
-            </div>
-          ))}
-        </div>
-      )}
 
       {months.length === 0 ? (
         <div style={S.card}>
@@ -144,15 +124,35 @@ export default function ForecastPage() {
         ))
       )}
 
-      <div style={S.footRow}>
-        <p style={S.foot}>
-          Every date here is the day a line becomes <b>ready</b> to invoice. Nothing sends itself. Drafts wait in the
-          Outbox until someone presses Send.
-        </p>
-        <a href="/api/tdi-admin/billing/export?view=forecast" style={S.dl} download>
-          Export this as a spreadsheet
-        </a>
-      </div>
+      {queue.length > 0 && (
+        <div style={S.card}>
+          <div style={S.head}>
+            <h2 style={S.h2}>Not on the calendar yet</h2>
+            <p style={S.blurb}>
+              {queue.length === totals.lines
+                ? 'Every line ahead of us is in here. Until these have dates there is nothing to put in a month.'
+                : 'These cannot be placed in a month yet, and that is the finding rather than an empty state.'}
+            </p>
+          </div>
+          {queue.map((r) => (
+            <div key={r.id} style={S.qrow}>
+              <span style={{ flex: 1, minWidth: 0 }}>
+                <b style={S.rlabel}>{r.label}</b>
+                <span style={S.rclient}>
+                  {r.client}
+                  {r.serviceOn && <> &middot; service {dayMonth(r.serviceOn)}{r.held ? ', held' : ''}</>}
+                </span>
+              </span>
+              <span style={{ flex: '0 0 150px' }}><LedgerPill ledger={r.ledger} /></span>
+              <span style={{ flex: '0 0 110px', textAlign: 'right', fontWeight: 650, fontVariantNumeric: 'tabular-nums' }}>
+                {r.ledger === 'complimentary' ? <span style={{ color: '#94A3B8' }}>No charge</span> : money2(r.amount)}
+              </span>
+              <span style={S.why}>{r.blockedBy}</span>
+            </div>
+          ))}
+        </div>
+      )}
+
     </Frame>
   );
 }
@@ -201,8 +201,8 @@ const S: Record<string, React.CSSProperties> = {
     background: '#EFF6FF', border: '1px solid #BFDBFE', borderRadius: 12,
     padding: '13px 16px', marginBottom: 18, color: '#1E3A8A', fontSize: 13,
   },
-  foot: { color: '#64748B', fontSize: 12.5, maxWidth: 620, margin: 0 },
-  footRow: { display: 'flex', gap: 18, alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap' },
+  topbar: { display: 'flex', gap: 18, alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', marginBottom: 14 },
+  topnote: { color: '#64748B', fontSize: 12.5, maxWidth: 620, margin: 0 },
   dl: {
     background: '#0B1120', color: '#fff', border: 0, borderRadius: 7,
     padding: '8px 14px', fontSize: 12.5, fontWeight: 650, textDecoration: 'none', whiteSpace: 'nowrap',

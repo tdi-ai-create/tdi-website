@@ -158,7 +158,7 @@ export default function BillingPage() {
               Client money and grant money are on separate sheets, so the two
               cannot be summed together by accident. */}
           <a href="/api/tdi-admin/billing/export?view=lines" style={S.dl} download>
-            Export all lines
+            Export as a spreadsheet
           </a>
         </div>
 
