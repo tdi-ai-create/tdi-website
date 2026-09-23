@@ -70,12 +70,22 @@ stuck.
 
 ## What updates itself, and what does not
 
-Updates on its own, within the hour:
+**A data change does not appear until the site is deployed again.**
 
-The full list under each accordion, as things publish and get assigned. The four
-shown at rest, as opening patterns change. Most used, Trending, Popular and New,
-which are all computed from real usage or the publish date and are never typed
-in by hand.
+This is the opposite of what this document said when it was written, and the
+correction matters more than the original claim did. The page is generated ahead
+of time and served from cache. On 23 September the section a tool belonged to was
+corrected in the database, and the live page went on showing the old arrangement
+for more than half an hour, serving a cached copy every time. A deploy fixed it
+within a minute.
+
+So assume nothing you change reaches a buyer on its own. Publish a tool, assign
+its section, move something between sections, and then get the site deployed
+before you tell anyone to look.
+
+What the page does work out for itself, at the moment it is generated: which
+tools sit in each section, which four show at rest, and every badge except Start
+here.
 
 Does not update on its own, ever:
 
