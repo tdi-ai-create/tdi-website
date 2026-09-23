@@ -110,9 +110,16 @@ export default function FundingCalendarPage() {
           <button onClick={() => { setYear(today.getFullYear()); setMonth(today.getMonth() + 1); setOpen(null) }} style={navBtn}>Today</button>
           <button onClick={() => step(1)} style={navBtn}>Next</button>
         </div>
-        <Link href="/tdi-admin/funding/schools" style={{ marginLeft: 'auto', fontSize: 13, color: C.ink3, textDecoration: 'none' }}>
-          Schools
-        </Link>
+        <div style={{ marginLeft: 'auto', display: 'flex', gap: 14 }}>
+          <Link href="/tdi-admin/funding/schools" style={{ fontSize: 13, color: C.ink3, textDecoration: 'none' }}>
+            Schools
+          </Link>
+          {/* Every action still lives on the portal page, so never leave this
+              screen without a way back to it. */}
+          <Link href="/tdi-admin/funding" style={{ fontSize: 13, color: C.ink3, textDecoration: 'none' }}>
+            Funding portal
+          </Link>
+        </div>
       </div>
 
       {coverage && (

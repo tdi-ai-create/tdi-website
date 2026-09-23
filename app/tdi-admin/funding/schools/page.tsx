@@ -56,9 +56,21 @@ export default function FundingSchoolsPage() {
 
   return (
     <div style={{ maxWidth: 900, margin: '0 auto', padding: '32px 24px 80px' }}>
-      <h1 style={{ fontSize: 26, fontWeight: 700, color: C.ink, margin: '0 0 4px', letterSpacing: '-0.02em' }}>
-        Partnership schools
-      </h1>
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: 14, flexWrap: 'wrap' }}>
+        <h1 style={{ fontSize: 26, fontWeight: 700, color: C.ink, margin: '0 0 4px', letterSpacing: '-0.02em' }}>
+          Partnership schools
+        </h1>
+        {/* Every action still lives on the portal page, so never leave this
+            screen without a way back to it. */}
+        <div style={{ marginLeft: 'auto', display: 'flex', gap: 14 }}>
+          <Link href="/tdi-admin/funding/calendar" style={{ fontSize: 13, color: C.ink3, textDecoration: 'none' }}>
+            Calendar
+          </Link>
+          <Link href="/tdi-admin/funding" style={{ fontSize: 13, color: C.ink3, textDecoration: 'none' }}>
+            Funding portal
+          </Link>
+        </div>
+      </div>
       <p style={{ color: C.ink3, fontSize: 13.5, margin: '0 0 24px' }}>
         What each school has been awarded, against what their grant plan is worth.
       </p>

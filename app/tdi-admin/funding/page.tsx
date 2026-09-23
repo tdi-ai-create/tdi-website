@@ -300,6 +300,25 @@ export default function FundingPage() {
               {t.label}{t.key === 'board' && needsYou > 0 ? ` ${needsYou}` : ''}
             </button>
           ))}
+          {/* The rebuilt screens. They live on their own routes rather than as
+              views here, so they are links, not tabs. Styled to match the tabs
+              because to anyone using this they are the same row of choices. */}
+          {([
+            { href: '/tdi-admin/funding/calendar', label: 'Calendar' },
+            { href: '/tdi-admin/funding/schools', label: 'Profiles' },
+          ]).map(t => (
+            <Link
+              key={t.href}
+              href={t.href}
+              style={{
+                fontSize: 13, padding: '6px 12px', borderRadius: 7,
+                background: 'transparent', color: '#7b8399', fontWeight: 500,
+                textDecoration: 'none',
+              }}
+            >
+              {t.label}
+            </Link>
+          ))}
         </div>
       </div>
 
