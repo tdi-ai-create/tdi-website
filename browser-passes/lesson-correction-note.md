@@ -20,9 +20,17 @@ video, before the player rather than inside the collapsed transcript panel.
 
 ## What I did
 
-- Opened:
-- Pressed:
-- Saw:
+- Opened: https://www.teachersdeserveit.com/hub/courses/how-to-use-flexible-seating-for-better-learning/bbca9e27-515d-423f-831a-ab51d20deef8
+  signed in as Rae on production, 22 Sep 2026.
+- Pressed: "How This Works" in the course curriculum, then read the lesson page.
+- Saw: a block headed "CORRECTION" above the video reading "This lesson mentions
+  a private Facebook group and weekly office hours. Both have been retired, and
+  Teachers Deserve It no longer runs either one." followed by the hello@ route.
+- Saw: the progress line reads "0 of 23 complete", down from the 273 Rae
+  screenshotted before the check-in rebuild. 17 lessons plus 6 questions.
+- Saw: the sidebar lists exactly "Check-in 1 of 3", "Check-in 2 of 3" and
+  "Check-in 3 of 3", placed after lessons 8, 13 and 17.
+- Saw: the course landing page reads "17 lessons + 3 check-ins".
 
 ## Checked without the browser
 
