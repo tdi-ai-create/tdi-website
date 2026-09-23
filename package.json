@@ -35,7 +35,8 @@
     "check:answers": "npx tsx scripts/integrity/verify-answer-actions.mts",
     "check:reachable": "node scripts/check-reachable.mjs",
     "check:browserpass": "node scripts/check-browser-pass.mjs",
-    "check:goals": "node scripts/check-goal-labels.mjs"
+    "check:goals": "node scripts/check-goal-labels.mjs",
+    "check:billingexport": "node scripts/integrity/verify-billing-export.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.78.0",
