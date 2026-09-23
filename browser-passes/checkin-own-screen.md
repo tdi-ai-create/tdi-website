@@ -51,3 +51,19 @@ account knowingly rather than a learner's.
 - Unverified: whether the check-in sat below the video before this change. The
   question text was present in the page body in both states, and what the press
   visibly removes is the player and its controls.
+
+## A defect found separately, not fixed here
+
+A second session verified this same change independently on 23 September and hit
+something this record should carry.
+
+The lesson's own URL,
+`/hub/courses/how-to-use-flexible-seating-for-better-learning/201ff1f1-3b21-4886-9909-f3041096b972`,
+**hangs on "Loading your Hub..." indefinitely** when opened cold in a fresh tab.
+Reproduced twice, over 45 seconds each, with no console errors. The course page
+loads normally and the same lesson opens fine when reached by clicking through
+the player, so it is specific to deep-linking a lesson from cold.
+
+Worth chasing because the "Verify after deploy" line at the top of this file is
+itself a direct lesson URL, and because any lesson link emailed to a member
+would behave the same way.
