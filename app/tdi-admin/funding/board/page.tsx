@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import FundingChrome from '../FundingChrome'
 import { DraftEmailModal, introEmailDraft, gateBlockerEmailDraft } from '../components/panel/DraftEmailModal'
 import { ImpactEvidence } from '../components/ImpactEvidence'
 import NeedsYouBoard from '../components/NeedsYouBoard'
@@ -241,7 +242,11 @@ export default function FundingPage() {
     : schools.filter(sc => openFor(sc, ownerFilter) > 0)
 
   return (
-    <div style={{ padding: '32px 48px', fontFamily: "'DM Sans', sans-serif", maxWidth: 1000 }}>
+    <>
+      {/* Without this the board is a dead end: clicking Board left no way back
+          to the calendar or the schools. */}
+      <FundingChrome active="board" />
+      <div style={{ padding: '32px 48px', fontFamily: "'DM Sans', sans-serif", maxWidth: 1000 }}>
       {toast && <Toast message={toast} onDone={() => setToast(null)} />}
       {draftEmail && (
         <DraftEmailModal {...draftEmail} onClose={() => setDraftEmail(null)} onSent={async () => {
@@ -421,7 +426,8 @@ export default function FundingPage() {
       <div style={{ marginTop: 28 }}>
         <ImpactEvidence />
       </div>
-    </div>
+      </div>
+    </>
   )
 }
 
