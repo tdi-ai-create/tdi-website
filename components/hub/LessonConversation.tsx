@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { MessageCircle, X, ThumbsUp, Flag, Bookmark, Pin, ChevronDown, Send } from 'lucide-react'
 import { useTranslation } from '@/lib/hub/useTranslation'
 import EducatorBadge from '@/components/hub/EducatorBadge'
+import TdiVoiceChip from '@/components/hub/TdiVoiceChip'
 
 // ─── TYPES ──────────────────────────────────────────────────────────────────
 
@@ -13,7 +14,7 @@ interface ConversationReply {
   id: string
   body: string
   posted_at: string
-  author: { name: string; role: string | null; educator_type?: string | null }
+  author: { name: string; role: string | null; educator_type?: string | null; is_tdi_voice?: boolean | null }
 }
 
 interface ConversationPost {
@@ -30,6 +31,7 @@ interface ConversationPost {
     role: string | null
     avatar_url: string | null
     educator_type?: string | null
+    is_tdi_voice?: boolean | null
   }
 }
 
@@ -330,6 +332,7 @@ function PostCard({ post, userId, isAdmin, onRefresh, tUI }: { post: Conversatio
           {/* Author line */}
           <p className="text-xs text-gray-400 mb-3">
             {post.author.name}
+            <TdiVoiceChip isTdiVoice={post.author.is_tdi_voice} />
             {post.author.educator_type && (
               <EducatorBadge educatorType={post.author.educator_type} />
             )}
@@ -423,6 +426,7 @@ function PostCard({ post, userId, isAdmin, onRefresh, tUI }: { post: Conversatio
                   <div className="flex-1 min-w-0">
                     <p className="text-xs text-gray-400 mb-1">
                       <span className="font-medium text-gray-600">{r.author.name}</span>
+                      <TdiVoiceChip isTdiVoice={r.author.is_tdi_voice} />
                       {r.author.educator_type && (
                         <EducatorBadge educatorType={r.author.educator_type} />
                       )}
