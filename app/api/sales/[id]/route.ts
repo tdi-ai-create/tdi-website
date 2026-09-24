@@ -11,6 +11,12 @@ const EDITABLE_FIELDS: Record<string, { type: 'text' | 'number' | 'enum' | 'bool
   school_year: { type: 'text' },
   lead_classification: { type: 'enum', values: ['current_client', 'new_inquiry', 'targeting_area', 'ar_collection'] },
   on_jims_call_sheet: { type: 'boolean' },
+  call_owner: { type: 'enum', values: [
+    'rae@teachersdeserveit.com',
+    'hello@teachersdeserveit.com',
+    'kristin@whatwilllast.com',
+    'jim@teachersdeserveit.com',
+  ] },
   notes: { type: 'text' },
   expected_close_date: { type: 'date' },
   last_activity_at: { type: 'date' },
@@ -52,8 +58,13 @@ export async function PATCH(
         return NextResponse.json({ error: `"${field}" must be a number` }, { status: 400 })
       }
     }
-    if (fieldDef.type === 'enum' && fieldDef.values && new_value !== null) {
-      if (!fieldDef.values.includes(new_value)) {
+    // An empty string means "clear it". Without this the call owner dropdown's
+    // "Nobody" option fails the enum check below and the lead can be put on the
+    // call list but never taken off it.
+    if (coerced === '') coerced = null
+
+    if (fieldDef.type === 'enum' && fieldDef.values && coerced !== null) {
+      if (!fieldDef.values.includes(coerced)) {
         return NextResponse.json({ error: `Invalid value for "${field}". Must be one of: ${fieldDef.values.join(', ')}` }, { status: 400 })
       }
     }
@@ -82,6 +93,14 @@ export async function PATCH(
     const updatePayload: Record<string, any> = {
       [field]: coerced,
       updated_at: new Date().toISOString(),
+    }
+
+    // The call list is now "somebody's name is on it". The old boolean is kept
+    // in step rather than deleted, because the export, the top bar count and
+    // `pipeline-summary` all still read it, and a column rename is a worse
+    // trade than one extra assignment here.
+    if (field === 'call_owner') {
+      updatePayload.on_jims_call_sheet = coerced !== null
     }
 
     const { error: updateError } = await (supabase.from('sales_opportunities') as any)

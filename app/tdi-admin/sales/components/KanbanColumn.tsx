@@ -3,13 +3,6 @@
 import { useState } from 'react'
 import { SalesCard, type SalesCardOpp } from './SalesCard'
 
-const HEAT_ORDER = ['hot', 'warm', 'cold', 'parked'] as const
-const HEAT_LABELS: Record<string, { label: string; color: string }> = {
-  hot: { label: 'Hot', color: '#EF4444' },
-  warm: { label: 'Warm', color: '#F59E0B' },
-  cold: { label: 'Cold', color: '#3B82F6' },
-  parked: { label: 'Parked', color: '#6B7280' },
-}
 
 export function KanbanColumn({
   stage,
@@ -38,24 +31,20 @@ export function KanbanColumn({
   const total = opportunities.reduce((s, o) => s + (o.value || 0), 0)
   const factored = opportunities.reduce((s, o) => s + (o.value || 0) * (o.probability || 0) / 100, 0)
 
-  const byHeat: Record<string, SalesCardOpp[]> = { hot: [], warm: [], cold: [], parked: [] }
-  opportunities.forEach(o => {
-    const h = o.heat || 'warm'
-    if (byHeat[h]) byHeat[h].push(o)
-    else byHeat.warm.push(o)
+  /**
+   * One flat list per stage, ordered by value per muck point.
+   *
+   * These used to be grouped into HOT / WARM / COLD / PARKED bands. Rae, 24
+   * September 2026: "remove hot warm and cold. we dont need that. its just
+   * creating confusion." A lead with no muck score yet sorts below the scored
+   * ones rather than above them, because unknown is not the same as cheap.
+   */
+  const ordered = [...opportunities].sort((a, b) => {
+    const ra = a.muck?.total ? (a.value || 0) / a.muck.total : -1
+    const rb = b.muck?.total ? (b.value || 0) / b.muck.total : -1
+    if (rb !== ra) return rb - ra
+    return ((b.value || 0) * (b.probability || 0)) - ((a.value || 0) * (a.probability || 0))
   })
-  // Sort within heat groups by value per muck point, cheapest work for the most
-  // money on top. This used to sort by the retired T1 fit score. A lead with no
-  // muck score yet sorts below the scored ones rather than above them, because
-  // unknown is not the same as cheap.
-  Object.values(byHeat).forEach(arr =>
-    arr.sort((a, b) => {
-      const ra = a.muck?.total ? (a.value || 0) / a.muck.total : -1
-      const rb = b.muck?.total ? (b.value || 0) / b.muck.total : -1
-      if (rb !== ra) return rb - ra
-      return ((b.value || 0) * (b.probability || 0)) - ((a.value || 0) * (a.probability || 0))
-    })
-  )
 
   function handleDragOver(e: React.DragEvent) {
     e.preventDefault()
@@ -115,80 +104,21 @@ export function KanbanColumn({
             {isDragOver ? 'Drop here' : 'No opportunities'}
           </p>
         ) : (
-          HEAT_ORDER.map(heat => {
-            const cards = byHeat[heat]
-            if (cards.length === 0) return null
-            const isCollapsible = heat === 'cold' || heat === 'parked'
-            return (
-              <CollapsibleHeatGroup
-                key={heat}
-                heat={heat}
-                cards={cards}
-                isCollapsible={isCollapsible}
-                onCardClick={onCardClick}
-                onCardContextMenu={onCardContextMenu}
-                onFieldSaved={onFieldSaved}
-                onToggleCallSheet={onToggleCallSheet}
-                onAddNote={onAddNote}
-                getNoteForOpp={getNoteForOpp}
-              />
-            )
-          })
+          ordered.map(opp => (
+            <SalesCard
+              key={opp.id}
+              opp={opp}
+              onClick={() => onCardClick(opp)}
+              draggable
+              onContextMenu={onCardContextMenu ? (e) => onCardContextMenu(e, opp.id) : undefined}
+              onFieldSaved={onFieldSaved}
+              onToggleCallSheet={onToggleCallSheet}
+              onAddNote={onAddNote}
+              latestNote={getNoteForOpp ? getNoteForOpp(opp.id) : null}
+            />
+          ))
         )}
       </div>
-    </div>
-  )
-}
-
-function CollapsibleHeatGroup({
-  heat,
-  cards,
-  isCollapsible,
-  onCardClick,
-  onCardContextMenu,
-  onFieldSaved,
-  onToggleCallSheet,
-  onAddNote,
-  getNoteForOpp,
-}: {
-  heat: string
-  cards: SalesCardOpp[]
-  isCollapsible: boolean
-  onCardClick: (opp: SalesCardOpp) => void
-  onCardContextMenu?: (e: React.MouseEvent, oppId: string) => void
-  onFieldSaved?: (oppId: string, field: string, newValue: any) => void
-  onToggleCallSheet?: (oppId: string) => void
-  onAddNote?: (oppId: string) => void
-  getNoteForOpp?: (oppId: string) => { body: string; created_at: string } | null
-}) {
-  const [isOpen, setIsOpen] = useState(!isCollapsible)
-  const meta = HEAT_LABELS[heat] || HEAT_LABELS.warm
-
-  return (
-    <div style={{ marginBottom: 8 }}>
-      <div
-        onClick={isCollapsible ? () => setIsOpen(!isOpen) : undefined}
-        style={{
-          fontSize: 10,
-          fontWeight: 700,
-          color: meta.color,
-          padding: '6px 4px',
-          textTransform: 'uppercase',
-          letterSpacing: 0.5,
-          cursor: isCollapsible ? 'pointer' : 'default',
-          userSelect: 'none',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 4,
-        }}
-      >
-        {isCollapsible && <span style={{ fontSize: 8, display: 'inline-block', transition: 'transform 0.15s', transform: isOpen ? 'rotate(90deg)' : 'rotate(0deg)' }}>&#9654;</span>}
-        <span style={{ width: 6, height: 6, borderRadius: '50%', background: meta.color, display: 'inline-block' }} />
-        {meta.label} &middot; {cards.length}
-      </div>
-      {isOpen && cards.map(opp => (
-        <SalesCard key={opp.id} opp={opp} onClick={() => onCardClick(opp)} draggable onContextMenu={onCardContextMenu ? (e) => onCardContextMenu(e, opp.id) : undefined} onFieldSaved={onFieldSaved} onToggleCallSheet={onToggleCallSheet} onAddNote={onAddNote} latestNote={getNoteForOpp ? getNoteForOpp(opp.id) : null} />
-      ))}
     </div>
   )
 }

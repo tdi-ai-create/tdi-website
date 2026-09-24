@@ -6,7 +6,6 @@ interface TopBarStats {
   /** Leads the muck model cannot value, because no offering is recorded. They
    *  count as zero in totalPipeline, so the count is shown alongside it. */
   unvaluedCount?: number
-  hotCount: number
   invoiceCount: number
   callSheetCount: number
   callSheetValue: number
@@ -78,16 +77,18 @@ export function StickyTopBar({
       </div>
 
       <div style={{ display: 'flex', gap: 20, alignItems: 'center' }}>
-        <div style={{ borderLeft: '1px solid #E5E7EB', paddingLeft: 20 }}>
-          <div style={{ fontSize: 14, fontWeight: 700, color: '#EF4444', display: 'flex', alignItems: 'center', gap: 5 }}>
-            <span style={{ width: 8, height: 8, borderRadius: '50%', background: 'linear-gradient(135deg, #EF4444, #F97316)', display: 'inline-block' }} />
-            {stats.hotCount} hot
+        {/* Hot / warm / cold is gone, so this block now carries only the
+            thing it shared space with. Rae, 24 September 2026: "remove hot warm
+            and cold. we dont need that. its just creating confusion." */}
+        {stats.invoiceCount > 0 && (
+          <div style={{ borderLeft: '1px solid #E5E7EB', paddingLeft: 20 }}>
+            <div style={{ fontSize: 14, fontWeight: 700, color: '#F59E0B', display: 'flex', alignItems: 'center', gap: 5 }}>
+              <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#F59E0B', display: 'inline-block' }} />
+              {stats.invoiceCount} invoices
+            </div>
+            <div style={{ fontSize: 11, color: '#6B7280' }}>owed to us</div>
           </div>
-          <div style={{ fontSize: 11, color: '#F59E0B', display: 'flex', alignItems: 'center', gap: 5 }}>
-            <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#F59E0B', display: 'inline-block' }} />
-            {stats.invoiceCount} invoices
-          </div>
-        </div>
+        )}
 
         {/* Muck across the board. Factored by stage probability, for the same
             reason pipeline value is: a lead at five percent should not put its
@@ -171,7 +172,7 @@ export function StickyTopBar({
                 ? 'Export'
                 : isFiltered
                   ? `Export these ${exportCount}`
-                  : `Export all ${exportCount}`}
+                  : `Export all ${exportCount} shown`}
           </button>
         )}
         <button onClick={onAddLead} style={{

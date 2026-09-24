@@ -25,7 +25,7 @@ import { HorizontalBarChart, DonutChart, DonutLegend, LiveSectionHeader } from '
 import { SELLABLE_OFFERINGS, OFFERING_LABELS, OFFERING_HINTS, offeringLabel } from '@/lib/partnerships/offerings'
 import { chaseOrder } from '@/lib/sales/muck'
 import { URGENCY_COLOR, followupRank, hasFollowup, shortDate, urgency, type Followup } from '@/lib/sales/followup'
-import { teamLabel } from '@/lib/sales/team'
+import { SALES_TEAM, teamLabel } from '@/lib/sales/team'
 
 interface MuckCardScore {
   total: number | null
@@ -129,6 +129,7 @@ interface SalesOpportunity {
   website: string | null
   city: string | null
   state: string | null
+  call_owner: string | null
   followup_text: string | null
   followup_kind: string | null
   followup_owner: string | null
@@ -179,6 +180,8 @@ interface Opportunity {
   website: string | null
   city: string | null
   state: string | null
+  /** Email of whoever is making the call, or null when nobody is. */
+  callOwner: string | null
   /** The live follow-up alert. Null text means nothing is owed on this lead. */
   followup: Followup
   // AI enrichment
@@ -249,6 +252,7 @@ function toCardOpp(opp: Opportunity, muckById: Record<string, MuckCardScore>): S
     type: opp.type,
     assignedTo: opp.assignedTo,
     onCallSheet: opp.onCallSheet,
+    callOwner: opp.callOwner,
     notes: opp.notes,
     needs_invoice: opp.needs_invoice,
     stage: opp.stage,
@@ -573,6 +577,7 @@ export default function SalesPage() {
         heat: row.heat || 'warm',
         grantSupport: row.grant_support || false,
         onCallSheet: row.on_jims_call_sheet || false,
+        callOwner: row.call_owner,
         schoolYear: normalizeSchoolYear(row.contract_year || row.school_year),
         paymentReceived: row.payment_received || false,
         invoiceSentAt: row.invoice_sent_at,
@@ -781,7 +786,9 @@ export default function SalesPage() {
     showToastMsg(`"${opp.name}" marked as paid`, 'success')
   }
 
-  // Toggle call sheet flag on an opp
+  // Toggle call sheet flag on an opp. Kept for the context menu; the card now
+  // sets a person instead, through handleFieldSaved below.
+
   async function handleToggleCallSheet(oppId: string) {
     const opp = opportunities.find(o => o.supabase_id === oppId)
     if (!opp) return
@@ -887,6 +894,7 @@ export default function SalesPage() {
       }))
       colWidths = {
         'District / School': 40,
+        'Who is calling': 14,
         'Contact Name': 22,
         'Contact Email': 30,
         'Phone': 18,
@@ -898,6 +906,7 @@ export default function SalesPage() {
       // Full export with all fields
       data = rows.map(o => ({
         'District / School': o.name || '',
+        'Who is calling': o.callOwner ? teamLabel(o.callOwner) : '',
         'Contact Name': o.contactName || '',
         'Contact Email': o.contactEmail || '',
         'Phone': o.contactPhone || '',
@@ -905,7 +914,6 @@ export default function SalesPage() {
         'State': o.state || '',
         'Stage': o.stageName || '',
         'Deal Value': o.value ?? '',
-        'Heat': o.heat ? o.heat.charAt(0).toUpperCase() + o.heat.slice(1) : '',
         'Source': o.source || '',
         'Deal Type': o.type === 'new_business' ? 'New Business' : o.type === 'renewal' ? 'Renewal' : o.type || '',
         'Website': o.website || '',
@@ -924,7 +932,7 @@ export default function SalesPage() {
         'State': 7,
         'Stage': 20,
         'Deal Value': 12,
-        'Heat': 8,
+
         'Source': 28,
         'Deal Type': 14,
         'Website': 35,
@@ -1127,6 +1135,12 @@ export default function SalesPage() {
       if (o.supabase_id !== oppId) return o
       const updated = { ...o }
       if (field === 'value') updated.value = newValue
+      else if (field === 'call_owner') {
+        // Picking a person puts the lead on the call list; picking nobody takes
+        // it off. One control, so the two can never disagree.
+        updated.callOwner = newValue || null
+        updated.onCallSheet = Boolean(newValue)
+      }
       else if (field === 'heat') updated.heat = newValue
       else if (field === 'notes') updated.notes = newValue
       else if (field === 'source') updated.source = newValue
@@ -1209,12 +1223,20 @@ export default function SalesPage() {
       case 'renewal':
         return opp.type === 'renewal'
       default:
+        // call:<email> for one person's calls, call:none for unclaimed ones.
+        if (key.startsWith('call:')) {
+          const who = key.slice(5)
+          return who === 'none' ? !opp.callOwner : opp.callOwner === who
+        }
         return false
     }
   }, [muckById])
 
   const filterCounts = useMemo(() => {
-    const keys = ['band:light', 'band:moderate', 'band:heavy', 'not_valued', 'needs_outreach', 'renewal']
+    const keys = [
+      'band:light', 'band:moderate', 'band:heavy', 'not_valued', 'needs_outreach', 'renewal',
+      ...SALES_TEAM.map(m => `call:${m.email}`), 'call:none',
+    ]
     const counts: Record<string, number> = {}
     for (const k of keys) counts[k] = activeOpps.filter(o => matchesFilterKey(o, k)).length
     return counts
@@ -1260,7 +1282,6 @@ export default function SalesPage() {
       totalPipeline: pipelineOpps.reduce((s, o) => s + dealValue(o), 0),
       activeCount: pipelineOpps.length,
       unvaluedCount: unvalued.length,
-      hotCount: pipelineOpps.filter(o => o.heat === 'hot').length,
       invoiceCount: opportunities.filter(o => o.needs_invoice && !o.deleted_at && !o.grantSupport).length,
       callSheetCount: callSheetOpps.length,
       callSheetValue: callSheetOpps.reduce((s, o) => s + dealValue(o), 0),

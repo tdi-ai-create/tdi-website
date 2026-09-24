@@ -33,7 +33,48 @@ opened, so this is sequencing rather than a habit.
 - The bar read "74 not valued" and the chip below read "Not valued 96". Both are
   right: the chip counts the whole board, the bar excludes Targeting.
 
-## What to press after the deploy
+## The production pass, done 24 September 2026 after the deploy
+
+Signed in as Rae, on a throwaway lead named "ZZ Sandbox Pass 637" that was
+deleted afterwards along with its notes.
+
+- Opened: https://www.teachersdeserveit.com/tdi-admin/sales
+- Saw: the bar reads "Call list: 20" and the button "Export call list". Searched
+  the whole page for "Jim's list" and "Export Jim's List" and both return no
+  match, so the rename is complete rather than partial.
+- Saw: "167 active  74 not valued in pipeline" in the bar and "Not valued on the
+  board &middot; 96" in the chip row. The same two words no longer produce two
+  numbers.
+- Saw: with no filter the export button reads "Export all 213 shown".
+- Pressed: the "Heavy &middot; 22" chip.
+- Saw: the button became "Export these 22" and "Clear filters" appeared. The
+  board narrowed to the heavy leads.
+- Typed "ZZ Sandbox Pass" into the search box.
+- Saw: the button became "Export these 1". So the export follows the search as
+  well as the chips.
+- Opened the lead. Read the stage dropdown out of the DOM: nine options,
+  unassigned through paid, and **no "lost"**.
+- Saw: a School year select carrying 2025-26, 2026-27 and 2027-28, and a
+  checkbox reading "This is a person, not a deal". Neither existed before.
+- Pressed: "+ Give this to someone", chose Bella, a date of 22 September which
+  is in the past, and saved with "Assign and write to notes".
+- Saw: the banner read "**Bella is on this** call, by Sep 22" with PAST DUE as a
+  small badge, and "Set by Rae on Sep 24" under it. The person leads and the
+  date trails, which is the change.
+- Saw: the card behind it carried the pill "BELLA &middot; CALL &middot; PAST
+  DUE SEP 22", name first.
+- Pressed: the "This is a person, not a deal" checkbox.
+- Saw: the card left the board immediately and the export button dropped to
+  "Export these 0", with "No opportunities" in every column.
+- Reverted that, reloaded, reopened the lead, and changed School year from
+  2026-27 to 2025-26.
+- Saw: the export button dropped to "Export these 0" again, so the lead left the
+  board. Queried the row afterwards: `school_year` is `2025-26`, so the write
+  landed rather than only the screen changing.
+
+Both deferrals on these screens are now complete.
+
+## What was pressed (original list)
 
 1. Filter to Heavy, read the export button, and confirm it says "Export these
    21" rather than "Export All". Download it and count the rows.
