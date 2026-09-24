@@ -36,6 +36,30 @@ This is the same treatment the retired T1 fit score got.
 The kanban columns are now one flat list per stage ordered by value per muck
 point, instead of four collapsible HOT / WARM / COLD / PARKED bands.
 
+## The production pass, done 24 September 2026 after the deploy
+
+- Opened: https://www.teachersdeserveit.com/tdi-admin/sales
+- Saw: a new filter row headed "WHO IS CALLING" with coloured chips reading
+  "Rae &middot; 2", "Bella &middot; 0", "Kristin &middot; 0", "Jim &middot; 18"
+  and "Nobody yet &middot; 190". The counts sum to 210 against 212 drawn, the
+  difference being two leads outside the chip set, and the 18 plus 2 matches the
+  20 leads that carried the old boolean exactly.
+- Saw: no card, column, panel or bar anywhere says hot, warm or cold. The top
+  bar block that held "51 hot" now carries only "2 invoices, owed to us". The
+  kanban columns are one flat list per stage with no HOT / WARM / COLD headers.
+- Saw: the export button reads "Export all 212 shown".
+- Saw: the phone position on each card is now a circle. Rae used it herself
+  during this session and set Bella on Addison SD4; that card came back showing
+  a yellow circle with a B in it.
+- Pressed: the circle on a card in the Qualified column.
+- Saw: **a defect.** The menu opened but was cut off down its right edge by the
+  scrolling kanban column, so the options read "Nobody... the call", "Rae is c",
+  "Bella is", "Kristin i", "Jim is c". Unusable. Reported by Rae as "overlap
+  issue" with a screenshot.
+- The cause is that the menu was absolutely positioned inside a column with
+  `overflow-y: auto`, which clips anything escaping it. Fixed in the next change
+  by drawing the menu into document.body through a portal.
+
 ## What to press after the deploy
 
 1. On any card, click the circle where the phone icon was. Confirm the menu

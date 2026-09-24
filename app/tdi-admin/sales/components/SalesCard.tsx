@@ -204,8 +204,8 @@ export function SalesCard({ opp, onClick, draggable = false, onContextMenu, onFi
             field="call_owner"
             value={opp.callOwner ?? ''}
             options={[
-              { value: '', label: 'Nobody, take it off the call list' },
-              ...SALES_TEAM.map(m => ({ value: m.email, label: `${m.label} is calling` })),
+              ...SALES_TEAM.map(m => ({ value: m.email, label: `${m.label} calls this one` })),
+              { value: '', label: 'Take it off the call list' },
             ]}
             onSaved={handleSaved}
             renderValue={(val) => {
@@ -307,14 +307,25 @@ export function SalesCard({ opp, onClick, draggable = false, onContextMenu, onFi
               overflow: 'hidden', whiteSpace: 'nowrap',
             }}
           >
-            {/* Person first. The card answers "whose job is this" before it
-                answers "by when", because on a board of 166 that is the thing
-                being scanned for. */}
+            {/* Why, not who.
+                The coloured circle above already says whose call it is, so this
+                said it twice. Rae, 24 September 2026: "it's kind of doubling up
+                now ... maybe the lower note is reason for the call", pointing at
+                a lead where she had typed "Goal of Call: ONBOARDING (FALL
+                Semester)". So this line is the reason, and the name only appears
+                here when nobody has taken it, which is the case worth shouting
+                about. */}
             <span aria-hidden>&#9873;</span>
-            <span>{opp.followup?.owner ? teamLabel(opp.followup.owner) : 'UNCLAIMED'}</span>
-            <span style={{ opacity: 0.5 }}>&middot;</span>
-            <span style={{ fontWeight: 600 }}>{opp.followup?.kind ?? 'follow up'}</span>
-            {when && <><span style={{ opacity: 0.5 }}>&middot;</span><span style={{ fontWeight: 600 }}>{state === 'overdue' ? `past due ${when}` : when}</span></>}
+            {!opp.followup?.owner && (
+              <><span>UNCLAIMED</span><span style={{ opacity: 0.5 }}>&middot;</span></>
+            )}
+            <span style={{
+              fontWeight: 600, textTransform: 'none', letterSpacing: 0,
+              overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0,
+            }}>
+              {opp.followup?.text}
+            </span>
+            {when && <><span style={{ opacity: 0.5 }}>&middot;</span><span style={{ fontWeight: 700, flexShrink: 0 }}>{state === 'overdue' ? `past due ${when}` : when}</span></>}
           </div>
         )
       })()}
