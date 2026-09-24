@@ -181,7 +181,7 @@ export function FollowupBar({ opportunityId, followup, onSaved, showToast }: Pro
           value={kind}
           onChange={e => setKind(e.target.value)}
           title="What kind of follow-up is owed."
-          style={selectStyle}
+          style={{ ...selectStyle, minWidth: 104 }}
         >
           {FOLLOWUP_KINDS.map(k => <option key={k} value={k}>{KIND_WORD[k]}</option>)}
         </select>
@@ -189,7 +189,7 @@ export function FollowupBar({ opportunityId, followup, onSaved, showToast }: Pro
           value={owner}
           onChange={e => setOwner(e.target.value)}
           title="Who is doing it. Separate from who owns the lead."
-          style={selectStyle}
+          style={{ ...selectStyle, minWidth: 148 }}
         >
           <option value="">Who is doing it?</option>
           {SALES_TEAM.map(m => <option key={m.email} value={m.email}>{m.label}</option>)}
@@ -199,7 +199,7 @@ export function FollowupBar({ opportunityId, followup, onSaved, showToast }: Pro
           value={due}
           onChange={e => setDue(e.target.value)}
           title="The day it is owed by. Leave blank if there is no deadline."
-          style={selectStyle}
+          style={{ ...selectStyle, minWidth: 150 }}
         />
       </div>
       <textarea
@@ -245,7 +245,16 @@ export function FollowupBar({ opportunityId, followup, onSaved, showToast }: Pro
   )
 }
 
+/**
+ * Widths are explicit because they have to be.
+ *
+ * With no width these three sat on three separate rows rather than side by
+ * side: a base stylesheet gives `select` a full width, so each one filled the
+ * flex line and pushed the next one down. Measured on production, both selects
+ * came back 1112px wide inside a 1152px panel. Seen, then fixed.
+ */
 const selectStyle: React.CSSProperties = {
   fontSize: 12, color: '#374151', border: '1px solid #D1D5DB',
   borderRadius: 6, padding: '4px 8px', background: 'white', outline: 'none',
+  width: 'auto', flex: '0 0 auto', maxWidth: '100%',
 }
