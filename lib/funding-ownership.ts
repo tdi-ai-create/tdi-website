@@ -61,17 +61,10 @@ export interface NamedOwner {
   owner_name?: string | null;
 }
 
-/**
- * Has this been escalated past the operator to a decision.
- *
- * owner on a card is 'team', 'agent' or 'school'. Bella and Rae are both
- * 'team', so once research dead ends started routing to Rae there were two
- * different answers to "is this Bella's": the board excluded Rae's items from
- * its column and the tab badge above it did not. On 14 September her screen
- * said 31 in the badge and 23 in the stat directly beneath it.
- *
- * One predicate, read by both.
- */
-export function isDecisionForRae(item: NamedOwner): boolean {
-  return (item.ownerName ?? item.owner_name ?? '').trim().toLowerCase() === 'rae';
-}
+// isDecisionForRae used to live here. It matched owner_name against 'rae' and
+// was used to split the human queue in two: one column for Bella, one for Rae,
+// and a headline count that excluded the second. Rae settled it on 24 September
+// 2026: work in funding is a human touch or an agent touch, and which person
+// picks it up is not a property of the work. owner_name stays, because the
+// follow-up cron uses it to address an internal nudge to somebody by name.
+// Nothing partitions a queue by it.

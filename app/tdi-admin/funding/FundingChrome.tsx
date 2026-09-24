@@ -3,19 +3,18 @@
 /**
  * The funding chrome bar.
  *
- * Shared so the board is not a dead end. Funding Home switches Calendar and
- * Schools in place, so there it hands in `onView` and they are buttons. The
- * board is its own route and cannot switch a view it does not have, so there
- * they are links back to Funding Home, and `?view=schools` tells it which one
- * to open.
+ * Funding Home switches views in place, so it hands in `onView` and these are
+ * buttons. Without it they are links carrying `?view=`, which is how anything
+ * outside this screen points at one of its views.
  */
 
 import Link from 'next/link'
 import './funding-home.css'
 
-export type FundingView = 'cal' | 'schools' | 'queue' | 'funders' | 'awarded' | 'board'
+export type FundingView = 'work' | 'cal' | 'schools' | 'queue' | 'funders' | 'awarded'
 
-const VIEWS: { key: Exclude<FundingView, 'board'>; label: string }[] = [
+const VIEWS: { key: FundingView; label: string }[] = [
+  { key: 'work', label: 'Work' },
   { key: 'cal', label: 'Calendar' },
   { key: 'schools', label: 'Schools' },
   { key: 'queue', label: 'Queue' },
@@ -25,7 +24,7 @@ const VIEWS: { key: Exclude<FundingView, 'board'>; label: string }[] = [
 
 export default function FundingChrome({ active, onView }: {
   active: FundingView
-  onView?: (v: Exclude<FundingView, 'board'>) => void
+  onView?: (v: FundingView) => void
 }) {
   return (
     <div className="fh">
@@ -47,11 +46,6 @@ export default function FundingChrome({ active, onView }: {
                   {v.label}
                 </Link>
               ))}
-          {active === 'board' ? (
-            <button aria-current="true" style={{ cursor: 'default' }}>Board</button>
-          ) : (
-            <Link className="navlink" href="/tdi-admin/funding/board">Board</Link>
-          )}
         </nav>
       </header>
     </div>

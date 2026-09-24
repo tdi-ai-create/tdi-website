@@ -28,7 +28,6 @@
 
 import { useState } from 'react'
 import { awardedTotal as awardedSum } from '@/lib/funding-award'
-import { isDecisionForRae } from '@/lib/funding-ownership'
 
 interface BoardQueueItem {
   id: string
@@ -377,9 +376,11 @@ export default function NeedsYouBoard({
   // same column as Bella's chases and inflated her count. Splitting them is the
   // difference between a list of nine things she can do and a list of thirty
   // she cannot tell apart.
-  const allReady = steps.filter(i => i.owner === 'team' && !i.inProgress)
-  const readyForYou = allReady.filter(i => !isDecisionForRae(i))
-  const raeDecides = allReady.filter(i => isDecisionForRae(i))
+  // One human column. Work in funding is a human touch or an agent touch, and
+  // which person picks it up is not a property of the work. Splitting this by
+  // owner_name put the same queue in two places and left the headline count
+  // four short, because the second column was excluded from it.
+  const needsAPerson = steps.filter(i => i.owner === 'team' && !i.inProgress)
   const withSchool = steps.filter(i => i.owner === 'school')
   const submitted = grants.filter(g => IN_PLAY.has(g.status))
   const closed = grants.filter(g => ENDED.has(g.status))
@@ -391,7 +392,7 @@ export default function NeedsYouBoard({
   const awardedTotal = award.total
   const withFunders = submitted.reduce((s, g) => s + (g.amount || 0), 0)
   const stillToFind = Math.max(0, visible.reduce((s, sc) => s + sc.pipeline, 0) - awardedTotal)
-  const schoolsNeedingYou = new Set(readyForYou.map(i => i.pursuitId)).size
+  const schoolsNeedingYou = new Set(needsAPerson.map(i => i.pursuitId)).size
 
   return (
     <div>
@@ -433,7 +434,7 @@ export default function NeedsYouBoard({
       <div style={{ display: 'flex', borderBottom: `1px solid ${C.line}`, flexWrap: 'wrap' }}>
         <Stat
           k="Needs you"
-          v={String(readyForYou.length)}
+          v={String(needsAPerson.length)}
           n={`across ${schoolsNeedingYou} school${schoolsNeedingYou === 1 ? '' : 's'}`}
           hot
         />
@@ -496,8 +497,8 @@ export default function NeedsYouBoard({
           ))}
         </Column>
 
-        <Column name="Ready for you" count={readyForYou.length} active empty="nothing waiting on you">
-          {readyForYou.map(i => (
+        <Column name="Needs a person" count={needsAPerson.length} active empty="nothing waiting on a person">
+          {needsAPerson.map(i => (
             <CardView
               key={i.id}
               c={{
@@ -523,22 +524,6 @@ export default function NeedsYouBoard({
                       onSecondary: () => onWriteToSchool(i),
                     }
                   : {}),
-              }}
-            />
-          ))}
-        </Column>
-
-        <Column name="Rae decides" count={raeDecides.length} empty="nothing waiting on Rae">
-          {raeDecides.map(i => (
-            <CardView
-              key={i.id}
-              c={{
-                name: i.label,
-                school: nameOf(i.pursuitId),
-                tone: 'quiet',
-                line: i.why,
-                action: 'Open',
-                onAction: () => onOpenItem(i),
               }}
             />
           ))}
