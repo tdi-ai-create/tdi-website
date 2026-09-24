@@ -30,7 +30,7 @@ import {
   ownerOfBlockedPath,
 } from '../funding-eligibility';
 import { isOursToDo, isWaitingOnUs, whoseTurn } from '../creator-turn';
-import { isPersonOwned, isSchoolOwned, isDecisionForRae } from '../funding-ownership';
+import { isPersonOwned, isSchoolOwned } from '../funding-ownership';
 import { planAfterAnswer } from '../funding-answer-actions';
 import { canAgentDraft, stalledDraftMessage } from '../funding-offerable';
 import { hasFunderDecided, isLive, isOver, isWithFunder } from '../funding-status';
@@ -691,28 +691,23 @@ export const GUARDS: Guard[] = [
     origin:
       '14 September 2026: the tab badge read "Needs you 31" and the stat four pixels below it read ' +
       '23. The badge counted every team item including the decisions routed to Rae; the board column ' +
-      'excluded them. The Schools tab made the same mistake again, listing her decisions under ' +
-      '"Ready for You" badged "You".',
+      'excluded them. Settled on 24 September 2026 by removing the split itself: there is one human ' +
+      'queue, because work is a human touch or an agent touch and which person picks it up is not a ' +
+      'property of the work.',
     cases: [
       {
-        name: "Rae's decisions are recognised by either field shape",
+        name: 'a human item is a human item whoever is named on it',
         holds: () =>
-          isDecisionForRae({ ownerName: 'Rae' }) && isDecisionForRae({ owner_name: 'Rae' }),
+          isPersonOwned({ ownerType: 'tdi' }) &&
+          isPersonOwned({ owner_type: 'tdi' }),
       },
       {
-        name: 'the test is not confused by case or spacing',
-        holds: () => isDecisionForRae({ ownerName: '  rae ' }),
-      },
-      {
-        name: "Bella's work is never counted as a decision",
-        holds: () =>
-          !isDecisionForRae({ ownerName: 'Bella' }) &&
-          !isDecisionForRae({ ownerName: null }) &&
-          !isDecisionForRae({}),
-      },
-      {
-        name: "a decision is still ours, not the school's",
+        name: "a person's work is never the school's",
         holds: () => isPersonOwned({ ownerType: 'tdi' }) && !isSchoolOwned({ ownerType: 'tdi' }),
+      },
+      {
+        name: 'the school owns only what it owes us',
+        holds: () => isSchoolOwned({ ownerType: 'client' }) && !isPersonOwned({ ownerType: 'client' }),
       },
     ],
   },

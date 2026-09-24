@@ -3,15 +3,16 @@
 /**
  * Funding Home.
  *
- * This is the port of the Funding Home mockup. It replaces the old board as
- * what `/tdi-admin/funding` shows. The old board still exists at
- * `/tdi-admin/funding/board` because it holds every control that changes a
- * grant, and those are not wired into this screen yet. Removing it before they
- * are would take away 35 of the 36 ways to change anything in funding.
+ * This is the port of the Funding Home mockup, and as of 24 September 2026 it
+ * is the whole funding portal. The board it replaced is a redirect.
  *
- * Three views, the same three the mockup has:
+ *   Work      the pipeline. The calendar cannot show a path with no date, and
+ *             most paths have none, so this is where they are.
  *   Calendar  what has to happen and when, confirmed and predicted
  *   Schools   what each school is trying to raise against what landed
+ *   Queue     the emails waiting to go, which is the only door they leave by
+ *   Funders   who we have looked at, and when the research went stale
+ *   Awarded   what landed and what did not
  *   Detail    the live notes log, and the profile with a source on every fact
  *
  * Every figure on this page is read from the funding API. Nothing here is
@@ -22,6 +23,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import FundingChrome from './FundingChrome'
+import WorkBoard from './WorkBoard'
 import OutreachQueue from './components/OutreachQueue'
 import FundersTab from './components/FundersTab'
 import AwardedTab from './components/AwardedTab'
@@ -158,7 +160,7 @@ function prettyKey(k: string): string {
 }
 
 export default function FundingHome() {
-  const [view, setView] = useState<'cal' | 'schools' | 'school' | 'queue' | 'funders' | 'awarded'>('cal')
+  const [view, setView] = useState<'work' | 'cal' | 'schools' | 'school' | 'queue' | 'funders' | 'awarded'>('work')
 
   // The board links back here with ?view=schools, because it is its own route
   // and cannot switch a view it does not have. Read after mount rather than
@@ -166,7 +168,8 @@ export default function FundingHome() {
   // prerendering and can fail the build instead of just working.
   useEffect(() => {
     const asked = new URLSearchParams(window.location.search).get('view')
-    if (asked === 'schools' || asked === 'queue' || asked === 'funders' || asked === 'awarded') {
+    if (asked === 'cal' || asked === 'schools' || asked === 'queue'
+        || asked === 'funders' || asked === 'awarded') {
       setView(asked)
     }
   }, [])
@@ -284,11 +287,12 @@ export default function FundingHome() {
     />
   )
 
-  if (view === 'queue' || view === 'funders' || view === 'awarded') {
+  if (view === 'work' || view === 'queue' || view === 'funders' || view === 'awarded') {
     return (
       <>
         {chrome}
         <div style={{ padding: '26px 20px 70px', maxWidth: 1180, margin: '0 auto' }}>
+          {view === 'work' && <WorkBoard />}
           {view === 'queue' && <OutreachQueue />}
           {view === 'funders' && <FundersTab />}
           {view === 'awarded' && (
