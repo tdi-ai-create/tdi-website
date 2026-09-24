@@ -63,7 +63,8 @@ export async function GET(
           display_name,
           role,
           avatar_url,
-          educator_type
+          educator_type,
+          is_tdi_voice
         )
       `)
       .eq('lesson_id', lessonId)
@@ -89,6 +90,7 @@ export async function GET(
         role: post.hub_profiles?.role || null,
         avatar_url: post.hub_profiles?.avatar_url || null,
         educator_type: post.hub_profiles?.educator_type || null,
+        is_tdi_voice: post.hub_profiles?.is_tdi_voice === true,
       },
     }))
 
@@ -163,7 +165,8 @@ export async function POST(
           display_name,
           role,
           avatar_url,
-          educator_type
+          educator_type,
+          is_tdi_voice
         )
       `)
       .single()
@@ -183,6 +186,8 @@ export async function POST(
         name: profile?.display_name || 'Anonymous',
         role: profile?.role || null,
         avatar_url: profile?.avatar_url || null,
+        educator_type: profile?.educator_type || null,
+        is_tdi_voice: profile?.is_tdi_voice === true,
       },
     }, { status: 201 })
   } catch (err: any) {
