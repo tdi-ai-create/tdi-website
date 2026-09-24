@@ -56,7 +56,7 @@ export default function MoneyPage() {
     const ref = p.settles[0].invoice_number;
     const parent = invoiceByRef.get(ref);
     // Never nest under a row the list is about to hide, or the payment goes with it.
-    if (!parent || parent.status === 'voided') continue;
+    if (!parent || parent.status === 'void') continue;
     nested.set(ref, [...(nested.get(ref) ?? []), p]);
   }
   const nestedIds = new Set([...nested.values()].flat().map((p) => p.id));
@@ -69,12 +69,12 @@ export default function MoneyPage() {
     ...data.payments.filter((p) => flatPayments || !nestedIds.has(p.id)),
   ];
   const shown = rows.filter((r) => {
-    if (filter === 'invoices') return r.kind === 'invoice' && r.status !== 'voided';
+    if (filter === 'invoices') return r.kind === 'invoice' && r.status !== 'void';
     if (filter === 'payments') return r.kind === 'payment';
     if (filter === 'overdue') return r.kind === 'invoice' && r.status === 'overdue';
-    if (filter === 'voided') return r.kind === 'invoice' && r.status === 'voided';
+    if (filter === 'void') return r.kind === 'invoice' && r.status === 'void';
     if (filter === 'attention') return (r.kind === 'invoice' && (r.missing_payment_record || r.status === 'overdue')) || (r.kind === 'payment' && !r.details_verified);
-    return r.kind !== 'invoice' || r.status !== 'voided';
+    return r.kind !== 'invoice' || r.status !== 'void';
   });
   const allCount = t.invoices + data.payments.filter((p) => !nestedIds.has(p.id)).length;
 
@@ -110,7 +110,7 @@ export default function MoneyPage() {
         <div style={S.filters}>
           {[['all', `All (${allCount})`], ['invoices', `Invoices (${t.invoices})`], ['payments', `Payments (${t.payments})`],
             ['overdue', `Overdue (${data.invoices.filter((i) => i.status === 'overdue').length})`],
-            ['attention', 'Needs attention'], ['voided', `Voided (${t.voided})`]].map(([k, label]) => (
+            ['attention', 'Needs attention'], ['void', `Voided (${t.voided})`]].map(([k, label]) => (
             <button key={k} onClick={() => setFilter(k)} style={filter === k ? S.chipOn : S.chip}>{label}</button>
           ))}
         </div>
@@ -123,10 +123,10 @@ export default function MoneyPage() {
           return (
             <div key={r.id} style={{ borderBottom: '1px solid #F1F5F9' }}>
               <button onClick={() => toggle(r.id)} aria-expanded={isOpen}
-                style={{ ...S.row, background: flagged ? '#FFFCFC' : isOpen ? '#FAFBFC' : '#fff', opacity: r.kind === 'invoice' && r.status === 'voided' ? 0.6 : 1 }}>
+                style={{ ...S.row, background: flagged ? '#FFFCFC' : isOpen ? '#FAFBFC' : '#fff', opacity: r.kind === 'invoice' && r.status === 'void' ? 0.6 : 1 }}>
                 <Caret open={isOpen} />
                 <span style={{ flex: 1, minWidth: 0, textAlign: 'left' }}>
-                  <b style={{ display: 'block', fontSize: 13.5, textDecoration: r.kind === 'invoice' && r.status === 'voided' ? 'line-through' : 'none' }}>{r.ref}</b>
+                  <b style={{ display: 'block', fontSize: 13.5, textDecoration: r.kind === 'invoice' && r.status === 'void' ? 'line-through' : 'none' }}>{r.ref}</b>
                   <span style={{ display: 'block', color: '#64748B', fontSize: 11.8 }}>
                     {r.client}{r.kind === 'invoice' && r.school_year ? `, ${r.school_year}` : ''}{r.kind === 'invoice' && r.contract ? `, ${r.contract}` : ''}{r.kind === 'payment' ? (r.settles.length === 1 ? ` · settles ${r.settles[0].invoice_number}` : r.settles.length === 0 ? ' · settles nothing yet' : ` · settles ${r.settles.length} invoices`) : ''}
                     {r.kind === 'invoice' && r.note_count > 0 ? `, ${r.note_count} note${r.note_count === 1 ? '' : 's'}` : ''}
@@ -137,7 +137,7 @@ export default function MoneyPage() {
                     : r.status === 'paid' ? <Pill tone="green">Paid</Pill>
                     : r.status === 'overdue' ? <Pill tone="red">{r.days_overdue} days late</Pill>
                     : r.status === 'sent' ? <Pill tone="amber">Sent</Pill>
-                    : r.status === 'voided' ? <Pill tone="slate">Voided</Pill>
+                    : r.status === 'void' ? <Pill tone="slate">Voided</Pill>
                     : <Pill tone="slate">Draft</Pill>}
                 </span>
                 <span style={{ flex: '0 0 118px', textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>
@@ -207,7 +207,7 @@ function InvoiceDetail({ i }: { i: Invoice }) {
           The client has no idea this exists. A draft can be deleted outright; once sent it can only be voided.
         </Banner>
       )}
-      {i.status === 'voided' && <Banner tone="amber" title="Voided">{i.void_reason}</Banner>}
+      {i.status === 'void' && <Banner tone="amber" title="Voided">{i.void_reason}</Banner>}
 
       <InvoiceDocumentBar i={i} />
 

@@ -64,7 +64,7 @@ export async function GET(request: NextRequest) {
   }
 
   const today = new Date().toISOString().slice(0, 10);
-  const liveInvoices = (invoices ?? []).filter((i) => !i.voided_at && i.status !== 'voided');
+  const liveInvoices = (invoices ?? []).filter((i) => !i.voided_at && i.status !== 'void');
   // Never below zero: an overpayment is a real thing and must not read as
   // negative money owed.
   const owed = (i: any) => Math.max(0, Number(i.amount || 0) - (appliedTo.get(i.id) ?? 0));

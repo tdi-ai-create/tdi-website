@@ -303,7 +303,7 @@ async function voidInvoice(sb: any, b: any, email: string, dryRun: boolean) {
   // Voiding is what tells the client an invoice no longer stands. A silent
   // failure here leaves a live invoice that everyone believes is void.
   const { error: voidErr } = await sb.from('intelligence_invoices').update({
-    status: 'voided', voided_at: new Date().toISOString(), void_reason: reason, updated_at: new Date().toISOString(),
+    status: 'void', voided_at: new Date().toISOString(), void_reason: reason, updated_at: new Date().toISOString(),
   }).eq('id', invoice_id);
   if (voidErr) {
     console.error('[billing/actions] void failed:', voidErr.message);
