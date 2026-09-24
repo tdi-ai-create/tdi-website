@@ -22,6 +22,9 @@
 import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import FundingChrome from './FundingChrome'
+import OutreachQueue from './components/OutreachQueue'
+import FundersTab from './components/FundersTab'
+import AwardedTab from './components/AwardedTab'
 import { ESCALATION_OPTIONS } from '@/lib/funding-qa'
 import './funding-home.css'
 
@@ -80,6 +83,16 @@ interface School {
   grantsWon: number
   grantsWonWithoutAnAmount: number
   livePaths: number
+  grants: AwardedRow[]
+}
+
+interface AwardedRow {
+  id: string
+  name: string
+  amount: number
+  awardedAmount: number | null
+  status: string
+  school: string
 }
 
 interface Fact {
@@ -145,15 +158,16 @@ function prettyKey(k: string): string {
 }
 
 export default function FundingHome() {
-  const [view, setView] = useState<'cal' | 'schools' | 'school'>('cal')
+  const [view, setView] = useState<'cal' | 'schools' | 'school' | 'queue' | 'funders' | 'awarded'>('cal')
 
   // The board links back here with ?view=schools, because it is its own route
   // and cannot switch a view it does not have. Read after mount rather than
   // with useSearchParams, which would force this route to opt out of
   // prerendering and can fail the build instead of just working.
   useEffect(() => {
-    if (new URLSearchParams(window.location.search).get('view') === 'schools') {
-      setView('schools')
+    const asked = new URLSearchParams(window.location.search).get('view')
+    if (asked === 'schools' || asked === 'queue' || asked === 'funders' || asked === 'awarded') {
+      setView(asked)
     }
   }, [])
 
@@ -260,12 +274,34 @@ export default function FundingHome() {
   const todayIso = iso(today)
   const dayItems = openDay ? (byDay.get(openDay) ?? []) : []
 
+  // The ported board views keep their own styling, so they render outside the
+  // .fh wrapper. Dropping them inside it would let this stylesheet's element
+  // rules repaint components that are already correct.
+  const chrome = (
+    <FundingChrome
+      active={view === 'school' ? 'schools' : view}
+      onView={v => { setView(v); setOpenDay(null) }}
+    />
+  )
+
+  if (view === 'queue' || view === 'funders' || view === 'awarded') {
+    return (
+      <>
+        {chrome}
+        <div style={{ padding: '26px 20px 70px', maxWidth: 1180, margin: '0 auto' }}>
+          {view === 'queue' && <OutreachQueue />}
+          {view === 'funders' && <FundersTab />}
+          {view === 'awarded' && (
+            <AwardedTab grants={(schools ?? []).flatMap(sc => sc.grants ?? [])} />
+          )}
+        </div>
+      </>
+    )
+  }
+
   return (
     <div className="fh">
-      <FundingChrome
-        active={view === 'cal' ? 'cal' : 'schools'}
-        onView={v => { setView(v); setOpenDay(null) }}
-      />
+      {chrome}
 
       <div className="wrap">
 

@@ -13,28 +13,40 @@
 import Link from 'next/link'
 import './funding-home.css'
 
-export type FundingView = 'cal' | 'schools' | 'board'
+export type FundingView = 'cal' | 'schools' | 'queue' | 'funders' | 'awarded' | 'board'
+
+const VIEWS: { key: Exclude<FundingView, 'board'>; label: string }[] = [
+  { key: 'cal', label: 'Calendar' },
+  { key: 'schools', label: 'Schools' },
+  { key: 'queue', label: 'Queue' },
+  { key: 'funders', label: 'Funders' },
+  { key: 'awarded', label: 'Awarded' },
+]
 
 export default function FundingChrome({ active, onView }: {
   active: FundingView
-  onView?: (v: 'cal' | 'schools') => void
+  onView?: (v: Exclude<FundingView, 'board'>) => void
 }) {
   return (
     <div className="fh">
       <header className="top">
         <div className="brand">TDI Funding <span>/ admin</span></div>
         <nav>
-          {onView ? (
-            <>
-              <button aria-current={active === 'cal'} onClick={() => onView('cal')}>Calendar</button>
-              <button aria-current={active === 'schools'} onClick={() => onView('schools')}>Schools</button>
-            </>
-          ) : (
-            <>
-              <Link className="navlink" href="/tdi-admin/funding">Calendar</Link>
-              <Link className="navlink" href="/tdi-admin/funding?view=schools">Schools</Link>
-            </>
-          )}
+          {onView
+            ? VIEWS.map(v => (
+                <button key={v.key} aria-current={active === v.key} onClick={() => onView(v.key)}>
+                  {v.label}
+                </button>
+              ))
+            : VIEWS.map(v => (
+                <Link
+                  key={v.key}
+                  className="navlink"
+                  href={v.key === 'cal' ? '/tdi-admin/funding' : `/tdi-admin/funding?view=${v.key}`}
+                >
+                  {v.label}
+                </Link>
+              ))}
           {active === 'board' ? (
             <button aria-current="true" style={{ cursor: 'default' }}>Board</button>
           ) : (

@@ -91,6 +91,16 @@ export async function GET() {
       grantsWon: won.length,
       grantsWonWithoutAnAmount: won.length - recorded.length,
       livePaths: mine.filter(o => isLive(o.status)).length,
+      // The rows the Awarded view needs. Returned here rather than fetched per
+      // school the way the board does it, which was one request per pursuit.
+      grants: mine.map(o => ({
+        id: o.id,
+        name: o.name,
+        amount: o.amount === null ? 0 : Number(o.amount),
+        awardedAmount: awardedAmountOf(o) ?? null,
+        status: o.status,
+        school: p.district_name,
+      })),
     }
   })
 
