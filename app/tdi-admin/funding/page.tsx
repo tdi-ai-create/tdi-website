@@ -46,6 +46,7 @@ interface Grant {
   status: string
   narrativeStatus: string
   attempts: number | null
+  docUrl: string | null
   escalation: {
     summary?: string
     root_cause?: string
@@ -54,6 +55,19 @@ interface Grant {
     awaiting_client?: boolean
     client_ask?: string
   } | null
+}
+
+/** A queued email waiting on approval, from the Outreach Queue. */
+interface Draft {
+  id: string
+  subject: string
+  body: string
+  toEmail: string
+  toName: string | null
+  opportunityId: string | null
+  emailType: string | null
+  blockedReason: string | null
+  warnings: string[]
 }
 
 interface School {
@@ -150,6 +164,7 @@ export default function FundingHome() {
   const [entries, setEntries] = useState<Entry[] | null>(null)
   const [coverage, setCoverage] = useState<{ livePaths: number; withDate: number } | null>(null)
   const [grants, setGrants] = useState<Record<string, Grant>>({})
+  const [drafts, setDrafts] = useState<Record<string, Draft>>({})
   const [calError, setCalError] = useState<string | null>(null)
 
   const [schools, setSchools] = useState<School[] | null>(null)
@@ -178,6 +193,25 @@ export default function FundingHome() {
       .catch(() => live && setCalError('The calendar could not be read.'))
     return () => { live = false }
   }, [year, month, reloadAt])
+
+  // The email that carries an approved application already exists: approving
+  // writes it into the Outreach Queue as a draft. It just could not be read or
+  // sent from here, which is what sent people back to the board.
+  useEffect(() => {
+    let live = true
+    fetch('/api/funding/outreach-queue')
+      .then(r => r.json())
+      .then(d => {
+        if (!live) return
+        const byOpp: Record<string, Draft> = {}
+        for (const row of (d.drafts ?? []) as Draft[]) {
+          if (row.opportunityId) byOpp[row.opportunityId] = row
+        }
+        setDrafts(byOpp)
+      })
+      .catch(() => {})
+    return () => { live = false }
+  }, [reloadAt])
 
   useEffect(() => {
     let live = true
@@ -424,6 +458,7 @@ export default function FundingHome() {
                     <GrantAction
                       entry={e}
                       grant={e.opportunityId ? grants[e.opportunityId] : undefined}
+                      draft={e.opportunityId ? drafts[e.opportunityId] : undefined}
                       schoolId={e.schoolId}
                       schoolName={e.schoolName}
                       onDone={() => setReloadAt(n => n + 1)}
@@ -528,9 +563,10 @@ function ProfileFields({ schoolId, facts, onSaved }: {
  *   approve      PATCH /api/funding/opportunities { id, narrative_status: 'ready' }
  *   send back    PATCH /api/funding/opportunities { id, narrative_status: 'requested', redraft_guidance }
  */
-function GrantAction({ entry, grant, schoolId, schoolName, onDone, onOpenSchool }: {
+function GrantAction({ entry, grant, draft, schoolId, schoolName, onDone, onOpenSchool }: {
   entry: Entry
   grant?: Grant
+  draft?: Draft
   schoolId: string
   schoolName: string
   onDone: () => void
@@ -585,18 +621,44 @@ function GrantAction({ entry, grant, schoolId, schoolName, onDone, onOpenSchool 
     }
   }
 
+  // "Open this grant" used to open a portal page. The thing worth opening is
+  // the packet, so it opens the document, and when there is no document it
+  // says so instead of offering a button that goes somewhere unhelpful.
+  const links = (
+    <div className="row">
+      {grant?.docUrl ? (
+        <a className="btn" href={grant.docUrl} target="_blank" rel="noopener noreferrer"
+           style={{ textDecoration: 'none' }}>
+          Open the packet
+        </a>
+      ) : (
+        <span className="why" style={{ alignSelf: 'center' }}>No packet document on this grant yet</span>
+      )}
+      <button className="btn" onClick={onOpenSchool}>Open {schoolName}</button>
+    </div>
+  )
+
   if (done) {
     return <div className="act"><div className="doneflag">{done}</div></div>
   }
 
-  const links = (
-    <div className="row">
-      <Link className="btn" href={`/tdi-admin/funding/${schoolId}`} style={{ textDecoration: 'none' }}>
-        Open this grant
-      </Link>
-      <button className="btn" onClick={onOpenSchool}>Open {schoolName}</button>
-    </div>
-  )
+  // The email is already written and waiting. Read it, change it, check the
+  // packet link it carries, and send it, without leaving this popup.
+  if (draft) {
+    return (
+      <DraftToSend
+        draft={draft}
+        docUrl={grant?.docUrl ?? null}
+        busy={busy}
+        error={error}
+        onSend={(subject, body) => post('/api/funding/outreach-queue',
+          { id: draft.id, action: 'approve', subject, body },
+          'Sent, and the grant is marked as gone to the school.')}
+        links={links}
+      />
+    )
+  }
+
 
   if (awaitingClient) {
     return (
@@ -710,4 +772,86 @@ function GrantAction({ entry, grant, schoolId, schoolName, onDone, onOpenSchool 
 
   // Nothing on this entry is a decision, so it only has to lead somewhere.
   return <div className="act">{links}</div>
+}
+
+/**
+ * The email that carries a finished application to a school.
+ *
+ * Approving a narrative already writes this into the Outreach Queue, which is
+ * the only door a funding email may leave by. What was missing was any way to
+ * read it, correct it, check the packet link it carries, and let it go, without
+ * walking over to the board.
+ *
+ * Sending is the queue's own approve path, with the edited wording passed
+ * through, so the allowlist, the one-email-per-person rule and the chases that
+ * follow all behave exactly as they did.
+ */
+function DraftToSend({ draft, docUrl, busy, error, onSend, links }: {
+  draft: Draft
+  docUrl: string | null
+  busy: boolean
+  error: string | null
+  onSend: (subject: string, body: string) => void
+  links: React.ReactNode
+}) {
+  const [subject, setSubject] = useState(draft.subject)
+  const [body, setBody] = useState(draft.body)
+
+  // The send gate already calls this a hard block: an application email with no
+  // application is a promise of a package above a blank line. Its enforcement
+  // flag is off, so the gate would let it through. This will not.
+  const missingPacket = draft.emailType === 'submission_instructions' && !docUrl
+
+  return (
+    <div className="act">
+      <label>Ready to send to {draft.toName || draft.toEmail}</label>
+      <div className="why">To: {draft.toEmail}</div>
+
+      {/* Confirm the packet is linked before it goes, which is the whole
+          reason this is here rather than behind a send button elsewhere. */}
+      {docUrl ? (
+        <div className="why">
+          Packet:{' '}
+          <a href={docUrl} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'underline' }}>
+            open it and check it reads right
+          </a>
+        </div>
+      ) : (
+        <div className="src warn">
+          {missingPacket
+            ? 'This grant has no packet document, and this email promises one. It would reach the school saying "here is your application package" above a blank line, so it cannot be sent until the document exists.'
+            : 'This grant has no packet document on it.'}
+        </div>
+      )}
+
+      {draft.warnings?.length > 0 && (
+        <div className="src warn">Our own wording is still in here: {draft.warnings.join(', ')}</div>
+      )}
+
+      <label htmlFor={`sub-${draft.id}`}>Subject</label>
+      <input id={`sub-${draft.id}`} value={subject} onChange={e => setSubject(e.target.value)} />
+
+      <label htmlFor={`body-${draft.id}`}>Email, edit it if it needs it</label>
+      <textarea
+        id={`body-${draft.id}`}
+        value={body}
+        onChange={e => setBody(e.target.value)}
+        style={{ minHeight: 220 }}
+      />
+
+      {draft.blockedReason && <div className="src warn">{draft.blockedReason}</div>}
+
+      <div className="row">
+        <button
+          className="btn primary"
+          disabled={busy || missingPacket || !!draft.blockedReason || !subject.trim() || !body.trim()}
+          onClick={() => onSend(subject.trim(), body.trim())}
+        >
+          {busy ? 'Sending' : 'Send it'}
+        </button>
+      </div>
+      {error && <div className="src warn">{error}</div>}
+      {links}
+    </div>
+  )
 }

@@ -58,7 +58,7 @@ export async function GET(request: NextRequest) {
   const [oppsRes, itemsRes] = await Promise.all([
     supabase
       .from('funding_opportunities')
-      .select('id, pursuit_id, name, status, amount, application_closes, window_closes, narrative_status, narrative_status_changed_at, assigned_agent, client_submitted, updated_at, qa_escalation, qa_attempt_count')
+      .select('id, pursuit_id, name, status, amount, application_closes, window_closes, narrative_status, narrative_status_changed_at, assigned_agent, client_submitted, updated_at, qa_escalation, qa_attempt_count, narrative_url')
       .in('pursuit_id', ids),
     supabase
       .from('funding_action_items')
@@ -90,6 +90,9 @@ export async function GET(request: NextRequest) {
       name: o.name,
       status: o.status,
       narrativeStatus: o.narrative_status ?? 'not_started',
+      // The packet itself. "Open this grant" pointed at a portal page; the
+      // thing anyone actually wants to open is the document.
+      docUrl: o.narrative_url ?? null,
       attempts: o.qa_attempt_count ?? null,
       escalation: o.qa_escalation ?? null,
     }
