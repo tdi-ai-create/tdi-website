@@ -9,10 +9,33 @@ follow up with", and that the call list should not be named after one person.
 
 ## What I did
 
-- Deferred: the admin portal authenticates against a Supabase session cookie
+Completed on production 24 September 2026, signed in as Rae Hughart. The
+deferral is kept for the record.
+
+- Was deferred: the admin portal authenticates against a Supabase session cookie
   scoped to the live domain, so a local server sends every `/tdi-admin` page to
   the login screen. Confirmed again in Playwright on this branch.
-- Verify after deploy: https://www.teachersdeserveit.com/tdi-admin/sales
+
+### On production
+
+- Opened: https://www.teachersdeserveit.com/tdi-admin/sales
+- Saw: the header reads **"Call list: 34 / $250K"**. It is no longer named after
+  one person, which was the correction.
+- Saw: a new filter row, **"WHO IS CALLING: Rae 13, Bella 0, Kristin 5, Jim 16,
+  Nobody yet 176"**. Responsibility, on the board, rather than a date nobody
+  reads. Bella at 0 is rendered greyed rather than hidden, so an empty queue is
+  visible as one.
+- Saw: the two export buttons read **"Export call list"** and **"Export all 212
+  shown"**. The second one names its own scope, which is the fix.
+- Pressed: the **"Heavy · 21"** filter.
+- Saw: the second button changed to **"Export these 21"**. This is the bug
+  itself, proven from the screen: `handleExport` read the whole board, so
+  narrowing to 21 and pressing export handed over all of them and nothing said
+  so. It now follows the filter and says what it will send.
+- Saw: the heaviness filter reads "Not valued on the board · 96" and the
+  headline "74 not valued in pipeline", two different counts that now each say
+  which population they mean.
+- Pressed: nothing that writes, and no export was downloaded.
 
 The previous deferral on these screens was completed in full before this one was
 opened, so this is sequencing rather than a habit.

@@ -11,11 +11,11 @@
 import Link from 'next/link'
 import './funding-home.css'
 
-export type FundingView = 'work' | 'cal' | 'schools' | 'queue' | 'funders' | 'awarded'
+export type FundingView = 'cal' | 'work' | 'schools' | 'queue' | 'funders' | 'awarded'
 
 const VIEWS: { key: FundingView; label: string }[] = [
-  { key: 'work', label: 'Work' },
   { key: 'cal', label: 'Calendar' },
+  { key: 'work', label: 'Work' },
   { key: 'schools', label: 'Schools' },
   { key: 'queue', label: 'Queue' },
   { key: 'funders', label: 'Funders' },
