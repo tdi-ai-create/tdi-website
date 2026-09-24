@@ -793,7 +793,7 @@ export default function SalesPage() {
       .from('sales_opportunities')
       .update({ on_jims_call_sheet: newVal, updated_at: new Date().toISOString() })
       .eq('id', oppId)
-    if (!wroteOk(sheetErr, "Updating Jim's call sheet")) {
+    if (!wroteOk(sheetErr, 'Updating the call list')) {
       // Put the toggle back rather than showing a state the database rejected.
       setOpportunities(prev => prev.map(o =>
         o.supabase_id === oppId ? { ...o, onCallSheet: !newVal } : o
@@ -865,14 +865,17 @@ export default function SalesPage() {
     rows: Opportunity[],
     filename: string,
     sheetName: string,
-    isJimsList: boolean,
+    isCallList: boolean,
     notesByOpp: Record<string, ExportNote[]>
   ) {
     let data: Record<string, string | number | null>[];
     let colWidths: Record<string, number>;
 
-    if (isJimsList) {
-      // Jim's call sheet format -- matches his Google Sheet exactly
+    if (isCallList) {
+      // The call list format. These columns match the Google Sheet the calling
+      // is actually done from, so they are deliberately unchanged by the
+      // rename: change a heading here and a paste into that sheet lands in the
+      // wrong column.
       data = rows.map(o => ({
         'District / School': (o.name || '').replace(/\s*\([A-Z]{2}\)\s*-\s*PD Plan Inquiry\s*$/i, '').replace(/\s*\([A-Z]{2}\)\s*-\s*Nomination\s*$/i, '').replace(/\s*-\s*PD Plan Inquiry\s*$/i, '').replace(/\s*-\s*Nomination\s*$/i, '').trim(),
         'Contact Name': o.contactName || '',
@@ -973,14 +976,14 @@ export default function SalesPage() {
     rows: Opportunity[],
     filename: string,
     sheetName: string,
-    isJimsList: boolean,
+    isCallList: boolean,
     label: string
   ) {
     if (exporting) return
     setExporting(true)
     try {
       const notesByOpp = await fetchNotesForExport()
-      exportToSheet(rows, filename, sheetName, isJimsList, notesByOpp)
+      exportToSheet(rows, filename, sheetName, isCallList, notesByOpp)
       const noteCount = rows.reduce((sum, o) => sum + (notesByOpp[o.supabase_id]?.length ?? 0), 0)
       showToastMsg(`Exported ${rows.length} ${label} with ${noteCount} notes`, 'success')
     } catch (e) {
@@ -993,27 +996,55 @@ export default function SalesPage() {
     }
   }
 
-  function handleExportJimsList() {
+  function handleExportCallList() {
     const rows = activeOpps
       .filter(o => !o.deleted_at && o.onCallSheet)
       .sort((a, b) => (b.value ?? 0) - (a.value ?? 0))
     void runExport(
       rows,
-      `jims-call-list-${new Date().toISOString().split('T')[0]}.xlsx`,
-      "Jim's Call List",
+      `tdi-call-list-${new Date().toISOString().split('T')[0]}.xlsx`,
+      'Call List',
       true,
-      "Jim's list deals"
+      'call list deals'
     )
   }
 
+  /**
+   * A name for what is currently on screen, for the filename and the sheet tab.
+   *
+   * A file called tdi-pipeline.xlsx tells you nothing three days later. One
+   * called tdi-pipeline-heavy-needs-outreach.xlsx tells you what you were
+   * looking at when you pulled it.
+   */
+  const exportSlug = useMemo(() => {
+    const parts: string[] = []
+    if (showCallSheetOnly) parts.push('call-list')
+    for (const k of activeFilters.keys) parts.push(k.replace('band:', '').replace(/_/g, '-'))
+    if (activeFilters.search) parts.push(activeFilters.search.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 24))
+    return parts.filter(Boolean).join('-')
+  }, [activeFilters, showCallSheetOnly])
+
+  /**
+   * Export what is on screen, not everything.
+   *
+   * This used to read `activeOpps`, which is the whole board. So filtering down
+   * to the 21 heavy leads and pressing export handed you all 166, silently, and
+   * the only way to notice was to count the rows in the spreadsheet. Rae, 24
+   * September 2026: it has to be "easy to export based on filters".
+   *
+   * `filtered` is the exact list the board is drawing, so what downloads is
+   * what you can see. The button says the number so there is no doubt before
+   * you press it.
+   */
   function handleExport() {
-    const rows = activeOpps
+    const rows = [...filtered]
       .filter(o => !o.deleted_at)
       .sort((a, b) => (b.value ?? 0) - (a.value ?? 0))
+    const stamp = new Date().toISOString().split('T')[0]
     void runExport(
       rows,
-      `tdi-pipeline-${new Date().toISOString().split('T')[0]}.xlsx`,
-      'Pipeline',
+      `tdi-pipeline${exportSlug ? `-${exportSlug}` : ''}-${stamp}.xlsx`,
+      exportSlug ? 'Filtered pipeline' : 'Pipeline',
       false,
       'deals'
     )
@@ -1502,8 +1533,8 @@ export default function SalesPage() {
                     border: `1px solid ${URGENCY_COLOR[urgency(lead.followup.due)].border}`,
                     borderRadius: 4, padding: '1px 5px', marginRight: 6,
                   }}>
-                    {lead.followup.kind ?? 'follow up'} &middot; {lead.followup.owner ? teamLabel(lead.followup.owner) : 'unassigned'}
-                    {shortDate(lead.followup.due) ? ` \u00b7 ${urgency(lead.followup.due) === 'overdue' ? 'overdue ' : ''}${shortDate(lead.followup.due)}` : ''}
+                    {lead.followup.owner ? teamLabel(lead.followup.owner) : 'UNCLAIMED'} &middot; {lead.followup.kind ?? 'follow up'}
+                    {shortDate(lead.followup.due) ? ` \u00b7 ${urgency(lead.followup.due) === 'overdue' ? 'past due ' : 'by '}${shortDate(lead.followup.due)}` : ''}
                   </span>
                   {lead.followup.text}
                 </div>
@@ -1566,11 +1597,12 @@ export default function SalesPage() {
             {owed.length > 0 && (
               <div style={{ marginBottom: 24 }}>
                 <h3 style={{ fontSize: 13, fontWeight: 700, color: '#0a0f1e', margin: '0 0 2px' }}>
-                  Somebody said they would do {owed.length === 1 ? 'this' : 'these'} ({owed.length})
+                  Somebody's name is on {owed.length === 1 ? 'this' : 'these'} ({owed.length})
                 </h3>
                 <p style={{ fontSize: 11, color: '#6B7280', margin: '0 0 8px' }}>
-                  Follow-ups set on the lead itself, oldest deadline first. These are promises, not
-                  predictions, so they sit above the ranked queue. Open the lead and press Done to clear one.
+                  Someone has taken these on. They sit above the ranked queue because a person
+                  agreeing to do something beats a model guessing who is worth calling. Undated ones
+                  are last, not first. Open the lead and press Done when it is handled.
                 </p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                   {owed.map(lead => renderRow(lead, false))}
@@ -1629,7 +1661,9 @@ export default function SalesPage() {
                 stats={stats}
                 onAddLead={() => setAddLeadModalOpen(true)}
                 onExport={handleExport}
-                onExportJimsList={handleExportJimsList}
+                onExportCallList={handleExportCallList}
+                exportCount={filtered.filter(o => !o.deleted_at).length}
+                isFiltered={Boolean(activeFilters.search) || activeFilters.keys.length > 0 || showCallSheetOnly}
                 exporting={exporting}
                 showCallSheetOnly={showCallSheetOnly}
                 onToggleCallSheet={() => setShowCallSheetOnly(!showCallSheetOnly)}
@@ -2304,6 +2338,11 @@ export default function SalesPage() {
               ...(changes.assigned_to_email !== undefined ? { assignedTo: changes.assigned_to_email } : {}),
               ...(changes.name ? { name: changes.name } : {}),
               ...(changes.grant_support !== undefined ? { grantSupport: Boolean(changes.grant_support) } : {}),
+              // Both of these decide whether the lead belongs on the board at
+              // all, so the board has to see the change or the card sits there
+              // looking edited and filtered out at the same time.
+              ...(changes.school_year !== undefined ? { schoolYear: normalizeSchoolYear(changes.school_year as string | null) } : {}),
+              ...(changes.is_contact_only !== undefined ? { isContactOnly: Boolean(changes.is_contact_only) } : {}),
               // The follow-up alert shows on the card and in the outreach
               // queue, so a change made in the panel has to land on the board
               // without a reload.

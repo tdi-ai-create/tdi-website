@@ -205,11 +205,11 @@ export function SalesCard({ opp, onClick, draggable = false, onContextMenu, onFi
               </svg>
             </button>
           )}
-          {/* Jim's list toggle */}
+          {/* Call list toggle. One shared list, not one person's. */}
           {onToggleCallSheet && (
             <button
               onClick={(e) => { e.stopPropagation(); onToggleCallSheet(opp.id) }}
-              title={opp.onCallSheet ? "Remove from Jim's list" : "Add to Jim's list"}
+              title={opp.onCallSheet ? 'Remove from the call list' : 'Add to the call list'}
               style={{
                 width: 22, height: 22, borderRadius: '50%', border: 'none', cursor: 'pointer',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -307,11 +307,14 @@ export function SalesCard({ opp, onClick, draggable = false, onContextMenu, onFi
               overflow: 'hidden', whiteSpace: 'nowrap',
             }}
           >
+            {/* Person first. The card answers "whose job is this" before it
+                answers "by when", because on a board of 166 that is the thing
+                being scanned for. */}
             <span aria-hidden>&#9873;</span>
-            <span>{opp.followup?.kind ?? 'follow up'}</span>
+            <span>{opp.followup?.owner ? teamLabel(opp.followup.owner) : 'UNCLAIMED'}</span>
             <span style={{ opacity: 0.5 }}>&middot;</span>
-            <span>{opp.followup?.owner ? teamLabel(opp.followup.owner) : 'unassigned'}</span>
-            {when && <><span style={{ opacity: 0.5 }}>&middot;</span><span>{state === 'overdue' ? `overdue ${when}` : when}</span></>}
+            <span style={{ fontWeight: 600 }}>{opp.followup?.kind ?? 'follow up'}</span>
+            {when && <><span style={{ opacity: 0.5 }}>&middot;</span><span style={{ fontWeight: 600 }}>{state === 'overdue' ? `past due ${when}` : when}</span></>}
           </div>
         )
       })()}

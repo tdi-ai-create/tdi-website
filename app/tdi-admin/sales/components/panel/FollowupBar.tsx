@@ -56,7 +56,7 @@ export function FollowupBar({ opportunityId, followup, onSaved, showToast }: Pro
 
   async function save() {
     if (!text.trim()) {
-      showToast('Say what has to happen next', 'error')
+      showToast('Say what they are taking on', 'error')
       return
     }
     setSaving(true)
@@ -115,13 +115,13 @@ export function FollowupBar({ opportunityId, followup, onSaved, showToast }: Pro
         <div style={{ padding: '8px 20px', borderBottom: '1px solid #E5E7EB', background: '#FAFAFA' }}>
           <button
             onClick={() => setEditing(true)}
-            title="Set what has to happen next on this lead, who is doing it, and by when. Everyone sees it, and it is written into the notes."
+            title="Put someone's name against the next thing this lead needs. Everyone sees it, it posts to Slack, and it is written into the notes."
             style={{
               background: 'none', border: 'none', padding: 0, cursor: 'pointer',
               fontSize: 12, color: '#2A9D8F', fontWeight: 600,
             }}
           >
-            + Set a follow-up
+            + Give this to someone
           </button>
         </div>
       )
@@ -129,20 +129,35 @@ export function FollowupBar({ opportunityId, followup, onSaved, showToast }: Pro
 
     const when = shortDate(followup.due)
     const state = urgency(followup.due)
+    const who = followup.owner ? teamLabel(followup.owner) : null
     return (
       <div style={{
         padding: '10px 20px', borderBottom: `1px solid ${tone.border}`,
         background: tone.bg, display: 'flex', alignItems: 'flex-start', gap: 12,
       }}>
         <div style={{ flex: 1, minWidth: 0 }}>
+          {/* The name leads. A follow-up is a person taking something on, and
+              the deadline is a detail of that rather than the headline. Rae, 24
+              September 2026: this is "less about date and more about this is
+              your responsibility to follow up with". An unclaimed one says so
+              in plain words, because that is the state worth fixing. */}
           <div style={{
-            fontSize: 10, fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase',
-            color: tone.fg, marginBottom: 3,
+            fontSize: 12, fontWeight: 800, letterSpacing: '0.01em',
+            color: who ? tone.fg : '#B45309', marginBottom: 3,
           }}>
-            {KIND_WORD[followup.kind ?? 'other'] ?? 'Follow up'} owed
-            {followup.owner ? ` · ${teamLabel(followup.owner)}` : ' · nobody assigned'}
-            {when ? ` · ${state === 'overdue' ? 'was due ' : 'due '}${when}` : ' · no date'}
-            {state === 'overdue' && ' · OVERDUE'}
+            {who ? `${who} is on this` : 'Nobody has taken this on'}
+            <span style={{ fontWeight: 600, marginLeft: 6, opacity: 0.85 }}>
+              {(KIND_WORD[followup.kind ?? 'other'] ?? 'Follow up').toLowerCase()}
+              {when ? `, by ${when}` : ''}
+            </span>
+            {state === 'overdue' && (
+              <span style={{
+                marginLeft: 8, fontSize: 9, fontWeight: 800, letterSpacing: '0.06em',
+                border: `1px solid ${tone.border}`, borderRadius: 4, padding: '1px 5px',
+              }}>
+                PAST DUE
+              </span>
+            )}
           </div>
           <div style={{ fontSize: 13, color: '#1F2937', lineHeight: 1.45, whiteSpace: 'pre-wrap' }}>
             {followup.text}
@@ -176,29 +191,37 @@ export function FollowupBar({ opportunityId, followup, onSaved, showToast }: Pro
 
   return (
     <div style={{ padding: '12px 20px', borderBottom: '1px solid #E5E7EB', background: '#FAFAFA' }}>
+      {/* Responsibility first, deadline last.
+          Rae, 24 September 2026: this is "less about date and more about this
+          is your responsibility to follow up with". So the sentence the form
+          makes reads person, then action, and the date is an optional trailing
+          clause rather than the second thing you are asked for. */}
       <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 8, flexWrap: 'wrap' }}>
-        <select
-          value={kind}
-          onChange={e => setKind(e.target.value)}
-          title="What kind of follow-up is owed."
-          style={{ ...selectStyle, minWidth: 104 }}
-        >
-          {FOLLOWUP_KINDS.map(k => <option key={k} value={k}>{KIND_WORD[k]}</option>)}
-        </select>
+        <span style={{ fontSize: 12, color: '#6B7280', flex: '0 0 auto' }}>Responsible</span>
         <select
           value={owner}
           onChange={e => setOwner(e.target.value)}
-          title="Who is doing it. Separate from who owns the lead."
-          style={{ ...selectStyle, minWidth: 148 }}
+          title="Who is taking this on. Separate from who owns the lead."
+          style={{ ...selectStyle, minWidth: 148, fontWeight: 600 }}
         >
-          <option value="">Who is doing it?</option>
+          <option value="">Pick a person</option>
           {SALES_TEAM.map(m => <option key={m.email} value={m.email}>{m.label}</option>)}
         </select>
+        <span style={{ fontSize: 12, color: '#6B7280', flex: '0 0 auto' }}>for the</span>
+        <select
+          value={kind}
+          onChange={e => setKind(e.target.value)}
+          title="What they are taking on."
+          style={{ ...selectStyle, minWidth: 104 }}
+        >
+          {FOLLOWUP_KINDS.map(k => <option key={k} value={k}>{KIND_WORD[k].toLowerCase()}</option>)}
+        </select>
+        <span style={{ fontSize: 12, color: '#9CA3AF', flex: '0 0 auto' }}>by (optional)</span>
         <input
           type="date"
           value={due}
           onChange={e => setDue(e.target.value)}
-          title="The day it is owed by. Leave blank if there is no deadline."
+          title="A deadline, if there is one. Leave it blank and the job still belongs to whoever is named."
           style={{ ...selectStyle, minWidth: 150 }}
         />
       </div>
@@ -206,7 +229,7 @@ export function FollowupBar({ opportunityId, followup, onSaved, showToast }: Pro
         autoFocus
         value={text}
         onChange={e => setText(e.target.value)}
-        placeholder="What has to happen next? e.g. Call Jennifer about elementary paras before the board meeting."
+        placeholder="What are they taking on? e.g. Call Jennifer about elementary paras before the board meeting."
         rows={2}
         style={{
           width: '100%', fontSize: 13, padding: '8px 10px', borderRadius: 8,
@@ -225,7 +248,7 @@ export function FollowupBar({ opportunityId, followup, onSaved, showToast }: Pro
             opacity: saving || !text.trim() ? 0.5 : 1,
           }}
         >
-          {saving ? 'Saving...' : 'Save and write to notes'}
+          {saving ? 'Saving...' : 'Assign and write to notes'}
         </button>
         <button
           onClick={() => {

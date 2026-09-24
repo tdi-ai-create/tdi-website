@@ -21,7 +21,9 @@ export function StickyTopBar({
   stats,
   onAddLead,
   onExport,
-  onExportJimsList,
+  onExportCallList,
+  exportCount,
+  isFiltered,
   exporting = false,
   showCallSheetOnly,
   onToggleCallSheet,
@@ -29,7 +31,11 @@ export function StickyTopBar({
   stats: TopBarStats
   onAddLead: () => void
   onExport?: () => void
-  onExportJimsList?: () => void
+  onExportCallList?: () => void
+  /** How many rows the export will actually contain, so the button can say so. */
+  exportCount?: number
+  /** True when a filter or a search is narrowing the board. */
+  isFiltered?: boolean
   /** The export loads the full note history first, which takes a moment. */
   exporting?: boolean
   showCallSheetOnly?: boolean
@@ -59,9 +65,13 @@ export function StickyTopBar({
         </div>
         <div style={{ fontSize: 12, color: '#6B7280', marginTop: 4 }}>
           {stats.activeCount} active
+          {/* "in pipeline", because the filter chip below says 96 and this says
+              74 and both are right: the chip counts the whole board, this
+              excludes Targeting. Two numbers under one word on one screen is
+              what makes a board unreadable, so the word is no longer the same. */}
           {stats.unvaluedCount ? (
-            <span title="No offering recorded, so there is nothing to predict a value from. These count as zero above rather than pulling in a figure from before the offering restructure." style={{ marginLeft: 8, color: '#9CA3AF' }}>
-              {stats.unvaluedCount} not valued
+            <span title="Leads with no offering recorded, so there is nothing to predict a value from. They count as zero in the figure above rather than pulling in a stale pre-restructure number. This counts the pipeline only. The filter row below counts the whole board including Targeting, which is why its number is larger." style={{ marginLeft: 8, color: '#9CA3AF' }}>
+              {stats.unvaluedCount} not valued in pipeline
             </span>
           ) : null}
         </div>
@@ -101,7 +111,12 @@ export function StickyTopBar({
           </div>
         )}
 
-        {/* Jim's call sheet count */}
+        {/* The call list.
+            Was labelled "Jim's list" everywhere. It is one shared flag on the
+            lead, not a list belonging to a person: of the 20 leads carrying it
+            on 24 September 2026, two were not assigned to Jim at all. Rae,
+            same day: "didn't we change this to all of us?" Who makes a given
+            call is now the follow-up owner on the lead itself. */}
         {stats.callSheetCount > 0 && (
           <button
             onClick={onToggleCallSheet}
@@ -120,7 +135,7 @@ export function StickyTopBar({
               display: 'flex', alignItems: 'center', gap: 5,
             }}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" /></svg>
-              Jim's list: {stats.callSheetCount}
+              Call list: {stats.callSheetCount}
             </div>
             <div style={{ fontSize: 11, color: '#6B7280' }}>
               ${(stats.callSheetValue / 1000).toFixed(0)}K
@@ -130,14 +145,14 @@ export function StickyTopBar({
       </div>
 
       <div style={{ display: 'flex', gap: 8 }}>
-        {onExportJimsList && (
-          <button onClick={onExportJimsList} disabled={exporting} style={{
+        {onExportCallList && (
+          <button onClick={onExportCallList} disabled={exporting} style={{
             fontSize: 12, padding: '8px 14px', borderRadius: 8,
             border: 'none', background: '#059669', color: 'white',
             cursor: exporting ? 'default' : 'pointer', fontWeight: 600,
             opacity: exporting ? 0.6 : 1,
           }}>
-            {exporting ? 'Exporting...' : "Export Jim's List"}
+            {exporting ? 'Exporting...' : 'Export call list'}
           </button>
         )}
         {onExport && (
@@ -147,7 +162,16 @@ export function StickyTopBar({
             cursor: exporting ? 'default' : 'pointer', fontWeight: 500,
             opacity: exporting ? 0.6 : 1,
           }}>
-            {exporting ? 'Exporting...' : 'Export All'}
+            {/* Say the number. The button used to read "Export All" and
+                hand over the whole board no matter what was filtered, so you
+                could not tell from the label what you were about to get. */}
+            {exporting
+              ? 'Exporting...'
+              : exportCount === undefined
+                ? 'Export'
+                : isFiltered
+                  ? `Export these ${exportCount}`
+                  : `Export all ${exportCount}`}
           </button>
         )}
         <button onClick={onAddLead} style={{

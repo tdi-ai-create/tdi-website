@@ -65,6 +65,8 @@ export interface FullOpportunity {
   activity?: OppActivity[]
   /** Confirmed, never predicted: 25 of the 100 muck points ride on this. */
   grant_support?: boolean | null
+  /** The board and the scorer both filter on this. Wrong year means invisible. */
+  school_year?: string | null
   /** The live follow-up alert. Written by /followup, never by PATCH. */
   followup_text?: string | null
   followup_kind?: string | null
@@ -97,7 +99,14 @@ const STAGE_OPTIONS = [
   { id: 'proposal_sent', name: 'Proposal Sent (80%)' },
   { id: 'signed', name: 'Signed (95%)' },
   { id: 'paid', name: 'Paid (100%)' },
-  { id: 'lost', name: 'Lost' },
+  // No "Lost". The pipeline rule is that a lead is never marked lost: in K-12 a
+  // no is almost always a not-this-budget-year, and "Not this year" in the
+  // footer is what replaced it, writing a reason and a return date and moving
+  // the lead to engaged. Leaving the option in the dropdown meant the rule
+  // could be broken with one click, which is what was happening.
+  //
+  // The stage still exists in the database and in STAGE_PROBABILITY below, so
+  // any historical row carrying it still renders. It just cannot be chosen.
 ]
 
 const STAGE_PROBABILITY: Record<string, number> = {
@@ -744,6 +753,13 @@ export function OpportunityDetailPanel({
                           {STAGE_OPTIONS.map(s => (
                             <option key={s.id} value={s.id}>{s.name}</option>
                           ))}
+                          {/* A historical row already sitting on a retired
+                              stage still has to render its own value, or the
+                              select silently shows the first option and the
+                              next save moves the lead somewhere nobody chose. */}
+                          {!STAGE_OPTIONS.some(o => o.id === opp.stage) && (
+                            <option value={opp.stage}>{opp.stage}</option>
+                          )}
                         </select>
                       </div>
                       {/* Factored */}
@@ -889,6 +905,51 @@ export function OpportunityDetailPanel({
                     <span style={{ fontSize: 12, color: '#374151', fontWeight: 600 }}>
                       {new Date(opp.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                     </span>
+                  </div>
+
+                  {/* School year.
+                      The board and the muck scorer both filter on this, so a
+                      lead carrying the wrong year is simply not on the board
+                      and nothing says why. It had no control anywhere, so the
+                      only fix was a SQL update. */}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+                    <span style={{ fontSize: 12, color: '#6B7280' }} title="Which school year this deal belongs to. The board only shows the current year, so changing this can make a lead disappear from it.">School year</span>
+                    <select
+                      key={`school_year-${opp.id}`}
+                      defaultValue={(opp.school_year as string | null) ?? ''}
+                      onChange={e => patchOpp({ school_year: e.target.value || null } as Partial<FullOpportunity>)}
+                      style={{ fontSize: 12, color: '#374151', border: '1px solid #E5E7EB', borderRadius: 6, padding: '3px 8px', background: 'white', outline: 'none' }}
+                    >
+                      <option value="">Not set</option>
+                      <option value="2025-26">2025-26</option>
+                      <option value="2026-27">2026-27 (current)</option>
+                      <option value="2027-28">2027-28</option>
+                    </select>
+                  </div>
+
+                  {/* Contact, not a deal.
+                      Takes a record off the board without deleting it, which is
+                      what a person who books a call with no district and no
+                      title actually needs. The column was already writable; no
+                      screen offered it. */}
+                  <div style={{ marginBottom: 10, paddingBottom: 10, borderBottom: '1px solid #F3F4F6' }}>
+                    <label style={{ display: 'flex', alignItems: 'flex-start', gap: 8, cursor: 'pointer' }}>
+                      <input
+                        type="checkbox"
+                        checked={Boolean(opp.is_contact_only)}
+                        onChange={e => patchOpp({ is_contact_only: e.target.checked } as Partial<FullOpportunity>)}
+                        style={{ marginTop: 2, width: 14, height: 14, cursor: 'pointer', accentColor: '#2A9D8F' }}
+                      />
+                      <span>
+                        <span style={{ fontSize: 12, color: '#374151', fontWeight: 600, display: 'block' }}>
+                          This is a person, not a deal
+                        </span>
+                        <span style={{ fontSize: 11, color: '#9CA3AF', display: 'block', lineHeight: 1.4 }}>
+                          Takes it off the board and out of every total without deleting anything. Use it
+                          for a contact with no school behind them yet.
+                        </span>
+                      </span>
+                    </label>
                   </div>
 
                   {/* Grant funding.
