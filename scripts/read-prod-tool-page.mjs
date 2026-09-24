@@ -6,7 +6,7 @@ import { readFileSync } from 'node:fs';
 import { createClient } from '@supabase/supabase-js';
 import { chromium } from 'playwright';
 
-const BASE = 'https://www.teachersdeserveit.com';
+const BASE = process.env.TARGET || "https://www.teachersdeserveit.com";
 const SLUG = process.argv[2] || 'end-of-day-educator-reset';
 const env = Object.fromEntries(
   readFileSync(new URL('../.env.local', import.meta.url), 'utf8')
@@ -27,12 +27,24 @@ const page = await browser.newPage({ viewport: { width: 1280, height: 1600 } });
 await page.goto(`${HUB}/auth/v1/verify?token=${link.properties.hashed_token}&type=magiclink&redirect_to=${encodeURIComponent(BASE + '/hub')}`, { waitUntil: 'domcontentloaded', timeout: 90000 });
 await page.waitForTimeout(4000);
 
-await page.goto(`${BASE}/hub/quick-wins/${SLUG}`, { waitUntil: 'domcontentloaded', timeout: 90000 });
+await page.goto(`${BASE}${process.env.COURSE ? '/hub/courses/' : '/hub/quick-wins/'}${SLUG}`, { waitUntil: 'domcontentloaded', timeout: 90000 });
 await page.waitForTimeout(3000);
 const skip = page.getByRole('button', { name: /skip for today|not now/i }).first();
 if (await skip.count() > 0 && await skip.isVisible().catch(() => false)) { await skip.click(); await page.waitForTimeout(2000); }
 await page.waitForTimeout(6000);
 
+// A course page opens on its Course tab, so the community section is not
+// mounted until the Community tab is pressed.
+if (process.env.COURSE) {
+  const tab = page.getByRole('button', { name: /^community$/i }).first();
+  if (await tab.count() > 0) {
+    console.log('pressing: "Community"');
+    await tab.click();
+    await page.waitForTimeout(6000);
+  } else {
+    console.log('no Community tab found on this page');
+  }
+}
 console.log('url:', page.url());
 console.log('h1:', JSON.stringify((await page.locator('h1').first().textContent().catch(()=> '') || '').trim()));
 
@@ -45,7 +57,7 @@ const conv = await page.evaluate(() => {
   }
   for (const p of document.querySelectorAll('p')) {
     const t = p.textContent.replace(/\s+/g,' ').trim();
-    if (/ago$/.test(t) && t.length < 140) out.bylines.push(t);
+    if (/\b(Classroom Teacher|Para|Coach|School Leader|Teacher)\b/.test(t) && t.length < 140) out.bylines.push(t);
   }
   for (const b of document.querySelectorAll('button')) {
     const t = b.textContent.replace(/\s+/g,' ').trim();
@@ -57,6 +69,14 @@ console.log('TDI chips:', conv.chips);
 console.log('type tags rendered:', JSON.stringify(conv.tags));
 console.log('filter chips:', JSON.stringify(conv.filterChips));
 console.log('bylines:'); conv.bylines.forEach(b => console.log('   ' + b));
+const saying = await page.evaluate(() => {
+  const body = document.body.innerText;
+  return {
+    heading: /educators are saying/i.test(body),
+    knownQuote: /5 minutes between classes|district PD day|building sub/i.test(body),
+  };
+});
+console.log('testimonial heading present:', saying.heading, '| invented quote present:', saying.knownQuote);
 const cards = await page.evaluate(() => {
   const out = [];
   for (const el of document.querySelectorAll('div')) {

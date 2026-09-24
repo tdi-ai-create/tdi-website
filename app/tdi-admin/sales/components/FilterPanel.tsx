@@ -1,5 +1,7 @@
 'use client'
 
+import { SALES_TEAM } from '@/lib/sales/team'
+
 /**
  * Board filters.
  *
@@ -35,12 +37,40 @@ export type FilterKey =
   | 'not_valued'
   | 'needs_outreach'
   | 'renewal'
+  /** `call:<email>` for one person's calls, `call:none` for unclaimed ones. */
+  | `call:${string}`
 
 interface ChipDef {
   key: FilterKey
   label: string
   title: string
+  /** Filled circle in this colour, for the caller chips. */
+  dot?: string
 }
+
+/**
+ * Who is on the phones.
+ *
+ * Rae, 24 September 2026: the phone button should say who is assigned "that way
+ * we can scan and filter quickly to see who's in charge of calls". Scanning is
+ * the coloured circle on the card; filtering is this row. Same four colours in
+ * both places, and both also carry the name, because two of the four are red
+ * and green.
+ */
+const CALLER_CHIPS: ChipDef[] = [
+  ...SALES_TEAM.map(m => ({
+    key: `call:${m.email}` as FilterKey,
+    label: m.label,
+    title: `Leads where ${m.label} is making the call.`,
+    dot: m.dot,
+  })),
+  {
+    key: 'call:none' as FilterKey,
+    label: 'Nobody yet',
+    title: 'On nobody\'s call list. These are the ones to hand out.',
+    dot: '#D1D5DB',
+  },
+]
 
 /** Grouped so the row reads as two ideas rather than six chips. */
 const EFFORT_CHIPS: ChipDef[] = [
@@ -49,8 +79,12 @@ const EFFORT_CHIPS: ChipDef[] = [
   { key: 'band:heavy', label: 'Heavy', title: 'The heaviest fifth of the board by muck points.' },
   {
     key: 'not_valued',
-    label: 'Not valued',
-    title: 'No offering recorded, so there is no muck score and no value per point. These cannot be ranked until somebody records what the school is likely to buy.',
+    // "on the board", because the headline above says a smaller number under
+    // the same two words. This chip counts everything including Targeting; the
+    // headline counts the pipeline only. Both are right, and a reader cannot
+    // tell that from the word alone.
+    label: 'Not valued on the board',
+    title: 'No offering recorded, so there is no muck score and no value per point. These cannot be ranked until somebody records what the school is likely to buy. This counts the whole board including Targeting, so it is larger than the "not valued in pipeline" figure in the bar above.',
   },
 ]
 
@@ -117,6 +151,13 @@ export function FilterPanel({
           cursor: dead ? 'default' : 'pointer',
         }}
       >
+        {def.dot && (
+          <span style={{
+            width: 8, height: 8, borderRadius: '50%', display: 'inline-block',
+            background: active ? 'white' : def.dot, marginRight: 6,
+            verticalAlign: 'middle',
+          }} />
+        )}
         {def.label} &middot; {count}
       </button>
     )
@@ -165,11 +206,18 @@ export function FilterPanel({
         {EFFORT_CHIPS.map(c => <Chip key={c.key} def={c} />)}
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10, flexWrap: 'wrap' }}>
         <span style={{ fontSize: 11, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: 1, flexShrink: 0 }}>
           Where it stands:
         </span>
         {STATE_CHIPS.map(c => <Chip key={c.key} def={c} />)}
+      </div>
+
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+        <span title="Who is making the call. Set it with the coloured circle on any card." style={{ fontSize: 11, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: 1, flexShrink: 0 }}>
+          Who is calling:
+        </span>
+        {CALLER_CHIPS.map(c => <Chip key={c.key} def={c} />)}
       </div>
     </div>
   )

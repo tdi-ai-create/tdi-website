@@ -24,6 +24,8 @@ import {
 import { HorizontalBarChart, DonutChart, DonutLegend, LiveSectionHeader } from '@/components/tdi-admin/hub-charts/HubCharts'
 import { SELLABLE_OFFERINGS, OFFERING_LABELS, OFFERING_HINTS, offeringLabel } from '@/lib/partnerships/offerings'
 import { chaseOrder } from '@/lib/sales/muck'
+import { URGENCY_COLOR, followupRank, hasFollowup, shortDate, urgency, type Followup } from '@/lib/sales/followup'
+import { SALES_TEAM, teamLabel } from '@/lib/sales/team'
 
 interface MuckCardScore {
   total: number | null
@@ -127,6 +129,11 @@ interface SalesOpportunity {
   website: string | null
   city: string | null
   state: string | null
+  call_owner: string | null
+  followup_text: string | null
+  followup_kind: string | null
+  followup_owner: string | null
+  followup_due: string | null
   created_at: string
   updated_at: string
   // AI enrichment fields (migration 063)
@@ -173,6 +180,10 @@ interface Opportunity {
   website: string | null
   city: string | null
   state: string | null
+  /** Email of whoever is making the call, or null when nobody is. */
+  callOwner: string | null
+  /** The live follow-up alert. Null text means nothing is owed on this lead. */
+  followup: Followup
   // AI enrichment
   enrichmentData: Record<string, any> | null
   strategicBrief: string | null
@@ -241,6 +252,7 @@ function toCardOpp(opp: Opportunity, muckById: Record<string, MuckCardScore>): S
     type: opp.type,
     assignedTo: opp.assignedTo,
     onCallSheet: opp.onCallSheet,
+    callOwner: opp.callOwner,
     notes: opp.notes,
     needs_invoice: opp.needs_invoice,
     stage: opp.stage,
@@ -250,6 +262,7 @@ function toCardOpp(opp: Opportunity, muckById: Record<string, MuckCardScore>): S
     contract_year: opp.contract_year,
     city: opp.city,
     state: opp.state,
+    followup: opp.followup,
     muck: muckById[opp.supabase_id]
       ? {
           total: muckById[opp.supabase_id].total,
@@ -507,6 +520,28 @@ export default function SalesPage() {
     }
   }, [])
 
+  /**
+   * Re-read the board-wide muck scores.
+   *
+   * Split out of loadAll so an edit can refresh it on its own. The panel shows
+   * muck's deal value, and it was only ever fetched on page load, so editing a
+   * value saved the new number and kept displaying the old one until a reload.
+   */
+  async function loadMuck() {
+    try {
+      const muckRes = await fetch('/api/sales/muck')
+      if (muckRes.ok) {
+        const { scores, rollup } = await muckRes.json()
+        setMuckById(scores ?? {})
+        setMuckRollup(rollup ?? null)
+      } else {
+        console.error('[sales] muck failed:', muckRes.status)
+      }
+    } catch (e) {
+      console.error('[sales] muck request failed:', e)
+    }
+  }
+
   async function loadAll() {
     setLoading(true)
     setError('')
@@ -542,6 +577,7 @@ export default function SalesPage() {
         heat: row.heat || 'warm',
         grantSupport: row.grant_support || false,
         onCallSheet: row.on_jims_call_sheet || false,
+        callOwner: row.call_owner,
         schoolYear: normalizeSchoolYear(row.contract_year || row.school_year),
         paymentReceived: row.payment_received || false,
         invoiceSentAt: row.invoice_sent_at,
@@ -554,6 +590,14 @@ export default function SalesPage() {
         website: row.website,
         city: row.city,
         state: row.state,
+        followup: {
+          text: row.followup_text,
+          kind: row.followup_kind,
+          owner: row.followup_owner,
+          due: row.followup_due,
+          setBy: null,
+          setAt: null,
+        },
         enrichmentData: row.enrichment_data,
         strategicBrief: row.ai_strategic_brief,
         enrichmentStatus: row.enrichment_status,
@@ -578,18 +622,7 @@ export default function SalesPage() {
         console.error('[sales] notes summary request failed:', e)
       }
 
-      try {
-        const muckRes = await fetch('/api/sales/muck')
-        if (muckRes.ok) {
-          const { scores, rollup } = await muckRes.json()
-          setMuckById(scores ?? {})
-          setMuckRollup(rollup ?? null)
-        } else {
-          console.error('[sales] muck failed:', muckRes.status)
-        }
-      } catch (e) {
-        console.error('[sales] muck request failed:', e)
-      }
+      await loadMuck()
     } catch (err: any) {
       setError(err.message || 'Failed to load opportunities')
     }
@@ -753,7 +786,9 @@ export default function SalesPage() {
     showToastMsg(`"${opp.name}" marked as paid`, 'success')
   }
 
-  // Toggle call sheet flag on an opp
+  // Toggle call sheet flag on an opp. Kept for the context menu; the card now
+  // sets a person instead, through handleFieldSaved below.
+
   async function handleToggleCallSheet(oppId: string) {
     const opp = opportunities.find(o => o.supabase_id === oppId)
     if (!opp) return
@@ -765,7 +800,7 @@ export default function SalesPage() {
       .from('sales_opportunities')
       .update({ on_jims_call_sheet: newVal, updated_at: new Date().toISOString() })
       .eq('id', oppId)
-    if (!wroteOk(sheetErr, "Updating Jim's call sheet")) {
+    if (!wroteOk(sheetErr, 'Updating the call list')) {
       // Put the toggle back rather than showing a state the database rejected.
       setOpportunities(prev => prev.map(o =>
         o.supabase_id === oppId ? { ...o, onCallSheet: !newVal } : o
@@ -837,14 +872,17 @@ export default function SalesPage() {
     rows: Opportunity[],
     filename: string,
     sheetName: string,
-    isJimsList: boolean,
+    isCallList: boolean,
     notesByOpp: Record<string, ExportNote[]>
   ) {
     let data: Record<string, string | number | null>[];
     let colWidths: Record<string, number>;
 
-    if (isJimsList) {
-      // Jim's call sheet format -- matches his Google Sheet exactly
+    if (isCallList) {
+      // The call list format. These columns match the Google Sheet the calling
+      // is actually done from, so they are deliberately unchanged by the
+      // rename: change a heading here and a paste into that sheet lands in the
+      // wrong column.
       data = rows.map(o => ({
         'District / School': (o.name || '').replace(/\s*\([A-Z]{2}\)\s*-\s*PD Plan Inquiry\s*$/i, '').replace(/\s*\([A-Z]{2}\)\s*-\s*Nomination\s*$/i, '').replace(/\s*-\s*PD Plan Inquiry\s*$/i, '').replace(/\s*-\s*Nomination\s*$/i, '').trim(),
         'Contact Name': o.contactName || '',
@@ -856,6 +894,7 @@ export default function SalesPage() {
       }))
       colWidths = {
         'District / School': 40,
+        'Who is calling': 14,
         'Contact Name': 22,
         'Contact Email': 30,
         'Phone': 18,
@@ -867,6 +906,7 @@ export default function SalesPage() {
       // Full export with all fields
       data = rows.map(o => ({
         'District / School': o.name || '',
+        'Who is calling': o.callOwner ? teamLabel(o.callOwner) : '',
         'Contact Name': o.contactName || '',
         'Contact Email': o.contactEmail || '',
         'Phone': o.contactPhone || '',
@@ -874,7 +914,6 @@ export default function SalesPage() {
         'State': o.state || '',
         'Stage': o.stageName || '',
         'Deal Value': o.value ?? '',
-        'Heat': o.heat ? o.heat.charAt(0).toUpperCase() + o.heat.slice(1) : '',
         'Source': o.source || '',
         'Deal Type': o.type === 'new_business' ? 'New Business' : o.type === 'renewal' ? 'Renewal' : o.type || '',
         'Website': o.website || '',
@@ -893,7 +932,7 @@ export default function SalesPage() {
         'State': 7,
         'Stage': 20,
         'Deal Value': 12,
-        'Heat': 8,
+
         'Source': 28,
         'Deal Type': 14,
         'Website': 35,
@@ -945,14 +984,14 @@ export default function SalesPage() {
     rows: Opportunity[],
     filename: string,
     sheetName: string,
-    isJimsList: boolean,
+    isCallList: boolean,
     label: string
   ) {
     if (exporting) return
     setExporting(true)
     try {
       const notesByOpp = await fetchNotesForExport()
-      exportToSheet(rows, filename, sheetName, isJimsList, notesByOpp)
+      exportToSheet(rows, filename, sheetName, isCallList, notesByOpp)
       const noteCount = rows.reduce((sum, o) => sum + (notesByOpp[o.supabase_id]?.length ?? 0), 0)
       showToastMsg(`Exported ${rows.length} ${label} with ${noteCount} notes`, 'success')
     } catch (e) {
@@ -965,27 +1004,55 @@ export default function SalesPage() {
     }
   }
 
-  function handleExportJimsList() {
+  function handleExportCallList() {
     const rows = activeOpps
       .filter(o => !o.deleted_at && o.onCallSheet)
       .sort((a, b) => (b.value ?? 0) - (a.value ?? 0))
     void runExport(
       rows,
-      `jims-call-list-${new Date().toISOString().split('T')[0]}.xlsx`,
-      "Jim's Call List",
+      `tdi-call-list-${new Date().toISOString().split('T')[0]}.xlsx`,
+      'Call List',
       true,
-      "Jim's list deals"
+      'call list deals'
     )
   }
 
+  /**
+   * A name for what is currently on screen, for the filename and the sheet tab.
+   *
+   * A file called tdi-pipeline.xlsx tells you nothing three days later. One
+   * called tdi-pipeline-heavy-needs-outreach.xlsx tells you what you were
+   * looking at when you pulled it.
+   */
+  const exportSlug = useMemo(() => {
+    const parts: string[] = []
+    if (showCallSheetOnly) parts.push('call-list')
+    for (const k of activeFilters.keys) parts.push(k.replace('band:', '').replace(/_/g, '-'))
+    if (activeFilters.search) parts.push(activeFilters.search.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 24))
+    return parts.filter(Boolean).join('-')
+  }, [activeFilters, showCallSheetOnly])
+
+  /**
+   * Export what is on screen, not everything.
+   *
+   * This used to read `activeOpps`, which is the whole board. So filtering down
+   * to the 21 heavy leads and pressing export handed you all 166, silently, and
+   * the only way to notice was to count the rows in the spreadsheet. Rae, 24
+   * September 2026: it has to be "easy to export based on filters".
+   *
+   * `filtered` is the exact list the board is drawing, so what downloads is
+   * what you can see. The button says the number so there is no doubt before
+   * you press it.
+   */
   function handleExport() {
-    const rows = activeOpps
+    const rows = [...filtered]
       .filter(o => !o.deleted_at)
       .sort((a, b) => (b.value ?? 0) - (a.value ?? 0))
+    const stamp = new Date().toISOString().split('T')[0]
     void runExport(
       rows,
-      `tdi-pipeline-${new Date().toISOString().split('T')[0]}.xlsx`,
-      'Pipeline',
+      `tdi-pipeline${exportSlug ? `-${exportSlug}` : ''}-${stamp}.xlsx`,
+      exportSlug ? 'Filtered pipeline' : 'Pipeline',
       false,
       'deals'
     )
@@ -1068,6 +1135,12 @@ export default function SalesPage() {
       if (o.supabase_id !== oppId) return o
       const updated = { ...o }
       if (field === 'value') updated.value = newValue
+      else if (field === 'call_owner') {
+        // Picking a person puts the lead on the call list; picking nobody takes
+        // it off. One control, so the two can never disagree.
+        updated.callOwner = newValue || null
+        updated.onCallSheet = Boolean(newValue)
+      }
       else if (field === 'heat') updated.heat = newValue
       else if (field === 'notes') updated.notes = newValue
       else if (field === 'source') updated.source = newValue
@@ -1150,12 +1223,20 @@ export default function SalesPage() {
       case 'renewal':
         return opp.type === 'renewal'
       default:
+        // call:<email> for one person's calls, call:none for unclaimed ones.
+        if (key.startsWith('call:')) {
+          const who = key.slice(5)
+          return who === 'none' ? !opp.callOwner : opp.callOwner === who
+        }
         return false
     }
   }, [muckById])
 
   const filterCounts = useMemo(() => {
-    const keys = ['band:light', 'band:moderate', 'band:heavy', 'not_valued', 'needs_outreach', 'renewal']
+    const keys = [
+      'band:light', 'band:moderate', 'band:heavy', 'not_valued', 'needs_outreach', 'renewal',
+      ...SALES_TEAM.map(m => `call:${m.email}`), 'call:none',
+    ]
     const counts: Record<string, number> = {}
     for (const k of keys) counts[k] = activeOpps.filter(o => matchesFilterKey(o, k)).length
     return counts
@@ -1201,7 +1282,6 @@ export default function SalesPage() {
       totalPipeline: pipelineOpps.reduce((s, o) => s + dealValue(o), 0),
       activeCount: pipelineOpps.length,
       unvaluedCount: unvalued.length,
-      hotCount: pipelineOpps.filter(o => o.heat === 'hot').length,
       invoiceCount: opportunities.filter(o => o.needs_invoice && !o.deleted_at && !o.grantSupport).length,
       callSheetCount: callSheetOpps.length,
       callSheetValue: callSheetOpps.reduce((s, o) => s + dealValue(o), 0),
@@ -1334,9 +1414,8 @@ export default function SalesPage() {
       {/* Outreach Queue Tab */}
       {pageTab === 'outreach' && (() => {
         const now = Date.now()
-        const queued = activeOpps
-          .filter(o => !o.deleted_at && o.stage !== 'lost' && o.stage !== 'paid' && o.contactEmail)
-          .map(o => {
+        const live = activeOpps.filter(o => !o.deleted_at && o.stage !== 'lost' && o.stage !== 'paid')
+        const enrich = (o: Opportunity) => {
             const daysSince = o.lastActivityAt ? Math.floor((now - new Date(o.lastActivityAt).getTime()) / 86400000) : 999
             const m = muckById[o.supabase_id]
             let action = 'Initial outreach'
@@ -1360,7 +1439,32 @@ export default function SalesPage() {
               valuePredicted: m?.valuePredicted ?? false,
               needsOutreach: daysSince >= 14 || !o.lastActivityAt,
             }
-          })
+        }
+
+        /**
+         * Leads somebody has promised to act on, above everything else.
+         *
+         * A separate group rather than a re-sort, because the rest of this
+         * queue answers a different question. Below, staleness decides who
+         * appears and value per muck point decides the order: who has gone
+         * quiet, chase the richest first. A follow-up alert is not a guess about
+         * who is worth chasing, it is a person saying they would do a thing by a
+         * date, so it outranks the model rather than competing with it.
+         *
+         * Deliberately not filtered on contactEmail or on staleness. The queue
+         * below requires both, which is right for finding neglected leads and
+         * wrong here: an alert set this morning is owed today, and a lead with
+         * no email on file still has a phone number and an owner.
+         */
+        const owed = live
+          .filter(o => hasFollowup(o.followup))
+          .map(enrich)
+          .sort((a, b) => followupRank(a.followup.due) - followupRank(b.followup.due))
+        const owedIds = new Set(owed.map(l => l.supabase_id))
+
+        const queued = live
+          .filter(o => o.contactEmail && !owedIds.has(o.supabase_id))
+          .map(enrich)
           .filter(o => o.needsOutreach)
 
         /**
@@ -1441,6 +1545,21 @@ export default function SalesPage() {
               <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 2 }}>
                 {lead.contactName || 'No contact'} {lead.contactEmail ? `-- ${lead.contactEmail}` : ''} {lead.state ? `(${lead.state})` : ''}
               </div>
+              {hasFollowup(lead.followup) && (
+                <div style={{ fontSize: 11, color: '#374151', marginTop: 4 }}>
+                  <span style={{
+                    fontWeight: 700, textTransform: 'uppercase', fontSize: 9, letterSpacing: '0.04em',
+                    color: URGENCY_COLOR[urgency(lead.followup.due)].fg,
+                    background: URGENCY_COLOR[urgency(lead.followup.due)].bg,
+                    border: `1px solid ${URGENCY_COLOR[urgency(lead.followup.due)].border}`,
+                    borderRadius: 4, padding: '1px 5px', marginRight: 6,
+                  }}>
+                    {lead.followup.owner ? teamLabel(lead.followup.owner) : 'UNCLAIMED'} &middot; {lead.followup.kind ?? 'follow up'}
+                    {shortDate(lead.followup.due) ? ` \u00b7 ${urgency(lead.followup.due) === 'overdue' ? 'past due ' : 'by '}${shortDate(lead.followup.due)}` : ''}
+                  </span>
+                  {lead.followup.text}
+                </div>
+              )}
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0, marginLeft: 16 }}>
               <div style={{ textAlign: 'right' }}>
@@ -1491,11 +1610,27 @@ export default function SalesPage() {
               <div>
                 <h2 style={{ fontSize: 18, fontWeight: 700, color: '#0a0f1e', margin: 0 }}>Outreach Queue</h2>
                 <p style={{ fontSize: 12, color: '#6B7280', margin: '2px 0 0' }}>
-                  {ordered.length} leads needing outreach. Ordered by deal value per muck point.
+                  {owed.length > 0 ? `${owed.length} follow-up${owed.length === 1 ? '' : 's'} owed, then ` : ''}
+                  {ordered.length} leads needing outreach, ordered by deal value per muck point.
                 </p>
               </div>
             </div>
-            {ordered.length === 0 ? (
+            {owed.length > 0 && (
+              <div style={{ marginBottom: 24 }}>
+                <h3 style={{ fontSize: 13, fontWeight: 700, color: '#0a0f1e', margin: '0 0 2px' }}>
+                  Somebody's name is on {owed.length === 1 ? 'this' : 'these'} ({owed.length})
+                </h3>
+                <p style={{ fontSize: 11, color: '#6B7280', margin: '0 0 8px' }}>
+                  Someone has taken these on. They sit above the ranked queue because a person
+                  agreeing to do something beats a model guessing who is worth calling. Undated ones
+                  are last, not first. Open the lead and press Done when it is handled.
+                </p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  {owed.map(lead => renderRow(lead, false))}
+                </div>
+              </div>
+            )}
+            {ordered.length === 0 && owed.length === 0 ? (
               <div style={{ textAlign: 'center', padding: 40, color: '#9CA3AF' }}>All leads are contacted. Nice work.</div>
             ) : (
               <>
@@ -1547,7 +1682,9 @@ export default function SalesPage() {
                 stats={stats}
                 onAddLead={() => setAddLeadModalOpen(true)}
                 onExport={handleExport}
-                onExportJimsList={handleExportJimsList}
+                onExportCallList={handleExportCallList}
+                exportCount={filtered.filter(o => !o.deleted_at).length}
+                isFiltered={Boolean(activeFilters.search) || activeFilters.keys.length > 0 || showCallSheetOnly}
                 exporting={exporting}
                 showCallSheetOnly={showCallSheetOnly}
                 onToggleCallSheet={() => setShowCallSheetOnly(!showCallSheetOnly)}
@@ -2221,9 +2358,29 @@ export default function SalesPage() {
               ...(changes.value !== undefined ? { value: changes.value } : {}),
               ...(changes.assigned_to_email !== undefined ? { assignedTo: changes.assigned_to_email } : {}),
               ...(changes.name ? { name: changes.name } : {}),
+              ...(changes.grant_support !== undefined ? { grantSupport: Boolean(changes.grant_support) } : {}),
+              // Both of these decide whether the lead belongs on the board at
+              // all, so the board has to see the change or the card sits there
+              // looking edited and filtered out at the same time.
+              ...(changes.school_year !== undefined ? { schoolYear: normalizeSchoolYear(changes.school_year as string | null) } : {}),
+              ...(changes.is_contact_only !== undefined ? { isContactOnly: Boolean(changes.is_contact_only) } : {}),
+              // The follow-up alert shows on the card and in the outreach
+              // queue, so a change made in the panel has to land on the board
+              // without a reload.
+              ...(changes.followup_text !== undefined ? {
+                followup: {
+                  text: (changes.followup_text as string | null) ?? null,
+                  kind: (changes.followup_kind as string | null) ?? null,
+                  owner: (changes.followup_owner as string | null) ?? null,
+                  due: (changes.followup_due as string | null) ?? null,
+                  setBy: (changes.followup_set_by as string | null) ?? null,
+                  setAt: (changes.followup_set_at as string | null) ?? null,
+                },
+              } : {}),
             }
           }))
         }}
+        onMuckStale={() => { void loadMuck() }}
         onDelete={(id) => {
           const opp = opportunities.find(o => o.supabase_id === id)
           if (opp) handleDeleteOpp(opp)

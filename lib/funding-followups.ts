@@ -241,8 +241,8 @@ export async function createApprovedSendStep(
     title,
     description:
       `Approved and ready. It does nothing for the school until it reaches them. ` +
-      `The email is drafted and waiting in the Outreach Queue at the top of the Funding board. ` +
-      `Approving it there sends it and schedules the chases.`,
+      `The email is drafted and waiting on this item in the funding calendar. ` +
+      `Read it, change it if it needs changing, check the packet link, and send it there.`,
     due_date: due.toISOString().split('T')[0],
   });
 

@@ -199,7 +199,6 @@ function PostCard({ post, userId, isAdmin, onRefresh, tUI }: { post: Conversatio
   const [showReplies, setShowReplies] = useState(false)
   const [postingReply, setPostingReply] = useState(false)
 
-  const timeAgo = getTimeAgo(post.posted_at)
 
   const toggleHelpful = async () => {
     if (!userId || toggling) return
@@ -322,16 +321,19 @@ function PostCard({ post, userId, isAdmin, onRefresh, tUI }: { post: Conversatio
             </div>
           )}
 
-          {/* Tag */}
-          <span
-            className="inline-block text-xs font-medium px-2 py-0.5 rounded mb-2"
-            style={{
-              backgroundColor: `${config.color}18`,
-              color: config.color,
-            }}
-          >
-            {tUI(config.label)}
-          </span>
+          {/* Tag. A from_tdi post already says TDI on the byline chip, so the
+              tag would be the same word twice on the same card. */}
+          {post.contribution_type !== 'from_tdi' && (
+            <span
+              className="inline-block text-xs font-medium px-2 py-0.5 rounded mb-2"
+              style={{
+                backgroundColor: `${config.color}18`,
+                color: config.color,
+              }}
+            >
+              {tUI(config.label)}
+            </span>
+          )}
 
           {/* Title */}
           {post.title && (
@@ -346,7 +348,6 @@ function PostCard({ post, userId, isAdmin, onRefresh, tUI }: { post: Conversatio
               <EducatorBadge educatorType={post.author.educator_type} />
             )}
             {post.author.role && <span> · {formatRole(post.author.role)}</span>}
-            <span> · {timeAgo}</span>
           </p>
 
           {/* Body */}
@@ -440,7 +441,6 @@ function PostCard({ post, userId, isAdmin, onRefresh, tUI }: { post: Conversatio
                         <EducatorBadge educatorType={r.author.educator_type} />
                       )}
                       {r.author.role && <span> · {formatRole(r.author.role)}</span>}
-                      <span> · {getTimeAgo(r.posted_at)}</span>
                     </p>
                     <p className="text-sm text-gray-700 leading-relaxed">{r.body}</p>
                   </div>
@@ -884,23 +884,6 @@ export default function LessonConversation({
 }
 
 // ─── HELPERS ────────────────────────────────────────────────────────────────
-
-function getTimeAgo(dateStr: string): string {
-  const now = Date.now()
-  const then = new Date(dateStr).getTime()
-  const diffMs = now - then
-  const diffMin = Math.floor(diffMs / 60000)
-  const diffHr = Math.floor(diffMin / 60)
-  const diffDay = Math.floor(diffHr / 24)
-  const diffWeek = Math.floor(diffDay / 7)
-
-  if (diffMin < 1) return 'just now'
-  if (diffMin < 60) return `${diffMin}m ago`
-  if (diffHr < 24) return `${diffHr}h ago`
-  if (diffDay < 7) return `${diffDay}d ago`
-  if (diffWeek < 5) return `${diffWeek}w ago`
-  return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-}
 
 function formatRole(role: string): string {
   return role.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())

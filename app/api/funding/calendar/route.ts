@@ -58,7 +58,7 @@ export async function GET(request: NextRequest) {
   const [oppsRes, itemsRes] = await Promise.all([
     supabase
       .from('funding_opportunities')
-      .select('id, pursuit_id, name, status, amount, application_closes, window_closes, narrative_status, narrative_status_changed_at, assigned_agent, client_submitted, updated_at')
+      .select('id, pursuit_id, name, status, amount, application_closes, window_closes, narrative_status, narrative_status_changed_at, assigned_agent, client_submitted, updated_at, qa_escalation, qa_attempt_count, narrative_url')
       .in('pursuit_id', ids),
     supabase
       .from('funding_action_items')
@@ -76,10 +76,33 @@ export async function GET(request: NextRequest) {
 
   const live = (oppsRes.data ?? []).filter(o => isLive(o.status))
 
+  const entries = entriesInMonth(all, year, month)
+
+  // What each popup needs to offer the right control, keyed by opportunity.
+  // Returned alongside the entries rather than fetched again by the screen, so
+  // there is one read and one answer about what state a grant is in.
+  const needed = new Set(entries.map(e => e.opportunityId).filter(Boolean) as string[])
+  const grants: Record<string, unknown> = {}
+  for (const o of oppsRes.data ?? []) {
+    if (!needed.has(o.id)) continue
+    grants[o.id] = {
+      id: o.id,
+      name: o.name,
+      status: o.status,
+      narrativeStatus: o.narrative_status ?? 'not_started',
+      // The packet itself. "Open this grant" pointed at a portal page; the
+      // thing anyone actually wants to open is the document.
+      docUrl: o.narrative_url ?? null,
+      attempts: o.qa_attempt_count ?? null,
+      escalation: o.qa_escalation ?? null,
+    }
+  }
+
   return NextResponse.json({
     year,
     month,
-    entries: entriesInMonth(all, year, month),
+    entries,
+    grants,
     coverage: {
       livePaths: live.length,
       withDate: live.filter(o => !!o.application_closes).length,

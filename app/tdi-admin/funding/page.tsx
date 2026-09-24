@@ -3,15 +3,16 @@
 /**
  * Funding Home.
  *
- * This is the port of the Funding Home mockup. It replaces the old board as
- * what `/tdi-admin/funding` shows. The old board still exists at
- * `/tdi-admin/funding/board` because it holds every control that changes a
- * grant, and those are not wired into this screen yet. Removing it before they
- * are would take away 35 of the 36 ways to change anything in funding.
+ * This is the port of the Funding Home mockup, and as of 24 September 2026 it
+ * is the whole funding portal. The board it replaced is a redirect.
  *
- * Three views, the same three the mockup has:
+ *   Work      the pipeline. The calendar cannot show a path with no date, and
+ *             most paths have none, so this is where they are.
  *   Calendar  what has to happen and when, confirmed and predicted
  *   Schools   what each school is trying to raise against what landed
+ *   Queue     the emails waiting to go, which is the only door they leave by
+ *   Funders   who we have looked at, and when the research went stale
+ *   Awarded   what landed and what did not
  *   Detail    the live notes log, and the profile with a source on every fact
  *
  * Every figure on this page is read from the funding API. Nothing here is
@@ -21,6 +22,12 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
+import FundingChrome from './FundingChrome'
+import WorkBoard from './WorkBoard'
+import OutreachQueue from './components/OutreachQueue'
+import FundersTab from './components/FundersTab'
+import AwardedTab from './components/AwardedTab'
+import { ESCALATION_OPTIONS } from '@/lib/funding-qa'
 import './funding-home.css'
 
 type EntryKind = 'send' | 'decide' | 'chase' | 'deadline'
@@ -38,6 +45,36 @@ interface Entry {
   detail?: string
 }
 
+interface Grant {
+  id: string
+  name: string
+  status: string
+  narrativeStatus: string
+  attempts: number | null
+  docUrl: string | null
+  escalation: {
+    summary?: string
+    root_cause?: string
+    recommended_option?: string
+    recommendation_reason?: string
+    awaiting_client?: boolean
+    client_ask?: string
+  } | null
+}
+
+/** A queued email waiting on approval, from the Outreach Queue. */
+interface Draft {
+  id: string
+  subject: string
+  body: string
+  toEmail: string
+  toName: string | null
+  opportunityId: string | null
+  emailType: string | null
+  blockedReason: string | null
+  warnings: string[]
+}
+
 interface School {
   id: string
   name: string
@@ -48,6 +85,16 @@ interface School {
   grantsWon: number
   grantsWonWithoutAnAmount: number
   livePaths: number
+  grants: AwardedRow[]
+}
+
+interface AwardedRow {
+  id: string
+  name: string
+  amount: number
+  awardedAmount: number | null
+  status: string
+  school: string
 }
 
 interface Fact {
@@ -113,7 +160,19 @@ function prettyKey(k: string): string {
 }
 
 export default function FundingHome() {
-  const [view, setView] = useState<'cal' | 'schools' | 'school'>('cal')
+  const [view, setView] = useState<'work' | 'cal' | 'schools' | 'school' | 'queue' | 'funders' | 'awarded'>('work')
+
+  // The board links back here with ?view=schools, because it is its own route
+  // and cannot switch a view it does not have. Read after mount rather than
+  // with useSearchParams, which would force this route to opt out of
+  // prerendering and can fail the build instead of just working.
+  useEffect(() => {
+    const asked = new URLSearchParams(window.location.search).get('view')
+    if (asked === 'cal' || asked === 'schools' || asked === 'queue'
+        || asked === 'funders' || asked === 'awarded') {
+      setView(asked)
+    }
+  }, [])
 
   const today = new Date()
   const [year, setYear] = useState(today.getFullYear())
@@ -121,6 +180,8 @@ export default function FundingHome() {
 
   const [entries, setEntries] = useState<Entry[] | null>(null)
   const [coverage, setCoverage] = useState<{ livePaths: number; withDate: number } | null>(null)
+  const [grants, setGrants] = useState<Record<string, Grant>>({})
+  const [drafts, setDrafts] = useState<Record<string, Draft>>({})
   const [calError, setCalError] = useState<string | null>(null)
 
   const [schools, setSchools] = useState<School[] | null>(null)
@@ -129,6 +190,9 @@ export default function FundingHome() {
   const [schoolId, setSchoolId] = useState<string | null>(null)
   const [detail, setDetail] = useState<Detail | null>(null)
   const [pane, setPane] = useState<'log' | 'profile'>('log')
+
+  // Bumped after a decision so the month reloads and the entry moves or goes.
+  const [reloadAt, setReloadAt] = useState(0)
 
   useEffect(() => {
     let live = true
@@ -140,11 +204,31 @@ export default function FundingHome() {
         if (!live) return
         if (d.error) { setCalError(d.error); return }
         setEntries(d.entries ?? [])
+        setGrants(d.grants ?? {})
         setCoverage(d.coverage ?? null)
       })
       .catch(() => live && setCalError('The calendar could not be read.'))
     return () => { live = false }
-  }, [year, month])
+  }, [year, month, reloadAt])
+
+  // The email that carries an approved application already exists: approving
+  // writes it into the Outreach Queue as a draft. It just could not be read or
+  // sent from here, which is what sent people back to the board.
+  useEffect(() => {
+    let live = true
+    fetch('/api/funding/outreach-queue')
+      .then(r => r.json())
+      .then(d => {
+        if (!live) return
+        const byOpp: Record<string, Draft> = {}
+        for (const row of (d.drafts ?? []) as Draft[]) {
+          if (row.opportunityId) byOpp[row.opportunityId] = row
+        }
+        setDrafts(byOpp)
+      })
+      .catch(() => {})
+    return () => { live = false }
+  }, [reloadAt])
 
   useEffect(() => {
     let live = true
@@ -193,20 +277,35 @@ export default function FundingHome() {
   const todayIso = iso(today)
   const dayItems = openDay ? (byDay.get(openDay) ?? []) : []
 
+  // The ported board views keep their own styling, so they render outside the
+  // .fh wrapper. Dropping them inside it would let this stylesheet's element
+  // rules repaint components that are already correct.
+  const chrome = (
+    <FundingChrome
+      active={view === 'school' ? 'schools' : view}
+      onView={v => { setView(v); setOpenDay(null) }}
+    />
+  )
+
+  if (view === 'work' || view === 'queue' || view === 'funders' || view === 'awarded') {
+    return (
+      <>
+        {chrome}
+        <div style={{ padding: '26px 20px 70px', maxWidth: 1180, margin: '0 auto' }}>
+          {view === 'work' && <WorkBoard />}
+          {view === 'queue' && <OutreachQueue />}
+          {view === 'funders' && <FundersTab />}
+          {view === 'awarded' && (
+            <AwardedTab grants={(schools ?? []).flatMap(sc => sc.grants ?? [])} />
+          )}
+        </div>
+      </>
+    )
+  }
+
   return (
     <div className="fh">
-      <header className="top">
-        <div className="brand">TDI Funding <span>/ admin</span></div>
-        <nav>
-          <button data-view="cal" aria-current={view === 'cal'} onClick={() => setView('cal')}>Calendar</button>
-          <button data-view="schools" aria-current={view === 'schools' || view === 'school'} onClick={() => setView('schools')}>Schools</button>
-          {/* The old board keeps every control that changes a grant until those
-              are wired into the popups here. */}
-          {/* Needs its own colour: the admin stylesheet gives anchors a dark
-              ink that is unreadable on the navy chrome. */}
-          <Link className="navlink" href="/tdi-admin/funding/board">Board</Link>
-        </nav>
-      </header>
+      {chrome}
 
       <div className="wrap">
 
@@ -396,23 +495,15 @@ export default function FundingHome() {
                     <h4>{e.label}</h4>
                     {e.detail && <p>{e.detail}</p>}
                     {e.derivation && <div className="why">{e.derivation}</div>}
-                    <div className="act">
-                      {/* The controls that change a grant are not wired into
-                          this popup yet. Rather than show a button that does
-                          nothing, this sends you to the place that can do it. */}
-                      <div className="row">
-                        <Link
-                          className="btn primary"
-                          href={`/tdi-admin/funding/${e.schoolId}`}
-                          style={{ textDecoration: 'none' }}
-                        >
-                          Open this grant
-                        </Link>
-                        <button className="btn" onClick={() => loadSchool(e.schoolId)}>
-                          Open {e.schoolName}
-                        </button>
-                      </div>
-                    </div>
+                    <GrantAction
+                      entry={e}
+                      grant={e.opportunityId ? grants[e.opportunityId] : undefined}
+                      draft={e.opportunityId ? drafts[e.opportunityId] : undefined}
+                      schoolId={e.schoolId}
+                      schoolName={e.schoolName}
+                      onDone={() => setReloadAt(n => n + 1)}
+                      onOpenSchool={() => loadSchool(e.schoolId)}
+                    />
                   </div>
                 </div>
               )
@@ -496,5 +587,311 @@ function ProfileFields({ schoolId, facts, onSaved }: {
       </div>
       {error && <div className="src warn" style={{ marginTop: 10 }}>{error}</div>}
     </>
+  )
+}
+
+/**
+ * The controls the mockup put inside the popup.
+ *
+ * Only decisions live here. Nothing on this screen sends an email: drafting and
+ * sending stay on the board behind their existing review step, because a send
+ * is not something to make one click away from a calendar.
+ *
+ * Every contract here is the one the board already uses, so there is one answer
+ * to what approving or escalating means:
+ *   escalation   POST  /api/funding/escalation  { opportunityId, option, detail }
+ *   approve      PATCH /api/funding/opportunities { id, narrative_status: 'ready' }
+ *   send back    PATCH /api/funding/opportunities { id, narrative_status: 'requested', redraft_guidance }
+ */
+function GrantAction({ entry, grant, draft, schoolId, schoolName, onDone, onOpenSchool }: {
+  entry: Entry
+  grant?: Grant
+  draft?: Draft
+  schoolId: string
+  schoolName: string
+  onDone: () => void
+  onOpenSchool: () => void
+}) {
+  const [choice, setChoice] = useState<string>(grant?.escalation?.recommended_option ?? '')
+  const [detail, setDetail] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [done, setDone] = useState<string | null>(null)
+
+  const ns = grant?.narrativeStatus
+  const esc = grant?.escalation ?? null
+
+  // A control appears only on the entry that means it, never on any entry that
+  // happens to share a grant. Found by looking: an action item reading "Ask
+  // BRAF for the Ourso form fields" was offering "Approve and release", purely
+  // because that grant's narrative sat at approval. That is a different
+  // decision, one click away, on the wrong card.
+  const isApprovalEntry = entry.id.startsWith('pred-approve-')
+
+  const escalated = ns === 'escalated' && !!esc && entry.id.startsWith('pred-escalate-')
+  const awaitingClient = escalated && esc?.awaiting_client === true
+  const atApproval = ns === 'approval' && isApprovalEntry
+
+  async function post(url: string, body: unknown, ok: string) {
+    setBusy(true)
+    setError(null)
+    try {
+      const res = await fetch(url, {
+        method: url.includes('escalation') ? 'POST' : 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      })
+      const text = await res.text()
+      let out: Record<string, unknown> = {}
+      try { out = text ? JSON.parse(text) : {} } catch { /* not json, kept below */ }
+      // The route answers 200 with an error body in some paths, so both are
+      // checked. When it fails without one, say what actually came back rather
+      // than a sentence that tells the reader nothing.
+      if (!res.ok || out.error) {
+        const why = typeof out.error === 'string' ? out.error : null
+        setError(why ?? `The server answered ${res.status}. ${text.slice(0, 200) || 'No detail.'}`)
+        return
+      }
+      setDone(typeof out.message === 'string' ? out.message : ok)
+      onDone()
+    } catch {
+      setError('That did not go through.')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  // "Open this grant" used to open a portal page. The thing worth opening is
+  // the packet, so it opens the document, and when there is no document it
+  // says so instead of offering a button that goes somewhere unhelpful.
+  const links = (
+    <div className="row">
+      {grant?.docUrl ? (
+        <a className="btn" href={grant.docUrl} target="_blank" rel="noopener noreferrer"
+           style={{ textDecoration: 'none' }}>
+          Open the packet
+        </a>
+      ) : (
+        <span className="why" style={{ alignSelf: 'center' }}>No packet document on this grant yet</span>
+      )}
+      <button className="btn" onClick={onOpenSchool}>Open {schoolName}</button>
+    </div>
+  )
+
+  if (done) {
+    return <div className="act"><div className="doneflag">{done}</div></div>
+  }
+
+  // The email is already written and waiting. Read it, change it, check the
+  // packet link it carries, and send it, without leaving this popup.
+  if (draft) {
+    return (
+      <DraftToSend
+        draft={draft}
+        docUrl={grant?.docUrl ?? null}
+        busy={busy}
+        error={error}
+        onSend={(subject, body) => post('/api/funding/outreach-queue',
+          { id: draft.id, action: 'approve', subject, body },
+          'Sent, and the grant is marked as gone to the school.')}
+        links={links}
+      />
+    )
+  }
+
+
+  if (awaitingClient) {
+    return (
+      <div className="act">
+        <label>Waiting on the school</label>
+        {esc?.client_ask && <p style={{ margin: 0, fontSize: 12.5 }}>We asked for: {esc.client_ask}</p>}
+        <div className="row">
+          <button
+            className="btn primary"
+            disabled={busy}
+            onClick={() => post('/api/funding/escalation',
+              { opportunityId: grant!.id, option: 'resume_drafting', detail: detail || 'The school replied.' },
+              'Drafting resumed.')}
+          >
+            {busy ? 'Working' : 'The school replied, resume drafting'}
+          </button>
+        </div>
+        {error && <div className="src warn">{error}</div>}
+        {links}
+      </div>
+    )
+  }
+
+  if (escalated) {
+    const selected = ESCALATION_OPTIONS.find(o => o.key === choice)
+    const needsDetail = !!selected?.requires && detail.trim().length < 3
+    return (
+      <div className="act">
+        <label>QA could not get this through{grant?.attempts ? ` after ${grant.attempts} attempts` : ''}</label>
+        {esc?.summary && <p style={{ margin: 0, fontSize: 12.5 }}>{esc.summary}</p>}
+        {esc?.root_cause && <div className="why">Why it keeps failing: {esc.root_cause}</div>}
+
+        <label htmlFor={`opt-${grant!.id}`}>Your decision</label>
+        <select id={`opt-${grant!.id}`} value={choice} onChange={ev => setChoice(ev.target.value)}>
+          <option value="">Choose one</option>
+          {ESCALATION_OPTIONS.map(o => (
+            <option key={o.key} value={o.key}>
+              {o.label}{o.key === esc?.recommended_option ? ' (recommended)' : ''}
+            </option>
+          ))}
+        </select>
+        {selected && (
+          <>
+            <p style={{ margin: 0, fontSize: 12 }}>{selected.whatHappens}</p>
+            {selected.requires && (
+              <>
+                <label htmlFor={`d-${grant!.id}`}>{selected.requires.label}</label>
+                <textarea
+                  id={`d-${grant!.id}`}
+                  value={detail}
+                  placeholder={selected.requires.placeholder}
+                  onChange={ev => setDetail(ev.target.value)}
+                />
+              </>
+            )}
+          </>
+        )}
+        <div className="row">
+          <button
+            className="btn primary"
+            disabled={busy || !choice || needsDetail}
+            onClick={() => post('/api/funding/escalation',
+              { opportunityId: grant!.id, option: choice, detail: detail.trim() },
+              'Decision recorded.')}
+          >
+            {busy ? 'Working' : 'Record this decision'}
+          </button>
+        </div>
+        {error && <div className="src warn">{error}</div>}
+        {links}
+      </div>
+    )
+  }
+
+  if (atApproval) {
+    return (
+      <div className="act">
+        <label>This has passed QA and is waiting on you</label>
+        <label htmlFor={`note-${grant!.id}`}>Note, required to send it back</label>
+        <textarea
+          id={`note-${grant!.id}`}
+          value={detail}
+          placeholder="Lead with the reading results from last spring. The draft buries them."
+          onChange={ev => setDetail(ev.target.value)}
+        />
+        <div className="row">
+          <button
+            className="btn primary"
+            disabled={busy}
+            onClick={() => post('/api/funding/opportunities',
+              { id: grant!.id, narrative_status: 'ready' },
+              'Approved. It is ready to go to the school.')}
+          >
+            {busy ? 'Working' : 'Approve and release'}
+          </button>
+          <button
+            className="btn"
+            disabled={busy || detail.trim().length < 3}
+            onClick={() => post('/api/funding/opportunities',
+              { id: grant!.id, narrative_status: 'requested', redraft_guidance: detail.trim() },
+              'Sent back to the writer with your note.')}
+          >
+            Send back with your direction
+          </button>
+        </div>
+        {error && <div className="src warn">{error}</div>}
+        {links}
+      </div>
+    )
+  }
+
+  // Nothing on this entry is a decision, so it only has to lead somewhere.
+  return <div className="act">{links}</div>
+}
+
+/**
+ * The email that carries a finished application to a school.
+ *
+ * Approving a narrative already writes this into the Outreach Queue, which is
+ * the only door a funding email may leave by. What was missing was any way to
+ * read it, correct it, check the packet link it carries, and let it go, without
+ * walking over to the board.
+ *
+ * Sending is the queue's own approve path, with the edited wording passed
+ * through, so the allowlist, the one-email-per-person rule and the chases that
+ * follow all behave exactly as they did.
+ */
+function DraftToSend({ draft, docUrl, busy, error, onSend, links }: {
+  draft: Draft
+  docUrl: string | null
+  busy: boolean
+  error: string | null
+  onSend: (subject: string, body: string) => void
+  links: React.ReactNode
+}) {
+  const [subject, setSubject] = useState(draft.subject)
+  const [body, setBody] = useState(draft.body)
+
+  // The send gate already calls this a hard block: an application email with no
+  // application is a promise of a package above a blank line. Its enforcement
+  // flag is off, so the gate would let it through. This will not.
+  const missingPacket = draft.emailType === 'submission_instructions' && !docUrl
+
+  return (
+    <div className="act">
+      <label>Ready to send to {draft.toName || draft.toEmail}</label>
+      <div className="why">To: {draft.toEmail}</div>
+
+      {/* Confirm the packet is linked before it goes, which is the whole
+          reason this is here rather than behind a send button elsewhere. */}
+      {docUrl ? (
+        <div className="why">
+          Packet:{' '}
+          <a href={docUrl} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'underline' }}>
+            open it and check it reads right
+          </a>
+        </div>
+      ) : (
+        <div className="src warn">
+          {missingPacket
+            ? 'This grant has no packet document, and this email promises one. It would reach the school saying "here is your application package" above a blank line, so it cannot be sent until the document exists.'
+            : 'This grant has no packet document on it.'}
+        </div>
+      )}
+
+      {draft.warnings?.length > 0 && (
+        <div className="src warn">Our own wording is still in here: {draft.warnings.join(', ')}</div>
+      )}
+
+      <label htmlFor={`sub-${draft.id}`}>Subject</label>
+      <input id={`sub-${draft.id}`} value={subject} onChange={e => setSubject(e.target.value)} />
+
+      <label htmlFor={`body-${draft.id}`}>Email, edit it if it needs it</label>
+      <textarea
+        id={`body-${draft.id}`}
+        value={body}
+        onChange={e => setBody(e.target.value)}
+        style={{ minHeight: 220 }}
+      />
+
+      {draft.blockedReason && <div className="src warn">{draft.blockedReason}</div>}
+
+      <div className="row">
+        <button
+          className="btn primary"
+          disabled={busy || missingPacket || !!draft.blockedReason || !subject.trim() || !body.trim()}
+          onClick={() => onSend(subject.trim(), body.trim())}
+        >
+          {busy ? 'Sending' : 'Send it'}
+        </button>
+      </div>
+      {error && <div className="src warn">{error}</div>}
+      {links}
+    </div>
   )
 }

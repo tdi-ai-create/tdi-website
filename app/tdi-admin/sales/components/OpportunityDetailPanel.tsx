@@ -5,6 +5,9 @@ import { PanelHeader } from './panel/PanelHeader'
 import { ContractsTab } from './panel/ContractsTab'
 import { IntelligenceTab } from './panel/IntelligenceTab'
 import { MuckBar, type MuckPanelScore } from './panel/MuckBar'
+import { FollowupBar } from './panel/FollowupBar'
+import type { Followup } from '@/lib/sales/followup'
+import { SALES_TEAM, teamLabel } from '@/lib/sales/team'
 
 export interface OppNote {
   id: string
@@ -60,6 +63,17 @@ export interface FullOpportunity {
   notes_list?: OppNote[]
   related_records?: RelatedRecord[]
   activity?: OppActivity[]
+  /** Confirmed, never predicted: 25 of the 100 muck points ride on this. */
+  grant_support?: boolean | null
+  /** The board and the scorer both filter on this. Wrong year means invisible. */
+  school_year?: string | null
+  /** The live follow-up alert. Written by /followup, never by PATCH. */
+  followup_text?: string | null
+  followup_kind?: string | null
+  followup_owner?: string | null
+  followup_due?: string | null
+  followup_set_by?: string | null
+  followup_set_at?: string | null
   // Optional fields pending DB migration
   [key: string]: unknown
 }
@@ -85,7 +99,14 @@ const STAGE_OPTIONS = [
   { id: 'proposal_sent', name: 'Proposal Sent (80%)' },
   { id: 'signed', name: 'Signed (95%)' },
   { id: 'paid', name: 'Paid (100%)' },
-  { id: 'lost', name: 'Lost' },
+  // No "Lost". The pipeline rule is that a lead is never marked lost: in K-12 a
+  // no is almost always a not-this-budget-year, and "Not this year" in the
+  // footer is what replaced it, writing a reason and a return date and moving
+  // the lead to engaged. Leaving the option in the dropdown meant the rule
+  // could be broken with one click, which is what was happening.
+  //
+  // The stage still exists in the database and in STAGE_PROBABILITY below, so
+  // any historical row carrying it still renders. It just cannot be chosen.
 ]
 
 const STAGE_PROBABILITY: Record<string, number> = {
@@ -123,6 +144,14 @@ function defaultRevisitDate(): string {
   return d.toISOString().slice(0, 10)
 }
 
+/** One colour per person on the roster. Grey for anyone not on it. */
+const NOTE_AUTHOR_COLOR: Record<string, string> = {
+  'rae@teachersdeserveit.com': '#C9A84C',
+  'hello@teachersdeserveit.com': '#7C3AED',
+  'kristin@whatwilllast.com': '#059669',
+  'jim@teachersdeserveit.com': '#3B82F6',
+}
+
 const TYPE_BADGE_COLORS: Record<string, { bg: string; color: string }> = {
   system: { bg: '#2A9D8F', color: 'white' },
   meeting: { bg: '#7C3AED', color: 'white' },
@@ -140,10 +169,20 @@ interface Props {
   onUpdate: (id: string, changes: Partial<FullOpportunity>) => void
   onDelete?: (id: string) => void
   showToast: (message: string, type: 'success' | 'error') => void
+  /**
+   * Ask the board to re-read /api/sales/muck.
+   *
+   * Muck is computed board-wide and fetched once on load, and the value it
+   * returns is what this panel displays. So editing a deal value wrote the new
+   * number to the database and then went on showing the old one, on both the
+   * panel and the card, until a full page reload. Rae hit this on Morenci on 24
+   * September 2026 and reasonably read it as the field refusing to save.
+   */
+  onMuckStale?: () => void
 }
 
 export function OpportunityDetailPanel({
-  muck, opportunityId, onClose, onUpdate, onDelete, showToast }: Props) {
+  muck, opportunityId, onClose, onUpdate, onDelete, showToast, onMuckStale }: Props) {
   const [opp, setOpp] = useState<FullOpportunity | null>(null)
   const [loading, setLoading] = useState(false)
   const [fetchError, setFetchError] = useState('')
@@ -160,6 +199,9 @@ export function OpportunityDetailPanel({
   // Right column: inline editing state
   const [editingValue, setEditingValue] = useState(false)
   const [valueInput, setValueInput] = useState('')
+  // Set once the value is edited in this session, cleared when the panel opens
+  // another lead. See the comment on `shownValue`.
+  const [valueJustEdited, setValueJustEdited] = useState(false)
 
   // Intelligence collapsible
   const [intelOpen, setIntelOpen] = useState(false)
@@ -197,7 +239,15 @@ export function OpportunityDetailPanel({
   const [pEnd, setPEnd] = useState('')
 
   useEffect(() => {
-    if (!opportunityId) { setOpp(null); return }
+    // Closing clears the lead AND the marker saying which lead is loaded.
+    //
+    // It used to clear only the lead. So closing a record and opening the same
+    // record again left `opp` null while `prevIdRef` still held its id, the
+    // guard below decided nothing had changed, `loadOpp` never ran, and the
+    // panel rendered as a blank white sheet with no error and no spinner. The
+    // only way out was to open a different lead first. Found by pressing it on
+    // production, 24 September 2026.
+    if (!opportunityId) { setOpp(null); prevIdRef.current = null; return }
     if (opportunityId !== prevIdRef.current) {
       prevIdRef.current = opportunityId
       loadOpp(opportunityId)
@@ -217,6 +267,8 @@ export function OpportunityDetailPanel({
     setFetchError('')
     setLinkedPartnership(null)
     setPartnershipCreated(false)
+    // A different lead gets the board-wide score again, not the last one's edit.
+    setValueJustEdited(false)
     try {
       const res = await fetch(`/api/sales/opportunities/${id}`)
       if (!res.ok) throw new Error('Failed to load opportunity')
@@ -277,6 +329,9 @@ export function OpportunityDetailPanel({
       const updated = await res.json()
       setOpp(o => o ? { ...o, ...updated } : o)
       onUpdate(opp.id, changes)
+      // These four are the model's inputs. Change one and every muck number on
+      // screen, here and on the card, is stale until the board re-reads it.
+      if (['value', 'offering', 'stage', 'state', 'grant_support'].some(k => k in changes)) onMuckStale?.()
       return true
     } catch {
       setOpp(prev)
@@ -327,16 +382,22 @@ export function OpportunityDetailPanel({
     setEditingValue(false)
     const parsed = parseInt(valueInput.replace(/[^0-9]/g, ''), 10)
     if (!isNaN(parsed) && parsed !== opp?.value) {
+      setValueJustEdited(true)
       patchOpp({ value: parsed })
     }
   }
 
+  /**
+   * Who wrote it, by colour.
+   *
+   * Matched against the roster rather than by testing whether the address
+   * contains "rae" or "jim". Bella writes from hello@teachersdeserveit.com and
+   * Kristin from kristin@whatwilllast.com, and neither substring test would
+   * have found either of them.
+   */
   function getNoteBarColor(note: OppNote): string {
     if (note.note_type === 'system') return '#2A9D8F'
-    const email = note.author_email.toLowerCase()
-    if (email.includes('rae')) return '#C9A84C'
-    if (email.includes('jim')) return '#3B82F6'
-    return '#9CA3AF'
+    return NOTE_AUTHOR_COLOR[note.author_email.toLowerCase().trim()] ?? '#9CA3AF'
   }
 
   async function markWon() {
@@ -436,7 +497,18 @@ export function OpportunityDetailPanel({
   const prob = opp ? (STAGE_PROBABILITY[opp.stage] ?? 0) : 0
   // Until a contract exists the deal value is a prediction, so this tile shows
   // the same figure the card and the pipeline headline show.
-  const shownValue = muck?.value ?? opp?.value ?? null
+  /**
+   * Which number to show.
+   *
+   * Muck's figure, normally: it falls back to list price where a recorded value
+   * contradicts the offering, and that correction is the point of it. But the
+   * board fetches muck once, so straight after an edit `muck.value` is the OLD
+   * number while `opp.value` is what was just saved. Preferring the freshly
+   * saved value for the rest of the session stops the panel arguing with the
+   * person typing into it. `onMuckStale` re-reads the model right behind this,
+   * so the correction still lands, a moment later, on a number that exists.
+   */
+  const shownValue = valueJustEdited ? (opp?.value ?? null) : (muck?.value ?? opp?.value ?? null)
   const valuePredicted = Boolean(muck?.valuePredicted)
   const factored = shownValue ? Math.round(shownValue * prob / 100) : null
   const o = opp as any
@@ -499,6 +571,37 @@ export function OpportunityDetailPanel({
 
             {/* Muck breakdown. Replaces the retired T1 fit score bar. */}
             <MuckBar score={muck ?? null} />
+
+            {/* What is owed on this lead next, and who owes it. Above the notes
+                because it is an instruction, not a record. */}
+            <FollowupBar
+              opportunityId={opp.id}
+              followup={{
+                text: opp.followup_text ?? null,
+                kind: opp.followup_kind ?? null,
+                owner: opp.followup_owner ?? null,
+                due: opp.followup_due ?? null,
+                setBy: opp.followup_set_by ?? null,
+                setAt: opp.followup_set_at ?? null,
+              }}
+              onSaved={(next: Followup) => {
+                const changes = {
+                  followup_text: next.text,
+                  followup_kind: next.kind,
+                  followup_owner: next.owner,
+                  followup_due: next.due,
+                  followup_set_by: next.setBy,
+                  followup_set_at: next.setAt,
+                }
+                setOpp(o => o ? { ...o, ...changes } : o)
+                onUpdate(opp.id, changes)
+                // The route writes the note server side, so the timeline on
+                // screen is now one note short. Re-read rather than guess at
+                // what it wrote.
+                void loadOpp(opp.id)
+              }}
+              showToast={showToast}
+            />
 
             {/* Two-column body */}
             <div style={{ display: 'flex', flex: 1, minHeight: 0, overflow: 'hidden' }}>
@@ -650,6 +753,13 @@ export function OpportunityDetailPanel({
                           {STAGE_OPTIONS.map(s => (
                             <option key={s.id} value={s.id}>{s.name}</option>
                           ))}
+                          {/* A historical row already sitting on a retired
+                              stage still has to render its own value, or the
+                              select silently shows the first option and the
+                              next save moves the lead somewhere nobody chose. */}
+                          {!STAGE_OPTIONS.some(o => o.id === opp.stage) && (
+                            <option value={opp.stage}>{opp.stage}</option>
+                          )}
                         </select>
                       </div>
                       {/* Factored */}
@@ -797,17 +907,109 @@ export function OpportunityDetailPanel({
                     </span>
                   </div>
 
+                  {/* School year.
+                      The board and the muck scorer both filter on this, so a
+                      lead carrying the wrong year is simply not on the board
+                      and nothing says why. It had no control anywhere, so the
+                      only fix was a SQL update. */}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+                    <span style={{ fontSize: 12, color: '#6B7280' }} title="Which school year this deal belongs to. The board only shows the current year, so changing this can make a lead disappear from it.">School year</span>
+                    <select
+                      key={`school_year-${opp.id}`}
+                      defaultValue={(opp.school_year as string | null) ?? ''}
+                      onChange={e => patchOpp({ school_year: e.target.value || null } as Partial<FullOpportunity>)}
+                      style={{ fontSize: 12, color: '#374151', border: '1px solid #E5E7EB', borderRadius: 6, padding: '3px 8px', background: 'white', outline: 'none' }}
+                    >
+                      <option value="">Not set</option>
+                      <option value="2025-26">2025-26</option>
+                      <option value="2026-27">2026-27 (current)</option>
+                      <option value="2027-28">2027-28</option>
+                    </select>
+                  </div>
+
+                  {/* Contact, not a deal.
+                      Takes a record off the board without deleting it, which is
+                      what a person who books a call with no district and no
+                      title actually needs. The column was already writable; no
+                      screen offered it. */}
+                  <div style={{ marginBottom: 10, paddingBottom: 10, borderBottom: '1px solid #F3F4F6' }}>
+                    <label style={{ display: 'flex', alignItems: 'flex-start', gap: 8, cursor: 'pointer' }}>
+                      <input
+                        type="checkbox"
+                        checked={Boolean(opp.is_contact_only)}
+                        onChange={e => patchOpp({ is_contact_only: e.target.checked } as Partial<FullOpportunity>)}
+                        style={{ marginTop: 2, width: 14, height: 14, cursor: 'pointer', accentColor: '#2A9D8F' }}
+                      />
+                      <span>
+                        <span style={{ fontSize: 12, color: '#374151', fontWeight: 600, display: 'block' }}>
+                          This is a person, not a deal
+                        </span>
+                        <span style={{ fontSize: 11, color: '#9CA3AF', display: 'block', lineHeight: 1.4 }}>
+                          Takes it off the board and out of every total without deleting anything. Use it
+                          for a contact with no school behind them yet.
+                        </span>
+                      </span>
+                    </label>
+                  </div>
+
+                  {/* Grant funding.
+
+                      Grant is 25 of the 100 muck points and until now there was
+                      no way to set it from any screen a person can reach. The
+                      only path was dragging a card into Signed with Grant,
+                      which also changes the stage, so an unsigned lead could
+                      never carry it. Measured on 24 September 2026: 4 leads of
+                      213 had it set and 3 of those were already signed, which
+                      means a quarter of the model was a constant.
+
+                      A checkbox for it did exist, in panel/DetailsTab.tsx.
+                      Nothing imported that file. It is deleted in this change
+                      rather than left sitting there for the next person to
+                      edit by mistake. */}
+                  <div style={{ marginBottom: 10, paddingBottom: 10, borderBottom: '1px solid #F3F4F6' }}>
+                    <label style={{ display: 'flex', alignItems: 'flex-start', gap: 8, cursor: 'pointer' }}>
+                      <input
+                        type="checkbox"
+                        checked={Boolean(opp.grant_support)}
+                        onChange={e => patchOpp({ grant_support: e.target.checked } as Partial<FullOpportunity>)}
+                        style={{ marginTop: 2, width: 14, height: 14, cursor: 'pointer', accentColor: '#2A9D8F' }}
+                      />
+                      <span>
+                        <span style={{ fontSize: 12, color: '#374151', fontWeight: 600, display: 'block' }}>
+                          This school needs grant funding
+                        </span>
+                        <span style={{ fontSize: 11, color: '#9CA3AF', display: 'block', lineHeight: 1.4 }}>
+                          Tick this only once somebody has said so. It adds 25 muck points and moves the lead
+                          up the outreach queue, so a guess here changes what everyone calls first.
+                        </span>
+                      </span>
+                    </label>
+                  </div>
+
                   {/* Assigned to */}
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
                     <span style={{ fontSize: 12, color: '#6B7280' }}>Assigned to</span>
                     <select
+                      // Keyed by lead: a bare defaultValue kept showing the
+                      // previous lead's owner when the panel switched records.
+                      key={`assigned-${opp.id}`}
                       defaultValue={opp.assigned_to_email ?? ''}
                       onChange={e => patchOpp({ assigned_to_email: e.target.value || null })}
                       style={{ fontSize: 12, color: '#374151', border: '1px solid #E5E7EB', borderRadius: 6, padding: '3px 8px', background: 'white', outline: 'none' }}
                     >
                       <option value="">Unassigned</option>
-                      <option value="rae@teachersdeserveit.com">Rae</option>
-                      <option value="jim@teachersdeserveit.com">Jim</option>
+                      {SALES_TEAM.map(m => (
+                        <option key={m.email} value={m.email}>{m.label}</option>
+                      ))}
+                      {/* An assignee that is not on the roster is kept as an
+                          option so the dropdown cannot silently rewrite one to
+                          Unassigned just by being opened. No live lead has one
+                          today; 79 rows with a junk id from an old import are
+                          all soft deleted. */}
+                      {opp.assigned_to_email &&
+                        !SALES_TEAM.some(m => m.email === opp.assigned_to_email) && (
+                        <option value={opp.assigned_to_email}>{opp.assigned_to_email}</option>
+                      )}
                     </select>
                   </div>
                 </div>
@@ -1148,7 +1350,7 @@ function NoteCardInline({ note, barColor, onDelete }: { note: OppNote; barColor:
       <div style={{ padding: '10px 14px', flex: 1, minWidth: 0 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
           <span style={{ fontSize: 12, fontWeight: 700, color: '#374151', textTransform: 'capitalize' }}>
-            {note.note_type === 'system' ? 'System' : note.author_email.split('@')[0]}
+            {note.note_type === 'system' ? 'System' : teamLabel(note.author_email)}
           </span>
           <span style={{
             fontSize: 10, padding: '2px 8px', borderRadius: 20, fontWeight: 600,

@@ -204,6 +204,19 @@ export function buildCalendar(input: CalendarInput): CalendarEntry[] {
       });
     }
 
+    // An escalated narrative is waiting on a person in exactly the way an
+    // approval is, and it was the only such state with nothing on the calendar.
+    // QA has given up, the grant cannot move, and until now that showed up only
+    // if an action item happened to exist alongside it.
+    if (o.narrative_status === 'escalated') {
+      const when = plusHours(since, BELLA_SILENCE_HOURS);
+      if (when) out.push({
+        id: `pred-escalate-${o.id}`, date: when, kind: 'decide', confirmed: false,
+        label: `${short(o.name, 22)} needs your decision`, ...school,
+        derivation: `QA could not get this through and stopped on ${String(since).slice(0, 10)}. ${hoursWord(BELLA_SILENCE_HOURS)} is the allowance before it reads as stuck. Nothing moves until somebody chooses.`,
+      });
+    }
+
     if (o.narrative_status === 'ready' && !['applied', 'submitted'].includes(o.status) && o.client_submitted !== true) {
       const when = plusHours(since, SEND_SILENCE_HOURS);
       if (when) out.push({
