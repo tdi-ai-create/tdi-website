@@ -89,6 +89,7 @@ interface School {
   grantsWon: number
   grantsWonWithoutAnAmount: number
   livePaths: number
+  inFlight: number
   grants: AwardedRow[]
 }
 
@@ -419,6 +420,31 @@ export default function FundingHome() {
                          {s.goal !== null && <span className="of">of {money(s.goal)}</span>}</>}
                   </div>
                   <div className="bar"><i style={{ width: `${pct}%` }} /></div>
+
+                  {/* The three figures, kept as three because they answer
+                      different questions and one number cannot. Won is what
+                      landed. Still to find is the gap against the plan. In
+                      flight is the ask on everything still being written, and
+                      it is not money, it is what we are currently trying for. */}
+                  <div className="money-row">
+                    <div>
+                      <div className="money-k">Won</div>
+                      <div className="money-v">
+                        {s.earned === null ? 'none recorded' : money(s.earned)}
+                      </div>
+                    </div>
+                    <div>
+                      <div className="money-k">Still to find</div>
+                      <div className="money-v">
+                        {s.goal === null ? 'no plan value' : money(Math.max(0, s.goal - (s.earned ?? 0)))}
+                      </div>
+                    </div>
+                    <div>
+                      <div className="money-k">Writing for</div>
+                      <div className="money-v">{money(s.inFlight)}</div>
+                    </div>
+                  </div>
+
                   <div className="meta">
                     <span><b>{s.livePaths}</b> live paths</span>
                     <span><b>{s.grantsWon}</b> won</span>

@@ -93,6 +93,12 @@ export async function GET() {
       livePaths: mine.filter(o => isLive(o.status)).length,
       // The rows the Awarded view needs. Returned here rather than fetched per
       // school the way the board does it, which was one request per pursuit.
+      // What we are chasing right now: the ask on every path still in play.
+      // Kept apart from `goal`, which is what the school set out to raise, and
+      // from `earned`, which is what actually landed.
+      inFlight: mine
+        .filter(o => isLive(o.status))
+        .reduce((sum, o) => sum + (o.amount === null ? 0 : Number(o.amount)), 0),
       grants: mine.map(o => ({
         id: o.id,
         name: o.name,
