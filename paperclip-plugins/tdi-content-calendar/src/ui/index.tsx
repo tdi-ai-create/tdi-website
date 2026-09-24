@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import {
   usePluginAction,
   usePluginData,
@@ -325,6 +325,27 @@ const SEND_BACK_REASONS: Array<{ label: string; text: string }> = [
  */
 const HUB_SITE = "https://www.teachersdeserveit.com";
 
+/**
+ * One look for every field on the page.
+ *
+ * Selects, inputs and textareas inherit their text colour from the board shell,
+ * which is dark, while every card they sit on here is white. Left alone they
+ * render white on white: on 24 September the channel and audience pickers both
+ * showed a blank box with an arrow, and the purpose line looked empty however
+ * much you typed into it. Stating background and colour on the control itself
+ * means a field is readable wherever it is dropped, without depending on what a
+ * parent happens to set.
+ */
+const FIELD: CSSProperties = {
+  padding: "7px 8px",
+  border: "1px solid #D8DDE3",
+  borderRadius: 4,
+  background: "#fff",
+  color: "#1E2749",
+  colorScheme: "light",
+  font: "inherit",
+};
+
 function ymd(y: number, m: number, d: number) {
   return `${y}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
 }
@@ -526,6 +547,8 @@ export function ContentCalendarPage(_props: PluginWidgetProps) {
    */
   const queuePanelRef = useRef<HTMLDivElement | null>(null);
   const hubPanelRef = useRef<HTMLDivElement | null>(null);
+  const slotPanelRef = useRef<HTMLDivElement | null>(null);
+  const slotPurposeRef = useRef<HTMLInputElement | null>(null);
 
   /**
    * Which piece is being dragged, and which day is under it.
@@ -663,6 +686,24 @@ export function ContentCalendarPage(_props: PluginWidgetProps) {
     if (!openHubId) return;
     hubPanelRef.current?.scrollIntoView({ block: "start" });
   }, [openHubId]);
+
+  /*
+   * The same fix the piece panel got on 21 September, for the same reason in the
+   * other direction. "Plan something" sits in a day square down in the grid, and
+   * the form it opens renders above the grid. Clicking a day near the bottom of
+   * a five-week month opened the form somewhere off the top of the screen and
+   * left the page exactly where it was, so the button read as dead. Kristin, 24
+   * September: "plan something buttons in a day aren't working." They were
+   * working. Nothing ever scrolled her to the result.
+   *
+   * Focus moves with the scroll so a keyboard lands in the form too, and so the
+   * jump has something to point at when it arrives.
+   */
+  useEffect(() => {
+    if (!slotDay) return;
+    slotPanelRef.current?.scrollIntoView({ block: "center" });
+    slotPurposeRef.current?.focus({ preventScroll: true });
+  }, [slotDay]);
   const hubByDay = useMemo(() => {
     const map = new Map<string, HubItem[]>();
     for (const h of hubItems) {
@@ -822,11 +863,34 @@ export function ContentCalendarPage(_props: PluginWidgetProps) {
   if (error) return <div style={{ padding: 24, color: "#9E3B3B" }}>Could not read the queue: {error.message}</div>;
 
   return (
-    <div style={{ padding: 24, maxWidth: 1200, margin: "0 auto", fontSize: 14 }}>
+    <div style={{
+      padding: 24, maxWidth: 1200, margin: "0 auto", fontSize: 14,
+      /*
+       * The board shell around this plugin is dark and hands down a near-white
+       * `color`. Every surface in here is a light card, so any text that did not
+       * name its own colour arrived white on white: draft bodies, card titles,
+       * the mix-strip counts, Cancel. Kristin, 24 September: "white text in a
+       * white box, can't read unless I highlight."
+       *
+       * Naming the base colour once here fixes every one of those at the same
+       * time, and it is safe to do: every dark-background element below already
+       * sets color: "#fff" explicitly rather than leaning on what it inherits,
+       * so nothing flips the other way.
+       */
+      color: "#1E2749",
+      /*
+       * Native selects, inputs and textareas take their text, caret and dropdown
+       * from the colour scheme rather than from `color`, so they stay unreadable
+       * on a light card without this even once `color` is set.
+       */
+      colorScheme: "light",
+    }}>
       <h1 style={{ fontSize: 24, fontWeight: 600, margin: "0 0 4px" }}>Content calendar</h1>
       <p style={{ color: "#5A6472", margin: "0 0 16px", maxWidth: "72ch" }}>
         Every channel, by month. Planned work sits on the day it is planned for; work that went out
         sits on the day it went out. Open a piece to read it and decide, here, without leaving the board.
+        Drag a piece to another day to move it, including one already sitting on a day. Work that has
+        already gone out will not move: its date is a record of what happened, not a plan.
       </p>
 
       {data && data.statesMissed.length > 0 && (
@@ -910,27 +974,27 @@ export function ContentCalendarPage(_props: PluginWidgetProps) {
       )}
 
       {slotDay && (
-        <div style={{ marginBottom: 12, padding: 14, borderRadius: 6, border: "1px solid #80A4ED", background: "#fff" }}>
-          <div style={{ marginBottom: 10, fontWeight: 600 }}>Plan something for {slotDay}</div>
+        <div ref={slotPanelRef} style={{ marginBottom: 12, padding: 14, borderRadius: 6, border: "1px solid #80A4ED", background: "#fff", color: "#1E2749" }}>
+          <div style={{ marginBottom: 10, fontWeight: 600, color: "#1E2749" }}>Plan something for {slotDay}</div>
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
             <label style={{ color: "#5A6472" }}>Channel</label>
             <select value={slotChannel} onChange={(e) => setSlotChannel(e.target.value)}
-              style={{ padding: "7px 8px", border: "1px solid #D8DDE3", borderRadius: 4 }}>
+              style={FIELD}>
               {PLANNABLE.map((k) => <option key={k} value={k}>{CHANNEL[k].label}</option>)}
             </select>
 
             <label style={{ color: "#5A6472" }}>For</label>
             <select value={slotAudience} onChange={(e) => setSlotAudience(e.target.value)}
-              style={{ padding: "7px 8px", border: "1px solid #D8DDE3", borderRadius: 4 }}>
+              style={FIELD}>
               <option value="teacher">teachers</option>
               <option value="decision_maker">district leaders</option>
               <option value="founder_network">Rae's own network</option>
             </select>
           </div>
 
-          <input value={slotPurpose} onChange={(e) => setSlotPurpose(e.target.value)}
+          <input ref={slotPurposeRef} value={slotPurpose} onChange={(e) => setSlotPurpose(e.target.value)}
             placeholder="What is it for? One line is enough."
-            style={{ width: "100%", padding: 8, border: "1px solid #D8DDE3", borderRadius: 4, margin: "10px 0" }} />
+            style={{ ...FIELD, width: "100%", padding: 8, margin: "10px 0" }} />
 
           <div style={{ display: "flex", gap: 8 }}>
             <button disabled={busy}
@@ -948,7 +1012,7 @@ export function ContentCalendarPage(_props: PluginWidgetProps) {
               Add it
             </button>
             <button onClick={() => { setSlotDay(null); setSlotPurpose(""); }}
-              style={{ padding: "8px 16px", borderRadius: 4, border: "1px solid #D8DDE3", background: "#fff", cursor: "pointer" }}>
+              style={{ padding: "8px 16px", borderRadius: 4, border: "1px solid #D8DDE3", background: "#fff", color: "#1E2749", cursor: "pointer" }}>
               Cancel
             </button>
           </div>
@@ -1085,9 +1149,12 @@ export function ContentCalendarPage(_props: PluginWidgetProps) {
         <div style={{ marginTop: 20, border: "1px solid #96631A", borderRadius: 6, background: "#FFFDF8", padding: 14 }}>
           <strong>Hub work finished with nowhere to go ({hubUnplaced.length})</strong>
           <p style={{ color: "#5A6472", margin: "4px 0 10px", maxWidth: "72ch" }}>
-            These cleared review and have no release date, so they sit on no day
-            and appear in no month. Drafts are not counted here: work nobody has
-            finished yet is not a problem.
+            A Quick Win is a one-page resource on the Hub, written for educators
+            and published there rather than posted to a channel, which is why
+            these run on their own pipeline and not through the queue above.
+            These ones cleared review and have no release date, so they sit on no
+            day and appear in no month. Drafts are not counted here: work nobody
+            has finished yet is not a problem.
           </p>
           <div style={{ display: "grid", gap: 8 }}>
             {hubUnplaced.map((q) => (
@@ -1197,7 +1264,7 @@ export function ContentCalendarPage(_props: PluginWidgetProps) {
 
             <textarea value={note} onChange={(e) => setNote(e.target.value)} rows={3}
               placeholder={held ? "If you are holding it, say why. Required." : "A note for the record. Optional."}
-              style={{ width: "100%", padding: 8, border: "1px solid #D8DDE3", borderRadius: 4, margin: "12px 0 10px" }} />
+              style={{ ...FIELD, width: "100%", padding: 8, margin: "12px 0 10px" }} />
 
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
               {held && (
@@ -1357,7 +1424,7 @@ export function ContentCalendarPage(_props: PluginWidgetProps) {
               </div>
               <textarea value={note} onChange={(e) => setNote(e.target.value)} rows={3}
                 placeholder="If you are sending it back, say what to change. Required."
-                style={{ width: "100%", padding: 8, border: "1px solid #D8DDE3", borderRadius: 4, marginBottom: 10 }} />
+                style={{ ...FIELD, width: "100%", padding: 8, marginBottom: 10 }} />
               <div style={{ fontSize: 12, color: "#7A8494", margin: "0 0 10px" }}>
                 A reason starts the note. The useful half is usually what you add after it.
               </div>
@@ -1385,7 +1452,7 @@ export function ContentCalendarPage(_props: PluginWidgetProps) {
               <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
                 <label htmlFor="cc-when" style={{ color: "#5A6472" }}>Goes out</label>
                 <input id="cc-when" type="date" value={when} onChange={(e) => setWhen(e.target.value)}
-                  style={{ padding: "7px 8px", border: "1px solid #D8DDE3", borderRadius: 4 }} />
+                  style={FIELD} />
                 <button disabled={busy || !when || when === open.scheduled_for} onClick={() => void act("schedule")}
                   style={{
                     padding: "8px 16px", borderRadius: 4, border: "none",

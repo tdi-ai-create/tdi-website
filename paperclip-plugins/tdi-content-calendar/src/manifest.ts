@@ -13,7 +13,7 @@ import type { PaperclipPluginManifestV1 } from "@paperclipai/plugin-sdk";
 const manifest: PaperclipPluginManifestV1 = {
   id: "tdi-content-calendar",
   apiVersion: 1,
-  version: "0.9.0",
+  version: "0.9.1",
   displayName: "Content calendar",
   description:
     "Plan and approve TDI content by month, on the board, without leaving Paperclip.",
