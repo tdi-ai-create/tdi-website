@@ -5,6 +5,9 @@ import { PanelHeader } from './panel/PanelHeader'
 import { ContractsTab } from './panel/ContractsTab'
 import { IntelligenceTab } from './panel/IntelligenceTab'
 import { MuckBar, type MuckPanelScore } from './panel/MuckBar'
+import { FollowupBar } from './panel/FollowupBar'
+import type { Followup } from '@/lib/sales/followup'
+import { SALES_TEAM } from '@/lib/sales/team'
 
 export interface OppNote {
   id: string
@@ -60,6 +63,13 @@ export interface FullOpportunity {
   notes_list?: OppNote[]
   related_records?: RelatedRecord[]
   activity?: OppActivity[]
+  /** The live follow-up alert. Written by /followup, never by PATCH. */
+  followup_text?: string | null
+  followup_kind?: string | null
+  followup_owner?: string | null
+  followup_due?: string | null
+  followup_set_by?: string | null
+  followup_set_at?: string | null
   // Optional fields pending DB migration
   [key: string]: unknown
 }
@@ -140,10 +150,20 @@ interface Props {
   onUpdate: (id: string, changes: Partial<FullOpportunity>) => void
   onDelete?: (id: string) => void
   showToast: (message: string, type: 'success' | 'error') => void
+  /**
+   * Ask the board to re-read /api/sales/muck.
+   *
+   * Muck is computed board-wide and fetched once on load, and the value it
+   * returns is what this panel displays. So editing a deal value wrote the new
+   * number to the database and then went on showing the old one, on both the
+   * panel and the card, until a full page reload. Rae hit this on Morenci on 24
+   * September 2026 and reasonably read it as the field refusing to save.
+   */
+  onMuckStale?: () => void
 }
 
 export function OpportunityDetailPanel({
-  muck, opportunityId, onClose, onUpdate, onDelete, showToast }: Props) {
+  muck, opportunityId, onClose, onUpdate, onDelete, showToast, onMuckStale }: Props) {
   const [opp, setOpp] = useState<FullOpportunity | null>(null)
   const [loading, setLoading] = useState(false)
   const [fetchError, setFetchError] = useState('')
@@ -160,6 +180,9 @@ export function OpportunityDetailPanel({
   // Right column: inline editing state
   const [editingValue, setEditingValue] = useState(false)
   const [valueInput, setValueInput] = useState('')
+  // Set once the value is edited in this session, cleared when the panel opens
+  // another lead. See the comment on `shownValue`.
+  const [valueJustEdited, setValueJustEdited] = useState(false)
 
   // Intelligence collapsible
   const [intelOpen, setIntelOpen] = useState(false)
@@ -217,6 +240,8 @@ export function OpportunityDetailPanel({
     setFetchError('')
     setLinkedPartnership(null)
     setPartnershipCreated(false)
+    // A different lead gets the board-wide score again, not the last one's edit.
+    setValueJustEdited(false)
     try {
       const res = await fetch(`/api/sales/opportunities/${id}`)
       if (!res.ok) throw new Error('Failed to load opportunity')
@@ -277,6 +302,9 @@ export function OpportunityDetailPanel({
       const updated = await res.json()
       setOpp(o => o ? { ...o, ...updated } : o)
       onUpdate(opp.id, changes)
+      // These four are the model's inputs. Change one and every muck number on
+      // screen, here and on the card, is stale until the board re-reads it.
+      if (['value', 'offering', 'stage', 'state'].some(k => k in changes)) onMuckStale?.()
       return true
     } catch {
       setOpp(prev)
@@ -327,6 +355,7 @@ export function OpportunityDetailPanel({
     setEditingValue(false)
     const parsed = parseInt(valueInput.replace(/[^0-9]/g, ''), 10)
     if (!isNaN(parsed) && parsed !== opp?.value) {
+      setValueJustEdited(true)
       patchOpp({ value: parsed })
     }
   }
@@ -436,7 +465,18 @@ export function OpportunityDetailPanel({
   const prob = opp ? (STAGE_PROBABILITY[opp.stage] ?? 0) : 0
   // Until a contract exists the deal value is a prediction, so this tile shows
   // the same figure the card and the pipeline headline show.
-  const shownValue = muck?.value ?? opp?.value ?? null
+  /**
+   * Which number to show.
+   *
+   * Muck's figure, normally: it falls back to list price where a recorded value
+   * contradicts the offering, and that correction is the point of it. But the
+   * board fetches muck once, so straight after an edit `muck.value` is the OLD
+   * number while `opp.value` is what was just saved. Preferring the freshly
+   * saved value for the rest of the session stops the panel arguing with the
+   * person typing into it. `onMuckStale` re-reads the model right behind this,
+   * so the correction still lands, a moment later, on a number that exists.
+   */
+  const shownValue = valueJustEdited ? (opp?.value ?? null) : (muck?.value ?? opp?.value ?? null)
   const valuePredicted = Boolean(muck?.valuePredicted)
   const factored = shownValue ? Math.round(shownValue * prob / 100) : null
   const o = opp as any
@@ -499,6 +539,37 @@ export function OpportunityDetailPanel({
 
             {/* Muck breakdown. Replaces the retired T1 fit score bar. */}
             <MuckBar score={muck ?? null} />
+
+            {/* What is owed on this lead next, and who owes it. Above the notes
+                because it is an instruction, not a record. */}
+            <FollowupBar
+              opportunityId={opp.id}
+              followup={{
+                text: opp.followup_text ?? null,
+                kind: opp.followup_kind ?? null,
+                owner: opp.followup_owner ?? null,
+                due: opp.followup_due ?? null,
+                setBy: opp.followup_set_by ?? null,
+                setAt: opp.followup_set_at ?? null,
+              }}
+              onSaved={(next: Followup) => {
+                const changes = {
+                  followup_text: next.text,
+                  followup_kind: next.kind,
+                  followup_owner: next.owner,
+                  followup_due: next.due,
+                  followup_set_by: next.setBy,
+                  followup_set_at: next.setAt,
+                }
+                setOpp(o => o ? { ...o, ...changes } : o)
+                onUpdate(opp.id, changes)
+                // The route writes the note server side, so the timeline on
+                // screen is now one note short. Re-read rather than guess at
+                // what it wrote.
+                void loadOpp(opp.id)
+              }}
+              showToast={showToast}
+            />
 
             {/* Two-column body */}
             <div style={{ display: 'flex', flex: 1, minHeight: 0, overflow: 'hidden' }}>
@@ -801,13 +872,24 @@ export function OpportunityDetailPanel({
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
                     <span style={{ fontSize: 12, color: '#6B7280' }}>Assigned to</span>
                     <select
+                      // Keyed by lead: a bare defaultValue kept showing the
+                      // previous lead's owner when the panel switched records.
+                      key={`assigned-${opp.id}`}
                       defaultValue={opp.assigned_to_email ?? ''}
                       onChange={e => patchOpp({ assigned_to_email: e.target.value || null })}
                       style={{ fontSize: 12, color: '#374151', border: '1px solid #E5E7EB', borderRadius: 6, padding: '3px 8px', background: 'white', outline: 'none' }}
                     >
                       <option value="">Unassigned</option>
-                      <option value="rae@teachersdeserveit.com">Rae</option>
-                      <option value="jim@teachersdeserveit.com">Jim</option>
+                      {SALES_TEAM.map(m => (
+                        <option key={m.email} value={m.email}>{m.label}</option>
+                      ))}
+                      {/* 79 leads carry a junk id here from an old import. Kept
+                          as an option so the dropdown does not silently rewrite
+                          one to Unassigned just by being opened. */}
+                      {opp.assigned_to_email &&
+                        !SALES_TEAM.some(m => m.email === opp.assigned_to_email) && (
+                        <option value={opp.assigned_to_email}>{opp.assigned_to_email}</option>
+                      )}
                     </select>
                   </div>
                 </div>

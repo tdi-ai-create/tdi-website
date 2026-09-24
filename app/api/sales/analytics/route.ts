@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextResponse } from 'next/server'
+import { SALES_TEAM } from '@/lib/sales/team'
 
 export async function GET() {
   try {
@@ -147,11 +148,11 @@ export async function GET() {
     })
 
     // Owner / team performance
-    // Map raw IDs or emails to display names
-    const OWNER_NAMES: Record<string, string> = {
-      'rae@teachersdeserveit.com': 'Rae',
-      'jim@teachersdeserveit.com': 'Jim',
-    }
+    // Map raw IDs or emails to display names. Built from the one roster in
+    // lib/sales/team.ts rather than a third hardcoded copy of it.
+    const OWNER_NAMES: Record<string, string> = Object.fromEntries(
+      SALES_TEAM.map(m => [m.email, m.label])
+    )
     function resolveOwner(raw: string | null): string {
       if (!raw) return 'unassigned'
       if (OWNER_NAMES[raw]) return OWNER_NAMES[raw]

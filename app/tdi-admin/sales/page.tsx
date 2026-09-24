@@ -24,6 +24,8 @@ import {
 import { HorizontalBarChart, DonutChart, DonutLegend, LiveSectionHeader } from '@/components/tdi-admin/hub-charts/HubCharts'
 import { SELLABLE_OFFERINGS, OFFERING_LABELS, OFFERING_HINTS, offeringLabel } from '@/lib/partnerships/offerings'
 import { chaseOrder } from '@/lib/sales/muck'
+import { URGENCY_COLOR, followupRank, hasFollowup, shortDate, urgency, type Followup } from '@/lib/sales/followup'
+import { teamLabel } from '@/lib/sales/team'
 
 interface MuckCardScore {
   total: number | null
@@ -127,6 +129,10 @@ interface SalesOpportunity {
   website: string | null
   city: string | null
   state: string | null
+  followup_text: string | null
+  followup_kind: string | null
+  followup_owner: string | null
+  followup_due: string | null
   created_at: string
   updated_at: string
   // AI enrichment fields (migration 063)
@@ -173,6 +179,8 @@ interface Opportunity {
   website: string | null
   city: string | null
   state: string | null
+  /** The live follow-up alert. Null text means nothing is owed on this lead. */
+  followup: Followup
   // AI enrichment
   enrichmentData: Record<string, any> | null
   strategicBrief: string | null
@@ -250,6 +258,7 @@ function toCardOpp(opp: Opportunity, muckById: Record<string, MuckCardScore>): S
     contract_year: opp.contract_year,
     city: opp.city,
     state: opp.state,
+    followup: opp.followup,
     muck: muckById[opp.supabase_id]
       ? {
           total: muckById[opp.supabase_id].total,
@@ -507,6 +516,28 @@ export default function SalesPage() {
     }
   }, [])
 
+  /**
+   * Re-read the board-wide muck scores.
+   *
+   * Split out of loadAll so an edit can refresh it on its own. The panel shows
+   * muck's deal value, and it was only ever fetched on page load, so editing a
+   * value saved the new number and kept displaying the old one until a reload.
+   */
+  async function loadMuck() {
+    try {
+      const muckRes = await fetch('/api/sales/muck')
+      if (muckRes.ok) {
+        const { scores, rollup } = await muckRes.json()
+        setMuckById(scores ?? {})
+        setMuckRollup(rollup ?? null)
+      } else {
+        console.error('[sales] muck failed:', muckRes.status)
+      }
+    } catch (e) {
+      console.error('[sales] muck request failed:', e)
+    }
+  }
+
   async function loadAll() {
     setLoading(true)
     setError('')
@@ -554,6 +585,14 @@ export default function SalesPage() {
         website: row.website,
         city: row.city,
         state: row.state,
+        followup: {
+          text: row.followup_text,
+          kind: row.followup_kind,
+          owner: row.followup_owner,
+          due: row.followup_due,
+          setBy: null,
+          setAt: null,
+        },
         enrichmentData: row.enrichment_data,
         strategicBrief: row.ai_strategic_brief,
         enrichmentStatus: row.enrichment_status,
@@ -578,18 +617,7 @@ export default function SalesPage() {
         console.error('[sales] notes summary request failed:', e)
       }
 
-      try {
-        const muckRes = await fetch('/api/sales/muck')
-        if (muckRes.ok) {
-          const { scores, rollup } = await muckRes.json()
-          setMuckById(scores ?? {})
-          setMuckRollup(rollup ?? null)
-        } else {
-          console.error('[sales] muck failed:', muckRes.status)
-        }
-      } catch (e) {
-        console.error('[sales] muck request failed:', e)
-      }
+      await loadMuck()
     } catch (err: any) {
       setError(err.message || 'Failed to load opportunities')
     }
@@ -1334,9 +1362,8 @@ export default function SalesPage() {
       {/* Outreach Queue Tab */}
       {pageTab === 'outreach' && (() => {
         const now = Date.now()
-        const queued = activeOpps
-          .filter(o => !o.deleted_at && o.stage !== 'lost' && o.stage !== 'paid' && o.contactEmail)
-          .map(o => {
+        const live = activeOpps.filter(o => !o.deleted_at && o.stage !== 'lost' && o.stage !== 'paid')
+        const enrich = (o: Opportunity) => {
             const daysSince = o.lastActivityAt ? Math.floor((now - new Date(o.lastActivityAt).getTime()) / 86400000) : 999
             const m = muckById[o.supabase_id]
             let action = 'Initial outreach'
@@ -1360,7 +1387,32 @@ export default function SalesPage() {
               valuePredicted: m?.valuePredicted ?? false,
               needsOutreach: daysSince >= 14 || !o.lastActivityAt,
             }
-          })
+        }
+
+        /**
+         * Leads somebody has promised to act on, above everything else.
+         *
+         * A separate group rather than a re-sort, because the rest of this
+         * queue answers a different question. Below, staleness decides who
+         * appears and value per muck point decides the order: who has gone
+         * quiet, chase the richest first. A follow-up alert is not a guess about
+         * who is worth chasing, it is a person saying they would do a thing by a
+         * date, so it outranks the model rather than competing with it.
+         *
+         * Deliberately not filtered on contactEmail or on staleness. The queue
+         * below requires both, which is right for finding neglected leads and
+         * wrong here: an alert set this morning is owed today, and a lead with
+         * no email on file still has a phone number and an owner.
+         */
+        const owed = live
+          .filter(o => hasFollowup(o.followup))
+          .map(enrich)
+          .sort((a, b) => followupRank(a.followup.due) - followupRank(b.followup.due))
+        const owedIds = new Set(owed.map(l => l.supabase_id))
+
+        const queued = live
+          .filter(o => o.contactEmail && !owedIds.has(o.supabase_id))
+          .map(enrich)
           .filter(o => o.needsOutreach)
 
         /**
@@ -1441,6 +1493,21 @@ export default function SalesPage() {
               <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 2 }}>
                 {lead.contactName || 'No contact'} {lead.contactEmail ? `-- ${lead.contactEmail}` : ''} {lead.state ? `(${lead.state})` : ''}
               </div>
+              {hasFollowup(lead.followup) && (
+                <div style={{ fontSize: 11, color: '#374151', marginTop: 4 }}>
+                  <span style={{
+                    fontWeight: 700, textTransform: 'uppercase', fontSize: 9, letterSpacing: '0.04em',
+                    color: URGENCY_COLOR[urgency(lead.followup.due)].fg,
+                    background: URGENCY_COLOR[urgency(lead.followup.due)].bg,
+                    border: `1px solid ${URGENCY_COLOR[urgency(lead.followup.due)].border}`,
+                    borderRadius: 4, padding: '1px 5px', marginRight: 6,
+                  }}>
+                    {lead.followup.kind ?? 'follow up'} &middot; {lead.followup.owner ? teamLabel(lead.followup.owner) : 'unassigned'}
+                    {shortDate(lead.followup.due) ? ` \u00b7 ${urgency(lead.followup.due) === 'overdue' ? 'overdue ' : ''}${shortDate(lead.followup.due)}` : ''}
+                  </span>
+                  {lead.followup.text}
+                </div>
+              )}
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0, marginLeft: 16 }}>
               <div style={{ textAlign: 'right' }}>
@@ -1491,11 +1558,26 @@ export default function SalesPage() {
               <div>
                 <h2 style={{ fontSize: 18, fontWeight: 700, color: '#0a0f1e', margin: 0 }}>Outreach Queue</h2>
                 <p style={{ fontSize: 12, color: '#6B7280', margin: '2px 0 0' }}>
-                  {ordered.length} leads needing outreach. Ordered by deal value per muck point.
+                  {owed.length > 0 ? `${owed.length} follow-ups owed, then ` : ''}
+                  {ordered.length} leads needing outreach, ordered by deal value per muck point.
                 </p>
               </div>
             </div>
-            {ordered.length === 0 ? (
+            {owed.length > 0 && (
+              <div style={{ marginBottom: 24 }}>
+                <h3 style={{ fontSize: 13, fontWeight: 700, color: '#0a0f1e', margin: '0 0 2px' }}>
+                  Somebody said they would do this ({owed.length})
+                </h3>
+                <p style={{ fontSize: 11, color: '#6B7280', margin: '0 0 8px' }}>
+                  Follow-ups set on the lead itself, oldest deadline first. These are promises, not
+                  predictions, so they sit above the ranked queue. Open the lead and press Done to clear one.
+                </p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  {owed.map(lead => renderRow(lead, false))}
+                </div>
+              </div>
+            )}
+            {ordered.length === 0 && owed.length === 0 ? (
               <div style={{ textAlign: 'center', padding: 40, color: '#9CA3AF' }}>All leads are contacted. Nice work.</div>
             ) : (
               <>
@@ -2221,9 +2303,23 @@ export default function SalesPage() {
               ...(changes.value !== undefined ? { value: changes.value } : {}),
               ...(changes.assigned_to_email !== undefined ? { assignedTo: changes.assigned_to_email } : {}),
               ...(changes.name ? { name: changes.name } : {}),
+              // The follow-up alert shows on the card and in the outreach
+              // queue, so a change made in the panel has to land on the board
+              // without a reload.
+              ...(changes.followup_text !== undefined ? {
+                followup: {
+                  text: (changes.followup_text as string | null) ?? null,
+                  kind: (changes.followup_kind as string | null) ?? null,
+                  owner: (changes.followup_owner as string | null) ?? null,
+                  due: (changes.followup_due as string | null) ?? null,
+                  setBy: (changes.followup_set_by as string | null) ?? null,
+                  setAt: (changes.followup_set_at as string | null) ?? null,
+                },
+              } : {}),
             }
           }))
         }}
+        onMuckStale={() => { void loadMuck() }}
         onDelete={(id) => {
           const opp = opportunities.find(o => o.supabase_id === id)
           if (opp) handleDeleteOpp(opp)
