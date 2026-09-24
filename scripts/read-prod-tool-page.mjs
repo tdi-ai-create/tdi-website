@@ -6,7 +6,7 @@ import { readFileSync } from 'node:fs';
 import { createClient } from '@supabase/supabase-js';
 import { chromium } from 'playwright';
 
-const BASE = 'https://www.teachersdeserveit.com';
+const BASE = process.env.TARGET || "https://www.teachersdeserveit.com";
 const SLUG = process.argv[2] || 'end-of-day-educator-reset';
 const env = Object.fromEntries(
   readFileSync(new URL('../.env.local', import.meta.url), 'utf8')
@@ -57,6 +57,14 @@ console.log('TDI chips:', conv.chips);
 console.log('type tags rendered:', JSON.stringify(conv.tags));
 console.log('filter chips:', JSON.stringify(conv.filterChips));
 console.log('bylines:'); conv.bylines.forEach(b => console.log('   ' + b));
+const saying = await page.evaluate(() => {
+  const body = document.body.innerText;
+  return {
+    heading: /educators are saying/i.test(body),
+    knownQuote: /5 minutes between classes|district PD day|building sub/i.test(body),
+  };
+});
+console.log('testimonial heading present:', saying.heading, '| invented quote present:', saying.knownQuote);
 const cards = await page.evaluate(() => {
   const out = [];
   for (const el of document.querySelectorAll('div')) {
