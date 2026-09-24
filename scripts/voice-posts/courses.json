@@ -1,0 +1,285 @@
+{
+  "category": "Courses",
+  "target": "course",
+  "tools": [
+    {
+      "slug": "book-club-teachers-deserve-it",
+      "posts": [
+        ["Priya Raghunathan", "from_tdi", "This works best as a group. Reading the book alone gives you the ideas, but the sessions are built around arguing over which chapter applies to your building and what you would actually change."],
+        ["Camille Thibodeaux", "from_tdi", "Do not save the action prompts for the end. Each session asks for one small commitment, and the people who skip those finish with a nice reading list and nothing different."],
+        ["Marcus Oyelaran", "question", "If you are running this with a team, how many of you are there and how often are you managing to meet?"],
+        ["Bettina Kowalczyk", "question", "Which chapter has been the hardest to sit with, and what part of it did you want to argue back at when you first read it?"]
+      ]
+    },
+    {
+      "slug": "boundaries-without-backlash",
+      "posts": [
+        ["Rosalie Dunne", "from_tdi", "The scripts are the easy part. The mindset section is where people stall, because saying no cleanly only holds if you have decided beforehand what you are protecting and why."],
+        ["Jarrod Levins", "from_tdi", "Worth knowing this is not about saying no to everything. Most of the lessons are about how to say yes to fewer things and then actually hold the line when someone pushes."],
+        ["Trevon Baptiste", "question", "Which boundary are you trying to set right now, and who is the person you are dreading the conversation with?"],
+        ["Marisol Aguirre", "question", "For anyone who has used one of the scripts, did you keep the wording as written or change it to sound more like you?"]
+      ]
+    },
+    {
+      "slug": "building-strong-teacher-para-partnerships",
+      "posts": [
+        ["Deshawn Pryor", "from_tdi", "Take this with the teacher you work beside if you can. Half the value is in comparing answers, because the gaps usually turn out to be things neither of you ever said out loud."],
+        ["Yolanda Betts", "from_tdi", "The clarity lessons come before the trust lessons on purpose. Trust is hard to build while two people still disagree about who is meant to be doing what during independent work."],
+        ["Ofelia Marchetti", "question", "Paras, do you have a set time each week to plan with the teacher you support, or is it all caught in passing?"],
+        ["Marisol Aguirre", "question", "Teachers, what is one thing you assumed about how your para wanted to work that turned out to be wrong once you actually asked?"]
+      ]
+    },
+    {
+      "slug": "calm-classrooms-not-chaos",
+      "posts": [
+        ["Simone Ashcroft", "from_tdi", "Visual structure is not decoration. The course is fussy about placement and height because a chart the class cannot see from where they sit is a chart nobody ever uses."],
+        ["Rosalie Dunne", "from_tdi", "Build one system and live with it for a fortnight before adding the next. Putting up every visual at once gives the room more to read and less to follow."],
+        ["Everett Crane", "question", "Which part of your day goes sideways most reliably, and does it land at the same point every day or move about?"],
+        ["Callum Ferreira", "question", "What visual have you kept on the wall all year, and what made that one stick when the others quietly came down?"]
+      ]
+    },
+    {
+      "slug": "classroom-management-toolkit",
+      "posts": [
+        ["Tobias Rennert", "from_tdi", "The toolkit is meant to be cut down. Pick the two or three routines that cover the moments you dread, and ignore the rest until those are running without you thinking about them."],
+        ["Hana Sugimoto", "from_tdi", "If you are new, start with the transitions section rather than the consequences section. Most of what looks like a behaviour problem is a gap where nobody said what happens next."],
+        ["Marcus Oyelaran", "question", "What is the one routine you would rebuild from scratch if you could start this year over, and what went wrong with it?"],
+        ["Gus Halvorsen", "question", "Specialists, how much of your management has to change between groups when you see the whole school inside one week?"]
+      ]
+    },
+    {
+      "slug": "communication-that-clicks",
+      "posts": [
+        ["Everett Crane", "from_tdi", "The premise is that behaviour is communication, which sounds soft until you try it. Asking what a student is telling you changes what you do next far more than deciding they are being difficult."],
+        ["Rosalie Dunne", "from_tdi", "Do not skip the section on non speaking and low speaking students. It covers the supports that end up in a cupboard because nobody was ever shown how to use them properly."],
+        ["Nadia Belhassen", "question", "For students still building English, how do you tell a language barrier apart from a student who has understood and is refusing?"],
+        ["Ofelia Marchetti", "question", "What is a signal one of your students uses that took a long time to read correctly, and who in your team worked it out first?"]
+      ]
+    },
+    {
+      "slug": "confident-parent-conversations",
+      "posts": [
+        ["Marisol Aguirre", "from_tdi", "The hardest lesson is the one on opening a difficult call. Most conversations go wrong in the first thirty seconds, and the rest of the call is spent recovering from it."],
+        ["Jarrod Levins", "from_tdi", "Useful for anyone who has to deliver news a family did not want. Less useful if you are looking for a way to avoid the conversation altogether, which this course refuses to offer."],
+        ["Camille Thibodeaux", "question", "What do you say first when you ring home about something difficult, and has that opening changed over the years?"],
+        ["Nadia Belhassen", "question", "When you need an interpreter on a call, what do you do differently to keep the family in the conversation rather than talking past them?"]
+      ]
+    },
+    {
+      "slug": "connected-educators-building-networks-for-bite-sized-professional-growth",
+      "posts": [
+        ["Priya Raghunathan", "from_tdi", "This is for people who feel isolated in their building, not for people chasing followers. The networks it helps you build are small and specific, and that is the whole point."],
+        ["Wendell Prosser", "from_tdi", "The bite sized framing matters if you are the only person teaching your subject on site. Ten minutes with someone doing the same job elsewhere beats a whole day of general training."],
+        ["Deacon Mwangi", "question", "Who is the one person outside your building you would ring with a teaching problem, and how did you come to meet them?"],
+        ["Aurelia Nkemdirim", "question", "If you have tried to build a network before and it fizzled out, what do you think was missing from it?"]
+      ]
+    },
+    {
+      "slug": "de-escalation-strategies-for-unstructured-environments",
+      "posts": [
+        ["Everett Crane", "from_tdi", "Corridors, the yard and the lunch hall are different problems from a classroom. You have no seating plan, no clear sightlines and often no relationship with the student in front of you."],
+        ["Gus Halvorsen", "from_tdi", "Watch the positioning lesson twice. Where you stand and how much space you leave does more work than anything you say, and it is the part people forget under pressure."],
+        ["Lorna Stimpson", "question", "Which unstructured part of the day is the hardest where you work, and who is usually the adult covering it?"],
+        ["Jarrod Levins", "question", "For anyone supervising those spaces, what did you have to unlearn from managing a room with walls and a door?"]
+      ]
+    },
+    {
+      "slug": "differentiated-choice-boards-empowering-student-choice-and-mastery",
+      "posts": [
+        ["Hana Sugimoto", "from_tdi", "A choice board is not a menu of easier and harder tasks. Every route on the board has to land on the same understanding, and that is the bit that takes the planning time."],
+        ["Camille Thibodeaux", "from_tdi", "Start with a board for one unit you already know inside out. Building your first one for unfamiliar content means fighting the format and the material at the same time."],
+        ["Ravi Chandrasekar", "question", "When you have offered choice, do students pick what suits them or what looks quickest, and how do you handle it when they choose badly?"],
+        ["Aurelia Nkemdirim", "question", "How many options do you put on a board before choice stops helping and starts overwhelming the room, in your experience?"]
+      ]
+    },
+    {
+      "slug": "effective-communication-strategies-for-leaders",
+      "posts": [
+        ["Jarrod Levins", "from_tdi", "The section on delivering an unpopular decision is the one to take seriously. Staff can live with a decision they dislike far more easily than one nobody bothered to explain."],
+        ["Priya Raghunathan", "from_tdi", "Aimed at people who hold some authority, including coaches and team leads who have influence without a title. Take it once you have a specific message you are struggling to land."],
+        ["Deacon Mwangi", "question", "What is the message you have had to repeat most this year, and why do you think it is not sticking?"],
+        ["Wendell Prosser", "question", "From the receiving end, what does a leader do that makes you read a whole email rather than skim the first line?"]
+      ]
+    },
+    {
+      "slug": "effective-small-group-one-on-one-instruction",
+      "posts": [
+        ["Deshawn Pryor", "from_tdi", "Most of this is about the first two minutes of a group. Getting everyone settled and clear on the task is the difference between teaching and refereeing for the rest of the session."],
+        ["Marisol Aguirre", "from_tdi", "Good for anyone running groups without a plan handed to them. It spends real time on what to do when the group arrives at wildly different places, which is usually every session."],
+        ["Yolanda Betts", "question", "How long do your small groups run, and do you get any say in who ends up in each one?"],
+        ["Callum Ferreira", "question", "What do you have the rest of the class doing while you are with a group, and does it actually hold?"]
+      ]
+    },
+    {
+      "slug": "executive-functioning-made-simple-tools-for-k-5-classrooms",
+      "posts": [
+        ["Rosalie Dunne", "from_tdi", "Executive functioning is a skill you teach, not a trait a child has or lacks. The course is built on that, so expect to be asked to model things you assumed were obvious."],
+        ["Bettina Kowalczyk", "from_tdi", "The task breakdown routine is the one worth doing first. Once children can see the steps of a job laid out, a lot of what looked like avoidance turns out to be paralysis."],
+        ["Simone Ashcroft", "question", "With the youngest children, what does a starting routine look like in your room before they are able to read a checklist?"],
+        ["Marisol Aguirre", "question", "Which part of the day needs the most scaffolding for your class, packing up, starting work, or moving between tasks?"]
+      ]
+    },
+    {
+      "slug": "explaining-homework-without-losing-your-mind",
+      "posts": [
+        ["Tobias Rennert", "from_tdi", "The premise is that you should not have to reteach the lesson at the door. It pushes you to build the explanation into the task itself so the same question stops coming back."],
+        ["Hana Sugimoto", "from_tdi", "Take the lesson on the worked example seriously. One clear example attached to the task answers more questions than any amount of verbal reminding at the end of a lesson."],
+        ["Ravi Chandrasekar", "question", "What is the question you get asked most about homework, and have you tried heading that one off in advance yet?"],
+        ["Yolanda Betts", "question", "For anyone supporting students with homework, what makes an instruction clear enough that you can help without guessing what the teacher wanted?"]
+      ]
+    },
+    {
+      "slug": "from-listening-to-helping-taking-notes-during-class",
+      "posts": [
+        ["Deshawn Pryor", "from_tdi", "This is about notes you can take while still supporting, not a formal record. If the system needs both hands and a quiet moment, it will not survive a real lesson."],
+        ["Ofelia Marchetti", "from_tdi", "The part people skip is deciding beforehand what you are watching for. Notes taken with no focus turn into a page of everything, which helps nobody when you sit down later."],
+        ["Lorna Stimpson", "question", "Paras, what do you actually write your notes on during a lesson, and does anyone read them apart from you?"],
+        ["Yolanda Betts", "question", "What is the one thing you wish the teacher knew from your notes that never quite gets passed on in the moment?"]
+      ]
+    },
+    {
+      "slug": "how-to-grow-your-personal-brand-as-a-teacher-hint-it-landed-me-a-ted-talk",
+      "posts": [
+        ["Wendell Prosser", "from_tdi", "This is about being findable by people who need what you know, not about building an audience. If you have nothing you are trying to share yet, the course will feel hollow."],
+        ["Priya Raghunathan", "from_tdi", "The useful lesson is the one on naming what you are genuinely good at. Most educators undersell their strengths because they have never had to describe them outside a staffroom."],
+        ["Trevon Baptiste", "question", "What are you known for among the people you work with, and would you have chosen that description for yourself?"],
+        ["Marcus Oyelaran", "question", "If a colleague from another building went looking for your work, what would they find, and is any of it current?"]
+      ]
+    },
+    {
+      "slug": "how-to-use-flexible-seating-for-better-learning",
+      "posts": [
+        ["Simone Ashcroft", "from_tdi", "The funding section is the reason to take this. Plenty of people plan a beautiful layout and then discover the furniture was the easy part compared with paying for it."],
+        ["Callum Ferreira", "from_tdi", "Flexible seating falls over when choice is unlimited. The management lessons are about deciding who chooses, how often, and what happens when a seat is clearly not working out."],
+        ["Bettina Kowalczyk", "question", "If you have tried flexible seating, what did you end up taking back out of the room after the first term?"],
+        ["Hana Sugimoto", "question", "How did you pay for your seating, and was any of it donated or built by hand rather than bought outright?"]
+      ]
+    },
+    {
+      "slug": "maximize-impact-one-on-one-student-conferences",
+      "posts": [
+        ["Camille Thibodeaux", "from_tdi", "A conference is not a marking session with the student watching. The course keeps pulling you back to one goal per conversation, which feels thin until you see how much a student can carry."],
+        ["Trevon Baptiste", "from_tdi", "The record keeping lesson is dull and essential. Without a note of what you agreed, the next conference starts from nothing and the student notices that you have forgotten."],
+        ["Deacon Mwangi", "question", "How long is a realistic conference in your timetable, and how often does each student actually get one across a term?"],
+        ["Ravi Chandrasekar", "question", "What do you do with the students who go silent the moment it is just the two of you talking?"]
+      ]
+    },
+    {
+      "slug": "mentoring-made-simple-how-to-guide-educators",
+      "posts": [
+        ["Priya Raghunathan", "from_tdi", "Mentoring is not evaluating, and this course draws that line early. If your role includes both, the hardest work is being clear with your mentee about which hat you have on."],
+        ["Deacon Mwangi", "from_tdi", "Between sessions, resist fixing things for your mentee. The listening lesson exists because most new mentors talk too much and leave with their own plan rather than the mentee's."],
+        ["Jarrod Levins", "question", "For anyone mentoring this year, what did your own best mentor do that you have tried to copy, and does it work for you?"],
+        ["Ingrid Vasquez-Lund", "question", "How often are you meeting your mentee, and is that a real schedule or whenever you both happen to be free?"]
+      ]
+    },
+    {
+      "slug": "paraprofessional-foundations-understanding-your-role-impact",
+      "posts": [
+        ["Deshawn Pryor", "from_tdi", "Built for paras rather than about them, which is rarer than it should be. Take it early if you are new, because it names the parts of the role nobody explains on day one."],
+        ["Lorna Stimpson", "from_tdi", "The lesson on scope is the one to sit with. Knowing what is yours to decide and what needs the teacher saves a lot of second guessing in the middle of a lesson."],
+        ["Ofelia Marchetti", "question", "Paras, what did you have to work out for yourself in your first term that somebody should have told you outright?"],
+        ["Yolanda Betts", "question", "What part of your role do people outside school most often misunderstand when you try to describe the job to them?"]
+      ]
+    },
+    {
+      "slug": "parent-tools-that-support-student-success",
+      "posts": [
+        ["Nadia Belhassen", "from_tdi", "These are tools for families to use at home, so pass them on in the language the family reads. A brilliant routine sent in the wrong language is a leaflet in a drawer."],
+        ["Callum Ferreira", "from_tdi", "Send one tool at a time. Handing a family the full set at a first meeting reads as a list of things they are doing wrong, which is the opposite of the intent."],
+        ["Marisol Aguirre", "question", "Which of these have you passed on to families, and did you hear anything back about whether it got used?"],
+        ["Bettina Kowalczyk", "question", "What do families ask you for most often when they want to help at home but do not know where to start?"]
+      ]
+    },
+    {
+      "slug": "procedures-daily-routines-for-art-teachers-systems-that-save-time",
+      "posts": [
+        ["Gus Halvorsen", "from_tdi", "Specialist rooms live and die by the first and last five minutes. The setup and pack down routines here are worth more than anything you plan for the middle of a lesson."],
+        ["Wendell Prosser", "from_tdi", "If you share a room or a trolley with someone, take the storage lessons together. Two people running different systems in the same space is how materials quietly go missing."],
+        ["Simone Ashcroft", "question", "How do you handle pack down when the bell goes and the next group is already queueing at the door?"],
+        ["Aurelia Nkemdirim", "question", "For anyone teaching with messy materials, what is the one procedure you would never give up, no matter how short the lesson is?"]
+      ]
+    },
+    {
+      "slug": "rinse-method-mindset-reset-for-educators",
+      "posts": [
+        ["Bettina Kowalczyk", "from_tdi", "Five steps, repeatable, and short enough to run on a bad day. That last part matters, because a reset you can only manage when you are already calm is not a reset."],
+        ["Marcus Oyelaran", "from_tdi", "Learn the sequence during an ordinary week. Picking up something new for the first time in the middle of a hard week is asking a great deal of yourself."],
+        ["Ingrid Vasquez-Lund", "question", "Which of the five steps do you skip when you are rushing, and what tends to happen when you skip it?"],
+        ["Gus Halvorsen", "question", "Where do you actually do a reset during the school day, given most of us have nowhere quiet to go?"]
+      ]
+    },
+    {
+      "slug": "simple-to-implement-themes-in-the-classroom-being-intentional-with-your-lessons",
+      "posts": [
+        ["Aurelia Nkemdirim", "from_tdi", "A theme is a thread through the content, not a costume. The course keeps checking whether the theme is helping students connect ideas or just giving you extra decorating to do."],
+        ["Simone Ashcroft", "from_tdi", "Plan the theme after the learning, never before. Choosing the topic first is how you end up bending a lesson to fit a display rather than the other way round."],
+        ["Ravi Chandrasekar", "question", "What theme have you run that genuinely changed how students saw the content, rather than just making it more fun?"],
+        ["Marisol Aguirre", "question", "How far ahead do you plan your themes, and do you reuse them year to year or start fresh each time?"]
+      ]
+    },
+    {
+      "slug": "smart-communication-choices-what-to-use-when-and-how",
+      "posts": [
+        ["Camille Thibodeaux", "from_tdi", "The whole course is about picking the right channel. A short video settles something that an email would take four paragraphs and one misunderstanding to get through."],
+        ["Tobias Rennert", "from_tdi", "Decide your defaults once, then tell families what they are. Most communication stress comes from parents not knowing where to look rather than from you not sending enough."],
+        ["Jarrod Levins", "question", "What channel do the families you work with actually check, and how did you work that out rather than assuming it?"],
+        ["Nadia Belhassen", "question", "Has switching to video or voice notes changed anything for the families who find long written updates hard work?"]
+      ]
+    },
+    {
+      "slug": "streamline-your-inbox-effective-email-management-for-educators",
+      "posts": [
+        ["Wendell Prosser", "from_tdi", "Half the course is folders and rules, half is deciding what deserves a reply at all. The second half is the one that actually gives you an evening back."],
+        ["Ingrid Vasquez-Lund", "from_tdi", "Do the setup in one sitting rather than across a week. A half built system means you are running two inboxes at once and trusting neither of them."],
+        ["Trevon Baptiste", "question", "When do you stop checking email in the evening, and did you have to tell anyone that this was the new rule?"],
+        ["Deacon Mwangi", "question", "What sort of message still pulls you back to your inbox at the weekend, and have you worked out why that one gets through?"]
+      ]
+    },
+    {
+      "slug": "supporting-students-through-their-daily-schedule",
+      "posts": [
+        ["Lorna Stimpson", "from_tdi", "The line it keeps drawing is between supporting a student and running their day for them. Independence is the goal, so every support is meant to be something you can eventually hand over."],
+        ["Everett Crane", "from_tdi", "Transitions get the most attention here because that is where most days come apart. Knowing what comes next is often the whole intervention, and it costs nothing to give."],
+        ["Ofelia Marchetti", "question", "Which transition do your students need the most help with, and have you managed to hand any of it back to them?"],
+        ["Rosalie Dunne", "question", "What does a schedule look like for your students, printed, up on a board, or something they carry around with them?"]
+      ]
+    },
+    {
+      "slug": "teacher-tested-hacks-for-smarter-days",
+      "posts": [
+        ["Hana Sugimoto", "from_tdi", "Dip in rather than working through it in order. These are separate small fixes, and taking them all on in one week is how you end up keeping none of them."],
+        ["Gus Halvorsen", "from_tdi", "Some of these will not fit your setting, and that is fine. Take the two that match the jobs you repeat every single day and leave the rest where they are."],
+        ["Marcus Oyelaran", "question", "What is your best time saver, the one you worked out yourself that you would never find written down in a course?"],
+        ["Callum Ferreira", "question", "Which of these have you tried and then dropped, and what was it about your day that it did not fit?"]
+      ]
+    },
+    {
+      "slug": "the-differentiation-fix",
+      "posts": [
+        ["Rosalie Dunne", "from_tdi", "The promise here is a system, not more planning. If you are rewriting every lesson three ways, you are doing the exact thing this course is trying to talk you out of."],
+        ["Ravi Chandrasekar", "from_tdi", "Take it with one unit in front of you and rebuild that as you go. Working through it in the abstract leaves you with a model and nothing you can actually use next week."],
+        ["Ingrid Vasquez-Lund", "question", "Where does differentiation fall apart for you, in the planning, in the resources, or in keeping track of who needs what?"],
+        ["Priya Raghunathan", "question", "What did you stop doing once you started differentiating more deliberately, because something usually has to go to make room?"]
+      ]
+    },
+    {
+      "slug": "understanding-student-needs-modifications",
+      "posts": [
+        ["Rosalie Dunne", "from_tdi", "A modification changes what a student is expected to learn, an accommodation changes how they get there. Mixing the two up is the common mistake, and it follows a child through their paperwork for years."],
+        ["Yolanda Betts", "from_tdi", "Read the plans before this course rather than after. The lessons make far more sense when you have a real document in mind and can see which parts you have been guessing at."],
+        ["Deshawn Pryor", "question", "Paras, do you get to read the plans for the students you support, or do you work from what you are told?"],
+        ["Nadia Belhassen", "question", "How do you tell a language need apart from a learning need when a student is still new to English, and who helps you decide?"]
+      ]
+    },
+    {
+      "slug": "your-designation-isn-t-your-destiny-recorded-webinar",
+      "posts": [
+        ["Jarrod Levins", "from_tdi", "Recorded, so you can watch it in pieces. The argument is that a designation describes a moment in your data and not the people in the building, which is easier to say than to hold onto."],
+        ["Deacon Mwangi", "from_tdi", "Worth watching with your leadership team rather than alone. The parts that sting are the ones about what a label does to staff morale, and that conversation needs more than one person in it."],
+        ["Priya Raghunathan", "question", "If your building has carried a designation, what changed first, the practice or the way people talked about the school?"],
+        ["Ingrid Vasquez-Lund", "question", "What do you wish someone outside the building understood about how a label lands on the staff who stayed through it?"]
+      ]
+    }
+  ]
+}
