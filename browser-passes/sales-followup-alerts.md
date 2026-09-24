@@ -70,6 +70,19 @@ its notes and activity.
   cause: the panel renders `muck?.value ?? opp?.value`, and `/api/sales/muck` is
   fetched once on page load and never again.
 
+## Note authorship, added after the first pass
+
+Queried `opportunity_notes` by author: 300 rows say
+`system@teachersdeserveit.com` and 132 say `rae@teachersdeserveit.com`, the
+newest real name dated 9 September. The panel never sent an author, so
+everything typed into it since has been stored as the system. The notes route
+now resolves the signed-in user first and falls back to the body for scripts.
+
+Locally this can only be shown falling back: with no session cookie, a POST
+still stores the claimed author. **The session path is the second thing to press
+on production**: type a note as Rae and confirm the card reads "Rae" in gold
+rather than "System" in teal.
+
 ## What I could not verify
 
 Everything a person presses. The alert banner, the card pill, the Outreach Queue

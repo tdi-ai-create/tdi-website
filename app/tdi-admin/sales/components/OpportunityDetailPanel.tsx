@@ -7,7 +7,7 @@ import { IntelligenceTab } from './panel/IntelligenceTab'
 import { MuckBar, type MuckPanelScore } from './panel/MuckBar'
 import { FollowupBar } from './panel/FollowupBar'
 import type { Followup } from '@/lib/sales/followup'
-import { SALES_TEAM } from '@/lib/sales/team'
+import { SALES_TEAM, teamLabel } from '@/lib/sales/team'
 
 export interface OppNote {
   id: string
@@ -131,6 +131,14 @@ function defaultRevisitDate(): string {
   const d = new Date()
   d.setMonth(d.getMonth() + 4)
   return d.toISOString().slice(0, 10)
+}
+
+/** One colour per person on the roster. Grey for anyone not on it. */
+const NOTE_AUTHOR_COLOR: Record<string, string> = {
+  'rae@teachersdeserveit.com': '#C9A84C',
+  'hello@teachersdeserveit.com': '#7C3AED',
+  'kristin@whatwilllast.com': '#059669',
+  'jim@teachersdeserveit.com': '#3B82F6',
 }
 
 const TYPE_BADGE_COLORS: Record<string, { bg: string; color: string }> = {
@@ -360,12 +368,17 @@ export function OpportunityDetailPanel({
     }
   }
 
+  /**
+   * Who wrote it, by colour.
+   *
+   * Matched against the roster rather than by testing whether the address
+   * contains "rae" or "jim". Bella writes from hello@teachersdeserveit.com and
+   * Kristin from kristin@whatwilllast.com, and neither substring test would
+   * have found either of them.
+   */
   function getNoteBarColor(note: OppNote): string {
     if (note.note_type === 'system') return '#2A9D8F'
-    const email = note.author_email.toLowerCase()
-    if (email.includes('rae')) return '#C9A84C'
-    if (email.includes('jim')) return '#3B82F6'
-    return '#9CA3AF'
+    return NOTE_AUTHOR_COLOR[note.author_email.toLowerCase().trim()] ?? '#9CA3AF'
   }
 
   async function markWon() {
@@ -1232,7 +1245,7 @@ function NoteCardInline({ note, barColor, onDelete }: { note: OppNote; barColor:
       <div style={{ padding: '10px 14px', flex: 1, minWidth: 0 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
           <span style={{ fontSize: 12, fontWeight: 700, color: '#374151', textTransform: 'capitalize' }}>
-            {note.note_type === 'system' ? 'System' : note.author_email.split('@')[0]}
+            {note.note_type === 'system' ? 'System' : teamLabel(note.author_email)}
           </span>
           <span style={{
             fontSize: 10, padding: '2px 8px', borderRadius: 20, fontWeight: 600,
