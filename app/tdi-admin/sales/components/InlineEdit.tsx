@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 
 // ─────────────────────────────────────────────
 // Shared save logic
@@ -168,22 +169,61 @@ export function InlineSelect({
   const [open, setOpen] = useState(false)
   const [status, setStatus] = useState<SaveStatus>('idle')
   const ref = useRef<HTMLDivElement>(null)
+  const menuRef = useRef<HTMLDivElement>(null)
+  /** Viewport coordinates for the menu, measured when it opens. */
+  const [pos, setPos] = useState<{ top: number; left: number } | null>(null)
 
+  /**
+   * The menu is drawn into document.body, not next to the trigger.
+   *
+   * Absolutely positioned, it was clipped: these controls sit on cards inside
+   * kanban columns that scroll, and a scrolling ancestor cuts off anything that
+   * escapes it. Rae hit this the moment the caller picker shipped, and the menu
+   * came out sliced down the middle with the names unreadable.
+   *
+   * A portal escapes every overflow context on the page. The cost is that the
+   * menu no longer travels with the trigger, so it closes on scroll rather than
+   * drifting away from the card it belongs to.
+   */
   useEffect(() => {
     if (!open) return
     function handleClick(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+      const t = e.target as Node
+      if (ref.current?.contains(t)) return
+      if (menuRef.current?.contains(t)) return
+      setOpen(false)
     }
     function handleKey(e: KeyboardEvent) {
       if (e.key === 'Escape') setOpen(false)
     }
+    function close() { setOpen(false) }
     document.addEventListener('mousedown', handleClick)
     document.addEventListener('keydown', handleKey)
+    window.addEventListener('scroll', close, true)
+    window.addEventListener('resize', close)
     return () => {
       document.removeEventListener('mousedown', handleClick)
       document.removeEventListener('keydown', handleKey)
+      window.removeEventListener('scroll', close, true)
+      window.removeEventListener('resize', close)
     }
   }, [open])
+
+  const MENU_WIDTH = 210
+
+  function openMenu() {
+    if (open) { setOpen(false); return }
+    const r = ref.current?.getBoundingClientRect()
+    if (r) {
+      // Keep it on screen: flip left when it would run off the right edge, and
+      // above when there is no room below.
+      const left = Math.max(8, Math.min(r.left, window.innerWidth - MENU_WIDTH - 8))
+      const below = window.innerHeight - r.bottom
+      const top = below < 200 ? Math.max(8, r.top - 200) : r.bottom + 4
+      setPos({ top, left })
+    }
+    setOpen(true)
+  }
 
   async function select(newVal: string) {
     setOpen(false)
@@ -206,7 +246,7 @@ export function InlineSelect({
   return (
     <div ref={ref} style={{ position: 'relative', display: 'inline-block' }}>
       <span
-        onClick={() => setOpen(!open)}
+        onClick={openMenu}
         style={{
           ...style,
           cursor: 'pointer',
@@ -220,18 +260,17 @@ export function InlineSelect({
         <span style={{ fontSize: 8, marginLeft: 3, color: '#9CA3AF', opacity: open ? 1 : 0, transition: 'opacity 0.15s' }}>&#9660;</span>
       </span>
 
-      {open && (
-        <div style={{
-          position: 'absolute',
-          top: '100%',
-          left: 0,
-          marginTop: 4,
+      {open && pos && createPortal(
+        <div ref={menuRef} style={{
+          position: 'fixed',
+          top: pos.top,
+          left: pos.left,
           background: 'white',
           border: '1px solid #E5E7EB',
           borderRadius: 8,
           boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
-          zIndex: 100,
-          minWidth: 160,
+          zIndex: 3000,
+          width: MENU_WIDTH,
           maxHeight: 240,
           overflowY: 'auto',
           padding: 4,
@@ -252,6 +291,9 @@ export function InlineSelect({
                 borderRadius: 4,
                 cursor: 'pointer',
                 textAlign: 'left',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
               }}
               onMouseEnter={(e) => { if (opt.value !== value) (e.currentTarget as HTMLElement).style.background = '#F9FAFB' }}
               onMouseLeave={(e) => { if (opt.value !== value) (e.currentTarget as HTMLElement).style.background = 'transparent' }}
@@ -260,7 +302,8 @@ export function InlineSelect({
               {opt.value === value && <span style={{ float: 'right', color: '#10B981' }}>&#10003;</span>}
             </button>
           ))}
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   )

@@ -21,14 +21,36 @@ export interface TeamMember {
   email: string
   /** What a human sees. First name only, because that is how the team talks. */
   label: string
+  /**
+   * The colour this person's calls are drawn in, chosen by Rae on 24 September
+   * 2026 so the board can be scanned for who is on the phones.
+   *
+   * `dot` is the filled circle, `ink` is text placed on that circle. Bella's
+   * yellow is the brand yellow, which needs dark text on it rather than white,
+   * which is why ink is carried per person rather than assumed.
+   *
+   * Colour is never the only signal: every control that uses these also shows
+   * the person's initial, because two of the four are red and green.
+   */
+  dot: string
+  ink: string
 }
 
 export const SALES_TEAM: readonly TeamMember[] = [
-  { email: 'rae@teachersdeserveit.com', label: 'Rae' },
-  { email: 'hello@teachersdeserveit.com', label: 'Bella' },
-  { email: 'kristin@whatwilllast.com', label: 'Kristin' },
-  { email: 'jim@teachersdeserveit.com', label: 'Jim' },
+  { email: 'rae@teachersdeserveit.com', label: 'Rae', dot: '#DC2626', ink: '#FFFFFF' },
+  { email: 'hello@teachersdeserveit.com', label: 'Bella', dot: '#ffba06', ink: '#1e2749' },
+  { email: 'kristin@whatwilllast.com', label: 'Kristin', dot: '#2563EB', ink: '#FFFFFF' },
+  { email: 'jim@teachersdeserveit.com', label: 'Jim', dot: '#059669', ink: '#FFFFFF' },
 ] as const
+
+/** The person on the phones for a lead, or null when nobody is. */
+export function callerOf(email: string | null | undefined): TeamMember | null {
+  if (!email) return null
+  return SALES_TEAM.find(m => m.email === email.toLowerCase().trim()) ?? null
+}
+
+/** Nobody assigned. Grey, and shown as a dash rather than an initial. */
+export const NO_CALLER = { dot: '#E5E7EB', ink: '#9CA3AF' } as const
 
 /**
  * The name to show for a stored address.

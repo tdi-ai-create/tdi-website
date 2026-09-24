@@ -5,12 +5,6 @@ import Link from 'next/link'
 import type { FullOpportunity } from '../OpportunityDetailPanel'
 import { SELLABLE_OFFERINGS, OFFERING_LABELS } from '@/lib/partnerships/offerings'
 
-const HEAT_OPTIONS = [
-  { id: 'hot', label: 'Hot', color: '#EF4444' },
-  { id: 'warm', label: 'Warm', color: '#F59E0B' },
-  { id: 'cold', label: 'Cold', color: '#3B82F6' },
-  { id: 'parked', label: 'Parked', color: '#9CA3AF' },
-]
 
 const TYPE_LABELS: Record<string, string> = {
   renewal: 'Renewal',
@@ -37,8 +31,6 @@ export function PanelHeader({ opp, onClose, onPatch }: Props) {
       onPatch({ name: name.trim() })
     }
   }
-
-  const heat = HEAT_OPTIONS.find(h => h.id === (opp as any).heat)
   const contactName = (opp as any).contact_name || ''
   const contactEmail = (opp as any).contact_email || ''
   const contactPhone = (opp as any).contact_phone || ''
@@ -126,7 +118,7 @@ export function PanelHeader({ opp, onClose, onPatch }: Props) {
         </div>
       </div>
 
-      {/* Tags + heat bar */}
+      {/* Tags and offering */}
       <div style={{ padding: '12px 28px', borderBottom: '1px solid #E5E7EB', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 6 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
           {typeLabel && (
@@ -175,21 +167,10 @@ export function PanelHeader({ opp, onClose, onPatch }: Props) {
           </select>
         </div>
 
-        {/* Heat selector */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          {heat && <span title="How responsive is this lead right now? Hot = replied recently or meeting booked. Warm = engaged but no recent reply. Cold = multiple outreach attempts with no response. Parked = not pursuing right now." style={{ width: 8, height: 8, borderRadius: '50%', background: heat.color, display: 'inline-block' }} />}
-          <select
-            value={(opp as any).heat ?? ''}
-            onChange={e => onPatch({ heat: e.target.value || null } as any)}
-            style={{ fontSize: 12, border: '1px solid #E5E7EB', borderRadius: 6, padding: '3px 8px', background: 'white', color: heat?.color || '#6B7280', fontWeight: 600, outline: 'none', cursor: 'pointer' }}
-            title="How responsive is this lead right now? Hot = replied recently or meeting booked. Warm = engaged but no recent reply. Cold = multiple outreach attempts with no response. Parked = not pursuing right now."
-          >
-            <option value="">Heat</option>
-            {HEAT_OPTIONS.map(h => (
-              <option key={h.id} value={h.id}>{h.label}</option>
-            ))}
-          </select>
-        </div>
+        {/* Heat is gone from every screen. Rae, 24 September 2026: "remove
+            hot warm and cold. we dont need that. its just creating confusion."
+            The column stays in the database, so the twelve dated heat decisions
+            recorded on 21 September are not destroyed by a UI change. */}
       </div>
     </div>
   )

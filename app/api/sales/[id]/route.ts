@@ -1,5 +1,18 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextResponse } from 'next/server'
+import { createSupabaseServerClient } from '@/lib/supabase-server'
+import { teamLabel } from '@/lib/sales/team'
+
+/** Who is doing this, from the session rather than from the request body. */
+async function actor(): Promise<string> {
+  try {
+    const sb = await createSupabaseServerClient()
+    const { data: { user } } = await sb.auth.getUser()
+    return user?.email ?? 'system@teachersdeserveit.com'
+  } catch {
+    return 'system@teachersdeserveit.com'
+  }
+}
 
 const EDITABLE_FIELDS: Record<string, { type: 'text' | 'number' | 'enum' | 'boolean' | 'date'; values?: string[] }> = {
   value: { type: 'number' },
@@ -11,6 +24,12 @@ const EDITABLE_FIELDS: Record<string, { type: 'text' | 'number' | 'enum' | 'bool
   school_year: { type: 'text' },
   lead_classification: { type: 'enum', values: ['current_client', 'new_inquiry', 'targeting_area', 'ar_collection'] },
   on_jims_call_sheet: { type: 'boolean' },
+  call_owner: { type: 'enum', values: [
+    'rae@teachersdeserveit.com',
+    'hello@teachersdeserveit.com',
+    'kristin@whatwilllast.com',
+    'jim@teachersdeserveit.com',
+  ] },
   notes: { type: 'text' },
   expected_close_date: { type: 'date' },
   last_activity_at: { type: 'date' },
@@ -52,8 +71,13 @@ export async function PATCH(
         return NextResponse.json({ error: `"${field}" must be a number` }, { status: 400 })
       }
     }
-    if (fieldDef.type === 'enum' && fieldDef.values && new_value !== null) {
-      if (!fieldDef.values.includes(new_value)) {
+    // An empty string means "clear it". Without this the call owner dropdown's
+    // "Nobody" option fails the enum check below and the lead can be put on the
+    // call list but never taken off it.
+    if (coerced === '') coerced = null
+
+    if (fieldDef.type === 'enum' && fieldDef.values && coerced !== null) {
+      if (!fieldDef.values.includes(coerced)) {
         return NextResponse.json({ error: `Invalid value for "${field}". Must be one of: ${fieldDef.values.join(', ')}` }, { status: 400 })
       }
     }
@@ -84,12 +108,53 @@ export async function PATCH(
       updated_at: new Date().toISOString(),
     }
 
+    // The call list is now "somebody's name is on it". The old boolean is kept
+    // in step rather than deleted, because the export, the top bar count and
+    // `pipeline-summary` all still read it, and a column rename is a worse
+    // trade than one extra assignment here.
+    if (field === 'call_owner') {
+      updatePayload.on_jims_call_sheet = coerced !== null
+    }
+
     const { error: updateError } = await (supabase.from('sales_opportunities') as any)
       .update(updatePayload)
       .eq('id', id)
 
     if (updateError) {
       return NextResponse.json({ error: updateError.message }, { status: 500 })
+    }
+
+    /**
+     * Putting a name on a call, and taking it off, are both written into the
+     * notes with the date on them.
+     *
+     * Rae, 24 September 2026: "any time a client is assigned to a caller, it
+     * should be timestamped in notes", and "when a caller is removed, it should
+     * also be timestamped". The note row carries created_at, but the date is
+     * written into the text as well so it survives an export or a paste into a
+     * document, where the column would not come along.
+     */
+    if (field === 'call_owner' && coerced !== oldValue) {
+      const by = await actor()
+      const stamp = new Date().toLocaleString('en-US', {
+        month: 'long', day: 'numeric', year: 'numeric',
+        hour: 'numeric', minute: '2-digit',
+      })
+      const noteText = coerced
+        ? `CALL ASSIGNED TO ${teamLabel(coerced).toUpperCase()}.\n` +
+          `Set by ${teamLabel(by)} on ${stamp}.` +
+          (oldValue ? `\nReplaces ${teamLabel(oldValue)} on the call.` : '')
+        : `CALL UNASSIGNED.\n` +
+          `${oldValue ? teamLabel(oldValue) : 'Nobody'} is no longer making this call. ` +
+          `Cleared by ${teamLabel(by)} on ${stamp}.`
+
+      const { error: noteErr } = await (supabase.from('opportunity_notes') as any).insert({
+        opportunity_id: id,
+        author_email: by,
+        note_text: noteText,
+        note_type: 'update',
+      })
+      if (noteErr) console.error('[sales] call owner note failed:', noteErr.message)
     }
 
     // Write audit log
