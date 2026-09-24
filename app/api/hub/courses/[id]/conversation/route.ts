@@ -66,12 +66,12 @@ export async function GET(
 
     // Try to get display names for the user IDs
     const userIds = [...new Set((posts || []).map(p => p.user_id))]
-    let profileMap: Record<string, { name: string; role: string | null; avatar_url: string | null; educator_type: string | null }> = {}
+    let profileMap: Record<string, { name: string; role: string | null; avatar_url: string | null; educator_type: string | null; is_tdi_voice: boolean }> = {}
 
     if (userIds.length > 0) {
       const { data: profiles } = await supabase
         .from('hub_profiles')
-        .select('id, display_name, role, avatar_url, educator_type')
+        .select('id, display_name, role, avatar_url, educator_type, is_tdi_voice')
         .in('id', userIds)
 
       if (profiles) {
@@ -81,6 +81,7 @@ export async function GET(
             role: p.role,
             avatar_url: p.avatar_url,
             educator_type: p.educator_type || null,
+            is_tdi_voice: p.is_tdi_voice === true,
           }
         }
       }
@@ -93,7 +94,7 @@ export async function GET(
       body: post.body,
       helpful_count: post.helpful_count,
       posted_at: post.created_at,
-      author: profileMap[post.user_id] || { name: 'Teacher', role: null, avatar_url: null, educator_type: null },
+      author: profileMap[post.user_id] || { name: 'Teacher', role: null, avatar_url: null, educator_type: null, is_tdi_voice: false },
     }))
 
     return NextResponse.json({
@@ -159,7 +160,7 @@ export async function POST(
     // Get author profile
     const { data: profile } = await supabase
       .from('hub_profiles')
-      .select('display_name, role, avatar_url, educator_type')
+      .select('display_name, role, avatar_url, educator_type, is_tdi_voice')
       .eq('id', user_id)
       .single()
 
@@ -175,6 +176,7 @@ export async function POST(
         role: profile?.role || null,
         educator_type: profile?.educator_type || null,
         avatar_url: profile?.avatar_url || null,
+        is_tdi_voice: profile?.is_tdi_voice === true,
       },
     }, { status: 201 })
   } catch (err: unknown) {
