@@ -1,5 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextResponse } from 'next/server'
+import { SALES_TEAM } from '@/lib/sales/team'
+import { pipelineMoney, scoreBoard } from '@/lib/sales/board-scores'
 
 export async function GET() {
   try {
@@ -20,12 +22,52 @@ export async function GET() {
     const lost = (opps || []).filter((o: any) => o.stage === 'lost')
     const now = new Date()
 
-    // Pulse metrics
-    const totalPipeline = active.reduce((s: number, o: any) => s + (o.value || 0), 0)
-    const factored = active.reduce((s: number, o: any) => s + (o.value || 0) * (o.probability || 0) / 100, 0)
-    const dealsWithValue = active.filter((o: any) => (o.value || 0) > 0)
-    const avgDealSize = dealsWithValue.length ? totalPipeline / dealsWithValue.length : 0
-    const wonValue = won.reduce((s: number, o: any) => s + (o.value || 0), 0)
+    /**
+     * Money comes from the same scorer the board headline uses.
+     *
+     * It used to be computed here, by summing the raw `value` column across
+     * every active lead. That is the pre-restructure import the September
+     * correction was built to stop counting, so on 24 September 2026 this tab
+     * reported $1,562K while the headline directly above it read $0.78M. Same
+     * board, same moment, two answers.
+     *
+     * `pipelineMoney` mirrors the headline's population exactly, Targeting
+     * included and excluded the same way, so the two screens can no longer
+     * disagree without somebody changing one function.
+     */
+    const { board, error: scoreErr } = await scoreBoard(supabase)
+    if (scoreErr) throw new Error(`scoring the board failed: ${scoreErr}`)
+    const money = board ? pipelineMoney(board) : { total: 0, count: 0, unvalued: 0, average: 0 }
+
+    const totalPipeline = money.total
+    const avgDealSize = money.average
+
+    /**
+     * Factored the same way the top bar factors: by stage probability, on the
+     * predicted value rather than the recorded one.
+     */
+    const probByStage = new Map<string, number>(
+      active.map((o: any) => [o.id as string, (o.probability || 0) as number])
+    )
+    const factored = board
+      ? board.scored.reduce((sum, sc) => {
+          const stage = board.stages[sc.id]
+          if (stage === 'paid' || stage === 'lost' || stage === 'targeting') return sum
+          return sum + (sc.value ?? 0) * (probByStage.get(sc.id) ?? 0) / 100
+        }, 0)
+      : 0
+
+    /**
+     * Signed and paid, together.
+     *
+     * This tile was labelled "Won YTD" and counted only the paid stage, so it
+     * read $4K on a board carrying $169K of signed work. A signed contract is
+     * won; whether the invoice has cleared is a billing question, not a sales
+     * one. Both use the recorded figure rather than a prediction, because once
+     * a contract is signed the number is in the contract.
+     */
+    const signedOpps = (opps || []).filter((o: any) => o.stage === 'signed')
+    const wonValue = [...won, ...signedOpps].reduce((s: number, o: any) => s + (o.value || 0), 0)
 
     // Stale leads: active deals with no activity in 30+ days
     const staleLeads = active.filter((o: any) => {
@@ -44,12 +86,19 @@ export async function GET() {
       return daysSince > 14
     }).length
 
-    // Win rate: signed / (signed + lost) for a more useful metric
-    const closedDeals = won.length + lost.length
-    const signedDeals = active.filter((o: any) => o.stage === 'signed').length
-    const winRate = closedDeals > 0
-      ? Math.round(((won.length + signedDeals) / (closedDeals + signedDeals)) * 100)
-      : signedDeals > 0 ? 100 : 0
+    /**
+     * There is no win rate any more, and there should never have been one.
+     *
+     * It was (signed + paid) / (signed + paid + lost). TDI does not mark a lead
+     * lost, on purpose: in K-12 a no is almost always a not-this-budget-year.
+     * So the denominator could never carry a loss, and the tile reported 100
+     * percent on 24 September 2026 with zero rows in the lost stage and no
+     * arrangement of real events that could ever move it.
+     *
+     * `signedCount` stays, because a count of signed deals is a fact.
+     */
+    const signedDeals = signedOpps.length
+    void lost
 
     // Funnel: show actual deals currently at each stage
     const stageOrder = ['targeting', 'engaged', 'qualified', 'likely_yes', 'proposal_sent', 'signed', 'paid']
@@ -147,11 +196,11 @@ export async function GET() {
     })
 
     // Owner / team performance
-    // Map raw IDs or emails to display names
-    const OWNER_NAMES: Record<string, string> = {
-      'rae@teachersdeserveit.com': 'Rae',
-      'jim@teachersdeserveit.com': 'Jim',
-    }
+    // Map raw IDs or emails to display names. Built from the one roster in
+    // lib/sales/team.ts rather than a third hardcoded copy of it.
+    const OWNER_NAMES: Record<string, string> = Object.fromEntries(
+      SALES_TEAM.map(m => [m.email, m.label])
+    )
     function resolveOwner(raw: string | null): string {
       if (!raw) return 'unassigned'
       if (OWNER_NAMES[raw]) return OWNER_NAMES[raw]
@@ -255,11 +304,11 @@ export async function GET() {
       pulse: {
         totalPipeline: Math.round(totalPipeline),
         factored: Math.round(factored),
-        activeCount: active.length,
+        activeCount: money.count,
         avgDealSize: Math.round(avgDealSize),
         wonValue: Math.round(wonValue),
-        wonCount: won.length,
-        winRate,
+        wonCount: won.length + signedDeals,
+        unvaluedCount: money.unvalued,
         staleLeads,
         needsFollowUp,
         signedCount: signedDeals,

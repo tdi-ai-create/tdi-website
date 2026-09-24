@@ -1,5 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServiceSupabase } from '@/lib/supabase'
+import { createSupabaseServerClient } from '@/lib/supabase-server'
+
+/**
+ * Who wrote this note.
+ *
+ * The panel never sent an author, so every note typed into it since the CRM
+ * shipped was stored as system@teachersdeserveit.com: 300 of them against 132
+ * carrying a real name, and the newest real name is 9 September. The timeline
+ * colours notes gold for Rae, blue for Jim and teal for system, so the whole
+ * recent history renders as the machine talking to itself.
+ *
+ * The session wins when there is one, because the caller cannot be checked.
+ * `author_email` from the body is still honoured for the scripts and agents
+ * that post here without a session, and system is the last resort.
+ */
+async function resolveAuthor(fallback: string): Promise<string> {
+  try {
+    const supabase = await createSupabaseServerClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    return user?.email ?? fallback
+  } catch {
+    return fallback
+  }
+}
 
 const VALID_TYPES = new Set(['call', 'email', 'meeting', 'demo', 'update', 'system'])
 
@@ -13,8 +37,9 @@ export async function POST(
   const {
     note_text,
     note_type = 'update',
-    author_email = 'system@teachersdeserveit.com',
+    author_email: claimedAuthor = 'system@teachersdeserveit.com',
   } = body
+  const author_email = await resolveAuthor(claimedAuthor)
 
   if (!note_text?.trim()) {
     return NextResponse.json({ error: 'note_text is required' }, { status: 400 })

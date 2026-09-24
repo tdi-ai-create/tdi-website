@@ -129,3 +129,38 @@ export async function quoteSent(quoteNumber: string, org: string, contactName: s
     `*Quote Sent* -- ${quoteNumber}\n${org} | Sent to ${contactName} | $${amount.toLocaleString()}\nWaiting for signature.`
   )
 }
+
+/**
+ * A follow-up was set on a lead.
+ *
+ * Posts to the sales channel rather than DMing the owner. Rae's call on 24
+ * September 2026: the whole team should see assignments as they happen, so
+ * nobody has to open the board to learn a call is owed.
+ *
+ * The lead name is internal shorthand for a district, so this does not leave
+ * the company. It still says nothing about what the district is paying, which
+ * is a separate rule.
+ */
+export async function followUpSet(f: {
+  lead: string
+  contact: string | null
+  kind: string
+  text: string
+  ownerLabel: string | null
+  due: string | null
+  setByLabel: string
+}) {
+  const who = f.ownerLabel ?? 'nobody yet'
+  const when = f.due ? ` by ${f.due}` : ''
+  const contact = f.contact ? ` (${f.contact})` : ''
+  await postToSlack(
+    `*${f.kind.toUpperCase()} owed: ${who}${when}*\n` +
+    `${f.lead}${contact}\n` +
+    `${f.text}\n` +
+    `_Set by ${f.setByLabel}_`
+  )
+}
+
+export async function followUpCleared(f: { lead: string; text: string; byLabel: string }) {
+  await postToSlack(`*Follow-up done* -- ${f.lead}\n~${f.text}~\n_Cleared by ${f.byLabel}_`)
+}
