@@ -321,16 +321,19 @@ function PostCard({ post, userId, isAdmin, onRefresh, tUI }: { post: Conversatio
             </div>
           )}
 
-          {/* Tag */}
-          <span
-            className="inline-block text-xs font-medium px-2 py-0.5 rounded mb-2"
-            style={{
-              backgroundColor: `${config.color}18`,
-              color: config.color,
-            }}
-          >
-            {tUI(config.label)}
-          </span>
+          {/* Tag. A from_tdi post already says TDI on the byline chip, so the
+              tag would be the same word twice on the same card. */}
+          {post.contribution_type !== 'from_tdi' && (
+            <span
+              className="inline-block text-xs font-medium px-2 py-0.5 rounded mb-2"
+              style={{
+                backgroundColor: `${config.color}18`,
+                color: config.color,
+              }}
+            >
+              {tUI(config.label)}
+            </span>
+          )}
 
           {/* Title */}
           {post.title && (
