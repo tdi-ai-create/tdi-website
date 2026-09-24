@@ -33,9 +33,11 @@ export const SALES_TEAM: readonly TeamMember[] = [
 /**
  * The name to show for a stored address.
  *
- * Falls back to the raw string rather than to "Unknown", because 79 leads carry
- * `blRAscdKSZLQMumakHZY` in `assigned_to_email` from an old import. Showing the
- * junk makes it findable. Hiding it behind a friendly word does not.
+ * Falls back to the raw string rather than to "Unknown". 79 rows carry
+ * `blRAscdKSZLQMumakHZY` in `assigned_to_email` from an old import; all 79 are
+ * soft deleted today, so none of them is on the live board, but the column
+ * still accepts anything and an undeleted one would be invisible behind a
+ * friendly word. Showing the junk makes it findable.
  */
 export function teamLabel(email: string | null | undefined): string {
   if (!email) return 'Unassigned'

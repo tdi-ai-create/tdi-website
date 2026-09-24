@@ -883,9 +883,11 @@ export function OpportunityDetailPanel({
                       {SALES_TEAM.map(m => (
                         <option key={m.email} value={m.email}>{m.label}</option>
                       ))}
-                      {/* 79 leads carry a junk id here from an old import. Kept
-                          as an option so the dropdown does not silently rewrite
-                          one to Unassigned just by being opened. */}
+                      {/* An assignee that is not on the roster is kept as an
+                          option so the dropdown cannot silently rewrite one to
+                          Unassigned just by being opened. No live lead has one
+                          today; 79 rows with a junk id from an old import are
+                          all soft deleted. */}
                       {opp.assigned_to_email &&
                         !SALES_TEAM.some(m => m.email === opp.assigned_to_email) && (
                         <option value={opp.assigned_to_email}>{opp.assigned_to_email}</option>
