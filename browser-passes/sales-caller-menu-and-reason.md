@@ -8,10 +8,29 @@ or unassigned.
 
 ## What I did
 
-- Deferred: the admin portal authenticates against a session cookie scoped to
-  the live domain, so a local server sends every `/tdi-admin` page to the login
-  screen.
-- Verify after deploy: https://www.teachersdeserveit.com/tdi-admin/sales
+Completed on production 24 September 2026, signed in as Rae Hughart. The
+deferral is kept for the record.
+
+- Was deferred: the admin portal authenticates against a session cookie scoped
+  to the live domain, so a local server sends every `/tdi-admin` page to the
+  login screen.
+
+### On production
+
+- Opened: https://www.teachersdeserveit.com/tdi-admin/sales
+- Saw: the pill under an unassigned card reads **"Nobody is on this call. Click
+  to put a name on it."** rather than a bare dash. 47 cards carry it.
+- Pressed: the caller badge on the Laredo Diocese OLOR card.
+- Saw: the menu opens in full and is **not clipped** by the card. All five
+  options are readable: "Rae calls this one", "Bella calls this one", "Kristin
+  calls this one", "Jim calls this one" with a tick against it, and "Take it off
+  the call list". The clipping is what this change existed to fix.
+- Saw: the assignment notes are on the cards. Laredo Diocese, Maplebrook and
+  Hancock County each read "CALL ASSIGNED TO JIM, 24 September 2026", and MSB
+  Private School reads "ON BELLA'S CALL LIST. Bella is making this call".
+- Saw: "WHO IS CALLING: Rae 18, Bella 16, Kristin 5, Jim 72, Nobody yet 99", and
+  "Call list: 111 / $556K". Bella read 0 earlier today, so her list landed.
+- Pressed: Escape. The menu closed and no assignment was changed.
 
 The deferral on the previous change to these screens was completed first and is
 recorded in `sales-call-owner-and-no-heat.md`.
