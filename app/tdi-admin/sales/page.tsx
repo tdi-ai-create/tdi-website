@@ -2303,6 +2303,7 @@ export default function SalesPage() {
               ...(changes.value !== undefined ? { value: changes.value } : {}),
               ...(changes.assigned_to_email !== undefined ? { assignedTo: changes.assigned_to_email } : {}),
               ...(changes.name ? { name: changes.name } : {}),
+              ...(changes.grant_support !== undefined ? { grantSupport: Boolean(changes.grant_support) } : {}),
               // The follow-up alert shows on the card and in the outreach
               // queue, so a change made in the panel has to land on the board
               // without a reload.

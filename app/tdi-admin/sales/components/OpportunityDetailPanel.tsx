@@ -63,6 +63,8 @@ export interface FullOpportunity {
   notes_list?: OppNote[]
   related_records?: RelatedRecord[]
   activity?: OppActivity[]
+  /** Confirmed, never predicted: 25 of the 100 muck points ride on this. */
+  grant_support?: boolean | null
   /** The live follow-up alert. Written by /followup, never by PATCH. */
   followup_text?: string | null
   followup_kind?: string | null
@@ -312,7 +314,7 @@ export function OpportunityDetailPanel({
       onUpdate(opp.id, changes)
       // These four are the model's inputs. Change one and every muck number on
       // screen, here and on the card, is stale until the board re-reads it.
-      if (['value', 'offering', 'stage', 'state'].some(k => k in changes)) onMuckStale?.()
+      if (['value', 'offering', 'stage', 'state', 'grant_support'].some(k => k in changes)) onMuckStale?.()
       return true
     } catch {
       setOpp(prev)
@@ -879,6 +881,40 @@ export function OpportunityDetailPanel({
                     <span style={{ fontSize: 12, color: '#374151', fontWeight: 600 }}>
                       {new Date(opp.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                     </span>
+                  </div>
+
+                  {/* Grant funding.
+
+                      Grant is 25 of the 100 muck points and until now there was
+                      no way to set it from any screen a person can reach. The
+                      only path was dragging a card into Signed with Grant,
+                      which also changes the stage, so an unsigned lead could
+                      never carry it. Measured on 24 September 2026: 4 leads of
+                      213 had it set and 3 of those were already signed, which
+                      means a quarter of the model was a constant.
+
+                      A checkbox for it did exist, in panel/DetailsTab.tsx.
+                      Nothing imported that file. It is deleted in this change
+                      rather than left sitting there for the next person to
+                      edit by mistake. */}
+                  <div style={{ marginBottom: 10, paddingBottom: 10, borderBottom: '1px solid #F3F4F6' }}>
+                    <label style={{ display: 'flex', alignItems: 'flex-start', gap: 8, cursor: 'pointer' }}>
+                      <input
+                        type="checkbox"
+                        checked={Boolean(opp.grant_support)}
+                        onChange={e => patchOpp({ grant_support: e.target.checked } as Partial<FullOpportunity>)}
+                        style={{ marginTop: 2, width: 14, height: 14, cursor: 'pointer', accentColor: '#2A9D8F' }}
+                      />
+                      <span>
+                        <span style={{ fontSize: 12, color: '#374151', fontWeight: 600, display: 'block' }}>
+                          This school needs grant funding
+                        </span>
+                        <span style={{ fontSize: 11, color: '#9CA3AF', display: 'block', lineHeight: 1.4 }}>
+                          Tick this only once somebody has said so. It adds 25 muck points and moves the lead
+                          up the outreach queue, so a guess here changes what everyone calls first.
+                        </span>
+                      </span>
+                    </label>
                   </div>
 
                   {/* Assigned to */}

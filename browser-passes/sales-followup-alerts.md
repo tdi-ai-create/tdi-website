@@ -83,6 +83,39 @@ still stores the claimed author. **The session path is the second thing to press
 on production**: type a note as Rae and confirm the card reads "Rae" in gold
 rather than "System" in teal.
 
+## Second change on this branch: Analytics and the grant control
+
+- Deferred: same reason. The admin portal cannot be signed in to locally.
+- Verify after deploy: https://www.teachersdeserveit.com/tdi-admin/sales
+
+Driven without a browser, against the live database:
+
+- The muck scorer moved into `lib/sales/board-scores.ts` so the Analytics tab
+  could share it. Captured `/api/sales/muck` before and after the move and
+  compared them field by field. Identical: same 213 leads, zero leads differing
+  on any field, and a byte-identical rollup of
+  `{"scored":107,"unscored":106,"totalMuck":2572,"factoredMuck":1108,"rae":1092,"bella":16,"heavy":21}`.
+  The refactor is a move, proven rather than asserted.
+- Called `/api/sales/analytics` afterwards. It now returns
+  `activeCount: 166` and `unvaluedCount: 74`, which are the two counts the
+  pipeline headline shows, and `totalPipeline: 764247` against the headline's
+  $0.76M. Before this change the same tab reported $1,562K.
+- Counted the population in SQL independently: 213 leads this school year,
+  minus 44 Targeting, minus 3 paid, is 166. The two screens now count the same
+  thing.
+- `avgDealSize` moved from $17.8K to $8.3K, and `wonValue` from $3,897 to
+  $172,891 across 12 deals, which is the 9 signed plus the 3 paid.
+- Win Rate is gone rather than corrected. Zero rows exist in the lost stage and
+  none ever will, so the tile could only report 100 percent.
+- The grant control: PATCHed `grant_support: true` on a throwaway lead, which
+  is exactly what the new checkbox sends, and read the score back. Muck points
+  went 12 to 37, the grant dimension 0 to 25, and value per muck point 517 to
+  168. So the control moves the chase order, which is the whole reason it needs
+  to exist. The throwaway lead was deleted.
+
+Not pressed: the checkbox itself, and the Analytics tab rendered. Both on
+production after the deploy.
+
 ## What I could not verify
 
 Everything a person presses. The alert banner, the card pill, the Outreach Queue
