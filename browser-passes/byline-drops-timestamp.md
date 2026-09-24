@@ -8,13 +8,13 @@ then role. Posts and replies both.
 
 ## What I did
 
-- Opened:
-- Pressed:
-- Saw:
+- Opened: https://www.teachersdeserveit.com/hub/quick-wins/calm-response-scripts as marisol.aguirre@voices.teachersdeserveit.com, an account TDI owns
+- Pressed: "Skip for today" on the Vibe Check popup, which covers the page and swallows every click until dismissed
+- Saw: the two bylines reading exactly "Rosalie Dunne TDI . Classroom Teacher" and "Everett Crane TDI . Para". No time on either. Before this deploy the same two read "19h ago" on the end.
+- Saw: the cards still carrying their tags, "Question" on Rosalie's and "From TDI" on Everett's, and the filter row still reading "All 1" and "Question 1", so nothing else moved.
 
-Waiting on the deploy. The local attempt is written below rather than on those
-lines, because a page that redirected to login is not an observation of this
-change.
+Read by matching bylines on role rather than on a trailing time, because
+matching on time is what the change removes.
 
 ## The local attempt
 
