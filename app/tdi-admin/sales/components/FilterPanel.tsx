@@ -49,8 +49,12 @@ const EFFORT_CHIPS: ChipDef[] = [
   { key: 'band:heavy', label: 'Heavy', title: 'The heaviest fifth of the board by muck points.' },
   {
     key: 'not_valued',
-    label: 'Not valued',
-    title: 'No offering recorded, so there is no muck score and no value per point. These cannot be ranked until somebody records what the school is likely to buy.',
+    // "on the board", because the headline above says a smaller number under
+    // the same two words. This chip counts everything including Targeting; the
+    // headline counts the pipeline only. Both are right, and a reader cannot
+    // tell that from the word alone.
+    label: 'Not valued on the board',
+    title: 'No offering recorded, so there is no muck score and no value per point. These cannot be ranked until somebody records what the school is likely to buy. This counts the whole board including Targeting, so it is larger than the "not valued in pipeline" figure in the bar above.',
   },
 ]
 

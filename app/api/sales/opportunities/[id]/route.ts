@@ -12,6 +12,11 @@ const ALLOWED_PATCH_FIELDS = new Set([
   'source', 'type', 'is_contact_only', 'partnership_status',
   'contact_name', 'contact_email', 'contact_phone',
   'city', 'state', 'grant_support',
+  // A lead on the wrong school year is invisible on the board and, until this
+  // was added, unfixable from the app: both the board and the scorer filter on
+  // it. Twelve leads were hidden this way in September 2026 and had to be
+  // corrected in SQL.
+  'school_year', 'contract_year',
   'expected_close_date', 'deletion_reason',
   // Fit scoring fields (old model)
   'fit_district_size', 'fit_turnover_signal', 'fit_pd_investment',
