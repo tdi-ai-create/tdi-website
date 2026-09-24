@@ -230,7 +230,15 @@ export function OpportunityDetailPanel({
   const [pEnd, setPEnd] = useState('')
 
   useEffect(() => {
-    if (!opportunityId) { setOpp(null); return }
+    // Closing clears the lead AND the marker saying which lead is loaded.
+    //
+    // It used to clear only the lead. So closing a record and opening the same
+    // record again left `opp` null while `prevIdRef` still held its id, the
+    // guard below decided nothing had changed, `loadOpp` never ran, and the
+    // panel rendered as a blank white sheet with no error and no spinner. The
+    // only way out was to open a different lead first. Found by pressing it on
+    // production, 24 September 2026.
+    if (!opportunityId) { setOpp(null); prevIdRef.current = null; return }
     if (opportunityId !== prevIdRef.current) {
       prevIdRef.current = opportunityId
       loadOpp(opportunityId)

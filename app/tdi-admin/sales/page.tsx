@@ -1558,7 +1558,7 @@ export default function SalesPage() {
               <div>
                 <h2 style={{ fontSize: 18, fontWeight: 700, color: '#0a0f1e', margin: 0 }}>Outreach Queue</h2>
                 <p style={{ fontSize: 12, color: '#6B7280', margin: '2px 0 0' }}>
-                  {owed.length > 0 ? `${owed.length} follow-ups owed, then ` : ''}
+                  {owed.length > 0 ? `${owed.length} follow-up${owed.length === 1 ? '' : 's'} owed, then ` : ''}
                   {ordered.length} leads needing outreach, ordered by deal value per muck point.
                 </p>
               </div>
@@ -1566,7 +1566,7 @@ export default function SalesPage() {
             {owed.length > 0 && (
               <div style={{ marginBottom: 24 }}>
                 <h3 style={{ fontSize: 13, fontWeight: 700, color: '#0a0f1e', margin: '0 0 2px' }}>
-                  Somebody said they would do this ({owed.length})
+                  Somebody said they would do {owed.length === 1 ? 'this' : 'these'} ({owed.length})
                 </h3>
                 <p style={{ fontSize: 11, color: '#6B7280', margin: '0 0 8px' }}>
                   Follow-ups set on the lead itself, oldest deadline first. These are promises, not
