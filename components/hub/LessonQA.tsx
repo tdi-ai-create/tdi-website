@@ -47,23 +47,6 @@ interface LessonQAProps {
   apiBasePath: string
 }
 
-function getTimeAgo(dateStr: string): string {
-  const now = new Date()
-  const date = new Date(dateStr)
-  const diffMs = now.getTime() - date.getTime()
-  const diffMins = Math.floor(diffMs / 60000)
-  if (diffMins < 1) return 'just now'
-  if (diffMins < 60) return `${diffMins}m ago`
-  const diffHours = Math.floor(diffMins / 60)
-  if (diffHours < 24) return `${diffHours}h ago`
-  const diffDays = Math.floor(diffHours / 24)
-  if (diffDays < 7) return `${diffDays}d ago`
-  const diffWeeks = Math.floor(diffDays / 7)
-  if (diffWeeks < 5) return `${diffWeeks}w ago`
-  const diffMonths = Math.floor(diffDays / 30)
-  return `${diffMonths}mo ago`
-}
-
 function AuthorAvatar({ name }: { name: string }) {
   return (
     <div
@@ -410,7 +393,6 @@ export default function LessonQA({ contentId, userId, isAdmin, apiBasePath }: Le
                           </span>
                         )}
                         <span className="text-xs" style={{ color: '#D1D5DB' }}>&middot;</span>
-                        <span className="text-xs" style={{ color: '#9CA3AF' }}>{getTimeAgo(q.posted_at)}</span>
                       </div>
                     </div>
                   </div>
@@ -471,7 +453,6 @@ export default function LessonQA({ contentId, userId, isAdmin, apiBasePath }: Le
                                 </span>
                               )}
                               <span className="text-xs" style={{ color: '#D1D5DB' }}>&middot;</span>
-                              <span className="text-xs" style={{ color: '#9CA3AF' }}>{getTimeAgo(r.posted_at)}</span>
                             </div>
                             <p className="text-sm leading-relaxed" style={{ color: '#374151', fontFamily: "'DM Sans', sans-serif" }}>
                               {r.body}
