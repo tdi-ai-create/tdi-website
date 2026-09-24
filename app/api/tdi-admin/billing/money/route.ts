@@ -62,7 +62,7 @@ export async function GET(_request: NextRequest) {
 
   const invoiceRows = (invoices ?? []).map((i) => {
     const paid = (appsByInvoice.get(i.id) ?? []).reduce((s, a) => s + Number(a.amount), 0);
-    const overdue = i.status !== 'paid' && i.status !== 'draft' && i.status !== 'voided' && i.due_date && i.due_date < today;
+    const overdue = i.status !== 'paid' && i.status !== 'draft' && i.status !== 'void' && i.due_date && i.due_date < today;
     return {
       kind: 'invoice' as const,
       id: i.id,
@@ -116,7 +116,7 @@ export async function GET(_request: NextRequest) {
     };
   });
 
-  const live = invoiceRows.filter((i) => i.status !== 'voided');
+  const live = invoiceRows.filter((i) => i.status !== 'void');
   // An invoice can be part paid. Allenwood paid $6,000 of a $7,920 invoice, so its face
   // value overstates what they owe by exactly that. Outstanding is always face value
   // minus what has been applied, never the face value on its own.
@@ -129,7 +129,7 @@ export async function GET(_request: NextRequest) {
     part_paid: live.filter((i) => i.paid_applied > 0 && i.paid_applied < i.amount).length,
     invoices: live.length,
     payments: paymentRows.length,
-    voided: invoiceRows.filter((i) => i.status === 'voided').length,
+    voided: invoiceRows.filter((i) => i.status === 'void').length,
     unverified_payments: paymentRows.filter((p) => !p.details_verified).length,
     missing_payment_records: live.filter((i) => i.missing_payment_record).length,
     overdue_unchased: live.filter((i) => i.overdue_unchased).length,

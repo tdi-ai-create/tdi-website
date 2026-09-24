@@ -187,7 +187,7 @@ export async function GET(_request: NextRequest) {
     'Reporting an invoice at face value after a partial payment overstates what a client owes.',
     (invoices ?? []).filter((i) => {
       const paid = appliedByInvoice.get(i.id) ?? 0;
-      return paid > 0 && paid < Number(i.amount) && !['paid', 'voided'].includes(i.status);
+      return paid > 0 && paid < Number(i.amount) && !['paid', 'void'].includes(i.status);
     }).map((i) => ({
       invoice: i.invoice_number,
       client: dName.get(i.district_id ?? '') ?? '?',
