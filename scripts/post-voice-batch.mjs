@@ -40,11 +40,20 @@ const supabase = createClient(
 
 const batch = JSON.parse(readFileSync(new URL(`./voice-posts/${name}.json`, import.meta.url), 'utf8'));
 
+// Courses keep their conversation in a different table with a different key.
+// Declared per batch so a course file cannot be written onto a quick win.
+const TARGETS = {
+  quick_win: { contentTable: 'hub_quick_wins', postTable: 'quick_win_responses', fk: 'quick_win_id' },
+  course:    { contentTable: 'hub_courses',    postTable: 'course_responses',    fk: 'course_id' },
+};
+const target = TARGETS[batch.target || 'quick_win'];
+if (!target) { console.error(`Unknown target "${batch.target}"`); process.exit(1); }
+
 // Resolve ids from slugs. Transcribing uuids by hand is how a batch lands on
 // the wrong tool, and a wrong slug should stop the run rather than write there.
 const slugs = batch.tools.map(t => t.slug);
 const { data: toolRows, error: toolError } = await supabase
-  .from('hub_quick_wins').select('id, slug, is_published').in('slug', slugs);
+  .from(target.contentTable).select('id, slug, is_published').in('slug', slugs);
 if (toolError) { console.error('Could not read tools:', toolError.message); process.exit(1); }
 const toolBySlug = Object.fromEntries((toolRows ?? []).map(t => [t.slug, t]));
 
@@ -59,7 +68,7 @@ const problems = [];
 
 for (const tool of batch.tools) {
   const found = toolBySlug[tool.slug];
-  if (!found) problems.push(`no published quick win with slug "${tool.slug}"`);
+  if (!found) problems.push(`no ${batch.target || 'quick win'} with slug "${tool.slug}"`);
   else if (!found.is_published) problems.push(`${tool.slug}: exists but is not published`);
 }
 
@@ -110,7 +119,7 @@ for (const r of rows) {
 const existing = new Set();
 for (let from = 0; ; from += 1000) {
   const { data, error } = await supabase
-    .from('quick_win_responses').select('body').range(from, from + 999);
+    .from(target.postTable).select('body').range(from, from + 999);
   if (error) { console.error('Could not read existing posts:', error.message); process.exit(1); }
   for (const row of data ?? []) existing.add((row.body || '').trim());
   if (!data || data.length < 1000) break;
@@ -148,8 +157,8 @@ if (!apply) {
 
 let written = 0;
 for (const r of rows) {
-  const { error } = await supabase.from('quick_win_responses').insert({
-    quick_win_id: r.toolId,
+  const { error } = await supabase.from(target.postTable).insert({
+    [target.fk]: r.toolId,
     user_id: voiceId[r.author],
     contribution_type: r.type,
     title: null,
