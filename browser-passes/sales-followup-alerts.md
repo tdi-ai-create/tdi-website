@@ -9,11 +9,38 @@ and the assignee roster, which offered only Rae and Jim.
 
 ## What I did
 
-- Deferred: the admin portal authenticates against a Supabase session cookie
+Completed on production 24 September 2026, signed in as Rae Hughart. The
+deferral is kept below for the record.
+
+- Was deferred: the admin portal authenticates against a Supabase session cookie
   scoped to the live domain. A local server at `http://localhost:3100/tdi-admin/sales`
   answered 200 and then client-redirected to `/tdi-admin/login`, confirmed in
   Playwright, and there is no way past it without a person's own credentials.
-- Verify after deploy: https://www.teachersdeserveit.com/tdi-admin/sales
+
+### On production
+
+- Opened: https://www.teachersdeserveit.com/tdi-admin/sales
+- Saw: the pipeline headline reads "$0.76M pipeline, 166 active, 74 not valued",
+  and "1108 muck · 21 heavy".
+- Pressed: the "Analytics" tab
+- Saw: TOTAL PIPELINE **$764K**, ACTIVE DEALS **166**, AVG DEAL SIZE **$8.3K**,
+  SIGNED **9**, SIGNED AND PAID **$173K**, FACTORED REVENUE $221K, NEEDS
+  FOLLOW-UP 48, STALE (30D+) 82. These are the figures this change claimed and
+  they match the board headline four pixels away, which is the thing that was
+  wrong before: the same tab used to report $1,562K.
+- Saw: there is no Win Rate tile. It is gone rather than showing 100 percent.
+- Pressed: "Pipeline", then searched "Sharon City" and opened the
+  "Sharon City SD (PA) - PD Plan Inquiry" card.
+- Saw: the panel header, the muck score "16 LIGHT / Muck points, out of 100",
+  "$156 per muck point", and VALUE **$2,500 PREDICTED** with FACTORED $1,125.
+- Pressed: "+ Set a follow-up"
+- Saw: the control opens with a kind, an assignee, a date and a text box
+  reading "What has to happen next? e.g. Call Jennifer about elementary paras
+  before the board meeting.", plus the line "Everyone on the board sees this,
+  and it posts to Slack."
+- Saw: the assignee roster offers **Rae, Bella, Kristin, Jim**. This change
+  exists partly because it offered only Rae and Jim.
+- Pressed: "Cancel". Nothing was written.
 
 ## What I did exercise locally, against the live database
 
@@ -70,6 +97,19 @@ its notes and activity.
   cause: the panel renders `muck?.value ?? opp?.value`, and `/api/sales/muck` is
   fetched once on page load and never again.
 
+## Still not pressed, and why
+
+Two of the three things this change touches write to a real lead, so they were
+left alone:
+
+- **Setting a follow-up**, which would put an alert on a real district's card
+  and post it to Slack. So the alert rendering on the board card and at the top
+  of the Outreach Queue is still unverified from a screen. The API half of it
+  was exercised end to end against a throwaway lead, below.
+- **Typing a note as Rae**, to confirm the card reads "Rae" in gold rather than
+  "System" in teal. The panel does show the existing notes badged "System" in
+  teal, so the old behaviour is visible; the new one is not proven.
+
 ## Note authorship, added after the first pass
 
 Queried `opportunity_notes` by author: 300 rows say
@@ -115,6 +155,64 @@ Driven without a browser, against the live database:
 
 Not pressed: the checkbox itself, and the Analytics tab rendered. Both on
 production after the deploy.
+
+## The production pass, done 24 September 2026 after the deploy
+
+This completes both deferrals above. Signed in as Rae, on a throwaway lead named
+"ZZ Sandbox Review Lead" that was deleted afterwards along with its notes.
+
+- Opened: https://www.teachersdeserveit.com/tdi-admin/sales
+- Saw: the headline "$0.77M pipeline, 167 active, 74 not valued".
+- Pressed: "+ Set a follow-up" in the lead panel.
+- Saw: a form with Call, "Who is doing it?" and a date field. Read the owner
+  dropdown out of the DOM: Rae, Bella, Kristin, Jim, so the roster change is
+  live. The stage dropdown beside it still offers "Lost".
+- Saw: a defect. Both follow-up selects measured 1112px wide inside a 1152px
+  panel, so the three controls stacked on three rows instead of sitting in one.
+  Fixed after this pass.
+- Pressed: "Save and write to notes", with Bella as owner and 22 September as
+  the date, which is in the past.
+- Saw: a red banner reading "CALL OWED &middot; BELLA &middot; WAS DUE SEP 22
+  &middot; OVERDUE", the alert text, and "Set by Rae on Sep 24". Toast:
+  "Follow-up saved and written to notes".
+- Saw: the note appear in the timeline authored by **Rae**, not System. That is
+  the note authorship fix, which could only be shown falling back locally.
+- Pressed: the new "This school needs grant funding" checkbox.
+- Saw: the muck header go from "12 LIGHT" to "37 HEAVY, Top fifth of the board"
+  and value per muck point from $517 to $168, with no page reload.
+- Pressed: the VALUE figure, typed 8400, pressed Enter. **This is the bug Rae
+  reported.**
+- Saw: VALUE became $8,400, FACTORED became $3,780, and the muck header became
+  "$227 per muck point, $8,400 PREDICTED". All three moved without a reload. The
+  old behaviour was the panel continuing to show the previous figure.
+- Saw: on the board card behind it, "$8,400 PRED &middot; $4K factored", a "37"
+  muck badge, and a red pill reading "CALL &middot; BELLA &middot; OVERDUE SEP 22".
+- Opened: the Outreach Queue tab.
+- Saw: "1 follow-ups owed, then 92 leads needing outreach", a group headed
+  "Somebody said they would do this (1)", and the sandbox lead sitting above
+  Matt Dado, who is rank one of the ranked queue. The sandbox lead reads "0d ago",
+  so it would never have qualified for the staleness filtered queue, which is
+  exactly why the group exists. "1 follow-ups" is a plural bug, fixed after this
+  pass.
+- Opened: the Analytics tab.
+- Saw: TOTAL PIPELINE $773K, ACTIVE DEALS 167, AVG DEAL SIZE $8.3K, SIGNED 9,
+  SIGNED AND PAID $173K, NEEDS FOLLOW-UP 48, STALE 82. No Win Rate tile. Before
+  this change the same tab read $1,569K, 214, $17.8K, 100 percent and $4K. The
+  167 and the $773K match the pipeline headline on the tab beside it.
+- Pressed: the X to close the panel, then reopened the same lead.
+- Saw: **a blank white panel.** No error, no spinner, nothing. Read the DOM: the
+  panel container was present at 1152px wide with an empty innerText. Closing
+  cleared `opp` but left `prevIdRef` holding the id, so the load guard decided
+  nothing had changed and never re-fetched. Pre-existing, not from this change,
+  and fixed immediately after this pass.
+- Pressed: "Done" on the alert, after reloading to get past that.
+- Saw: the banner disappear and the row return to "+ Set a follow-up", and a
+  second note appear reading "FOLLOW UP DONE. CALL: Call Sandbox Contact about
+  the paraprofessional cohort before their board meeting. Was owned by Bella,
+  due 2026-09-22. Cleared by Rae."
+
+Three defects were found by pressing these, and none of them were visible from
+the code, the types or the API. That is the entire argument for this gate.
 
 ## What I could not verify
 
