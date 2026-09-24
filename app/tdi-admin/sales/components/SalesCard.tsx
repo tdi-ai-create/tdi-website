@@ -2,6 +2,8 @@
 
 import React from 'react'
 import { InlineText, InlineSelect } from './InlineEdit'
+import { URGENCY_COLOR, hasFollowup, shortDate, urgency, type Followup } from '@/lib/sales/followup'
+import { teamLabel } from '@/lib/sales/team'
 
 function timeAgo(dateStr: string): string {
   const diff = Date.now() - new Date(dateStr).getTime()
@@ -85,6 +87,8 @@ export interface SalesCardOpp {
   contract_year?: string | null
   city?: string | null
   state?: string | null
+  /** The live follow-up alert, if anything is owed on this lead. */
+  followup?: Followup | null
   /** Muck points. Null total means the offering is unknown, not that it is light. */
   muck?: {
     total: number | null
@@ -285,6 +289,32 @@ export function SalesCard({ opp, onClick, draggable = false, onContextMenu, onFi
           />
         </div>
       </div>
+
+      {/* Line 4: what is owed next, and who owes it. Only rendered when there
+          is an alert, so a card with nothing outstanding is unchanged. */}
+      {hasFollowup(opp.followup) && (() => {
+        const state = urgency(opp.followup?.due)
+        const tone = URGENCY_COLOR[state]
+        const when = shortDate(opp.followup?.due)
+        return (
+          <div
+            title={opp.followup?.text ?? ''}
+            style={{
+              marginTop: 6, display: 'flex', alignItems: 'center', gap: 5,
+              background: tone.bg, border: `1px solid ${tone.border}`, borderRadius: 6,
+              padding: '3px 6px', fontSize: 9, fontWeight: 700, color: tone.fg,
+              textTransform: 'uppercase', letterSpacing: '0.03em',
+              overflow: 'hidden', whiteSpace: 'nowrap',
+            }}
+          >
+            <span aria-hidden>&#9873;</span>
+            <span>{opp.followup?.kind ?? 'follow up'}</span>
+            <span style={{ opacity: 0.5 }}>&middot;</span>
+            <span>{opp.followup?.owner ? teamLabel(opp.followup.owner) : 'unassigned'}</span>
+            {when && <><span style={{ opacity: 0.5 }}>&middot;</span><span>{state === 'overdue' ? `overdue ${when}` : when}</span></>}
+          </div>
+        )
+      })()}
     </div>
   )
 }

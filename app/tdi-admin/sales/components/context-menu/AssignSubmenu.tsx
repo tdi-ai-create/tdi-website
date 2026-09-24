@@ -1,9 +1,10 @@
 'use client'
 
-const ASSIGNEES = [
-  { email: 'rae@teachersdeserveit.com', label: 'Rae' },
-  { email: 'jim@teachersdeserveit.com', label: 'Jim' },
-]
+import { SALES_TEAM } from '@/lib/sales/team'
+
+// One roster, in lib/sales/team.ts. This list used to be its own copy of Rae
+// and Jim, which is why it stayed two names long after the team grew.
+const ASSIGNEES = SALES_TEAM
 
 interface Props {
   current: string | null
