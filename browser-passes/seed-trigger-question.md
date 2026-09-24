@@ -27,8 +27,12 @@ than backdated.
 A newly published tool showing this in the Hub, because none has been published
 since the change. The last publish was 11 September.
 
-- Deferred: no quick win has been published since the trigger changed.
-- Verify after deploy: the conversation section of the next published tool at https://www.teachersdeserveit.com/hub/quick-wins should carry one question from a TDI account and nothing else.
+- Still open: no quick win has been published since the trigger changed, so the
+  first real proof will be the next publish. What is proven is the write itself,
+  by publishing a throwaway row inside an uncommitted transaction before and
+  after the change: 5 posts before, 1 question from a TDI-owned account after,
+  with a live timestamp. The post count was unchanged at 1,567 throughout.
+- Verify at next publish: the conversation section of the next published tool should carry one question from a TDI account and nothing else.
 
 ## What I did not press
 
