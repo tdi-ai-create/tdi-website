@@ -52,6 +52,10 @@ interface Grant {
   narrativeStatus: string
   attempts: number | null
   docUrl: string | null
+  closesOn: string | null
+  windowStatus: string | null
+  targetDate: string | null
+  targetNote: string | null
   escalation: {
     summary?: string
     root_cause?: string
@@ -160,7 +164,7 @@ function prettyKey(k: string): string {
 }
 
 export default function FundingHome() {
-  const [view, setView] = useState<'work' | 'cal' | 'schools' | 'school' | 'queue' | 'funders' | 'awarded'>('work')
+  const [view, setView] = useState<'work' | 'cal' | 'schools' | 'school' | 'queue' | 'funders' | 'awarded'>('cal')
 
   // The board links back here with ?view=schools, because it is its own route
   // and cannot switch a view it does not have. Read after mount rather than
@@ -168,7 +172,7 @@ export default function FundingHome() {
   // prerendering and can fail the build instead of just working.
   useEffect(() => {
     const asked = new URLSearchParams(window.location.search).get('view')
-    if (asked === 'cal' || asked === 'schools' || asked === 'queue'
+    if (asked === 'work' || asked === 'cal' || asked === 'schools' || asked === 'queue'
         || asked === 'funders' || asked === 'awarded') {
       setView(asked)
     }
@@ -343,6 +347,8 @@ export default function FundingHome() {
               The rest have no date yet, so they cannot appear here until somebody confirms a window.
             </p>
           )}
+
+          <NoDateGrants grants={grants} onDone={() => setReloadAt(n => n + 1)} />
 
           {calError && <p className="sub">{calError}</p>}
           {!calError && entries === null && <p className="sub">Loading.</p>}
@@ -892,6 +898,143 @@ function DraftToSend({ draft, docUrl, busy, error, onSend, links }: {
       </div>
       {error && <div className="src warn">{error}</div>}
       {links}
+    </div>
+  )
+}
+
+/**
+ * The grant paths with no date on them.
+ *
+ * A calendar is built on dates, so a path without one appears nowhere. Most
+ * paths do not have one: the funder published nothing, or nobody has found it
+ * yet. Those are two different problems and they are not the same fix.
+ *
+ *   window open, no close date   the funder takes applications any time, so
+ *                                the date is ours to choose. Set a target.
+ *   window unknown               nobody has looked it up. A target here would
+ *                                be inventing a deadline on top of a fact we
+ *                                have not established, so it asks for research.
+ *
+ * A target is never written to application_closes. One is the funder's cutoff
+ * and the other is our intention, and a screen that blurred them would let an
+ * internal goal read as a real deadline.
+ */
+function NoDateGrants({ grants, onDone }: {
+  grants: Record<string, Grant>
+  onDone: () => void
+}) {
+  const [open, setOpen] = useState(false)
+  const all = Object.values(grants)
+  const dateless = all.filter(g => !g.closesOn)
+  if (dateless.length === 0) return null
+
+  const settable = dateless.filter(g => g.windowStatus === 'open')
+  const needResearch = dateless.filter(g => g.windowStatus !== 'open')
+  const withTarget = dateless.filter(g => g.targetDate)
+
+  return (
+    <div style={{ margin: '0 0 14px' }}>
+      <button
+        className="btn"
+        onClick={() => setOpen(o => !o)}
+        style={{ fontSize: 12.5 }}
+      >
+        {dateless.length} paths have no date
+        {withTarget.length > 0 ? `, ${withTarget.length} with a target we set` : ''}
+        {open ? '. Hide' : '. Show them'}
+      </button>
+
+      {open && (
+        <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {settable.length > 0 && (
+            <>
+              <div className="why">
+                Window open, no published deadline. The date is ours to choose.
+              </div>
+              {settable.map(g => <TargetRow key={g.id} grant={g} onDone={onDone} />)}
+            </>
+          )}
+          {needResearch.length > 0 && (
+            <>
+              <div className="why" style={{ marginTop: 6 }}>
+                Window not established. These need the real date found, not one invented.
+              </div>
+              {needResearch.map(g => (
+                <div className="card" key={g.id}>
+                  <div className="cbody">
+                    <div className="ctop">
+                      <span className="tag" style={{ background: 'var(--client-soft)', color: 'var(--client)' }}>
+                        {g.windowStatus === 'unknown' ? 'Window unknown' : String(g.windowStatus)}
+                      </span>
+                    </div>
+                    <h4>{g.name}</h4>
+                  </div>
+                </div>
+              ))}
+            </>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
+/** One open-window grant, with the date we intend to apply by. */
+function TargetRow({ grant, onDone }: { grant: Grant; onDone: () => void }) {
+  const [date, setDate] = useState(grant.targetDate ?? '')
+  const [note, setNote] = useState(grant.targetNote ?? '')
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [saved, setSaved] = useState(false)
+
+  async function save(clearing = false) {
+    setBusy(true)
+    setError(null)
+    try {
+      const res = await fetch('/api/funding/opportunities', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: grant.id,
+          internal_target_date: clearing ? null : date,
+          internal_target_note: clearing ? null : note.trim() || null,
+        }),
+      })
+      const out = await res.json().catch(() => ({}))
+      if (!res.ok || out.error) { setError(out.error ?? `The server answered ${res.status}.`); return }
+      setSaved(true)
+      onDone()
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  return (
+    <div className="card">
+      <div className="cbody">
+        <h4>{grant.name}</h4>
+        <div className="act" style={{ borderTop: 'none', paddingTop: 4, marginTop: 4 }}>
+          <label htmlFor={`t-${grant.id}`}>Apply by</label>
+          <input id={`t-${grant.id}`} type="date" value={date} onChange={e => { setDate(e.target.value); setSaved(false) }} />
+          <label htmlFor={`n-${grant.id}`}>Why this date</label>
+          <input
+            id={`n-${grant.id}`}
+            value={note}
+            placeholder="Before the board meeting in November."
+            onChange={e => { setNote(e.target.value); setSaved(false) }}
+          />
+          <div className="row">
+            <button className="btn primary" disabled={busy || !date} onClick={() => save()}>
+              {busy ? 'Saving' : grant.targetDate ? 'Change the target' : 'Set the target'}
+            </button>
+            {grant.targetDate && (
+              <button className="btn" disabled={busy} onClick={() => save(true)}>Clear it</button>
+            )}
+            {saved && <span className="saved on">Saved</span>}
+          </div>
+          {error && <div className="src warn">{error}</div>}
+        </div>
+      </div>
     </div>
   )
 }

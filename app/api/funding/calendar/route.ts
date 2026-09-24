@@ -58,7 +58,7 @@ export async function GET(request: NextRequest) {
   const [oppsRes, itemsRes] = await Promise.all([
     supabase
       .from('funding_opportunities')
-      .select('id, pursuit_id, name, status, amount, application_closes, window_closes, narrative_status, narrative_status_changed_at, assigned_agent, client_submitted, updated_at, qa_escalation, qa_attempt_count, narrative_url')
+      .select('id, pursuit_id, name, status, amount, application_closes, window_closes, narrative_status, narrative_status_changed_at, assigned_agent, client_submitted, updated_at, qa_escalation, qa_attempt_count, narrative_url, internal_target_date, internal_target_note, window_status')
       .in('pursuit_id', ids),
     supabase
       .from('funding_action_items')
@@ -81,10 +81,12 @@ export async function GET(request: NextRequest) {
   // What each popup needs to offer the right control, keyed by opportunity.
   // Returned alongside the entries rather than fetched again by the screen, so
   // there is one read and one answer about what state a grant is in.
-  const needed = new Set(entries.map(e => e.opportunityId).filter(Boolean) as string[])
+  // Every live grant, not only the ones with an entry this month. A path with
+  // no date has no entry by definition, and those are exactly the ones that
+  // need a target set on them.
   const grants: Record<string, unknown> = {}
   for (const o of oppsRes.data ?? []) {
-    if (!needed.has(o.id)) continue
+    if (!isLive(o.status)) continue
     grants[o.id] = {
       id: o.id,
       name: o.name,
@@ -93,6 +95,10 @@ export async function GET(request: NextRequest) {
       // The packet itself. "Open this grant" pointed at a portal page; the
       // thing anyone actually wants to open is the document.
       docUrl: o.narrative_url ?? null,
+      closesOn: o.application_closes ?? null,
+      windowStatus: o.window_status ?? null,
+      targetDate: o.internal_target_date ?? null,
+      targetNote: o.internal_target_note ?? null,
       attempts: o.qa_attempt_count ?? null,
       escalation: o.qa_escalation ?? null,
     }
