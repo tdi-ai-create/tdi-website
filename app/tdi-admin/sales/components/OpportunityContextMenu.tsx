@@ -19,7 +19,6 @@ interface Props {
   onClose: () => void
   onOpenDetail: (id: string) => void
   onStageChange: (id: string, stage: string) => void
-  onHeatChange: (id: string, heat: string) => void
   onAssignChange: (id: string, email: string | null) => void
   onAddNote: (id: string) => void
   onMarkWon: (id: string) => void
@@ -79,7 +78,6 @@ export function OpportunityContextMenu(props: Props) {
         onClose={props.onClose}
         onOpenDetail={props.onOpenDetail}
         onStageChange={props.onStageChange}
-        onHeatChange={props.onHeatChange}
         onAssignChange={props.onAssignChange}
         onAddNote={props.onAddNote}
         onMarkWon={props.onMarkWon}

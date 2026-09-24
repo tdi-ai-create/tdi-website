@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import { StageSubmenu } from './StageSubmenu'
-import { HeatSubmenu } from './HeatSubmenu'
 import { AssignSubmenu } from './AssignSubmenu'
 import { DeleteConfirmModal } from './DeleteConfirmModal'
 import { LostReasonModal } from './LostReasonModal'
@@ -13,7 +12,6 @@ interface Props {
   onClose: () => void
   onOpenDetail: (id: string) => void
   onStageChange: (id: string, stage: string) => void
-  onHeatChange: (id: string, heat: string) => void
   onAssignChange: (id: string, email: string | null) => void
   onAddNote: (id: string) => void
   onMarkWon: (id: string) => void
@@ -47,7 +45,7 @@ function Item({
   )
 }
 
-type Submenu = 'stage' | 'heat' | 'assign' | null
+type Submenu = 'stage' | 'assign' | null
 
 function SubmenuTrigger({
   icon, label, open, onToggle, children,
@@ -76,7 +74,7 @@ function SubmenuTrigger({
 }
 
 export function ContextMenu({
-  opportunity, onClose, onOpenDetail, onStageChange, onHeatChange,
+  opportunity, onClose, onOpenDetail, onStageChange,
   onAssignChange, onAddNote, onMarkWon, onMarkLost, onDelete, showToast,
 }: Props) {
   const [openSubmenu, setOpenSubmenu] = useState<Submenu>(null)
@@ -106,9 +104,6 @@ export function ContextMenu({
           />
         </SubmenuTrigger>
 
-        <SubmenuTrigger icon="🌡️" label="Heat" open={openSubmenu === 'heat'} onToggle={() => toggle('heat')}>
-          <HeatSubmenu onSelect={heat => { onHeatChange(opportunity.supabase_id, heat); onClose() }} />
-        </SubmenuTrigger>
 
         <SubmenuTrigger icon="👤" label="Assign to" open={openSubmenu === 'assign'} onToggle={() => toggle('assign')}>
           <AssignSubmenu
