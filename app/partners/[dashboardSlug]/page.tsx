@@ -8,7 +8,7 @@ import RosterAccessManager from '@/components/partners/RosterAccessManager';
 import Link from 'next/link';
 import FooterSymbol from '@/components/FooterSymbol';
 import { offeringLabel } from '@/lib/partnerships/offerings';
-import { goalMeasurement, goalProgress, howBody, type Offering, type ContractShape } from '@/lib/partners/goal-measurement';
+import { goalMeasurement, goalProgress, howBody, withUnit, type Offering, type ContractShape } from '@/lib/partners/goal-measurement';
 import {
   Calendar,
   Users,
@@ -3052,8 +3052,8 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                   // which told a principal the goal was unmeasured without ever
                   // telling them what the goal was.
                   const stat = progress.awaitingBaseline
-                    ? (target > 0 ? `Target ${target}${unit}` : 'Target set with your team')
-                    : `${progress.display} of ${target}${unit}`;
+                    ? (target > 0 ? `Target ${withUnit(target, unit)}` : 'Target set with your team')
+                    : `${progress.display} of ${withUnit(target, unit)}`;
                   const paragraphs = measure.how
                     ? howBody(measure.how).split('\n').map(s => s.trim()).filter(Boolean)
                     : [];
