@@ -74,8 +74,21 @@ helper in `lib/partners/goal-measurement.ts` that spaces a worded unit and keeps
 "%" tight, used by both the target and `goalProgress().display` so the two halves
 of a row can never disagree.
 
-- Opened again after the fix deployed: https://www.teachersdeserveit.com/partners/roosevelt-school
-- Saw: pending, recorded below once the fix is live.
+- Opened again after the fix deployed as b8cfbb5b: https://www.teachersdeserveit.com/partners/roosevelt-school
+- Saw: the same goal row now reads **"Target 3.5 of 5"** with the space. Read off
+  the live DOM rather than a screenshot, because this page paints late and a
+  screenshot taken a moment early shows the loading screen.
+
+## Empty state, also checked on production
+
+- Opened: https://www.teachersdeserveit.com/partners/oak-grove-sd-68
+- Saw: a "Your Goals" heading followed by "Your goals are written together on
+  your onboarding call, against your own data, and in your words." Oak Grove has
+  no rows in partnership_kpis, so this is the empty state.
+- Saw: no goal rings in that slot. The only metric blocks on the page are the
+  ordinary "Team Activation", "Partnership Intelligence" and "Partnership
+  Momentum" sections, so the four generic gauges that used to impersonate goals
+  are gone.
 
 ## What I did not press
 
@@ -84,9 +97,6 @@ Nothing was pressed anywhere in production. No row in `partnership_kpis` or
 
 ## What I could not verify
 
-- The empty state. A school with no goals (Addison SD4, Oak Grove SD68,
-  Tidioute) should show the one-line block and no longer four generic rings in
-  that slot. Not opened yet.
 - What a school sees rather than what a TDI admin sees. This was viewed through
   Rae's own signed-in session, which takes the `viewerIsAdmin` path. The goals
   block does not branch on that flag, so the rendering is the same, but nobody
