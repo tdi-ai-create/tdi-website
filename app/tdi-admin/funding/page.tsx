@@ -664,12 +664,20 @@ function GrantAction({ entry, grant, draft, schoolId, schoolName, onDone, onOpen
   const awaitingClient = escalated && esc?.awaiting_client === true
   const atApproval = ns === 'approval' && isApprovalEntry
 
-  async function post(url: string, body: unknown, ok: string) {
+  // The verb is passed in, not guessed from the URL. It used to be
+  // `url.includes('escalation') ? 'POST' : 'PATCH'`, which silently sent PATCH
+  // to every route that was not the escalation one. The outreach queue only
+  // exports GET and POST, so "Send it" hit Next's default handler and came back
+  // 405 with an empty body, which is why the reviewer read "The server answered
+  // 405. No detail." while a finished Saunemin CCSD #438 packet sat unsent
+  // (TEA-6). Any new route added here would have inherited the same wrong
+  // default, which is the actual reason this is a parameter now.
+  async function submit(method: 'POST' | 'PATCH', url: string, body: unknown, ok: string) {
     setBusy(true)
     setError(null)
     try {
       const res = await fetch(url, {
-        method: url.includes('escalation') ? 'POST' : 'PATCH',
+        method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
       })
@@ -723,7 +731,7 @@ function GrantAction({ entry, grant, draft, schoolId, schoolName, onDone, onOpen
         docUrl={grant?.docUrl ?? null}
         busy={busy}
         error={error}
-        onSend={(subject, body) => post('/api/funding/outreach-queue',
+        onSend={(subject, body) => submit('POST', '/api/funding/outreach-queue',
           { id: draft.id, action: 'approve', subject, body },
           'Sent, and the grant is marked as gone to the school.')}
         links={links}
@@ -741,7 +749,7 @@ function GrantAction({ entry, grant, draft, schoolId, schoolName, onDone, onOpen
           <button
             className="btn primary"
             disabled={busy}
-            onClick={() => post('/api/funding/escalation',
+            onClick={() => submit('POST', '/api/funding/escalation',
               { opportunityId: grant!.id, option: 'resume_drafting', detail: detail || 'The school replied.' },
               'Drafting resumed.')}
           >
@@ -792,7 +800,7 @@ function GrantAction({ entry, grant, draft, schoolId, schoolName, onDone, onOpen
           <button
             className="btn primary"
             disabled={busy || !choice || needsDetail}
-            onClick={() => post('/api/funding/escalation',
+            onClick={() => submit('POST', '/api/funding/escalation',
               { opportunityId: grant!.id, option: choice, detail: detail.trim() },
               'Decision recorded.')}
           >
@@ -820,7 +828,7 @@ function GrantAction({ entry, grant, draft, schoolId, schoolName, onDone, onOpen
           <button
             className="btn primary"
             disabled={busy}
-            onClick={() => post('/api/funding/opportunities',
+            onClick={() => submit('PATCH', '/api/funding/opportunities',
               { id: grant!.id, narrative_status: 'ready' },
               'Approved. It is ready to go to the school.')}
           >
@@ -829,7 +837,7 @@ function GrantAction({ entry, grant, draft, schoolId, schoolName, onDone, onOpen
           <button
             className="btn"
             disabled={busy || detail.trim().length < 3}
-            onClick={() => post('/api/funding/opportunities',
+            onClick={() => submit('PATCH', '/api/funding/opportunities',
               { id: grant!.id, narrative_status: 'requested', redraft_guidance: detail.trim() },
               'Sent back to the writer with your note.')}
           >
