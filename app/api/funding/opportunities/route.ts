@@ -207,6 +207,11 @@ export async function PATCH(request: NextRequest) {
     // New fields from migration 093
     'application_opens', 'application_closes', 'plan_category',
     'waiting_on', 'narrative_status', 'narrative_url', 'narrative_content',
+    // A date we chose, for a window that is open with no published close date.
+    // Kept apart from application_closes on purpose: one is the funder's
+    // deadline and the other is our own intention, and a screen that blurred
+    // them would let an internal goal read as a real cutoff.
+    'internal_target_date', 'internal_target_note',
     // qa_reviewer / qa_notes / qa_passed are deliberately NOT patchable here.
     // QA verdicts are Julie's alone and arrive through the sync route's
     // submit_qa_verdict action, which enforces the attempt bound, writes the

@@ -208,6 +208,18 @@ export function buildCalendar(input: CalendarInput): CalendarEntry[] {
     // approval is, and it was the only such state with nothing on the calendar.
     // QA has given up, the grant cannot move, and until now that showed up only
     // if an action item happened to exist alongside it.
+    // A date we set ourselves, because the funder published none. It is
+    // confirmed, not predicted: nobody derived it, somebody chose it.
+    if (o.internal_target_date && !o.application_closes) {
+      out.push({
+        id: `target-${o.id}`, date: String(o.internal_target_date), kind: 'decide', confirmed: true,
+        label: `${short(o.name, 20)}, our target`, ...school,
+        detail: o.internal_target_note
+          ? `We set this date. ${o.internal_target_note}`
+          : 'We set this date. The funder has not published one, so this is our own intention and nothing enforces it but us.',
+      });
+    }
+
     if (o.narrative_status === 'escalated') {
       const when = plusHours(since, BELLA_SILENCE_HOURS);
       if (when) out.push({
