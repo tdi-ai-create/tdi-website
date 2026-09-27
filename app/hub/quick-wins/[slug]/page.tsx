@@ -553,7 +553,26 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
   // hook here would be the 23rd. The function is pure and cheap, so recomputing
   // it on every render costs nothing and cannot go stale when the language
   // toggles or the flag arrives.
-  const picked = pickDownloads(quickWin ?? {}, language, spanishDownloads);
+  //
+  // The adapter is not decoration. `pickDownloads` reads `file_url`, and this
+  // page renames that column to `download_url` when it maps the row. Passing
+  // the mapped object straight in meant `file_url` was always undefined, so
+  // `downloadUrl` came back null on every English page load and the hero
+  // button read "Download coming soon" over a file that was sitting right
+  // there. It hit 101 published Quick Wins outright, and stripped the guide
+  // button from 158 more that had a separate tool. Name the fields the
+  // function actually expects rather than hoping the shapes line up.
+  const picked = pickDownloads(
+    {
+      file_url: quickWin?.download_url ?? null,
+      tool_file_url: quickWin?.tool_file_url ?? null,
+      file_url_es: quickWin?.file_url_es ?? null,
+      tool_file_url_es: quickWin?.tool_file_url_es ?? null,
+      translated_at: quickWin?.translated_at ?? null,
+    },
+    language,
+    spanishDownloads
+  );
 
   // Fetch quick win data
   useEffect(() => {
