@@ -40,6 +40,43 @@ Rae approved on 27 September: https://claude.ai/code/artifact/dfd6758f-c148-4ffd
   into.
 - Verify after deploy: https://www.teachersdeserveit.com/partners/roosevelt-school
 
+## Deferred pass, now performed on production
+
+Merged as e2146827 and deployed to the `teachersdeserveit` project at
+2026-09-27T19:02:22Z, deployment status success.
+
+- Opened: https://www.teachersdeserveit.com/partners/roosevelt-school
+- Saw: "Your Goals" as the first card under the hero, above "Your Next Steps",
+  with "Written with you on your onboarding call" on the right of its header.
+  Hero above it reads "Roosevelt School", "2026-2027", "Phase 1 . IGNITE".
+- Saw: all four labels in full, no ellipsis. "Staff using the Hub in their own
+  classrooms", "MTSS strategies in continuous use", "Staff supported on stress
+  and burnout", "Positive parent engagement".
+- Saw: the first goal reads "24% of 70%" with a navy bar filled roughly a third
+  of the way. The other three show dashed tracks and read "Target 60%",
+  "Target 3.5of 5" and "Target set with your team".
+- Pressed: "How we measure this" on the first goal.
+- Saw: the chevron rotated and the panel opened inline, starting "The share of
+  your staff who have signed in and actually used the Hub, not just been handed
+  an account", then "Today that is 24 percent, four of your seventeen staff".
+  The old duplicated "How we measure this." opening sentence is gone, so
+  `howBody()` is doing its job on real rows.
+- Saw: below the paragraphs, "WHAT THIS DOES NOT SHOW" followed by "This goal is
+  measured by asking your team rather than by watching a classroom", then
+  "The Focus is built for this." with a "Read about The Focus" link.
+
+### One bug found by looking
+
+"Target 3.5of 5" is missing a space. `target_unit` for that goal is the word
+"of 5", and the template put the number and the unit straight together. "%" was
+fine, which is why it survived every check up to this one. Fixed by a `withUnit()`
+helper in `lib/partners/goal-measurement.ts` that spaces a worded unit and keeps
+"%" tight, used by both the target and `goalProgress().display` so the two halves
+of a row can never disagree.
+
+- Opened again after the fix deployed: https://www.teachersdeserveit.com/partners/roosevelt-school
+- Saw: pending, recorded below once the fix is live.
+
 ## What I did not press
 
 Nothing was pressed anywhere in production. No row in `partnership_kpis` or
@@ -47,14 +84,10 @@ Nothing was pressed anywhere in production. No row in `partnership_kpis` or
 
 ## What I could not verify
 
-Everything a person actually sees. Specifically, still unproven until the
-production check above:
-
-- That "Your Goals" renders above "Set Up Your Partnership" rather than below it.
-- That Roosevelt's first goal reads "24% of 70%" and the other three read
-  "Target 60%", "Target 3.5 of 5" and "Target set with your team".
-- That the four goal labels render in full rather than truncated.
-- That the "How we measure this" disclosure opens and the duplicated opening
-  sentence is gone.
-- That a school with no goals (Addison SD4, Oak Grove SD68, Tidioute) shows the
-  one-line block and no longer shows four generic rings in that slot.
+- The empty state. A school with no goals (Addison SD4, Oak Grove SD68,
+  Tidioute) should show the one-line block and no longer four generic rings in
+  that slot. Not opened yet.
+- What a school sees rather than what a TDI admin sees. This was viewed through
+  Rae's own signed-in session, which takes the `viewerIsAdmin` path. The goals
+  block does not branch on that flag, so the rendering is the same, but nobody
+  has loaded it as a principal.
