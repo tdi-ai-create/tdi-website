@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { useHub } from '@/components/hub/HubContext';
 import { useTranslation } from '@/lib/hub/useTranslation';
@@ -242,6 +242,20 @@ function formatDate(dateStr: string): string {
 
 // ── Component ──────────────────────────────────────────────────────────
 
+/**
+ * The "About You" fields. These write straight to hub_profiles columns, so the
+ * key has to match the column name.
+ */
+const ABOUT_FIELDS = [
+  { key: 'school_name', label: 'School', placeholder: 'Your school name' },
+  { key: 'district', label: 'District', placeholder: 'Your school district' },
+  { key: 'state', label: 'State', placeholder: 'Your state (e.g., Illinois)' },
+  { key: 'years_in_education', label: 'Years in Education', placeholder: 'e.g., 7' },
+  { key: 'grade_band', label: 'Grade Band', placeholder: 'e.g., K-2, 3-5, 6-8, 9-12' },
+  { key: 'proud_of', label: 'Something you are proud of this year', placeholder: 'One thing that went well...' },
+  { key: 'pet_names', label: 'Pet names (we love pets)', placeholder: 'e.g., Luna and Biscuit' },
+] as const;
+
 export default function ProfileSettingsPage() {
   const { profile, user } = useHub();
   const { tUI } = useTranslation();
@@ -280,6 +294,16 @@ export default function ProfileSettingsPage() {
   const [isUploading, setIsUploading] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [savedField, setSavedField] = useState<string | null>(null);
+  const [goalsError, setGoalsError] = useState(false);
+
+  // About You. Controlled, not defaultValue: the profile arrives after the
+  // first render, and an uncontrolled input never picks it up, so saved
+  // answers came back looking blank. Pending edits are tracked separately so
+  // a half-typed answer still lands if the person navigates away.
+  const [about, setAbout] = useState<Record<string, string>>({});
+  const [aboutStatus, setAboutStatus] = useState<Record<string, 'saving' | 'saved' | 'error'>>({});
+  const aboutPending = useRef<Record<string, string>>({});
+  const aboutTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
 
   // Data for other tabs
   const [statsData, setStatsData] = useState<StatsData | null>(null);
@@ -312,6 +336,18 @@ export default function ProfileSettingsPage() {
       if (onboardingData?.goals) {
         setSelectedGoals(onboardingData.goals);
       }
+
+      const row = profile as unknown as Record<string, unknown>;
+      setAbout((prev) => {
+        const next = { ...prev };
+        for (const field of ABOUT_FIELDS) {
+          // Never clobber something they are typing right now.
+          if (aboutPending.current[field.key] === undefined) {
+            next[field.key] = (row[field.key] as string) || '';
+          }
+        }
+        return next;
+      });
     }
   }, [profile]);
 
@@ -650,6 +686,84 @@ export default function ProfileSettingsPage() {
 
   // ── Handlers ──────────────────────────────────────────────────────────
 
+  /**
+   * Write one About You field and confirm it landed.
+   *
+   * The old version fired an update and threw the result away, so a failure
+   * and a success looked identical to the person typing. An update that
+   * matches no row is the quiet one: PostgREST returns success with zero rows
+   * changed, which is what a missing profile row looks like.
+   */
+  const saveAboutField = useCallback(
+    async (key: string, rawValue: string) => {
+      if (!user?.id) return;
+
+      if (aboutTimers.current[key]) clearTimeout(aboutTimers.current[key]);
+      delete aboutPending.current[key];
+
+      const value = rawValue.trim();
+      setAboutStatus((prev) => ({ ...prev, [key]: 'saving' }));
+
+      const supabase = getSupabase();
+      const { data, error } = await supabase
+        .from('hub_profiles')
+        .update({ [key]: value || null, updated_at: new Date().toISOString() })
+        .eq('id', user.id)
+        .select('id');
+
+      let failed = error;
+      if (!failed && (!data || data.length === 0)) {
+        const { error: insertError } = await supabase
+          .from('hub_profiles')
+          .insert({ id: user.id, email: user.email, [key]: value || null });
+        failed = insertError;
+      }
+
+      if (failed) {
+        console.error(`Failed to save ${key}:`, failed);
+        setAboutStatus((prev) => ({ ...prev, [key]: 'error' }));
+        return;
+      }
+
+      setAboutStatus((prev) => ({ ...prev, [key]: 'saved' }));
+      setTimeout(() => {
+        setAboutStatus((prev) => {
+          if (prev[key] !== 'saved') return prev;
+          const next = { ...prev };
+          delete next[key];
+          return next;
+        });
+      }, 2000);
+    },
+    [user?.id, user?.email]
+  );
+
+  const handleAboutChange = (key: string, value: string) => {
+    setAbout((prev) => ({ ...prev, [key]: value }));
+    aboutPending.current[key] = value;
+    if (aboutTimers.current[key]) clearTimeout(aboutTimers.current[key]);
+    aboutTimers.current[key] = setTimeout(() => saveAboutField(key, value), 800);
+  };
+
+  // Blur is not enough on its own. Typing an answer and then closing the tab,
+  // hitting the back button or tapping a nav link never fires it, which is how
+  // answers went missing while the page looked like it was working.
+  useEffect(() => {
+    const flushPending = () => {
+      for (const [key, value] of Object.entries(aboutPending.current)) {
+        saveAboutField(key, value);
+      }
+    };
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') flushPending();
+    };
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+      flushPending();
+    };
+  }, [saveAboutField]);
+
   const handleSaveName = async () => {
     if (!user?.id || !hasNameChanged) return;
     setIsSaving(true);
@@ -770,13 +884,30 @@ export default function ProfileSettingsPage() {
       onboarding_data: { ...currentData, goals: selectedGoals },
     });
 
-    await supabase.from('hub_user_goals').delete().eq('user_id', user.id);
-    if (selectedGoals.length > 0) {
-      await supabase.from('hub_user_goals').insert(
+    // Replace the set, and notice if either half fails. This used to discard
+    // both errors and then say "Saved" regardless, so a goal list that never
+    // reached the database looked identical to one that did.
+    const { error: clearError } = await supabase
+      .from('hub_user_goals')
+      .delete()
+      .eq('user_id', user.id);
+
+    let writeError = clearError;
+    if (!writeError && selectedGoals.length > 0) {
+      const { error: insertError } = await supabase.from('hub_user_goals').insert(
         selectedGoals.map((goal) => ({ user_id: user.id, goal_type: goal }))
       );
+      writeError = insertError;
     }
 
+    if (writeError) {
+      console.error('Failed to save goals:', writeError);
+      setGoalsError(true);
+      setIsSaving(false);
+      return;
+    }
+
+    setGoalsError(false);
     setSavedField('goals');
     setTimeout(() => setSavedField(null), 2000);
     setIsSaving(false);
@@ -1149,32 +1280,39 @@ export default function ProfileSettingsPage() {
               </p>
             </div>
 
-            {[
-              { key: 'school_name', label: 'School', placeholder: 'Your school name' },
-              { key: 'district', label: 'District', placeholder: 'Your school district' },
-              { key: 'state', label: 'State', placeholder: 'Your state (e.g., Illinois)' },
-              { key: 'years_in_education', label: 'Years in Education', placeholder: 'e.g., 7' },
-              { key: 'grade_band', label: 'Grade Band', placeholder: 'e.g., K-2, 3-5, 6-8, 9-12' },
-              { key: 'proud_of', label: 'Something you are proud of this year', placeholder: 'One thing that went well...' },
-              { key: 'pet_names', label: 'Pet names (we love pets)', placeholder: 'e.g., Luna and Biscuit' },
-            ].map((field, idx) => (
+            {ABOUT_FIELDS.map((field, idx) => (
               <div
                 key={field.key}
                 className="px-6 py-4 flex items-center gap-4"
-                style={idx < 6 ? { borderBottom: '1px solid #F3F4F6' } : {}}
+                style={idx < ABOUT_FIELDS.length - 1 ? { borderBottom: '1px solid #F3F4F6' } : {}}
               >
                 <label className="text-sm font-medium w-48 flex-shrink-0" style={{ color: '#1B2A4A', fontFamily: "'DM Sans', sans-serif" }}>
                   {tUI(field.label)}
+                  {aboutStatus[field.key] === 'saving' && (
+                    <span className="ml-2 text-xs font-normal" style={{ color: '#9CA3AF' }}>
+                      {tUI('Saving...')}
+                    </span>
+                  )}
+                  {aboutStatus[field.key] === 'saved' && (
+                    <span className="ml-2 text-xs text-green-600 font-normal">
+                      <Check size={14} className="inline" /> {tUI('Saved')}
+                    </span>
+                  )}
+                  {aboutStatus[field.key] === 'error' && (
+                    <span className="ml-2 text-xs text-red-600 font-normal">
+                      {tUI('Not saved, try again')}
+                    </span>
+                  )}
                 </label>
                 <input
                   type="text"
                   placeholder={tUI(field.placeholder)}
-                  defaultValue={(profile as unknown as Record<string, unknown>)?.[field.key] as string || ''}
-                  onBlur={async (e) => {
-                    const value = e.target.value.trim();
-                    if (!user?.id) return;
-                    const supabase = getSupabase();
-                    await supabase.from('hub_profiles').update({ [field.key]: value }).eq('id', user.id);
+                  value={about[field.key] ?? ''}
+                  onChange={(e) => handleAboutChange(field.key, e.target.value)}
+                  onBlur={(e) => {
+                    if (aboutPending.current[field.key] !== undefined) {
+                      saveAboutField(field.key, e.target.value);
+                    }
                   }}
                   className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#E8B84B] transition-colors"
                   style={{ fontFamily: "'DM Sans', sans-serif" }}
@@ -1428,6 +1566,9 @@ export default function ProfileSettingsPage() {
               {tUI('Pick what matters. We will shape everything around it.')}
               {savedField === 'goals' && (
                 <span className="ml-2 text-xs text-green-600"><Check size={12} className="inline" /> {tUI('Saved')}</span>
+              )}
+              {goalsError && (
+                <span className="ml-2 text-xs text-red-600">{tUI('Not saved, try again')}</span>
               )}
             </p>
 
