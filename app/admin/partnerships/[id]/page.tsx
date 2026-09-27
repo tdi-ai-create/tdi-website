@@ -47,6 +47,7 @@ import {
   type ReminderType,
   type ReminderVariables,
 } from '@/lib/reminder-templates';
+import AttachDealCard from '@/components/dashboard/admin/AttachDealCard';
 
 // Types
 interface Partnership {
@@ -441,12 +442,12 @@ export default function PartnershipDetailPage() {
           schoolName: organization?.name || partnership.contact_name,
         }),
       });
-      const data = await resp.json();
-      if (data.success) {
+      const data = await resp.json().catch(() => ({}));
+      if (resp.ok && data.success) {
         setLoginLinkSent(true);
         setTimeout(() => setLoginLinkSent(false), 5000);
       } else {
-        alert(data.error || 'Failed to send login link');
+        alert(data.error || `Failed to send login link (${resp.status})`);
       }
     } catch {
       alert('Failed to send login link. Please try again.');
@@ -1617,6 +1618,20 @@ export default function PartnershipDetailPage() {
               );
             })()}
 
+            {/* CRM Deal link. Sits above District Intelligence because that
+                panel is empty until this is set. */}
+            {partnership && userEmail && (
+              <AttachDealCard
+                partnershipId={partnership.id}
+                userEmail={userEmail}
+                salesDealId={partnership.sales_deal_id ?? null}
+                onChange={(dealId) => {
+                  setPartnership({ ...partnership, sales_deal_id: dealId });
+                  if (!dealId) setSalesEnrichment(null);
+                }}
+              />
+            )}
+
             {/* District Intelligence Panel */}
             {salesEnrichment?.enrichment_data && (() => {
               const ed = salesEnrichment.enrichment_data;
@@ -2294,7 +2309,7 @@ export default function PartnershipDetailPage() {
 
                     // Log the reminder
                     try {
-                      await fetch('/api/admin/reminders', {
+                      const logResp = await fetch('/api/admin/reminders', {
                         method: 'POST',
                         headers: {
                           'Content-Type': 'application/json',
@@ -2309,6 +2324,9 @@ export default function PartnershipDetailPage() {
                           status: 'sent',
                         }),
                       });
+                      if (!logResp.ok) {
+                        console.error('Failed to log reminder:', logResp.status);
+                      }
                     } catch (error) {
                       console.error('Failed to log reminder:', error);
                     }
