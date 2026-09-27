@@ -162,6 +162,19 @@ export function deeperMeasurementFor(contract: ContractShape | null | undefined)
   return { text: NO_VISITS, heading: 'What this does not show' };
 }
 
+/**
+ * The body of the "how we measure" text, without its own opening heading.
+ *
+ * Every `benchmark_label` we have written opens with the sentence "How we
+ * measure this." Rendering it under a heading that says the same thing prints
+ * the phrase twice, which is how it read on the dashboard from the day the
+ * field was first surfaced. Strip the lead-in and let the heading do that job.
+ * Text that was written without the lead-in is returned untouched.
+ */
+export function howBody(how: string): string {
+  return how.replace(/^\s*How we measure this[.:]?\s*/i, '').trim();
+}
+
 export function goalMeasurement(
   kpi: GoalMeasurementInput,
   contract: ContractShape | null | undefined
