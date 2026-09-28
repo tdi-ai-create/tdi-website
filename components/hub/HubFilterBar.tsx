@@ -40,15 +40,13 @@ interface HubFilterBarProps {
   searchQuery?: string;
   setSearchQuery?: (value: string) => void;
   /**
-   * Optional curated collection toggle, rendered as its own pill ahead of the
-   * category row. A collection is not a category: it combines with the category
-   * and role filters rather than replacing one, which is why it carries separate
-   * state instead of being another value in `categories`.
+   * A value in `categories` that is a curated collection rather than a real
+   * category. It renders as an ordinary pill in the row. The only thing it
+   * changes here is that selecting it shows `collectionSubtitle`, because the
+   * label alone does not say what the shelf is.
    */
-  collectionActive?: boolean;
-  setCollectionActive?: (value: boolean) => void;
   collectionLabel?: string;
-  /** Shown under the count while the collection is on. Says what the shelf means. */
+  /** Shown under the count while that pill is selected. */
   collectionSubtitle?: string;
 }
 
@@ -70,12 +68,10 @@ export default function HubFilterBar({
   subtitle,
   searchQuery = '',
   setSearchQuery,
-  collectionActive = false,
-  setCollectionActive,
   collectionLabel,
   collectionSubtitle,
 }: HubFilterBarProps) {
-  const hasCollection = Boolean(collectionLabel && setCollectionActive);
+  const collectionActive = Boolean(collectionLabel && activeFilter === collectionLabel);
   const [moreFiltersOpen, setMoreFiltersOpen] = useState(false);
   const [searchFocused, setSearchFocused] = useState(false);
 
@@ -93,7 +89,7 @@ export default function HubFilterBar({
 
   const hasAdvancedFilters = capacityFilter !== 'all' || danielsonFilter.length > 0;
   const hasSearch = searchQuery.trim().length > 0;
-  const isFiltered = activeFilter !== 'All' || roleFilter !== 'all' || hasAdvancedFilters || hasSearch || collectionActive;
+  const isFiltered = activeFilter !== 'All' || roleFilter !== 'all' || hasAdvancedFilters || hasSearch;
 
   return (
     <>
@@ -154,33 +150,6 @@ export default function HubFilterBar({
           className="w-px h-6 flex-shrink-0"
           style={{ backgroundColor: 'rgba(0,0,0,0.12)' }}
         />
-
-        {/*
-          Curated collection pill. Styled apart from the category pills on purpose:
-          it is a different kind of thing, and it stays selected while the reader
-          also narrows by category or role.
-        */}
-        {hasCollection && (
-          <>
-            <button
-              onClick={() => setCollectionActive!(!collectionActive)}
-              aria-pressed={collectionActive}
-              className="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all flex-shrink-0"
-              style={{
-                backgroundColor: collectionActive ? '#E8B84B' : 'transparent',
-                color: '#1B2A4A',
-                border: collectionActive ? 'none' : '1.5px solid #E8B84B',
-                fontFamily: "'DM Sans', sans-serif",
-              }}
-            >
-              {tUI(collectionLabel!)}
-            </button>
-            <div
-              className="w-px h-6 flex-shrink-0"
-              style={{ backgroundColor: 'rgba(0,0,0,0.12)' }}
-            />
-          </>
-        )}
 
         {/* Scrollable category pills */}
         <style>{`.hub-filter-scroll::-webkit-scrollbar { display: none; }`}</style>
