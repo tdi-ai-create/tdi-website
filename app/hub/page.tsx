@@ -270,6 +270,9 @@ interface SavedCourse {
 
 // ── Browse topics ──
 const BROWSE_TOPICS = [
+  // Working Together is a curated shelf rather than a category, but it is
+  // selected exactly like one, so it is an ordinary chip here too.
+  { label: 'Working Together', query: 'Working Together' },
   { label: 'Classroom Tools', query: 'Classroom Tools' },
   { label: 'Stress Relief', query: 'Stress Relief' },
   { label: 'Time Savers', query: 'Time Savers' },
@@ -1364,31 +1367,6 @@ export default function HubDashboard() {
           Click any topic to explore tools, games, and resources in that category.
         </div>
         <div style={{ display: 'flex', flexWrap: 'wrap' as const, gap: 8 }}>
-          {/*
-            The Working Together shelf leads this row and is filled rather than
-            outlined, because it is a curated collection and not one of the
-            category chips beside it. It also earns the position: a shelf that
-            only exists behind a filter pill is a shelf nobody finds, which is
-            the exact failure it was built to fix.
-          */}
-          <Link
-            href="/hub/quick-wins?collection=working-together"
-            style={{
-              padding: '8px 18px',
-              borderRadius: 20,
-              fontSize: 13, fontWeight: 600,
-              textDecoration: 'none',
-              border: '1.5px solid #E8B84B',
-              color: '#1B2A4A',
-              background: '#FDF6E3',
-              transition: 'all 0.15s',
-              fontFamily: "'DM Sans', sans-serif",
-            }}
-            onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = '#E8B84B'; }}
-            onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = '#FDF6E3'; }}
-          >
-            Working Together
-          </Link>
           {BROWSE_TOPICS.map(({ label, query }) => (
             <Link
               key={query}

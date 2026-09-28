@@ -29,6 +29,7 @@ import { getPracticeToolsForBrowse, PRACTICE_GAME_SLUGS } from '@/lib/hub/practi
 const FILTER_CATEGORIES = [
   'All',
   'Saved',
+  'Working Together',
   'Instructional Strategies',
   'Lesson Planning',
   'Assessment',
@@ -46,22 +47,27 @@ const FILTER_CATEGORIES = [
 /**
  * The Working Together shelf.
  *
- * This is a collection, not a thirteenth category. A Quick Win gets exactly one
- * category, and these tools legitimately belong to Communication, Leadership and
- * Classroom Management at once, so a category could never hold them together.
- * Being a collection also means it combines with the role and category filters
- * rather than replacing them.
+ * It sits in the filter row as an ordinary pill, alongside All and the twelve
+ * categories, because that is where Rae asked for it on 28 September after
+ * seeing it shipped as a separate control. It had been split out so it could
+ * stack with a category, and the cost of that was a pill nobody could place.
+ * Her question on seeing it, why is this on its own, was the answer.
  *
- * Membership is the `staff-collaboration` tag, which is applied by review against
- * one test: does this help two adults in a school work with each other. It is not
- * applied by query match. The library already carries ~300 uncontrolled topic tags
- * because tags were applied that way, and the agent instructions that govern this
- * one now spell the rule out.
+ * So it behaves like a category to the reader and is selected the same way. It
+ * is still not one underneath. A Quick Win gets exactly one `category`, and
+ * these tools sit in Communication, Leadership and Classroom Management at
+ * once, which is why membership is the `staff-collaboration` tag rather than a
+ * thirteenth category value. Selecting it matches on that tag instead.
  *
- * The distinction the label has to carry: this shelf is about the adults, not the
- * kids. The library has group work and cooperative learning tools for students,
- * and the backfill rejected several tools about students in conflict with each
- * other for exactly this reason. Hence the subtitle, which is not decoration.
+ * The tag is applied by review against one test: does this help two adults in a
+ * school work with each other. Never by query match. The library already
+ * carries around 300 uncontrolled topic tags because tags were applied that
+ * way, and the agent instructions that govern this one now spell the rule out.
+ *
+ * The subtitle is load bearing rather than decorative. Without a line saying
+ * this is about the adults, the label reads as student group work, and the
+ * library does hold cooperative learning tools. The backfill rejected several
+ * tools about students in conflict with each other for exactly this reason.
  */
 const WORKING_TOGETHER_SLUG = 'working-together';
 const WORKING_TOGETHER_TAG = 'staff-collaboration';
@@ -97,16 +103,19 @@ export default function QuickWinsPage() {
   const searchParams = useSearchParams();
   const initialFilter = searchParams.get('filter') ?? 'All';
   const initialSearch = searchParams.get('search') ?? '';
-  const initialCollection = searchParams.get('collection') === WORKING_TOGETHER_SLUG;
+  // ?collection=working-together still works. The Hub home links to it and the
+  // URL has been shared, so it resolves to the pill rather than 404ing quietly.
+  const initialFilterFromCollection =
+    searchParams.get('collection') === WORKING_TOGETHER_SLUG ? WORKING_TOGETHER_LABEL : null;
   const [quickWins, setQuickWins] = useState<QuickWin[]>([]);
   const [activeFilter, setActiveFilter] = useState(
-    FILTER_CATEGORIES.includes(initialFilter) ? initialFilter : 'All'
+    initialFilterFromCollection ??
+      (FILTER_CATEGORIES.includes(initialFilter) ? initialFilter : 'All')
   );
   const [capacityFilter, setCapacityFilter] = useState<'all' | 'low' | 'medium' | 'high'>('all');
   const [roleFilter, setRoleFilter] = useState<string>('all');
   const [danielsonFilter, setDanielsonFilter] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState(initialSearch);
-  const [collectionActive, setCollectionActive] = useState(initialCollection);
   const [visibleCount, setVisibleCount] = useState(18);
   const [isLoading, setIsLoading] = useState(true);
   const { isFavorite, toggleFavorite } = useFavorites();
@@ -217,6 +226,10 @@ export default function QuickWinsPage() {
     const categoryMatch = (() => {
       if (activeFilter === 'All') return true;
       if (activeFilter === 'Saved') return isFavorite(qw.id);
+      // Reads as a category, matches on a tag. See the note above the constants.
+      if (activeFilter === WORKING_TOGETHER_LABEL) {
+        return !!qw.topic_tags?.includes(WORKING_TOGETHER_TAG);
+      }
       return qw.category === activeFilter;
     })();
     const capacityMatch = capacityFilter === 'all' || qw.capacity === capacityFilter;
@@ -231,8 +244,7 @@ export default function QuickWinsPage() {
         qw.topic_tags?.some(t => t.toLowerCase().includes(q))
       );
     })();
-    const collectionMatch = !collectionActive || !!qw.topic_tags?.includes(WORKING_TOGETHER_TAG);
-    return categoryMatch && capacityMatch && danielsonMatch && roleMatch && searchMatch && collectionMatch;
+    return categoryMatch && capacityMatch && danielsonMatch && roleMatch && searchMatch;
   });
 
   /**
@@ -312,7 +324,7 @@ export default function QuickWinsPage() {
     return result;
   };
 
-  const displayQuickWins = collectionActive
+  const displayQuickWins = activeFilter === WORKING_TOGETHER_LABEL
     ? pinParaTeacherFirst(filteredQuickWins)
     : activeFilter === 'All' && capacityFilter === 'all' && roleFilter === 'all' && danielsonFilter.length === 0
       ? sortByAccess(filteredQuickWins)
@@ -322,7 +334,7 @@ export default function QuickWinsPage() {
   const hasMore = visibleCount < displayQuickWins.length;
 
   // Reset visible count when filters change
-  useEffect(() => { setVisibleCount(18); }, [activeFilter, capacityFilter, roleFilter, danielsonFilter.length, collectionActive]);
+  useEffect(() => { setVisibleCount(18); }, [activeFilter, capacityFilter, roleFilter, danielsonFilter.length]);
 
   // Loading skeleton
   if (isLoading) {
@@ -412,8 +424,6 @@ export default function QuickWinsPage() {
           subtitle="Short, practical tools you can use right now"
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
-          collectionActive={collectionActive}
-          setCollectionActive={setCollectionActive}
           collectionLabel={WORKING_TOGETHER_LABEL}
           collectionSubtitle={WORKING_TOGETHER_SUBTITLE}
         />
