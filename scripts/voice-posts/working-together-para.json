@@ -1,0 +1,81 @@
+{
+  "category": "Working Together",
+  "note": "The three para and teacher relationship tools that published 2026-09-28. These sit on the Working Together shelf. Written as TDI voice: the comments explain why the tool is built the way it is, and the questions ask the reader something. No post claims a classroom moment, because nobody is behind these accounts to answer for one.",
+  "tools": [
+    {
+      "slug": "para-norms-conversation-starter",
+      "posts": [
+        [
+          "Lorna Stimpson",
+          "from_tdi",
+          "Fill it in before the conversation, with your best guess in every box. A teacher reacting to something concrete is a far easier ask than a teacher answering an open question about expectations."
+        ],
+        [
+          "Camille Thibodeaux",
+          "from_tdi",
+          "Five questions rather than fifteen, on purpose. It is built for the length of conversation that can actually happen, standing up, between two blocks."
+        ],
+        [
+          "Everett Crane",
+          "question",
+          "Of the five questions on the form, which one would you most want answered in the room you are in right now?"
+        ],
+        [
+          "Bettina Kowalczyk",
+          "question",
+          "If you handed this to a teacher tomorrow, which box would be the hardest one to let them see your guess on?"
+        ]
+      ]
+    },
+    {
+      "slug": "para-repair-checklist",
+      "posts": [
+        [
+          "Deshawn Pryor",
+          "from_tdi",
+          "The first section asks what happened, not why it happened. Motive is the part we get wrong most often, and naming it early tends to end a conversation before it has started."
+        ],
+        [
+          "Priya Raghunathan",
+          "from_tdi",
+          "There is a step for deciding whether an administrator needs to be involved, and wording for raising it so it does not land as a complaint. Jumping straight to that step is usually what makes it land as one."
+        ],
+        [
+          "Yolanda Betts",
+          "question",
+          "Where does it usually break down for you, working out what actually happened, or having the conversation afterwards?"
+        ],
+        [
+          "Marcus Oyelaran",
+          "question",
+          "What has helped you tell the difference between a problem that is missing norms and a problem that is missing respect?"
+        ]
+      ]
+    },
+    {
+      "slug": "para-five-minutes-better-monday",
+      "posts": [
+        [
+          "Everett Crane",
+          "from_tdi",
+          "The lines are written out word for word deliberately. Knowing you ought to offer help is not the difficult part. Having a sentence ready that does not come out sounding like criticism is."
+        ],
+        [
+          "Deacon Mwangi",
+          "from_tdi",
+          "None of these need the teacher to agree to anything first. That is the constraint the whole card is built around, because a para often has no way to call a meeting."
+        ],
+        [
+          "Lorna Stimpson",
+          "question",
+          "Which of the four moments is the one you tend to let go past without saying anything?"
+        ],
+        [
+          "Aurelia Nkemdirim",
+          "question",
+          "What is a line that has worked for you when you needed information nobody thought to give you?"
+        ]
+      ]
+    }
+  ]
+}
