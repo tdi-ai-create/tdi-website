@@ -57,11 +57,23 @@ function sh(cmd, args) {
  *
  * API routes are included: the bug that started this was a caller sending the
  * wrong id, which no amount of route testing would have caught.
+ *
+ * `app/partners` was missing until 27 September 2026, which meant the one screen
+ * our schools actually log into was the only operated surface outside this gate.
+ * The goals rebuild went through it without ever being asked for a pass, and it
+ * shipped a goal reading "Target 3.5of 5" that typecheck, the build, eslint and
+ * every other gate passed. Loading the page was the only thing that caught it.
+ *
+ * This page cannot be signed into locally, because it authenticates against a
+ * live Supabase session. That is not a reason to leave it out. It is exactly
+ * what the deferred pass is for: say so in the record, name the production URL,
+ * and fill in what you saw after it deploys.
  */
 const OPERATED = [
   /^app\/tdi-admin\/.*\.tsx$/,
   /^app\/hub\/.*\.tsx$/,
   /^app\/creator-portal\/.*\.tsx$/,
+  /^app\/partners\/.*\.tsx$/,
   /^components\/.*\.tsx$/,
   /^app\/api\/(admin|funding|creator-studio)\/.*route\.ts$/,
 ];
