@@ -25,7 +25,35 @@ observation of the shelf, so it is written here rather than dressed up as one.
   Localhost fails the same way for the same reason.
 - Verify after deploy: https://www.teachersdeserveit.com/hub/quick-wins?collection=working-together
 
-- Saw:
+- Saw: done on production after the deploy, signed in as Rae. Opened
+  https://www.teachersdeserveit.com/hub/quick-wins?collection=working-together
+  cold, as a full page load rather than a client side navigation, and it came up
+  on the shelf: "Showing 18 of 286 quick wins" with the Working Together pill
+  filled gold and "All" still the selected category beside it. That is the hard
+  refresh case, and the collection survived it.
+- Saw: the subtitle under the count reads "Tools for the adults in the building,
+  not the students".
+- Saw: 18 rather than 22 is correct and not a bug. Four of the 22 tagged items
+  are the new para tools, which are scheduled to publish on 28 and 29 September
+  and are not live yet. 18 published plus 4 unpublished matches the database.
+- Saw: the pinning works. The first nine cards are all para or teacher tools,
+  starting "Multi-Classroom Communication Log", "Para Onboarding & Orientation
+  Checklist" and "Para-to-Teacher End-of-Day Handoff Note", and the coach and
+  leader material begins only after them at "Parent Conference Coaching Prep".
+- Saw: both items the tag query would have missed are on the shelf, "The
+  Teacher-Para Partnership Planner" and "Teacher + Para Communication Kit".
+- Pressed: "Instructional Strategies" in the category row while Working Together
+  was still on. This was the interaction most likely to be broken.
+- Saw: the count went from 18 to 2, the Working Together pill stayed gold and
+  selected, and the two remaining cards were "Instructional Rounds Planning
+  Guide" and "New Teacher Check-in Protocol". The collection narrowed alongside
+  the category instead of being cleared by it, which is the whole point of
+  making it a collection.
+- Pressed: the "Working Together" chip in the Browse by Topic row on
+  https://www.teachersdeserveit.com/hub
+- Saw: it sits first in that row, gold outlined against the plain white chips,
+  and it landed on the shelf showing "Showing 18 of 286 quick wins". Two clicks
+  from the Hub home, which was the requirement.
 
 ## What I did not press
 
@@ -35,20 +63,13 @@ than assumed.
 
 ## What I could not verify
 
-Everything that matters about the shelf, which is the honest answer and the
-reason this is deferred rather than claimed:
-
-- That the shelf renders 22 items. The count is measured in the database, not
-  read off the screen, and those are different claims.
-- That para and teacher tools actually appear first.
-- That the subtitle reads as being about adults rather than students.
-- That a hard refresh on `?collection=working-together` keeps the shelf on.
-- That the pill combines with a category or role filter instead of clearing it.
-  This is the one most likely to be wrong, because the collection carries its
-  own state alongside the existing single valued category filter.
-- That the Hub home chip is visible and lands on the shelf.
-
-What is verified without a browser: `tsc --noEmit` is clean, and
-`check:adminauth`, `check:writes` and `check:schema` all pass. None of those
-would have caught either of the 13 and 14 September failures this gate exists
-for, which is the point.
+- The shelf at its full size. Four of the 22 tagged tools publish on 28 and 29
+  September, so what was on screen was 18. The other four were checked as
+  database rows, not as cards, and a row is not a card.
+- The Spanish rendering. The label and subtitle go through `tUI`, which
+  translates on demand rather than from a string file, and the ES toggle was not
+  pressed.
+- The combination with the role dropdown. The category combination was pressed
+  and worked, and the role filter runs through the same filter chain, but that
+  is reasoning rather than an observation.
+- Whether the shelf reads well on a phone. Only desktop width was opened.
