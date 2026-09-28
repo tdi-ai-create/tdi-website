@@ -162,6 +162,33 @@ export function deeperMeasurementFor(contract: ContractShape | null | undefined)
   return { text: NO_VISITS, heading: 'What this does not show' };
 }
 
+/**
+ * The body of the "how we measure" text, without its own opening heading.
+ *
+ * Every `benchmark_label` we have written opens with the sentence "How we
+ * measure this." Rendering it under a heading that says the same thing prints
+ * the phrase twice, which is how it read on the dashboard from the day the
+ * field was first surfaced. Strip the lead-in and let the heading do that job.
+ * Text that was written without the lead-in is returned untouched.
+ */
+export function howBody(how: string): string {
+  return how.replace(/^\s*How we measure this[.:]?\s*/i, '').trim();
+}
+
+/**
+ * A goal value printed with its unit.
+ *
+ * "%" sits tight against the number. A worded unit like "of 5" needs the space,
+ * or a goal reads "Target 3.5of 5", which is how it shipped on 27 September and
+ * was caught by loading the page. Both halves of a goal row go through this, so
+ * the target and the current value can never disagree about spacing.
+ */
+export function withUnit(value: number | string, unit?: string | null): string {
+  const u = (unit ?? '').trim();
+  if (!u) return String(value);
+  return /^[A-Za-z]/.test(u) ? `${value} ${u}` : `${value}${u}`;
+}
+
 export function goalMeasurement(
   kpi: GoalMeasurementInput,
   contract: ContractShape | null | undefined
@@ -209,7 +236,7 @@ export function goalProgress(kpi: {
   const current = Number(kpi.current_value);
   return {
     pct: Math.min((current / target) * 100, 100),
-    display: `${current}${unit}`,
+    display: withUnit(current, unit),
     awaitingBaseline: false,
   };
 }

@@ -32,6 +32,58 @@ deferral is kept for the record.
   "Call list: 111 / $556K". Bella read 0 earlier today, so her list landed.
 - Pressed: Escape. The menu closed and no assignment was changed.
 
+## Deferral completed, 27 September 2026
+
+Driven on the live board in Rae's own browser, with her approval, on the one
+card that was already unclaimed so the round trip would put it back.
+
+1. Pressed: the caller circle on Wauconda CUSD 118, sitting mid column in
+   Targeting with the column scrolled.
+   Saw: the menu opened whole, above the card and outside the column, with all
+   five options readable: "Rae calls this one", "Bella calls this one",
+   "Kristin calls this one", "Jim calls this one", "Take it off the call list".
+   Nothing clipped.
+
+2. Pressed: scrolled the Targeting column with that menu open.
+   Saw: it closed. No menu left drifting over other cards.
+
+3. Pressed: "Rae calls this one".
+   Saw: a red R badge on the card, and the header counts moved together, Rae 18
+   to 19, Nobody yet 100 to 99, Call list 111 to 112, $556K to $566K. Opening
+   the lead showed a note headed Rae / UPDATE / Sep 25, 2026 reading "CALL
+   ASSIGNED TO RAE. Set by Rae on September 25, 2026 at 3:50 PM." The time is in
+   the text, not only in the column.
+
+4. Pressed: the caller circle again, then "Take it off the call list".
+   Saw: the R badge went back to a plain phone icon and the counts returned to
+   Rae 18, Nobody yet 100, Call list 111, $556K. The lead gained a second note,
+   Rae / UPDATE / Sep 27, 2026, reading "CALL UNASSIGNED. Rae is no longer
+   making this call. Cleared by Rae on September 27, 2026 at 6:29 PM." Its own
+   timestamp, above the assign note.
+
+5. Looked at Addison SD4 in Likely Yes, which has both a caller and a follow-up.
+   Saw: a B badge for Bella and a pill reading "Goal of Call: ONBOARDING (FALL
+   Semester)". The reason for the call, not the caller's name repeated.
+
+   Then filtered to "Nobody yet 100" and looked at Mount Vernon City School
+   District, which has a follow-up and no caller. Saw: the pill reads "Follow up
+   to book a time with TDI. Kristi... SEP 30", again the reason, and the caller
+   control renders as an empty grey phone icon.
+
+## What did not match this record
+
+Step 5 expected a lead with a follow-up and no caller to "read UNCLAIMED". No
+card on the Kanban board carries that word. Searching the accessibility tree for
+it returns nothing. The unclaimed state is shown by an empty caller control
+rather than by the word, which is legible enough in context but is not what this
+file said to confirm. Not a regression, and not fixed here. Flagged for Rae.
+
+## What was left alone
+
+Everything else on the board. One lead was touched, Wauconda CUSD 118, chosen
+because it was unclaimed, and it is back to unclaimed. It keeps the two notes
+above, which are the honest record of the check and were not deleted.
+
 The deferral on the previous change to these screens was completed first and is
 recorded in `sales-call-owner-and-no-heat.md`.
 

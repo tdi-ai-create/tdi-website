@@ -8,7 +8,7 @@ import RosterAccessManager from '@/components/partners/RosterAccessManager';
 import Link from 'next/link';
 import FooterSymbol from '@/components/FooterSymbol';
 import { offeringLabel } from '@/lib/partnerships/offerings';
-import { goalMeasurement, goalProgress, type Offering, type ContractShape } from '@/lib/partners/goal-measurement';
+import { goalMeasurement, goalProgress, howBody, withUnit, type Offering, type ContractShape } from '@/lib/partners/goal-measurement';
 import {
   Calendar,
   Users,
@@ -392,7 +392,6 @@ export default function PartnerDashboard() {
   // goal card offers. Defaults to zeros so a school reads as unobserved rather
   // than observed if the load fails.
   const [contract, setContract] = useState<ContractShape>({ observation_days_total: 0, virtual_sessions_total: 0, executive_sessions_total: 0 });
-  const [openGoalInfo, setOpenGoalInfo] = useState<string | null>(null);
   const [staffStats, setStaffStats] = useState<StaffStats>({ total: 0, hubLoggedIn: 0 });
   const [metricSnapshots, setMetricSnapshots] = useState<MetricSnapshot[]>([]);
   const [apiBuildings, setApiBuildings] = useState<Building[]>([]);
@@ -3028,6 +3027,103 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
             aria-labelledby="tab-overview"
             className="space-y-6"
           >
+            {/* ─── YOUR GOALS ─── first thing under the hero.
+                These used to render as four unlabelled rings eight blocks down
+                this tab. There was no heading saying "Goals" anywhere on the
+                page, every label was cut at 25 characters, and the target was
+                never printed, so a ring reading 24% had nothing to be 24% of.
+                The board PDF built from these same rows already said
+                "Partnership Goals" and "24% of 70% target". The screen now
+                agrees with the export. Rae approved 27 September 2026. */}
+            {partnershipKpis.length > 0 ? (
+              <div className="bg-white rounded-2xl px-5 py-5 md:px-7 md:py-6 shadow-sm border border-gray-100">
+                <div className="flex items-baseline justify-between gap-4 flex-wrap pb-3.5 border-b border-gray-200">
+                  <h2 className="text-[17px] font-bold text-[#1e2749] tracking-tight">Your Goals</h2>
+                  <span className="text-xs text-gray-400">Written with you on your onboarding call</span>
+                </div>
+
+                {partnershipKpis.map((kpi) => {
+                  const progress = goalProgress(kpi);
+                  const measure = goalMeasurement(kpi, contract);
+                  const unit = kpi.target_unit || '';
+                  const target = Number(kpi.target_value ?? 0);
+                  // A goal still collecting its baseline states the target it is
+                  // working toward. The old card said "Soon" and nothing else,
+                  // which told a principal the goal was unmeasured without ever
+                  // telling them what the goal was.
+                  const stat = progress.awaitingBaseline
+                    ? (target > 0 ? `Target ${withUnit(target, unit)}` : 'Target set with your team')
+                    : `${progress.display} of ${withUnit(target, unit)}`;
+                  const paragraphs = measure.how
+                    ? howBody(measure.how).split('\n').map(s => s.trim()).filter(Boolean)
+                    : [];
+
+                  return (
+                    <div key={kpi.kpi_key} className="py-4 border-b border-gray-100 last:border-b-0">
+                      <div className="flex items-baseline justify-between gap-4 mb-2">
+                        <span className="text-[15px] font-semibold text-[#1e2749] leading-snug">{kpi.kpi_label}</span>
+                        <span className={`text-[13px] tabular-nums whitespace-nowrap ${progress.awaitingBaseline ? 'text-gray-400 font-medium' : 'text-[#1e2749] font-semibold'}`}>
+                          {stat}
+                        </span>
+                      </div>
+
+                      {progress.awaitingBaseline ? (
+                        <div
+                          className="h-1.5 rounded-full"
+                          style={{ background: 'repeating-linear-gradient(90deg, #E8EAF0 0 5px, transparent 5px 10px)' }}
+                          aria-hidden="true"
+                        />
+                      ) : (
+                        <div className="h-1.5 rounded-full bg-gray-100 overflow-hidden" aria-hidden="true">
+                          <div className="h-full rounded-full bg-[#1e2749]" style={{ width: `${progress.pct}%` }} />
+                        </div>
+                      )}
+
+                      {paragraphs.length > 0 && (
+                        <details className="mt-2.5 group">
+                          <summary className="cursor-pointer list-none [&::-webkit-details-marker]:hidden inline-flex items-center gap-1.5 text-xs font-semibold text-[#1e2749]">
+                            <ChevronDown className="w-3.5 h-3.5 text-gray-400 transition-transform group-open:rotate-180" />
+                            How we measure this
+                          </summary>
+                          <div className="mt-3 p-4 bg-gray-50 border border-gray-100 rounded-xl">
+                            {paragraphs.map((para, i) => (
+                              <p key={i} className="text-[13.5px] leading-relaxed text-gray-600 mb-2.5 last:mb-0 max-w-[68ch]">{para}</p>
+                            ))}
+                            <div className="mt-3 pt-3 border-t border-gray-200">
+                              <p className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1">{measure.deeperHeading}</p>
+                              <p className="text-[13.5px] leading-relaxed text-gray-600 max-w-[68ch]">{measure.deeper}</p>
+                              {measure.offer && (
+                                <p className="text-[13.5px] leading-relaxed text-gray-600 mt-2.5 max-w-[68ch]">
+                                  <strong className="text-[#1e2749]">{measure.offer.name}</strong> is built for this. {measure.offer.why}{' '}
+                                  <a
+                                    href={measure.offer.href}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="font-semibold text-[#1e2749] underline underline-offset-2 hover:text-[#38618C]"
+                                  >
+                                    Read about {measure.offer.name}
+                                  </a>
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        </details>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              // A school with no goals used to get four generic metrics in this
+              // slot styled exactly like goals. Saying plainly that none are set
+              // is honest, and the onboarding call is the thing that sets them.
+              <div className="bg-white rounded-2xl px-5 py-6 md:px-7 shadow-sm border border-gray-100">
+                <h2 className="text-[17px] font-bold text-[#1e2749] tracking-tight mb-2">Your Goals</h2>
+                <p className="text-[15px] leading-relaxed text-gray-500 max-w-[62ch]">
+                  Your goals are written together on your onboarding call, against your own data, and in your words. They appear here as soon as they are set.
+                </p>
+              </div>
+            )}
             {/* ─── PARTNERSHIP SETUP CHECKLIST (contract-specific onboarding) ─── */}
             {showGettingStarted && (() => {
               const hasObservations = (partnership.observation_days_total || 0) > 0;
@@ -3360,7 +3456,6 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
               const activeUsers = metricsRange === 'month' ? (hubStats?.logins_this_month ?? hubStats?.active_users_7d ?? 0) : (hubStats?.active_users_7d ?? 0);
               const totalDeliverables = (partnership.observation_days_total || 0) + (partnership.virtual_sessions_total || 0);
               const completedDeliverables = (partnership.observation_days_completed || 0) + (partnership.virtual_sessions_completed || 0);
-              const phaseNum = partnership.contract_phase === 'IGNITE' ? 1 : partnership.contract_phase === 'ACCELERATE' ? 2 : 3;
 
               return (
                 <>
@@ -3414,7 +3509,7 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                     )}
                   </div>
 
-                  {/* Date Range Toggle + Visual Gauge Rings */}
+                  {/* Date Range Toggle, drives the numbers in the summary above */}
                   <div className="flex justify-end mb-1">
                     <div className="inline-flex bg-gray-100 rounded-lg p-0.5">
                       {([['month', 'This Month'], ['quarter', 'Quarter'], ['all', 'All Time']] as const).map(([key, label]) => (
@@ -3432,108 +3527,6 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                       ))}
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                    {(partnershipKpis.length > 0
-                      ? partnershipKpis.slice(0, 4).map(kpi => {
-                          const kpiColors: Record<string, string> = {
-                            strategy_implementation: '#8B5CF6', classroom_application: '#2563EB',
-                            course_completion: '#4ecdc4', field_notes_earned: '#E8B84B',
-                            pd_hours_completed: '#F97316', team_wellness: '#2A9D8F',
-                            stress_reduction: '#EC4899', retention_intent: '#10B981',
-                            hub_engagement: '#E8B84B', custom_course_mandate: '#1e2749',
-                          }
-                          // A goal whose target is deliberately not set yet used
-                          // to divide by zero and draw an empty ring reading 0%.
-                          // Four of those in a row reads as a school failing at
-                          // everything when it only means we have not measured
-                          // them yet.
-                          const progress = goalProgress(kpi)
-                          return {
-                            value: progress.pct,
-                            label: kpi.kpi_label.length > 25 ? kpi.kpi_label.slice(0, 22) + '...' : kpi.kpi_label,
-                            display: progress.display,
-                            color: progress.awaitingBaseline ? '#9CA3AF' : (kpiColors[kpi.kpi_key] || '#1e2749'),
-                            max: 100,
-                            info: { id: kpi.kpi_key, title: kpi.kpi_label, ...goalMeasurement(kpi, contract) },
-                          }
-                        })
-                      : [
-                          { value: hubPct, label: 'Hub Engagement', display: `${hubPct}%`, color: '#E8B84B', max: 100 },
-                          { value: totalDeliverables > 0 ? (completedDeliverables / totalDeliverables) * 100 : 0, label: 'Deliverables', display: `${completedDeliverables}/${totalDeliverables}`, color: '#4ecdc4', max: 100 },
-                          { value: wellnessScore ? (wellnessScore / 5) * 100 : (staffStats.total > 0 ? (staffStats.hubLoggedIn / staffStats.total) * 100 : 0), label: wellnessScore ? (metricsRange === 'month' ? '30-Day Wellness' : 'Team Wellness') : 'Staff Active', display: wellnessScore ? `${wellnessScore}` : `${staffStats.hubLoggedIn}`, color: '#2A9D8F', max: 100 },
-                          { value: (phaseNum / 3) * 100, label: 'Current Phase', display: `${phaseNum}/3`, color: '#1e2749', max: 100 },
-                        ]
-                    ).map((gauge, i) => {
-                      const info = 'info' in gauge ? gauge.info : null
-                      const isOpen = !!info && openGoalInfo === info.id
-                      return (
-                      <div key={i} className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 flex flex-col items-center relative">
-                        {info && (
-                          <button
-                            type="button"
-                            onClick={() => setOpenGoalInfo(isOpen ? null : info.id)}
-                            aria-expanded={isOpen}
-                            aria-label={`How we measure ${info.title}`}
-                            className="absolute top-2.5 right-2.5 w-6 h-6 rounded-full border border-gray-200 text-gray-400 hover:text-[#1e2749] hover:border-[#1e2749] transition-colors flex items-center justify-center text-[11px] font-bold"
-                          >
-                            i
-                          </button>
-                        )}
-                        <div className="relative w-20 h-20 mb-3">
-                          <svg className="w-full h-full transform -rotate-90" viewBox="0 0 80 80">
-                            <circle cx="40" cy="40" r="34" fill="none" stroke="#F3F4F6" strokeWidth="6" />
-                            <circle cx="40" cy="40" r="34" fill="none" stroke={gauge.color} strokeWidth="6"
-                              strokeDasharray={`${gauge.value * 2.136} ${(100 - gauge.value) * 2.136}`} strokeLinecap="round" />
-                          </svg>
-                          <div className="absolute inset-0 flex items-center justify-center">
-                            <span className={`font-bold ${gauge.display.length > 4 ? 'text-sm' : 'text-xl'}`} style={{ color: gauge.color }}>{gauge.display}</span>
-                          </div>
-                        </div>
-                        <p className="text-[11px] text-gray-500 font-medium text-center">{gauge.label}</p>
-
-                        {isOpen && info && (
-                          <div className="absolute z-30 top-full left-0 right-0 mt-2 mx-1 bg-white rounded-xl shadow-xl border border-gray-200 p-4 text-left">
-                            <p className="text-xs font-bold text-[#1e2749] mb-2">{info.title}</p>
-                            {info.how && (
-                              <>
-                                <p className="text-[10px] font-bold uppercase tracking-wide text-gray-400 mb-1">How we measure this</p>
-                                <p className="text-[11px] text-gray-600 leading-relaxed mb-3">{info.how}</p>
-                              </>
-                            )}
-                            <p className="text-[10px] font-bold uppercase tracking-wide text-gray-400 mb-1">{info.deeperHeading}</p>
-                            <p className="text-[11px] text-gray-600 leading-relaxed">{info.deeper}</p>
-                            {info.offer && (
-                              <div className="mt-3 pt-3 border-t border-gray-100">
-                                <p className="text-[11px] text-gray-600 leading-relaxed mb-2">
-                                  <strong className="text-[#1e2749]">{info.offer.name}</strong> is built for this. {info.offer.why}
-                                </p>
-                                <a
-                                  href={info.offer.href}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="text-[11px] font-semibold text-[#1e2749] underline underline-offset-2 hover:text-[#38618C]"
-                                >
-                                  Read about {info.offer.name}
-                                </a>
-                              </div>
-                            )}
-                            <button
-                              type="button"
-                              onClick={() => setOpenGoalInfo(null)}
-                              className="mt-3 text-[10px] font-semibold text-gray-400 hover:text-gray-600"
-                            >
-                              Close
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                      )
-                    })}
-                  </div>
-
-                  {/* The "Set a Goal for Your Team" card was removed on
-                      24 September 2026 along with the wizard behind it. A school
-                      with no goals yet simply shows no goals section. */}
 
                   {/* Board Report Download */}
                   <div className="flex justify-end">

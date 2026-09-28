@@ -1,0 +1,582 @@
+<title>Your Goals Block</title>
+<style>
+  :root {
+    --navy: #1B2A4A;
+    --navy-2: #1e2749;
+    --ink: #1e2749;
+    --body: #4B5563;
+    --muted: #6B7280;
+    --faint: #9CA3AF;
+    --line: #F0F1F4;
+    --line-2: #E5E7EB;
+    --page: #F5F6F8;
+    --card: #ffffff;
+    --gold: #E8B84B;
+    --yellow: #FFBA06;
+    --teal: #4ecdc4;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --serif: Georgia, "Iowan Old Style", "Times New Roman", serif;
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0; background: var(--page); color: var(--body);
+    font-family: var(--sans); font-size: 16px; line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ============ mockup chrome (not part of the product) ============ */
+  .chrome {
+    position: sticky; top: 0; z-index: 60;
+    background: #101828; color: #fff;
+    padding: 11px 20px;
+    display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px;
+  }
+  .chrome .tag {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--gold);
+  }
+  .chrome .spacer { flex: 1 1 auto; }
+  .switch { display: inline-flex; background: rgba(255,255,255,0.08); border-radius: 8px; padding: 3px; gap: 2px; }
+  .switch button {
+    font: inherit; font-size: 12px; font-weight: 650; color: rgba(255,255,255,0.55);
+    background: none; border: 0; padding: 5px 12px; border-radius: 6px; cursor: pointer;
+    transition: background 0.15s, color 0.15s; white-space: nowrap;
+  }
+  .switch button:hover { color: rgba(255,255,255,0.85); }
+  .switch button[aria-pressed="true"] { background: #fff; color: #101828; }
+  .switch button:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+  .chrome .lbl { font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(255,255,255,0.4); }
+
+  .caption {
+    background: #1d2939; color: rgba(255,255,255,0.72);
+    font-size: 12.5px; line-height: 1.55; padding: 10px 20px;
+    border-top: 1px solid rgba(255,255,255,0.07);
+  }
+  .caption b { color: #fff; font-weight: 650; }
+  .caption .mono { font-family: var(--mono); font-size: 11.5px; color: var(--gold); }
+
+  /* ============ the hero, matching DashboardHeader.tsx ============ */
+  .hero { position: relative; overflow: hidden; color: #fff; }
+  .hero .grad { position: absolute; inset: 0; background: linear-gradient(135deg, #1B2A4A 0%, #2d3a5c 50%, #38618C 100%); }
+  .hero .dots {
+    position: absolute; inset: 0; opacity: 0.05;
+    background-image: radial-gradient(circle at 25% 25%, #fff 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+  .hero .inner { position: relative; max-width: 1024px; margin: 0 auto; padding: 32px 24px; }
+  @media (min-width: 768px) { .hero .inner { padding: 48px 24px; } }
+  .hero .toprow { display: flex; flex-direction: column; gap: 16px; }
+  @media (min-width: 768px) { .hero .toprow { flex-direction: row; align-items: center; justify-content: space-between; } }
+  .hero h1 {
+    font-size: 30px; font-weight: 700; letter-spacing: -0.02em; margin: 0; color: #fff;
+  }
+  @media (min-width: 768px) { .hero h1 { font-size: 36px; } }
+  .hero .namerow { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; flex-wrap: wrap; }
+  .yearbadge {
+    white-space: nowrap; padding: 4px 12px; border-radius: 999px; font-size: 12px; font-weight: 600;
+    background: linear-gradient(135deg, rgba(255,186,6,0.2), rgba(255,186,6,0.1));
+    border: 1px solid rgba(255,186,6,0.4); color: #FFBA06;
+  }
+  .hero .loc { color: rgba(255,255,255,0.6); font-size: 15px; margin: 0; }
+  .phasechip {
+    padding: 8px 16px; border-radius: 12px; font-size: 14px; font-weight: 600;
+    display: inline-flex; align-items: center; gap: 8px; white-space: nowrap;
+    background: linear-gradient(135deg, rgba(251,191,36,0.2), rgba(251,191,36,0.1));
+    border: 1px solid rgba(251,191,36,0.4); box-shadow: 0 0 20px rgba(251,191,36,0.2);
+    color: #FBBF24;
+  }
+  .phasechip .d { width: 8px; height: 8px; border-radius: 50%; background: #FBBF24; box-shadow: 0 0 8px rgba(251,191,36,0.6); }
+  .herogoal {
+    margin-top: 24px; padding: 16px; border-radius: 12px;
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+  }
+  .herogoal .k {
+    font-size: 12px; color: rgba(255,255,255,0.4); text-transform: uppercase;
+    letter-spacing: 0.08em; margin: 0 0 4px;
+  }
+  .herogoal p { margin: 0; color: rgba(255,255,255,0.9); font-size: 15px; line-height: 1.6; }
+
+  /* ============ tab bar ============ */
+  .tabbar { position: sticky; top: 0; z-index: 30; background: #fff; border-bottom: 1px solid var(--line); box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+  .tabbar .inner { max-width: 1024px; margin: 0 auto; padding: 0 24px; display: flex; align-items: center; gap: 4px; overflow-x: auto; }
+  .tabbar span {
+    padding: 16px; font-size: 14px; font-weight: 600; white-space: nowrap;
+    border-bottom: 2px solid transparent; color: var(--faint);
+  }
+  .tabbar span.on { color: var(--navy); border-bottom-color: var(--navy); }
+
+  /* ============ page body ============ */
+  main { max-width: 1024px; margin: 0 auto; padding: 32px 16px 80px; display: flex; flex-direction: column; gap: 20px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+  .card.pad { padding: 24px; }
+  @media (min-width: 768px) { .card.pad { padding: 28px; } }
+
+  /* condensed stand-in blocks */
+  .stub { display: flex; align-items: center; gap: 12px; padding: 18px 24px; }
+  .stub .t { font-size: 15px; font-weight: 650; color: var(--ink); }
+  .stub .s { font-size: 13px; color: var(--faint); }
+  .stub .mark {
+    margin-left: auto; font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--faint); background: #F3F4F6; padding: 3px 9px; border-radius: 4px; white-space: nowrap;
+  }
+
+  /* setup checklist, real styling */
+  .setup { border-radius: 16px; overflow: hidden; }
+  .setup .head { background: var(--navy-2); padding: 18px 24px; display: flex; align-items: center; gap: 12px; }
+  .setup .head .ic { width: 20px; height: 20px; color: var(--gold); flex: none; }
+  .setup .head h2 { margin: 0; font-size: 16px; font-weight: 700; color: #fff; }
+  .setup .head p { margin: 0; font-size: 12px; color: rgba(255,255,255,0.5); }
+  .setup .rows { background: #fff; padding: 8px 24px 16px; }
+  .setup .r { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+  .setup .r:last-child { border-bottom: 0; }
+  .setup .r .bx { width: 24px; height: 24px; border-radius: 50%; border: 1px solid var(--line-2); flex: none; }
+  .setup .r .bx.done { border-color: #A7F3D0; background: #ECFDF5; position: relative; }
+  .setup .r .bx.done::after {
+    content: ""; position: absolute; left: 8px; top: 4px; width: 5px; height: 10px;
+    border: solid #059669; border-width: 0 2px 2px 0; transform: rotate(45deg);
+  }
+  .setup .r .tx { flex: 1; min-width: 0; }
+  .setup .r .tx p { margin: 0; font-size: 14px; font-weight: 500; color: var(--ink); }
+  .setup .r.done .tx p { color: var(--faint); text-decoration: line-through; }
+  .setup .r .tx .d { display: block; font-size: 12px; color: var(--muted); font-weight: 400; }
+  .setup .r .go { font-size: 12px; font-weight: 650; padding: 8px 16px; border-radius: 8px; background: var(--navy-2); color: #fff; white-space: nowrap; }
+  .setup .r .ok { font-size: 10px; font-weight: 600; color: #059669; background: #ECFDF5; padding: 4px 9px; border-radius: 999px; white-space: nowrap; }
+
+  /* partnership intelligence, real styling */
+  .intel .k { display: flex; align-items: center; gap: 6px; margin-bottom: 12px; }
+  .intel .k i { width: 6px; height: 6px; border-radius: 50%; background: var(--gold); display: block; }
+  .intel .k span { font-size: 10px; font-weight: 700; color: var(--gold); text-transform: uppercase; letter-spacing: 0.14em; }
+  .intel p { margin: 0; font-family: var(--serif); font-size: 17px; line-height: 1.65; color: #374151; }
+  @media (min-width: 768px) { .intel p { font-size: 18px; } }
+  .intel .more { margin-top: 12px; font-size: 12px; color: var(--faint); }
+
+  /* ============ CURRENT: unnamed ring grid ============ */
+  .rangerow { display: flex; justify-content: flex-end; margin-bottom: 4px; }
+  .rangerow .seg { display: inline-flex; background: #F3F4F6; border-radius: 8px; padding: 2px; }
+  .rangerow .seg span { font-size: 10px; font-weight: 650; color: var(--muted); padding: 4px 12px; border-radius: 6px; }
+  .rangerow .seg span.on { background: #fff; color: var(--navy); box-shadow: 0 1px 2px rgba(0,0,0,0.06); }
+  .ringgrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  @media (min-width: 768px) { .ringgrid { grid-template-columns: repeat(4, 1fr); } }
+  .ringcard {
+    position: relative; background: #fff; border: 1px solid var(--line); border-radius: 16px;
+    padding: 20px 10px; display: flex; flex-direction: column; align-items: center;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+  .ringcard .i {
+    position: absolute; top: 10px; right: 10px; width: 24px; height: 24px; border-radius: 50%;
+    border: 1px solid var(--line-2); color: var(--faint); font-size: 11px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .ringwrap { position: relative; width: 80px; height: 80px; margin-bottom: 12px; }
+  .ringwrap svg { display: block; transform: rotate(-90deg); }
+  .ringwrap .v {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 20px;
+  }
+  .ringwrap .v.sm { font-size: 14px; }
+  .ringcard .lab { font-size: 11px; font-weight: 500; color: var(--muted); text-align: center; line-height: 1.35; }
+
+  /* ============ PROPOSED: the goals block ============ */
+  .goals { padding: 22px 24px 8px; }
+  @media (min-width: 768px) { .goals { padding: 24px 28px 10px; } }
+  .goals .gh { display: flex; align-items: baseline; justify-content: space-between; gap: 14px; flex-wrap: wrap; padding-bottom: 14px; border-bottom: 1px solid var(--line-2); }
+  .goals .gh h2 { margin: 0; font-size: 17px; font-weight: 700; color: var(--ink); letter-spacing: -0.01em; }
+  .goals .gh .prov { font-size: 12px; color: var(--faint); }
+  .goal { padding: 16px 0; border-bottom: 1px solid var(--line); }
+  .goal:last-of-type { border-bottom: 0; }
+  .goal .top { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 9px; }
+  .goal .nm { font-size: 15px; font-weight: 600; color: var(--ink); line-height: 1.4; }
+  .goal .st {
+    font-family: var(--mono); font-size: 13px; font-weight: 600; white-space: nowrap;
+    font-variant-numeric: tabular-nums; color: var(--navy-2);
+  }
+  .goal .st.wait { color: var(--faint); font-weight: 500; }
+  .trk { height: 6px; border-radius: 3px; background: #F1F2F5; overflow: hidden; }
+  .trk i { display: block; height: 100%; border-radius: 3px; background: var(--navy-2); }
+  .trk.wait { background: repeating-linear-gradient(90deg, #E8EAF0 0 5px, transparent 5px 10px); }
+  .goal .sub2 { margin: 9px 0 0; font-size: 13px; color: var(--muted); }
+  .goal details { margin-top: 9px; }
+  .goal summary {
+    list-style: none; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
+    font-size: 12.5px; font-weight: 650; color: var(--navy-2);
+  }
+  .goal summary::-webkit-details-marker { display: none; }
+  .goal summary::before { content: "+"; font-family: var(--mono); font-size: 14px; line-height: 1; color: var(--faint); }
+  .goal details[open] summary::before { content: "\2212"; }
+  .goal summary:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; border-radius: 3px; }
+  .goal .expl {
+    margin-top: 12px; padding: 16px 18px; background: #FAFBFC; border: 1px solid var(--line);
+    border-radius: 10px;
+  }
+  .goal .expl p { margin: 0 0 11px; font-size: 13.5px; line-height: 1.65; color: #4B5563; max-width: 68ch; }
+  .goal .expl p:last-child { margin-bottom: 0; }
+  .goal .expl .lim { margin-top: 13px; padding-top: 13px; border-top: 1px solid var(--line-2); }
+  .goal .expl .lim .h {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--faint); margin: 0 0 5px;
+  }
+  .goalfoot { padding: 14px 0 18px; border-top: 1px solid var(--line-2); font-size: 13px; color: var(--muted); }
+  .goalfoot a { color: var(--navy-2); font-weight: 600; text-decoration: none; border-bottom: 1px solid var(--line-2); }
+  .goalfoot a:hover { border-bottom-color: var(--gold); }
+
+  /* empty state for a school with no goals */
+  .nogoals { padding: 26px 28px; }
+  .nogoals h2 { margin: 0 0 8px; font-size: 17px; font-weight: 700; color: var(--ink); }
+  .nogoals p { margin: 0; font-size: 14.5px; line-height: 1.6; color: var(--muted); max-width: 62ch; }
+  .nogoals .cta {
+    display: inline-block; margin-top: 16px; font-size: 13px; font-weight: 650;
+    background: var(--navy-2); color: #fff; padding: 10px 18px; border-radius: 9px;
+  }
+
+  .ghost {
+    text-align: center; font-size: 12px; font-weight: 600; letter-spacing: 0.08em;
+    text-transform: uppercase; color: #C4C8D0; padding: 28px 0 8px;
+  }
+  [hidden] { display: none !important; }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="chrome">
+  <span class="tag">Mockup</span>
+  <span class="lbl">School</span>
+  <span class="switch" role="group" aria-label="School">
+    <button type="button" data-school="roosevelt" aria-pressed="true">Roosevelt</button>
+    <button type="button" data-school="oakgrove" aria-pressed="false">Oak Grove</button>
+  </span>
+  <span class="lbl">View</span>
+  <span class="switch" role="group" aria-label="View">
+    <button type="button" data-view="now" aria-pressed="false">Today</button>
+    <button type="button" data-view="new" aria-pressed="true">Proposed</button>
+  </span>
+  <span class="spacer"></span>
+</div>
+<p class="caption" id="caption"></p>
+
+<!-- ================= HERO ================= -->
+<div class="hero">
+  <div class="grad"></div>
+  <div class="dots"></div>
+  <div class="inner">
+    <div class="toprow">
+      <div>
+        <div class="namerow">
+          <h1 id="schoolName">Roosevelt School</h1>
+          <span class="yearbadge" id="yearBadge">2026-2027</span>
+        </div>
+        <p class="loc">School Partnership</p>
+      </div>
+      <div><span class="phasechip"><span class="d"></span>Phase 1 &middot; IGNITE</span></div>
+    </div>
+    <div class="herogoal">
+      <p class="k">Partnership Goal</p>
+      <p id="heroGoal">Support 19 Roosevelt School educators with access to TDI's Learning Hub, building classroom strategies and reducing teacher stress across a full-year partnership.</p>
+    </div>
+  </div>
+</div>
+
+<div class="tabbar">
+  <div class="inner">
+    <span class="on">Overview</span><span>Our Partnership</span><span>Your Plan</span>
+    <span>Reports</span><span>Next Year</span><span>Team</span>
+  </div>
+</div>
+
+<main>
+
+  <!-- ============ PROPOSED: goals block, first thing under the hero ============ -->
+  <div class="card" id="blockGoalsRoosevelt">
+    <div class="goals">
+      <div class="gh">
+        <h2>Your Goals</h2>
+        <span class="prov">Written with you on your onboarding call</span>
+      </div>
+
+      <div class="goal">
+        <div class="top">
+          <span class="nm">Staff using the Hub in their own classrooms</span>
+          <span class="st">24% of 70%</span>
+        </div>
+        <div class="trk"><i style="width:34%"></i></div>
+        <p class="sub2">Checkpoint at the October call is 30 percent.</p>
+        <details>
+          <summary>How we measure this</summary>
+          <div class="expl">
+            <p>The share of your staff who have signed in and actually used the Hub, not just been handed an account. It comes from your Hub activity records, so nobody has to fill anything in for us. Today that is 24 percent, four of your seventeen staff, and two of those four started on the day of our call.</p>
+            <p>The harder bar sits just above this one. Nobody at Roosevelt has yet marked a resource as tried or adapted in their own classroom, which is the signal that something actually reached students rather than being read. That is what the goals below depend on, and it is the reason the one tool in three days ask matters.</p>
+            <p>Checkpoint at the October call is 30 percent, and the goal by the March renewal is 70 percent. These statements are drafts from our call. Tell us what to change and we will.</p>
+            <div class="lim">
+              <p class="h">What this does not show</p>
+              <p>This goal is measured by asking your team rather than by watching a classroom, because nobody from our side is in your building this year. That is an honest limit of the plan you have, not a problem with the goal.</p>
+            </div>
+          </div>
+        </details>
+      </div>
+
+      <div class="goal">
+        <div class="top">
+          <span class="nm">MTSS strategies in continuous use</span>
+          <span class="st wait">Target 60%</span>
+        </div>
+        <div class="trk wait"></div>
+        <p class="sub2">No number yet. This one starts moving once the Hub is in use.</p>
+        <details>
+          <summary>How we measure this</summary>
+          <div class="expl">
+            <p>The share of your staff who have tried or adapted an MTSS aligned strategy in at least two separate months, rather than once. It comes from the responses your staff mark against each Quick Win in the Hub, tagged to progress monitoring, assessment and intervention, counted per person per month. Nothing extra to fill in.</p>
+            <p>The two month rule is the whole point. One person marking five strategies in a single week after a staff meeting is not continuous practice, and we would rather not count it as though it were. You named progress monitoring checklists first on the call and MTSS as the initiative they sit inside, so this measures whether the strategies keep being used, not whether anyone says they own a routine.</p>
+            <p>There is no number yet because the Hub is barely in use. Goal by the March renewal is 60 percent.</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="goal">
+        <div class="top">
+          <span class="nm">Staff supported on stress and burnout</span>
+          <span class="st wait">Target 3.5 of 5</span>
+        </div>
+        <div class="trk wait"></div>
+        <p class="sub2">No baseline yet. Needs enough staff active for an average to mean anything.</p>
+        <details>
+          <summary>How we measure this</summary>
+          <div class="expl">
+            <p>Your school level Vibe Check average, out of 5. The Hub asks staff short check ins on mood, energy, belonging, purpose and needs, so this comes from what your team is already telling us rather than from another survey landing in their inbox. You named stress and burnout second on the call and it is already written into this partnership goal.</p>
+            <p>Individual vibe check and quiz results are private to the educator. You see the school level picture and never a named result. That is deliberate. If staff believe their principal can read their score they will not answer honestly, and the number stops being worth having.</p>
+            <p>There is no baseline yet because too few staff have signed in for an average to mean anything, so this one moves only once the first goal does. Goal by the March renewal is 3.5 out of 5.</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="goal">
+        <div class="top">
+          <span class="nm">Positive parent engagement</span>
+          <span class="st wait">Target set in October</span>
+        </div>
+        <div class="trk wait"></div>
+        <p class="sub2">Deliberately unset. We agree this one with you at the October call.</p>
+        <details>
+          <summary>Why there is no number yet</summary>
+          <div class="expl">
+            <p>Whether families hear from school when something is going well, not only when there is a problem. There is no number on this one yet, on purpose. You said on our call that you want this to support the work Roosevelt already runs rather than land as a separate initiative, and parent engagement is one of the priorities you named.</p>
+            <p>We would rather agree a target with you at the October call, once you have told us where families actually are, than put a figure on your dashboard that neither of us can stand behind today. Where the number comes from is part of that same conversation. Most likely a count of the positive family contacts your staff log, set alongside whatever you already track on family response.</p>
+          </div>
+        </details>
+      </div>
+
+      <p class="goalfoot">These are drafts from your onboarding call. <a href="#">Tell us what to change</a> and we will.</p>
+    </div>
+  </div>
+
+  <div class="card nogoals" id="blockGoalsOakGrove" hidden>
+    <h2>Your Goals</h2>
+    <p>Your goals are written together on your onboarding call, against your own data, and in your words. They appear here as soon as they are set.</p>
+    <span class="cta">Ask us about your goals</span>
+  </div>
+
+  <!-- ============ CURRENT: unnamed rings, Roosevelt ============ -->
+  <div id="blockRingsRoosevelt" hidden>
+    <div class="rangerow">
+      <span class="seg"><span class="on">This Month</span><span>Quarter</span><span>All Time</span></span>
+    </div>
+    <div class="ringgrid">
+      <div class="ringcard">
+        <span class="i">i</span>
+        <div class="ringwrap">
+          <svg width="80" height="80" viewBox="0 0 80 80">
+            <circle cx="40" cy="40" r="34" fill="none" stroke="#F3F4F6" stroke-width="6"></circle>
+            <circle cx="40" cy="40" r="34" fill="none" stroke="#1e2749" stroke-width="6" stroke-dasharray="73 140" stroke-linecap="round"></circle>
+          </svg>
+          <span class="v" style="color:#1e2749">24%</span>
+        </div>
+        <span class="lab">Staff using the Hub in...</span>
+      </div>
+      <div class="ringcard">
+        <span class="i">i</span>
+        <div class="ringwrap">
+          <svg width="80" height="80" viewBox="0 0 80 80"><circle cx="40" cy="40" r="34" fill="none" stroke="#F3F4F6" stroke-width="6"></circle></svg>
+          <span class="v sm" style="color:#9CA3AF">Soon</span>
+        </div>
+        <span class="lab">MTSS strategies in con...</span>
+      </div>
+      <div class="ringcard">
+        <span class="i">i</span>
+        <div class="ringwrap">
+          <svg width="80" height="80" viewBox="0 0 80 80"><circle cx="40" cy="40" r="34" fill="none" stroke="#F3F4F6" stroke-width="6"></circle></svg>
+          <span class="v sm" style="color:#9CA3AF">Soon</span>
+        </div>
+        <span class="lab">Staff supported on str...</span>
+      </div>
+      <div class="ringcard">
+        <span class="i">i</span>
+        <div class="ringwrap">
+          <svg width="80" height="80" viewBox="0 0 80 80"><circle cx="40" cy="40" r="34" fill="none" stroke="#F3F4F6" stroke-width="6"></circle></svg>
+          <span class="v sm" style="color:#9CA3AF">Soon</span>
+        </div>
+        <span class="lab">Positive parent engage...</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ CURRENT: unnamed fallback rings, Oak Grove ============ -->
+  <div id="blockRingsOakGrove" hidden>
+    <div class="rangerow">
+      <span class="seg"><span class="on">This Month</span><span>Quarter</span><span>All Time</span></span>
+    </div>
+    <div class="ringgrid">
+      <div class="ringcard">
+        <div class="ringwrap">
+          <svg width="80" height="80" viewBox="0 0 80 80">
+            <circle cx="40" cy="40" r="34" fill="none" stroke="#F3F4F6" stroke-width="6"></circle>
+            <circle cx="40" cy="40" r="34" fill="none" stroke="#E8B84B" stroke-width="6" stroke-dasharray="214 0" stroke-linecap="round"></circle>
+          </svg>
+          <span class="v" style="color:#E8B84B">100%</span>
+        </div>
+        <span class="lab">Hub Engagement</span>
+      </div>
+      <div class="ringcard">
+        <div class="ringwrap">
+          <svg width="80" height="80" viewBox="0 0 80 80"><circle cx="40" cy="40" r="34" fill="none" stroke="#F3F4F6" stroke-width="6"></circle></svg>
+          <span class="v sm" style="color:#4ecdc4">0/3</span>
+        </div>
+        <span class="lab">Deliverables</span>
+      </div>
+      <div class="ringcard">
+        <div class="ringwrap">
+          <svg width="80" height="80" viewBox="0 0 80 80">
+            <circle cx="40" cy="40" r="34" fill="none" stroke="#F3F4F6" stroke-width="6"></circle>
+            <circle cx="40" cy="40" r="34" fill="none" stroke="#2A9D8F" stroke-width="6" stroke-dasharray="214 0" stroke-linecap="round"></circle>
+          </svg>
+          <span class="v" style="color:#2A9D8F">2</span>
+        </div>
+        <span class="lab">Staff Active</span>
+      </div>
+      <div class="ringcard">
+        <div class="ringwrap">
+          <svg width="80" height="80" viewBox="0 0 80 80">
+            <circle cx="40" cy="40" r="34" fill="none" stroke="#F3F4F6" stroke-width="6"></circle>
+            <circle cx="40" cy="40" r="34" fill="none" stroke="#1e2749" stroke-width="6" stroke-dasharray="71 143" stroke-linecap="round"></circle>
+          </svg>
+          <span class="v sm" style="color:#1e2749">1/3</span>
+        </div>
+        <span class="lab">Current Phase</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ setup checklist, unchanged ============ -->
+  <div class="card setup" id="blockSetup">
+    <div class="head">
+      <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"></path><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"></path><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"></path><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"></path></svg>
+      <div>
+        <h2>Set Up Your Partnership</h2>
+        <p id="setupCount">1 of 4 steps complete</p>
+      </div>
+    </div>
+    <div class="rows">
+      <div class="r done">
+        <span class="bx done"></span>
+        <span class="tx"><p>Kickoff call</p><span class="d">A 30-minute call with our team to align on goals, walk through your dashboard, and answer any questions.</span></span>
+        <span class="ok">Done</span>
+      </div>
+      <div class="r done" id="setupGoalsRow">
+        <span class="bx done"></span>
+        <span class="tx"><p>Goals are set</p><span class="d">Goals are set. Tell us any time if they should change.</span></span>
+        <span class="ok">Done</span>
+      </div>
+      <div class="r">
+        <span class="bx"></span>
+        <span class="tx"><p>Get your team on the Hub</p><span class="d">Upload your roster so every educator has an account.</span></span>
+        <span class="go">Start</span>
+      </div>
+      <div class="r">
+        <span class="bx"></span>
+        <span class="tx"><p>Schedule your key dates</p><span class="d">Pick the days our team is on campus this year.</span></span>
+        <span class="go">Start</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card stub"><span class="t">Your Next Steps</span><span class="s">Action items</span><span class="mark">Unchanged</span></div>
+  <div class="card stub"><span class="t">Staff Activation</span><span class="s">Who is on the Hub</span><span class="mark">Unchanged</span></div>
+  <div class="card stub"><span class="t">What Educators Are Saying</span><span class="s">Quotes from your team</span><span class="mark">Unchanged</span></div>
+
+  <div class="card pad intel">
+    <div class="k"><i></i><span>Partnership Intelligence</span></div>
+    <p id="intelText">Your team is getting started. 24% of 17 educators logged into the Hub this month. As your team engages with the Hub, this summary will update with real-time insights.</p>
+    <p class="more">See detailed breakdown</p>
+  </div>
+
+  <div id="ringsSlotNote" class="ghost" hidden>The four rings sat here, directly below this summary</div>
+
+  <p class="ghost">Rest of the Overview tab continues unchanged</p>
+</main>
+
+<script>
+  var state = { school: 'roosevelt', view: 'new' };
+
+  var CAPTIONS = {
+    'roosevelt|new': 'Roosevelt School, <b>proposed</b>. The goals block is named, sits directly under the hero, carries full labels and shows every target. The written explanation we already store for each goal expands inline instead of hiding in a 230 pixel popover. <span class="mono">Real goal text, live values, read 25 Sep.</span>',
+    'roosevelt|now': 'Roosevelt School, <b>as it renders today</b>. Four rings, eighth block down, with no heading above them. Every label cut at 22 characters, no target shown anywhere, three of the four reading Soon. <span class="mono">Intervening blocks condensed. Order and titles are real.</span>',
+    'oakgrove|new': 'Oak Grove School District 68, <b>proposed</b>. Oak Grove has no goals set, so the block says so plainly and points at the thing that fixes it. The generic metrics move down into Data and Indicators where they belong.',
+    'oakgrove|now': 'Oak Grove School District 68, <b>as it renders today</b>. No goals exist, so the same slot silently fills with four generic metrics styled identically to goals. <b>Hub Engagement reads 100 percent</b> because both people on the roster have logged in. <span class="mono">Live values, read 25 Sep.</span>'
+  };
+
+  var HERO = {
+    roosevelt: {
+      name: 'Roosevelt School',
+      year: '2026-2027',
+      goal: "Support 19 Roosevelt School educators with access to TDI's Learning Hub, building classroom strategies and reducing teacher stress across a full-year partnership.",
+      intel: 'Your team is getting started. 24% of 17 educators logged into the Hub this month. As your team engages with the Hub, this summary will update with real-time insights.',
+      setup: '2 of 4 steps complete'
+    },
+    oakgrove: {
+      name: 'Oak Grove School District 68',
+      year: '2026-2027',
+      goal: "Build real support for the 20 adults closest to Oak Grove's highest-need students: paraprofessionals plus SpEd support teachers. Open with an Executive Impact Session to set goals against current data, then three on-campus days across the year structured as fall baseline, winter mid-point, spring growth, so the third visit exists to show these staff got better rather than to add scrutiny.",
+      intel: 'Your partnership is active with 2 educators enrolled. 0 of 3 deliverables completed so far. As your team engages with the Hub, this summary will update with real-time insights.',
+      setup: '1 of 3 steps complete'
+    }
+  };
+
+  function show(id, on) {
+    var el = document.getElementById(id);
+    if (el) { el.hidden = !on; }
+  }
+
+  function render() {
+    var s = state.school, v = state.view, h = HERO[s];
+
+    document.getElementById('schoolName').textContent = h.name;
+    document.getElementById('yearBadge').textContent = h.year;
+    document.getElementById('heroGoal').textContent = h.goal;
+    document.getElementById('intelText').textContent = h.intel;
+    document.getElementById('setupCount').textContent = h.setup;
+    document.getElementById('caption').innerHTML = CAPTIONS[s + '|' + v];
+
+    show('blockGoalsRoosevelt', v === 'new' && s === 'roosevelt');
+    show('blockGoalsOakGrove', v === 'new' && s === 'oakgrove');
+    show('blockRingsRoosevelt', v === 'now' && s === 'roosevelt');
+    show('blockRingsOakGrove', v === 'now' && s === 'oakgrove');
+    show('ringsSlotNote', v === 'new');
+
+    // The "Goals are set" checklist step only exists for a school that has goals.
+    show('setupGoalsRow', s === 'roosevelt');
+
+    document.querySelectorAll('[data-school]').forEach(function (b) {
+      b.setAttribute('aria-pressed', String(b.dataset.school === s));
+    });
+    document.querySelectorAll('[data-view]').forEach(function (b) {
+      b.setAttribute('aria-pressed', String(b.dataset.view === v));
+    });
+  }
+
+  document.querySelectorAll('[data-school]').forEach(function (b) {
+    b.addEventListener('click', function () { state.school = b.dataset.school; render(); });
+  });
+  document.querySelectorAll('[data-view]').forEach(function (b) {
+    b.addEventListener('click', function () { state.view = b.dataset.view; render(); });
+  });
+
+  render();
+</script>
