@@ -39,6 +39,17 @@ interface HubFilterBarProps {
   /** Optional search query for inline text search */
   searchQuery?: string;
   setSearchQuery?: (value: string) => void;
+  /**
+   * Optional curated collection toggle, rendered as its own pill ahead of the
+   * category row. A collection is not a category: it combines with the category
+   * and role filters rather than replacing one, which is why it carries separate
+   * state instead of being another value in `categories`.
+   */
+  collectionActive?: boolean;
+  setCollectionActive?: (value: boolean) => void;
+  collectionLabel?: string;
+  /** Shown under the count while the collection is on. Says what the shelf means. */
+  collectionSubtitle?: string;
 }
 
 export default function HubFilterBar({
@@ -59,7 +70,12 @@ export default function HubFilterBar({
   subtitle,
   searchQuery = '',
   setSearchQuery,
+  collectionActive = false,
+  setCollectionActive,
+  collectionLabel,
+  collectionSubtitle,
 }: HubFilterBarProps) {
+  const hasCollection = Boolean(collectionLabel && setCollectionActive);
   const [moreFiltersOpen, setMoreFiltersOpen] = useState(false);
   const [searchFocused, setSearchFocused] = useState(false);
 
@@ -77,7 +93,7 @@ export default function HubFilterBar({
 
   const hasAdvancedFilters = capacityFilter !== 'all' || danielsonFilter.length > 0;
   const hasSearch = searchQuery.trim().length > 0;
-  const isFiltered = activeFilter !== 'All' || roleFilter !== 'all' || hasAdvancedFilters || hasSearch;
+  const isFiltered = activeFilter !== 'All' || roleFilter !== 'all' || hasAdvancedFilters || hasSearch || collectionActive;
 
   return (
     <>
@@ -93,6 +109,16 @@ export default function HubFilterBar({
           ? `${tUI('Showing')} ${filteredCount} ${tUI('of')} ${totalCount} ${tUI(itemLabel)}`
           : `${totalCount} ${tUI(itemLabel)} · ${tUI(subtitle)}`}
       </p>
+
+      {/* What the shelf means. Without this it reads as student group work. */}
+      {collectionActive && collectionSubtitle && (
+        <p
+          className="text-[13px] mt-1 mb-0"
+          style={{ fontFamily: "'DM Sans', sans-serif", color: '#6B7280' }}
+        >
+          {tUI(collectionSubtitle)}
+        </p>
+      )}
 
       {/* Role dropdown + Category pills row */}
       <div className="flex items-center gap-3 mt-5 mb-2">
@@ -128,6 +154,33 @@ export default function HubFilterBar({
           className="w-px h-6 flex-shrink-0"
           style={{ backgroundColor: 'rgba(0,0,0,0.12)' }}
         />
+
+        {/*
+          Curated collection pill. Styled apart from the category pills on purpose:
+          it is a different kind of thing, and it stays selected while the reader
+          also narrows by category or role.
+        */}
+        {hasCollection && (
+          <>
+            <button
+              onClick={() => setCollectionActive!(!collectionActive)}
+              aria-pressed={collectionActive}
+              className="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all flex-shrink-0"
+              style={{
+                backgroundColor: collectionActive ? '#E8B84B' : 'transparent',
+                color: '#1B2A4A',
+                border: collectionActive ? 'none' : '1.5px solid #E8B84B',
+                fontFamily: "'DM Sans', sans-serif",
+              }}
+            >
+              {tUI(collectionLabel!)}
+            </button>
+            <div
+              className="w-px h-6 flex-shrink-0"
+              style={{ backgroundColor: 'rgba(0,0,0,0.12)' }}
+            />
+          </>
+        )}
 
         {/* Scrollable category pills */}
         <style>{`.hub-filter-scroll::-webkit-scrollbar { display: none; }`}</style>
