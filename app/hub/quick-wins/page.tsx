@@ -43,6 +43,31 @@ const FILTER_CATEGORIES = [
   'Vocational',
 ];
 
+/**
+ * The Working Together shelf.
+ *
+ * This is a collection, not a thirteenth category. A Quick Win gets exactly one
+ * category, and these tools legitimately belong to Communication, Leadership and
+ * Classroom Management at once, so a category could never hold them together.
+ * Being a collection also means it combines with the role and category filters
+ * rather than replacing them.
+ *
+ * Membership is the `staff-collaboration` tag, which is applied by review against
+ * one test: does this help two adults in a school work with each other. It is not
+ * applied by query match. The library already carries ~300 uncontrolled topic tags
+ * because tags were applied that way, and the agent instructions that govern this
+ * one now spell the rule out.
+ *
+ * The distinction the label has to carry: this shelf is about the adults, not the
+ * kids. The library has group work and cooperative learning tools for students,
+ * and the backfill rejected several tools about students in conflict with each
+ * other for exactly this reason. Hence the subtitle, which is not decoration.
+ */
+const WORKING_TOGETHER_SLUG = 'working-together';
+const WORKING_TOGETHER_TAG = 'staff-collaboration';
+const WORKING_TOGETHER_LABEL = 'Working Together';
+const WORKING_TOGETHER_SUBTITLE = 'Tools for the adults in the building, not the students';
+
 // Practice tools derived from the single source of truth in lib/hub/practice-games.ts
 // To add a new game, update PRACTICE_GAME_REGISTRY there. This list auto-generates.
 const PRACTICE_TOOLS: QuickWin[] = getPracticeToolsForBrowse();
@@ -72,6 +97,7 @@ export default function QuickWinsPage() {
   const searchParams = useSearchParams();
   const initialFilter = searchParams.get('filter') ?? 'All';
   const initialSearch = searchParams.get('search') ?? '';
+  const initialCollection = searchParams.get('collection') === WORKING_TOGETHER_SLUG;
   const [quickWins, setQuickWins] = useState<QuickWin[]>([]);
   const [activeFilter, setActiveFilter] = useState(
     FILTER_CATEGORIES.includes(initialFilter) ? initialFilter : 'All'
@@ -80,6 +106,7 @@ export default function QuickWinsPage() {
   const [roleFilter, setRoleFilter] = useState<string>('all');
   const [danielsonFilter, setDanielsonFilter] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState(initialSearch);
+  const [collectionActive, setCollectionActive] = useState(initialCollection);
   const [visibleCount, setVisibleCount] = useState(18);
   const [isLoading, setIsLoading] = useState(true);
   const { isFavorite, toggleFavorite } = useFavorites();
@@ -204,8 +231,24 @@ export default function QuickWinsPage() {
         qw.topic_tags?.some(t => t.toLowerCase().includes(q))
       );
     })();
-    return categoryMatch && capacityMatch && danielsonMatch && roleMatch && searchMatch;
+    const collectionMatch = !collectionActive || !!qw.topic_tags?.includes(WORKING_TOGETHER_TAG);
+    return categoryMatch && capacityMatch && danielsonMatch && roleMatch && searchMatch && collectionMatch;
   });
+
+  /**
+   * On the shelf, para and teacher tools come first.
+   *
+   * The shelf is deliberately wide: it holds PLC protocols and staff meeting kits
+   * alongside the para and teacher set. That breadth is what makes it useful to
+   * coaches and leaders, and it is also the thing most likely to bury the tools
+   * that prompted the shelf in the first place. Pinning costs nothing and keeps
+   * the original need visible to the reader who has it.
+   */
+  const pinParaTeacherFirst = (items: QuickWin[]): QuickWin[] => {
+    const isParaTeacher = (qw: QuickWin) =>
+      !!qw.roles?.includes('para') || !!qw.roles?.includes('teacher');
+    return [...items.filter(isParaTeacher), ...items.filter(qw => !isParaTeacher(qw))];
+  };
 
   // Interleave by category for variety when showing "All" unfiltered
   const interleaveByCategory = (items: QuickWin[]): QuickWin[] => {
@@ -269,15 +312,17 @@ export default function QuickWinsPage() {
     return result;
   };
 
-  const displayQuickWins = activeFilter === 'All' && capacityFilter === 'all' && roleFilter === 'all' && danielsonFilter.length === 0
-    ? sortByAccess(filteredQuickWins)
-    : filteredQuickWins;
+  const displayQuickWins = collectionActive
+    ? pinParaTeacherFirst(filteredQuickWins)
+    : activeFilter === 'All' && capacityFilter === 'all' && roleFilter === 'all' && danielsonFilter.length === 0
+      ? sortByAccess(filteredQuickWins)
+      : filteredQuickWins;
 
   const visibleQuickWins = displayQuickWins.slice(0, visibleCount);
   const hasMore = visibleCount < displayQuickWins.length;
 
   // Reset visible count when filters change
-  useEffect(() => { setVisibleCount(18); }, [activeFilter, capacityFilter, roleFilter, danielsonFilter.length]);
+  useEffect(() => { setVisibleCount(18); }, [activeFilter, capacityFilter, roleFilter, danielsonFilter.length, collectionActive]);
 
   // Loading skeleton
   if (isLoading) {
@@ -367,6 +412,10 @@ export default function QuickWinsPage() {
           subtitle="Short, practical tools you can use right now"
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
+          collectionActive={collectionActive}
+          setCollectionActive={setCollectionActive}
+          collectionLabel={WORKING_TOGETHER_LABEL}
+          collectionSubtitle={WORKING_TOGETHER_SUBTITLE}
         />
 
         {/* Games Discovery Banner -- shown when not already filtering by Games */}
