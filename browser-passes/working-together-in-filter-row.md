@@ -21,25 +21,47 @@ version live.
   was opened, so nothing is outstanding.
 - Verify after deploy: https://www.teachersdeserveit.com/hub/quick-wins?collection=working-together
 
-- Saw:
+- Saw: done on production after the deploy, signed in as Rae. Opened
+  https://www.teachersdeserveit.com/hub/quick-wins?filter=Working%20Together
+  and the pill sits second in the row, right after All, styled navy and filled
+  exactly like a selected category. "Showing 21 of 289 quick wins" with the
+  subtitle "Tools for the adults in the building, not the students" under it.
+- Saw: 21 is correct. 18 items were on the shelf before, three of the four new
+  para tools published this morning, and the fourth publishes 29 September.
+  The first three cards are "Five Minutes to a Better Monday", "When It Is Not
+  Working: A Para's Repair Checklist" and "The Norms Conversation Starter".
+- Saw: the first load of the day served the previous build, with the old gold
+  pill sitting outside the row and All still navy beside it. A cache busting
+  query string brought back the new build. Worth writing down: the first look
+  after a deploy can show the old page and read as a broken change.
+- Pressed: "Instructional Strategies" while Working Together was selected.
+- Saw: Working Together deselected, Instructional Strategies went navy, the
+  count went from 21 to 32, and the subtitle disappeared. That is the trade Rae
+  accepted, confirmed live rather than assumed: the shelf no longer stacks with
+  a category.
+- Pressed: nothing on the Hub home, because the Vibe Check modal intercepted the
+  click.
+- Saw: on https://www.teachersdeserveit.com/hub the Browse by Topic row now
+  leads with a plain "Working Together" chip, styled the same as "Classroom
+  Tools", "Leadership" and "Para" rather than the gold one it replaced.
+- Saw: the legacy URL still works. ?collection=working-together resolved to the
+  same shelf, "Showing 21 of 289 quick wins", so shared links did not break.
 
 ## What I did not press
 
-Nothing by choice.
+The Vibe Check answers. Pressing one would have written a real wellbeing entry
+against Rae's account and changed her dashboard, so it was skipped for today
+instead.
 
 ## What I could not verify
 
-- That the pill renders inside the scrolling category row rather than being cut
-  off. It is third in the list, after All, so it should be visible without
-  scrolling, but that is reasoning rather than an observation.
-- That selecting a category now clears Working Together. This is the behaviour
-  Rae accepted in exchange for the simpler placement, and it is the thing most
-  likely to surprise later, so it needs pressing rather than assuming.
-- That `?collection=working-together` still resolves to the pill. The Hub home
-  linked to that URL and it has been shared, so it is kept working deliberately
-  and needs checking rather than trusting.
-- That the subtitle still appears, now that it keys off the selected filter
-  rather than its own state.
+- The Hub home chip by clicking it. The modal took the click, so the chip was
+  read off the screen and the destination was checked by opening the URL it
+  points at instead.
+- The Spanish rendering. The label and subtitle go through `tUI`, and the ES
+  toggle was not pressed.
+- Mobile width. Only desktop was opened, and the pill row scrolls horizontally,
+  so a narrow screen may cut the pill off.
 
 Verified without a browser: `tsc --noEmit` exited 0, and `check:adminauth`,
 `check:writes`, `check:schema` and `check:reachable` all exited 0.
