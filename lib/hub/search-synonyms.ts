@@ -22,6 +22,12 @@
  *   - **It changes when the zero result log says it should**, not when someone
  *     has a hunch. That log is the evidence and it now exists.
  *
+ * One note on `ta`, added at Rae's request on 29 September 2026. Two letters is
+ * short enough that it can only be matched against exact `topic_tags` values,
+ * never free text, or it would pull in start, data, table and stand. The
+ * caller enforces that. It is worth having anyway, because TA is what a lot of
+ * schools actually call the role.
+ *
  * Misspellings sit in here too, deliberately. A dedicated spelling layer using
  * trigram similarity is the next step, and it needs two Postgres extensions
  * that are not installed yet. Until then, the handful of misspellings that
@@ -43,6 +49,7 @@ export const SYNONYM_GROUPS: readonly (readonly string[])[] = [
     'paraprofesional',
     'paraeducator',
     'para educator',
+    'ta',
     'teaching assistant',
     'classroom aide',
     'instructional assistant',

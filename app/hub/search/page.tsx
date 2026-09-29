@@ -49,17 +49,34 @@ export default function HubSearchPage() {
     setIsSearching(true);
     setHasSearched(true);
     const supabase = getSupabase();
-    const q = `%${searchQuery.trim()}%`;
+    const trimmed = searchQuery.trim();
+    const q = `%${trimmed}%`;
+
+    /**
+     * A very short query is not searched as free text.
+     *
+     * `ilike '%ta%'` matches start, data, stand and important, so a reader
+     * typing TA would get a page of unrelated tools ranked above the para ones
+     * they meant. The same precision rule already applies to short synonym
+     * expansions; this applies it to what was typed.
+     *
+     * Two characters still searches tags exactly, and still expands through the
+     * vocabulary, so TA finds the para tools. It just does not also drag in
+     * every word containing those two letters.
+     */
+    const tooShortForText = trimmed.length < 3;
 
     try {
       const [qwResult, qwTagResult, courseResult, convResult] = await Promise.all([
         // Quick Wins - text search on title/description/category
-        supabase
-          .from('hub_quick_wins')
-          .select('id, slug, title, description, category, roles, topic_tags')
-          .eq('is_published', true)
-          .or(`title.ilike.${q},description.ilike.${q},category.ilike.${q}`)
-          .limit(20),
+        tooShortForText
+          ? Promise.resolve({ data: [], error: null })
+          : supabase
+              .from('hub_quick_wins')
+              .select('id, slug, title, description, category, roles, topic_tags')
+              .eq('is_published', true)
+              .or(`title.ilike.${q},description.ilike.${q},category.ilike.${q}`)
+              .limit(20),
         // Quick Wins - array search on topic_tags (contains the search term)
         supabase
           .from('hub_quick_wins')
@@ -68,17 +85,21 @@ export default function HubSearchPage() {
           .contains('topic_tags', [searchQuery.trim().toLowerCase()])
           .limit(12),
         // Courses
-        supabase
-          .from('hub_courses')
-          .select('id, slug, title, description, category')
-          .or(`title.ilike.${q},description.ilike.${q},category.ilike.${q}`)
-          .limit(12),
+        tooShortForText
+          ? Promise.resolve({ data: [], error: null })
+          : supabase
+              .from('hub_courses')
+              .select('id, slug, title, description, category')
+              .or(`title.ilike.${q},description.ilike.${q},category.ilike.${q}`)
+              .limit(12),
         // Community conversations
-        supabase
-          .from('quick_win_responses')
-          .select('id, body, quick_win_id, contribution_type')
-          .ilike('body', q)
-          .limit(8),
+        tooShortForText
+          ? Promise.resolve({ data: [], error: null })
+          : supabase
+              .from('quick_win_responses')
+              .select('id, body, quick_win_id, contribution_type')
+              .ilike('body', q)
+              .limit(8),
       ]);
 
       // Merge and deduplicate quick wins from text search + tag search
