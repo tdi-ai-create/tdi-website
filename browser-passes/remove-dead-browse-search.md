@@ -21,25 +21,41 @@ point, and also why this needs pressing rather than reasoning about.
   nothing is outstanding.
 - Verify after deploy: https://www.teachersdeserveit.com/hub/quick-wins
 
-- Saw:
+- Saw: done on production after the deploy, signed in as Rae. Opened
+  https://www.teachersdeserveit.com/hub/quick-wins and it came up reading
+  "290 quick wins" with the cards rendered and the filter row intact. No search
+  box anywhere, which is the intended state rather than a regression.
+- Pressed: the "Working Together" pill.
+- Saw: "Showing 22 of 290 quick wins" with the subtitle "Tools for the adults in
+  the building, not the students" beneath it, and the four new para tools at the
+  top of the grid. So `isFiltered` still drives the count line correctly after
+  the search term was taken out of it.
+- Pressed: the "I am a..." dropdown, selected Para, with Working Together still
+  on.
+- Saw: 22 became 11, the dropdown turned navy to show it was active, and the
+  shelf stayed selected. Both filters still combine.
+- Opened: https://www.teachersdeserveit.com/hub/courses, which shares this
+  filter bar.
+- Saw: "41 courses" with its own pills (All, In Progress, Stress & Wellness,
+  Classroom Management) and the In Progress row rendering course cards. Untouched,
+  as intended, and now confirmed rather than assumed.
+- Saw: one thing worth writing down for the next person. Both pages sat on
+  "Loading your Hub..." for around twenty seconds before rendering, and the first
+  click on a pill was swallowed during that window. That is the auth gate, not
+  this change, but it is long enough to read as broken.
 
 ## What I did not press
 
-Nothing by choice.
+The Vibe Check answers on either page. Pressing one writes a real wellbeing entry
+against Rae's account and moves her dashboard, so it was skipped for today.
 
 ## What I could not verify
 
-A removal is the easiest kind of change to get wrong quietly, because the thing
-that proves it is fine is that nothing changed. So the pass is that the page
-still works, not that it still loads:
-
-- The Quick Wins page renders its cards and its count.
-- The category pills still filter, including Working Together.
-- The role dropdown still filters, since `isFiltered` was rewritten when the
-  search term was taken out of it and that flag drives the count line.
-- The Courses page still renders. It shares `HubFilterBar` and never passed the
-  search props, so it should be untouched, but "should be" is the phrase that
-  precedes most of the incidents in this repo.
+- Mobile width. Only desktop was opened. The pill row scrolls horizontally and
+  nothing in this change touched that, but it was not looked at.
+- Whether any bookmark still carries `?search=` on the Quick Wins page. That
+  parameter is now ignored rather than erroring, and no link in the codebase
+  produced one, but a bookmark somebody saved cannot be checked from here.
 
 Verified without a browser: `tsc --noEmit` exited 0, `check:adminauth`,
 `check:writes`, `check:schema` and `check:reachable` all exited 0, and `knip`
