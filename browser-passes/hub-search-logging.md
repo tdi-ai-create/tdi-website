@@ -19,29 +19,44 @@ came back.
   28 September, so nothing is outstanding.
 - Verify after deploy: https://www.teachersdeserveit.com/hub/quick-wins
 
-- Saw:
+- Saw: done on production after the deploy, signed in as Rae. Opened
+  https://www.teachersdeserveit.com/hub/search?q=paraprofesional and the page
+  ran the search on mount.
+- Saw: the row landed. Read straight back out of `hub_activity_log` with the
+  service key: `2026-09-29T14:29:51.232834+00:00 source=global results=0
+  zero=true query="paraprofesional"`. One row, not several. The logger fires,
+  which is the only thing that could not be proved from the code.
+- Saw: that single row is also the argument for the rest of phase four.
+  "paraprofesional" with one s returns zero results on a Hub where 55 published
+  tools carry the `para` tag.
+
+- Pressed: "More Filters" on https://www.teachersdeserveit.com/hub/quick-wins,
+  looking for the browse search box to exercise the other source.
+- Saw: there is no search box. Not hidden behind More Filters, not anywhere on
+  the page. Confirmed three ways: the accessibility tree returned no input
+  twice, and `HubFilterBar.tsx` contains no `<input>` element at all.
 
 ## What I did not press
 
-Nothing by choice.
+The browse search box, because it does not exist. See below rather than reading
+this as a step skipped.
 
 ## What I could not verify
 
-Everything, and for this change the important check is not visual. The page
-looks identical whether the logger fires or not, which is exactly the shape of
-the bug this codebase keeps producing. The download logger shipped on
-9 September as `void supabase.from(...).insert(...)`, looked fine, and wrote
-zero rows for a fortnight.
+**The `browse` source has never fired and currently cannot.** The Quick Wins
+page keeps `searchQuery` state, filters on it, and passes `searchQuery` and
+`setSearchQuery` into `HubFilterBar`, which imports a `Search` icon, holds a
+`searchFocused` state and computes `matchingSuggestions` from a list of popular
+topics. None of it renders. There is no input, so nothing can call
+`setSearchQuery` except the `?search=` URL parameter.
 
-So the pass is not "I searched and the page looked right". It is:
+So the browse half of this change is live, correct and unreachable, which is
+this repo's documented dead component trap rather than a new bug. It is written
+down here instead of being left to look like working coverage.
 
-- Type a query on the browse page, wait for the debounce, then find the row in
-  `hub_activity_log` with `action = 'hub_searched'` and read the query back off
-  it.
-- Do the same on the Hub search page and confirm `source` says `global`.
-- Search for something that returns nothing and confirm `zero_results` is true
-  and `result_count` is 0. That row is the entire reason for the change.
-- Confirm one settled query produces one row, not one per keystroke.
+The remaining unverified item is the debounce, that one settled query writes one
+row rather than one per keystroke. It cannot be exercised until there is a box
+to type into.
 
 Verified without a browser: `tsc --noEmit` exited 0, and `check:adminauth`,
 `check:writes`, `check:schema` and `check:reachable` all exited 0. None of
