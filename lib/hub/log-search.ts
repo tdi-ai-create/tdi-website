@@ -20,8 +20,20 @@ import type { SupabaseClient } from '@supabase/supabase-js';
  *   - reading the zero result list, which is a content backlog writing itself
  */
 
-/** Which box the query was typed into. They behave differently and rank differently. */
-export type SearchSource = 'browse' | 'global';
+/**
+ * Which box the query was typed into.
+ *
+ * Only one value today, and that is the point rather than an oversight. The
+ * Quick Wins page had a second search that rendered no input, so it had not
+ * worked for anyone in a long time. Rae's call on 29 September 2026: the Hub
+ * has one search, in the navigation. Two boxes meant two matching
+ * implementations that had already drifted, and the synonym and spelling work
+ * would have had to be built twice.
+ *
+ * Kept as a union rather than dropped, because the field is written into every
+ * row and a second surface would need to be distinguishable from this one.
+ */
+type SearchSource = 'global';
 
 const MIN_QUERY_LENGTH = 2;
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Heart, Info, ChevronDown, ChevronUp, Search, X } from 'lucide-react';
+import { Heart, Info, ChevronDown, ChevronUp } from 'lucide-react';
 
 export const ROLE_FILTERS = [
   { value: 'all', label: 'All Roles', short: 'All Roles' },
@@ -36,9 +36,6 @@ interface HubFilterBarProps {
   itemLabel: string;
   /** Static subtitle shown when no filters active */
   subtitle: string;
-  /** Optional search query for inline text search */
-  searchQuery?: string;
-  setSearchQuery?: (value: string) => void;
   /**
    * A value in `categories` that is a curated collection rather than a real
    * category. It renders as an ordinary pill in the row. The only thing it
@@ -66,30 +63,25 @@ export default function HubFilterBar({
   tUI,
   itemLabel,
   subtitle,
-  searchQuery = '',
-  setSearchQuery,
   collectionLabel,
   collectionSubtitle,
 }: HubFilterBarProps) {
   const collectionActive = Boolean(collectionLabel && activeFilter === collectionLabel);
   const [moreFiltersOpen, setMoreFiltersOpen] = useState(false);
-  const [searchFocused, setSearchFocused] = useState(false);
 
-  // Popular search suggestions (common topic tags)
-  const POPULAR_TOPICS = [
-    'back-to-school', 'classroom-management', 'coaching', 'wellness',
-    'communication', 'assessment', 'relationships', 'behavior',
-    'lesson-planning', 'leadership', 'special-education', 'de-escalation',
-    'para', 'feedback', 'time-management', 'inclusion',
-  ];
-
-  const matchingSuggestions = searchQuery.trim().length >= 2
-    ? POPULAR_TOPICS.filter(t => t.includes(searchQuery.trim().toLowerCase())).slice(0, 5)
-    : [];
-
+  /**
+   * There is deliberately no search box here.
+   *
+   * This component used to carry the props, the focus state, a Search icon and
+   * a list of suggested topics for one, and it rendered no input, so browse
+   * search had not worked for anyone in a long time. Rae's call on
+   * 29 September 2026: the Hub has one search, in the navigation, and that is
+   * enough. Two boxes meant two matching implementations, which had already
+   * drifted apart, and any synonym or spelling work would have to be built
+   * twice. Narrowing here is what the pills and the role dropdown are for.
+   */
   const hasAdvancedFilters = capacityFilter !== 'all' || danielsonFilter.length > 0;
-  const hasSearch = searchQuery.trim().length > 0;
-  const isFiltered = activeFilter !== 'All' || roleFilter !== 'all' || hasAdvancedFilters || hasSearch;
+  const isFiltered = activeFilter !== 'All' || roleFilter !== 'all' || hasAdvancedFilters;
 
   return (
     <>
