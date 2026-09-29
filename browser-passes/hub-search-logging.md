@@ -30,6 +30,31 @@ came back.
   "paraprofesional" with one s returns zero results on a Hub where 55 published
   tools carry the `para` tag.
 
+### Second pass, 29 September 19:36Z, closing the debounce item
+
+Picked up because the gate blocked an unrelated funding change behind this
+record. Signed in as Rae on production.
+
+- Pressed: the magnifier in the Hub top nav, which lands on /hub/search.
+- Pressed: the search field, typed "walkthrough", then Return.
+- Saw: "19 results for "walkthrough"", heading "Quick Wins (12)".
+- Pressed: the field again, replaced with "qqzzxx no such tool", then Return.
+- Saw: "No results for "qqzzxx no such tool"".
+- Saw: both rows in `hub_activity_log`.
+
+| Time | query | source | result_count | zero_results |
+|---|---|---|---|---|
+| 19:36:29Z | walkthrough | global | 19 | false |
+| 19:36:43Z | qqzzxx no such tool | global | 0 | true |
+
+The first row carries a `breakdown` of `quick_wins: 12`, `conversations: 7`,
+`courses: 0`, adding to the 19 on screen. So a **non-zero** result count is now
+exercised too, which the first pass could not do with a single misspelling.
+
+**The debounce is proved.** "walkthrough" is eleven keystrokes and wrote one
+row. Two settled queries, two rows, not twelve. That was the open item below and
+it can be closed.
+
 - Pressed: "More Filters" on https://www.teachersdeserveit.com/hub/quick-wins,
   looking for the browse search box to exercise the other source.
 - Saw: there is no search box. Not hidden behind More Filters, not anywhere on
@@ -54,9 +79,10 @@ So the browse half of this change is live, correct and unreachable, which is
 this repo's documented dead component trap rather than a new bug. It is written
 down here instead of being left to look like working coverage.
 
-The remaining unverified item is the debounce, that one settled query writes one
-row rather than one per keystroke. It cannot be exercised until there is a box
-to type into.
+~~The remaining unverified item is the debounce.~~ **Closed on 29 September.**
+It was exercised on the global search field rather than the browse box, which
+does not exist: eleven keystrokes wrote one row. The debounce works. The browse
+source remains unreachable and that is still the open finding here.
 
 Verified without a browser: `tsc --noEmit` exited 0, and `check:adminauth`,
 `check:writes`, `check:schema` and `check:reachable` all exited 0. None of
