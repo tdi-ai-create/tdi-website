@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTDIAdmin } from '@/lib/tdi-admin/context';
 import { Search, Download, Printer, ExternalLink } from 'lucide-react';
@@ -288,6 +288,16 @@ export default function DocsPage() {
   const { teamMember } = useTDIAdmin();
   const router = useRouter();
   const [activeDoc, setActiveDoc] = useState<DocId>('admin-guide');
+
+  // Deep link support: /tdi-admin/docs?doc=visit-prep-sop opens straight to that doc.
+  // Read from window rather than useSearchParams so this client page does not need a
+  // Suspense boundary at build time.
+  useEffect(() => {
+    const requested = new URLSearchParams(window.location.search).get('doc');
+    if (!requested) return;
+    const valid = DOC_GROUPS.flatMap(g => g.docs.map(d => d.id as string));
+    if (valid.includes(requested)) setActiveDoc(requested as DocId);
+  }, []);
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearch, setShowSearch] = useState(false);
 

@@ -584,6 +584,34 @@ export default function AdminPartnershipDetailPage() {
       })
     }
 
+    // Upcoming observation day: surface the prep SOP while there is still time to use it.
+    // timeline_events already stores these with event_type 'observation' and an event_date,
+    // so nothing new is written. This only reads what the calendar already knows.
+    const nextObservation = timelineEvents
+      .filter(e => e.event_type === 'observation' && e.status !== 'completed' && e.event_date)
+      .map(e => ({
+        daysUntil: Math.ceil(
+          (new Date(e.event_date as string).getTime() - Date.now()) / (1000 * 60 * 60 * 24)
+        ),
+      }))
+      .filter(e => e.daysUntil >= 0 && e.daysUntil <= 30)
+      .sort((a, b) => a.daysUntil - b.daysUntil)[0]
+
+    if (nextObservation) {
+      const { daysUntil } = nextObservation
+      actions.push({
+        label: 'Open visit prep SOP',
+        description:
+          daysUntil === 0
+            ? 'Observation day is today. Roster, addresses and school day times should already be in.'
+            : `Observation day in ${daysUntil} day${daysUntil === 1 ? '' : 's'}. Ask for the roster, building addresses and school day times.`,
+        variant: daysUntil <= 14 ? 'urgent' : 'primary',
+        onClick: () => {
+          window.open('/tdi-admin/docs?doc=visit-prep-sop', '_blank')
+        },
+      })
+    }
+
     // Prep for call (only show when there's an upcoming meeting or > 3 days since last contact)
     const lastNoteTs = internalNotes.length > 0 ? new Date(internalNotes[0].created_at).getTime() : 0
     const lastMeetingTs = internalMeetings.length > 0 ? new Date(internalMeetings[0].meeting_date).getTime() : 0
@@ -639,7 +667,7 @@ export default function AdminPartnershipDetailPage() {
     }
 
     return actions.slice(0, 4)
-  }, [partnership, actionItems, partnershipId, internalNotes, internalMeetings, briefingLoading])
+  }, [partnership, actionItems, partnershipId, internalNotes, internalMeetings, briefingLoading, timelineEvents])
 
   // ─── Computed: Unified Timeline ────────────────────────────────────
   const unifiedTimeline = useMemo(() => {
