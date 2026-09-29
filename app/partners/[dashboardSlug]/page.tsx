@@ -9,6 +9,7 @@ import Link from 'next/link';
 import FooterSymbol from '@/components/FooterSymbol';
 import { offeringLabel } from '@/lib/partnerships/offerings';
 import { goalMeasurement, goalProgress, howBody, withUnit, type Offering, type ContractShape } from '@/lib/partners/goal-measurement';
+import { checkinProgressLine, type CheckinProgress } from '@/lib/partners/checkin-aggregate';
 import {
   Calendar,
   Users,
@@ -387,6 +388,8 @@ export default function PartnerDashboard() {
   const [viewerIsAdmin, setViewerIsAdmin] = useState(false);
   const [organization, setOrganization] = useState<Organization | null>(null);
   const [actionItems, setActionItems] = useState<ActionItem[]>([]);
+  // Staff check-ins feeding the goals below, and how many people have answered.
+  const [checkins, setCheckins] = useState<CheckinProgress[]>([]);
   const [partnershipKpis, setPartnershipKpis] = useState<{ kpi_key: string; kpi_label: string; target_value: number | null; target_unit: string; current_value: number; benchmark_low: number; benchmark_high: number; benchmark_label: string | null; data_source: string | null; how_tdi_delivers: string; deeper_measurement: string | null; suggested_offering: Offering | null; status: string }[]>([]);
   // What this school bought, which is what decides the sharper measurement each
   // goal card offers. Defaults to zeros so a school reads as unobserved rather
@@ -718,6 +721,7 @@ export default function PartnerDashboard() {
           setRecentActivity(data.activityLog || []);
           setStaffRoster(data.staffMembers || []);
           if (data.kpis) setPartnershipKpis(data.kpis);
+          setCheckins(data.checkins || []);
           if (data.contract) setContract(data.contract);
         }
       }
@@ -3044,6 +3048,7 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
 
                 {partnershipKpis.map((kpi) => {
                   const progress = goalProgress(kpi);
+                  const checkin = checkins.find((c) => c.kpi_key === kpi.kpi_key);
                   const measure = goalMeasurement(kpi, contract);
                   const unit = kpi.target_unit || '';
                   const target = Number(kpi.target_value ?? 0);
@@ -3077,6 +3082,29 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                         <div className="h-1.5 rounded-full bg-gray-100 overflow-hidden" aria-hidden="true">
                           <div className="h-full rounded-full bg-[#1e2749]" style={{ width: `${progress.pct}%` }} />
                         </div>
+                      )}
+
+                      {/* A goal fed by a staff check-in says where that check-in
+                          stands. Below its threshold the number above is blank on
+                          purpose, and a leader running it in a staff meeting cannot
+                          tell that apart from a broken form without a count. */}
+                      {checkin && (
+                        <p className="mt-2 text-[13px] leading-relaxed text-gray-500">
+                          {checkinProgressLine(checkin, !progress.awaitingBaseline)}
+                          {checkin.status === 'open' && (
+                            <>
+                              {' '}
+                              <a
+                                href={`/check-in/${checkin.code}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="font-semibold text-[#1e2749] underline decoration-gray-300 hover:decoration-[#1e2749]"
+                              >
+                                Open the check-in
+                              </a>
+                            </>
+                          )}
+                        </p>
                       )}
 
                       {paragraphs.length > 0 && (

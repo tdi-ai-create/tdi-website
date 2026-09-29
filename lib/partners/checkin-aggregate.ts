@@ -92,6 +92,49 @@ export function tallyGoal(
   };
 }
 
+/**
+ * What a school leader needs to know about a check-in while running it.
+ *
+ * Hillary Russell's whole reason for wanting this sent to her rather than to her
+ * staff was "that way I can ensure it gets done". A count is the thing that lets
+ * her do that, and without it a thin turnout looks exactly like a broken form:
+ * below min_responses the goal stays blank on purpose.
+ */
+export interface CheckinProgress {
+  kpi_key: string;
+  code: string;
+  responses: number;
+  min_responses: number;
+  status: 'draft' | 'open' | 'closed';
+}
+
+/**
+ * One sentence, in front of a principal, saying where the check-in stands.
+ * `measured` is whether the goal already carries a number.
+ */
+export function checkinProgressLine(progress: CheckinProgress, measured: boolean): string {
+  const { responses, min_responses: min } = progress;
+  const people = responses === 1 ? '1 person has' : `${responses} of your team have`;
+
+  if (measured) {
+    return responses === 1
+      ? 'Measured from 1 answer, and it updates as more come in.'
+      : `Measured from ${responses} answers, and it updates as more come in.`;
+  }
+
+  if (responses === 0) {
+    return `Nobody has answered yet. Your number appears once ${min} people have.`;
+  }
+
+  if (responses < min) {
+    return `${people} answered. Your number appears once ${min} have, so that a handful of replies cannot speak for everyone.`;
+  }
+
+  // Enough answers but no number yet. Honest rather than reassuring: something
+  // did not run, and saying "any moment now" would be a guess.
+  return `${people} answered, which is enough, but the number has not come through. Tell Rae and she will look.`;
+}
+
 export interface PublishResult {
   /** Whether partnership_kpis.current_value was actually changed. */
   written: boolean;
