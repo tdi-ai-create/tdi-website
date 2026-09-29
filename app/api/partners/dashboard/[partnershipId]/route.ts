@@ -151,6 +151,55 @@ export async function GET(
       .eq('status', 'active')
       .order('sort_order');
 
+    // Check-ins feeding those goals, with how many people have answered.
+    // A goal below its min_responses threshold renders blank on purpose, and a
+    // leader running the check-in in a staff meeting cannot tell that apart from
+    // a broken form without a count.
+    const { data: checkinRows, error: checkinError } = await supabase
+      .from('partner_checkins')
+      .select('id, code, kpi_key, min_responses, status')
+      .eq('partnership_id', partnershipId)
+      .not('kpi_key', 'is', null)
+      .neq('status', 'draft');
+
+    if (checkinError) {
+      console.error('[partner dashboard] could not read check-ins:', checkinError.message);
+    }
+
+    let checkins: {
+      kpi_key: string;
+      code: string;
+      responses: number;
+      min_responses: number;
+      status: string;
+    }[] = [];
+
+    if (checkinRows && checkinRows.length > 0) {
+      // Counted in JS from the ids rather than grouped in SQL: PostgREST has no
+      // group by, and a school's check-in is a dozen rows.
+      const { data: responseRows, error: responseError } = await supabase
+        .from('partner_checkin_responses')
+        .select('checkin_id')
+        .in('checkin_id', checkinRows.map((c) => c.id));
+
+      if (responseError) {
+        console.error('[partner dashboard] could not count check-in responses:', responseError.message);
+      }
+
+      const counts = new Map<string, number>();
+      for (const row of responseRows || []) {
+        counts.set(row.checkin_id, (counts.get(row.checkin_id) || 0) + 1);
+      }
+
+      checkins = checkinRows.map((c) => ({
+        kpi_key: c.kpi_key as string,
+        code: c.code as string,
+        responses: counts.get(c.id) || 0,
+        min_responses: c.min_responses as number,
+        status: c.status as string,
+      }));
+    }
+
     // Get staff login stats (for hub_login tracking)
     const { data: staffMembers } = await supabase
       .from('staff_members')
@@ -282,6 +331,7 @@ export async function GET(
       teacherQuotes: teacherQuotes || [],
       sessionRecords: sessionRecords || [],
       kpis: kpis || [],
+      checkins,
       contract: {
         observation_days_total: partnership?.observation_days_total ?? 0,
         virtual_sessions_total: partnership?.virtual_sessions_total ?? 0,
