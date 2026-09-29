@@ -28,7 +28,19 @@ filter except All and Games.
   nothing is outstanding.
 - Verify after deploy: https://www.teachersdeserveit.com/hub/quick-wins?filter=Working%20Together
 
-- Saw:
+- Saw: done on production after the deploy, signed in as Rae. Opened
+  https://www.teachersdeserveit.com/hub/quick-wins?filter=Working%20Together and
+  it reads "Showing 28 of 302 quick wins". It read 24 before this change against
+  a database count of 28, so the four missing games are back.
+- Saw: "Partner Up" is on the shelf, described as seeing classroom scenarios
+  from both the para and teacher perspective. That is the tool whose whole
+  subject is the relationship the shelf exists for, and it could not appear on it
+  at all until now.
+- Pressed: the "I am a..." dropdown, selected Para, with Working Together still
+  selected.
+- Saw: 28 became 13, and "Partner Up" survived the filter. A game answering the
+  role filter is the half of this fix that goes beyond the shelf. No game could
+  match any role before, because none of them carried roles.
 
 ## What I did not press
 
@@ -36,15 +48,11 @@ Nothing by choice.
 
 ## What I could not verify
 
-- That the shelf now reads 28 rather than 24, and that Partner Up is on it.
-- That selecting Para in the role dropdown now returns games. It never has, and
-  that is the wider half of this fix rather than a side effect.
-- That the Games category still behaves. Games previously arrived with no roles
-  at all, so they matched the unfiltered view by default. They now carry real
-  roles, which means a game with no `para` role will correctly stop appearing
-  under Para. That is the intended behaviour and it is a change in what someone
-  sees, so it needs looking at rather than assuming.
-- Whether every game has sensible tags in the database. This change surfaces
+- The Games category on its own, and whether a game that lacks the `para` role
+  has correctly stopped appearing under Para. That is the intended behaviour and
+  it is a change in what someone sees, so it deserves a look rather than an
+  assumption. The Para view was not compared before and after outside the shelf.
+- Whether every game carries sensible tags in the database. This change surfaces
   whatever is there, good or bad, which is the same exposure the search work
   created.
 
