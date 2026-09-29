@@ -88,7 +88,19 @@ interface Partnership {
   contact_email: string;
   phone?: string | null;
   contract_phase: 'IGNITE' | 'ACCELERATE' | 'SUSTAIN';
-  offering: 'PULSE' | 'FOCUS' | 'COHORT' | 'BLUEPRINT' | null;
+  /**
+   * Typed from the shared list rather than inlined, because the inline union
+   * here was missing PILOT, which exists in the database and is what Roosevelt
+   * carries. See lib/partnerships/offerings.ts.
+   */
+  offering: Offering | null;
+  /**
+   * The school's own next step, shown as a second badge on their offering card.
+   * Null means no badge, which is correct for a school that already has every
+   * component of its offering. Deliberately per partnership rather than derived
+   * from contract_phase: a phase default is wrong more often than right.
+   */
+  next_step_suggestion: string | null;
   contract_start: string | null;
   contract_end: string | null;
   building_count: number;
@@ -6798,190 +6810,158 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                 switch (blueprintSubTab) {
                   case 'approach':
                     return (
-                      <div className="space-y-8">
+                      <div className="space-y-6">
                         <div>
                           <h2 className="text-lg font-bold text-gray-900 mb-3">
-                            A Phased Journey,<br />Not a One-Time Event
+                            The Supports We Offer
                           </h2>
-                          <p className="text-lg text-[#1e2749]/80">
-                            Real change takes time. Our three-phase model meets your school where you are and grows with you.
+                          <p className="text-[15px] leading-relaxed text-[#1e2749]/80 max-w-[68ch]">
+                            Four ways we work with schools. Yours is marked below. The others are here so you
+                            can see what else exists, not because anything is missing.
                           </p>
                         </div>
 
-                        {/* Vertical Timeline */}
-                        <div className="py-4">
-                          <div className="space-y-0">
-                            {/* Phase 1: IGNITE */}
-                            {(() => {
-                              const isActive = partnership?.contract_phase === 'IGNITE';
-                              const isPast = partnership?.contract_phase === 'ACCELERATE' || partnership?.contract_phase === 'SUSTAIN';
-                              return (
-                                <div className="flex gap-4 md:gap-6">
-                                  <div className="flex flex-col items-center">
-                                    <div
-                                      className={`w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center text-xl font-bold flex-shrink-0 shadow-md ${isPast ? 'bg-[#4ecdc4] text-white' : ''}`}
-                                      style={!isPast ? { backgroundColor: '#ffba06', color: '#1e2749' } : undefined}
-                                    >
-                                      {isPast ? <Check className="w-6 h-6" /> : '1'}
-                                    </div>
-                                    <div className="w-1 flex-1 mt-2" style={{ backgroundColor: isPast ? '#4ecdc4' : '#ffba06' }} />
-                                  </div>
-                                  <div className="flex-1 pb-8">
-                                    <div
-                                      className={`bg-white rounded-xl p-5 md:p-6 shadow-md ${isActive ? 'ring-2 ring-[#4ecdc4]' : ''}`}
-                                      style={{ border: `2px solid ${isActive ? '#4ecdc4' : '#ffba06'}` }}
-                                    >
-                                      <div className="flex flex-wrap items-center gap-2 mb-2">
-                                        <span className="inline-block px-3 py-1 text-xs font-bold rounded-full" style={{ backgroundColor: '#ffba06', color: '#1e2749' }}>
-                                          Start Here
-                                        </span>
-                                        <h3 className="text-base font-bold text-[#1e2749]">IGNITE</h3>
-                                        {isActive && <span className="ml-auto px-2 py-0.5 bg-[#4ecdc4] text-white text-xs font-bold rounded">YOU ARE HERE</span>}
-                                        {isPast && <span className="ml-auto px-2 py-0.5 bg-[#4ecdc4]/20 text-[#4ecdc4] text-xs font-bold rounded flex items-center gap-1"><Check className="w-3 h-3" /> Complete</span>}
-                                      </div>
-                                      <p className="text-sm font-medium mb-3" style={{ color: '#80a4ed' }}>Leadership + Pilot Group</p>
-                                      <div className="inline-flex items-center gap-2 mb-3 py-2 px-3 rounded-lg" style={{ backgroundColor: '#fffbeb' }}>
-                                        <span className="text-xs font-medium text-[#1e2749]">Awareness</span>
-                                        <ArrowRight className="w-4 h-4" style={{ color: '#ffba06' }} />
-                                        <span className="text-xs font-bold" style={{ color: '#ffba06' }}>Buy-in</span>
-                                      </div>
-                                      <p className="text-sm mb-3 text-[#1e2749]/70">
-                                        Build buy-in with your leadership team and a pilot group of 10-25 educators. See early wins. Lay the foundation for school-wide change.
-                                      </p>
-                                      <div className="mb-3 pt-3 border-t border-gray-200">
-                                        <p className="text-xs font-bold mb-2 text-[#1e2749]">What&apos;s Included:</p>
-                                        <ul className="space-y-1">
-                                          {['2 On-Campus Observation Days', '4 Virtual Strategy Sessions', '2 Executive Impact Sessions', 'Learning Hub access for pilot group', 'Leadership Dashboard'].map((item) => (
-                                            <li key={item} className="flex items-center gap-1.5 text-xs text-[#1e2749]/70">
-                                              <Check className="w-3 h-3 flex-shrink-0" style={{ color: '#ffba06' }} />
-                                              {item}
-                                            </li>
-                                          ))}
-                                        </ul>
-                                      </div>
-                                      <p className="text-xs text-[#1e2749]/50">Typical timeline: One semester to one year</p>
-                                    </div>
-                                  </div>
-                                </div>
-                              );
-                            })()}
+                        {/*
+                          Offering cards.
 
-                            {/* Phase 2: ACCELERATE */}
-                            {(() => {
-                              const isActive = partnership?.contract_phase === 'ACCELERATE';
-                              const isPast = partnership?.contract_phase === 'SUSTAIN';
-                              const isFuture = partnership?.contract_phase === 'IGNITE';
-                              return (
-                                <div className="flex gap-4 md:gap-6">
-                                  <div className="flex flex-col items-center">
-                                    <div
-                                      className={`w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center text-xl font-bold flex-shrink-0 shadow-md ${isPast ? 'bg-[#4ecdc4] text-white' : isFuture ? 'bg-gray-200 text-gray-500' : ''}`}
-                                      style={!isPast && !isFuture ? { backgroundColor: '#80a4ed', color: '#ffffff' } : undefined}
-                                    >
-                                      {isPast ? <Check className="w-6 h-6" /> : '2'}
-                                    </div>
-                                    <div className="w-1 flex-1 mt-2" style={{ backgroundColor: isPast ? '#4ecdc4' : isFuture ? '#e5e7eb' : '#80a4ed' }} />
-                                  </div>
-                                  <div className="flex-1 pb-8">
-                                    <div
-                                      className={`bg-white rounded-xl p-5 md:p-6 shadow-md ${isActive ? 'ring-2 ring-[#4ecdc4]' : ''} ${isFuture ? 'opacity-75' : ''}`}
-                                      style={{ border: `2px solid ${isFuture ? '#e5e7eb' : '#80a4ed'}` }}
-                                    >
-                                      <div className="flex flex-wrap items-center gap-2 mb-2">
-                                        <span className="inline-block px-3 py-1 text-xs font-bold rounded-full" style={{ backgroundColor: isFuture ? '#e5e7eb' : '#80a4ed', color: isFuture ? '#6b7280' : '#ffffff' }}>
-                                          Scale
-                                        </span>
-                                        <h3 className="text-base font-bold text-[#1e2749]">ACCELERATE</h3>
-                                        {isActive && <span className="ml-auto px-2 py-0.5 bg-[#4ecdc4] text-white text-xs font-bold rounded">YOU ARE HERE</span>}
-                                        {isPast && <span className="ml-auto px-2 py-0.5 bg-[#4ecdc4]/20 text-[#4ecdc4] text-xs font-bold rounded flex items-center gap-1"><Check className="w-3 h-3" /> Complete</span>}
-                                      </div>
-                                      <p className="text-sm font-medium mb-3" style={{ color: '#80a4ed' }}>Full Staff</p>
-                                      <div className="inline-flex items-center gap-2 mb-3 py-2 px-3 rounded-lg" style={{ backgroundColor: '#f0f9ff' }}>
-                                        <span className="text-xs font-medium text-[#1e2749]">Buy-in</span>
-                                        <ArrowRight className="w-4 h-4" style={{ color: '#80a4ed' }} />
-                                        <span className="text-xs font-bold" style={{ color: '#80a4ed' }}>Action</span>
-                                      </div>
-                                      <p className="text-sm mb-3 text-[#1e2749]/70">
-                                        Expand support to your full staff. Every teacher, para, and coach gets access. Strategies get implemented school-wide, not just talked about.
-                                      </p>
-                                      <div className="mb-3 pt-3 border-t border-gray-200">
-                                        <p className="text-xs font-bold mb-2 text-[#1e2749]">What&apos;s Included:</p>
-                                        <p className="text-xs italic mb-1.5" style={{ color: '#80a4ed' }}>Everything in IGNITE, plus:</p>
-                                        <ul className="space-y-1">
-                                          {['Learning Hub access for ALL staff', '4 Executive Impact Sessions', 'Teachers Deserve It book for every educator', 'Retention tracking tools'].map((item) => (
-                                            <li key={item} className="flex items-center gap-1.5 text-xs text-[#1e2749]/70">
-                                              <Check className="w-3 h-3 flex-shrink-0" style={{ color: '#80a4ed' }} />
-                                              {item}
-                                            </li>
-                                          ))}
-                                        </ul>
-                                      </div>
-                                      <p className="text-xs text-[#1e2749]/50">Typical timeline: 1-3 years (many schools stay here)</p>
-                                    </div>
-                                  </div>
-                                </div>
-                              );
-                            })()}
+                          These describe what each support IS. They deliberately carry no
+                          counts, because this panel used to print a fixed package list
+                          ("2 On-Campus Observation Days, 4 Virtual Strategy Sessions...")
+                          against a "YOU ARE HERE" badge, and not one of the nine live
+                          partnerships actually matched it. Four schools with zero
+                          observation days were being shown two. What a school actually
+                          bought lives on Your Plan, driven by the contract, and must stay
+                          the only place a number appears.
 
-                            {/* Phase 3: SUSTAIN */}
-                            {(() => {
-                              const isActive = partnership?.contract_phase === 'SUSTAIN';
-                              const isFuture = partnership?.contract_phase === 'IGNITE' || partnership?.contract_phase === 'ACCELERATE';
-                              return (
-                                <div className="flex gap-4 md:gap-6">
-                                  <div className="flex flex-col items-center">
-                                    <div
-                                      className={`w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center text-xl font-bold flex-shrink-0 shadow-md ${isFuture ? 'bg-gray-200 text-gray-500' : ''}`}
-                                      style={!isFuture ? { backgroundColor: '#abc4ab', color: '#1e2749' } : undefined}
-                                    >
-                                      3
-                                    </div>
-                                  </div>
-                                  <div className="flex-1">
-                                    <div
-                                      className={`bg-white rounded-xl p-5 md:p-6 shadow-md ${isActive ? 'ring-2 ring-[#4ecdc4]' : ''} ${isFuture ? 'opacity-75' : ''}`}
-                                      style={{ border: `2px solid ${isFuture ? '#e5e7eb' : '#abc4ab'}` }}
-                                    >
-                                      <div className="flex flex-wrap items-center gap-2 mb-2">
-                                        <span className="inline-block px-3 py-1 text-xs font-bold rounded-full" style={{ backgroundColor: isFuture ? '#e5e7eb' : '#abc4ab', color: isFuture ? '#6b7280' : '#1e2749' }}>
-                                          Embed
-                                        </span>
-                                        <h3 className="text-base font-bold text-[#1e2749]">SUSTAIN</h3>
-                                        {isActive && <span className="ml-auto px-2 py-0.5 bg-[#4ecdc4] text-white text-xs font-bold rounded">YOU ARE HERE</span>}
-                                      </div>
-                                      <p className="text-sm font-medium mb-3" style={{ color: '#80a4ed' }}>Embedded Systems</p>
-                                      <div className="inline-flex items-center gap-2 mb-3 py-2 px-3 rounded-lg" style={{ backgroundColor: '#f0fff4' }}>
-                                        <span className="text-xs font-medium text-[#1e2749]">Action</span>
-                                        <ArrowRight className="w-4 h-4" style={{ color: '#abc4ab' }} />
-                                        <span className="text-xs font-bold" style={{ color: '#22c55e' }}>Identity</span>
-                                      </div>
-                                      <p className="text-sm mb-3 text-[#1e2749]/70">
-                                        Wellness becomes part of your school&apos;s identity. Systems sustain through staff turnover. Your school becomes a model for others.
-                                      </p>
-                                      <div className="mb-3 pt-3 border-t border-gray-200">
-                                        <p className="text-xs font-bold mb-2 text-[#1e2749]">What&apos;s Included:</p>
-                                        <p className="text-xs italic mb-1.5" style={{ color: '#abc4ab' }}>Everything in ACCELERATE, plus:</p>
-                                        <ul className="space-y-1">
-                                          {['Desi AI Assistant (24/7 support)', 'Advanced analytics', 'Ongoing partnership support'].map((item) => (
-                                            <li key={item} className="flex items-center gap-1.5 text-xs text-[#1e2749]/70">
-                                              <Check className="w-3 h-3 flex-shrink-0" style={{ color: '#abc4ab' }} />
-                                              {item}
-                                            </li>
-                                          ))}
-                                        </ul>
-                                      </div>
-                                      <p className="text-xs text-[#1e2749]/50">Typical timeline: Ongoing partnership</p>
-                                    </div>
-                                  </div>
+                          The second badge is the school's own next step. It is stored per
+                          partnership rather than derived from the phase, because a phase
+                          default is wrong more often than it is right: Oak Grove is Ignite
+                          with three observation days already bought and nothing scheduled,
+                          so "add a visit" would be the wrong thing to say to them.
+                          Null means no badge, which is the correct output for a school
+                          that already has every component.
+                        */}
+                        {(() => {
+                          const offerings = [
+                            {
+                              key: 'PULSE',
+                              name: 'The Pulse',
+                              line: 'Before the music.',
+                              body: 'For leaders who cannot see how staff are really doing until someone resigns. Short check-ins that rotate through mood, energy, belonging, purpose and needs, and a monthly read on what changed and what to do about it.',
+                              note: 'It teaches nobody anything, and it never names an individual.',
+                              icon: <TrendingUp className="w-5 h-5" />,
+                            },
+                            {
+                              key: 'FOCUS',
+                              name: 'The Focus',
+                              line: 'The marching band.',
+                              body: 'For schools already committed to an initiative but short on practical resources. Ready built tools released across the year, plus short leadership sessions to keep the work moving and tracking so you can see it land.',
+                              note: 'One vocabulary across the building. Nobody gets an arrangement written for them.',
+                              icon: <BookOpen className="w-5 h-5" />,
+                            },
+                            {
+                              key: 'COHORT',
+                              name: 'The Cohort',
+                              line: 'The a cappella group.',
+                              body: 'For the group carrying the most and getting the least, whether that is paras, new teachers or a specific role. Virtual sessions built around a named group, with full Hub and blog access, office hours and direct email support.',
+                              note: 'It reaches the people in the room, and only them.',
+                              icon: <Users className="w-5 h-5" />,
+                            },
+                            {
+                              key: 'BLUEPRINT',
+                              name: 'The Blueprint',
+                              line: 'The jazz ensemble.',
+                              body: 'Full partnership across the system. The Hub for your staff, leadership coaching, classroom observations while students are present, staff check-ins, and your own dashboard. It runs in phases, Ignite then Accelerate then Sustain, so it meets you where you are.',
+                              note: 'Every line is different, and it only works because someone is listening to each of them.',
+                              icon: <Target className="w-5 h-5" />,
+                            },
+                          ];
+
+                          const phase = partnership?.contract_phase || null;
+                          const current = (partnership?.offering || '').toUpperCase();
+                          const nextStep = partnership?.next_step_suggestion || null;
+                          // PILOT is a legacy Hub-only contract, not one of the four, so
+                          // nothing below gets badged. Say so plainly rather than showing
+                          // a school four cards with no mark and letting them wonder.
+                          const isLegacyPilot = current === 'PILOT';
+
+                          return (
+                            <div className="space-y-4">
+                              {isLegacyPilot && (
+                                <div
+                                  className="rounded-xl px-4 py-3"
+                                  style={{ background: '#f8fafc', border: '1px solid #e5e7eb' }}
+                                >
+                                  <p className="text-sm leading-relaxed text-[#1e2749]/80">
+                                    Your partnership is a Learning Hub pilot, agreed before these four
+                                    supports were set out. Everything in your contract continues as it is.
+                                    These are here so you can see what else we offer.
+                                  </p>
                                 </div>
-                              );
-                            })()}
-                          </div>
-                        </div>
+                              )}
+                              {offerings.map((o) => {
+                                const isYours = o.key === current;
+                                return (
+                                  <div
+                                    key={o.key}
+                                    className="rounded-2xl p-5 md:p-6 bg-white transition-colors"
+                                    style={{
+                                      border: isYours ? '2px solid #2A9D8F' : '1px solid #e5e7eb',
+                                      boxShadow: isYours
+                                        ? '0 2px 12px rgba(42,157,143,0.10)'
+                                        : '0 1px 3px rgba(0,0,0,0.04)',
+                                    }}
+                                  >
+                                    <div className="flex flex-wrap items-center gap-2.5 mb-2">
+                                      <span
+                                        className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+                                        style={{
+                                          background: isYours ? 'rgba(42,157,143,0.12)' : '#f3f4f6',
+                                          color: isYours ? '#2A9D8F' : '#9ca3af',
+                                        }}
+                                      >
+                                        {o.icon}
+                                      </span>
+                                      <h3 className="text-base font-bold text-[#1e2749]">{o.name}</h3>
+                                      {isYours && (
+                                        <span
+                                          className="text-[11px] font-bold uppercase tracking-wide px-2.5 py-1 rounded-full"
+                                          style={{ background: '#2A9D8F', color: '#FFFFFF' }}
+                                        >
+                                          {phase ? `You are here · ${phase}` : 'You are here'}
+                                        </span>
+                                      )}
+                                    </div>
+
+                                    <p className="text-sm font-semibold text-[#1e2749]/70 mb-1.5">{o.line}</p>
+                                    <p className="text-sm leading-relaxed text-[#1e2749]/80 mb-2">{o.body}</p>
+                                    <p className="text-xs italic text-[#1e2749]/55">{o.note}</p>
+
+                                    {isYours && nextStep && (
+                                      <div
+                                        className="mt-4 flex items-start gap-2.5 rounded-xl px-4 py-3"
+                                        style={{ background: '#fff8e6', border: '1px solid #f0d089' }}
+                                      >
+                                        <Sparkles
+                                          className="w-4 h-4 flex-shrink-0 mt-0.5"
+                                          style={{ color: '#b98900' }}
+                                        />
+                                        <p className="text-sm leading-relaxed text-[#1e2749]">
+                                          <span className="font-semibold">To get the most from this: </span>
+                                          {nextStep}
+                                        </p>
+                                      </div>
+                                    )}
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          );
+                        })()}
 
                         <div className="p-4 rounded-lg" style={{ backgroundColor: '#f0f9ff', border: '1px solid #80a4ed' }}>
                           <p className="text-sm text-[#1e2749]">
-                            <strong>Every phase</strong> includes support for teachers, paraprofessionals, instructional coaches, and administrators. We meet each role where they are.
+                            <strong>Every one of these</strong> supports teachers, paraprofessionals, instructional coaches and administrators. We meet each role where they are.
                           </p>
                         </div>
                       </div>
