@@ -25,8 +25,16 @@ not yet deployed, plus a verification deferred to after deploy.
   (Saunemin CCSD #438, chosen because it is the only partnership with an
   observation day inside 30 days)
 - Saw: header "Saunemin CCSD #438", "ACCELERATE", "Jul 2026 to Jul 2027", and the
-  metric row "Last Login 13d", "Items Due 7", "Provisioned 0/23",
-  "Hub Login 50%", "Last Contact 6d".
+  metric row "Last Login 13d", "Items Due 7", "Provisioned 18/23",
+  "Hub Login 44%", "Last Contact 6d".
+- Correction, and worth recording because it nearly became a bug report. On the
+  first look this row read "Provisioned 0/23" and "Hub Login 50%", and I took it
+  for a reporting fault. It is not. Those two metrics come from
+  `/api/partnerships/[id]/hub-stats`, which the page fetches as non-blocking
+  secondary data, so the first paint shows 0 and the stored fallback percentage
+  before the response lands. Waiting six seconds gives 18/23 and 44%, which match
+  the endpoint exactly. **Screenshotting this page immediately after navigation
+  reads a loading state as a number.**
 - Saw: exactly two smart action cards, "Prep for Next Call" and "2 overdue items".
   No visit prep card, which is correct because this change is not deployed here.
   Two cards also means the new one lands third and pushes nothing off the
