@@ -17,7 +17,22 @@ para tools. Exact matches still come first.
   so nothing is outstanding.
 - Verify after deploy: https://www.teachersdeserveit.com/hub/search?q=teaching%20assistant
 
-- Saw:
+- Saw: done on production after the deploy, signed in as Rae. Opened
+  https://www.teachersdeserveit.com/hub/search?q=teaching%20assistant and it
+  read "1 results for teaching assistant", a single community post and no Quick
+  Wins at all.
+- Saw: that was the stale build, not a failure. The same URL with a cache
+  busting parameter returned "21 results for teaching assistant", 20 Quick Wins
+  and 1 conversation. Second time this has happened after a deploy, and it reads
+  exactly like a change that did not work.
+- Saw: the widened results are the right ones. "Partner Up", "What I Need From
+  You, What You Need From Me", "Para Onboarding & Orientation Checklist", "The
+  Teacher-Para Partnership Planner", "Pre-K Para Toolkit", "The Norms
+  Conversation Starter", "Five Minutes to a Better Monday", "When It Is Not
+  Working: A Para's Repair Checklist" and "SpEd Para Toolkit" are all present.
+  Before this change the same query returned zero Quick Wins.
+- Saw: 20 rather than the 33 the simulation counted is the display cap on the
+  Quick Wins section, not a shortfall.
 
 ## What I did not press
 
@@ -41,14 +56,13 @@ The last row is the precision check. Expanding to a short word like `para`
 would substring match separate, preparation and comparable, so short terms are
 only matched against exact `topic_tags` values and never against free text.
 
-Still to press on production:
+Still unproven:
 
-- That the results render in the right order, exact matches above widened ones.
-  The code appends rather than merges, and the simulation confirms the counts,
-  but the order on screen was not looked at.
-- That a search with no expansion at all is unchanged.
-- That the log row now carries `quick_wins_via_synonym`, so the zero result
-  report can show whether this layer is doing anything.
+- The ordering rule, that exact matches sit above widened ones. "teaching
+  assistant" has no exact matches at all, so every result came from the widening
+  and the order could not be told apart. A query with both kinds is needed.
+- That the log row now carries `quick_wins_via_synonym`.
+- A search with no expansion, to confirm nothing changed for it.
 
 Two findings from the simulation that are not this change and want their own
 look:
