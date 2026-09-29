@@ -197,6 +197,53 @@ export async function POST(request: NextRequest) {
         }
       }
 
+      // The same check the support_page block above already does, applied to the
+      // payload that actually draws the tool. It was guarded there and not here,
+      // so the main path still failed the way that comment describes.
+      //
+      // Every template takes { title, sections[] }, and every section takes an
+      // items array, or fields for a form. Miss the sections array, pass null for
+      // it, or give a section no items, and the renderer throws mid-tree and
+      // react-pdf reports "Cannot read properties of null (reading 'props')".
+      // That string names nothing the caller sent, so it reads as a broken
+      // renderer rather than a malformed payload.
+      //
+      // TEA-520 is exactly that. A caller sent { title, items: [...] } with the
+      // items flat at the top level instead of inside sections, got the 'props'
+      // 500 three times, reshaped the same content for reference_card, saw it
+      // succeed, and reasonably concluded the checklist renderer had broken that
+      // afternoon. Nothing had broken. Reproduced both shapes directly: the
+      // flat one throws that exact message, the nested one renders 3103 bytes.
+      // Unknown types are rejected first. The dispatch below ends in an else that
+      // says "Unknown tool_type", and if the shape check ran before it, a typo in
+      // tool_type would come back complaining about sections instead of naming
+      // the typo.
+      const TOOL_TYPES = ['checklist', 'form', 'reference_card', 'toolkit']
+      if (!TOOL_TYPES.includes(tool_type)) {
+        return NextResponse.json({
+          error: `Unknown tool_type: ${tool_type}. Known types are ${TOOL_TYPES.join(', ')}.`,
+        }, { status: 400 })
+      }
+
+      const toolSections = (tool_content as { sections?: unknown }).sections
+      const itemsKey = tool_type === 'form' ? 'fields' : 'items'
+      if (!Array.isArray(toolSections)) {
+        return NextResponse.json({
+          error: `${tool_type} needs a sections array. Got ${toolSections === undefined ? 'no sections key' : JSON.stringify(toolSections)}. `
+            + `Shape is { title, sections: [ { heading, ${itemsKey}: [...] } ] }. `
+            + `${itemsKey} go inside a section, not at the top level.`,
+        }, { status: 400 })
+      }
+      const badSection = toolSections.findIndex(
+        sec => !Array.isArray((sec as Record<string, unknown>)?.[itemsKey]),
+      )
+      if (badSection !== -1) {
+        return NextResponse.json({
+          error: `${tool_type} section ${badSection} has no ${itemsKey} array. `
+            + `Every section needs ${itemsKey}, even if empty. Refusing rather than throwing mid-render.`,
+        }, { status: 400 })
+      }
+
       let pdfBuffer: Buffer
       if (tool_type === 'checklist') {
         pdfBuffer = await renderToBuffer(<ChecklistPDF data={{ ...(tool_content as ChecklistData), lang }} />)
