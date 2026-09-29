@@ -9,7 +9,7 @@
  * the Quick Wins page will break for all users.
  */
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import QuickWinCard from '@/components/hub/QuickWinCard';
 import EmptyState from '@/components/hub/EmptyState';
@@ -24,8 +24,6 @@ import HubFilterBar from '@/components/hub/HubFilterBar';
 import { useGameTracking } from '@/lib/hub/useGameTracking';
 import ToolRequestBoard from '@/components/hub/ToolRequestBoard';
 import { getPracticeToolsForBrowse, PRACTICE_GAME_SLUGS } from '@/lib/hub/practice-games';
-import { useHub } from '@/components/hub/HubContext';
-import { logHubSearch } from '@/lib/hub/log-search';
 
 // Filter categories for Quick Wins
 const FILTER_CATEGORIES = [
@@ -104,7 +102,6 @@ interface QuickWin {
 export default function QuickWinsPage() {
   const searchParams = useSearchParams();
   const initialFilter = searchParams.get('filter') ?? 'All';
-  const initialSearch = searchParams.get('search') ?? '';
   // ?collection=working-together still works. The Hub home links to it and the
   // URL has been shared, so it resolves to the pill rather than 404ing quietly.
   const initialFilterFromCollection =
@@ -117,11 +114,8 @@ export default function QuickWinsPage() {
   const [capacityFilter, setCapacityFilter] = useState<'all' | 'low' | 'medium' | 'high'>('all');
   const [roleFilter, setRoleFilter] = useState<string>('all');
   const [danielsonFilter, setDanielsonFilter] = useState<string[]>([]);
-  const [searchQuery, setSearchQuery] = useState(initialSearch);
   const [visibleCount, setVisibleCount] = useState(18);
-  const lastLoggedSearch = useRef('');
   const [isLoading, setIsLoading] = useState(true);
-  const { user } = useHub();
   const { isFavorite, toggleFavorite } = useFavorites();
   const { canAccess } = useMembership();
   const { language, t } = useLanguage();
@@ -239,16 +233,7 @@ export default function QuickWinsPage() {
     const capacityMatch = capacityFilter === 'all' || qw.capacity === capacityFilter;
     const danielsonMatch = danielsonFilter.length === 0 || danielsonFilter.some(d => qw.danielson_domains?.includes(d));
     const roleMatch = roleFilter === 'all' || qw.roles?.includes(roleFilter);
-    const searchMatch = !searchQuery.trim() || (() => {
-      const q = searchQuery.trim().toLowerCase();
-      return (
-        qw.title?.toLowerCase().includes(q) ||
-        qw.description?.toLowerCase().includes(q) ||
-        qw.category?.toLowerCase().includes(q) ||
-        qw.topic_tags?.some(t => t.toLowerCase().includes(q))
-      );
-    })();
-    return categoryMatch && capacityMatch && danielsonMatch && roleMatch && searchMatch;
+    return categoryMatch && capacityMatch && danielsonMatch && roleMatch;
   });
 
   /**
@@ -340,32 +325,6 @@ export default function QuickWinsPage() {
   // Reset visible count when filters change
   useEffect(() => { setVisibleCount(18); }, [activeFilter, capacityFilter, roleFilter, danielsonFilter.length]);
 
-  /**
-   * Record what was typed here, once the typing stops.
-   *
-   * This box filters as you type, so logging every keystroke would record
-   * "p", "pa", "par", "para" as four searches and drown the real signal. The
-   * pause is what makes a row mean "this is what they were looking for"
-   * rather than "this is a letter they pressed on the way".
-   *
-   * `lastLoggedSearch` stops a re-render, a filter change, or a returning
-   * reader writing the same query twice.
-   */
-  useEffect(() => {
-    const q = searchQuery.trim();
-    if (!q || q === lastLoggedSearch.current) return;
-    const timer = setTimeout(() => {
-      lastLoggedSearch.current = q;
-      logHubSearch({
-        supabase: getSupabase(),
-        userId: user?.id,
-        query: q,
-        source: 'browse',
-        resultCount: filteredQuickWins.length,
-      }).catch(() => {});
-    }, 900);
-    return () => clearTimeout(timer);
-  }, [searchQuery, filteredQuickWins.length, user?.id]);
 
   // Loading skeleton
   if (isLoading) {
@@ -453,8 +412,6 @@ export default function QuickWinsPage() {
           tUI={tUI}
           itemLabel="quick wins"
           subtitle="Short, practical tools you can use right now"
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
           collectionLabel={WORKING_TOGETHER_LABEL}
           collectionSubtitle={WORKING_TOGETHER_SUBTITLE}
         />
