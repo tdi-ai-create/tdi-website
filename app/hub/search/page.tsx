@@ -10,6 +10,7 @@ import { BookOpen, Lightbulb, MessageCircle, Search, ArrowRight } from 'lucide-r
 
 import { categoryColor } from '@/lib/hub/categoryColors';
 import { logHubSearch } from '@/lib/hub/log-search';
+import { expandQuery } from '@/lib/hub/search-synonyms';
 interface SearchResult {
   id: string;
   slug: string;
@@ -48,17 +49,34 @@ export default function HubSearchPage() {
     setIsSearching(true);
     setHasSearched(true);
     const supabase = getSupabase();
-    const q = `%${searchQuery.trim()}%`;
+    const trimmed = searchQuery.trim();
+    const q = `%${trimmed}%`;
+
+    /**
+     * A very short query is not searched as free text.
+     *
+     * `ilike '%ta%'` matches start, data, stand and important, so a reader
+     * typing TA would get a page of unrelated tools ranked above the para ones
+     * they meant. The same precision rule already applies to short synonym
+     * expansions; this applies it to what was typed.
+     *
+     * Two characters still searches tags exactly, and still expands through the
+     * vocabulary, so TA finds the para tools. It just does not also drag in
+     * every word containing those two letters.
+     */
+    const tooShortForText = trimmed.length < 3;
 
     try {
       const [qwResult, qwTagResult, courseResult, convResult] = await Promise.all([
         // Quick Wins - text search on title/description/category
-        supabase
-          .from('hub_quick_wins')
-          .select('id, slug, title, description, category, roles, topic_tags')
-          .eq('is_published', true)
-          .or(`title.ilike.${q},description.ilike.${q},category.ilike.${q}`)
-          .limit(20),
+        tooShortForText
+          ? Promise.resolve({ data: [], error: null })
+          : supabase
+              .from('hub_quick_wins')
+              .select('id, slug, title, description, category, roles, topic_tags')
+              .eq('is_published', true)
+              .or(`title.ilike.${q},description.ilike.${q},category.ilike.${q}`)
+              .limit(20),
         // Quick Wins - array search on topic_tags (contains the search term)
         supabase
           .from('hub_quick_wins')
@@ -67,17 +85,21 @@ export default function HubSearchPage() {
           .contains('topic_tags', [searchQuery.trim().toLowerCase()])
           .limit(12),
         // Courses
-        supabase
-          .from('hub_courses')
-          .select('id, slug, title, description, category')
-          .or(`title.ilike.${q},description.ilike.${q},category.ilike.${q}`)
-          .limit(12),
+        tooShortForText
+          ? Promise.resolve({ data: [], error: null })
+          : supabase
+              .from('hub_courses')
+              .select('id, slug, title, description, category')
+              .or(`title.ilike.${q},description.ilike.${q},category.ilike.${q}`)
+              .limit(12),
         // Community conversations
-        supabase
-          .from('quick_win_responses')
-          .select('id, body, quick_win_id, contribution_type')
-          .ilike('body', q)
-          .limit(8),
+        tooShortForText
+          ? Promise.resolve({ data: [], error: null })
+          : supabase
+              .from('quick_win_responses')
+              .select('id, body, quick_win_id, contribution_type')
+              .ilike('body', q)
+              .limit(8),
       ]);
 
       // Merge and deduplicate quick wins from text search + tag search
@@ -89,8 +111,65 @@ export default function HubSearchPage() {
         return true;
       });
 
+      /**
+       * Search again for what the reader meant, not only what they typed.
+       *
+       * This runs after the exact search rather than instead of it, and its
+       * results are appended rather than merged in. Someone who typed our word
+       * keeps seeing their match first. Widening a search must never demote a
+       * good one.
+       *
+       * The `seen` set is shared with the exact pass, so a tool that matched
+       * both ways stays in its earlier, better position.
+       */
+      const synonyms = expandQuery(searchQuery);
+      let synonymMatches: typeof deduped = [];
+      if (synonyms.length > 0) {
+        /**
+         * Short expansions go to tags only, never to free text.
+         *
+         * `ilike '%para%'` also matches separate, preparation and comparable.
+         * Widening a search is supposed to find the tools someone meant, not
+         * bury them under every word that happens to contain four letters. So
+         * a short term is only trusted where it is precise, which is an exact
+         * value in `topic_tags`. Longer words and phrases are specific enough
+         * to search the text with.
+         */
+        const SAFE_TEXT_LENGTH = 6;
+        const textTerms = synonyms.filter(t => t.length >= SAFE_TEXT_LENGTH || t.includes(' '));
+
+        const [synTextResult, synTagResult] = await Promise.all([
+          textTerms.length > 0
+            ? supabase
+                .from('hub_quick_wins')
+                .select('id, slug, title, description, category, roles, topic_tags')
+                .eq('is_published', true)
+                .or(textTerms.map(t => `title.ilike.%${t}%,description.ilike.%${t}%`).join(','))
+                .limit(20)
+            : Promise.resolve({ data: [], error: null }),
+          supabase
+            .from('hub_quick_wins')
+            .select('id, slug, title, description, category, roles, topic_tags')
+            .eq('is_published', true)
+            .overlaps('topic_tags', synonyms)
+            .limit(20),
+        ]);
+
+        // A failed widening must not take the exact results down with it.
+        if (synTextResult.error) console.error('[hub-search] synonym text pass failed:', synTextResult.error.message);
+        if (synTagResult.error) console.error('[hub-search] synonym tag pass failed:', synTagResult.error.message);
+
+        synonymMatches = [...(synTagResult.data ?? []), ...(synTextResult.data ?? [])].filter(qw => {
+          if (seen.has(qw.id)) return false;
+          seen.add(qw.id);
+          return true;
+        });
+      }
+
+      const rankedQuickWins = [...deduped, ...synonymMatches];
+
       setQuickWins(
-        deduped.slice(0, 20).map(qw => ({
+        rankedQuickWins.slice(0, 20).map(qw => ({
           id: qw.id,
           slug: qw.slug,
           title: qw.title,
@@ -150,9 +229,12 @@ export default function HubSearchPage() {
         userId: user?.id,
         query: searchQuery,
         source: 'global',
-        resultCount: deduped.length + (courseResult.data?.length ?? 0) + (convResult.data?.length ?? 0),
+        resultCount: rankedQuickWins.length + (courseResult.data?.length ?? 0) + (convResult.data?.length ?? 0),
         breakdown: {
-          quick_wins: deduped.length,
+          quick_wins: rankedQuickWins.length,
+          // Separated so the zero result log can show whether the synonym layer
+          // is doing anything, rather than only that results appeared.
+          quick_wins_via_synonym: synonymMatches.length,
           courses: courseResult.data?.length ?? 0,
           conversations: convResult.data?.length ?? 0,
         },

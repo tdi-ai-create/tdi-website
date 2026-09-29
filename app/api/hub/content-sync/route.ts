@@ -1,4 +1,5 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
+import { unapprovedTopicTags, describeUnapprovedTags } from '@/lib/hub/topic-vocabulary'
 import { NextRequest, NextResponse } from 'next/server'
 import { getQuizBySlug } from '@/lib/hub/quizConfigs'
 import { retireReviewStamp } from '@/lib/hub/replace-file'
@@ -183,7 +184,36 @@ const isPdf = (url: string) => /\.pdf(\?|#|$)/i.test(url)
  * today, so section 7 of that document sets the order for turning them on.
  * Add checks here only in step with that sequence.
  */
-export function qaBlockers(qw: QuickWinRow): string[] {
+/**
+ * Is the topic tag vocabulary being enforced yet.
+ *
+ * Read from hub_config rather than assumed, and treated as off when the read
+ * fails. An unreadable gate must not silently start refusing correct publishes,
+ * and the direction it fails in is a decision rather than an accident: the cost
+ * of a wrong tag slipping through for one more day is small, and the cost of
+ * blocking every publish because a config read broke is not.
+ *
+ * Flip it with a single update and no deploy:
+ *   update hub_config set value = 'true' where key = 'topic_vocabulary_enforced';
+ */
+async function vocabularyEnforced(supabase: SupabaseClient): Promise<boolean> {
+  const { data, error } = await supabase
+    .from('hub_config')
+    .select('value')
+    .eq('key', 'topic_vocabulary_enforced')
+    .maybeSingle()
+
+  if (error) {
+    console.error('[content-sync] could not read topic_vocabulary_enforced, treating as off:', error.message)
+    return false
+  }
+  return data?.value === 'true'
+}
+
+export function qaBlockers(
+  qw: QuickWinRow,
+  opts: { enforceVocabulary?: boolean } = {},
+): string[] {
   const out: string[] = []
   const nonEmpty = (a: unknown): a is string[] => Array.isArray(a) && a.length > 0
 
@@ -210,6 +240,16 @@ export function qaBlockers(qw: QuickWinRow): string[] {
   } else {
     if (qw.topic_tags.length < 2) out.push(`at least 2 topic_tags are required (has ${qw.topic_tags.length})`)
     if (qw.topic_tags.includes('general')) out.push('topic_tag "general" is not allowed, it breaks Browse by Topic')
+
+    // Standard section 3, the vocabulary gate. Ships dark: the caller reads
+    // hub_config and only passes enforceVocabulary once the agent instructions
+    // carrying the approved list have been deployed and verified. A constraint
+    // that arrives before the code satisfying it fails every correct caller,
+    // which is exactly what happened on 13 August.
+    if (opts.enforceVocabulary) {
+      const bad = unapprovedTopicTags(qw.topic_tags)
+      if (bad.length > 0) out.push(describeUnapprovedTags(bad))
+    }
   }
 
   if (!qw.lift) {
@@ -373,6 +413,11 @@ export function scoreItem(qw: ScoredRow): { lane: Lane; defects: string[] } {
   const substantive: string[] = []
   const fixable: string[] = []
 
+  // Deliberately without the vocabulary gate. Scoring judges the 286 items that
+  // are already live, and they predate the approved list by roughly 300 tags.
+  // Turning it on here would drop most of the library into the fixable lane and
+  // bury the genuinely broken downloads the lane exists to surface. Rae's call
+  // on 27 September was to stop the number growing, not to relitigate the past.
   for (const d of qaBlockers(qw)) {
     if (BROKEN.test(d)) broken.push(d)
     else if (FIXABLE.test(d)) fixable.push(d)
@@ -890,7 +935,9 @@ export async function POST(request: NextRequest) {
 
       // Run the same mechanical checks the publish gate enforces, so QA gets the
       // full list up front instead of discovering them one exception at a time.
-      const blockers = qaBlockers(qw as QuickWinRow)
+      const blockers = qaBlockers(qw as QuickWinRow, {
+        enforceVocabulary: await vocabularyEnforced(supabase),
+      })
       if (blockers.length > 0) {
         return NextResponse.json({ success: false, blockers }, { status: 400 })
       }
@@ -1050,7 +1097,9 @@ export async function POST(request: NextRequest) {
         }, { status: 400 })
       }
 
-      const blockers = qaBlockers(qw as QuickWinRow)
+      const blockers = qaBlockers(qw as QuickWinRow, {
+        enforceVocabulary: await vocabularyEnforced(supabase),
+      })
       if (blockers.length > 0) {
         return NextResponse.json({ success: false, blockers }, { status: 400 })
       }
@@ -1201,7 +1250,9 @@ export async function POST(request: NextRequest) {
         }, { status: 400 })
       }
 
-      const blockers = qaBlockers(qw as QuickWinRow)
+      const blockers = qaBlockers(qw as QuickWinRow, {
+        enforceVocabulary: await vocabularyEnforced(supabase),
+      })
       if (blockers.length > 0) {
         return NextResponse.json({ success: false, blockers }, { status: 400 })
       }
