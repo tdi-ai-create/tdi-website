@@ -216,7 +216,37 @@ export default function QuickWinsPage() {
   // Merge practice tools with database quick wins
   // Deduplicate: practice games take priority over DB entries with same slug
   const deduplicatedQuickWins = quickWins.filter((qw) => !PRACTICE_GAME_SLUGS.has(qw.slug));
-  const allQuickWins = [...deduplicatedQuickWins, ...PRACTICE_TOOLS];
+
+  /**
+   * Give the practice games back their tags and roles.
+   *
+   * A game exists twice: as a row in `hub_quick_wins`, which carries its
+   * `topic_tags`, `roles` and `danielson_domains`, and as an entry in the
+   * registry, which carries how it looks and how it is played. The line above
+   * drops the database row and keeps the registry entry, and
+   * `getPracticeToolsForBrowse` does not return tags or roles at all.
+   *
+   * So every one of the 21 games was invisible to every filter except All and
+   * Games. Selecting Para returned no games. The Working Together shelf could
+   * not hold Partner Up, a game whose entire subject is the teacher and para
+   * relationship, however it was tagged in the database.
+   *
+   * Found on 29 September when six tools were added to the shelf and only two
+   * appeared on the page. Presentation still comes from the registry; anything
+   * a filter reads now comes from the row.
+   */
+  const practiceToolsWithMetadata = PRACTICE_TOOLS.map((tool) => {
+    const row = quickWins.find((qw) => qw.slug === tool.slug);
+    if (!row) return tool;
+    return {
+      ...tool,
+      topic_tags: row.topic_tags,
+      roles: row.roles,
+      danielson_domains: row.danielson_domains,
+    };
+  });
+
+  const allQuickWins = [...deduplicatedQuickWins, ...practiceToolsWithMetadata];
   const totalCount = allQuickWins.length;
 
   // Filter quick wins by category and capacity
