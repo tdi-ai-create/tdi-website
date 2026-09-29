@@ -9,7 +9,7 @@
  * the Quick Wins page will break for all users.
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import QuickWinCard from '@/components/hub/QuickWinCard';
 import EmptyState from '@/components/hub/EmptyState';
@@ -24,6 +24,8 @@ import HubFilterBar from '@/components/hub/HubFilterBar';
 import { useGameTracking } from '@/lib/hub/useGameTracking';
 import ToolRequestBoard from '@/components/hub/ToolRequestBoard';
 import { getPracticeToolsForBrowse, PRACTICE_GAME_SLUGS } from '@/lib/hub/practice-games';
+import { useHub } from '@/components/hub/HubContext';
+import { logHubSearch } from '@/lib/hub/log-search';
 
 // Filter categories for Quick Wins
 const FILTER_CATEGORIES = [
@@ -117,7 +119,9 @@ export default function QuickWinsPage() {
   const [danielsonFilter, setDanielsonFilter] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState(initialSearch);
   const [visibleCount, setVisibleCount] = useState(18);
+  const lastLoggedSearch = useRef('');
   const [isLoading, setIsLoading] = useState(true);
+  const { user } = useHub();
   const { isFavorite, toggleFavorite } = useFavorites();
   const { canAccess } = useMembership();
   const { language, t } = useLanguage();
@@ -335,6 +339,33 @@ export default function QuickWinsPage() {
 
   // Reset visible count when filters change
   useEffect(() => { setVisibleCount(18); }, [activeFilter, capacityFilter, roleFilter, danielsonFilter.length]);
+
+  /**
+   * Record what was typed here, once the typing stops.
+   *
+   * This box filters as you type, so logging every keystroke would record
+   * "p", "pa", "par", "para" as four searches and drown the real signal. The
+   * pause is what makes a row mean "this is what they were looking for"
+   * rather than "this is a letter they pressed on the way".
+   *
+   * `lastLoggedSearch` stops a re-render, a filter change, or a returning
+   * reader writing the same query twice.
+   */
+  useEffect(() => {
+    const q = searchQuery.trim();
+    if (!q || q === lastLoggedSearch.current) return;
+    const timer = setTimeout(() => {
+      lastLoggedSearch.current = q;
+      logHubSearch({
+        supabase: getSupabase(),
+        userId: user?.id,
+        query: q,
+        source: 'browse',
+        resultCount: filteredQuickWins.length,
+      }).catch(() => {});
+    }, 900);
+    return () => clearTimeout(timer);
+  }, [searchQuery, filteredQuickWins.length, user?.id]);
 
   // Loading skeleton
   if (isLoading) {

@@ -9,6 +9,7 @@ import { useTranslation } from '@/lib/hub/useTranslation';
 import { BookOpen, Lightbulb, MessageCircle, Search, ArrowRight } from 'lucide-react';
 
 import { categoryColor } from '@/lib/hub/categoryColors';
+import { logHubSearch } from '@/lib/hub/log-search';
 interface SearchResult {
   id: string;
   slug: string;
@@ -138,6 +139,24 @@ export default function HubSearchPage() {
       } else {
         setConversations([]);
       }
+
+      // Logged here rather than on submit, because the number that matters is
+      // how many results came back, and a zero is the whole point of the record.
+      // Not awaited, so a slow log never holds up results. The catch is not
+      // decoration: dropping the promise without one turns a failed log into an
+      // unhandled rejection in the reader's console.
+      logHubSearch({
+        supabase,
+        userId: user?.id,
+        query: searchQuery,
+        source: 'global',
+        resultCount: deduped.length + (courseResult.data?.length ?? 0) + (convResult.data?.length ?? 0),
+        breakdown: {
+          quick_wins: deduped.length,
+          courses: courseResult.data?.length ?? 0,
+          conversations: convResult.data?.length ?? 0,
+        },
+      }).catch(() => {});
     } catch (err) {
       console.error('Search error:', err);
     } finally {
