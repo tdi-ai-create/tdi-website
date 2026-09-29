@@ -61,7 +61,13 @@ export async function GET() {
   const oppIds = [...new Set(drafts.map(d => d.opportunity_id).filter(Boolean))]
 
   type PursuitRow = { id: string; district_name: string | null; funder_label: string | null }
-  type OppRow = { id: string; name: string | null; amount: number | string | null; application_closes: string | null }
+  type OppRow = {
+    id: string
+    name: string | null
+    amount: number | string | null
+    application_closes: string | null
+    narrative_url: string | null
+  }
 
   // Live items only. A cancelled item is not work, and the follow-up cron
   // already refuses to chase one, so offering to rewrite its client wording
@@ -73,7 +79,7 @@ export async function GET() {
     oppIds.length
       ? supabase
           .from('funding_opportunities')
-          .select('id, name, amount, application_closes')
+          .select('id, name, amount, application_closes, narrative_url')
           .in('id', oppIds)
       : Promise.resolve({ data: [] as OppRow[] }),
     supabase
@@ -141,6 +147,15 @@ export async function GET() {
       grant: opp?.name ?? null,
       amount: opp?.amount ?? null,
       closesOn: opp?.application_closes ?? null,
+      // The packet this email promises. Funding Home has always had it, from a
+      // different route, so the same draft showed its packet link on one screen
+      // and nothing at all on the other. Bella reported the links as missing,
+      // and she was right: this route never read the column.
+      docUrl: opp?.narrative_url ?? null,
+      // An application email with no application attached. Computed here
+      // rather than on each screen, so the queue and Funding Home cannot
+      // disagree about which drafts are unsendable.
+      missingPacket: d.email_type === 'submission_instructions' && !opp?.narrative_url,
       pursuitId: d.pursuit_id,
       opportunityId: d.opportunity_id,
       needsClientLabel,
@@ -160,6 +175,7 @@ export async function GET() {
       unsendable: rows.filter(r => r.blockedReason).length,
       needsRewrite: rows.filter(r => r.warnings.length > 0).length,
       needsClientLabel: rows.filter(r => r.needsClientLabel).length,
+      missingPacket: rows.filter(r => r.missingPacket).length,
     },
   })
 }
@@ -175,7 +191,7 @@ export async function POST(request: NextRequest) {
   // exercise the approve path without mailing a real school.
   const dryRun = request.nextUrl.searchParams.get('dryRun') === '1'
 
-  const { action, id, subject, body, reason, clientLabel } = await request.json()
+  const { action, id, subject, body, reason, clientLabel, packetUrl } = await request.json()
 
   if (!id || !action) {
     return NextResponse.json({ error: 'id and action are required' }, { status: 400 })
@@ -198,6 +214,68 @@ export async function POST(request: NextRequest) {
       { error: `This draft is already ${draft.status}. Refresh the queue.` },
       { status: 409 }
     )
+  }
+
+  // Attach the application packet to the grant this email is about.
+  //
+  // Until this existed there was no way to put a document on a grant from
+  // anywhere in the portal, so an application email with no application could
+  // only sit. The Ourso draft for St. Peter Chanel sat five days for exactly
+  // that reason: the send is correctly blocked, and nothing on any screen
+  // could clear the block.
+  //
+  // Written to the grant, not to the draft, because the packet belongs to the
+  // grant. Every future email about it, and the Funding Home card, pick it up
+  // from the same column.
+  if (action === 'set_packet') {
+    const url = (packetUrl ?? '').trim()
+
+    if (!draft.opportunity_id) {
+      return NextResponse.json(
+        { error: 'This draft is not attached to a grant, so there is nothing to put the packet on.' },
+        { status: 409 }
+      )
+    }
+
+    // A link that is not a link would satisfy the send gate while still
+    // reaching the school as a promise of a package above nothing. The gate is
+    // only worth having if what clears it is real.
+    let parsed: URL
+    try {
+      parsed = new URL(url)
+    } catch {
+      return NextResponse.json(
+        { error: 'That is not a link. Paste the full address of the document, starting with https://' },
+        { status: 400 }
+      )
+    }
+    if (parsed.protocol !== 'https:' && parsed.protocol !== 'http:') {
+      return NextResponse.json(
+        { error: 'Paste a web address for the document, starting with https://' },
+        { status: 400 }
+      )
+    }
+
+    if (dryRun) {
+      return NextResponse.json({
+        ok: true, dryRun: true, action: 'would attach packet',
+        wouldWrite: { opportunityId: draft.opportunity_id, narrative_url: parsed.toString() },
+      })
+    }
+
+    const { error: packetErr } = await supabase
+      .from('funding_opportunities')
+      .update({
+        narrative_url: parsed.toString(),
+        last_action: 'Application packet attached',
+        last_action_date: new Date().toISOString(),
+        last_activity_at: new Date().toISOString(),
+      })
+      .eq('id', draft.opportunity_id)
+
+    if (packetErr) return NextResponse.json({ error: packetErr.message }, { status: 500 })
+
+    return NextResponse.json({ ok: true, action: 'packet attached', docUrl: parsed.toString() })
   }
 
   // Write the wording a school should read for this task, then correct the

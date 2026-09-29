@@ -17,7 +17,7 @@
  */
 
 import { useCallback, useEffect, useState } from 'react'
-import { Check, X, Pencil, AlertTriangle, Clock, Inbox } from 'lucide-react'
+import { Check, X, Pencil, AlertTriangle, Clock, Inbox, FileText } from 'lucide-react'
 import { findInternalText } from '@/lib/funding-draft-warnings'
 
 type Draft = {
@@ -38,6 +38,9 @@ type Draft = {
   amount: string | number | null
   closesOn: string | null
   needsClientLabel: boolean
+  opportunityId: string | null
+  docUrl: string | null
+  missingPacket: boolean
   usesPlaceholder: boolean
   placeholderText: string | null
   actionItemId: string | null
@@ -66,6 +69,9 @@ export default function OutreachQueue() {
   const [labelDraftId, setLabelDraftId] = useState<string | null>(null)
   const [labelText, setLabelText] = useState('')
   const [labelError, setLabelError] = useState<string | null>(null)
+  const [packetDraftId, setPacketDraftId] = useState<string | null>(null)
+  const [packetUrl, setPacketUrl] = useState('')
+  const [packetError, setPacketError] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   const load = useCallback(async () => {
@@ -151,6 +157,40 @@ export default function OutreachQueue() {
     }
   }
 
+  // Put the application document on the grant this email is about.
+  //
+  // Every draft for the same grant clears at once, because the packet lives on
+  // the grant rather than on any one email.
+  const savePacket = async (id: string, opportunityId: string | null) => {
+    setBusyId(id)
+    setPacketError(null)
+    try {
+      const res = await fetch('/api/funding/outreach-queue', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'set_packet', id, packetUrl }),
+      })
+      const json = await res.json()
+      if (!res.ok || json.error) {
+        setPacketError(json.error || 'That did not save')
+        return
+      }
+      setDrafts(prev =>
+        prev.map(d =>
+          d.opportunityId && d.opportunityId === opportunityId
+            ? { ...d, docUrl: json.docUrl, missingPacket: false }
+            : d
+        )
+      )
+      setPacketDraftId(null)
+      setPacketUrl('')
+    } catch (e: unknown) {
+      setPacketError(e instanceof Error ? e.message : 'That did not save')
+    } finally {
+      setBusyId(null)
+    }
+  }
+
   if (loading) {
     return <div style={{ padding: 24, color: '#6B7280', fontSize: 14 }}>Loading outreach queue…</div>
   }
@@ -179,6 +219,7 @@ export default function OutreachQueue() {
   const staleCount = drafts.filter(d => d.isStale).length
   const rewriteCount = drafts.filter(d => d.warnings.length > 0).length
   const labelCount = drafts.filter(d => d.needsClientLabel).length
+  const packetCount = drafts.filter(d => d.missingPacket).length
 
   return (
     <div>
@@ -202,6 +243,24 @@ export default function OutreachQueue() {
           >
             <Clock className="w-3 h-3" />
             {staleCount} waiting over 48 hours
+          </span>
+        )}
+        {packetCount > 0 && (
+          <span
+            style={{
+              fontSize: 12,
+              fontWeight: 700,
+              color: '#8A3520',
+              background: '#FDECE8',
+              padding: '3px 10px',
+              borderRadius: 20,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 5,
+            }}
+          >
+            <FileText className="w-3 h-3" />
+            {packetCount} waiting on a packet document
           </span>
         )}
         {rewriteCount > 0 && (
@@ -345,6 +404,107 @@ export default function OutreachQueue() {
                 >
                   <AlertTriangle className="w-4 h-4" />
                   {d.blockedReason}. Fix this before it can send.
+                </div>
+              )}
+
+              {/* The packet this email promises. It was only ever visible on
+                  Funding Home, which meant the same draft looked complete here
+                  and blocked there. */}
+              {d.docUrl ? (
+                <div
+                  style={{
+                    marginTop: 12, display: 'flex', alignItems: 'center', gap: 8,
+                    fontSize: 13, color: '#4B5563',
+                  }}
+                >
+                  <FileText className="w-4 h-4" />
+                  Packet:{' '}
+                  <a
+                    href={d.docUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ color: NAVY, fontWeight: 600 }}
+                  >
+                    open it and check it reads right
+                  </a>
+                </div>
+              ) : (
+                <div
+                  style={{
+                    marginTop: 12, fontSize: 13,
+                    color: d.missingPacket ? '#8A3520' : '#6B7280',
+                    background: d.missingPacket ? '#FDECE8' : '#F9FAFB',
+                    border: `1px solid ${d.missingPacket ? '#F3C4B8' : '#E5E7EB'}`,
+                    borderRadius: 8, padding: '11px 13px',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontWeight: d.missingPacket ? 700 : 600 }}>
+                    <AlertTriangle className="w-4 h-4" />
+                    {d.missingPacket
+                      ? 'This email promises an application package and no document is attached'
+                      : 'No packet document on this grant'}
+                  </div>
+                  {d.missingPacket && (
+                    <p style={{ margin: '7px 0 0', lineHeight: 1.5 }}>
+                      {d.toName ? d.toName.split(' ')[0] : 'They'} would read &ldquo;here is your application
+                      package&rdquo; above a blank line, so this cannot send until the document exists.
+                    </p>
+                  )}
+
+                  {packetDraftId === d.id ? (
+                    <>
+                      <label
+                        htmlFor={`packet-${d.id}`}
+                        style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#4B5563', margin: '10px 0 6px' }}
+                      >
+                        Paste the link to the document
+                      </label>
+                      <input
+                        id={`packet-${d.id}`}
+                        value={packetUrl}
+                        onChange={e => setPacketUrl(e.target.value)}
+                        placeholder="https://docs.google.com/document/d/..."
+                        style={{
+                          width: '100%', padding: '9px 11px', fontSize: 13, borderRadius: 6,
+                          border: '1px solid #D1D5DB', fontFamily: 'inherit', color: NAVY,
+                        }}
+                      />
+                      <p style={{ margin: '7px 0 0', fontSize: 12, color: '#6B7280', lineHeight: 1.5 }}>
+                        Saved on the grant, so every email about it carries the same packet.
+                      </p>
+                      {packetError && (
+                        <p style={{ margin: '7px 0 0', fontSize: 12, color: '#B4231F', fontWeight: 600 }}>
+                          {packetError}
+                        </p>
+                      )}
+                      <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
+                        <button
+                          onClick={() => savePacket(d.id, d.opportunityId)}
+                          disabled={busy || packetUrl.trim().length < 8}
+                          style={btn(NAVY, busy || packetUrl.trim().length < 8)}
+                        >
+                          {busy ? 'Attaching...' : 'Attach it to this grant'}
+                        </button>
+                        <button
+                          onClick={() => { setPacketDraftId(null); setPacketUrl(''); setPacketError(null) }}
+                          disabled={busy}
+                          style={btn('#9CA3AF', busy)}
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </>
+                  ) : (
+                    <div style={{ marginTop: 10 }}>
+                      <button
+                        onClick={() => { setPacketDraftId(d.id); setPacketUrl(''); setPacketError(null) }}
+                        disabled={!d.opportunityId}
+                        style={btn(NAVY, !d.opportunityId)}
+                      >
+                        Link the packet document
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -512,19 +672,21 @@ export default function OutreachQueue() {
                       onClick={() =>
                         act(d.id, 'approve', editing ? { subject: editSubject, body: editBody } : {})
                       }
-                      disabled={busy || !!d.blockedReason || blockedByWording}
-                      style={btn('#2A9D8F', busy || !!d.blockedReason || blockedByWording)}
+                      disabled={busy || !!d.blockedReason || blockedByWording || d.missingPacket}
+                      style={btn('#2A9D8F', busy || !!d.blockedReason || blockedByWording || d.missingPacket)}
                     >
                       <Check className="w-4 h-4" />
                       {busy
                         ? 'Sending…'
-                        : d.needsClientLabel && liveWarnings.length === 0
-                          ? 'Needs their wording first'
+                        : d.missingPacket
+                          ? 'Attach the packet first'
+                          : d.needsClientLabel && liveWarnings.length === 0
+                            ? 'Needs their wording first'
                             : blockedByWording
-                            ? 'Reword before sending'
-                            : editing
-                              ? 'Save and send'
-                              : 'Approve and send'}
+                              ? 'Reword before sending'
+                              : editing
+                                ? 'Save and send'
+                                : 'Approve and send'}
                     </button>
                     {!editing && (
                       <button

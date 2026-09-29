@@ -77,6 +77,9 @@ interface Draft {
   emailType: string | null
   blockedReason: string | null
   warnings: string[]
+  /** The packet, straight from the queue route rather than the calendar. */
+  docUrl: string | null
+  missingPacket: boolean
 }
 
 interface School {
@@ -728,7 +731,7 @@ function GrantAction({ entry, grant, draft, schoolId, schoolName, onDone, onOpen
     return (
       <DraftToSend
         draft={draft}
-        docUrl={grant?.docUrl ?? null}
+        docUrl={draft.docUrl ?? grant?.docUrl ?? null}
         busy={busy}
         error={error}
         onSend={(subject, body) => submit('POST', '/api/funding/outreach-queue',
@@ -877,10 +880,43 @@ function DraftToSend({ draft, docUrl, busy, error, onSend, links }: {
   const [subject, setSubject] = useState(draft.subject)
   const [body, setBody] = useState(draft.body)
 
+  // A packet attached here, before a reload has happened. The block has to
+  // clear in front of the person who cleared it, or the screen still says the
+  // email cannot go and the obvious next move is to reload and lose the edits.
+  const [attached, setAttached] = useState<string | null>(null)
+  const [packetUrl, setPacketUrl] = useState('')
+  const [attaching, setAttaching] = useState(false)
+  const [attachError, setAttachError] = useState<string | null>(null)
+
+  const packet = attached ?? docUrl
+
   // The send gate already calls this a hard block: an application email with no
   // application is a promise of a package above a blank line. Its enforcement
   // flag is off, so the gate would let it through. This will not.
-  const missingPacket = draft.emailType === 'submission_instructions' && !docUrl
+  const missingPacket = draft.emailType === 'submission_instructions' && !packet
+
+  async function attach() {
+    setAttaching(true)
+    setAttachError(null)
+    try {
+      const res = await fetch('/api/funding/outreach-queue', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: draft.id, action: 'set_packet', packetUrl }),
+      })
+      const out = await res.json().catch(() => ({}))
+      if (!res.ok || out.error) {
+        setAttachError(typeof out.error === 'string' ? out.error : 'That did not save.')
+        return
+      }
+      setAttached(out.docUrl ?? packetUrl.trim())
+      setPacketUrl('')
+    } catch {
+      setAttachError('That did not save.')
+    } finally {
+      setAttaching(false)
+    }
+  }
 
   return (
     <div className="act">
@@ -889,19 +925,41 @@ function DraftToSend({ draft, docUrl, busy, error, onSend, links }: {
 
       {/* Confirm the packet is linked before it goes, which is the whole
           reason this is here rather than behind a send button elsewhere. */}
-      {docUrl ? (
+      {packet ? (
         <div className="why">
           Packet:{' '}
-          <a href={docUrl} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'underline' }}>
+          <a href={packet} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'underline' }}>
             open it and check it reads right
           </a>
+          {attached && ' (just attached)'}
         </div>
       ) : (
-        <div className="src warn">
-          {missingPacket
-            ? 'This grant has no packet document, and this email promises one. It would reach the school saying "here is your application package" above a blank line, so it cannot be sent until the document exists.'
-            : 'This grant has no packet document on it.'}
-        </div>
+        <>
+          <div className="src warn">
+            {missingPacket
+              ? 'This grant has no packet document, and this email promises one. It would reach the school saying "here is your application package" above a blank line, so it cannot be sent until the document exists.'
+              : 'This grant has no packet document on it.'}
+          </div>
+          {/* The document exists in Drive long before anything points the
+              grant at it, and until now nothing in the portal could. */}
+          <label htmlFor={`packet-${draft.id}`}>Link the packet document</label>
+          <input
+            id={`packet-${draft.id}`}
+            value={packetUrl}
+            placeholder="https://docs.google.com/document/d/..."
+            onChange={e => setPacketUrl(e.target.value)}
+          />
+          <div className="row">
+            <button
+              className="btn"
+              disabled={attaching || packetUrl.trim().length < 8}
+              onClick={attach}
+            >
+              {attaching ? 'Attaching' : 'Attach it to this grant'}
+            </button>
+          </div>
+          {attachError && <div className="src warn">{attachError}</div>}
+        </>
       )}
 
       {draft.warnings?.length > 0 && (

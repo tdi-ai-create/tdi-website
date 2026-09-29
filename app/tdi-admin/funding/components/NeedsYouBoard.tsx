@@ -132,6 +132,10 @@ interface Card {
   /** A second, quieter action. Used for writing to the school from the board. */
   secondary?: string
   onSecondary?: () => void
+  /** Closing the item from here, for work that happened outside the portal. */
+  third?: string
+  onThird?: () => void
+  thirdBusy?: boolean
 }
 
 function CardView({ c }: { c: Card }) {
@@ -235,6 +239,31 @@ function CardView({ c }: { c: Card }) {
           {c.secondary}
         </button>
       )}
+      {/* Work done outside the portal still has to be recordable inside it.
+          A card asking for something already handled by hand had no close
+          anywhere on this board: the only mark-done control sits inside the
+          school panel, two clicks away, which is why the board kept asking for
+          sends that had already gone. */}
+      {c.third && (
+        <button
+          onClick={c.onThird}
+          disabled={c.thirdBusy}
+          style={{
+            marginTop: 7,
+            marginLeft: 6,
+            fontSize: 11.5,
+            fontWeight: 700,
+            padding: '4px 9px',
+            borderRadius: 6,
+            background: 'transparent',
+            color: c.thirdBusy ? C.faint : C.soft,
+            border: `1px solid ${C.line}`,
+            cursor: c.thirdBusy ? 'default' : 'pointer',
+          }}
+        >
+          {c.thirdBusy ? 'Closing' : c.third}
+        </button>
+      )}
     </div>
   )
 }
@@ -318,6 +347,8 @@ function Stat({ k, v, n, hot }: { k: string; v: string; n: string; hot?: boolean
 
 export default function NeedsYouBoard({
   schools,
+  onMarkDone,
+  markingDoneId,
   onOpenItem,
   onWriteToSchool,
 }: {
@@ -334,6 +365,10 @@ export default function NeedsYouBoard({
   onOpenItem: (item: BoardQueueItem) => void
   /** Open the drafted email for this item, on the school page. */
   onWriteToSchool: (item: BoardQueueItem) => void
+  /** Close an item that was handled outside the portal. */
+  onMarkDone: (item: BoardQueueItem) => void
+  /** The item currently being closed, so its button can say so. */
+  markingDoneId?: string | null
 }) {
   const [filter, setFilter] = useState<string>('all')
   const [showClosed, setShowClosed] = useState(false)
@@ -522,6 +557,9 @@ export default function NeedsYouBoard({
                   ? {
                       secondary: 'Write to the school',
                       onSecondary: () => onWriteToSchool(i),
+                      third: 'Already done',
+                      onThird: () => onMarkDone(i),
+                      thirdBusy: markingDoneId === i.actionItemId,
                     }
                   : {}),
               }}
