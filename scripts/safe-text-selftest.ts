@@ -39,6 +39,29 @@ eq('non-breaking space becomes a space', safeText('10 minutes'), '10 minutes')
 eq('accented latin survives', safeText('café, naïve, Zoë'), 'café, naïve, Zoë')
 eq('plain ascii untouched', safeText('Lower your voice.'), 'Lower your voice.')
 
+// Decomposed accents, which is how Spanish body text actually arrived (TEA-800).
+// Written with explicit escapes rather than literal characters, because an editor
+// or a formatter that normalises this file would silently turn these back into
+// the precomposed forms and the cases would pass without testing anything.
+//
+// Before the NFC pass in safeText, every combining mark below was dropped and
+// the reader got "senal mas pequena".
+eq('decomposed n-tilde composes',
+   safeText('señal'),
+   'señal')
+eq('decomposed acute composes',
+   safeText('más pequeña'),
+   'más pequeña')
+eq('decomposed spanish sentence keeps every mark',
+   safeText('¿Qué cambió después de la primera señal?'),
+   '¿Qué cambió después de la primera señal?')
+eq('decomposed diaeresis composes', safeText('naïve'), 'naïve')
+// A combining mark with no precomposed partner still has no glyph, so it goes
+// rather than printing rubbish. The base letter must survive.
+eq('uncomposable combining mark is dropped, base kept',
+   safeText('a̧'),
+   'a')
+
 // Emoji have no glyph and no equivalent, so they go rather than print rubbish.
 eq('emoji dropped', safeText('Nice work \u{1F44D}'), 'Nice work')
 

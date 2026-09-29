@@ -61,8 +61,24 @@ function drawable(code: number): boolean {
 
 /** Map one string to what the font can actually draw. */
 export function safeText(value: string): string {
+  // Compose first, or this function eats Spanish.
+  //
+  // An accent can arrive two ways. Precomposed (NFC), "a" is U+00E1, inside
+  // Latin-1, drawable. Decomposed (NFD), it is "a" followed by U+0301 COMBINING
+  // ACUTE ACCENT, and U+0301 is above 0xFF and not in WINANSI_EXTRA, so the loop
+  // below drops it and leaves the bare letter. The word survives, the accent
+  // does not.
+  //
+  // That is not hypothetical. On 2026-09-23 two of seven Spanish guide PDFs came
+  // out with almost every diacritic gone (TEA-800): "senal mas pequena" for
+  // "señal más pequeña". Section headings on the same page were correct,
+  // because those come from lib/pdf/labels.ts as source literals, which are NFC.
+  // Only the body text, which travels through the database, was decomposed.
+  //
+  // NFC also folds the compatibility forms a lossy round trip can leave behind,
+  // so it belongs here rather than at any single call site.
   let out = ''
-  for (const ch of value) {
+  for (const ch of value.normalize('NFC')) {
     const mapped = REPLACEMENTS[ch]
     if (mapped !== undefined) {
       out += mapped
