@@ -23,9 +23,12 @@ export function MainSiteWrapper({ children }: MainSiteWrapperProps) {
   const isPartnerRoute = pathname?.startsWith('/partners/');
   // Client-facing quote signing pages
   const isInvoiceRoute = pathname?.startsWith('/invoice');
+  // A staff check-in opened from a link in a meeting. Site navigation and a
+  // Login button on it are an invitation to wander off mid-form.
+  const isCheckinRoute = pathname?.startsWith('/check-in/');
 
   // Don't render main site chrome on portal routes
-  if (isHubRoute || isTDIAdminRoute || isAdminRoute || isLoginPage || isDashboardRoute || isCreatorPortal || isPartnerRoute || isInvoiceRoute) {
+  if (isHubRoute || isTDIAdminRoute || isAdminRoute || isLoginPage || isDashboardRoute || isCreatorPortal || isPartnerRoute || isInvoiceRoute || isCheckinRoute) {
     return null;
   }
 
