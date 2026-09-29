@@ -1,0 +1,31 @@
+{
+  "category": "Working Together",
+  "note": "The fourth para and teacher tool, published 2026-09-29, a day after the other three. Same rules as working-together-para.json: TDI voice only, explain why the tool is built the way it is, ask the reader something, never testify.",
+  "tools": [
+    {
+      "slug": "para-two-way-needs-agreement",
+      "posts": [
+        [
+          "Ofelia Marchetti",
+          "from_tdi",
+          "The two columns are not there for symmetry. They exist so the para can fill in her half and hand the page over, which turns a conversation that needed scheduling into one that needs a spare minute."
+        ],
+        [
+          "Jarrod Levins",
+          "from_tdi",
+          "Keep both copies. The value of a written agreement shows up in February, when something feels unclear and neither person can remember what was actually agreed in August."
+        ],
+        [
+          "Deshawn Pryor",
+          "question",
+          "If you filled in your column today and left it on a desk, what is the first thing you would write in it?"
+        ],
+        [
+          "Rosalie Dunne",
+          "question",
+          "For the teachers here, would you rather be handed this half finished, or asked for a meeting about it first?"
+        ]
+      ]
+    }
+  ]
+}
