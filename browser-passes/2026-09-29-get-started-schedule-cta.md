@@ -37,6 +37,22 @@ route, not a component in isolation.
   titled **"Quick Chat with Rae Hughart"**. The confirmation page stayed open
   behind it, which is the reason for `target="_blank"`.
 
+### The embedded calendar, second pass after Kristin's reply
+
+Kristin asked for the booking widget embedded rather than a button, to cut the
+friction of leaving the page. Checked before building it that Google permits it:
+the schedule with `?gv=true` returns 200 with no `X-Frame-Options` and no
+`frame-ancestors` in its CSP.
+
+- Opened: http://localhost:3433/get-started, confirmation state seeded as above.
+- Saw: the widget render inside the page under "Pick a time to walk through it",
+  headed "Rae Hughart", "Quick Chat with Rae Hughart", "30 min appointments".
+- Saw: real bookable slots for Wed 30 September: 10:30am, 11:00am, 11:30am,
+  12:30pm, 2:30pm, 3:00pm, with "(GMT-05:00) Central Time - Chicago" shown and
+  past dates struck through in the month grid.
+- Saw: the fallback line beneath it, "Calendar not loading? Open it in a new
+  tab.", with the short booking link behind it.
+
 ### The failure state
 
 The change also stops the form reporting success when the submission failed, so
@@ -70,8 +86,13 @@ https://www.teachersdeserveit.com/get-started by completing the leader path
 properly, which is also the only way to confirm the real name and school
 interpolate into the new sentence.
 
-**Whether the booking page offers sensible times.** The calendar opened and is
-the correct schedule. I did not book anything, so availability is unchecked.
+**Whether a booking completes.** The widget lists real slots and I did not press
+one, because that would put a fake meeting on the calendar. The path from
+choosing a slot to a confirmed booking is unexercised.
+
+**The embed on a narrow screen.** Checked at desktop width only. The frame is
+600px tall and Google's widget is cramped on a phone, so this wants a look on
+mobile after deploy.
 
 **The teacher and para path.** Untouched by the booking button, which sits
 inside `!isTeacherPath`, so a nominating teacher never sees it. The submit fix

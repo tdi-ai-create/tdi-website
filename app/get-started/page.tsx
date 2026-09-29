@@ -17,6 +17,14 @@ interface RoleConfig {
 // calendar, so do not consolidate the two.
 const BOOKING_LINK = 'https://calendar.app.google/zmoXT65rpHK9nyvS7';
 
+// The same schedule in its embeddable form. `?gv=true` is what makes Google
+// serve the bookable widget rather than the full calendar chrome, and the
+// short calendar.app.google link does not work inside a frame, so both forms
+// are needed rather than one derived from the other.
+const BOOKING_EMBED =
+  'https://calendar.google.com/calendar/appointments/schedules/' +
+  'AcZssZ0w4-V7-n-p8VfbSabzhENFg6BlgrVGsAZkAEL5iWB6Q7W1ZNRBY86akwTiYYzIwGxdxL6wYowK?gv=true';
+
 const roles: RoleConfig[] = [
   { role: 'Teacher', icon: GraduationCap, description: 'I teach in a classroom', tagline: 'TDI was built for you', group: 'classroom' },
   { role: 'Para', icon: Users, description: 'I support students and staff', tagline: 'You deserve this too', group: 'classroom' },
@@ -340,17 +348,37 @@ export default function GetStartedPage() {
               the wrong meeting to the wrong person. */}
           {!isTeacherPath && (
             <div className="mb-8">
-              <a
-                href={BOOKING_LINK}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-block px-8 py-4 rounded-xl font-bold text-base transition-opacity hover:opacity-90"
-                style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
-              >
-                Schedule your call
-              </a>
+              <p className="font-semibold mb-3" style={{ color: '#1e2749' }}>
+                Pick a time to walk through it
+              </p>
+
+              {/* Embedded rather than a button, so booking does not cost them a
+                  page. Google serves this schedule with no X-Frame-Options and
+                  no frame-ancestors, so it is embeddable by design.
+
+                  The link underneath is not decoration. If the frame is blocked
+                  by an extension, a strict network, or a future header change,
+                  a button that opens the same schedule is the difference
+                  between a booking and a dead space where one used to be. */}
+              <iframe
+                src={BOOKING_EMBED}
+                title="Book a time with Rae"
+                className="w-full rounded-xl"
+                style={{ border: '1px solid #e5e5e5', height: 600, backgroundColor: '#ffffff' }}
+              />
+
               <p className="text-sm mt-3" style={{ color: '#6b7280' }}>
-                Pick a time that works. Your plan will be ready before it.
+                Calendar not loading?{' '}
+                <a
+                  href={BOOKING_LINK}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline font-semibold"
+                  style={{ color: '#1e2749' }}
+                >
+                  Open it in a new tab
+                </a>
+                .
               </p>
             </div>
           )}
