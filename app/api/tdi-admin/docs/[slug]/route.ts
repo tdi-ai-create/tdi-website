@@ -43,6 +43,7 @@ export async function GET(
     'leadership-workflow': 'leadership-workflow.html',
     'muck-points-sop': 'muck-points-sop.html',
     'whats-inside-sop': 'whats-inside-sop.html',
+    'visit-prep-sop': 'visit-prep-sop.html',
   };
 
   const filename = allowedDocs[slug];

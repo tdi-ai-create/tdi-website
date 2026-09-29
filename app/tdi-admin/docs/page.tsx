@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useTDIAdmin } from '@/lib/tdi-admin/context';
 import { Search, Download, Printer, ExternalLink } from 'lucide-react';
 
-type DocId = 'admin-guide' | 'data-flow' | 'workflow' | 'billing-sop' | 'funding' | 'funding-launch' | 'grant-application-spec' | 'grant-workflow-sop' | 'hub-engagement' | 'engagement-workflow' | 'hub-content-standards' | 'hub-content-creation' | 'course-upload-sop' | 'course-checkins-sop' | 'creator-feedback-sop' | 'creator-recruitment-sop' | 'creator-dormancy-sop' | 'communication-map' | 'swag-fulfillment' | 'leadership-workflow' | 'muck-points-sop' | 'whats-inside-sop';
+type DocId = 'admin-guide' | 'data-flow' | 'workflow' | 'billing-sop' | 'funding' | 'funding-launch' | 'grant-application-spec' | 'grant-workflow-sop' | 'hub-engagement' | 'engagement-workflow' | 'hub-content-standards' | 'hub-content-creation' | 'course-upload-sop' | 'course-checkins-sop' | 'creator-feedback-sop' | 'creator-recruitment-sop' | 'creator-dormancy-sop' | 'communication-map' | 'swag-fulfillment' | 'leadership-workflow' | 'muck-points-sop' | 'whats-inside-sop' | 'visit-prep-sop';
 
 interface Doc {
   id: DocId;
@@ -75,6 +75,15 @@ const DOC_GROUPS: DocGroup[] = [
         label: 'Leadership Dashboard',
         desc: 'White-glove partnership management: onboarding, sessions, observations, renewal',
         tags: ['leadership', 'dashboard', 'partnership', 'observation', 'session', 'onboarding', 'roster', 'KPI', 'action items', 'billing', 'renewal', 'white glove', 'love notes'],
+        relatedSections: [
+          { label: 'Lead Dashboard', href: '/tdi-admin/leadership' },
+        ],
+      },
+      {
+        id: 'visit-prep-sop',
+        label: 'School Visit Prep',
+        desc: 'Prepping an observation day: what to ask the school for, and the email template',
+        tags: ['visit', 'observation', 'observation day', 'school visit', 'prep', 'roster', 'love notes', 'route', 'paras', 'onsite', 'on-site', 'template', 'email template', 'schedule', 'building', 'address'],
         relatedSections: [
           { label: 'Lead Dashboard', href: '/tdi-admin/leadership' },
         ],
