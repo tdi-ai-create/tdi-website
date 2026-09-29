@@ -14,7 +14,10 @@ export default function DesiWrapper() {
     pathname?.startsWith('/hub/admin') ||
     pathname?.startsWith('/admin') ||
     pathname?.startsWith('/invoice') ||
-    pathname?.startsWith('/swag')
+    pathname?.startsWith('/swag') ||
+    // A staff check-in is two minutes of anonymous answers. A chat bubble
+    // offering help is something to tap instead of finishing.
+    pathname?.startsWith('/check-in/')
   ) {
     return null
   }
