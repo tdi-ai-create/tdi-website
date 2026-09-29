@@ -13,6 +13,18 @@ interface RoleConfig {
   group: 'classroom' | 'leader';
 }
 
+// Same link as /for-schools/whats-inside. The creator portal uses a different
+// calendar, so do not consolidate the two.
+const BOOKING_LINK = 'https://calendar.app.google/zmoXT65rpHK9nyvS7';
+
+// The same schedule in its embeddable form. `?gv=true` is what makes Google
+// serve the bookable widget rather than the full calendar chrome, and the
+// short calendar.app.google link does not work inside a frame, so both forms
+// are needed rather than one derived from the other.
+const BOOKING_EMBED =
+  'https://calendar.google.com/calendar/appointments/schedules/' +
+  'AcZssZ0w4-V7-n-p8VfbSabzhENFg6BlgrVGsAZkAEL5iWB6Q7W1ZNRBY86akwTiYYzIwGxdxL6wYowK?gv=true';
+
 const roles: RoleConfig[] = [
   { role: 'Teacher', icon: GraduationCap, description: 'I teach in a classroom', tagline: 'TDI was built for you', group: 'classroom' },
   { role: 'Para', icon: Users, description: 'I support students and staff', tagline: 'You deserve this too', group: 'classroom' },
@@ -40,6 +52,7 @@ export default function GetStartedPage() {
     teacher_pd_contact: '',
   });
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+  const [submitFailed, setSubmitFailed] = useState(false);
 
   // GA4: Page view on load
   useEffect(() => {
@@ -126,6 +139,7 @@ export default function GetStartedPage() {
     }
 
     setIsSubmitting(true);
+    setSubmitFailed(false);
 
     const submitData = {
       access_key: '6533e850-3216-4ba6-bdd3-3d1273ce353b',
@@ -154,11 +168,17 @@ export default function GetStartedPage() {
     };
 
     try {
-      await fetch('https://api.web3forms.com/submit', {
+      // This is the only awaited call of the three, so it is what decides
+      // whether the request actually reached us. It used to be fired and
+      // forgotten, and the catch below sent everyone to the confirmation
+      // screen regardless, so an outage looked exactly like a success: the
+      // leader was told their PD plan was coming and nothing had been filed.
+      const res = await fetch('https://api.web3forms.com/submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(submitData),
       });
+      if (!res.ok) throw new Error(`web3forms answered ${res.status}`);
 
       // TEA-7426: Teacher and Para paths fire the nomination workflow in GHL
       // (gated on the `nomination` tag). PD-question answers land on the
@@ -229,7 +249,9 @@ export default function GetStartedPage() {
         document.getElementById('step-3')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }, 100);
     } catch {
-      setStep(3);
+      // Stay on the form. Telling someone their plan is on the way when the
+      // request never arrived costs us the lead and costs them the wait.
+      setSubmitFailed(true);
     } finally {
       setIsSubmitting(false);
     }
@@ -313,8 +335,53 @@ export default function GetStartedPage() {
           <p className="text-lg mb-8 max-w-md mx-auto" style={{ color: '#4b5563' }}>
             {isTeacherPath
               ? `Thanks for nominating ${formData.schoolName}. We'll reach out to their admin within 48 hours to start the conversation.`
-              : `Thanks, ${formData.name}. Check your inbox within 24 hours for your custom PD plan for ${formData.schoolName}.`}
+              : `Thanks, ${formData.name}. We're reviewing your answers and we'll have your custom PD plan for ${formData.schoolName} ready for you in 24 hours. You can schedule your call now to review it.`}
           </p>
+
+          {/* The leader has just told us what their PD problem is and then been
+              asked to wait 24 hours, which is where this page used to end. The
+              call is the next real step, so it is the page's primary action
+              rather than something to find later in an email.
+
+              Leader path only. A teacher who nominated their school has no plan
+              of their own to review, and offering them a call would be offering
+              the wrong meeting to the wrong person. */}
+          {!isTeacherPath && (
+            <div className="mb-8">
+              <p className="font-semibold mb-3" style={{ color: '#1e2749' }}>
+                Pick a time to walk through it
+              </p>
+
+              {/* Embedded rather than a button, so booking does not cost them a
+                  page. Google serves this schedule with no X-Frame-Options and
+                  no frame-ancestors, so it is embeddable by design.
+
+                  The link underneath is not decoration. If the frame is blocked
+                  by an extension, a strict network, or a future header change,
+                  a button that opens the same schedule is the difference
+                  between a booking and a dead space where one used to be. */}
+              <iframe
+                src={BOOKING_EMBED}
+                title="Book a time with Rae"
+                className="w-full rounded-xl"
+                style={{ border: '1px solid #e5e5e5', height: 600, backgroundColor: '#ffffff' }}
+              />
+
+              <p className="text-sm mt-3" style={{ color: '#6b7280' }}>
+                Calendar not loading?{' '}
+                <a
+                  href={BOOKING_LINK}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline font-semibold"
+                  style={{ color: '#1e2749' }}
+                >
+                  Open it in a new tab
+                </a>
+                .
+              </p>
+            </div>
+          )}
 
           <div className="bg-white rounded-2xl p-6 shadow-sm max-w-md mx-auto mb-8 text-left">
             <p className="font-semibold mb-4 text-center" style={{ color: '#1e2749' }}>What happens next</p>
@@ -325,7 +392,7 @@ export default function GetStartedPage() {
             ] : [
               'We review your answers',
               'Your custom PD plan lands in your inbox within 24 hours',
-              'We follow up to answer any questions',
+              'We walk you through it on your call',
             ]).map((stepText, i) => (
               <div key={i} className="flex gap-3 items-start mb-3">
                 <div
@@ -766,6 +833,22 @@ export default function GetStartedPage() {
                     : 'Send My PD Plan →'
                 )}
               </button>
+              {submitFailed && (
+                <div
+                  className="mt-4 rounded-xl p-4 text-sm"
+                  style={{ backgroundColor: '#fef2f2', border: '1px solid #fecaca', color: '#991b1b' }}
+                >
+                  <p className="font-semibold mb-1">That did not go through.</p>
+                  <p>
+                    Nothing was sent, so please press the button again. If it fails twice, email{' '}
+                    <a href="mailto:hello@teachersdeserveit.com" className="underline">
+                      hello@teachersdeserveit.com
+                    </a>{' '}
+                    and we will set your plan up by hand.
+                  </p>
+                </div>
+              )}
+
               <p className="text-center text-xs mt-3" style={{ color: '#9ca3af' }}>
                 Your data is secure. We never sell your information.
               </p>
