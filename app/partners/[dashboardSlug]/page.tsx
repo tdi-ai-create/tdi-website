@@ -5,6 +5,7 @@ import { useRouter, useParams } from 'next/navigation';
 import Image from 'next/image';
 import InviteLeader from '@/components/partners/InviteLeader';
 import RosterAccessManager from '@/components/partners/RosterAccessManager';
+import { SemesterRecord } from '@/components/partners/SemesterRecord';
 import Link from 'next/link';
 import FooterSymbol from '@/components/FooterSymbol';
 import { offeringLabel } from '@/lib/partnerships/offerings';
@@ -197,35 +198,6 @@ interface EngagementItem {
   title: string;
   people: number;
   opens: number;
-}
-
-/**
- * A completed year, stored rather than derived.
- *
- * Addison's first year ran on the previous platform, so none of it can be
- * recomputed from the Hub. Every field here is a stated fact somebody wrote
- * down, which is why the shape is generous: a school's year does not reduce
- * neatly to one set of columns.
- */
-interface YearRecord {
-  id: string;
-  year_label: string;
-  headline: string | null;
-  summary: string | null;
-  stats: { value: string; label: string }[] | null;
-  change: {
-    label?: string;
-    before?: string;
-    after?: string;
-    beforeLabel?: string;
-    afterLabel?: string;
-    delta?: string;
-    note?: string;
-  } | null;
-  themes: { title: string; body: string }[] | null;
-  lists: { title: string; subtitle?: string; unit?: string; items: { label: string; count: number }[] }[] | null;
-  quotes: { text: string; attribution?: string }[] | null;
-  footnote: string | null;
 }
 
 interface HubEngagementDetail {
@@ -473,7 +445,6 @@ export default function PartnerDashboard() {
   const [metricSnapshots, setMetricSnapshots] = useState<MetricSnapshot[]>([]);
   const [apiBuildings, setApiBuildings] = useState<Building[]>([]);
   const [engagement, setEngagement] = useState<HubEngagementDetail | null>(null);
-  const [yearRecords, setYearRecords] = useState<YearRecord[]>([]);
   // Funding status for this school only, from its own funding_pursuits row.
   const [funding, setFunding] = useState<{
     hasFunding: boolean;
@@ -612,9 +583,11 @@ export default function PartnerDashboard() {
     return () => clearTimeout(timer);
   }, []);
 
-  // Fetch semester list when our-partnership tab is activated
+  // Fetch the semester list as soon as we have a partnership. The year tabs are
+  // built from it, so waiting for a tab activation would mean the tabs never
+  // appear until you visited the tab that builds them.
   useEffect(() => {
-    if (activeTab !== 'our-partnership' || !partnership?.id) return;
+    if (!partnership?.id) return;
     const fetchSemesters = async () => {
       try {
         const res = await fetch(`/api/partners/semester-data?partnershipId=${partnership.id}`);
@@ -632,11 +605,11 @@ export default function PartnerDashboard() {
       }
     };
     fetchSemesters();
-  }, [activeTab, partnership?.id]);
+  }, [partnership?.id]);
 
   // Fetch specific semester data when activeSemester changes (and partnership exists)
   useEffect(() => {
-    if (activeTab !== 'our-partnership' || !partnership?.id || semesterList.length === 0) return;
+    if (!partnership?.id || semesterList.length === 0) return;
     const target = semesterList.find((s) => s.semester === activeSemester);
     if (!target) return;
     const fetchSemesterData = async () => {
@@ -656,7 +629,17 @@ export default function PartnerDashboard() {
     };
     fetchSemesterData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeSemester]);
+  }, [activeSemester, semesterList.length]);
+
+  /**
+   * Pressing a year tab is what selects the year. The old toggle lived inside
+   * Our Partnership and set this directly; the tabs do it now.
+   */
+  useEffect(() => {
+    if (!activeTab.startsWith('year-')) return;
+    const semester = activeTab.slice('year-'.length);
+    if (semester && semester !== activeSemester) setActiveSemester(semester);
+  }, [activeTab, activeSemester]);
 
   // Triple gate: ALL THREE must be true before showing dashboard
   const showDashboard = animationComplete && timerDone && dataReady;
@@ -765,7 +748,6 @@ export default function PartnerDashboard() {
           setActionItems(updatedItems);
           setStaffStats(data.staffStats || { total: 0, hubLoggedIn: 0 });
           setEngagement(data.engagement ?? null);
-          setYearRecords(data.yearRecords || []);
           setMetricSnapshots(data.metricSnapshots || []);
           setApiBuildings(data.buildings || []);
           // The timeline_events table stores event_title and event_date, but this
@@ -1565,7 +1547,24 @@ export default function PartnerDashboard() {
   const TABS = [
     { id: 'overview', label: 'Overview' },
     { id: 'our-partnership', label: 'Our Partnership' },
-    { id: 'blueprint', label: 'Your Plan' },
+    /**
+     * A tab per school year, newest first, built from partnership_semester_data.
+     *
+     * This replaced "Your Plan". Rae, 30 September 2026: each year should carry
+     * its own goals, metrics and standing, in the same shape, so the two can be
+     * read against each other. The record for a year in progress is the plan.
+     *
+     * These were previously reachable only behind a toggle inside Our
+     * Partnership, which is why a school's own first year was effectively
+     * invisible to them.
+     */
+    ...(semesterList.length > 0
+      ? semesterList.map(sem => ({ id: `year-${sem.semester}`, label: sem.semester_label }))
+      // A school with no year record keeps Your Plan. Addison is the only
+      // partnership that has records, and replacing the tab unconditionally
+      // would take the approach, the contract and the offering cards away from
+      // the other eight and give them nothing back.
+      : [{ id: 'blueprint', label: 'Your Plan' }]),
     { id: 'reporting', label: 'Reports' },
     // Funding only appears when this school actually has a live pursuit.
     // It used to live inside Our Partnership, which Rae wants kept on goals.
@@ -1577,10 +1576,6 @@ export default function PartnerDashboard() {
     // building card, the per-building engagement breakdown and the district
     // overview row rendered for nobody. Found on 30 Sep 2026 by opening
     // Addison's live dashboard and counting six tabs.
-    // One tab per completed year we hold a record for, newest first. Only
-    // records marked visible_to_partner reach the client, so this is empty for
-    // a school whose record is still being written.
-    ...yearRecords.map(r => ({ id: `year-${r.id}`, label: r.year_label })),
     ...(partnership?.partnership_type === 'district' ? [{ id: 'schools', label: 'Schools' }] : []),
     { id: 'team', label: 'Team' },
   ];
@@ -7732,256 +7727,9 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
               </div>
             </div>
 
-            {/* Semester Toggle - only shown when there are multiple semesters */}
-            {semesterList.length > 1 && (
-              <div className="flex flex-wrap items-center gap-2">
-                {semesterList.map((s) => (
-                  <button
-                    key={s.semester}
-                    onClick={() => setActiveSemester(s.semester)}
-                    className="text-sm font-semibold px-4 py-2 rounded-full transition-colors"
-                    style={
-                      activeSemester === s.semester
-                        ? { background: '#1e2749', color: '#ffffff' }
-                        : { background: '#F3F4F6', color: '#6B7280' }
-                    }
-                  >
-                    {s.semester_label}
-                    {s.is_current && (
-                      <span className="ml-1.5 text-[10px] font-bold uppercase tracking-wide opacity-60">Current</span>
-                    )}
-                  </button>
-                ))}
-              </div>
-            )}
-
-            {/* Historical semester view */}
-            {semesterList.length > 1 && !semesterList.find((s) => s.semester === activeSemester)?.is_current && (
-              <>
-                {/* "Viewing past semester" banner */}
-                <div
-                  className="rounded-xl px-4 py-3 flex items-center gap-3 text-sm"
-                  style={{ background: '#FEF3C7', border: '1px solid #FDE68A', color: '#92400E' }}
-                >
-                  <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: '#D97706' }} />
-                  <span>
-                    Viewing {semesterList.find((s) => s.semester === activeSemester)?.semester_label} data. This semester has ended.
-                  </span>
-                </div>
-
-                {semesterLoading ? (
-                  <div className="flex items-center justify-center py-12">
-                    <Loader2 className="w-6 h-6 animate-spin text-gray-300" />
-                  </div>
-                ) : semesterData ? (
-                  <div className="space-y-4">
-
-                    {/* Historical Metrics */}
-                    {semesterData.metrics && Object.keys(semesterData.metrics).length > 0 && (
-                      <div className="bg-white rounded-xl border border-gray-100 p-6" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-                        <h2 className="text-base font-semibold text-gray-900 mb-4">
-                          {semesterData.semester_label} Metrics
-                        </h2>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                          {Object.entries(semesterData.metrics as Record<string, { label: string; value: string | number; color?: string }>).map(([key, metric]) => (
-                            <div key={key} className="rounded-xl bg-gray-50 p-4 text-center">
-                              <p className="text-2xl font-bold" style={{ color: metric.color || '#1e2749' }}>
-                                {metric.value}
-                              </p>
-                              <p className="text-[10px] text-gray-500 font-medium mt-1">{metric.label}</p>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Historical Highlights */}
-                    {semesterData.highlights && (semesterData.highlights as string[]).length > 0 && (
-                      <div className="bg-white rounded-xl border border-gray-100 p-6" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-                        <h2 className="text-base font-semibold text-gray-900 mb-4">Semester Highlights</h2>
-                        <div className="space-y-2">
-                          {(semesterData.highlights as string[]).map((h, i) => (
-                            <div key={i} className="flex items-start gap-2.5">
-                              <div className="w-2 h-2 rounded-full flex-shrink-0 mt-1.5" style={{ background: '#2A9D8F' }} />
-                              <p className="text-sm text-gray-700 leading-relaxed">{h}</p>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Historical Building Data */}
-                    {semesterData.building_data && semesterData.building_data.length > 0 && (
-                      <div className="bg-white rounded-xl border border-gray-100 p-6" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-                        <h2 className="text-base font-semibold text-gray-900 mb-4">Building Spotlight</h2>
-                        <div className="overflow-x-auto">
-                          <table className="w-full text-sm">
-                            <thead>
-                              <tr className="border-b border-gray-100">
-                                <th className="text-left text-xs font-semibold text-gray-500 pb-2 pr-4">Building</th>
-                                <th className="text-right text-xs font-semibold text-gray-500 pb-2 px-4">Paras</th>
-                                <th className="text-right text-xs font-semibold text-gray-500 pb-2 px-4">Login %</th>
-                                <th className="text-left text-xs font-semibold text-gray-500 pb-2 pl-4">Recognition</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {semesterData.building_data.map((b: Record<string, unknown>, i: number) => (
-                                <tr key={i} className="border-b border-gray-50">
-                                  <td className="py-2.5 pr-4 font-medium text-[#1e2749]">{b.name as string}</td>
-                                  <td className="py-2.5 px-4 text-right text-gray-600">{(b.staff_count as number) ?? '—'}</td>
-                                  <td className="py-2.5 px-4 text-right text-gray-600">{b.login_pct ? `${b.login_pct}%` : '—'}</td>
-                                  <td className="py-2.5 pl-4 text-left">
-                                    {(b.awards as string[])?.length > 0 ? (
-                                      <div className="flex flex-wrap gap-1">
-                                        {(b.awards as string[]).map((award: string, j: number) => (
-                                          <span key={j} className="inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold" style={{ background: '#FFF7ED', color: '#C2410C', border: '1px solid #FDBA74' }}>
-                                            {award}
-                                          </span>
-                                        ))}
-                                      </div>
-                                    ) : '—'}
-                                  </td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Historical Observation Notes */}
-                    {semesterData.observation_notes && (semesterData.observation_notes as { title: string; date?: string; notes?: string; love_notes?: { para: string; school: string; highlights: string; para_replied?: boolean; reply_summary?: string }[] }[]).length > 0 && (
-                      <div className="bg-white rounded-xl border border-gray-100 p-6" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-                        <h2 className="text-base font-semibold text-gray-900 mb-4">Observation Notes</h2>
-                        <div className="space-y-6">
-                          {(semesterData.observation_notes as { title: string; date?: string; notes?: string; love_notes?: { para: string; school: string; highlights: string; para_replied?: boolean; reply_summary?: string }[] }[]).map((note, i) => (
-                            <div key={i}>
-                              <div className="flex items-start gap-3">
-                                <div className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5" style={{ background: '#EFF6FF' }}>
-                                  <Eye className="w-3.5 h-3.5" style={{ color: '#2563EB' }} />
-                                </div>
-                                <div className="flex-1">
-                                  <p className="text-sm font-semibold text-[#1e2749]">{note.title}</p>
-                                  {note.date && (
-                                    <p className="text-xs text-gray-400 mt-0.5">
-                                      {new Date(note.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
-                                    </p>
-                                  )}
-                                  {note.notes && (
-                                    <p className="text-sm text-gray-600 mt-1 leading-relaxed">{note.notes}</p>
-                                  )}
-                                </div>
-                              </div>
-                              {/* Individual Love Notes */}
-                              {note.love_notes && note.love_notes.length > 0 && (
-                                <div className="mt-4 ml-9 space-y-3">
-                                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Individual Feedback Sent</p>
-                                  {note.love_notes.map((ln, j) => (
-                                    <div key={j} className="rounded-lg p-3" style={{ background: '#F8FAFC', border: '1px solid #E2E8F0' }}>
-                                      <div className="flex items-center gap-2 mb-1">
-                                        <span className="text-sm font-semibold text-[#1e2749]">{ln.para}</span>
-                                        <span className="text-[10px] px-1.5 py-0.5 rounded-full font-medium" style={{ background: '#EFF6FF', color: '#2563EB' }}>{ln.school}</span>
-                                        {ln.para_replied && (
-                                          <span className="text-[10px] px-1.5 py-0.5 rounded-full font-medium" style={{ background: '#ECFDF5', color: '#059669' }}>replied</span>
-                                        )}
-                                      </div>
-                                      <p className="text-xs text-gray-600 leading-relaxed">{ln.highlights}</p>
-                                      {ln.reply_summary && (
-                                        <p className="text-xs text-gray-500 mt-1.5 pl-3 italic" style={{ borderLeft: '2px solid #D1D5DB' }}>{ln.reply_summary}</p>
-                                      )}
-                                    </div>
-                                  ))}
-                                </div>
-                              )}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Historical Para Quotes */}
-                    {semesterData.para_quotes && semesterData.para_quotes.length > 0 && (
-                      <div className="bg-white rounded-xl border border-gray-100 p-6" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-                        <h2 className="text-base font-semibold text-gray-900 mb-4">Voices From Your School</h2>
-                        <div className="space-y-3">
-                          {semesterData.para_quotes.map((q, i) => (
-                            <div
-                              key={i}
-                              className="p-4 rounded-xl border-l-4"
-                              style={{ background: '#F9FAFB', borderLeftColor: '#2A9D8F' }}
-                            >
-                              <p className="text-sm text-gray-700 italic leading-relaxed">
-                                &ldquo;{q.text}&rdquo;
-                              </p>
-                              {(q.role || q.building) && (
-                                <p className="text-xs text-gray-400 mt-2 font-medium">
-                                  {[q.role, q.building].filter(Boolean).join(', ')}
-                                </p>
-                              )}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Historical Timeline */}
-                    {semesterData.timeline_events && semesterData.timeline_events.length > 0 && (
-                      <div className="bg-white rounded-xl border border-gray-100 p-6" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-                        <h2 className="text-base font-semibold text-gray-900 mb-5">
-                          {semesterData.semester_label} Timeline
-                        </h2>
-                        <div className="grid grid-cols-3 gap-6">
-                          {(['completed', 'in_progress', 'upcoming'] as const).map((status) => {
-                            const cfg = {
-                              completed: { label: 'Done', color: '#16A34A' },
-                              in_progress: { label: 'In Progress', color: '#D97706' },
-                              upcoming: { label: 'Coming Soon', color: '#2563EB' },
-                            }[status];
-                            const events = semesterData.timeline_events.filter((e) => e.status === status);
-                            return (
-                              <div key={status}>
-                                <div className="flex items-center gap-1.5 mb-3">
-                                  <div className="w-2 h-2 rounded-full" style={{ background: cfg.color }} />
-                                  <span className="text-xs font-bold uppercase tracking-wide" style={{ color: cfg.color }}>
-                                    {cfg.label}
-                                  </span>
-                                  <span className="text-xs text-gray-400 ml-auto">{events.length}</span>
-                                </div>
-                                {events.length === 0 ? (
-                                  <p className="text-xs text-gray-300 italic">Nothing here</p>
-                                ) : (
-                                  events.map((ev, j) => (
-                                    <div key={j} className="flex items-start gap-2 mb-3">
-                                      <div className="w-1.5 h-1.5 rounded-full flex-shrink-0 mt-1.5" style={{ background: cfg.color }} />
-                                      <div>
-                                        <p className="text-sm text-gray-700 leading-snug">{ev.title}</p>
-                                        {ev.date && (
-                                          <p className="text-xs text-gray-400 mt-0.5">
-                                            {new Date(ev.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                                          </p>
-                                        )}
-                                        {ev.notes && (
-                                          <p className="text-xs text-gray-500 mt-0.5">{ev.notes}</p>
-                                        )}
-                                      </div>
-                                    </div>
-                                  ))
-                                )}
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    )}
-
-                  </div>
-                ) : (
-                  <div className="bg-white rounded-xl border border-gray-100 p-8 text-center" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-                    <p className="text-sm text-gray-400">No data has been recorded for this semester yet.</p>
-                  </div>
-                )}
-              </>
-            )}
+            {/* The semester toggle and the historical record that sat here moved to
+                their own year tabs on 30 September 2026. A school's first year was
+                reachable only by pressing a toggle most people never noticed. */}
 
             {/* Current semester content - only shown when viewing the current semester (or no semesters configured) */}
             {(semesterList.length <= 1 || !!semesterList.find((s) => s.semester === activeSemester)?.is_current) && (
@@ -8200,135 +7948,42 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
         )}
 
         {/* SCHOOLS TAB (District Only) */}
-        {/* ─── A COMPLETED YEAR ───
-            Stored rather than derived. Addison's first year ran Jan to May 2026
-            on the previous platform and the Hub holds none of it, so every
-            figure here is a stated fact somebody wrote down.
+        {/* ─── ONE TAB PER SCHOOL YEAR ───
+            Rae, 30 September 2026: each year carries its own goals, metrics and
+            standing, in the same shape, so the two read against each other.
 
-            Quotes carry a school rather than a person. A first name plus a small
-            building identifies someone, and these were written in a survey about
-            the sessions, not for a leadership screen. */}
-        {yearRecords.map(record => activeTab === `year-${record.id}` && (
+            The record itself is `partnership_semester_data`, which already held
+            a far better Spring 2026 record than anything derived: nine para
+            quotes, two observation days, ten love notes with replies. It was
+            reachable only behind a toggle inside Our Partnership, so a school's
+            own first year was effectively invisible to them.
+
+            The current year additionally carries the plan, because for a year
+            in progress the plan is the record. */}
+        {semesterList.map(sem => activeTab === `year-${sem.semester}` && (
           <div
-            key={record.id}
+            key={sem.semester}
             role="tabpanel"
-            id={`panel-year-${record.id}`}
-            aria-labelledby={`tab-year-${record.id}`}
-            className="py-6 space-y-5"
+            id={`panel-year-${sem.semester}`}
+            aria-labelledby={`tab-year-${sem.semester}`}
+            className="py-6 space-y-4"
           >
-            <div className="bg-white rounded-2xl p-6 md:p-7 shadow-sm border border-gray-100">
-              <div className="flex items-baseline justify-between gap-4 flex-wrap">
-                <h2 className="text-[17px] font-bold text-[#1e2749] tracking-tight">
-                  {record.headline || record.year_label}
-                </h2>
-                <span className="text-xs text-gray-400">{record.year_label}</span>
-              </div>
-              {record.summary && (
-                <p className="text-xs text-gray-500 mt-2 leading-relaxed max-w-3xl">{record.summary}</p>
-              )}
-              {!!record.stats?.length && (
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 md:gap-4 mt-5">
-                  {record.stats.map((s, i) => (
-                    <div key={i} className="p-3 md:p-4 bg-gray-50 rounded-xl text-center">
-                      <p className="text-xl md:text-2xl font-bold text-[#1e2749]">{s.value}</p>
-                      <p className="text-xs md:text-sm text-gray-500">{s.label}</p>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {record.change && (
-              <div className="bg-white rounded-2xl p-6 md:p-7 shadow-sm border border-gray-100">
-                <h2 className="text-[17px] font-bold text-[#1e2749] tracking-tight">{record.change.label}</h2>
-                {record.change.note && (
-                  <p className="text-xs text-gray-500 mt-2 leading-relaxed max-w-3xl">{record.change.note}</p>
-                )}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-center mt-5 p-5 bg-gray-50 rounded-xl">
-                  <div className="text-center">
-                    <p className="text-3xl font-bold text-gray-400">{record.change.before}</p>
-                    <p className="text-xs text-gray-500 mt-1">{record.change.beforeLabel}</p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-sm font-bold text-[#1e2749]">{record.change.delta}</p>
-                    <div className="h-2 bg-gray-200 rounded-full overflow-hidden mt-2.5">
-                      <div className="h-full rounded-full bg-[#E8B84B]" style={{ width: '64%' }} />
-                    </div>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-3xl font-bold text-[#E8B84B]">{record.change.after}</p>
-                    <p className="text-xs text-gray-500 mt-1">{record.change.afterLabel}</p>
-                  </div>
-                </div>
+            {!sem.is_current && (
+              <div
+                className="rounded-xl px-4 py-3 flex items-center gap-3 text-sm"
+                style={{ background: '#FEF3C7', border: '1px solid #FDE68A', color: '#92400E' }}
+              >
+                <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: '#D97706' }} />
+                <span>Viewing {sem.semester_label}. This year has ended.</span>
               </div>
             )}
-
-            {!!record.themes?.length && (
-              <div className="bg-white rounded-2xl p-6 md:p-7 shadow-sm border border-gray-100">
-                <h2 className="text-[17px] font-bold text-[#1e2749] tracking-tight mb-4">What they came back to</h2>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
-                  {record.themes.map((t, i) => (
-                    <div key={i} className="border border-gray-200 rounded-xl p-4">
-                      <h3 className="text-sm font-bold text-[#1e2749] mb-1.5">{t.title}</h3>
-                      <p className="text-[13px] text-gray-500 leading-relaxed">{t.body}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {record.lists?.map((list, li) => {
-              const max = Math.max(...list.items.map(i => i.count), 1);
-              return (
-                <div key={li} className="bg-white rounded-2xl p-6 md:p-7 shadow-sm border border-gray-100">
-                  <h2 className="text-[17px] font-bold text-[#1e2749] tracking-tight">{list.title}</h2>
-                  {list.subtitle && <p className="text-xs text-gray-500 mt-2">{list.subtitle}</p>}
-                  <div className="flex flex-col gap-3.5 mt-5">
-                    {list.items.map((item, i) => (
-                      <div key={i}>
-                        <div className="flex justify-between text-sm mb-1.5">
-                          <span className="text-[#1e2749]">{item.label}</span>
-                          <span className="text-gray-500 tabular-nums">{item.count}</span>
-                        </div>
-                        <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                          <div
-                            className={`h-full rounded-full ${i === 0 ? 'bg-[#E8B84B]' : 'bg-[#80a4ed]'}`}
-                            style={{ width: `${Math.round((item.count / max) * 100)}%` }}
-                          />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              );
-            })}
-
-            {!!record.quotes?.length && (
-              <div className="bg-white rounded-2xl p-6 md:p-7 shadow-sm border border-gray-100">
-                <h2 className="text-[17px] font-bold text-[#1e2749] tracking-tight">In their own words</h2>
-                <p className="text-xs text-gray-500 mt-2">
-                  Unedited, from the survey your staff filled in themselves.
-                </p>
-                <div className="flex flex-col gap-3 mt-5">
-                  {record.quotes.map((q, i) => (
-                    <div key={i} className="pl-4 py-3 bg-gray-50 rounded-r-xl border-l-[3px] border-[#80a4ed]">
-                      <p className="text-sm text-[#1e2749] leading-relaxed">{q.text}</p>
-                      {q.attribution && (
-                        <span className="block text-xs text-gray-400 mt-2">{q.attribution}</span>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {record.footnote && (
-              <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-                <p className="text-xs text-gray-500 leading-relaxed">{record.footnote}</p>
-              </div>
-            )}
+            <SemesterRecord
+              data={semesterData && semesterData.semester === sem.semester ? semesterData : null}
+              loading={semesterLoading}
+            />
           </div>
         ))}
+
 
         {activeTab === 'schools' && partnership?.partnership_type === 'district' && (
           <div role="tabpanel" id="panel-schools" aria-labelledby="tab-schools" className="space-y-4 md:space-y-6">

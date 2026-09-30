@@ -445,24 +445,6 @@ export async function GET(
       sort_order: 1000 + i,
     }));
 
-    /**
-     * A completed year, stored rather than derived.
-     *
-     * Addison's first year ran Jan to May 2026 on the previous platform. The Hub
-     * holds no Addison activity earlier than 29 July, so none of that year can be
-     * recomputed here and it has to live as stated facts.
-     *
-     * Only records explicitly marked visible reach the client. A record is written
-     * and reviewed first, which is why the column defaults to false.
-     */
-    const { data: yearRecords, error: yearError } = await supabase
-      .from('partnership_year_records')
-      .select('id, year_label, headline, summary, stats, change, themes, lists, quotes, footnote')
-      .eq('partnership_id', partnershipId)
-      .eq('visible_to_partner', true)
-      .order('sort_order', { ascending: true });
-    if (yearError) console.error('[partners/dashboard] year records:', yearError.message);
-
     // Get teacher quotes for Our Partnership tab
     const { data: teacherQuotes } = await supabase
       .from('teacher_quotes')
@@ -485,7 +467,6 @@ export async function GET(
       staffStats,
       staffMembers: (staffMembers || []).map(s => ({ id: s.id, name: `${s.first_name || ''} ${s.last_name || ''}`.trim(), role: s.role_title, hubActive: isActive(s) })),
       engagement,
-      yearRecords: yearRecords || [],
       metricSnapshots: Object.values(latestMetrics),
       buildings: buildings || [],
       activityLog: activityLog || [],
