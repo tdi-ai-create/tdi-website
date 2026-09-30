@@ -465,7 +465,9 @@ export async function GET(
       organization,
       actionItems: actionItems || [],
       staffStats,
-      staffMembers: (staffMembers || []).map(s => ({ id: s.id, name: `${s.first_name || ''} ${s.last_name || ''}`.trim(), role: s.role_title, hubActive: isActive(s) })),
+      // email is included so a leader can write to their own staff from their own
+      // dashboard. It is their roster, and they already hold these addresses.
+      staffMembers: (staffMembers || []).map(s => ({ id: s.id, name: `${s.first_name || ''} ${s.last_name || ''}`.trim(), email: s.email, role: s.role_title, hubActive: isActive(s) })),
       engagement,
       metricSnapshots: Object.values(latestMetrics),
       buildings: buildings || [],

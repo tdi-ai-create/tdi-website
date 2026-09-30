@@ -1,41 +1,56 @@
-import { Loader2, Eye } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 
 /**
  * One school year, as the school's own record of it.
  *
- * Lifted verbatim out of the Our Partnership tab on 30 September 2026, where it
- * was reachable only behind a semester toggle that most people never pressed.
- * Rae asked for a tab per year instead, so this renders the same record in a
- * place a person can find.
+ * Two rules from Rae, 30 September 2026, and the layout follows them:
  *
- * Every field is optional because a year in progress has different parts filled
- * in than a year that finished.
+ *   The page exists to show what the partnership produced, so the result leads.
+ *   An earlier version opened on 51 of 149 and 98 who had not started, which
+ *   reads as a partnership underperforming to the person deciding whether to
+ *   renew it.
+ *
+ *   Any number that is not favourable carries a TDI solution beside it. The
+ *   strongest of those is something already in their contract, because it costs
+ *   the leader nothing to accept.
+ *
+ * Both years render through this same component so they can be read against
+ * each other. What differs is the data: each year carries its own hero rather
+ * than borrowing the other's.
  */
+
 export interface SemesterRecordData {
   semester: string;
   semester_label: string;
   is_current?: boolean;
+  hero?: {
+    eyebrow?: string;
+    headline?: string;
+    blurb?: string;
+    stats?: { value: string; label: string }[];
+    benchmark?: { label?: string; value?: string; pct?: number } | null;
+  } | null;
+  solutions?: {
+    kind?: 'included' | 'add';
+    label?: string;
+    title?: string;
+    body?: string;
+    ctaLabel?: string;
+    ctaHref?: string;
+  }[] | null;
   metrics?: Record<string, unknown> | null;
   highlights?: unknown[] | null;
-  building_data?: Record<string, unknown>[] | null;
-  observation_notes?: unknown[] | {
-    title: string;
-    date?: string;
-    notes?: string;
-    love_notes?: { para: string; school: string; highlights: string; para_replied?: boolean; reply_summary?: string }[];
-  }[] | null;
   para_quotes?: { quote?: string; text?: string; para?: string; school?: string; building?: string; role?: string }[] | null;
+  observation_notes?: unknown[] | null;
   timeline_events?: { date?: string; label?: string; title?: string; notes?: string; status?: string }[] | null;
 }
-
 
 /**
  * A calendar date, read as a calendar date.
  *
  * `new Date('2026-07-01')` is parsed as UTC midnight, which in Chicago renders
  * as 30 June. Every date on this record was a day early, including observation
- * day dates a school would plan around. Splitting the parts builds it in local
- * time instead. A value carrying a time is left to the normal parser.
+ * day dates a school would plan around.
  */
 function formatRecordDate(value: string, opts: Intl.DateTimeFormatOptions): string {
   const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value.trim());
@@ -44,7 +59,32 @@ function formatRecordDate(value: string, opts: Intl.DateTimeFormatOptions): stri
   return d.toLocaleDateString('en-US', opts);
 }
 
-export function SemesterRecord({ data, loading }: { data: SemesterRecordData | null; loading?: boolean }) {
+function quoteText(q: { quote?: string; text?: string }): string {
+  return q.quote || q.text || '';
+}
+
+/**
+ * A school, never a person.
+ *
+ * Rae and I settled this on 30 September: a first name plus a small building
+ * identifies someone, these were written in a survey about the sessions rather
+ * than for a leadership screen, and the reader is their Associate
+ * Superintendent.
+ */
+function quoteAttribution(q: { para?: string; school?: string; building?: string; role?: string }): string {
+  return q.school || q.building || q.role || '';
+}
+
+export function SemesterRecord({
+  data,
+  loading,
+  children,
+}: {
+  data: SemesterRecordData | null;
+  loading?: boolean;
+  /** Live-data blocks the stored record cannot hold, such as who has not started. */
+  children?: React.ReactNode;
+}) {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -54,129 +94,137 @@ export function SemesterRecord({ data, loading }: { data: SemesterRecordData | n
   }
   if (!data) {
     return (
-      <div className="bg-white rounded-xl border border-gray-100 p-8 text-center" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+      <div className="bg-white rounded-2xl border border-gray-100 p-8 text-center shadow-sm">
         <p className="text-sm text-gray-400">No record has been written for this year yet.</p>
       </div>
     );
   }
+
+  const hero = data.hero || null;
+  const highlights = (data.highlights || []).filter(h => typeof h === 'string') as string[];
+  const quotes = (data.para_quotes || []).filter(q => quoteText(q));
+  const timeline = data.timeline_events || [];
+  const included = (data.solutions || []).filter(s => s.kind === 'included');
+  const addons = (data.solutions || []).filter(s => s.kind !== 'included');
+
+  const metricEntries = Object.entries(
+    (data.metrics || {}) as Record<string, { label?: string; value?: string | number; color?: string }>
+  ).filter(([, m]) => m && typeof m === 'object' && 'value' in m);
+
   return (
     <div className="space-y-4">
-      {/* Historical Metrics */}
-      {data.metrics && Object.keys(data.metrics).length > 0 && (
-        <div className="bg-white rounded-xl border border-gray-100 p-6" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-          <h2 className="text-base font-semibold text-gray-900 mb-4">
-            {data.semester_label} Metrics
+
+      {/* ─── THE RESULT, FIRST ─── */}
+      {hero?.headline && (
+        <div
+          className="rounded-2xl p-7 md:p-8 text-white"
+          style={{ background: 'linear-gradient(135deg, #1e2749, #33507e)' }}
+        >
+          {hero.eyebrow && (
+            <p className="text-[10px] font-bold uppercase tracking-[0.09em] mb-2.5" style={{ color: 'rgba(255,255,255,0.55)' }}>
+              {hero.eyebrow}
+            </p>
+          )}
+          <h2 className="text-xl md:text-2xl font-bold leading-snug tracking-tight mb-1.5" style={{ color: '#FFFFFF', textWrap: 'balance' }}>
+            {hero.headline}
           </h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {Object.entries(data.metrics as Record<string, { label: string; value: string | number; color?: string }>).map(([key, metric]) => (
-              <div key={key} className="rounded-xl bg-gray-50 p-4 text-center">
-                <p className="text-2xl font-bold" style={{ color: metric.color || '#1e2749' }}>
-                  {metric.value}
-                </p>
-                <p className="text-[10px] text-gray-500 font-medium mt-1">{metric.label}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+          {hero.blurb && (
+            <p className="text-sm leading-relaxed max-w-3xl" style={{ color: 'rgba(255,255,255,0.72)' }}>
+              {hero.blurb}
+            </p>
+          )}
 
-      {/* Historical Highlights */}
-      {data.highlights && (data.highlights as string[]).length > 0 && (
-        <div className="bg-white rounded-xl border border-gray-100 p-6" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-          <h2 className="text-base font-semibold text-gray-900 mb-4">Semester Highlights</h2>
-          <div className="space-y-2">
-            {(data.highlights as string[]).map((h, i) => (
-              <div key={i} className="flex items-start gap-2.5">
-                <div className="w-2 h-2 rounded-full flex-shrink-0 mt-1.5" style={{ background: '#2A9D8F' }} />
-                <p className="text-sm text-gray-700 leading-relaxed">{h}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Historical Building Data */}
-      {data.building_data && data.building_data.length > 0 && (
-        <div className="bg-white rounded-xl border border-gray-100 p-6" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-          <h2 className="text-base font-semibold text-gray-900 mb-4">Building Spotlight</h2>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-gray-100">
-                  <th className="text-left text-xs font-semibold text-gray-500 pb-2 pr-4">Building</th>
-                  <th className="text-right text-xs font-semibold text-gray-500 pb-2 px-4">Paras</th>
-                  <th className="text-right text-xs font-semibold text-gray-500 pb-2 px-4">Login %</th>
-                  <th className="text-left text-xs font-semibold text-gray-500 pb-2 pl-4">Recognition</th>
-                </tr>
-              </thead>
-              <tbody>
-                {data.building_data.map((b: Record<string, unknown>, i: number) => (
-                  <tr key={i} className="border-b border-gray-50">
-                    <td className="py-2.5 pr-4 font-medium text-[#1e2749]">{b.name as string}</td>
-                    <td className="py-2.5 px-4 text-right text-gray-600">{(b.staff_count as number) ?? '—'}</td>
-                    <td className="py-2.5 px-4 text-right text-gray-600">{b.login_pct ? `${b.login_pct}%` : '—'}</td>
-                    <td className="py-2.5 pl-4 text-left">
-                      {(b.awards as string[])?.length > 0 ? (
-                        <div className="flex flex-wrap gap-1">
-                          {(b.awards as string[]).map((award: string, j: number) => (
-                            <span key={j} className="inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold" style={{ background: '#FFF7ED', color: '#C2410C', border: '1px solid #FDBA74' }}>
-                              {award}
-                            </span>
-                          ))}
-                        </div>
-                      ) : '—'}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
-
-      {/* Historical Observation Notes */}
-      {data.observation_notes && (data.observation_notes as { title: string; date?: string; notes?: string; love_notes?: { para: string; school: string; highlights: string; para_replied?: boolean; reply_summary?: string }[] }[]).length > 0 && (
-        <div className="bg-white rounded-xl border border-gray-100 p-6" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-          <h2 className="text-base font-semibold text-gray-900 mb-4">Observation Notes</h2>
-          <div className="space-y-6">
-            {(data.observation_notes as { title: string; date?: string; notes?: string; love_notes?: { para: string; school: string; highlights: string; para_replied?: boolean; reply_summary?: string }[] }[]).map((note, i) => (
-              <div key={i}>
-                <div className="flex items-start gap-3">
-                  <div className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5" style={{ background: '#EFF6FF' }}>
-                    <Eye className="w-3.5 h-3.5" style={{ color: '#2563EB' }} />
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-sm font-semibold text-[#1e2749]">{note.title}</p>
-                    {note.date && (
-                      <p className="text-xs text-gray-400 mt-0.5">
-                        {formatRecordDate(note.date, { month: 'long', day: 'numeric', year: 'numeric' })}
-                      </p>
-                    )}
-                    {note.notes && (
-                      <p className="text-sm text-gray-600 mt-1 leading-relaxed">{note.notes}</p>
-                    )}
-                  </div>
+          {!!hero.stats?.length && (
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-6">
+              {hero.stats.map((s, i) => (
+                <div
+                  key={i}
+                  className="rounded-xl p-4"
+                  style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)' }}
+                >
+                  <p className="text-2xl font-bold leading-none tabular-nums" style={{ color: '#E8B84B' }}>{s.value}</p>
+                  <p className="text-[11.5px] leading-snug mt-1.5" style={{ color: 'rgba(255,255,255,0.72)' }}>{s.label}</p>
                 </div>
-                {/* Individual Love Notes */}
-                {note.love_notes && note.love_notes.length > 0 && (
-                  <div className="mt-4 ml-9 space-y-3">
-                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Individual Feedback Sent</p>
-                    {note.love_notes.map((ln, j) => (
-                      <div key={j} className="rounded-lg p-3" style={{ background: '#F8FAFC', border: '1px solid #E2E8F0' }}>
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="text-sm font-semibold text-[#1e2749]">{ln.para}</span>
-                          <span className="text-[10px] px-1.5 py-0.5 rounded-full font-medium" style={{ background: '#EFF6FF', color: '#2563EB' }}>{ln.school}</span>
-                          {ln.para_replied && (
-                            <span className="text-[10px] px-1.5 py-0.5 rounded-full font-medium" style={{ background: '#ECFDF5', color: '#059669' }}>replied</span>
-                          )}
-                        </div>
-                        <p className="text-xs text-gray-600 leading-relaxed">{ln.highlights}</p>
-                        {ln.reply_summary && (
-                          <p className="text-xs text-gray-500 mt-1.5 pl-3 italic" style={{ borderLeft: '2px solid #D1D5DB' }}>{ln.reply_summary}</p>
-                        )}
-                      </div>
-                    ))}
-                  </div>
+              ))}
+            </div>
+          )}
+
+          {hero.benchmark?.pct != null && (
+            <div className="flex items-center gap-3 flex-wrap mt-5 text-xs" style={{ color: 'rgba(255,255,255,0.72)' }}>
+              <span>{hero.benchmark.label}</span>
+              <span className="flex-1 min-w-[180px] h-[7px] rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.14)' }}>
+                <span className="block h-full rounded-full" style={{ width: `${hero.benchmark.pct}%`, background: '#E8B84B' }} />
+              </span>
+              <span className="font-bold tabular-nums">{hero.benchmark.value}</span>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ─── THE NUMBERS BEHIND IT ─── */}
+      {metricEntries.length > 0 && (
+        <div className="bg-white rounded-2xl p-6 md:p-7 shadow-sm border border-gray-100">
+          <h2 className="text-[15px] font-bold text-[#1e2749] tracking-tight">{data.semester_label} in numbers</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4">
+            {metricEntries.map(([key, m]) => (
+              <div key={key} className="bg-gray-50 rounded-xl p-4">
+                <p className="text-[22px] font-bold tabular-nums" style={{ color: m.color || '#1e2749' }}>{String(m.value)}</p>
+                <p className="text-xs text-gray-500 mt-1 leading-snug">{m.label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {highlights.length > 0 && (
+        <div className="bg-white rounded-2xl p-6 md:p-7 shadow-sm border border-gray-100">
+          <h2 className="text-[15px] font-bold text-[#1e2749] tracking-tight mb-4">What stood out</h2>
+          <ul className="flex flex-col gap-2.5">
+            {highlights.map((h, i) => (
+              <li key={i} className="flex gap-3 text-sm text-[#1e2749] leading-relaxed">
+                <span className="w-1.5 h-1.5 rounded-full mt-2 shrink-0" style={{ background: '#2A9D8F' }} />
+                <span>{h}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {/* Live blocks the stored record cannot hold, such as who has not started */}
+      {children}
+
+      {/* ─── A SOLUTION BESIDE EVERY GAP ─── */}
+      {included.map((s, i) => (
+        <div key={`inc-${i}`} className="rounded-2xl p-6 md:p-7 border" style={{ background: '#E8F0FD', borderColor: 'rgba(128,164,237,0.35)' }}>
+          {s.label && (
+            <p className="text-[10px] font-bold uppercase tracking-[0.08em] text-gray-500 mb-1.5">{s.label}</p>
+          )}
+          <h3 className="text-sm font-bold text-[#1e2749] mb-1.5">{s.title}</h3>
+          <p className="text-[13px] text-gray-600 leading-relaxed max-w-3xl">{s.body}</p>
+          {s.ctaLabel && s.ctaHref && (
+            <a
+              href={s.ctaHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block mt-3.5 text-[13px] font-bold rounded-full px-4 py-2"
+              style={{ background: '#E8B84B', color: '#1e2749' }}
+            >
+              {s.ctaLabel}
+            </a>
+          )}
+        </div>
+      ))}
+
+      {quotes.length > 0 && (
+        <div className="bg-white rounded-2xl p-6 md:p-7 shadow-sm border border-gray-100">
+          <h2 className="text-[15px] font-bold text-[#1e2749] tracking-tight">In their own words</h2>
+          <p className="text-xs text-gray-500 mt-1.5">Unedited, from the survey your staff filled in themselves.</p>
+          <div className="flex flex-col gap-3 mt-4">
+            {quotes.map((q, i) => (
+              <div key={i} className="pl-4 py-3 bg-gray-50 rounded-r-xl border-l-[3px] border-[#80a4ed]">
+                <p className="text-sm text-[#1e2749] leading-relaxed">{quoteText(q)}</p>
+                {quoteAttribution(q) && (
+                  <span className="block text-xs text-gray-400 mt-2">{quoteAttribution(q)}</span>
                 )}
               </div>
             ))}
@@ -184,73 +232,39 @@ export function SemesterRecord({ data, loading }: { data: SemesterRecordData | n
         </div>
       )}
 
-      {/* Historical Para Quotes */}
-      {data.para_quotes && data.para_quotes.length > 0 && (
-        <div className="bg-white rounded-xl border border-gray-100 p-6" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-          <h2 className="text-base font-semibold text-gray-900 mb-4">Voices From Your School</h2>
-          <div className="space-y-3">
-            {data.para_quotes.map((q, i) => (
-              <div
-                key={i}
-                className="p-4 rounded-xl border-l-4"
-                style={{ background: '#F9FAFB', borderLeftColor: '#2A9D8F' }}
-              >
-                <p className="text-sm text-gray-700 italic leading-relaxed">
-                  &ldquo;{q.text}&rdquo;
-                </p>
-                {(q.role || q.building) && (
-                  <p className="text-xs text-gray-400 mt-2 font-medium">
-                    {[q.role, q.building].filter(Boolean).join(', ')}
-                  </p>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Historical Timeline */}
-      {data.timeline_events && data.timeline_events.length > 0 && (
-        <div className="bg-white rounded-xl border border-gray-100 p-6" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-          <h2 className="text-base font-semibold text-gray-900 mb-5">
-            {data.semester_label} Timeline
-          </h2>
-          <div className="grid grid-cols-3 gap-6">
-            {(['completed', 'in_progress', 'upcoming'] as const).map((status) => {
+      {timeline.length > 0 && (
+        <div className="bg-white rounded-2xl p-6 md:p-7 shadow-sm border border-gray-100">
+          <h2 className="text-[15px] font-bold text-[#1e2749] tracking-tight mb-4">{data.semester_label} timeline</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+            {(['completed', 'in_progress', 'upcoming'] as const).map(status => {
               const cfg = {
-                completed: { label: 'Done', color: '#16A34A' },
-                in_progress: { label: 'In Progress', color: '#D97706' },
-                upcoming: { label: 'Coming Soon', color: '#2563EB' },
+                completed: { label: 'Done', color: '#2A9D8F' },
+                in_progress: { label: 'In progress', color: '#B4741A' },
+                upcoming: { label: 'Coming up', color: '#3b5fa8' },
               }[status];
-              const events = (data.timeline_events ?? []).filter((e) => e.status === status);
+              const events = timeline.filter(e => e.status === status);
               return (
                 <div key={status}>
-                  <div className="flex items-center gap-1.5 mb-3">
-                    <div className="w-2 h-2 rounded-full" style={{ background: cfg.color }} />
-                    <span className="text-xs font-bold uppercase tracking-wide" style={{ color: cfg.color }}>
-                      {cfg.label}
-                    </span>
-                    <span className="text-xs text-gray-400 ml-auto">{events.length}</span>
+                  <div className="flex items-center gap-1.5 mb-2.5">
+                    <span className="w-2 h-2 rounded-full" style={{ background: cfg.color }} />
+                    <span className="text-[11px] font-bold uppercase tracking-wide" style={{ color: cfg.color }}>{cfg.label}</span>
+                    <span className="text-[11px] text-gray-400 ml-auto tabular-nums">{events.length}</span>
                   </div>
                   {events.length === 0 ? (
-                    <p className="text-xs text-gray-300 italic">Nothing here</p>
+                    <p className="text-xs text-gray-400">Nothing here</p>
                   ) : (
-                    events.map((ev, j) => (
-                      <div key={j} className="flex items-start gap-2 mb-3">
-                        <div className="w-1.5 h-1.5 rounded-full flex-shrink-0 mt-1.5" style={{ background: cfg.color }} />
-                        <div>
-                          <p className="text-sm text-gray-700 leading-snug">{ev.title}</p>
-                          {ev.date && (
-                            <p className="text-xs text-gray-400 mt-0.5">
-                              {formatRecordDate(ev.date, { month: 'short', day: 'numeric', year: 'numeric' })}
-                            </p>
+                    <ul className="flex flex-col gap-2">
+                      {events.map((e, i) => (
+                        <li key={i} className="text-[13px] text-[#1e2749] leading-snug">
+                          {e.label || e.title}
+                          {e.date && (
+                            <span className="block text-[11px] text-gray-400 mt-0.5">
+                              {formatRecordDate(e.date, { month: 'short', day: 'numeric', year: 'numeric' })}
+                            </span>
                           )}
-                          {ev.notes && (
-                            <p className="text-xs text-gray-500 mt-0.5">{ev.notes}</p>
-                          )}
-                        </div>
-                      </div>
-                    ))
+                        </li>
+                      ))}
+                    </ul>
                   )}
                 </div>
               );
@@ -259,6 +273,21 @@ export function SemesterRecord({ data, loading }: { data: SemesterRecordData | n
         </div>
       )}
 
+      {addons.length > 0 && (
+        <div className="bg-white rounded-2xl p-6 md:p-7 shadow-sm border border-gray-100">
+          <h2 className="text-[15px] font-bold text-[#1e2749] tracking-tight">
+            {addons[0].label || 'What districts add next'}
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4">
+            {addons.map((s, i) => (
+              <div key={i} className="rounded-xl p-4 border border-dashed" style={{ borderColor: '#80a4ed' }}>
+                <h3 className="text-[13px] font-bold text-[#1e2749] mb-1.5">{s.title}</h3>
+                <p className="text-[12.5px] text-gray-500 leading-relaxed">{s.body}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

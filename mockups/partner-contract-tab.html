@@ -1,0 +1,271 @@
+<title>Leadership Year Tab</title>
+<style>
+  :root{
+    --navy:#1e2749; --gold:#E8B84B; --blue:#80a4ed; --lightblue:#E8F0FD;
+    --ground:#f6f7f9; --card:#fff; --line:#e9ebf0; --rule:#f0f1f5;
+    --ink:#1e2749; --muted:#5f6675; --faint:#9aa0ad;
+    --ok:#2A9D8F; --okbg:rgba(42,157,143,.10);
+    --warn:#B4741A; --warnbg:rgba(232,184,75,.16);
+    --heroA:#1e2749; --heroB:#33507e; --heroInk:#ffffff; --heroMut:rgba(255,255,255,.72);
+  }
+  @media (prefers-color-scheme:dark){ :root:not([data-theme="light"]){
+    --ground:#10131c; --card:#181c28; --line:#262b38; --rule:#222634;
+    --ink:#e9ebf1; --muted:#a2a9ba; --faint:#717889; --lightblue:#1f2c44;
+    --ok:#4fd1c5; --okbg:rgba(79,209,197,.13);
+    --warn:#E8B84B; --warnbg:rgba(232,184,75,.14);
+    --heroA:#151a28; --heroB:#22314d;
+  }}
+  :root[data-theme="dark"]{
+    --ground:#10131c; --card:#181c28; --line:#262b38; --rule:#222634;
+    --ink:#e9ebf1; --muted:#a2a9ba; --faint:#717889; --lightblue:#1f2c44;
+    --ok:#4fd1c5; --okbg:rgba(79,209,197,.13);
+    --warn:#E8B84B; --warnbg:rgba(232,184,75,.14);
+    --heroA:#151a28; --heroB:#22314d;
+  }
+  body{margin:0;background:var(--ground);color:var(--ink);
+    font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;}
+  .note{max-width:1000px;margin:0 auto;padding:20px 24px 0;font-size:12px;color:var(--faint);line-height:1.6;}
+  .frame{max-width:1000px;margin:0 auto;padding:14px 24px 64px;display:flex;flex-direction:column;gap:16px;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 26px;}
+  h2{font-size:15px;font-weight:700;margin:0;letter-spacing:-.01em;}
+  .eyebrow{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--faint);margin-bottom:10px;}
+  .sub{font-size:12.5px;color:var(--muted);margin:6px 0 0;line-height:1.6;}
+
+  /* Hero: the result, first */
+  .hero{background:linear-gradient(135deg,var(--heroA),var(--heroB));border-radius:16px;
+        padding:30px 32px;color:var(--heroInk);}
+  .hero .eyebrow{color:rgba(255,255,255,.55);}
+  .hero h1{font-size:24px;line-height:1.3;font-weight:700;margin:0 0 6px;letter-spacing:-.02em;text-wrap:balance;}
+  .hero p{font-size:13.5px;color:var(--heroMut);margin:0;line-height:1.65;max-width:64ch;}
+  .wins{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:22px;}
+  .win{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:15px 16px;}
+  .win .n{font-size:27px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums;color:var(--gold);}
+  .win .l{font-size:11.5px;color:var(--heroMut);margin-top:6px;line-height:1.45;}
+  .bench{margin-top:16px;font-size:12px;color:var(--heroMut);display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+  .benchbar{flex:1;min-width:180px;height:7px;background:rgba(255,255,255,.14);border-radius:99px;overflow:hidden;}
+  .benchbar i{display:block;height:100%;background:var(--gold);border-radius:99px;}
+
+  /* Momentum */
+  .mom{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:14px;}
+  .m{background:var(--ground);border-radius:11px;padding:15px 16px;}
+  .m .n{font-size:22px;font-weight:700;font-variant-numeric:tabular-nums;}
+  .m .l{font-size:12px;color:var(--muted);margin-top:3px;line-height:1.45;}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;}
+  .chip{font-size:12px;background:var(--lightblue);border-radius:99px;padding:6px 12px;}
+  .chip b{font-variant-numeric:tabular-nums;}
+
+  .quote{margin:14px 0 0;padding:13px 16px;border-left:3px solid var(--blue);background:var(--ground);
+         border-radius:0 9px 9px 0;font-size:13.5px;line-height:1.6;}
+  .quote cite{display:block;font-style:normal;font-size:11.5px;color:var(--faint);margin-top:7px;}
+
+  /* Growth */
+  .grow{display:grid;grid-template-columns:auto 1fr;gap:22px;align-items:center;margin-top:14px;}
+  .grow .n{font-size:40px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums;}
+  .track{height:9px;background:var(--ground);border-radius:99px;overflow:hidden;display:flex;}
+  .track i{display:block;height:100%;}
+  .legend{display:flex;gap:16px;margin-top:9px;flex-wrap:wrap;}
+  .legend span{font-size:11.5px;color:var(--muted);display:flex;align-items:center;gap:6px;}
+  .dot{width:8px;height:8px;border-radius:99px;display:inline-block;}
+
+  details.who{margin-top:14px;border:1px solid var(--line);border-radius:11px;background:var(--ground);}
+  details.who>summary{list-style:none;cursor:pointer;padding:11px 15px;font-size:12.5px;font-weight:700;
+    display:flex;align-items:center;gap:8px;}
+  details.who>summary::-webkit-details-marker{display:none;}
+  details.who>summary::before{content:"";width:0;height:0;border-left:5px solid var(--faint);
+    border-top:4px solid transparent;border-bottom:4px solid transparent;transition:transform .15s;}
+  details.who[open]>summary::before{transform:rotate(90deg);}
+  details.who>summary:focus-visible{outline:2px solid var(--blue);outline-offset:2px;}
+  .whobody{padding:0 15px 14px;}
+  .person{display:flex;align-items:center;gap:12px;padding:9px 0;border-top:1px solid var(--rule);}
+  .person:first-child{border-top:none;}
+  .person .nm{font-size:13px;flex:1;min-width:0;}
+  .person .sc{font-size:11.5px;color:var(--faint);}
+  .nudge{font-size:11.5px;font-weight:700;border:1px solid var(--line);background:var(--card);
+    border-radius:99px;padding:5px 12px;color:var(--ink);text-decoration:none;}
+  .nudge:hover{border-color:var(--blue);}
+  .whofoot{display:flex;justify-content:space-between;align-items:center;gap:12px;
+    padding-top:12px;margin-top:4px;border-top:1px solid var(--rule);flex-wrap:wrap;}
+  .whofoot .all{font-size:12.5px;font-weight:700;background:var(--gold);color:#1e2749;
+    border-radius:99px;padding:8px 16px;text-decoration:none;display:inline-block;}
+  .whonote{font-size:11.5px;color:var(--faint);line-height:1.6;}
+
+  .line{display:grid;grid-template-columns:1fr auto auto;gap:14px;align-items:center;
+        padding:12px 0;border-top:1px solid var(--rule);}
+  .line:first-of-type{border-top:none;}
+  .line .nm{font-size:13.5px;font-weight:600;}
+  .line .dt{font-size:12px;color:var(--muted);margin-top:2px;}
+  .line .ct{font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap;}
+  .pill{font-size:10.5px;font-weight:700;padding:4px 10px;border-radius:99px;white-space:nowrap;}
+  .pill.ok{background:var(--okbg);color:var(--ok);}
+  .pill.warn{background:var(--warnbg);color:var(--warn);}
+  /* Whenever a number is not favourable, the fix sits with it */
+  .fix{margin-top:16px;border-radius:12px;padding:16px 18px;background:var(--lightblue);
+       border:1px solid rgba(128,164,237,.35);}
+  .fix .k{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;
+          color:var(--muted);margin-bottom:6px;}
+  .fix h4{font-size:13.5px;font-weight:700;margin:0 0 5px;}
+  .fix p{font-size:12.5px;color:var(--muted);margin:0;line-height:1.65;}
+  .fix a.go{display:inline-block;margin-top:11px;font-size:12.5px;font-weight:700;
+    background:var(--gold);color:#1e2749;border-radius:99px;padding:8px 16px;text-decoration:none;}
+
+  .lever{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin-top:14px;}
+  .lv{border:1px dashed var(--blue);border-radius:11px;padding:15px 16px;}
+  .lv h4{font-size:13px;font-weight:700;margin:0 0 5px;}
+  .lv p{font-size:12.5px;color:var(--muted);margin:0;line-height:1.6;}
+  @media (max-width:680px){ .grow{grid-template-columns:1fr;} .line{grid-template-columns:1fr auto;} }
+</style>
+
+<div class="note">
+  Mockup, not live. The <strong>2026-2027</strong> tab. Rebuilt again after feedback: the earlier version
+  opened on what was missing, which reads as a partnership underperforming. This one opens on what the work
+  produced, and every number that is not favourable carries a TDI solution beside it. Every figure is Addison's
+  real data and nothing has been rounded in our favour.
+</div>
+
+<div class="frame">
+
+  <div class="hero">
+    <div class="eyebrow">Your first year, in one line</div>
+    <h1>Your paras ended last year less stressed, more confident, and putting the work into practice.</h1>
+    <p>
+      Nine schools, 113 paraprofessionals, one semester. This is what the partnership produced, measured by your
+      own staff answering your own surveys.
+    </p>
+    <div class="wins">
+      <div class="win"><div class="n">91%</div><div class="l">put a strategy into practice after two sessions</div></div>
+      <div class="win"><div class="n">2.9</div><div class="l">points lower reported stress, 7.9 down to 5.03</div></div>
+      <div class="win"><div class="n">100%</div><div class="l">of your team engaged with the Hub by the end of spring</div></div>
+      <div class="win"><div class="n">4.2</div><div class="l">out of 5 on confidence, up across the year</div></div>
+    </div>
+    <div class="bench">
+      <span>Implementation against the industry average of 10%</span>
+      <span class="benchbar"><i style="width:91%"></i></span>
+      <span><b>91%</b></span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="eyebrow">This year, so far</div>
+    <h2>Eleven weeks in, and the pattern is already clear</h2>
+    <p class="sub">Nobody assigned any of this. Your paras chose it.</p>
+    <div class="mom">
+      <div class="m"><div class="n">51</div><div class="l">paras already using the Hub</div></div>
+      <div class="m"><div class="n">20</div><div class="l">were in it this week</div></div>
+      <div class="m"><div class="n">32</div><div class="l">have opened a lesson</div></div>
+      <div class="m"><div class="n">9</div><div class="l">buildings represented</div></div>
+    </div>
+    <p class="sub" style="margin-top:16px">What they are choosing, by number of people:</p>
+    <div class="chips">
+      <span class="chip">Calm Classrooms, Not Chaos <b>8</b></span>
+      <span class="chip">In-the-Moment Student Conflict <b>7</b></span>
+      <span class="chip">RINSE Method <b>5</b></span>
+      <span class="chip">Classroom Management Toolkit <b>5</b></span>
+      <span class="chip">Communication that Clicks <b>5</b></span>
+    </div>
+    <p class="sub" style="margin-top:14px">
+      Every one of those is de-escalation or classroom calm, which is exactly what your team said drove their
+      stress last spring. They are going straight to it.
+    </p>
+    <blockquote class="quote">
+      A lot of these games are relatable to our students. It is nice to chat and discuss these situations with
+      our co-workers, since we do not get time to discuss or chat about work.
+      <cite>A para at Stone</cite>
+    </blockquote>
+  </div>
+
+  <div class="card">
+    <div class="eyebrow">Your next 98</div>
+    <h2>The rest of your team, and the fastest way to reach them</h2>
+    <div class="grow">
+      <div class="n">51<span style="font-size:15px;color:var(--muted);font-weight:600"> of 149</span></div>
+      <div>
+        <div class="track">
+          <i style="width:13.4%;background:var(--ok)"></i>
+          <i style="width:20.8%;background:var(--blue)"></i>
+          <i style="width:65.8%;background:var(--rule)"></i>
+        </div>
+        <div class="legend">
+          <span><i class="dot" style="background:var(--ok)"></i>20 in this week</span>
+          <span><i class="dot" style="background:var(--blue)"></i>31 started</span>
+          <span><i class="dot" style="background:var(--rule)"></i>98 still to reach</span>
+        </div>
+      </div>
+    </div>
+    <p class="sub" style="margin-top:14px">
+      Your team reached 100% last year, so this is a question of timing rather than appetite. When we asked what
+      would help, 44 of 83 said dedicated time during the work day and 28 said knowing which course to start
+      with. A protected twenty minutes at a late start does more than any reminder.
+    </p>
+    <div class="fix">
+      <div class="k">Already in your contract</div>
+      <h4>Use your second Executive Impact Session on this</h4>
+      <p>
+        You have one left and it is paid for. It is a working session with your leadership, so we can spend it
+        building the plan to reach the rest of your team rather than reporting on numbers you can already see
+        here. Nothing extra to buy.
+      </p>
+      <p style="margin-top:9px">
+        <strong style="color:var(--ink)">We would suggest late November or December.</strong> That puts it far
+        enough in to have a full semester of your own data, and before your Hub access runs out on 31 December,
+        so the session can double as the decision point for next year.
+      </p>
+      <a class="go" href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat">Book your second session</a>
+    </div>
+
+    <details class="who">
+      <summary>Or nudge them yourself</summary>
+      <div class="whobody">
+        <div class="person"><span class="nm">Bryan Alecksen</span><span class="sc">Para</span><a class="nudge" href="mailto:?bcc=bryan.example%40asd4.org%2C%20patricia.example%40asd4.org&subject=A%20few%20minutes%20on%20the%20Learning%20Hub%20this%20week&body=Hi%2C%0A%0AYou%20have%20full%20access%20to%20the%20TDI%20Learning%20Hub%20through%20December%2C%20and%20I%20would%20like%20us%20to%20make%20use%20of%20it.%0A%0ASigning%20in%20takes%20about%20ten%20seconds.%20Go%20to%20teachersdeserveit.com/hub/login%2C%20enter%20your%20district%20email%2C%20and%20choose%20the%20option%20to%20have%20a%20sign%20in%20link%20emailed%20to%20you.%20No%20password%20needed.%0A%0AIf%20you%20are%20not%20sure%20where%20to%20start%2C%20try%20%22What%20should%20I%20be%20doing%20right%20now%3F%20A%20Para%20Guide%20for%20Teacher%20Support%22.%20It%20is%20short%20and%20it%20is%20written%20for%20our%20role.%0A%0AThank%20you%2C%0ABonnie%0A">Nudge</a></div>
+        <div class="person"><span class="nm">Patricia Alvarado</span><span class="sc">Para</span><a class="nudge" href="mailto:?bcc=bryan.example%40asd4.org%2C%20patricia.example%40asd4.org&subject=A%20few%20minutes%20on%20the%20Learning%20Hub%20this%20week&body=Hi%2C%0A%0AYou%20have%20full%20access%20to%20the%20TDI%20Learning%20Hub%20through%20December%2C%20and%20I%20would%20like%20us%20to%20make%20use%20of%20it.%0A%0ASigning%20in%20takes%20about%20ten%20seconds.%20Go%20to%20teachersdeserveit.com/hub/login%2C%20enter%20your%20district%20email%2C%20and%20choose%20the%20option%20to%20have%20a%20sign%20in%20link%20emailed%20to%20you.%20No%20password%20needed.%0A%0AIf%20you%20are%20not%20sure%20where%20to%20start%2C%20try%20%22What%20should%20I%20be%20doing%20right%20now%3F%20A%20Para%20Guide%20for%20Teacher%20Support%22.%20It%20is%20short%20and%20it%20is%20written%20for%20our%20role.%0A%0AThank%20you%2C%0ABonnie%0A">Nudge</a></div>
+        <div class="person"><span class="nm">Nicole Anweiler-Stanford</span><span class="sc">Para</span><a class="nudge" href="mailto:?bcc=bryan.example%40asd4.org%2C%20patricia.example%40asd4.org&subject=A%20few%20minutes%20on%20the%20Learning%20Hub%20this%20week&body=Hi%2C%0A%0AYou%20have%20full%20access%20to%20the%20TDI%20Learning%20Hub%20through%20December%2C%20and%20I%20would%20like%20us%20to%20make%20use%20of%20it.%0A%0ASigning%20in%20takes%20about%20ten%20seconds.%20Go%20to%20teachersdeserveit.com/hub/login%2C%20enter%20your%20district%20email%2C%20and%20choose%20the%20option%20to%20have%20a%20sign%20in%20link%20emailed%20to%20you.%20No%20password%20needed.%0A%0AIf%20you%20are%20not%20sure%20where%20to%20start%2C%20try%20%22What%20should%20I%20be%20doing%20right%20now%3F%20A%20Para%20Guide%20for%20Teacher%20Support%22.%20It%20is%20short%20and%20it%20is%20written%20for%20our%20role.%0A%0AThank%20you%2C%0ABonnie%0A">Nudge</a></div>
+        <div class="person"><span class="nm">Gregoria Arredondo</span><span class="sc">Para</span><a class="nudge" href="mailto:?bcc=bryan.example%40asd4.org%2C%20patricia.example%40asd4.org&subject=A%20few%20minutes%20on%20the%20Learning%20Hub%20this%20week&body=Hi%2C%0A%0AYou%20have%20full%20access%20to%20the%20TDI%20Learning%20Hub%20through%20December%2C%20and%20I%20would%20like%20us%20to%20make%20use%20of%20it.%0A%0ASigning%20in%20takes%20about%20ten%20seconds.%20Go%20to%20teachersdeserveit.com/hub/login%2C%20enter%20your%20district%20email%2C%20and%20choose%20the%20option%20to%20have%20a%20sign%20in%20link%20emailed%20to%20you.%20No%20password%20needed.%0A%0AIf%20you%20are%20not%20sure%20where%20to%20start%2C%20try%20%22What%20should%20I%20be%20doing%20right%20now%3F%20A%20Para%20Guide%20for%20Teacher%20Support%22.%20It%20is%20short%20and%20it%20is%20written%20for%20our%20role.%0A%0AThank%20you%2C%0ABonnie%0A">Nudge</a></div>
+        <div class="person"><span class="nm">Carmen Arroyo</span><span class="sc">Para</span><a class="nudge" href="mailto:?bcc=bryan.example%40asd4.org%2C%20patricia.example%40asd4.org&subject=A%20few%20minutes%20on%20the%20Learning%20Hub%20this%20week&body=Hi%2C%0A%0AYou%20have%20full%20access%20to%20the%20TDI%20Learning%20Hub%20through%20December%2C%20and%20I%20would%20like%20us%20to%20make%20use%20of%20it.%0A%0ASigning%20in%20takes%20about%20ten%20seconds.%20Go%20to%20teachersdeserveit.com/hub/login%2C%20enter%20your%20district%20email%2C%20and%20choose%20the%20option%20to%20have%20a%20sign%20in%20link%20emailed%20to%20you.%20No%20password%20needed.%0A%0AIf%20you%20are%20not%20sure%20where%20to%20start%2C%20try%20%22What%20should%20I%20be%20doing%20right%20now%3F%20A%20Para%20Guide%20for%20Teacher%20Support%22.%20It%20is%20short%20and%20it%20is%20written%20for%20our%20role.%0A%0AThank%20you%2C%0ABonnie%0A">Nudge</a></div>
+        <div class="person"><span class="nm">Allison Baumgartner</span><span class="sc">Para</span><a class="nudge" href="mailto:?bcc=bryan.example%40asd4.org%2C%20patricia.example%40asd4.org&subject=A%20few%20minutes%20on%20the%20Learning%20Hub%20this%20week&body=Hi%2C%0A%0AYou%20have%20full%20access%20to%20the%20TDI%20Learning%20Hub%20through%20December%2C%20and%20I%20would%20like%20us%20to%20make%20use%20of%20it.%0A%0ASigning%20in%20takes%20about%20ten%20seconds.%20Go%20to%20teachersdeserveit.com/hub/login%2C%20enter%20your%20district%20email%2C%20and%20choose%20the%20option%20to%20have%20a%20sign%20in%20link%20emailed%20to%20you.%20No%20password%20needed.%0A%0AIf%20you%20are%20not%20sure%20where%20to%20start%2C%20try%20%22What%20should%20I%20be%20doing%20right%20now%3F%20A%20Para%20Guide%20for%20Teacher%20Support%22.%20It%20is%20short%20and%20it%20is%20written%20for%20our%20role.%0A%0AThank%20you%2C%0ABonnie%0A">Nudge</a></div>
+        <div class="whofoot">
+          <span class="whonote">Showing 6 of 98, alphabetical. Send us your roster by school and this groups by building.</span>
+          <a class="all" href="mailto:?bcc=bryan.example%40asd4.org%2C%20patricia.example%40asd4.org&subject=A%20few%20minutes%20on%20the%20Learning%20Hub%20this%20week&body=Hi%2C%0A%0AYou%20have%20full%20access%20to%20the%20TDI%20Learning%20Hub%20through%20December%2C%20and%20I%20would%20like%20us%20to%20make%20use%20of%20it.%0A%0ASigning%20in%20takes%20about%20ten%20seconds.%20Go%20to%20teachersdeserveit.com/hub/login%2C%20enter%20your%20district%20email%2C%20and%20choose%20the%20option%20to%20have%20a%20sign%20in%20link%20emailed%20to%20you.%20No%20password%20needed.%0A%0AIf%20you%20are%20not%20sure%20where%20to%20start%2C%20try%20%22What%20should%20I%20be%20doing%20right%20now%3F%20A%20Para%20Guide%20for%20Teacher%20Support%22.%20It%20is%20short%20and%20it%20is%20written%20for%20our%20role.%0A%0AThank%20you%2C%0ABonnie%0A">Nudge all 98</a>
+        </div>
+        <p class="whonote" style="margin-top:10px">
+          Nudge opens your own email with the addresses in blind copy and a draft already written. It comes from
+          you rather than from us, which is the version that worked last year.
+        </p>
+      </div>
+    </details>
+  </div>
+
+  <div class="card">
+    <div class="eyebrow">Your partnership</div>
+    <h2>What you have, through December</h2>
+    <div style="margin-top:14px">
+      <div class="line">
+        <div><div class="nm">Learning Hub access</div><div class="dt">Every para on your roster, through 31 December</div></div>
+        <div class="ct">149 people</div><span class="pill ok">Active</span>
+      </div>
+      <div class="line">
+        <div><div class="nm">Executive Impact Sessions</div><div class="dt">First was your onboarding call on 30 September. We suggest the second in late November or December.</div></div>
+        <div class="ct">1 of 2 delivered</div><span class="pill warn">Suggested: Nov to Dec</span>
+      </div>
+      <div style="padding-top:12px">
+        <a class="nudge" href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat">Book your second session</a>
+      </div>
+      <div class="line">
+        <div><div class="nm">This dashboard</div><div class="dt">Live from your team's activity, not a quarterly report</div></div>
+        <div class="ct">Included</div><span class="pill ok">Active</span>
+      </div>
+    </div>
+
+    <div class="eyebrow" style="margin-top:26px">What districts add next</div>
+    <div class="lever">
+      <div class="lv">
+        <h4>An on-campus observation day</h4>
+        <p>You had these last year. Ten paras received a personalised note naming what they did well, and eight
+           of them wrote back. It is the single fastest way to reach the 98.</p>
+      </div>
+      <div class="lv">
+        <h4>Virtual strategy sessions</h4>
+        <p>Shorter working sessions between visits, aimed at one building or one problem.</p>
+      </div>
+    </div>
+  </div>
+
+</div>

@@ -456,7 +456,7 @@ export default function PartnerDashboard() {
   const [suggestions, setSuggestions] = useState<TDISuggestion[]>([]);
   const [sessionRecords, setSessionRecords] = useState<SessionRecord[]>([]);
   const [recentActivity, setRecentActivity] = useState<{ action: string; details?: Record<string, unknown>; created_at: string }[]>([]);
-  const [staffRoster, setStaffRoster] = useState<{ id: string; name: string; role: string; hubActive: boolean }[]>([]);
+  const [staffRoster, setStaffRoster] = useState<{ id: string; name: string; email?: string | null; role: string; hubActive: boolean }[]>([]);
   const [hubIntel, setHubIntel] = useState<Record<string, unknown> | null>(null);
   const [observationImpact, setObservationImpact] = useState<{ has_data: boolean; observations: { event_title: string; event_date: string; before_logins: number; after_logins: number; engagement_change_pct: number; before_mood: number | null; after_mood: number | null; mood_change: number | null; before_quick_wins: number; after_quick_wins: number }[] } | null>(null);
   const [hubStats, setHubStats] = useState<{
@@ -640,6 +640,40 @@ export default function PartnerDashboard() {
     const semester = activeTab.slice('year-'.length);
     if (semester && semester !== activeSemester) setActiveSemester(semester);
   }, [activeTab, activeSemester]);
+
+  /**
+   * Nudge, rebuilt as a mailto.
+   *
+   * The previous platform had this and it was used often: one link that opened
+   * the leader's own email with everyone filled in and a draft ready. It never
+   * got carried across, and the only trace left in this codebase is a disabled
+   * button in the demo dashboard that still tells prospects it is "available in
+   * active partnerships".
+   *
+   * Addresses go in blind copy so a hundred paras do not see each other or hit
+   * reply all. The draft is written for the leader to send as their own, because
+   * a message from their Associate Superintendent lands differently than one
+   * from a vendor.
+   */
+  const notStartedMailto = (() => {
+    const emails = staffRoster
+      .filter(s => !s.hubActive && s.email)
+      .map(s => s.email as string);
+    if (emails.length === 0) return '';
+    const subject = 'A few minutes on the Learning Hub this week';
+    const body = [
+      'Hi,',
+      '',
+      'You have full access to the TDI Learning Hub, and I would like us to make use of it.',
+      '',
+      'Signing in takes about ten seconds. Go to teachersdeserveit.com/hub/login, enter your district email, and choose the option to have a sign in link emailed to you. There is no password to set up.',
+      '',
+      'If you are not sure where to start, try "What should I be doing right now? A Para Guide for Teacher Support". It is short and it is written for your role.',
+      '',
+      'Thank you,',
+    ].join('\n');
+    return `mailto:?bcc=${encodeURIComponent(emails.join(','))}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  })();
 
   // Triple gate: ALL THREE must be true before showing dashboard
   const showDashboard = animationComplete && timerDone && dataReady;
@@ -7966,24 +8000,87 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
             role="tabpanel"
             id={`panel-year-${sem.semester}`}
             aria-labelledby={`tab-year-${sem.semester}`}
-            className="py-6 space-y-4"
+            className="py-6"
           >
-            {!sem.is_current && (
-              <div
-                className="rounded-xl px-4 py-3 flex items-center gap-3 text-sm"
-                style={{ background: '#FEF3C7', border: '1px solid #FDE68A', color: '#92400E' }}
-              >
-                <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: '#D97706' }} />
-                <span>Viewing {sem.semester_label}. This year has ended.</span>
-              </div>
-            )}
             <SemesterRecord
               data={semesterData && semesterData.semester === sem.semester ? semesterData : null}
               loading={semesterLoading}
-            />
+            >
+              {/* Live, and only for the year in progress: who is still to reach,
+                  and the way to reach them. A past year has no one left to nudge.
+
+                  Nudge opens the leader's own email with the addresses in blind
+                  copy and a draft written. It comes from them rather than from
+                  us, which is the version that worked on the previous platform
+                  and never got rebuilt here. */}
+              {sem.is_current && staffStats.total > 0 && staffStats.hubLoggedIn < staffStats.total && (
+                <div className="bg-white rounded-2xl p-6 md:p-7 shadow-sm border border-gray-100">
+                  <h2 className="text-[15px] font-bold text-[#1e2749] tracking-tight">
+                    Your next {staffStats.total - staffStats.hubLoggedIn}
+                  </h2>
+                  <p className="text-xs text-gray-500 mt-1.5">
+                    The rest of your team, and the fastest way to reach them.
+                  </p>
+
+                  <div className="flex items-center gap-5 flex-wrap mt-4">
+                    <p className="text-[34px] font-bold leading-none tabular-nums text-[#1e2749]">
+                      {staffStats.hubLoggedIn}
+                      <span className="text-sm font-semibold text-gray-500"> of {staffStats.total}</span>
+                    </p>
+                    <div className="flex-1 min-w-[220px]">
+                      <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden flex">
+                        <span
+                          className="block h-full"
+                          style={{
+                            width: `${Math.round(((engagement?.activeThisWeek ?? 0) / staffStats.total) * 100)}%`,
+                            background: '#2A9D8F',
+                          }}
+                        />
+                        <span
+                          className="block h-full"
+                          style={{
+                            width: `${Math.round(((staffStats.hubLoggedIn - (engagement?.activeThisWeek ?? 0)) / staffStats.total) * 100)}%`,
+                            background: '#80a4ed',
+                          }}
+                        />
+                      </div>
+                      <div className="flex gap-4 flex-wrap mt-2">
+                        <span className="text-[11.5px] text-gray-500 flex items-center gap-1.5">
+                          <i className="w-2 h-2 rounded-full inline-block" style={{ background: '#2A9D8F' }} />
+                          {engagement?.activeThisWeek ?? 0} in this week
+                        </span>
+                        <span className="text-[11.5px] text-gray-500 flex items-center gap-1.5">
+                          <i className="w-2 h-2 rounded-full inline-block" style={{ background: '#80a4ed' }} />
+                          {staffStats.hubLoggedIn - (engagement?.activeThisWeek ?? 0)} started
+                        </span>
+                        <span className="text-[11.5px] text-gray-500 flex items-center gap-1.5">
+                          <i className="w-2 h-2 rounded-full inline-block bg-gray-200" />
+                          {staffStats.total - staffStats.hubLoggedIn} still to reach
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {notStartedMailto && (
+                    <div className="mt-5 flex items-center justify-between gap-3 flex-wrap">
+                      <p className="text-[12.5px] text-gray-500 leading-relaxed max-w-xl">
+                        Nudge opens your own email with the addresses in blind copy and a draft already written.
+                        It comes from you rather than from us.
+                      </p>
+                      <a
+                        href={notStartedMailto}
+                        className="text-[13px] font-bold rounded-full px-4 py-2 shrink-0"
+                        style={{ background: '#E8B84B', color: '#1e2749' }}
+                      >
+                        Nudge all {staffStats.total - staffStats.hubLoggedIn}
+                      </a>
+                    </div>
+                  )}
+                </div>
+              )}
+            </SemesterRecord>
           </div>
         ))}
-
 
         {activeTab === 'schools' && partnership?.partnership_type === 'district' && (
           <div role="tabpanel" id="panel-schools" aria-labelledby="tab-schools" className="space-y-4 md:space-y-6">
