@@ -707,6 +707,11 @@ export async function POST(request: NextRequest) {
         resource_type: body.resource_type || 'pdf',
         title_es: body.title_es || null,
         description_es: body.description_es || null,
+        // Never referenced here before, for any spelling, so a draft created
+        // with its content inline came back with both fields null and no error.
+        // TEA-882.
+        tool_content: body.tool_content ?? null,
+        guide_sections: body.guide_sections ?? null,
         is_published: false,
         status: 'draft',
         tier,
@@ -748,11 +753,23 @@ export async function POST(request: NextRequest) {
       if (fetchErr || !qw) return NextResponse.json({ error: 'Quick Win not found' }, { status: 404 })
       if (qw.is_published) return NextResponse.json({ error: 'Cannot update a published Quick Win' }, { status: 400 })
 
+      /**
+       * tool_content and guide_sections were missing here, which made the two
+       * fields holding the actual content the only ones an agent could not
+       * write.
+       *
+       * The loop below copies a field only if it appears in this list, so an
+       * unlisted field is dropped and the route still answers 200 with a body
+       * echoing the request. TEA-882 spent a day proving that: every spelling
+       * tried (guide_content, guide, stringified JSON) no-opped identically,
+       * because the name was never the problem.
+       */
       const allowedFields = [
         'title', 'slug', 'description', 'category', 'duration_minutes',
         'quick_win_type', 'access_tier', 'capacity', 'topic_tags', 'roles',
         'danielson_domains', 'objectives', 'lift', 'resource_type',
         'title_es', 'description_es',
+        'tool_content', 'guide_sections',
       ]
 
       const updates: Record<string, unknown> = { updated_at: new Date().toISOString() }
@@ -760,6 +777,28 @@ export async function POST(request: NextRequest) {
         if (body[field] !== undefined) {
           updates[field] = body[field]
         }
+      }
+
+      /**
+       * Changing the content makes the rendered PDFs stale, because they were
+       * drawn from the old content and nothing here redraws them.
+       *
+       * The PDFs are produced by a different route (/api/hub/generate-pdf),
+       * which takes the content in its request body rather than reading it
+       * back from this table, so there is nothing sensible to call inline. It
+       * stays two steps on purpose.
+       *
+       * What must not happen is the record quietly disagreeing with the file.
+       * A reviewed item whose content changed underneath its review stamp is
+       * exactly that, so the stamp retires with the content it described. Same
+       * rule generate-pdf already applies when the file changes; this is the
+       * other half of it.
+       */
+      const contentChanged =
+        body.tool_content !== undefined || body.guide_sections !== undefined
+      if (contentChanged) {
+        updates.reviewed_at = null
+        updates.reviewed_by = null
       }
 
       const { data, error } = await supabase
@@ -771,7 +810,19 @@ export async function POST(request: NextRequest) {
 
       if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-      return NextResponse.json({ success: true, quick_win: data })
+      return NextResponse.json({
+        success: true,
+        quick_win: data,
+        // Said out loud rather than left for the caller to discover. Silence
+        // here is what let a 200 mean "written" when nothing had been.
+        ...(contentChanged
+          ? {
+              warning:
+                'Content changed, so the rendered PDFs are now stale and the review stamp has been cleared. '
+                + 'Regenerate via POST /api/hub/generate-pdf (action generate_pdf for the guide, generate_tool for the tool), then send for review again.',
+            }
+          : {}),
+      })
     }
 
     // ── upload_pdf: store a PDF and link it to a Quick Win ──
