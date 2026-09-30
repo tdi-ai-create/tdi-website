@@ -114,8 +114,27 @@ export async function POST(request: NextRequest) {
       }
 
       case 'buildings': {
-        // Insert buildings into buildings table
-        if (org && data.buildings && Array.isArray(data.buildings)) {
+        /**
+         * The column is `estimated_staff_count`. This wrote `staff_count`,
+         * which does not exist on `buildings`, so Postgres rejected the entire
+         * insert every time. The error was only logged and the route still
+         * answered "Buildings saved!", so a school filled the step in, saw
+         * success, and got nothing.
+         *
+         * That is why on 30 September 2026 not one of the nine active
+         * partnerships had a single building row, and why Addison's Schools tab
+         * showed an example district called Harmony Elementary instead of their
+         * own eight schools.
+         */
+        if (!org) {
+          console.error('[partners/action-item-data] no organizations row, buildings cannot be saved');
+          return NextResponse.json(
+            { error: 'This partnership has no organization record yet, so buildings cannot be saved.' },
+            { status: 409 }
+          );
+        }
+
+        if (data.buildings && Array.isArray(data.buildings)) {
           const buildingsToInsert = data.buildings
             .filter((b: BuildingInput) => b.name.trim())
             .map((b: BuildingInput) => ({
@@ -124,18 +143,41 @@ export async function POST(request: NextRequest) {
               building_type: b.building_type,
               lead_name: b.lead_name || null,
               lead_email: b.lead_email || null,
-              staff_count: b.staff_count || 0,
+              estimated_staff_count: b.staff_count || 0,
             }));
 
           if (buildingsToInsert.length > 0) {
-            const { error: buildingsError } = await supabase.from('buildings').insert(buildingsToInsert);
+            const { data: inserted, error: buildingsError } = await supabase
+              .from('buildings')
+              .insert(buildingsToInsert)
+              .select('id');
 
+            // Never report success the database did not give us.
             if (buildingsError) {
               console.error('[partners/action-item-data] buildings not saved:', buildingsError.message);
+              return NextResponse.json(
+                { error: `Buildings were not saved: ${buildingsError.message}` },
+                { status: 500 }
+              );
             }
+
+            const savedCount = inserted?.length ?? 0;
+            if (savedCount !== buildingsToInsert.length) {
+              console.error(
+                `[partners/action-item-data] expected ${buildingsToInsert.length} buildings, saved ${savedCount}`
+              );
+              return NextResponse.json(
+                { error: 'Some buildings were not saved. Nothing has been confirmed.' },
+                { status: 500 }
+              );
+            }
+
+            message = `${savedCount} building${savedCount === 1 ? '' : 's'} saved.`;
+            break;
           }
         }
-        message = 'Buildings saved!';
+
+        message = 'No buildings to save.';
         break;
       }
 

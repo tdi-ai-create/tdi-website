@@ -173,13 +173,22 @@ interface StaffStats {
   hubLoggedIn: number;
 }
 
+/**
+ * A row from the `buildings` table, as the dashboard API returns it.
+ *
+ * The count column is `estimated_staff_count`. This interface declared
+ * `staff_count` until 30 September 2026, which no row has ever had, so every
+ * building card rendered "0 staff" no matter what a school entered. Nothing
+ * caught it because both spellings are valid TypeScript on an interface nobody
+ * cross-checked against the schema.
+ */
 interface Building {
   id: string;
   name: string;
   building_type: string;
   lead_name: string | null;
   lead_email: string | null;
-  staff_count: number;
+  estimated_staff_count: number | null;
 }
 
 interface SessionRecord {
@@ -1493,6 +1502,13 @@ export default function PartnerDashboard() {
     // It used to live inside Our Partnership, which Rae wants kept on goals.
     ...(funding?.hasFunding ? [{ id: 'funding', label: 'Funding' }] : []),
     { id: 'next-year', label: 'Next Year', badge: true },
+    // Districts only. The panel this selects has existed for months and was
+    // unreachable the entire time, because TABS never carried a 'schools'
+    // entry and activeTab could therefore never hold that value. Every
+    // building card, the per-building engagement breakdown and the district
+    // overview row rendered for nobody. Found on 30 Sep 2026 by opening
+    // Addison's live dashboard and counting six tabs.
+    ...(partnership?.partnership_type === 'district' ? [{ id: 'schools', label: 'Schools' }] : []),
     { id: 'team', label: 'Team' },
   ];
 
@@ -4435,7 +4451,7 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                       <div key={building.id} className="p-4 bg-gray-50 rounded-lg border border-gray-100">
                         <div className="flex items-center gap-2">
                           <span className="font-medium text-[#1e2749]">{building.name}</span>
-                          <span className="text-xs text-gray-400">· {building.staff_count || 0} staff</span>
+                          <span className="text-xs text-gray-400">· {building.estimated_staff_count || 0} staff</span>
                         </div>
                         <p className="text-xs text-gray-500 mt-1">
                           Champion: {building.lead_name || 'Not yet assigned'}
@@ -8329,7 +8345,7 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                             <div>
                               <h3 className="font-medium text-[#1e2749]">{building.name}</h3>
                               <p className="text-sm text-gray-500">
-                                {building.building_type} · {building.staff_count || 0} staff
+                                {building.building_type} · {building.estimated_staff_count || 0} staff
                                 {building.lead_name && ` · ${building.lead_name}`}
                               </p>
                             </div>
