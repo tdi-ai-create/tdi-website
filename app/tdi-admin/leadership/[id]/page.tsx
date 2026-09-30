@@ -36,6 +36,7 @@ import LogSessionPanel from '@/components/tdi-admin/leadership/LogSessionPanel'
 import ObservationPanel from '@/components/tdi-admin/leadership/ObservationPanel'
 import { formatDateOnly } from '@/lib/format-date';
 import { ActionItem, isOpen, isOverdue } from '@/lib/leadership/action-items';
+import { flagSentence } from '@/lib/partners/flag-copy'
 
 const NOTE_TYPE_COLORS: Record<string, string> = {
   general: 'bg-gray-100 text-gray-700',
@@ -585,19 +586,28 @@ export default function AdminPartnershipDetailPage() {
       : 999
     const loginThreshold = partnershipAge < 30 ? 7 : 14
 
-    // Check last login
-    // partnerships.last_principal_login does not exist as a column, so this was
-    // always undefined and every school read "Never" regardless of reality.
-    // Five of the nine have real logins in activity_log.
+    // Check last sign in, from auth.users across every linked user. This said
+    // "Principal hasn't logged in" while counting a sign in by anybody at the
+    // school, which is not the same claim: a school can be signed in while its
+    // named contact never has, which is Addison exactly.
     const lastLogin = partnership.last_leader_login
     const daysSinceLogin = lastLogin
       ? Math.floor((Date.now() - new Date(lastLogin).getTime()) / (1000 * 60 * 60 * 24))
       : null
 
-    if (daysSinceLogin !== null && daysSinceLogin > loginThreshold) {
+    if (partnership.sign_in_unknown !== true && partnership.leader_never_signed_in === true) {
       actions.push({
         label: 'Schedule check-in',
-        description: `Principal hasn't logged in for ${daysSinceLogin} days.`,
+        description: 'Nobody at this school has ever signed in.',
+        variant: 'urgent',
+        onClick: () => {
+          window.open('https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat', '_blank')
+        },
+      })
+    } else if (daysSinceLogin !== null && daysSinceLogin > loginThreshold) {
+      actions.push({
+        label: 'Schedule check-in',
+        description: `Nobody at this school has signed in for ${daysSinceLogin} days.`,
         variant: 'urgent',
         onClick: () => {
           window.open('https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat', '_blank')
@@ -777,11 +787,27 @@ export default function AdminPartnershipDetailPage() {
       color: contracted === 0 ? '#9CA3AF' : provisioned >= contracted ? '#10B981' : provisioned === 0 ? '#EF4444' : '#EAB308',
     })
 
-    // Hub Login %
-    const loginPct = hubStats?.hub_login_pct ?? partnership.hub_login_pct
-    if (loginPct !== null && loginPct !== undefined) {
-      const lColor = loginPct >= 60 ? '#10B981' : loginPct >= 30 ? '#EAB308' : '#EF4444'
-      metrics.push({ label: 'Hub Login', value: `${loginPct}%`, color: lColor })
+    // Using the Hub. One definition, shared with the leadership list page and
+    // with the nightly attention flags: live all_access seats carrying at least
+    // one genuine engagement action.
+    //
+    // This used to read hub_login_pct, which is distinct sign ins in the
+    // current calendar month over provisioned seats. That is a different
+    // question on a different window, and the warning printed a few inches
+    // below it answered a third way, so Addison showed 19% here and 34% there.
+    // The label said "Hub Login" for a number that reset on the first of the
+    // month, which is the part nobody could have guessed from the screen.
+    const activePct = partnership.hub_active_pct
+    if (partnership.hub_engagement_unknown) {
+      // An outage must not read as nobody using it.
+      metrics.push({ label: 'Using the Hub', value: 'Unknown', color: '#9CA3AF' })
+    } else if (activePct !== null && activePct !== undefined) {
+      const lColor = activePct >= 60 ? '#10B981' : activePct >= 30 ? '#EAB308' : '#EF4444'
+      metrics.push({
+        label: 'Using the Hub',
+        value: `${partnership.hub_active_educators} of ${partnership.hub_seats}`,
+        color: lColor,
+      })
     }
 
     // Contract renewal countdown
@@ -1237,7 +1263,19 @@ export default function AdminPartnershipDetailPage() {
                           style={{ background: urgent ? '#B03325' : '#9A6608' }}
                         />
                         <div className="min-w-0">
-                          <p className="text-[12.5px] text-gray-700">{f.message}</p>
+                          {/* Rendered from today's numbers, not from the
+                              sentence stored when the flag was first raised.
+                              Addison's stored text still said 34% five weeks
+                              after the header said 19%. */}
+                          <p className="text-[12.5px] text-gray-700">
+                            {flagSentence(f.flag_key, {
+                              active: partnership?.hub_active_educators,
+                              seats: partnership?.hub_seats,
+                              pct: partnership?.hub_active_pct,
+                              neverSignedIn: partnership?.leader_never_signed_in,
+                              unknown: partnership?.hub_engagement_unknown || partnership?.sign_in_unknown,
+                            }) ?? f.message}
+                          </p>
                           <p className="text-[10px] text-gray-400 mt-0.5">
                             first raised {new Date(f.first_raised_at).toLocaleDateString()}
                             {days > 0 ? `, open ${days} day${days === 1 ? '' : 's'}` : ''}
@@ -1300,13 +1338,20 @@ export default function AdminPartnershipDetailPage() {
                               onClick={async () => {
                                 if (!confirm('Delete this note?')) return
                                 try {
-                                  await fetch(`/api/tdi-admin/leadership/${partnershipId}/notes`, {
+                                  const res = await fetch(`/api/tdi-admin/leadership/${partnershipId}/notes`, {
                                     method: 'DELETE',
                                     headers: { 'Content-Type': 'application/json' },
                                     body: JSON.stringify({ id: entry.meta.noteId }),
                                   })
+                                  if (!res.ok) {
+                                    // This swallowed everything, so a failed
+                                    // delete removed the note from the screen
+                                    // and left it in the database.
+                                    showToast('Could not delete that note. It is still there.', 'error')
+                                    return
+                                  }
                                   setInternalNotes(prev => prev.filter(n => n.id !== entry.meta.noteId))
-                                } catch {}
+                                } catch { showToast('Could not delete that note. It is still there.', 'error') }
                               }}
                               className="text-[10px] text-gray-400 hover:text-red-600 px-1"
                             >delete</button>
@@ -1323,13 +1368,17 @@ export default function AdminPartnershipDetailPage() {
                           onBlur={async () => {
                             if (editingNoteContent.trim() && editingNoteContent !== entry.content) {
                               try {
-                                await fetch(`/api/tdi-admin/leadership/${partnershipId}/notes`, {
+                                const res = await fetch(`/api/tdi-admin/leadership/${partnershipId}/notes`, {
                                   method: 'PATCH',
                                   headers: { 'Content-Type': 'application/json' },
                                   body: JSON.stringify({ id: entry.meta.noteId, content: editingNoteContent }),
                                 })
+                                if (!res.ok) {
+                                  showToast('Could not save that edit. The note is unchanged.', 'error')
+                                  return
+                                }
                                 setInternalNotes(prev => prev.map(n => n.id === entry.meta.noteId ? { ...n, content: editingNoteContent } : n))
-                              } catch { showToast('Failed to update note', 'error') }
+                              } catch { showToast('Could not save that edit. The note is unchanged.', 'error') }
                             }
                             setEditingNoteId(null)
                           }}
@@ -1584,13 +1633,22 @@ export default function AdminPartnershipDetailPage() {
                                   const num = parseFloat(editingKpiValue)
                                   if (!isNaN(num) && num !== kpi.current_value) {
                                     try {
-                                      await fetch(`/api/tdi-admin/leadership/${partnershipId}/kpis`, {
+                                      const res = await fetch(`/api/tdi-admin/leadership/${partnershipId}/kpis`, {
                                         method: 'PATCH',
                                         headers: { 'Content-Type': 'application/json' },
                                         body: JSON.stringify({ kpiId: kpi.id, currentValue: num }),
                                       })
+                                      if (!res.ok) {
+                                        // A goal number that shows on the
+                                        // client's own dashboard. Reporting a
+                                        // save that did not happen is worse
+                                        // here than almost anywhere else.
+                                        showToast('Could not save that goal number. Nothing changed.', 'error')
+                                        setEditingKpiId(null)
+                                        return
+                                      }
                                       setActiveKpis(prev => prev.map(k => k.id === kpi.id ? { ...k, current_value: num } : k))
-                                    } catch { showToast('Failed to update KPI value', 'error') }
+                                    } catch { showToast('Could not save that goal number. Nothing changed.', 'error') }
                                   }
                                   setEditingKpiId(null)
                                 }}
@@ -1681,9 +1739,20 @@ export default function AdminPartnershipDetailPage() {
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ selectedKpis: selected }),
                           })
+                          if (!res.ok) {
+                            showToast('Could not save those goals. Nothing was written.', 'error')
+                            return
+                          }
                           const data = await res.json()
                           if (data.success) {
                             const reload = await fetch(`/api/tdi-admin/leadership/${partnershipId}/kpis`)
+                            if (!reload.ok) {
+                              // Saved, but the screen cannot prove it. Say so
+                              // rather than leaving the old list on display.
+                              showToast('Goals saved. Reload the page to see them.', 'success')
+                              setShowKpiSelector(false)
+                              return
+                            }
                             const reloadData = await reload.json()
                             if (reloadData.kpis) setActiveKpis(reloadData.kpis)
                             setShowKpiSelector(false)

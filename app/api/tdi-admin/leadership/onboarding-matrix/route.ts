@@ -3,6 +3,7 @@ import { requireAdminAuth } from '@/lib/tdi-admin/auth';
 import { createClient } from '@supabase/supabase-js';
 import { getHubServiceClient, isEngagementAction } from '@/lib/hub/partnership-members';
 import { getSchoolSignIns } from '@/lib/partners/signed-in';
+import { getHubEngagement } from '@/lib/partners/hub-engagement';
 
 /**
  * Where every active partnership stands, on one screen.
@@ -140,25 +141,16 @@ export async function GET(_request: NextRequest) {
     // Everything below is fetched once for all partnerships rather than per
     // row. Nine partnerships today, but a per-row loop is how a page like this
     // quietly becomes unusable at forty.
-    const [staffRes, kpiRes, actionRes, seatRes, profileRes] = await Promise.all([
+    const [staffRes, kpiRes, actionRes] = await Promise.all([
       portal.from('staff_members').select('partnership_id, email, is_active').in('partnership_id', ids),
       portal.from('partnership_kpis').select('partnership_id, status').in('partnership_id', ids),
       portal.from('action_items').select('partnership_id, title, category, status').in('partnership_id', ids),
-      hub
-        .from('hub_memberships')
-        .select('user_id, partnership_id')
-        .in('partnership_id', ids)
-        .eq('tier', 'all_access')
-        .eq('status', 'active'),
-      hub.from('hub_profiles').select('id, partnership_slug').not('partnership_slug', 'is', null),
     ]);
 
     for (const [name, res] of [
       ['staff_members', staffRes],
       ['partnership_kpis', kpiRes],
       ['action_items', actionRes],
-      ['hub_memberships', seatRes],
-      ['hub_profiles', profileRes],
     ] as const) {
       // Surface rather than swallow. A discarded error here would produce a
       // matrix that looks authoritative and reports everyone as behind.
@@ -168,57 +160,23 @@ export async function GET(_request: NextRequest) {
       }
     }
 
-    // Seats by partnership, with a slug fallback for schools provisioned by
-    // hand. St. Mary is the live case: eleven seats carrying the slug but no
-    // partnership_id, because they skipped the official provisioning route.
-    const slugToId = new Map<string, string>();
-    for (const p of rows) if (p.slug) slugToId.set(p.slug, p.id);
+    // Seats and genuine Hub use, from the one shared definition in
+    // lib/partners/hub-engagement.ts. This was computed here, inline, and this
+    // page was the only screen that got it right. The per-school page and the
+    // nightly attention-flag cron each answered the same question their own
+    // way, which is how Addison came to show 19% in a header and 34% in the
+    // warning directly beneath it. Lifted out verbatim so this page cannot
+    // change behaviour, and both of those now call it too.
+    const engagementByPartnership = await getHubEngagement(portal, hub, ids);
 
     const seatUserIds = new Map<string, Set<string>>();
-    for (const s of seatRes.data ?? []) {
-      const key = String(s.partnership_id);
-      if (!seatUserIds.has(key)) seatUserIds.set(key, new Set());
-      seatUserIds.get(key)!.add(s.user_id as string);
-    }
-    const profileByPartnership = new Map<string, Set<string>>();
-    for (const pr of profileRes.data ?? []) {
-      const pid = slugToId.get(String(pr.partnership_slug));
-      if (!pid) continue;
-      if (!profileByPartnership.has(pid)) profileByPartnership.set(pid, new Set());
-      profileByPartnership.get(pid)!.add(pr.id as string);
-    }
-    // Only fall back for partnerships with no linked seats at all, and only
-    // count a profile if it actually holds a live seat. A profile is not an
-    // entitlement: someone who has left still has one.
-    const fallbackCandidates = [...profileByPartnership.entries()].filter(
-      ([pid]) => (seatUserIds.get(pid)?.size ?? 0) === 0
-    );
-    if (fallbackCandidates.length > 0) {
-      const candidateIds = [...new Set(fallbackCandidates.flatMap(([, set]) => [...set]))];
-      const { data: fallbackSeats, error: fallbackError } = await hub
-        .from('hub_memberships')
-        .select('user_id')
-        .in('user_id', candidateIds)
-        .eq('tier', 'all_access')
-        .eq('status', 'active');
-
-      if (fallbackError) {
-        console.error('[onboarding-matrix] fallback seat read failed:', fallbackError.message);
-        return NextResponse.json({ error: fallbackError.message }, { status: 500 });
-      }
-
-      const seated = new Set((fallbackSeats ?? []).map((s) => s.user_id as string));
-      for (const [pid, set] of fallbackCandidates) {
-        seatUserIds.set(pid, new Set([...set].filter((u) => seated.has(u))));
-      }
-    }
-
-    // Genuine activity only, via the one shared allowlist. Everything it
-    // leaves out was written by TDI rather than earned by the educator: the
-    // seat we created, the welcome we sent, the perk we granted. Counting any
-    // of it reports a school as active on the strength of our own outbound.
-    const allSeatIds = [...new Set([...seatUserIds.values()].flatMap((s) => [...s]))];
     const activeByPartnership = new Map<string, Set<string>>();
+    for (const [pid, engagement] of engagementByPartnership) {
+      seatUserIds.set(pid, engagement.seatUserIds);
+      activeByPartnership.set(pid, engagement.activeUserIds);
+    }
+
+    const allSeatIds = [...new Set([...seatUserIds.values()].flatMap((s) => [...s]))];
     const actionCounts = new Map<string, Map<string, number>>();
 
     const emptyEngagement = () => ({
@@ -258,9 +216,10 @@ export async function GET(_request: NextRequest) {
       );
       const activeUsers = new Set(genuine.map((a) => a.user_id as string));
 
+      // activeByPartnership already came from the shared definition above.
+      // This only needs the reverse index, to attribute each action row.
       const partnershipOfUser = new Map<string, string>();
       for (const [pid, set] of seatUserIds) {
-        activeByPartnership.set(pid, new Set([...set].filter((u) => activeUsers.has(u))));
         for (const uid of set) partnershipOfUser.set(uid, pid);
       }
 

@@ -3,6 +3,9 @@ import { slackNotify } from '@/lib/slack-notify';
 import { notifyAdmin } from '@/lib/admin-notify';
 import { shouldPostDigest, recordDigestPost, recordDigestSuppressed } from '@/lib/digest-state';
 import { createClient } from '@supabase/supabase-js';
+import { getSchoolSignIns } from '@/lib/partners/signed-in';
+import { getHubEngagement, hubActivePct } from '@/lib/partners/hub-engagement';
+import { getHubServiceClient } from '@/lib/hub/partnership-members';
 
 /**
  * GET /api/cron/partner-attention-flags
@@ -60,12 +63,33 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ success: true, flagsCreated: 0, message: 'No active partnerships.' });
     }
 
+    // The two definitions every screen now shares, fetched once for all
+    // partnerships rather than per row.
+    //
+    // This cron used to answer both questions its own way, which is why its
+    // warnings contradicted the page they appeared on. "Has the principal
+    // logged in" came from counting dashboard_views rows, a table whose writes
+    // were broken until 29 August and which is still empty for Saunemin,
+    // Glen Ellyn and Roosevelt, so it reported schools as never signed in while
+    // the header showed a sign in from yesterday. "How many staff are logged
+    // in" came from staff_members.hub_login_date over the count of roster rows,
+    // a different window and a different denominator from anything else.
+    const partnershipIds = partnerships.map((p) => p.id as string);
+    const signIns = await getSchoolSignIns(supabase, partnershipIds);
+    const engagementByPartnership = await getHubEngagement(
+      supabase,
+      getHubServiceClient(),
+      partnershipIds
+    );
+
     const now = new Date();
     let flagsCreated = 0;
     let concernsComputed = 0;
     let emailsSent = 0;
     let emailsFailed = 0;
     let emailsWouldSend = 0;
+    let flagsResolved = 0;
+    const resolutions: string[] = [];
 
     // These flags were written to a table and never told anyone. A partner
     // whose staff are not logging in is the clearest renewal risk we have, and
@@ -78,28 +102,36 @@ export async function GET(request: NextRequest) {
       const start = new Date(p.contract_start);
       const daysSinceStart = Math.floor((now.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
 
-      // Skip partnerships older than 90 days (they're past the onboarding window)
-      if (daysSinceStart > 90) continue;
+      // No 90 day cap any more, and removing it is the actual fix for stale
+      // flags. The resolve step lives inside this loop, so a partnership past
+      // day 90 was skipped entirely and every flag it was carrying froze
+      // exactly as it was: Saunemin's "nobody has ever signed in" was raised on
+      // 28 August, became false when somebody signed in, and could never be
+      // cleared because Saunemin had aged out of the loop that clears it.
+      //
+      // Every threshold below is a "day N or later" test, so they keep
+      // answering correctly for an older partnership. A school at 24% use six
+      // months in is more of a problem than one at 24% in week three, not less.
 
       // No "already flagged today" guard any more. There is one row per open
       // issue and the upsert moves last_seen_at, so running twice in a day is
       // harmless rather than a source of duplicates.
 
-      // Get dashboard view count for principal
-      const { count: dashViews } = await supabase
-        .from('dashboard_views')
-        .select('*', { count: 'exact', head: true })
-        .eq('partnership_id', p.id);
+      const signIn = signIns.get(p.id as string);
+      const engagement = engagementByPartnership.get(p.id as string);
 
-      // Get staff login stats
-      const { data: staffStats } = await supabase
-        .from('staff_members')
-        .select('hub_enrolled, hub_login_date')
-        .eq('partnership_id', p.id);
+      // A failed lookup must never raise a flag. Reading an outage as "nobody
+      // has signed in" would put every school on an attention list, and this
+      // cron emails what it raises.
+      if (!signIn || signIn.unknown || !engagement || engagement.unknown) {
+        console.warn(`[partner-attention-flags] skipping ${p.org_name}: engagement or sign-in unknown`);
+        continue;
+      }
 
-      const totalStaff = staffStats?.length || 0;
-      const loggedInStaff = staffStats?.filter(s => s.hub_login_date).length || 0;
-      const loginPct = totalStaff > 0 ? Math.round((loggedInStaff / totalStaff) * 100) : 0;
+      const neverSignedIn = signIn.neverSignedIn;
+      const totalStaff = engagement.seats;
+      const loggedInStaff = engagement.active;
+      const loginPct = hubActivePct(engagement) ?? 0;
 
       type Flag = { key: string; severity: 'warning' | 'urgent'; message: string };
       const flags: Flag[] = [];
@@ -108,11 +140,11 @@ export async function GET(request: NextRequest) {
       const newFlags: Flag[] = [];
 
       // Day 7: Principal not logged in
-      if (daysSinceStart >= 7 && daysSinceStart < 21 && (dashViews || 0) === 0) {
+      if (daysSinceStart >= 7 && daysSinceStart < 21 && neverSignedIn) {
         flags.push({
           key: 'principal_not_logged_in',
           severity: 'warning',
-          message: 'Principal has not logged into the dashboard yet. Direct call recommended.',
+          message: 'Nobody at this school has signed in yet. A direct call is the fastest fix.',
         });
       }
 
@@ -121,16 +153,16 @@ export async function GET(request: NextRequest) {
         flags.push({
           key: 'staff_logins_below_50',
           severity: 'warning',
-          message: `Only ${loginPct}% of staff have logged in, ${loggedInStaff} of ${totalStaff}. Re-engage through the staff champion.`,
+          message: `${loggedInStaff} of ${totalStaff} educators are using the Hub. Re-engage through the staff champion.`,
         });
       }
 
       // Day 21: Principal still not logged in (escalation)
-      if (daysSinceStart >= 21 && (dashViews || 0) === 0) {
+      if (daysSinceStart >= 21 && neverSignedIn) {
         flags.push({
           key: 'principal_still_not_logged_in',
           severity: 'urgent',
-          message: 'Principal has still not logged in after 21 days. Immediate follow up required.',
+          message: 'Nobody at this school has ever signed in. This needs a person, not another email.',
         });
       }
 
@@ -139,7 +171,7 @@ export async function GET(request: NextRequest) {
         flags.push({
           key: 'active_usage_below_40',
           severity: 'urgent',
-          message: `Active usage is ${loginPct}%, below the 40% mark. Escalate with a re-engagement plan.`,
+          message: `Use is at ${loginPct}%, below the 40% mark. Escalate with a re-engagement plan.`,
         });
       }
 
@@ -206,15 +238,21 @@ export async function GET(request: NextRequest) {
 
         // Anything previously open that is no longer true gets resolved rather
         // than lingering. A stale red flag is worse than no flag.
-        const { error: resolveError } = await supabase
+        const { data: resolvedRows, error: resolveError } = await supabase
           .from('partnership_flags')
           .update({ resolved_at: nowIso, updated_at: nowIso })
           .eq('partnership_id', p.id)
           .is('resolved_at', null)
-          .not('flag_key', 'in', `(${openKeys.length ? openKeys.map((k) => `"${k}"`).join(',') : '""'})`);
+          .not('flag_key', 'in', `(${openKeys.length ? openKeys.map((k) => `"${k}"`).join(',') : '""'})`)
+          .select('flag_key');
 
         if (resolveError) {
           console.error('[partner-attention-flags] flag resolve failed:', p.id, resolveError.message);
+        } else {
+          for (const row of resolvedRows ?? []) {
+            flagsResolved++;
+            resolutions.push(`${p.org_name ?? p.id}: ${row.flag_key}`);
+          }
         }
       } else {
         // A dry run has to compute the same decision set, or the numbers it
@@ -236,6 +274,25 @@ export async function GET(request: NextRequest) {
           if (!existing) newFlags.push(flag);
         }
         flagsCreated += flags.length;
+
+        // What the real run would clear. Without this the dry run reported only
+        // what it would raise, and clearing a flag that has stopped being true
+        // is the main thing this cron does for a school that has recovered.
+        const { data: wouldResolve, error: wouldResolveError } = await supabase
+          .from('partnership_flags')
+          .select('flag_key')
+          .eq('partnership_id', p.id)
+          .is('resolved_at', null)
+          .not('flag_key', 'in', `(${openKeys.length ? openKeys.map((k) => `"${k}"`).join(',') : '""'})`);
+
+        if (wouldResolveError) {
+          console.error('[partner-attention-flags] dry run resolve lookup failed:', p.id, wouldResolveError.message);
+        } else {
+          for (const row of wouldResolve ?? []) {
+            flagsResolved++;
+            resolutions.push(`${p.org_name ?? p.id}: ${row.flag_key}`);
+          }
+        }
       }
 
       // Email on newly opened flags only, and await it so a failure is visible.
@@ -317,8 +374,12 @@ export async function GET(request: NextRequest) {
       emailsWouldSend,
       slackPosted,
       partnershipsChecked: partnerships.length,
+      flagsResolved,
+      // Named, not counted. "2 resolved" is not reviewable and the point of a
+      // dry run is that somebody can check the decision before it happens.
+      resolutions,
       message: dryRun
-        ? `Dry run. Would open or refresh ${flagsCreated} flags across ${partnerships.length} partnerships. Nothing written.`
+        ? `Dry run. Would open or refresh ${flagsCreated} flags and clear ${flagsResolved} across ${partnerships.length} partnerships. Nothing written.`
         : undefined,
     });
   } catch (error) {
