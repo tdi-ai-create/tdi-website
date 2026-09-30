@@ -30,6 +30,7 @@ export default function GetStartedPage() {
     name: '',
     email: '',
     schoolName: '',
+    districtName: '',
     schoolCity: '',
     schoolState: '',
     pd_plan_audience: [] as string[],
@@ -138,6 +139,7 @@ export default function GetStartedPage() {
       'Name': formData.name,
       'Email': formData.email,
       'School Name': formData.schoolName,
+      'District': formData.districtName || '(not given)',
       'City': formData.schoolCity,
       'State': formData.schoolState,
       'Path': isTeacherPath ? 'Teacher/Para - Nomination' : 'Leader - PD Plan Request',
@@ -172,6 +174,7 @@ export default function GetStartedPage() {
           name: formData.name,
           role: (({"Teacher":"teacher","Para":"paraprofessional","Building Leader":"building leader","District Leader":"district leader"} as Record<string, string>)[selectedRole ?? ""]) ?? selectedRole?.toLowerCase(),
           school_name: formData.schoolName,
+          district_name: formData.districtName,
           school_city: formData.schoolCity,
           school_state: formData.schoolState,
           path: isTeacherPath ? 'nomination' : 'pd-plan',
@@ -196,12 +199,14 @@ export default function GetStartedPage() {
       const crmNotes = isTeacherPath
         ? [
             `${selectedRole}. Nomination submitted via /get-started.`,
+            formData.districtName && `District: ${formData.districtName}`,
             formData.teacher_pd_frustration && `PD Frustration: ${formData.teacher_pd_frustration}`,
             formData.teacher_pd_leadership_wish && `Leadership Wish: ${formData.teacher_pd_leadership_wish}`,
             formData.teacher_pd_contact && `Contact preference: ${formData.teacher_pd_contact}`,
           ].filter(Boolean).join('\n')
         : [
             `${selectedRole}. PD Plan Request submitted via /get-started.`,
+            formData.districtName && `District: ${formData.districtName}`,
             `Audience: ${formData.pd_plan_audience.join(', ')}`,
             `Scope: ${formData.pd_plan_scope}`,
             `Pain point: ${formData.pd_pain_point}`,
@@ -363,7 +368,7 @@ export default function GetStartedPage() {
             onClick={() => {
               setStep(1);
               setSelectedRole(null);
-              setFormData({ name: '', email: '', schoolName: '', schoolCity: '', schoolState: '', pd_plan_audience: [], pd_plan_scope: '', pd_pain_point: '', teacher_pd_frustration: '', teacher_pd_leadership_wish: '', teacher_pd_contact: '' });
+              setFormData({ name: '', email: '', schoolName: '', districtName: '', schoolCity: '', schoolState: '', pd_plan_audience: [], pd_plan_scope: '', pd_pain_point: '', teacher_pd_frustration: '', teacher_pd_leadership_wish: '', teacher_pd_contact: '' });
               setFormErrors({});
             }}
             className="text-sm underline"
@@ -564,12 +569,16 @@ export default function GetStartedPage() {
                 <label className="block text-sm font-semibold mb-2" style={{ color: '#1e2749' }}>
                   {selectedRole === 'Teacher' || selectedRole === 'Para'
                     ? "School You're Nominating"
-                    : 'Your School or District Name'}
+                    : selectedRole === 'District Leader'
+                      ? 'Your District Name'
+                      : 'Your School'}
                   {' '}<span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
-                  placeholder="Full school or district name"
+                  placeholder={selectedRole === 'District Leader'
+                    ? 'Full district name'
+                    : 'The school itself, not the district'}
                   value={formData.schoolName}
                   onChange={(e) => { setFormData({ ...formData, schoolName: e.target.value }); setFormErrors({ ...formErrors, schoolName: '' }); }}
                   className="w-full px-4 py-3 rounded-lg border focus:outline-none focus:border-gray-500"
@@ -577,6 +586,22 @@ export default function GetStartedPage() {
                 />
                 {formErrors.schoolName && <p className="text-red-500 text-xs mt-1">{formErrors.schoolName}</p>}
               </div>
+
+              {selectedRole !== 'District Leader' && (
+                <div className="mb-5">
+                  <label className="block text-sm font-semibold mb-2" style={{ color: '#1e2749' }}>
+                    District <span className="font-normal text-gray-500">(optional)</span>
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="If this school is part of a larger district"
+                    value={formData.districtName}
+                    onChange={(e) => setFormData({ ...formData, districtName: e.target.value })}
+                    className="w-full px-4 py-3 rounded-lg border focus:outline-none focus:border-gray-500"
+                    style={{ borderColor: '#d1d5db' }}
+                  />
+                </div>
+              )}
 
               <div className="grid grid-cols-[65%_35%] gap-4 mb-5">
                 <div>
