@@ -23,8 +23,78 @@ export interface Claim {
   id: string;
   /** Patterns that mean a piece of text is making this claim. */
   patterns: RegExp[];
+  /**
+   * An occurrence with this nearby is a different claim, and does not count.
+   *
+   * One figure can be two claims. 94% is retired as a completion rate and
+   * approved as a recommendation rate, and the only thing separating them is
+   * the words around the number. Matching on the figure alone made the register
+   * block a claim Rae had settled.
+   *
+   * Tested per occurrence against a window either side, not against the whole
+   * document, so a draft that makes both claims still trips on the retired one.
+   */
+  unlessNear?: RegExp;
   /** Why it is settled, and by whom, so it can be revisited on evidence. */
   note: string;
+}
+
+/** How far either side of a match counts as "near" it, within its sentence. */
+const CONTEXT_CHARS = 60;
+
+/** Sentence and line boundaries. A claim's own words live in its own sentence. */
+const BOUNDARY = /[.!?\n]/;
+
+/**
+ * The text around a match that decides what the match means.
+ *
+ * Clipped to the sentence, not just to a character count. "Our 94% would
+ * recommend us. Also a 94% success rate." is two claims, and a window wide
+ * enough to see the first sentence from the second one clears a retired claim
+ * because of a word that belongs to its neighbour.
+ */
+function contextAround(text: string, start: number, end: number): string {
+  let from = Math.max(0, start - CONTEXT_CHARS);
+  for (let i = start - 1; i >= from; i--) {
+    if (BOUNDARY.test(text[i])) {
+      from = i + 1;
+      break;
+    }
+  }
+
+  let to = Math.min(text.length, end + CONTEXT_CHARS);
+  for (let i = end; i < to; i++) {
+    if (BOUNDARY.test(text[i])) {
+      to = i;
+      break;
+    }
+  }
+
+  return text.slice(from, to);
+}
+
+/**
+ * Does this text make this claim.
+ *
+ * Walks every occurrence rather than asking whether one exists, because an
+ * `unlessNear` decides per occurrence and a document can hold both.
+ */
+function makesClaim(text: string, claim: Claim): boolean {
+  for (const pattern of claim.patterns) {
+    const flags = pattern.flags.includes('g') ? pattern.flags : pattern.flags + 'g';
+    const scanner = new RegExp(pattern.source, flags);
+
+    let match: RegExpExecArray | null;
+    while ((match = scanner.exec(text)) !== null) {
+      const end = match.index + match[0].length;
+      if (!claim.unlessNear) return true;
+      if (!claim.unlessNear.test(contextAround(text, match.index, end))) return true;
+
+      // A zero-length match would otherwise spin here forever.
+      if (match.index === scanner.lastIndex) scanner.lastIndex++;
+    }
+  }
+  return false;
 }
 
 /**
@@ -52,6 +122,22 @@ export const APPROVED_CLAIMS: Claim[] = [
       'The benchmark the 74% is compared against. Approved with it, since blocking on one and not ' +
       'the other leaves the sentence unusable either way.',
   },
+  {
+    id: 'recommend-rate-94',
+    // Requires the word next to the number in either direction. A bare 94% is
+    // not this claim, and must keep failing.
+    // The gap may not cross a sentence boundary, or "a 94% success rate. We
+    // recommend..." would clear itself using a word from the next sentence.
+    patterns: [
+      /\b94\s*(?:%|percent)[^.!?\n]{0,60}recommend/i,
+      /recommend[^.!?\n]{0,60}\b94\s*(?:%|percent)/i,
+    ],
+    note:
+      'The share of educators who would recommend TDI, published on /for-schools. Rae cleared it ' +
+      'on 23 September 2026: "i already told you that stat is right." It is a different claim from ' +
+      'the retired keynote figure that happens to share the number, and the register blocked both ' +
+      'until 30 September.',
+  },
 ];
 
 /**
@@ -65,9 +151,14 @@ export const RETIRED_CLAIMS: Claim[] = [
   {
     id: 'ninety-four-percent',
     patterns: [/\b94\s*%/, /\b94\s*percent/i],
+    // The recommendation figure is a separate, approved claim. Everything else
+    // carrying this number is still retired, including the vaguer readings like
+    // "a 94% success rate", which is exactly how a withdrawn number comes back.
+    unlessNear: /recommend/i,
     note:
-      'Used in the BRCC keynote and withdrawn. It must not appear in anything a school, funder or ' +
-      'audience sees.',
+      'The completion figure used in the BRCC keynote, "94 percent finished, 74 percent still ' +
+      'doing it", withdrawn for having no source. It must not appear in anything a school, funder ' +
+      'or audience sees. Not to be confused with the approved 94% recommendation rate.',
   },
 ];
 
@@ -75,14 +166,14 @@ export const RETIRED_CLAIMS: Claim[] = [
 export function approvedClaimsIn(text?: string | null): Claim[] {
   const t = String(text ?? '');
   if (!t.trim()) return [];
-  return APPROVED_CLAIMS.filter((c) => c.patterns.some((p) => p.test(t)));
+  return APPROVED_CLAIMS.filter((c) => makesClaim(t, c));
 }
 
 /** Every retired claim a piece of text makes. Any hit is a hard stop. */
 export function retiredClaimsIn(text?: string | null): Claim[] {
   const t = String(text ?? '');
   if (!t.trim()) return [];
-  return RETIRED_CLAIMS.filter((c) => c.patterns.some((p) => p.test(t)));
+  return RETIRED_CLAIMS.filter((c) => makesClaim(t, c));
 }
 
 /**
