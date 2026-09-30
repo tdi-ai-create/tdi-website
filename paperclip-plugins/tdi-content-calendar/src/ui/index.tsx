@@ -716,6 +716,9 @@ export function ContentCalendarPage(_props: PluginWidgetProps) {
   const byDay = useMemo(() => {
     const map = new Map<string, QueueItem[]>();
     for (const it of items) {
+      // Excluded from the counts above, so it has no business on the grid
+      // either. A cancelled piece on a day reads as work that is going out.
+      if (it.status === "cancelled") continue;
       const day = it.published_at ? localDay(it.published_at) : it.scheduled_for;
       if (!day) continue;
       const list = map.get(day) ?? [];
@@ -928,30 +931,28 @@ export function ContentCalendarPage(_props: PluginWidgetProps) {
     if (!item || !day) return;
     if (item.scheduled_for === day) return;
 
-    // Work that is already out has a date recording what happened. Moving it
-    // would be rewriting history rather than changing a plan.
-    if (item.status === "published" || item.status === "verified") {
-      setSaid(`"${item.title ?? "That piece"}" has already gone out. Its date is a record, not a plan.`);
-      return;
-    }
-
-    // Approved work moves through schedule, which is a real transition.
-    // Anything earlier gets set_date, which writes the day and leaves the piece
-    // exactly where it is, so laying out a month claims nothing about sign off.
-    const approved = item.status === "approved" || item.status === "scheduled";
-
+    // Everything moves, including finished work.
+    //
+    // This used to refuse anything published, on the grounds that its date
+    // recorded what happened and moving it would rewrite history. That was true
+    // of the content queue, which stored a real published_at. It is not true
+    // here: a finished ticket's day is read out of its title, so it is a guess
+    // about a plan, not a record of an event, and refusing to correct a guess
+    // is the wrong way round. See the published_at note in the worker.
+    //
+    // set_date for everything. It writes the day and leaves the ticket exactly
+    // where it is on the board, so laying out a month claims nothing about
+    // whether anyone signed it off.
     setBusy(true);
     setSaid(null);
     try {
       const res = (await decide({
         id: item.id,
-        decision: approved ? "schedule" : "set_date",
+        decision: "set_date",
         scheduled_for: day,
       })) as { ok?: boolean; error?: string };
       if (!res?.ok) throw new Error(res?.error ?? "That did not go through.");
-      setSaid(approved
-        ? `Moved to ${day}.`
-        : `Planned for ${day}. Still ${WAITING[item.status] ?? item.status}.`);
+      setSaid(`Moved to ${day}.`);
       refresh();
     } catch (e) {
       setSaid(e instanceof Error ? e.message : "That did not go through.");
@@ -1028,10 +1029,10 @@ export function ContentCalendarPage(_props: PluginWidgetProps) {
     }}>
       <h1 style={{ fontSize: 24, fontWeight: 600, margin: "0 0 4px" }}>Content calendar</h1>
       <p style={{ color: "#5A6472", margin: "0 0 16px", maxWidth: "72ch" }}>
-        Every channel, by month. Planned work sits on the day it is planned for; work that went out
-        sits on the day it went out. Open a piece to read it and decide, here, without leaving the board.
-        Drag a piece to another day to move it, including one already sitting on a day. Work that has
-        already gone out will not move: its date is a record of what happened, not a plan.
+        Every channel, by month, read straight off the board. A piece sits on the day it is planned
+        for, taken from its ticket unless somebody has moved it. Open one to read it and decide, here,
+        without leaving the board. Drag any piece to another day to move it, finished work included:
+        these are planned days, not a record of when anything went out.
       </p>
 
       {data && (data.readError || (data.projectsMissed?.length ?? 0) > 0) && (
@@ -1207,9 +1208,11 @@ export function ContentCalendarPage(_props: PluginWidgetProps) {
                 {c.day && <div style={{ fontSize: 11, color: "#8A94A2", marginBottom: 4 }}>{c.day}</div>}
                 {day.map((it) => {
                   const done = it.status === "published" || it.status === "verified";
-                  // Published work has already gone out. Dragging it would be
-                  // rewriting history rather than changing a plan.
-                  const movable = it.status !== "published" && it.status !== "verified" && it.status !== "cancelled";
+                  // Finished work moves too. Its day is read out of the ticket
+                  // title rather than recorded when it went out, so it is a
+                  // guess worth correcting, not a fact worth protecting.
+                  // Cancelled work is the one thing there is no point moving.
+                  const movable = it.status !== "cancelled";
                   return (
                     <button key={it.id}
                       draggable={movable}

@@ -66,16 +66,48 @@ and waking Izzy to write a test post is a real cost paid for nothing.
 Cleaned up: set TEA-931 to Cancelled through the board, and confirmed by query
 that its status is "cancelled".
 
+## Drag and drop, checked afterwards (v0.10.3)
+
+Reading the handler before testing found it broken. It refused anything with
+status published, saying "its date is a record, not a plan". That was true of
+the content queue, which stored a real published_at. Here a finished ticket's
+day is parsed out of its title, so the message was false and it blocked every
+finished card. The `draggable` attribute was gated the same way, so the cards
+could not even be picked up.
+
+Fixed, then driven:
+
+- Dragged: "Week 9 Substack Drafts (Sep 28-Oct 2)" from Monday 28 to Tuesday 29
+- Saw: "Moved to 2026-09-29.", the card redrawn in the Tuesday column, and
+  Monday 28 left empty
+- Dragged it back, saw "Moved to 2026-09-28." and the card return
+
+## Kristin's view, checked afterwards
+
+Could not sign in as her, so I checked the thing that would actually break:
+the hardcoded approver list. Queried the board's own user table.
+
+- `VSCr53SR...` is Rae Hughart, admin@teachersdeserveit.com, mapped to "rae"
+- `oEWxpBEN...` is Kristin, team@whatwilllast.com, mapped to "kristin"
+- `BeBKQO7M...` is "Legacy Admin (Inactive)" and is correctly absent
+- Bella is absent, so she can read the calendar but not decide from it
+
+Both ids match, so Kristin can approve and plan. Everything else on the page is
+identical code and identical data: the plugin reads the projects with its own
+privileges, not the signed-in person's.
+
 ## What I could not verify
 
-Drag and drop. It is unchanged code, but the date it writes now goes to plugin
-state rather than the content queue, so the path underneath it is new and I did
-not exercise it.
+How the page looks rendered in Kristin's browser. The colour bug on 24 September
+came from the board shell passing white text down, so appearance is worth her
+eyes even though the logic is now proven.
 
-Whether the month reads correctly for somebody who is not Rae. I was signed in
-as Rae Hughart throughout, and the approver list only recognises Rae and
-Kristin, so Kristin's own view is inferred and not observed.
+## Flaws found after the first deploy, all fixed
 
-One flaw found and fixed after the fact: the generated ticket description read
-"For teacher." because the note quoted the stored value instead of the label on
-the control. Shipped as v0.10.2.
+- "For teacher." in a planned ticket, because the note quoted the stored value
+  rather than the label on the control (v0.10.2)
+- Drag refusing all finished work with a message that was no longer true (v0.10.3)
+- The intro paragraph still promising that published work would not move (v0.10.4)
+- Cancelled work drawing on the grid while being excluded from the counts above
+  it. Confirmed by the cancelled TEA-931 sitting on 20 September, and by that
+  square being empty afterwards (v0.10.4)
