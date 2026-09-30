@@ -13,6 +13,7 @@ import { LoveNotesCallout } from '@/components/dashboard/shared/LoveNotesCallout
 import { LeadingIndicators } from '@/components/dashboard/shared/LeadingIndicators'
 import { ServiceTracker } from '@/components/dashboard/admin/ServiceTracker'
 import { InlineEditField } from '@/components/dashboard/admin/InlineEditField'
+import { VisitPrepPanel } from '@/components/dashboard/admin/VisitPrepPanel'
 import { OFFERINGS, offeringLabel } from '@/lib/partnerships/offerings'
 import { FileUploadZone } from '@/components/dashboard/admin/FileUploadZone'
 import { AIExtractModal } from '@/components/dashboard/admin/AIExtractModal'
@@ -84,6 +85,9 @@ export default function AdminPartnershipDetailPage() {
   const [partnership, setPartnership] = useState<any>(null)
   const [organization, setOrganization] = useState<any>(null)
   const [timelineEvents, setTimelineEvents] = useState<TimelineEvent[]>([])
+  // Mirrors observation_visits.prep_done_at so ticking done in the panel drops
+  // the urgent card without a refetch of the whole page.
+  const [visitPrepDone, setVisitPrepDone] = useState(false)
   const [actionItems, setActionItems] = useState<ActionItem[]>([])
   const [defaults, setDefaults] = useState<Record<string, string>>(STATIC_DEFAULTS)
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([])
@@ -553,6 +557,23 @@ export default function AdminPartnershipDetailPage() {
     }
   }
 
+  // ─── Computed: the next observation day inside 30 days ─────────────
+  // Lifted out of smartActions because the prep panel needs the event id too,
+  // and the card used to compute the gap and then throw the event away.
+  const nextObservation = useMemo(() => {
+    const upcoming = timelineEvents
+      .filter(e => e.event_type === 'observation' && e.status !== 'completed' && e.event_date)
+      .map(e => ({
+        id: e.id,
+        daysUntil: Math.ceil(
+          (new Date(e.event_date as string).getTime() - Date.now()) / (1000 * 60 * 60 * 24)
+        ),
+      }))
+      .filter(e => e.daysUntil >= 0 && e.daysUntil <= 30)
+      .sort((a, b) => a.daysUntil - b.daysUntil)
+    return upcoming[0] ?? null
+  }, [timelineEvents])
+
   // ─── Computed: Smart Actions ───────────────────────────────────────
   const smartActions = useMemo(() => {
     if (!partnership) return []
@@ -584,30 +605,20 @@ export default function AdminPartnershipDetailPage() {
       })
     }
 
-    // Upcoming observation day: surface the prep SOP while there is still time to use it.
-    // timeline_events already stores these with event_type 'observation' and an event_date,
-    // so nothing new is written. This only reads what the calendar already knows.
-    const nextObservation = timelineEvents
-      .filter(e => e.event_type === 'observation' && e.status !== 'completed' && e.event_date)
-      .map(e => ({
-        daysUntil: Math.ceil(
-          (new Date(e.event_date as string).getTime() - Date.now()) / (1000 * 60 * 60 * 24)
-        ),
-      }))
-      .filter(e => e.daysUntil >= 0 && e.daysUntil <= 30)
-      .sort((a, b) => a.daysUntil - b.daysUntil)[0]
-
-    if (nextObservation) {
+    // Upcoming observation day. Sends you to the prep panel on this page rather
+    // than straight to the SOP, because the panel is where the school's answers
+    // go and it links the SOP itself.
+    if (nextObservation && !visitPrepDone) {
       const { daysUntil } = nextObservation
       actions.push({
-        label: 'Open visit prep SOP',
+        label: 'Visit prep',
         description:
           daysUntil === 0
             ? 'Observation day is today. Roster, addresses and school day times should already be in.'
             : `Observation day in ${daysUntil} day${daysUntil === 1 ? '' : 's'}. Ask for the roster, building addresses and school day times.`,
         variant: daysUntil <= 14 ? 'urgent' : 'primary',
         onClick: () => {
-          window.open('/tdi-admin/docs?doc=visit-prep-sop', '_blank')
+          document.getElementById('visit-prep')?.scrollIntoView({ behavior: 'smooth', block: 'center' })
         },
       })
     }
@@ -667,7 +678,7 @@ export default function AdminPartnershipDetailPage() {
     }
 
     return actions.slice(0, 4)
-  }, [partnership, actionItems, partnershipId, internalNotes, internalMeetings, briefingLoading, timelineEvents])
+  }, [partnership, actionItems, partnershipId, internalNotes, internalMeetings, briefingLoading, nextObservation, visitPrepDone])
 
   // ─── Computed: Unified Timeline ────────────────────────────────────
   const unifiedTimeline = useMemo(() => {
@@ -1017,6 +1028,16 @@ export default function AdminPartnershipDetailPage() {
                 </button>
               )
             })}
+          </div>
+        )}
+
+        {nextObservation && (
+          <div id="visit-prep" className="mb-4">
+            <VisitPrepPanel
+              eventId={nextObservation.id}
+              daysUntil={nextObservation.daysUntil}
+              onDoneChange={setVisitPrepDone}
+            />
           </div>
         )}
 
