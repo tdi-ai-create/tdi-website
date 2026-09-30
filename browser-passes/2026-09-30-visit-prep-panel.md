@@ -11,9 +11,9 @@ observation day.
 ## What I did
 
 - Opened: https://tdi-website-git-visit-prep-capture-raes-projects-94e0788c.vercel.app/tdi-admin/leadership/02f4b713-f258-4dff-a526-91565ff9a8e6
-- Saw: preview deployments still return
-  "500 MIDDLEWARE_INVOCATION_FAILED" on every route, the same failure recorded
-  in the 29 September pass. The preview cannot be signed in to or exercised.
+- Saw: HTTP 500 with "MIDDLEWARE_INVOCATION_FAILED" in the body, checked with curl
+  against this PR's own preview on 30 September. Same failure recorded in the
+  29 September pass, so the preview cannot be signed in to or exercised at all.
 
 - Deferred: preview is unusable and the admin portal cannot be signed in to on
   localhost or a vercel.app origin, so the panel cannot be pressed before merge.
@@ -35,8 +35,11 @@ Nothing on a live partnership. The panel writes to a real visit record for
 Saunemin, whose observation day is 7 October, and I am not putting test notes or
 files on it before Rae has seen the panel.
 
-- Pressed: nothing. See the deferral above.
-- Saw: nothing in a browser. See the deferral above.
+- Pressed: nothing in a browser. See the deferral above.
+- Saw: the 6 new columns exist on observation_visits and all 6 are nullable,
+  confirmed by querying information_schema, and "0" rows in the table. That is a
+  query result rather than a screen, which is exactly why this pass is deferred
+  rather than claimed as complete.
 
 ## Still to press on production
 
