@@ -187,6 +187,35 @@ interface EngagementItem {
   opens: number;
 }
 
+/**
+ * A completed year, stored rather than derived.
+ *
+ * Addison's first year ran on the previous platform, so none of it can be
+ * recomputed from the Hub. Every field here is a stated fact somebody wrote
+ * down, which is why the shape is generous: a school's year does not reduce
+ * neatly to one set of columns.
+ */
+interface YearRecord {
+  id: string;
+  year_label: string;
+  headline: string | null;
+  summary: string | null;
+  stats: { value: string; label: string }[] | null;
+  change: {
+    label?: string;
+    before?: string;
+    after?: string;
+    beforeLabel?: string;
+    afterLabel?: string;
+    delta?: string;
+    note?: string;
+  } | null;
+  themes: { title: string; body: string }[] | null;
+  lists: { title: string; subtitle?: string; unit?: string; items: { label: string; count: number }[] }[] | null;
+  quotes: { text: string; attribution?: string }[] | null;
+  footnote: string | null;
+}
+
 interface HubEngagementDetail {
   topContent: EngagementItem[];
   activeThisWeek: number;
@@ -432,6 +461,7 @@ export default function PartnerDashboard() {
   const [metricSnapshots, setMetricSnapshots] = useState<MetricSnapshot[]>([]);
   const [apiBuildings, setApiBuildings] = useState<Building[]>([]);
   const [engagement, setEngagement] = useState<HubEngagementDetail | null>(null);
+  const [yearRecords, setYearRecords] = useState<YearRecord[]>([]);
   // Funding status for this school only, from its own funding_pursuits row.
   const [funding, setFunding] = useState<{
     hasFunding: boolean;
@@ -723,6 +753,7 @@ export default function PartnerDashboard() {
           setActionItems(updatedItems);
           setStaffStats(data.staffStats || { total: 0, hubLoggedIn: 0 });
           setEngagement(data.engagement ?? null);
+          setYearRecords(data.yearRecords || []);
           setMetricSnapshots(data.metricSnapshots || []);
           setApiBuildings(data.buildings || []);
           // The timeline_events table stores event_title and event_date, but this
@@ -1534,6 +1565,10 @@ export default function PartnerDashboard() {
     // building card, the per-building engagement breakdown and the district
     // overview row rendered for nobody. Found on 30 Sep 2026 by opening
     // Addison's live dashboard and counting six tabs.
+    // One tab per completed year we hold a record for, newest first. Only
+    // records marked visible_to_partner reach the client, so this is empty for
+    // a school whose record is still being written.
+    ...yearRecords.map(r => ({ id: `year-${r.id}`, label: r.year_label })),
     ...(partnership?.partnership_type === 'district' ? [{ id: 'schools', label: 'Schools' }] : []),
     { id: 'team', label: 'Team' },
   ];
@@ -8185,6 +8220,136 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
         )}
 
         {/* SCHOOLS TAB (District Only) */}
+        {/* ─── A COMPLETED YEAR ───
+            Stored rather than derived. Addison's first year ran Jan to May 2026
+            on the previous platform and the Hub holds none of it, so every
+            figure here is a stated fact somebody wrote down.
+
+            Quotes carry a school rather than a person. A first name plus a small
+            building identifies someone, and these were written in a survey about
+            the sessions, not for a leadership screen. */}
+        {yearRecords.map(record => activeTab === `year-${record.id}` && (
+          <div
+            key={record.id}
+            role="tabpanel"
+            id={`panel-year-${record.id}`}
+            aria-labelledby={`tab-year-${record.id}`}
+            className="py-6 space-y-5"
+          >
+            <div className="bg-white rounded-2xl p-6 md:p-7 shadow-sm border border-gray-100">
+              <div className="flex items-baseline justify-between gap-4 flex-wrap">
+                <h2 className="text-[17px] font-bold text-[#1e2749] tracking-tight">
+                  {record.headline || record.year_label}
+                </h2>
+                <span className="text-xs text-gray-400">{record.year_label}</span>
+              </div>
+              {record.summary && (
+                <p className="text-xs text-gray-500 mt-2 leading-relaxed max-w-3xl">{record.summary}</p>
+              )}
+              {!!record.stats?.length && (
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 md:gap-4 mt-5">
+                  {record.stats.map((s, i) => (
+                    <div key={i} className="p-3 md:p-4 bg-gray-50 rounded-xl text-center">
+                      <p className="text-xl md:text-2xl font-bold text-[#1e2749]">{s.value}</p>
+                      <p className="text-xs md:text-sm text-gray-500">{s.label}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {record.change && (
+              <div className="bg-white rounded-2xl p-6 md:p-7 shadow-sm border border-gray-100">
+                <h2 className="text-[17px] font-bold text-[#1e2749] tracking-tight">{record.change.label}</h2>
+                {record.change.note && (
+                  <p className="text-xs text-gray-500 mt-2 leading-relaxed max-w-3xl">{record.change.note}</p>
+                )}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-center mt-5 p-5 bg-gray-50 rounded-xl">
+                  <div className="text-center">
+                    <p className="text-3xl font-bold text-gray-400">{record.change.before}</p>
+                    <p className="text-xs text-gray-500 mt-1">{record.change.beforeLabel}</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-sm font-bold text-[#1e2749]">{record.change.delta}</p>
+                    <div className="h-2 bg-gray-200 rounded-full overflow-hidden mt-2.5">
+                      <div className="h-full rounded-full bg-[#E8B84B]" style={{ width: '64%' }} />
+                    </div>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-3xl font-bold text-[#E8B84B]">{record.change.after}</p>
+                    <p className="text-xs text-gray-500 mt-1">{record.change.afterLabel}</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {!!record.themes?.length && (
+              <div className="bg-white rounded-2xl p-6 md:p-7 shadow-sm border border-gray-100">
+                <h2 className="text-[17px] font-bold text-[#1e2749] tracking-tight mb-4">What they came back to</h2>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+                  {record.themes.map((t, i) => (
+                    <div key={i} className="border border-gray-200 rounded-xl p-4">
+                      <h3 className="text-sm font-bold text-[#1e2749] mb-1.5">{t.title}</h3>
+                      <p className="text-[13px] text-gray-500 leading-relaxed">{t.body}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {record.lists?.map((list, li) => {
+              const max = Math.max(...list.items.map(i => i.count), 1);
+              return (
+                <div key={li} className="bg-white rounded-2xl p-6 md:p-7 shadow-sm border border-gray-100">
+                  <h2 className="text-[17px] font-bold text-[#1e2749] tracking-tight">{list.title}</h2>
+                  {list.subtitle && <p className="text-xs text-gray-500 mt-2">{list.subtitle}</p>}
+                  <div className="flex flex-col gap-3.5 mt-5">
+                    {list.items.map((item, i) => (
+                      <div key={i}>
+                        <div className="flex justify-between text-sm mb-1.5">
+                          <span className="text-[#1e2749]">{item.label}</span>
+                          <span className="text-gray-500 tabular-nums">{item.count}</span>
+                        </div>
+                        <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                          <div
+                            className={`h-full rounded-full ${i === 0 ? 'bg-[#E8B84B]' : 'bg-[#80a4ed]'}`}
+                            style={{ width: `${Math.round((item.count / max) * 100)}%` }}
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+
+            {!!record.quotes?.length && (
+              <div className="bg-white rounded-2xl p-6 md:p-7 shadow-sm border border-gray-100">
+                <h2 className="text-[17px] font-bold text-[#1e2749] tracking-tight">In their own words</h2>
+                <p className="text-xs text-gray-500 mt-2">
+                  Unedited, from the survey your staff filled in themselves.
+                </p>
+                <div className="flex flex-col gap-3 mt-5">
+                  {record.quotes.map((q, i) => (
+                    <div key={i} className="pl-4 py-3 bg-gray-50 rounded-r-xl border-l-[3px] border-[#80a4ed]">
+                      <p className="text-sm text-[#1e2749] leading-relaxed">{q.text}</p>
+                      {q.attribution && (
+                        <span className="block text-xs text-gray-400 mt-2">{q.attribution}</span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {record.footnote && (
+              <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+                <p className="text-xs text-gray-500 leading-relaxed">{record.footnote}</p>
+              </div>
+            )}
+          </div>
+        ))}
+
         {activeTab === 'schools' && partnership?.partnership_type === 'district' && (
           <div role="tabpanel" id="panel-schools" aria-labelledby="tab-schools" className="space-y-4 md:space-y-6">
             {/* Schools Overview */}
