@@ -3217,7 +3217,7 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                 ...(hasObservations ? [{
                   id: 'photos',
                   title: 'Share Staff Photos',
-                  description: 'Even a few photos help. When our team visits your building for observations, knowing faces makes the experience more personal for everyone. Send whatever you have -- a staff directory page, a few headshots, or a ZIP file. New staff can be added later.',
+                  description: 'Even a few photos help. When our team visits your building for observations, knowing faces makes the experience more personal for everyone. Send whatever you have, a staff directory page, a few headshots, or a ZIP file. New staff can be added later.',
                   done: false,
                   icon: Eye,
                   action: () => navigateToTab('team'),
@@ -3421,88 +3421,13 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                     </div>
                     <p className="text-xs text-gray-400 mt-1">
                       {staffStats.hubLoggedIn === 0
-                        ? 'Your team hasn\'t logged in yet -- they\'ll receive an email invite shortly.'
+                        ? 'Your team hasn\'t logged in yet. They\'ll receive an email invite shortly.'
                         : staffStats.hubLoggedIn < staffStats.total
                           ? `${staffStats.total - staffStats.hubLoggedIn} educators haven't logged in yet. A quick reminder can help.`
                           : 'Your entire team is active on the Hub!'}
                     </p>
                   </div>
                 </div>
-              </div>
-            )}
-
-            {/* ─── WHAT YOUR TEAM IS WORKING ON ───
-                Bonnie Osborne, 30 September 2026: she could see that staff had
-                signed in and nothing about what they did next. Every ingredient
-                was already recorded and never shown to the client.
-
-                Ranked by distinct people rather than opens, because eight paras
-                in one course says something about the school and one para
-                opening it thirty times says something about one para. */}
-            {engagement && !engagement.unknown && engagement.topContent.length > 0 && (
-              <div className="bg-white rounded-2xl p-6 md:p-7 shadow-sm border border-gray-100">
-                <div className="flex items-baseline justify-between gap-4 flex-wrap mb-1">
-                  <h2 className="text-[17px] font-bold text-[#1e2749] tracking-tight">
-                    What your team is working on
-                  </h2>
-                  <span className="text-xs text-gray-400">
-                    Last {engagement.windowDays} days
-                  </span>
-                </div>
-                <p className="text-xs text-gray-500 mb-5">
-                  Nobody assigned these. Your staff chose them.
-                </p>
-
-                <div className="grid grid-cols-3 gap-2 md:gap-4 mb-6">
-                  <div className="p-3 md:p-4 bg-gray-50 rounded-xl text-center">
-                    <p className="text-xl md:text-2xl font-bold text-[#1e2749]">{engagement.activeThisWeek}</p>
-                    <p className="text-xs md:text-sm text-gray-500">Active this week</p>
-                  </div>
-                  <div className="p-3 md:p-4 bg-gray-50 rounded-xl text-center">
-                    <p className="text-xl md:text-2xl font-bold text-[#1e2749]">{engagement.activeThisMonth}</p>
-                    <p className="text-xs md:text-sm text-gray-500">Active this month</p>
-                  </div>
-                  <div className="p-3 md:p-4 bg-gray-50 rounded-xl text-center">
-                    <p className="text-xl md:text-2xl font-bold text-[#1e2749]">
-                      {engagement.lastActiveAt
-                        ? new Date(engagement.lastActiveAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
-                        : '—'}
-                    </p>
-                    <p className="text-xs md:text-sm text-gray-500">Most recent sign in</p>
-                  </div>
-                </div>
-
-                <div className="space-y-2.5">
-                  {engagement.topContent.map((item, i) => (
-                    <div key={`${item.kind}-${i}`} className="flex items-center gap-3">
-                      <span
-                        className="px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wide shrink-0"
-                        style={
-                          item.kind === 'course'
-                            ? { background: '#E8F0FD', color: '#1e2749' }
-                            : { background: '#FFF8E7', color: '#8a6d1f' }
-                        }
-                      >
-                        {item.kind === 'course' ? 'Course' : 'Quick Win'}
-                      </span>
-                      <span className="text-sm text-[#1e2749] flex-1 min-w-0 truncate" title={item.title}>
-                        {item.title}
-                      </span>
-                      <span className="text-sm font-semibold text-[#1e2749] shrink-0">
-                        {item.people}
-                      </span>
-                      <span className="text-xs text-gray-400 shrink-0 w-24 text-right">
-                        {item.people === 1 ? 'person' : 'people'}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-
-                {engagement.truncated && (
-                  <p className="text-[11px] text-gray-400 mt-4">
-                    Your team is busy enough that this is based on the most recent activity rather than every record in the window.
-                  </p>
-                )}
               </div>
             )}
 
@@ -3522,7 +3447,7 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                         &ldquo;{q.quote_text}&rdquo;
                       </p>
                       <p className="text-[10px] text-gray-400 mt-1">
-                        -- {q.teacher_role}{q.session_type ? `, ${q.session_type}` : ''}{q.created_at ? `, ${new Date(q.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}` : ''}
+                        {q.teacher_role}{q.session_type ? `, ${q.session_type}` : ''}{q.created_at ? `, ${new Date(q.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}` : ''}
                       </p>
                     </div>
                   ))}
@@ -3595,7 +3520,21 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
             {(() => {
               // Always show real data -- no fake preview numbers
               const isPreview = false;
-              const hubPct = hubStats?.hub_login_pct ?? (staffStats.total > 0 ? Math.round((staffStats.hubLoggedIn / staffStats.total) * 100) : 0);
+              /**
+               * Deliberately NOT hubStats.hub_login_pct.
+               *
+               * That field answers a different question, distinct sign ins in
+               * the current calendar month over provisioned seats, so on
+               * 30 September 2026 it printed "19% of 149 educators" three lines
+               * under a card reading "51 of 149" and "34%". Same screen, same
+               * moment, two numbers, and the smaller one was the one a
+               * superintendent would quote.
+               *
+               * This is the same arithmetic as the Team Activation card above,
+               * so the summary can no longer contradict the number it sits
+               * beneath.
+               */
+              const hubPct = staffStats.total > 0 ? Math.round((staffStats.hubLoggedIn / staffStats.total) * 100) : 0;
               const toolsExplored = hubStats?.quick_wins_completed ?? 0;
               const wellnessScore = metricsRange === 'month' ? (hubStats?.mood_avg_30d ?? hubStats?.mood_avg_7d ?? null) : (hubStats?.mood_avg_7d ?? null);
               const activeUsers = metricsRange === 'month' ? (hubStats?.logins_this_month ?? hubStats?.active_users_7d ?? 0) : (hubStats?.active_users_7d ?? 0);
@@ -3613,7 +3552,7 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                     </div>
                     <p className="text-base md:text-lg leading-relaxed text-gray-700" style={{ fontFamily: 'Georgia, serif' }}>
                       {hubPct > 0 ? (
-                        <>Your team is {hubPct >= 70 ? 'engaged' : hubPct >= 40 ? 'building momentum' : 'getting started'}. {hubPct}% of {staffStats.total} educators logged into the Hub this month{toolsExplored > 0 ? `, exploring ${toolsExplored} tools` : ''}{partnership.partnership_type === 'district' ? ` across ${apiBuildings.length} buildings` : ''}. {completedDeliverables > 0 ? `${completedDeliverables} of ${totalDeliverables} deliverables are complete.` : ''} {wellnessScore ? `Your educators' average wellness score is ${wellnessScore} out of 5${wellnessScore >= 4 ? ' -- stronger than the national average' : ''}.` : ''}</>
+                        <>Your team is {hubPct >= 70 ? 'engaged' : hubPct >= 40 ? 'building momentum' : 'getting started'}. {hubPct}% of {staffStats.total} educators logged into the Hub this month{toolsExplored > 0 ? `, exploring ${toolsExplored} tools` : ''}{partnership.partnership_type === 'district' ? ` across ${apiBuildings.length} buildings` : ''}. {completedDeliverables > 0 ? `${completedDeliverables} of ${totalDeliverables} deliverables are complete.` : ''} {wellnessScore ? `Your educators' average wellness score is ${wellnessScore} out of 5${wellnessScore >= 4 ? ', stronger than the national average' : ''}.` : ''}</>
                       ) : (
                         <>Your partnership is active with {staffStats.total} educators enrolled. {completedDeliverables} of {totalDeliverables} deliverables completed so far. As your team engages with the Hub, this summary will update with real-time insights.</>
                       )}
@@ -3647,7 +3586,7 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                         {hubStats?.course_completions && hubStats.course_completions > 0 && (
                           <div className="flex items-center gap-3 p-3 rounded-xl bg-gray-50">
                             <Award className="w-4 h-4 text-[#E8B84B] flex-shrink-0" />
-                            <p className="text-sm text-gray-600"><strong>{hubStats.course_completions}</strong> courses completed -- PD credit your team can show you.</p>
+                            <p className="text-sm text-gray-600"><strong>{hubStats.course_completions}</strong> courses completed, PD credit your team can show you.</p>
                           </div>
                         )}
                       </div>
@@ -4039,7 +3978,7 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                       <div className="flex items-center gap-3 p-3 rounded-xl" style={{ background: '#F0FDF4' }}>
                         <span className="text-lg">&#128172;</span>
                         <p className="text-sm" style={{ color: '#374151' }}>
-                          Your team contributed <strong>{intel.communityPostCount as number} posts</strong> and engaged in <strong>{intel.qaThreadCount as number} Q&A threads</strong> -- helping other educators across the country.
+                          Your team contributed <strong>{intel.communityPostCount as number} posts</strong> and engaged in <strong>{intel.qaThreadCount as number} Q&A threads</strong>, helping other educators across the country.
                         </p>
                       </div>
                     )}
@@ -4051,7 +3990,7 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                         <p className="text-sm italic" style={{ color: '#374151', lineHeight: 1.6 }}>
                           &ldquo;{(intel.communityHighlights as { quote: string }[])[0].quote}&rdquo;
                         </p>
-                        <p className="text-[10px] text-gray-400 mt-1">-- An educator in your building</p>
+                        <p className="text-[10px] text-gray-400 mt-1">An educator in your building</p>
                       </div>
                     )}
 
@@ -7671,6 +7610,81 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
         {/* OUR PARTNERSHIP TAB */}
         {activeTab === 'our-partnership' && (
           <div className="py-6 space-y-4">
+
+            {/* ─── WHAT YOUR TEAM IS WORKING ON ───
+                Bonnie Osborne, 30 September 2026: she could see that staff had
+                signed in and nothing about what they did next. Every ingredient
+                was already recorded and never shown to the client.
+
+                Ranked by distinct people rather than opens, because eight paras
+                in one course says something about the school and one para
+                opening it thirty times says something about one para. */}
+            {engagement && !engagement.unknown && engagement.topContent.length > 0 && (
+              <div className="bg-white rounded-2xl p-6 md:p-7 shadow-sm border border-gray-100">
+                <div className="flex items-baseline justify-between gap-4 flex-wrap mb-1">
+                  <h2 className="text-[17px] font-bold text-[#1e2749] tracking-tight">
+                    What your team is working on
+                  </h2>
+                  <span className="text-xs text-gray-400">
+                    Last {engagement.windowDays} days
+                  </span>
+                </div>
+                <p className="text-xs text-gray-500 mb-5">
+                  Nobody assigned these. Your staff chose them.
+                </p>
+
+                <div className="grid grid-cols-3 gap-2 md:gap-4 mb-6">
+                  <div className="p-3 md:p-4 bg-gray-50 rounded-xl text-center">
+                    <p className="text-xl md:text-2xl font-bold text-[#1e2749]">{engagement.activeThisWeek}</p>
+                    <p className="text-xs md:text-sm text-gray-500">Active this week</p>
+                  </div>
+                  <div className="p-3 md:p-4 bg-gray-50 rounded-xl text-center">
+                    <p className="text-xl md:text-2xl font-bold text-[#1e2749]">{engagement.activeThisMonth}</p>
+                    <p className="text-xs md:text-sm text-gray-500">Active this month</p>
+                  </div>
+                  <div className="p-3 md:p-4 bg-gray-50 rounded-xl text-center">
+                    <p className="text-xl md:text-2xl font-bold text-[#1e2749]">
+                      {engagement.lastActiveAt
+                        ? new Date(engagement.lastActiveAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
+                        : '—'}
+                    </p>
+                    <p className="text-xs md:text-sm text-gray-500">Most recent sign in</p>
+                  </div>
+                </div>
+
+                <div className="space-y-2.5">
+                  {engagement.topContent.map((item, i) => (
+                    <div key={`${item.kind}-${i}`} className="flex items-center gap-3">
+                      <span
+                        className="px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wide shrink-0"
+                        style={
+                          item.kind === 'course'
+                            ? { background: '#E8F0FD', color: '#1e2749' }
+                            : { background: '#FFF8E7', color: '#8a6d1f' }
+                        }
+                      >
+                        {item.kind === 'course' ? 'Course' : 'Quick Win'}
+                      </span>
+                      <span className="text-sm text-[#1e2749] flex-1 min-w-0 truncate" title={item.title}>
+                        {item.title}
+                      </span>
+                      <span className="text-sm font-semibold text-[#1e2749] shrink-0">
+                        {item.people}
+                      </span>
+                      <span className="text-xs text-gray-400 shrink-0 w-24 text-right">
+                        {item.people === 1 ? 'person' : 'people'}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
+                {engagement.truncated && (
+                  <p className="text-[11px] text-gray-400 mt-4">
+                    Your team is busy enough that this is based on the most recent activity rather than every record in the window.
+                  </p>
+                )}
+              </div>
+            )}
 
             {/* Welcome / Context Section */}
             <div className="bg-gradient-to-br from-[#1B2A4A] to-[#38618C] rounded-2xl p-6 md:p-8 text-white">
