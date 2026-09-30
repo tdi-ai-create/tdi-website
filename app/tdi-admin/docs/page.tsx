@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTDIAdmin } from '@/lib/tdi-admin/context';
 import { Search, Download, Printer, ExternalLink } from 'lucide-react';
 
-type DocId = 'admin-guide' | 'data-flow' | 'workflow' | 'billing-sop' | 'funding' | 'funding-launch' | 'grant-application-spec' | 'grant-workflow-sop' | 'hub-engagement' | 'engagement-workflow' | 'hub-content-standards' | 'hub-content-creation' | 'course-upload-sop' | 'course-checkins-sop' | 'creator-feedback-sop' | 'creator-recruitment-sop' | 'creator-dormancy-sop' | 'communication-map' | 'swag-fulfillment' | 'leadership-workflow' | 'muck-points-sop' | 'whats-inside-sop';
+type DocId = 'admin-guide' | 'data-flow' | 'workflow' | 'billing-sop' | 'funding' | 'funding-launch' | 'grant-application-spec' | 'grant-workflow-sop' | 'hub-engagement' | 'engagement-workflow' | 'hub-content-standards' | 'hub-content-creation' | 'course-upload-sop' | 'course-checkins-sop' | 'creator-feedback-sop' | 'creator-recruitment-sop' | 'creator-dormancy-sop' | 'communication-map' | 'swag-fulfillment' | 'leadership-workflow' | 'muck-points-sop' | 'whats-inside-sop' | 'visit-prep-sop';
 
 interface Doc {
   id: DocId;
@@ -75,6 +75,15 @@ const DOC_GROUPS: DocGroup[] = [
         label: 'Leadership Dashboard',
         desc: 'White-glove partnership management: onboarding, sessions, observations, renewal',
         tags: ['leadership', 'dashboard', 'partnership', 'observation', 'session', 'onboarding', 'roster', 'KPI', 'action items', 'billing', 'renewal', 'white glove', 'love notes'],
+        relatedSections: [
+          { label: 'Lead Dashboard', href: '/tdi-admin/leadership' },
+        ],
+      },
+      {
+        id: 'visit-prep-sop',
+        label: 'School Visit Prep',
+        desc: 'Prepping an observation day: what to ask the school for, and the email template',
+        tags: ['visit', 'observation', 'observation day', 'school visit', 'prep', 'roster', 'love notes', 'route', 'paras', 'onsite', 'on-site', 'template', 'email template', 'schedule', 'building', 'address'],
         relatedSections: [
           { label: 'Lead Dashboard', href: '/tdi-admin/leadership' },
         ],
@@ -279,6 +288,16 @@ export default function DocsPage() {
   const { teamMember } = useTDIAdmin();
   const router = useRouter();
   const [activeDoc, setActiveDoc] = useState<DocId>('admin-guide');
+
+  // Deep link support: /tdi-admin/docs?doc=visit-prep-sop opens straight to that doc.
+  // Read from window rather than useSearchParams so this client page does not need a
+  // Suspense boundary at build time.
+  useEffect(() => {
+    const requested = new URLSearchParams(window.location.search).get('doc');
+    if (!requested) return;
+    const valid = DOC_GROUPS.flatMap(g => g.docs.map(d => d.id as string));
+    if (valid.includes(requested)) setActiveDoc(requested as DocId);
+  }, []);
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearch, setShowSearch] = useState(false);
 
