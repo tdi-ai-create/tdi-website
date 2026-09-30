@@ -164,9 +164,37 @@ describe("the content calendar page", () => {
     });
     await plugin.definition.setup(harness.ctx);
 
-    const board = await harness.getData<{ items: Array<{ status: string; published_at: string | null }> }>("board", { companyId: "c1" });
+    const board = await harness.getData<{
+      items: Array<{ status: string; published_at: string | null; scheduled_for: string | null }>;
+    }>("board", { companyId: "c1" });
     expect(board.items[0].status).toBe("published");
-    expect(board.items[0].published_at).not.toBeNull();
+    // Still on the week it was written for, not the day the ticket was touched.
+    expect(board.items[0].scheduled_for).toBe("2026-09-28");
+  });
+
+  it("never invents a publication date out of updatedAt", async () => {
+    // updatedAt is when the record changed, not when the post went out, and the
+    // calendar prefers published_at over the planned day. Deriving one from the
+    // other put "Week of Oct 12-18" and "Week 9 (Sep 28-Oct 2)" on the same
+    // Saturday square on 30 September, because both were touched on the 26th.
+    const { harness } = boardHarness({
+      "p-sub": [
+        { id: "a", title: "Week 9 Substack Drafts (Sep 28-Oct 2)", status: "done",
+          updatedAt: "2026-09-26T12:00:00.000Z" },
+        { id: "b", title: "Week of Oct 12-18 Substack Drafts", status: "done",
+          updatedAt: "2026-09-26T12:00:00.000Z" },
+      ],
+    });
+    await plugin.definition.setup(harness.ctx);
+
+    const board = await harness.getData<{
+      items: Array<{ id: string; published_at: string | null; scheduled_for: string | null }>;
+    }>("board", { companyId: "c1" });
+
+    for (const it of board.items) expect(it.published_at).toBeNull();
+    // Two tickets touched the same day still land on two different weeks.
+    expect(board.items.find((i) => i.id === "a")?.scheduled_for).toBe("2026-09-28");
+    expect(board.items.find((i) => i.id === "b")?.scheduled_for).toBe("2026-10-12");
   });
 
   it("keeps board chores off the calendar and says how many it hid", async () => {

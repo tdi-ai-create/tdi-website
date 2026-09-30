@@ -190,6 +190,20 @@ const chan = (c: string) => CHANNEL[c] ?? { label: c, dot: "#8A94A2" };
  * channel server side as of 22 September 2026; this keeps the picker honest so
  * nobody reaches that refusal by surprise.
  */
+/**
+ * Who a piece is for, and what to call them.
+ *
+ * One map rather than hardcoded <option> labels, because the ticket a plan
+ * writes quotes this back. Deriving the wording from the stored value produced
+ * "For teacher." on TEA-931 on 30 September; the reader should see the same
+ * words that were on the control they picked.
+ */
+const AUDIENCE: Record<string, string> = {
+  teacher: "teachers",
+  decision_maker: "district leaders",
+  founder_network: "Rae's own network",
+};
+
 const RETIRED_CHANNELS = new Set(["facebook"]);
 const PLANNABLE = Object.keys(CHANNEL).filter((c) => !RETIRED_CHANNELS.has(c));
 
@@ -438,7 +452,7 @@ function HistoryStrip({ history }: { history?: History | null }) {
  * different destination, and mixing it in is what made the month feel chaotic.
  */
 function ChannelFilter({
-  items, hubCount, selected, onSelect, showHub, onShowHub, choresHidden,
+  items, hubCount, selected, onSelect, showHub, onShowHub, showOther, onShowOther, choresHidden,
 }: {
   items: QueueItem[];
   hubCount: number;
@@ -446,6 +460,8 @@ function ChannelFilter({
   onSelect: (s: Set<string>) => void;
   showHub: boolean;
   onShowHub: (v: boolean) => void;
+  showOther: boolean;
+  onShowOther: (v: boolean) => void;
   choresHidden: number;
 }) {
   const counts = new Map<string, number>();
@@ -453,7 +469,10 @@ function ChannelFilter({
     if (i.status === "cancelled") continue;
     counts.set(i.channel, (counts.get(i.channel) ?? 0) + 1);
   }
-  const present = [...counts.entries()].sort((a, b) => b[1] - a[1]);
+  const otherCount = counts.get("other") ?? 0;
+  const present = [...counts.entries()]
+    .filter(([c]) => c !== "other")
+    .sort((a, b) => b[1] - a[1]);
 
   const toggle = (c: string) => {
     const next = new Set(selected);
@@ -490,6 +509,15 @@ function ChannelFilter({
         Hub
         <span style={{ color: "#5A6472" }}>{hubCount}</span>
       </button>
+
+      {otherCount > 0 && (
+        <button onClick={() => onShowOther(!showOther)} style={CHIP(showOther)}
+          title="Board work that is not a post: queue chores, Buffer refills, gate tickets.">
+          <span style={{ width: 8, height: 8, borderRadius: 999, background: chan("other").dot }} />
+          Board work
+          <span style={{ color: "#5A6472" }}>{otherCount}</span>
+        </button>
+      )}
 
       {choresHidden > 0 && (
         // Named, not silent. The month is hiding things and should say so.
@@ -654,6 +682,19 @@ export function ContentCalendarPage(_props: PluginWidgetProps) {
    */
   const [channelFilter, setChannelFilter] = useState<Set<string>>(new Set());
   const [showHub, setShowHub] = useState(true);
+  /**
+   * Board work that is not for any channel, off by default.
+   *
+   * The Marketing project holds the running of the machine next to the output
+   * of it: "Refill Buffer queue", "Provision PAPERCLIP_REPORT_SECRET", "QA
+   * gate: 5 content-queue pieces". On 30 September that was 76 of the 82 cards
+   * on the month, which buries the posts under the plumbing and is the same
+   * chaos Kristin reported, wearing a different hat.
+   *
+   * A toggle rather than a filter, so nothing is hidden irrecoverably and the
+   * count stays visible on the chip.
+   */
+  const [showOther, setShowOther] = useState(false);
 
   const { data, loading, error, refresh } = usePluginData<Board>("board");
   const { data: plan, refresh: refreshPlan } = usePluginData<Plan>("plan", { month });
@@ -667,10 +708,10 @@ export function ContentCalendarPage(_props: PluginWidgetProps) {
 
   const [y, m] = month.split("-").map(Number);
   const allItems = data?.items ?? [];
-  const items = useMemo(
-    () => (channelFilter.size === 0 ? allItems : allItems.filter((i) => channelFilter.has(i.channel))),
-    [allItems, channelFilter],
-  );
+  const items = useMemo(() => {
+    const base = showOther ? allItems : allItems.filter((i) => i.channel !== "other");
+    return channelFilter.size === 0 ? base : base.filter((i) => channelFilter.has(i.channel));
+  }, [allItems, channelFilter, showOther]);
 
   const byDay = useMemo(() => {
     const map = new Map<string, QueueItem[]>();
@@ -836,7 +877,7 @@ export function ContentCalendarPage(_props: PluginWidgetProps) {
         title: slotPurpose.trim(),
         planned_for: slotDay,
         channel: slotChannel,
-        note: `For ${slotAudience.replace(/_/g, " ")}.`,
+        note: `For ${AUDIENCE[slotAudience] ?? slotAudience}.`,
         assigneeAgentId: slotAssignee || undefined,
       })) as { ok?: boolean; error?: string; identifier?: string };
       if (!res?.ok) throw new Error(res?.error ?? "That did not go through.");
@@ -1082,9 +1123,9 @@ export function ContentCalendarPage(_props: PluginWidgetProps) {
             <label style={{ color: "#5A6472" }}>For</label>
             <select value={slotAudience} onChange={(e) => setSlotAudience(e.target.value)}
               style={FIELD}>
-              <option value="teacher">teachers</option>
-              <option value="decision_maker">district leaders</option>
-              <option value="founder_network">Rae's own network</option>
+              {Object.entries(AUDIENCE).map(([k, label]) => (
+                <option key={k} value={k}>{label}</option>
+              ))}
             </select>
           </div>
 
@@ -1132,6 +1173,8 @@ export function ContentCalendarPage(_props: PluginWidgetProps) {
         onSelect={setChannelFilter}
         showHub={showHub}
         onShowHub={setShowHub}
+        showOther={showOther}
+        onShowOther={setShowOther}
         choresHidden={data?.choresHidden ?? 0}
       />
 

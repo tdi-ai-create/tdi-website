@@ -186,7 +186,19 @@ const plugin = definePlugin({
               audience_tag: null,
               // A day a person chose beats a day read out of a title.
               scheduled_for: dates[i.id] ?? weekStartFromTitle(i.title, createdAt),
-              published_at: status === "published" ? updatedAt : null,
+              // Deliberately null, even for finished work.
+              //
+              // The obvious move is published_at = updatedAt, and it is wrong.
+              // updatedAt is when the ticket record last changed, not when the
+              // post went out, and the calendar prefers published_at over the
+              // planned day. On 30 September that put "Week of Oct 12-18" and
+              // "Week 9 (Sep 28-Oct 2)" on the same Saturday square, because
+              // both tickets happened to be touched on the 26th.
+              //
+              // The board does not record when something actually shipped. So
+              // this does not invent it, and every card sits on the day it was
+              // planned for whether or not it has gone out.
+              published_at: null,
               published_url: null,
               updated_at: updatedAt,
             });
