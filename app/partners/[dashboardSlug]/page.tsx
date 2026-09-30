@@ -1502,6 +1502,13 @@ export default function PartnerDashboard() {
     // It used to live inside Our Partnership, which Rae wants kept on goals.
     ...(funding?.hasFunding ? [{ id: 'funding', label: 'Funding' }] : []),
     { id: 'next-year', label: 'Next Year', badge: true },
+    // Districts only. The panel this selects has existed for months and was
+    // unreachable the entire time, because TABS never carried a 'schools'
+    // entry and activeTab could therefore never hold that value. Every
+    // building card, the per-building engagement breakdown and the district
+    // overview row rendered for nobody. Found on 30 Sep 2026 by opening
+    // Addison's live dashboard and counting six tabs.
+    ...(partnership?.partnership_type === 'district' ? [{ id: 'schools', label: 'Schools' }] : []),
     { id: 'team', label: 'Team' },
   ];
 
