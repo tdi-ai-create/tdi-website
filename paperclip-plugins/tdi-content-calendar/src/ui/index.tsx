@@ -140,15 +140,6 @@ type HubUnplaced = {
   unscheduled?: Unscheduled | null;
 };
 
-/** A board approval holding one or more Hub pieces. */
-type HubApproval = {
-  approvalId: string;
-  title: string;
-  summary: string;
-  risks: string[];
-  covers: string[];
-};
-
 type Plan = {
   month: string;
   slots: Slot[];
@@ -160,12 +151,21 @@ type Plan = {
   error?: string | null;
 };
 
+/**
+ * What one read of the board returned.
+ *
+ * `statesRead` and `statesMissed` are gone: they described a loop over eleven
+ * content-queue statuses that TEA-831 showed was returning the same batch every
+ * time. What can fail now is a project, so that is what gets reported.
+ */
 type Board = {
   fetchedAt: string;
   counted: number;
-  statesRead: number;
-  statesMissed: string[];
-  whyMissed?: string[];
+  /** Build and bug tickets kept off the grid. Shown, never silently dropped. */
+  choresHidden?: number;
+  projectsRead?: string[];
+  projectsMissed?: string[];
+  readError?: string | null;
   items: QueueItem[];
 };
 
@@ -427,6 +427,80 @@ function HistoryStrip({ history }: { history?: History | null }) {
  * Counts, not percentages. At this volume a percentage of eleven is a number
  * that sounds more precise than it is.
  */
+/**
+ * Show one channel, or all of them, and take Hub out of the view.
+ *
+ * Kristin asked for both on 29 September. The counts are on the chips on
+ * purpose: a channel with nothing in it reads as "nothing planned here", which
+ * is a real answer, where an empty grid after clicking a filter reads as broken.
+ *
+ * Hub is a toggle rather than a chip because it is a different pipeline, not a
+ * different destination, and mixing it in is what made the month feel chaotic.
+ */
+function ChannelFilter({
+  items, hubCount, selected, onSelect, showHub, onShowHub, choresHidden,
+}: {
+  items: QueueItem[];
+  hubCount: number;
+  selected: Set<string>;
+  onSelect: (s: Set<string>) => void;
+  showHub: boolean;
+  onShowHub: (v: boolean) => void;
+  choresHidden: number;
+}) {
+  const counts = new Map<string, number>();
+  for (const i of items) {
+    if (i.status === "cancelled") continue;
+    counts.set(i.channel, (counts.get(i.channel) ?? 0) + 1);
+  }
+  const present = [...counts.entries()].sort((a, b) => b[1] - a[1]);
+
+  const toggle = (c: string) => {
+    const next = new Set(selected);
+    if (next.has(c)) next.delete(c);
+    else next.add(c);
+    onSelect(next);
+  };
+
+  const CHIP = (on: boolean): CSSProperties => ({
+    display: "inline-flex", alignItems: "center", gap: 6,
+    padding: "4px 10px", borderRadius: 999, cursor: "pointer",
+    border: `1px solid ${on ? "#1E2749" : "#D8DDE3"}`,
+    background: on ? "#E8F0FD" : "#fff",
+    color: "#1E2749", font: "inherit", fontSize: 12,
+  });
+
+  return (
+    <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap", margin: "0 0 12px" }}>
+      <button onClick={() => onSelect(new Set())} style={CHIP(selected.size === 0)}>
+        Everything
+      </button>
+      {present.map(([c, n]) => (
+        <button key={c} onClick={() => toggle(c)} style={CHIP(selected.has(c))}>
+          <span style={{ width: 8, height: 8, borderRadius: 999, background: chan(c).dot }} />
+          {chan(c).label}
+          <span style={{ color: "#5A6472" }}>{n}</span>
+        </button>
+      ))}
+
+      <span style={{ width: 1, height: 20, background: "#D8DDE3", margin: "0 2px" }} />
+
+      <button onClick={() => onShowHub(!showHub)} style={CHIP(showHub)}>
+        <span style={{ width: 8, height: 8, borderRadius: 999, background: chan("hub").dot }} />
+        Hub
+        <span style={{ color: "#5A6472" }}>{hubCount}</span>
+      </button>
+
+      {choresHidden > 0 && (
+        // Named, not silent. The month is hiding things and should say so.
+        <span style={{ marginLeft: "auto", fontSize: 12, color: "#5A6472" }}>
+          {choresHidden} build {choresHidden === 1 ? "ticket" : "tickets"} not shown
+        </span>
+      )}
+    </div>
+  );
+}
+
 function MixStrip({ items, hub, month }: { items: QueueItem[]; hub: HubItem[]; month: string }) {
   // Scoped to the month on screen. The board returns every live queue item
   // regardless of month, so counting it raw made August report "10 pieces in
@@ -560,24 +634,43 @@ export function ContentCalendarPage(_props: PluginWidgetProps) {
   const [dragId, setDragId] = useState<string | null>(null);
   const [dragOverDay, setDragOverDay] = useState<string | null>(null);
 
+  const [slotAssignee, setSlotAssignee] = useState("");
   const [planMode, setPlanMode] = useState(false);
   const [slotDay, setSlotDay] = useState<string | null>(null);
   const [slotChannel, setSlotChannel] = useState("substack");
   const [slotAudience, setSlotAudience] = useState("teacher");
   const [slotPurpose, setSlotPurpose] = useState("");
 
+  /**
+   * Which channels are showing, and whether Hub work is among them.
+   *
+   * Kristin, 29 September: "I can't sort through just the hub, just LinkedIn,
+   * or just Facebook", and separately that having Hub work mixed in "feels a
+   * little chaotic without being able to remove that as a view."
+   *
+   * An empty set means everything, rather than nothing. A filter that starts
+   * by hiding the whole month would look exactly like the bug she was already
+   * reporting.
+   */
+  const [channelFilter, setChannelFilter] = useState<Set<string>>(new Set());
+  const [showHub, setShowHub] = useState(true);
+
   const { data, loading, error, refresh } = usePluginData<Board>("board");
   const { data: plan, refresh: refreshPlan } = usePluginData<Plan>("plan", { month });
-  const { data: approvalsData, refresh: refreshApprovals } =
-    usePluginData<{ byItem: Record<string, HubApproval>; error: string | null }>(
-      "hub_approvals", {},
-    );
   const decide = usePluginAction("decide");
   const planEdit = usePluginAction("plan_edit");
-  const decideApproval = usePluginAction("decide_approval");
+  const planWork = usePluginAction("plan_work");
+  const { data: assignees } = usePluginData<{
+    agents: Array<{ id: string; name: string; status: string }>;
+    error: string | null;
+  }>("assignees", {});
 
   const [y, m] = month.split("-").map(Number);
-  const items = data?.items ?? [];
+  const allItems = data?.items ?? [];
+  const items = useMemo(
+    () => (channelFilter.size === 0 ? allItems : allItems.filter((i) => channelFilter.has(i.channel))),
+    [allItems, channelFilter],
+  );
 
   const byDay = useMemo(() => {
     const map = new Map<string, QueueItem[]>();
@@ -663,9 +756,11 @@ export function ContentCalendarPage(_props: PluginWidgetProps) {
   const slots = plan?.slots ?? [];
   const standardFor = (channel: string) => standards.find((s) => s.channel === channel) ?? null;
 
-  const hubItems = plan?.hub ?? [];
-  const hubApprovals = approvalsData?.byItem ?? {};
-  const hubUnplaced = plan?.hubUnplaced ?? [];
+  // Hub is its own pipeline, so it is a toggle rather than another channel
+  // chip. Hiding it empties both the grid squares and the finished-work list,
+  // because leaving the list behind would not be hiding it.
+  const hubItems = showHub ? (plan?.hub ?? []) : [];
+  const hubUnplaced = showHub ? (plan?.hubUnplaced ?? []) : [];
   const openHub = hubItems.find((h) => h.id === openHubId) ?? null;
 
   // Bring the panel into view whenever a different piece is opened. Guarded on
@@ -725,6 +820,42 @@ export function ContentCalendarPage(_props: PluginWidgetProps) {
     return map;
   }, [slots]);
 
+  /**
+   * Turn a planned day into a ticket somebody is holding.
+   *
+   * Names the ticket back at the person when it lands. "Planned for the 9th"
+   * was the old message and it was the whole problem: Kristin could not tell
+   * whether anything had actually been created, so she assumed it had not.
+   */
+  async function planSomething() {
+    if (!slotDay || !slotPurpose.trim()) return;
+    setBusy(true);
+    setSaid(null);
+    try {
+      const res = (await planWork({
+        title: slotPurpose.trim(),
+        planned_for: slotDay,
+        channel: slotChannel,
+        note: `For ${slotAudience.replace(/_/g, " ")}.`,
+        assigneeAgentId: slotAssignee || undefined,
+      })) as { ok?: boolean; error?: string; identifier?: string };
+      if (!res?.ok) throw new Error(res?.error ?? "That did not go through.");
+      setSaid(
+        `${res.identifier ?? "The ticket"} created for ${slotDay}${
+          slotAssignee ? "" : ", unassigned"
+        }.`,
+      );
+      setSlotDay(null);
+      setSlotPurpose("");
+      setSlotAssignee("");
+      refresh();
+    } catch (e) {
+      setSaid(e instanceof Error ? e.message : "That did not go through.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function editPlan(payload: Record<string, unknown>, done: string) {
     setBusy(true);
     setSaid(null);
@@ -781,37 +912,6 @@ export function ContentCalendarPage(_props: PluginWidgetProps) {
         ? `Moved to ${day}.`
         : `Planned for ${day}. Still ${WAITING[item.status] ?? item.status}.`);
       refresh();
-    } catch (e) {
-      setSaid(e instanceof Error ? e.message : "That did not go through.");
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  async function actOnApproval(action: "approve" | "reject") {
-    if (!openHub) return;
-    const held = hubApprovals[openHub.id];
-    if (!held) return;
-    setBusy(true);
-    setSaid(null);
-    try {
-      const res = (await decideApproval({
-        approvalId: held.approvalId,
-        action,
-        note: note || undefined,
-      })) as { ok?: boolean; error?: string; alreadyDecided?: boolean };
-      if (!res?.ok) throw new Error(res?.error ?? "That did not go through.");
-      setSaid(
-        res.alreadyDecided
-          ? "That had already been decided somewhere else, so nothing changed here."
-          : action === "approve"
-            ? `Approved. That releases ${held.covers.length} ${held.covers.length === 1 ? "piece" : "pieces"}.`
-            : "Held, with your reason on the record.",
-      );
-      setOpenHubId(null);
-      setNote("");
-      refreshApprovals();
-      refreshPlan();
     } catch (e) {
       setSaid(e instanceof Error ? e.message : "That did not go through.");
     } finally {
@@ -893,15 +993,11 @@ export function ContentCalendarPage(_props: PluginWidgetProps) {
         already gone out will not move: its date is a record of what happened, not a plan.
       </p>
 
-      {data && data.statesMissed.length > 0 && (
+      {data && (data.readError || (data.projectsMissed?.length ?? 0) > 0) && (
         <div style={{ marginBottom: 12, padding: 10, borderRadius: 4, background: "#F8F0DF", border: "1px solid #96631A" }}>
-          Read {data.statesRead} of {data.statesRead + data.statesMissed.length} states. Missing:{" "}
-          {data.statesMissed.join(", ")}. This month may be showing less than there is.
-          {data.whyMissed && data.whyMissed.length > 0 && (
-            <div style={{ marginTop: 6, fontFamily: "ui-monospace, monospace", fontSize: 12 }}>
-              {data.whyMissed.map((w, i) => <div key={i}>{w}</div>)}
-            </div>
-          )}
+          {data.readError
+            ? data.readError
+            : `Could not read ${data.projectsMissed?.join(", ")}. This month is showing less than there is.`}
         </div>
       )}
       {said && (
@@ -961,9 +1057,9 @@ export function ContentCalendarPage(_props: PluginWidgetProps) {
 
       {planMode && (
         <div style={{ marginBottom: 12, padding: "10px 12px", borderRadius: 4, background: "#E8F0FD", border: "1px solid #80A4ED", color: "#1E2749", fontSize: 13 }}>
-          Planning. Put a slot on a day to say what you want to go out and who it is for. Nora briefs
-          into the open ones instead of inventing work. A slot still empty within a week of its date
-          turns red, because nothing can clear three gates in less than that.
+          Planning. Pick a day and say what you want. This writes a real ticket on the board,
+          assigned to whoever you choose, so the work has an owner rather than sitting as an
+          intention nobody is holding.
         </div>
       )}
 
@@ -993,23 +1089,33 @@ export function ContentCalendarPage(_props: PluginWidgetProps) {
           </div>
 
           <input ref={slotPurposeRef} value={slotPurpose} onChange={(e) => setSlotPurpose(e.target.value)}
-            placeholder="What is it for? One line is enough."
+            placeholder="What do you want made? This becomes the ticket title."
             style={{ ...FIELD, width: "100%", padding: 8, margin: "10px 0" }} />
 
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 10 }}>
+            <label style={{ color: "#5A6472" }}>Give it to</label>
+            <select value={slotAssignee} onChange={(e) => setSlotAssignee(e.target.value)} style={FIELD}>
+              <option value="">nobody yet</option>
+              {(assignees?.agents ?? []).map((a) => (
+                <option key={a.id} value={a.id}>{a.name}</option>
+              ))}
+            </select>
+            {assignees?.error && (
+              <span style={{ fontSize: 12, color: "#8A5A1A" }}>
+                Could not read the agent list, so this can only be left unassigned.
+              </span>
+            )}
+          </div>
+
           <div style={{ display: "flex", gap: 8 }}>
-            <button disabled={busy}
-              onClick={() => void editPlan(
-                {
-                  action: "add_slot",
-                  planned_for: slotDay,
-                  channel: slotChannel,
-                  audience_tag: slotAudience,
-                  purpose: slotPurpose || undefined,
-                },
-                `Planned for ${slotDay}.`,
-              ).then(() => { setSlotDay(null); setSlotPurpose(""); })}
-              style={{ padding: "8px 16px", borderRadius: 4, border: "none", background: "#1E2749", color: "#fff", cursor: "pointer" }}>
-              Add it
+            <button disabled={busy || !slotPurpose.trim()}
+              onClick={() => void planSomething()}
+              style={{
+                padding: "8px 16px", borderRadius: 4, border: "none",
+                background: slotPurpose.trim() ? "#1E2749" : "#9AA3AF",
+                color: "#fff", cursor: slotPurpose.trim() ? "pointer" : "not-allowed",
+              }}>
+              Create the ticket
             </button>
             <button onClick={() => { setSlotDay(null); setSlotPurpose(""); }}
               style={{ padding: "8px 16px", borderRadius: 4, border: "1px solid #D8DDE3", background: "#fff", color: "#1E2749", cursor: "pointer" }}>
@@ -1018,6 +1124,16 @@ export function ContentCalendarPage(_props: PluginWidgetProps) {
           </div>
         </div>
       )}
+
+      <ChannelFilter
+        items={allItems}
+        hubCount={(plan?.hub ?? []).length}
+        selected={channelFilter}
+        onSelect={setChannelFilter}
+        showHub={showHub}
+        onShowHub={setShowHub}
+        choresHidden={data?.choresHidden ?? 0}
+      />
 
       <MixStrip items={items} hub={hubItems} month={month} />
 
@@ -1075,9 +1191,7 @@ export function ContentCalendarPage(_props: PluginWidgetProps) {
                   month where some cards open a panel, some leave the app and
                   some do nothing is three behaviours wearing one costume.
                 */}
-                {c.iso && (hubByDay.get(c.iso) ?? []).map((h) => {
-                  const held = hubApprovals[h.id];
-                  return (
+                {c.iso && (hubByDay.get(c.iso) ?? []).map((h) => (
                     <button key={h.id} onClick={() => { setOpenHubId(h.id); setNote(""); }}
                       title={h.category ?? undefined}
                       style={{
@@ -1089,12 +1203,11 @@ export function ContentCalendarPage(_props: PluginWidgetProps) {
                         font: "inherit", fontWeight: 400,
                       }}>
                       <div style={{ fontWeight: 600 }}>{h.title || "(untitled)"}</div>
-                      <div style={{ color: held ? "#8A5A1A" : "#5A6472", fontSize: 10 }}>
-                        Hub · {h.is_published ? "live" : held ? "waiting on you" : "not live yet"}
+                      <div style={{ color: "#5A6472", fontSize: 10 }}>
+                        Hub · {h.is_published ? "live" : "not live yet"}
                       </div>
                     </button>
-                  );
-                })}
+                  ))}
 
                 {c.iso && (slotsByDay.get(c.iso) ?? [])
                   .filter((s) => !s.filled_by)
@@ -1213,8 +1326,6 @@ export function ContentCalendarPage(_props: PluginWidgetProps) {
       )}
 
       {openHub && (() => {
-        const held = hubApprovals[openHub.id];
-        const others = held ? held.covers.length - 1 : 0;
         return (
           <div ref={hubPanelRef} style={{ marginTop: 20, border: "1px solid #D8DDE3", borderRadius: 6, background: "#fff", padding: 18 }}>
             <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", alignItems: "baseline" }}>
@@ -1236,49 +1347,18 @@ export function ContentCalendarPage(_props: PluginWidgetProps) {
               </div>
             )}
 
-            {!openHub.is_published && !held && (
+            {!openHub.is_published && (
               <div style={{ margin: "12px 0 0", padding: "10px 12px", borderRadius: 4, background: "#F4F6F8", border: "1px solid #D8DDE3", fontSize: 13, color: "#3D4756" }}>
-                Not live yet, and nothing is holding it. It is scheduled and will
-                go out on its day without needing anyone. Nothing to decide here.
-              </div>
-            )}
-
-            {held && (
-              <div style={{ margin: "12px 0 0", padding: "10px 12px", borderRadius: 4, background: "#F8F0DF", border: "1px solid #96631A", color: "#5A431A", fontSize: 13, lineHeight: 1.5 }}>
-                <strong>{held.title}</strong>
-                {others > 0 && (
-                  <div style={{ marginTop: 4 }}>
-                    Deciding this releases {others + 1} pieces, not just this one.
-                  </div>
-                )}
-                {held.risks.length > 0 && (
-                  <ul style={{ margin: "8px 0 0", paddingLeft: 18 }}>
-                    {held.risks.map((r, i) => <li key={i} style={{ marginBottom: 4 }}>{r}</li>)}
-                  </ul>
-                )}
-                <div style={{ marginTop: 8, whiteSpace: "pre-wrap", color: "#6B5222", fontSize: 12.5 }}>
-                  {held.summary}
-                </div>
+                Not live yet. It is scheduled and will go out on its day without
+                needing anyone. Nothing to decide here.
               </div>
             )}
 
             <textarea value={note} onChange={(e) => setNote(e.target.value)} rows={3}
-              placeholder={held ? "If you are holding it, say why. Required." : "A note for the record. Optional."}
+              placeholder="A note for the record. Optional."
               style={{ ...FIELD, width: "100%", padding: 8, margin: "12px 0 10px" }} />
 
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-              {held && (
-                <>
-                  <button disabled={busy} onClick={() => void actOnApproval("approve")}
-                    style={{ padding: "8px 16px", borderRadius: 4, border: "none", background: "#1E2749", color: "#fff", cursor: "pointer" }}>
-                    Approve{others > 0 ? ` all ${others + 1}` : ""}
-                  </button>
-                  <button disabled={busy || !note.trim()} onClick={() => void actOnApproval("reject")}
-                    style={{ padding: "8px 16px", borderRadius: 4, border: "1px solid #9E3B3B", background: "#fff", color: "#9E3B3B", cursor: "pointer" }}>
-                    Hold it
-                  </button>
-                </>
-              )}
               <button onClick={() => { setOpenHubId(null); setNote(""); }}
                 style={{ padding: "8px 16px", borderRadius: 4, border: "1px solid #D8DDE3", background: "#fff", cursor: "pointer" }}>
                 Close

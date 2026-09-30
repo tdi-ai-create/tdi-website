@@ -13,7 +13,7 @@ import type { PaperclipPluginManifestV1 } from "@paperclipai/plugin-sdk";
 const manifest: PaperclipPluginManifestV1 = {
   id: "tdi-content-calendar",
   apiVersion: 1,
-  version: "0.9.1",
+  version: "0.10.0",
   displayName: "Content calendar",
   description:
     "Plan and approve TDI content by month, on the board, without leaving Paperclip.",
@@ -25,11 +25,21 @@ const manifest: PaperclipPluginManifestV1 = {
     "http.outbound",
     "plugin.state.read",
     "plugin.state.write",
+    // The calendar reads the board itself as of 30 September. Every one of these
+    // was checked against this host's own PLUGIN_CAPABILITIES list before being
+    // added, rather than trusted from the SDK types.
+    "projects.read",
+    "issues.read",
+    "issues.create",
+    "issues.update",
+    "issue.comments.create",
+    "agents.read",
     // NOT approvals.read / approvals.respond. The SDK types offer them and this
     // Paperclip build rejects them outright: adding them failed manifest
     // validation and left the plugin in error state with the calendar down on
-    // 15 September. The host is older than the SDK. Until it catches up, the
-    // calendar can show that a Hub piece is held and cannot release it.
+    // 15 September. Confirmed still absent from the host's capability list on
+    // 30 September, which is why the Hub approvals panel was removed rather
+    // than repaired: it called an API this host will never grant.
   ],
   // Operator-editable, per instance. Named instanceConfigSchema by the host.
   // The key lives here as a plain value, which is not where a credential
