@@ -99,6 +99,133 @@ async function emailsActiveInHub(emails: string[]): Promise<Set<string> | null> 
   return active;
 }
 
+export interface EngagementItem {
+  kind: 'course' | 'quick_win';
+  title: string;
+  /** Distinct people, which is the number that means something. */
+  people: number;
+  opens: number;
+}
+
+export interface HubEngagementDetail {
+  topContent: EngagementItem[];
+  activeThisWeek: number;
+  activeThisMonth: number;
+  lastActiveAt: string | null;
+  windowDays: number;
+  /** True when the activity read hit the cap, so the page can say so. */
+  truncated: boolean;
+  unknown: boolean;
+}
+
+const ENGAGEMENT_WINDOW_DAYS = 90;
+const ACTIVITY_ROW_CAP = 5000;
+
+/**
+ * What a school's team is actually working on, read live from the Hub.
+ *
+ * Bonnie Osborne asked for this on 30 September 2026: she could see that people
+ * had logged in and nothing about what they did next. Every ingredient was
+ * already being recorded, just never shown to the client. `lesson_viewed`
+ * carries `course_title`, and the quick win actions carry `quick_win_title`.
+ *
+ * Ranked by distinct people rather than opens. Eight paras in one course is a
+ * signal about the school; one para opening the same course thirty times is a
+ * signal about one para.
+ *
+ * Bounded to 90 days because "trending" that includes last spring is not
+ * trending, and because it keeps the row count sane. If the cap is hit we say
+ * so rather than quietly reporting a partial picture as the whole one.
+ */
+async function hubEngagementDetail(profileIds: string[]): Promise<HubEngagementDetail> {
+  const empty: HubEngagementDetail = {
+    topContent: [],
+    activeThisWeek: 0,
+    activeThisMonth: 0,
+    lastActiveAt: null,
+    windowDays: ENGAGEMENT_WINDOW_DAYS,
+    truncated: false,
+    unknown: false,
+  };
+  if (profileIds.length === 0) return empty;
+
+  const hub = getHubSupabase();
+  if (!hub) return { ...empty, unknown: true };
+
+  const since = new Date(Date.now() - ENGAGEMENT_WINDOW_DAYS * 86400000).toISOString();
+
+  const { data: rows, error } = await hub
+    .from('hub_activity_log')
+    .select('user_id, action, metadata, created_at')
+    .in('user_id', profileIds)
+    .neq('action', 'account_provisioned')
+    .gte('created_at', since)
+    .order('created_at', { ascending: false })
+    .limit(ACTIVITY_ROW_CAP);
+
+  if (error) {
+    console.error('[partners/dashboard] engagement detail failed:', error.message);
+    return { ...empty, unknown: true };
+  }
+
+  const weekAgo = Date.now() - 7 * 86400000;
+  const monthAgo = Date.now() - 30 * 86400000;
+  const week = new Set<string>();
+  const month = new Set<string>();
+  let lastActiveAt: string | null = null;
+
+  // key -> { kind, title, people:Set, opens:number }
+  const byContent = new Map<
+    string,
+    { kind: 'course' | 'quick_win'; title: string; people: Set<string>; opens: number }
+  >();
+
+  for (const row of rows || []) {
+    const userId = String(row.user_id);
+    const at = new Date(row.created_at as string).getTime();
+    if (!lastActiveAt) lastActiveAt = row.created_at as string;
+    if (at >= weekAgo) week.add(userId);
+    if (at >= monthAgo) month.add(userId);
+
+    const meta = (row.metadata || {}) as Record<string, unknown>;
+    let kind: 'course' | 'quick_win' | null = null;
+    let title: string | null = null;
+
+    if (row.action === 'lesson_viewed' && typeof meta.course_title === 'string') {
+      kind = 'course';
+      title = meta.course_title;
+    } else if (
+      ['quick_win_viewed', 'quick_win_saved', 'quick_win_downloaded'].includes(String(row.action)) &&
+      typeof meta.quick_win_title === 'string'
+    ) {
+      kind = 'quick_win';
+      title = meta.quick_win_title;
+    }
+
+    if (!kind || !title) continue;
+    const key = `${kind}:${title}`;
+    const entry = byContent.get(key) || { kind, title, people: new Set<string>(), opens: 0 };
+    entry.people.add(userId);
+    entry.opens += 1;
+    byContent.set(key, entry);
+  }
+
+  const topContent = Array.from(byContent.values())
+    .map(e => ({ kind: e.kind, title: e.title, people: e.people.size, opens: e.opens }))
+    .sort((a, b) => b.people - a.people || b.opens - a.opens)
+    .slice(0, 8);
+
+  return {
+    topContent,
+    activeThisWeek: week.size,
+    activeThisMonth: month.size,
+    lastActiveAt,
+    windowDays: ENGAGEMENT_WINDOW_DAYS,
+    truncated: (rows?.length ?? 0) >= ACTIVITY_ROW_CAP,
+    unknown: false,
+  };
+}
+
 // GET - Get all dashboard data for a partnership
 export async function GET(
   request: NextRequest,
@@ -208,9 +335,24 @@ export async function GET(
 
     // Live from the Hub. Null means the Hub could not be reached, in which case
     // we fall back to the once-a-day column rather than claiming nobody is active.
-    const activeEmails = await emailsActiveInHub(
-      (staffMembers || []).map(s => s.email).filter(Boolean) as string[]
-    );
+    const rosterEmails = (staffMembers || []).map(s => s.email).filter(Boolean) as string[];
+    const activeEmails = await emailsActiveInHub(rosterEmails);
+
+    // What the team is actually working on. Same roster, same matching by email,
+    // so this panel can never disagree with the login count above it.
+    let engagement: HubEngagementDetail | null = null;
+    const hubForIds = getHubSupabase();
+    if (hubForIds && rosterEmails.length > 0) {
+      const { data: idRows, error: idError } = await hubForIds
+        .from('hub_profiles')
+        .select('id')
+        .in('email', rosterEmails.map(e => e.toLowerCase()));
+      if (idError) {
+        console.error('[partners/dashboard] profile id lookup failed:', idError.message);
+      } else {
+        engagement = await hubEngagementDetail((idRows || []).map(r => String(r.id)));
+      }
+    }
 
     const isActive = (s: { email?: string | null; hub_login_date?: string | null }) =>
       activeEmails
@@ -324,6 +466,7 @@ export async function GET(
       actionItems: actionItems || [],
       staffStats,
       staffMembers: (staffMembers || []).map(s => ({ id: s.id, name: `${s.first_name || ''} ${s.last_name || ''}`.trim(), role: s.role_title, hubActive: isActive(s) })),
+      engagement,
       metricSnapshots: Object.values(latestMetrics),
       buildings: buildings || [],
       activityLog: activityLog || [],

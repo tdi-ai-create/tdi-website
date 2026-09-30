@@ -174,6 +174,30 @@ interface StaffStats {
 }
 
 /**
+ * What the team is actually working on, from /api/partners/dashboard.
+ *
+ * Ranked by distinct people, not opens. Bonnie Osborne asked for this on
+ * 30 September 2026: she could see that staff had signed in and nothing about
+ * what they did next.
+ */
+interface EngagementItem {
+  kind: 'course' | 'quick_win';
+  title: string;
+  people: number;
+  opens: number;
+}
+
+interface HubEngagementDetail {
+  topContent: EngagementItem[];
+  activeThisWeek: number;
+  activeThisMonth: number;
+  lastActiveAt: string | null;
+  windowDays: number;
+  truncated: boolean;
+  unknown: boolean;
+}
+
+/**
  * A row from the `buildings` table, as the dashboard API returns it.
  *
  * The count column is `estimated_staff_count`. This interface declared
@@ -407,6 +431,7 @@ export default function PartnerDashboard() {
   const [staffStats, setStaffStats] = useState<StaffStats>({ total: 0, hubLoggedIn: 0 });
   const [metricSnapshots, setMetricSnapshots] = useState<MetricSnapshot[]>([]);
   const [apiBuildings, setApiBuildings] = useState<Building[]>([]);
+  const [engagement, setEngagement] = useState<HubEngagementDetail | null>(null);
   // Funding status for this school only, from its own funding_pursuits row.
   const [funding, setFunding] = useState<{
     hasFunding: boolean;
@@ -697,6 +722,7 @@ export default function PartnerDashboard() {
           const updatedItems = await autoResurfaceItems(items, partnershipId);
           setActionItems(updatedItems);
           setStaffStats(data.staffStats || { total: 0, hubLoggedIn: 0 });
+          setEngagement(data.engagement ?? null);
           setMetricSnapshots(data.metricSnapshots || []);
           setApiBuildings(data.buildings || []);
           // The timeline_events table stores event_title and event_date, but this
@@ -3402,6 +3428,81 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                     </p>
                   </div>
                 </div>
+              </div>
+            )}
+
+            {/* ─── WHAT YOUR TEAM IS WORKING ON ───
+                Bonnie Osborne, 30 September 2026: she could see that staff had
+                signed in and nothing about what they did next. Every ingredient
+                was already recorded and never shown to the client.
+
+                Ranked by distinct people rather than opens, because eight paras
+                in one course says something about the school and one para
+                opening it thirty times says something about one para. */}
+            {engagement && !engagement.unknown && engagement.topContent.length > 0 && (
+              <div className="bg-white rounded-2xl p-6 md:p-7 shadow-sm border border-gray-100">
+                <div className="flex items-baseline justify-between gap-4 flex-wrap mb-1">
+                  <h2 className="text-[17px] font-bold text-[#1e2749] tracking-tight">
+                    What your team is working on
+                  </h2>
+                  <span className="text-xs text-gray-400">
+                    Last {engagement.windowDays} days
+                  </span>
+                </div>
+                <p className="text-xs text-gray-500 mb-5">
+                  Nobody assigned these. Your staff chose them.
+                </p>
+
+                <div className="grid grid-cols-3 gap-2 md:gap-4 mb-6">
+                  <div className="p-3 md:p-4 bg-gray-50 rounded-xl text-center">
+                    <p className="text-xl md:text-2xl font-bold text-[#1e2749]">{engagement.activeThisWeek}</p>
+                    <p className="text-xs md:text-sm text-gray-500">Active this week</p>
+                  </div>
+                  <div className="p-3 md:p-4 bg-gray-50 rounded-xl text-center">
+                    <p className="text-xl md:text-2xl font-bold text-[#1e2749]">{engagement.activeThisMonth}</p>
+                    <p className="text-xs md:text-sm text-gray-500">Active this month</p>
+                  </div>
+                  <div className="p-3 md:p-4 bg-gray-50 rounded-xl text-center">
+                    <p className="text-xl md:text-2xl font-bold text-[#1e2749]">
+                      {engagement.lastActiveAt
+                        ? new Date(engagement.lastActiveAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
+                        : '—'}
+                    </p>
+                    <p className="text-xs md:text-sm text-gray-500">Most recent sign in</p>
+                  </div>
+                </div>
+
+                <div className="space-y-2.5">
+                  {engagement.topContent.map((item, i) => (
+                    <div key={`${item.kind}-${i}`} className="flex items-center gap-3">
+                      <span
+                        className="px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wide shrink-0"
+                        style={
+                          item.kind === 'course'
+                            ? { background: '#E8F0FD', color: '#1e2749' }
+                            : { background: '#FFF8E7', color: '#8a6d1f' }
+                        }
+                      >
+                        {item.kind === 'course' ? 'Course' : 'Quick Win'}
+                      </span>
+                      <span className="text-sm text-[#1e2749] flex-1 min-w-0 truncate" title={item.title}>
+                        {item.title}
+                      </span>
+                      <span className="text-sm font-semibold text-[#1e2749] shrink-0">
+                        {item.people}
+                      </span>
+                      <span className="text-xs text-gray-400 shrink-0 w-24 text-right">
+                        {item.people === 1 ? 'person' : 'people'}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
+                {engagement.truncated && (
+                  <p className="text-[11px] text-gray-400 mt-4">
+                    Your team is busy enough that this is based on the most recent activity rather than every record in the window.
+                  </p>
+                )}
               </div>
             )}
 
