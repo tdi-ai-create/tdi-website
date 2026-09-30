@@ -73,6 +73,32 @@ days and I am not putting test data on it.
   the Admin Guide. Then open the Glen Ellyn partnership and confirm no card
   appears yet, because that visit is 37 days out.
 
+## Verified on production after deploy, 30 September 2026
+
+Deploy of #660 reached production. A hard reload was needed: the API route served
+the new SOP immediately while the browser still held the previous client bundle,
+so the first look showed the old sidebar with no School Visit Prep entry. Worth
+knowing before reporting a deploy as broken.
+
+- Opened: https://www.teachersdeserveit.com/tdi-admin/leadership/02f4b713-f258-4dff-a526-91565ff9a8e6
+- Saw: a third card, first in the row, in the urgent red style, reading
+  "Open visit prep SOP" and "Observation day in 7 days. Ask for the roster,
+  building addresses and school day times." 7 days is correct for 30 September
+  against the 7 October visit, and under the 14 day urgent threshold.
+- Saw: it did not displace anything. All three cards render, "Prep for Next Call"
+  and "2 overdue items" both still present.
+- Pressed: the "Open visit prep SOP" card.
+- Saw: a new tab at /tdi-admin/docs?doc=visit-prep-sop showing "School Visit Prep
+  SOP" with "School Visit Prep" highlighted in the Partnerships list, not the
+  Admin Guide. The deep link works.
+
+Negative control:
+
+- Opened: https://www.teachersdeserveit.com/tdi-admin/leadership/6884a5e5-f934-4f92-a348-839bdae1dd00
+- Saw: "Glen Ellyn School District 41" with one card only, "Schedule check-in",
+  "Principal hasn't logged in for 46 days." No visit prep card, which is correct:
+  that observation day is 5 November, 36 days out and outside the 30 day window.
+
 ## A thing this pass found
 
 Saunemin's observation day is 7 October, 8 days away. No prep email has gone to
