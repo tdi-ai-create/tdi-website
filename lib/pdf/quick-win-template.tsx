@@ -1,7 +1,7 @@
 /** @jsxImportSource react */
 import React from 'react'
 import { Document, Page, Text, View, StyleSheet, Link } from '@react-pdf/renderer'
-import { getLabels, liftLabel, roleLabel, type Lang } from './labels'
+import { getLabels, liftLabel, roleLabel, categoryLabel, type Lang } from './labels'
 
 export interface QuickWinSections {
   overview: string
@@ -245,7 +245,16 @@ export function QuickWinPDF({ data }: { data: QuickWinPDFData }) {
           {category ? (
             <View style={s.metaPill}>
               <Text style={s.metaLabel}>{L.category} </Text>
-              <Text style={s.metaValue}>{category}</Text>
+              {/*
+                Through categoryLabel, not raw. The label beside it already
+                translates via getLabels, so printing the value raw produced
+                "Categoria: Instructional Strategies" on a Spanish guide: a
+                translated label with an English value, which reads as broken
+                rather than as untranslated. The three tool templates
+                (checklist, form, reference) have always routed through
+                categoryLabel; only this guide template did not. TEA-650.
+              */}
+              <Text style={s.metaValue}>{categoryLabel(category, lang)}</Text>
             </View>
           ) : null}
           {roles && roles.length > 0 ? (

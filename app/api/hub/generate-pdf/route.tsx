@@ -149,7 +149,7 @@ export async function POST(request: NextRequest) {
 
       const { data: qw, error: fetchErr } = await supabase
         .from('hub_quick_wins')
-        .select('id, slug, title, qa_notes, reviewed_at, reviewed_by, is_published, translated_at')
+        .select('id, slug, title, title_es, category, qa_notes, reviewed_at, reviewed_by, is_published, translated_at')
         .eq('id', id)
         .single()
 
@@ -197,13 +197,39 @@ export async function POST(request: NextRequest) {
         }
       }
 
+      /**
+       * Title and category fall back to the Quick Win record when the payload
+       * does not carry them.
+       *
+       * Every tool template prints `data.title` and routes `data.category`
+       * through categoryLabel, and both came only from the submitted JSON. A
+       * Spanish payload written without those two keys therefore rendered a
+       * blank title and, because categoryLabel returns the product name when it
+       * is handed nothing, the literal word "Quick Win" in the category band.
+       *
+       * Measured on the live Hub before this fix: of 57 items carrying a
+       * tool_content_es, 37 had no category key and 2 had no title. So this was
+       * most of the Spanish library, not an edge case. TEA-880.
+       *
+       * The payload still wins when it carries the field, because a tool card's
+       * title is sometimes deliberately not the Quick Win's title. This only
+       * fills a gap; it never overrides an author.
+       */
+      const fallbackTitle = (lang === 'es' ? qw.title_es : qw.title) || qw.title || ''
+      const withMeta = <T extends { title?: string; category?: string }>(content: T) => ({
+        ...content,
+        title: content.title || fallbackTitle,
+        category: content.category || qw.category || undefined,
+        lang,
+      })
+
       let pdfBuffer: Buffer
       if (tool_type === 'checklist') {
-        pdfBuffer = await renderToBuffer(<ChecklistPDF data={{ ...(tool_content as ChecklistData), lang }} />)
+        pdfBuffer = await renderToBuffer(<ChecklistPDF data={withMeta(tool_content as ChecklistData)} />)
       } else if (tool_type === 'form') {
-        pdfBuffer = await renderToBuffer(<FormPDF data={{ ...(tool_content as FormData), lang }} />)
+        pdfBuffer = await renderToBuffer(<FormPDF data={withMeta(tool_content as FormData)} />)
       } else if (tool_type === 'reference_card') {
-        const card = { ...(tool_content as ReferenceData), lang }
+        const card = withMeta(tool_content as ReferenceData)
         pdfBuffer = supportPage
           ? await renderToBuffer(
               <Document title={card.title} author="Teachers Deserve It">
@@ -213,7 +239,7 @@ export async function POST(request: NextRequest) {
             )
           : await renderToBuffer(<ReferencePDF data={card} />)
       } else if (tool_type === 'toolkit') {
-        pdfBuffer = await renderToBuffer(<ToolkitPDF data={{ ...(tool_content as ToolkitData), lang }} />)
+        pdfBuffer = await renderToBuffer(<ToolkitPDF data={withMeta(tool_content as ToolkitData)} />)
       } else {
         return NextResponse.json({ error: `Unknown tool_type: ${tool_type}` }, { status: 400 })
       }
