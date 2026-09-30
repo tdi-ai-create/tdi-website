@@ -45,6 +45,7 @@ const ALLOWED = new Map([
   ['LETTER', 'page size'],
   ['Teachers Deserve It', 'the company name, English in every language'],
   ['Quick Win', 'product name, English in every language, see labels.ts'],
+  ['NFC', 'Unicode normalisation form passed to String.normalize, never printed'],
 ])
 
 const SUSPECT = /'([A-Z][A-Za-z]*(?:[ -][A-Za-z]+)*)'/g
