@@ -2,6 +2,9 @@ import { isTDIAdmin } from '@/lib/tdi-admin/auth-check'
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAdminAuth } from '@/lib/tdi-admin/auth';
 import { getServiceSupabase } from '@/lib/supabase'
+import { getSchoolSignIns } from '@/lib/partners/signed-in'
+import { getHubEngagement, hubActivePct } from '@/lib/partners/hub-engagement'
+import { getHubServiceClient } from '@/lib/hub/partnership-members'
 
 // function isTDIAdmin(email: string) {
 //   return email.toLowerCase().endsWith('@teachersdeserveit.com')
@@ -46,22 +49,25 @@ export async function GET(
       .eq('partnership_id', id)
       .order('sort_order')
 
-    // The leader's most recent visit. partnerships has no last_principal_login
-    // column, which the detail page was reading, so every school displayed
-    // "Last Login Never". activity_log is where visits are actually recorded.
-    const { data: loginEvents, error: loginError } = await supabase
-      .from('activity_log')
-      .select('created_at')
-      .eq('partnership_id', id)
-      .in('action', ['login', 'dashboard_viewed'])
-      .order('created_at', { ascending: false })
-      .limit(1)
+    // Who has signed in, from the one definition the leadership list page
+    // already uses: auth.users.last_sign_in_at across every linked user.
+    //
+    // This read activity_log actions login and dashboard_viewed, whose writes
+    // were unchecked until 29 Aug and which therefore has holes. That is why
+    // this page and the warning printed under it disagreed: Saunemin showed
+    // "Last Login 0d" from an activity_log row while the nightly flag, which
+    // counts dashboard_views instead, still said the principal had never
+    // signed in. Two tables, one question, opposite answers.
+    const signIns = await getSchoolSignIns(supabase, [id])
+    const signIn = signIns.get(id)
+    const lastLeaderLogin = signIn?.lastSignInAt ?? null
 
-    if (loginError) {
-      console.error('[leadership/[id]] login lookup failed:', loginError.message)
-    }
-
-    const lastLeaderLogin = loginEvents?.[0]?.created_at ?? null
+    // And how much of the team is using the Hub, on the same definition as the
+    // list page: live all_access seats with at least one genuine engagement
+    // action. The header used to show sign ins in the current calendar month
+    // over provisioned seats, a different question on a different window.
+    const engagement = await getHubEngagement(supabase, getHubServiceClient(), [id])
+    const hubEngagement = engagement.get(id)
 
     // partnerships.org_name is the real column and select('*') already returned
     // it. This overwrote it with the organizations lookup, and only 7 of the 9
@@ -71,6 +77,14 @@ export async function GET(
       ...partnership,
       org_name: partnership.org_name || organization?.name || null,
       last_leader_login: lastLeaderLogin,
+      // Never signed in and "we could not tell" are different states and the
+      // page must not flatten them into a red "Never".
+      leader_never_signed_in: signIn ? signIn.neverSignedIn : null,
+      sign_in_unknown: signIn?.unknown ?? true,
+      hub_seats: hubEngagement?.seats ?? null,
+      hub_active_educators: hubEngagement?.active ?? null,
+      hub_active_pct: hubActivePct(hubEngagement),
+      hub_engagement_unknown: hubEngagement?.unknown ?? true,
     }
 
     return NextResponse.json({
