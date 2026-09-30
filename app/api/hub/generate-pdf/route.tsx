@@ -197,13 +197,48 @@ export async function POST(request: NextRequest) {
         }
       }
 
+      /**
+       * Normalise a flat payload, then refuse an unusable one in words.
+       *
+       * Every tool template maps over `sections`. When that key is absent or
+       * null the map throws a TypeError mid-render, and react-pdf's reconciler
+       * re-surfaces it as "Cannot read properties of null (reading 'props')".
+       * That message points at a null component, so TEA-520 was investigated
+       * for two weeks as a broken checklist renderer. It was neither null nor
+       * checklist-specific: all four generators fail identically on a missing
+       * sections key, verified by rendering each one.
+       *
+       * The reporter's payload was `{ title, items: [...] }`. That is the
+       * obvious way to write a checklist and it is wrong only because the
+       * schema says so, so accept it rather than correct the author. A flat
+       * child array becomes one unnamed section, which renders the same as an
+       * unnamed section written longhand.
+       *
+       * Anything still unusable gets a 400 naming the shape, not a 500.
+       */
+      const CHILD_KEY = tool_type === 'form' ? 'fields' : 'items'
+      const rawContent = tool_content as Record<string, unknown>
+      let normalized = rawContent
+      if (!Array.isArray(rawContent.sections) && Array.isArray(rawContent[CHILD_KEY])) {
+        const { [CHILD_KEY]: flat, ...rest } = rawContent
+        normalized = { ...rest, sections: [{ [CHILD_KEY]: flat }] }
+      }
+      if (!Array.isArray(normalized.sections) || normalized.sections.length === 0) {
+        return NextResponse.json({
+          error: `tool_content needs a sections array with at least one section, and each section needs a ${CHILD_KEY} array. `
+            + `A flat top-level "${CHILD_KEY}" array is also accepted and becomes a single unnamed section. `
+            + `Received keys: ${Object.keys(rawContent).join(', ') || 'none'}.`,
+        }, { status: 400 })
+      }
+      const toolData = normalized as unknown
+
       let pdfBuffer: Buffer
       if (tool_type === 'checklist') {
-        pdfBuffer = await renderToBuffer(<ChecklistPDF data={{ ...(tool_content as ChecklistData), lang }} />)
+        pdfBuffer = await renderToBuffer(<ChecklistPDF data={{ ...(toolData as ChecklistData), lang }} />)
       } else if (tool_type === 'form') {
-        pdfBuffer = await renderToBuffer(<FormPDF data={{ ...(tool_content as FormData), lang }} />)
+        pdfBuffer = await renderToBuffer(<FormPDF data={{ ...(toolData as FormData), lang }} />)
       } else if (tool_type === 'reference_card') {
-        const card = { ...(tool_content as ReferenceData), lang }
+        const card = { ...(toolData as ReferenceData), lang }
         pdfBuffer = supportPage
           ? await renderToBuffer(
               <Document title={card.title} author="Teachers Deserve It">
@@ -213,7 +248,7 @@ export async function POST(request: NextRequest) {
             )
           : await renderToBuffer(<ReferencePDF data={card} />)
       } else if (tool_type === 'toolkit') {
-        pdfBuffer = await renderToBuffer(<ToolkitPDF data={{ ...(tool_content as ToolkitData), lang }} />)
+        pdfBuffer = await renderToBuffer(<ToolkitPDF data={{ ...(toolData as ToolkitData), lang }} />)
       } else {
         return NextResponse.json({ error: `Unknown tool_type: ${tool_type}` }, { status: 400 })
       }
