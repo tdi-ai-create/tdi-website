@@ -48,12 +48,23 @@ export function waitingMessage(item: {
 /**
  * Tell the approver something is waiting.
  *
- * Goes to Kristin, because she is the approver for content. Reaching an
- * approver was left silent when approval moved onto the board, on the
- * assumption that Nora would raise a board approval for every piece. On
+ * Reaching an approver was left silent when approval moved onto the board, on
+ * the assumption that Nora would raise a board approval for every piece. On
  * 14 September ten pieces sat in pending_approval and only two had ever had one
  * raised, so eight were waiting with nobody told. An agent remembering to write
  * a ticket is not a mechanism.
+ *
+ * This went to Kristin until 30 September 2026, when it moved to Rae. The
+ * reason was not preference: across the queue's whole life, thirteen items had
+ * ever been approved and Rae approved every one of them. Kristin had approved
+ * none, and had not posted in #kristin-actions since 3 September while fourteen
+ * items stacked up there averaging five days old. Notifying someone who has
+ * never used the gate is the same as not notifying anyone.
+ *
+ * Both roles still hold `approver` in workflow.ts, so this changed where the
+ * push goes, not who is permitted to decide. The target is data, not code: it
+ * is `content_approval_webhook_url` in funding_notification_settings. Move it
+ * back there rather than here if Kristin takes the gate on again.
  *
  * The board approval stays as it is. This is the push; that is the record.
  */
