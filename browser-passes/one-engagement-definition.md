@@ -80,3 +80,85 @@ Nothing was run without `dryRun=1`, so no flag was raised, cleared or emailed.
   while reading a portal table. The new copy says nobody has signed in for N
   days, which is true of the portal and is what the flag actually measures. Dee's
   absence from the Hub now shows as 6 of 9 using it rather than as a red flag.
+
+---
+
+## Production pass, 30 September 2026
+
+Completed on production in Chrome, signed in as Rae. This closes the deferral above.
+
+- Opened: https://www.teachersdeserveit.com/tdi-admin/leadership
+- Saw: "9 Active Partnerships", "272 Total Educators", and the seat subtitles
+  "Glen Ellyn School District 41 IGNITE / 9 of 9 seats", "Oak Grove School
+  District 68 IGNITE / 2 of 20 seats", "Roosevelt School IGNITE / 17 of 17
+  seats", "St. Mary Catholic School IGNITE / 12 of 12 seats", "St. Peter Chanel
+  Catholic School ACCELERATE / 30 of 30 seats", "Tidioute Community Charter
+  School IGNITE / 2 of 2 seats", "Allenwood Elementary (2026-27) IGNITE / 0 of
+  13 seats". Every one of those matches the seat column in the table above, so
+  the lift was faithful and the list page did not move.
+- Saw: two rows that do not match the table, both explained by real seats
+  created today rather than by this change. "Addison School District 4
+  ACCELERATE / 149 of 144 seats" against 144 in the table, because five para
+  accounts were provisioned for Addison today. "Saunemin CCSD #438 ACCELERATE /
+  26 of 25 seats" against 18, because eight Saunemin accounts were provisioned
+  today by another session.
+
+- Opened: https://www.teachersdeserveit.com/tdi-admin/leadership/02f4b713-f258-4dff-a526-91565ff9a8e6
+- Saw: header "Provisioned 26/25" and "Using the Hub 11 of 26", agreeing with
+  the list page's "26 of 25 seats".
+
+- Opened: https://www.teachersdeserveit.com/tdi-admin/leadership/1e2ba852-dca5-49f1-b9dc-654443f5b2cd
+- Saw: header "Provisioned 149/144" and "Using the Hub 51 of 149". Directly
+  underneath, the open flags read "Use is at 34%, below the 40% mark" and "51 of
+  149 educators are using the Hub". 51/149 is 34.2%, so the header and the
+  warning beneath it now agree. This is the exact contradiction the change
+  targeted: Addison previously read 19% in the header against 34% in the
+  warning.
+
+- Pressed: the "Meetings" filter tab in the partnership timeline on Addison's page
+- Saw: the tab became the selected one and the feed replaced its contents with
+  "No timeline entries yet. Add a note or log a meeting above.", while the
+  "OPEN FLAGS 2 open" block above it stayed put.
+
+## The 19% is still on the screen
+
+Pressing that tab scrolled the AI panel into view, and it still carries the old
+definition this change was meant to retire.
+
+- Saw, on the same Addison page, directly beneath flags reading "Use is at 34%"
+  and "51 of 149 educators are using the Hub": "AI PARTNERSHIP INSIGHT --
+  Addison School District 4 has 19% of 144 enrolled staff logging in this month
+  during the ACCELERATE phase, which gives us room to grow. Activity highlights:
+  20 active in the last 7 days."
+
+So 19% of 144 is still rendered, three lines under 51 of 149 and 34%. The header
+and the flags were unified by this change. The AI insight panel was not, and it
+is a fourth number on the same screen: 19%, 34%, "51 of 149", and "20 active in
+the last 7 days", all at once.
+
+Raised separately. Not a regression from this change, but it means the stated
+goal, one definition per screen, is not met yet on the per-school page.
+
+## One thing this pass found that the change did not cause
+
+Addison reads 51 of 149 here and 50 of 148 on the school's own dashboard at
+/partners/addison-sd4, at the same moment.
+
+Both are correct for their own definition. This page counts live Hub seats; the
+partner dashboard counts roster rows in `staff_members` matched across to the
+Hub by email. The single row of difference is one real person.
+
+`hub_profiles` row `90170788-c9ea-480a-99ef-83bad5ad18bf`, display name
+"Jennifer Casey", holds an active all_access seat with
+`hub_memberships.partnership_id` set to Addison, and has two `hub_login` events.
+Her profile has a **null email**, a null `partnership_id`, and no matching row
+in `staff_members` under any partnership.
+
+So she is a real person using a seat Addison is paying for, who cannot appear on
+Bonnie's dashboard at all, because the email join has nothing to join on. Not
+caused by this change and not fixed by it. Raised separately.
+
+## Still not verified
+
+Whether any other partnership has a seat holder with a null email doing the same
+thing. Only Addison was checked at that level of detail.
