@@ -22,6 +22,8 @@ export default function WorkBoard() {
   const router = useRouter()
   const [schools, setSchools] = useState<BoardSchool[] | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [markingDoneId, setMarkingDoneId] = useState<string | null>(null)
+  const [closeNote, setCloseNote] = useState<string | null>(null)
 
   const load = useCallback(() => {
     Promise.all([
@@ -77,12 +79,64 @@ export default function WorkBoard() {
 
   useEffect(() => { load() }, [load])
 
+  // Close a card for work that happened outside the portal.
+  //
+  // Bella sent an application to a school by hand on a Friday and the board
+  // went on asking her to send it, because the only way to close an item was
+  // inside the school panel. She read that as a queue that would not clear.
+  //
+  // This is the same markDone path that panel uses, so the question guard
+  // still applies: an item that is a question cannot close here without an
+  // answer, and the route says so. That answer belongs on the item, not in a
+  // board card, so those are sent to the panel rather than closed from here.
+  const markDone = useCallback(async (item: { pursuitId: string; actionItemId?: string | null; label: string }) => {
+    if (!item.actionItemId) return
+    setMarkingDoneId(item.actionItemId)
+    setCloseNote(null)
+    try {
+      const res = await fetch(`/api/funding/pursuits/${item.pursuitId}/actions`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ actionId: item.actionItemId, markDone: true }),
+      })
+      const out = await res.json().catch(() => ({}))
+      if (!res.ok || out.error) {
+        // The guard refused, and it is right to. Say what it wants and where.
+        setCloseNote(
+          typeof out.error === 'string'
+            ? `${out.error} Open it to record that.`
+            : 'That did not close.'
+        )
+        return
+      }
+      load()
+    } catch {
+      setCloseNote('That did not close.')
+    } finally {
+      setMarkingDoneId(null)
+    }
+  }, [load])
+
   if (error) return <p style={{ color: '#6B7280', fontSize: 14 }}>{error}</p>
   if (schools === null) return <p style={{ color: '#6B7280', fontSize: 14 }}>Loading.</p>
 
   return (
+    <>
+      {closeNote && (
+        <div
+          role="alert"
+          style={{
+            background: '#FDF4E3', border: '1px solid #EBD7A8', color: '#7A4A12',
+            borderRadius: 8, padding: '10px 14px', fontSize: 13.5, marginBottom: 12,
+          }}
+        >
+          {closeNote}
+        </div>
+      )}
     <NeedsYouBoard
       schools={schools}
+      onMarkDone={markDone}
+      markingDoneId={markingDoneId}
       onWriteToSchool={item =>
         router.push(
           `/tdi-admin/funding/${item.pursuitId}?open=actions&action=${item.actionItemId}&write=1`
@@ -95,5 +149,6 @@ export default function WorkBoard() {
         router.push(base)
       }}
     />
+    </>
   )
 }
