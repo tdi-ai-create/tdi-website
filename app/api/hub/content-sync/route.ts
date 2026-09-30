@@ -1302,6 +1302,12 @@ export async function POST(request: NextRequest) {
       // Fields that describe the item. Safe to correct while live.
       const BACKFILLABLE = [
         'objectives', 'topic_tags', 'danielson_domains', 'roles',
+        // description was missing while description_es was present, so the
+        // Spanish blurb of a live item could be corrected and the English one
+        // could not. Same asymmetry as objectives_es below, one field over.
+        // It is not an identity field: title names the thing, description only
+        // describes it, and description_es was already judged safe to edit live.
+        'description',
         // The Spanish half of the same descriptive fields. objectives_es was
         // missing here while objectives, title_es and description_es were all
         // present, so a Spanish edition could be described in every way except
@@ -1337,6 +1343,23 @@ export async function POST(request: NextRequest) {
         )
       }
 
+      // A field that is neither backfillable nor an identity field used to be
+      // dropped in silence. Send objectives plus description and the response
+      // was `success: true, updated_fields: ["objectives"]`: one of the two
+      // writes landed, nothing said so, and the caller had to diff the row to
+      // find out. That is how TEA-407 read as "cannot edit description" for a
+      // month rather than as a missing entry in one array.
+      //
+      // Refuse instead. A caller that names a field it cannot write should be
+      // told, not quietly given a partial success.
+      const KNOWN = new Set<string>([...BACKFILLABLE, ...IDENTITY_FIELDS, 'action', 'id', 'reason', 'dryRun'])
+      const unknown = Object.keys(body).filter(k => !KNOWN.has(k))
+      if (unknown.length > 0) {
+        return NextResponse.json({
+          error: `backfill_published does not write ${unknown.join(', ')}. Backfillable fields are: ${BACKFILLABLE.join(', ')}.`,
+        }, { status: 400 })
+      }
+
       const updates: Record<string, unknown> = {}
       for (const field of BACKFILLABLE) {
         if (body[field] !== undefined) updates[field] = body[field]
@@ -1370,7 +1393,13 @@ export async function POST(request: NextRequest) {
           updated_at: stamp,
         })
         .eq('id', id)
-        .select('id, slug, objectives, topic_tags, danielson_domains, roles')
+        // Read back every field this action can write, not a subset. The old
+        // list stopped at roles, so a caller correcting title_es or description
+        // got a 200 and a row that did not contain the thing it had just
+        // changed, and had to re-fetch to confirm the write landed. Writes on
+        // this table have silently dropped fields before, which is exactly why
+        // the response has to show them.
+        .select('id, slug, objectives, topic_tags, danielson_domains, roles, description, title_es, description_es, objectives_es')
         .single()
 
       if (error) return NextResponse.json({ error: error.message }, { status: 500 })
