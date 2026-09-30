@@ -41,7 +41,47 @@ files on it before Rae has seen the panel.
   query result rather than a screen, which is exactly why this pass is deferred
   rather than claimed as complete.
 
-## Still to press on production
+## Completed on production, 30 September 2026
+
+Run after #680 deployed, signed in as Rae, on Saunemin CCSD #438 whose
+observation day is 7 October.
+
+- Opened: https://www.teachersdeserveit.com/tdi-admin/leadership/02f4b713-f258-4dff-a526-91565ff9a8e6
+- Saw: the panel under the cards, headed "Visit prep" with "Observation day in 7 days",
+  a "SOP and email template" button, a "Mark prep done" button, the line "What the
+  school has sent back. Paste anything that arrived by email, and attach the schedule
+  if they sent one." and an empty notes box.
+- Saw: opening the page created the visit row. One row, `visit_number` 1, status
+  "scheduled", `visit_date` 2026-10-07, `timeline_event_id` linked to the calendar event.
+- Pressed: the notes box, typed a real prep note, then clicked away to blur.
+- Saw: the note saved at 311 characters. Reloading the page showed the text still
+  there rather than an empty box, and the table still held exactly 1 row, so
+  find-or-create did not make a second visit on the second open.
+- Pressed: "Mark prep done".
+- Saw: the button turned green and read "Prep done", the panel header changed from
+  "Observation day in 7 days" to "Handled", and the urgent red "Visit prep" card
+  disappeared from the row above, leaving only "Prep for Next Call" and
+  "2 overdue items". No reload was needed.
+- Pressed: "Prep done" again, to undo it.
+- Saw: `prep_done_at` back to null with the 311 character note intact and status
+  still "scheduled", confirmed by query. Left in the not-done state deliberately,
+  because the prep genuinely is not finished and marking it done would suppress
+  the reminder for a real visit.
+
+- Did not press: "Attach a file". Uploading to a live partnership record needs a
+  real file from the school, and there is not one yet. The upload path is the one
+  part of this still unexercised in a browser.
+
+### A thing worth recording
+
+Immediately after the deploy, a hard reload of the admin portal returned
+"Access Denied" and "You are signed in as: rae@teachersdeserveit.com". Nothing was
+revoked: `tdi_team_members` still had rae@teachersdeserveit.com active as owner,
+unchanged since May, and `/api/admin/whoami` returned `{"isAdmin":true}`. A normal
+reload restored the portal. A hard reload against a deploy that is mid-swap can
+read as a permissions failure.
+
+## Still to press, carried forward
 
 - That the panel appears on Saunemin under the card, titled "Visit prep" and
   reading "Observation day in N days", and does not appear on Glen Ellyn.
