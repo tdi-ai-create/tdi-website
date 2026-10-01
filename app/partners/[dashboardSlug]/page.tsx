@@ -6,6 +6,7 @@ import Image from 'next/image';
 import InviteLeader from '@/components/partners/InviteLeader';
 import RosterAccessManager from '@/components/partners/RosterAccessManager';
 import { SemesterRecord } from '@/components/partners/SemesterRecord';
+import VibeCheckPanel, { type VibeCheckData } from '@/components/partners/VibeCheckPanel';
 import Link from 'next/link';
 import FooterSymbol from '@/components/FooterSymbol';
 import { offeringLabel } from '@/lib/partnerships/offerings';
@@ -449,6 +450,10 @@ export default function PartnerDashboard() {
   // with school specific filtered data".
   const [openBuilding, setOpenBuilding] = useState<string | null>(null);
   const [engagement, setEngagement] = useState<HubEngagementDetail | null>(null);
+  // Where this school sits among ours. Computed server side, so no school has to
+  // enter anything and it keeps working as the fleet grows.
+  const [cohort, setCohort] = useState<{ median: number; schools: number; best: number; rank: number } | null>(null);
+  const [vibe, setVibe] = useState<VibeCheckData | null>(null);
   // Funding status for this school only, from its own funding_pursuits row.
   const [funding, setFunding] = useState<{
     hasFunding: boolean;
@@ -575,7 +580,7 @@ export default function PartnerDashboard() {
     is_current: boolean;
     metrics: Record<string, unknown>;
     highlights: unknown[];
-    observation_notes: unknown[];
+    observation_notes: { date?: string; title?: string; label?: string; note?: string; body?: string; text?: string; building?: string; school?: string; observed?: number; love_notes?: number }[];
     para_quotes: { text: string; role?: string; building?: string }[];
     building_data: { name: string; staff_count?: number; hub_logins?: number; quick_wins?: number }[];
     timeline_events: { title: string; date?: string; status: string; notes?: string }[];
@@ -791,6 +796,8 @@ export default function PartnerDashboard() {
           setActionItems(updatedItems);
           setStaffStats(data.staffStats || { total: 0, hubLoggedIn: 0 });
           setEngagement(data.engagement ?? null);
+          setCohort(data.cohort ?? null);
+          setVibe(data.vibe ?? null);
           setMetricSnapshots(data.metricSnapshots || []);
           setApiBuildings(data.buildings || []);
           // The timeline_events table stores event_title and event_date, but this
@@ -7982,6 +7989,12 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                 </div>
               )}
 
+              {/* All five Vibe Check areas, on the live year only. A finished
+                  year's mood is history; a leader acts on the one running. */}
+              {sem.is_current && vibe && !vibe.unknown && (
+                <VibeCheckPanel data={vibe} staffTotal={staffStats.total} />
+              )}
+
               {sem.is_current && staffStats.total > 0 && staffStats.hubLoggedIn < staffStats.total && (
                 <div className="bg-white rounded-2xl p-6 md:p-7 shadow-sm border border-gray-100">
                   <h2 className="text-[15px] font-bold text-[#1e2749] tracking-tight">
@@ -7990,6 +8003,27 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                   <p className="text-xs text-gray-500 mt-1.5">
                     The rest of your team, and the fastest way to reach them.
                   </p>
+
+                  {/* Where this school sits among ours.
+                      Rae, 1 October 2026: every dashboard quoted a 10% industry
+                      average from research and never our own fleet, which is the
+                      more credible number and was already in the database.
+                      Suppressed below four schools, because a median of two is
+                      not a benchmark. */}
+                  {cohort && staffStats.total > 0 && (() => {
+                    const mine = Math.round((staffStats.hubLoggedIn / staffStats.total) * 100);
+                    const ahead = mine > cohort.median;
+                    const level = mine === cohort.median;
+                    return (
+                      <p className="text-[12.5px] leading-relaxed text-gray-600 mt-2.5 max-w-[68ch]">
+                        {ahead
+                          ? `You are at ${mine}%, against a median of ${cohort.median}% across the ${cohort.schools} schools we run. You are ahead of most of them.`
+                          : level
+                            ? `You are at ${mine}%, which is exactly the median across the ${cohort.schools} schools we run.`
+                            : `You are at ${mine}%, against a median of ${cohort.median}% across the ${cohort.schools} schools we run. What separates the schools above it is usually somebody in the building rather than anything about the staff.`}
+                      </p>
+                    );
+                  })()}
 
                   <div className="flex items-center gap-5 flex-wrap mt-4">
                     <p className="text-[34px] font-bold leading-none tabular-nums text-[#1e2749]">
