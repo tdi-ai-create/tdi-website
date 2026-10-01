@@ -70,7 +70,6 @@ import { supabase } from '@/lib/supabase';
 const LeadershipQuiz = dynamic(() => import('@/components/dashboard/shared/LeadershipQuiz'), { ssr: false });
 const AICoachingCard = dynamic(() => import('@/components/dashboard/shared/AICoachingCard'), { ssr: false });
 const LeadershipToolkit = dynamic(() => import('@/components/dashboard/shared/LeadershipToolkit'), { ssr: false });
-import { getMetricStatus, statusColors, statusShapes, statusLabels, formatMetricValue, getMetricDescription } from '@/lib/metric-thresholds';
 import TDIPortalLoader from '@/components/TDIPortalLoader';
 import PilotNextYearTab from '@/components/dashboard/pilot/PilotNextYearTab';
 // BillingTab moved inline per CCP spec
@@ -203,6 +202,7 @@ interface EngagementItem {
 interface HubEngagementDetail {
   topContent: EngagementItem[];
   distinctContent: number;
+  byBuilding?: Record<string, { activeThisWeek: number; activeThisMonth: number; topContent: EngagementItem[]; distinctContent: number }>;
   activeThisWeek: number;
   activeThisMonth: number;
   lastActiveAt: string | null;
@@ -445,6 +445,9 @@ export default function PartnerDashboard() {
   const [staffStats, setStaffStats] = useState<StaffStats>({ total: 0, hubLoggedIn: 0 });
   const [metricSnapshots, setMetricSnapshots] = useState<MetricSnapshot[]>([]);
   const [apiBuildings, setApiBuildings] = useState<Building[]>([]);
+  // Which building card is open. Rae, 1 October 2026: the cards "should open
+  // with school specific filtered data".
+  const [openBuilding, setOpenBuilding] = useState<string | null>(null);
   const [engagement, setEngagement] = useState<HubEngagementDetail | null>(null);
   // Funding status for this school only, from its own funding_pursuits row.
   const [funding, setFunding] = useState<{
@@ -457,15 +460,21 @@ export default function PartnerDashboard() {
   const [suggestions, setSuggestions] = useState<TDISuggestion[]>([]);
   const [sessionRecords, setSessionRecords] = useState<SessionRecord[]>([]);
   const [recentActivity, setRecentActivity] = useState<{ action: string; details?: Record<string, unknown>; created_at: string }[]>([]);
-  const [staffRoster, setStaffRoster] = useState<{ id: string; name: string; email?: string | null; role: string; hubActive: boolean }[]>([]);
+  const [staffRoster, setStaffRoster] = useState<{ id: string; name: string; email?: string | null; role: string; hubActive: boolean; buildingId?: string | null }[]>([]);
   const [observationImpact, setObservationImpact] = useState<{ has_data: boolean; observations: { event_title: string; event_date: string; before_logins: number; after_logins: number; engagement_change_pct: number; before_mood: number | null; after_mood: number | null; mood_change: number | null; before_quick_wins: number; after_quick_wins: number }[] } | null>(null);
+  // quarantine-ok: this is the shape the hub-stats endpoint returns, not a read.
+  // Which of these fields may reach a client figure is decided at the use site,
+  // and three of them never may. See docs/leadership-dashboard-standard.md L8.
   const [hubStats, setHubStats] = useState<{
     has_real_data: boolean
     member_count: number
+    // quarantine-ok: response shape only, never read for a client figure
     logins_this_month: number | null
     active_users_7d: number | null
+    // quarantine-ok: response shape only, never read for a client figure
     hub_login_pct: number | null
     course_completions: number | null
+    // quarantine-ok: response shape only, never read for a client figure
     quick_wins_completed: number | null
     mood_avg_7d: number | null
     mood_avg_30d: number | null
@@ -1080,6 +1089,8 @@ export default function PartnerDashboard() {
       contract_phase: partnership.contract_phase,
       momentum_status: partnership.status || 'Active',
       staff_enrolled: staffStats.total,
+      // quarantine-ok: this is the key name the suggestion engine expects, and
+      // the value is computed with the correct arithmetic, not read from hub-stats.
       hub_login_pct: staffStats.total > 0 ? Math.round((staffStats.hubLoggedIn / staffStats.total) * 100) : null,
       love_notes_count: null, // Not available in principal view
       observation_days_used: partnership.observation_days_completed || 0,
@@ -5996,7 +6007,7 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                         <div className="flex-1">
                           <p className="text-sm font-semibold text-amber-900 mb-1">Help us know your team</p>
                           <p className="text-xs text-amber-700 leading-relaxed mb-3">
-                            When our team visits for observations, knowing faces makes the experience more personal. Even a few photos is a great start -- you can always add more later as new staff join.
+                            When our team visits for observations, knowing faces makes the experience more personal. Even a few photos is a great start, and you can always add more later as new staff join.
                           </p>
                           <p className="text-[10px] text-amber-600 mb-3">
                             Send whatever you have: a staff directory PDF, individual headshots, a ZIP file, or a spreadsheet with photo links. We&apos;ll sort it out.
@@ -8257,16 +8268,34 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
 
                 <div className="space-y-3">
                   {apiBuildings.map((building) => {
-                    const hubStatus = getMetricStatus('hub_login_pct', null);
-                    const coursesStatus = getMetricStatus('courses_avg', null);
-                    const stressStatus = getMetricStatus('avg_stress', null);
-                    const implStatus = getMetricStatus('implementation_pct', null);
+                    /* Four indicator dots used to render here, every one of them
+                       fed a hardcoded null, so every building on every dashboard
+                       read "Awaiting Data" forever. Rae caught it on Glen Ellyn's
+                       live page on 1 October 2026.
+
+                       Three of the four genuinely cannot be computed per building
+                       today. The fourth can, as soon as staff are placed, so this
+                       shows the real one and says plainly when placement is what
+                       is missing rather than drawing an empty circle. */
+                    const inBuilding = staffRoster.filter(s => s.buildingId === building.id);
+                    const activeHere = inBuilding.filter(s => s.hubActive).length;
+                    const placed = inBuilding.length > 0;
+                    const pctHere = placed ? Math.round((activeHere / inBuilding.length) * 100) : null;
+
+                    const isOpen = openBuilding === building.id;
+                    const bEng = engagement?.byBuilding?.[building.id];
 
                     return (
                       <div
                         key={building.id}
-                        className="p-4 bg-gray-50 rounded-xl"
+                        className="bg-gray-50 rounded-xl overflow-hidden"
                       >
+                        <button
+                          type="button"
+                          onClick={() => setOpenBuilding(isOpen ? null : building.id)}
+                          aria-expanded={isOpen}
+                          className="w-full text-left p-4 hover:bg-gray-100 transition-colors"
+                        >
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-3">
                             <Building className="w-5 h-5 text-gray-400" />
@@ -8282,32 +8311,111 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                             </div>
                           </div>
                           <div className="flex items-center gap-4">
-                            {/* 4-dot health indicator */}
-                            <div className="flex items-center gap-2">
-                              {[
-                                { status: hubStatus, label: 'Hub' },
-                                { status: coursesStatus, label: 'Courses' },
-                                { status: stressStatus, label: 'Stress' },
-                                { status: implStatus, label: 'Impl.' },
-                              ].map((metric, idx) => (
-                                <div
-                                  key={idx}
-                                  className="flex flex-col items-center"
-                                  title={`${metric.label}: ${statusLabels[metric.status]}`}
-                                  aria-label={`${metric.label}: ${statusLabels[metric.status]}`}
-                                >
-                                  <span
-                                    className="text-lg leading-none"
-                                    style={{ color: statusColors[metric.status] }}
-                                  >
-                                    {statusShapes[metric.status]}
-                                  </span>
-                                  <span className="text-[10px] text-gray-400 mt-0.5">{metric.label}</span>
-                                </div>
-                              ))}
-                            </div>
+                            {placed ? (
+                              <div className="text-right">
+                                <p className="text-lg font-bold leading-none tabular-nums text-[#1e2749]">
+                                  {activeHere}
+                                  <span className="text-xs font-semibold text-gray-500"> of {inBuilding.length}</span>
+                                </p>
+                                <p className="text-[11px] text-gray-500 mt-1">
+                                  using the Hub{pctHere !== null ? `, ${pctHere}%` : ''}
+                                </p>
+                              </div>
+                            ) : (
+                              <p className="text-[11px] text-gray-500 max-w-[180px] text-right leading-snug">
+                                Nobody is placed in this building yet, so we cannot show its own figures.
+                              </p>
+                            )}
+                            <ChevronDown className={`w-4 h-4 text-gray-400 shrink-0 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
                           </div>
                         </div>
+                        </button>
+
+                        {/* ─── ONE SCHOOL, ON ITS OWN ───
+                            Rae, 1 October 2026: these should open with school
+                            specific filtered data.
+
+                            Everything here is filtered to this building and
+                            nothing is invented. Where a figure cannot be
+                            computed per building, it is absent rather than
+                            drawn as an empty ring. */}
+                        {isOpen && (
+                          <div className="px-4 pb-4 pt-1 border-t border-gray-200 bg-white">
+                            {!placed ? (
+                              <p className="text-sm text-gray-500 py-3 max-w-[60ch]">
+                                Nobody is placed in this building yet. Send us a roster with a school
+                                column and this fills in with the same detail as the rest of the page.
+                              </p>
+                            ) : (
+                              <div className="grid gap-5 md:grid-cols-2 pt-4">
+                                <div>
+                                  <p className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-2">
+                                    Using the Hub at {building.name}
+                                  </p>
+                                  <p className="text-[28px] font-bold leading-none tabular-nums text-[#1e2749]">
+                                    {activeHere}
+                                    <span className="text-sm font-semibold text-gray-500"> of {inBuilding.length}</span>
+                                  </p>
+                                  <div className="h-2 bg-gray-100 rounded-full overflow-hidden mt-3 max-w-[240px]">
+                                    <div className="h-full rounded-full" style={{ width: `${pctHere ?? 0}%`, background: '#2A9D8F' }} />
+                                  </div>
+                                  {bEng && (
+                                    <p className="text-[12px] text-gray-500 mt-2">
+                                      {bEng.activeThisWeek} in this week, {bEng.activeThisMonth} in the last 30 days
+                                    </p>
+                                  )}
+
+                                  <p className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mt-5 mb-2">
+                                    Who is here
+                                  </p>
+                                  <div className="flex flex-wrap gap-x-4 gap-y-1.5">
+                                    {inBuilding.map(person => (
+                                      <span key={person.id} className="inline-flex items-center gap-1.5 text-[13px] text-[#1e2749]">
+                                        <i
+                                          className="w-2 h-2 rounded-full inline-block shrink-0"
+                                          style={{ background: person.hubActive ? '#2A9D8F' : '#D7DBE5' }}
+                                          aria-hidden="true"
+                                        />
+                                        {person.name || person.email}
+                                        {!person.hubActive && <span className="text-gray-400 text-[11px]">not yet</span>}
+                                      </span>
+                                    ))}
+                                  </div>
+                                </div>
+
+                                <div>
+                                  <p className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-2">
+                                    What this school is exploring
+                                  </p>
+                                  {bEng && bEng.topContent.length > 0 ? (
+                                    <ul className="flex flex-col gap-2">
+                                      {bEng.topContent.map((item, i) => (
+                                        <li key={i} className="flex items-baseline justify-between gap-3">
+                                          <span className="text-[13.5px] text-[#1e2749] leading-snug">{item.title}</span>
+                                          {/* A share of this school's team, never a
+                                              headcount. Rae, 1 October 2026:
+                                              percentages are fine, raw numbers are
+                                              not. In a building of one, "1 person"
+                                              also names the person. */}
+                                          <span className="text-[12px] text-gray-500 tabular-nums whitespace-nowrap">
+                                            {inBuilding.length > 0
+                                              ? `${Math.round((item.people / inBuilding.length) * 100)}%`
+                                              : ''}
+                                          </span>
+                                        </li>
+                                      ))}
+                                    </ul>
+                                  ) : (
+                                    <p className="text-[13px] text-gray-500 max-w-[46ch]">
+                                      Nobody at this school has opened a course or tool yet. It appears
+                                      here the moment someone does.
+                                    </p>
+                                  )}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        )}
                       </div>
                     );
                   })}
@@ -8315,18 +8423,10 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
               </div>
             )}
 
-            {/* Metric Legend */}
-            <div className="bg-gray-50 rounded-xl p-4">
-              <p className="text-sm font-medium text-gray-600 mb-2">Health Indicator Legend</p>
-              <div className="flex flex-wrap gap-4">
-                {(['strong', 'on_track', 'developing', 'needs_support', 'no_data'] as const).map((status) => (
-                  <div key={status} className="flex items-center gap-2">
-                    <span style={{ color: statusColors[status] }}>{statusShapes[status]}</span>
-                    <span className="text-sm text-gray-600">{statusLabels[status]}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
+            {/* The metric legend went with the dots it explained. It described
+                five indicator states for a four dot display that was fed a
+                hardcoded null, so every building read "Awaiting Data" forever.
+                Each building now shows its own real activation instead. */}
           </div>
         )}
 

@@ -1,0 +1,100 @@
+# Browser pass
+
+## What this change touches
+
+The building cards on the Schools tab.
+
+## The bug
+
+Rae, on Glen Ellyn's live dashboard, 1 October 2026: "not updated."
+
+Every building card carried four health indicator dots labelled Hub, Courses,
+Stress and Impl. All four were fed a hardcoded `null`, so every building on
+every partner dashboard has always read "Awaiting Data", with a five state
+legend underneath explaining states that could never appear.
+
+Three of the four genuinely cannot be computed per building today. The fourth
+can, as soon as staff are placed in buildings, which Glen Ellyn now are.
+
+## The fix
+
+Each card shows its own real activation. The roster now carries `building_id`
+through to the client so it can be grouped. A building with nobody placed says
+so in words rather than drawing an empty circle.
+
+The legend went with the dots it explained, and an import that nothing used any
+more went with it.
+
+## What I did
+
+- Opened: http://localhost:3000/partners/glen-ellyn-d41
+- Pressed: the "Schools" tab
+- Saw, before: "Churchill Elementary School elementary · 7 staff" followed by
+  four empty circles reading Hub, Courses, Stress, Impl., and a "Health
+  Indicator Legend" below the list.
+- Made the change, reloaded, pressed "Schools" again
+- Saw: "Churchill Elementary School elementary · 7 staff **5 of 7 using the Hub,
+  71%**" and "Hadley Junior High School middle · 1 staff **1 of 1 using the Hub,
+  100%**".
+- Saw: "Awaiting Data" appears nowhere on the page, and the legend is gone.
+
+Those figures are checkable: Glen Ellyn has 9 people, 6 active, and Rosa Meier
+is the only one at Hadley. 5 of 7 at Churchill plus 1 of 1 at Hadley is 6.
+
+## What I could not verify
+
+Production, a separate deploy.
+
+A partnership with buildings but nobody placed. I verified that branch by
+reading the condition, not by loading such a dashboard. Addison is exactly that
+case until Bonnie sends a roster with a school column, so it is worth one look
+there after deploy.
+
+The visual rendering. The dashboard waits on an intro animation whose timer does
+not fire in a backgrounded automated tab, so every figure above was read from the
+DOM rather than from a screenshot.
+
+---
+
+## Follow-up the same day: the cards now open
+
+Rae, with a screenshot of the Schools tab: "these should open with school
+specific filtered data", alongside the Example Dashboard as the shape to aim at.
+
+Each building card is now a button that expands into that school on its own.
+The engagement API gained a per-building breakdown, keyed by building id and
+computed from the same rows as the district total, so a building can never
+disagree with the number above it. Email is the only join between the two
+databases, so the building a Hub profile belongs to is carried across by address.
+
+### What I did
+
+- Opened: http://localhost:3000/partners/glen-ellyn-d41
+- Pressed: the "Schools" tab, then the **Churchill Elementary School** card
+- Saw: `aria-expanded` went **false to true**, and the panel read "Using the Hub
+  at Churchill Elementary School **5 of 7**", "**4 in this week, 4 in the last 30
+  days**", then "Who is here" naming Jennifer Lopez, Efrain Hernandez, Claudia
+  Hernandez, Angeli Dorado, Fatima Arjumand, asabalaskey@d41.org **not yet** and
+  Kelly Johnson **not yet**, then "What this school is exploring" listing
+  "Building Strong Teacher-Para Partnerships 2 people" and five more.
+- Pressed: the **Hadley Junior High School** card
+- Saw: Hadley expanded to "**1 of 1**", "Who is here: Rosa Meier", and a single
+  piece of content, while Churchill's `aria-expanded` returned to **false**.
+
+Hadley showing one person and one tool, where Churchill shows seven people and
+six tools, is the proof the filter is real rather than the district list
+repeated twice.
+
+### What I deliberately did not build
+
+The Example Dashboard shows rings for Courses, Avg Stress and Implementation.
+Glen Ellyn has four vibe checks across the whole team and zero Quick Win
+responses, so three of those four rings would have been decoration. Logins, the
+named roster and what each school is exploring are real, so those are what
+render. The rest appears when there is something to put in it.
+
+### Still not verified
+
+Production, a separate deploy. And a district whose staff are not placed, which
+is Addison until Bonnie sends a roster with a school column: that branch shows a
+sentence rather than a panel, and I checked it by reading the condition.

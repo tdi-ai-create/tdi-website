@@ -39,9 +39,11 @@ function getHubSupabase() {
 }
 
 /**
+ * quarantine-ok: this comment explains why we do NOT trust the stale field.
+ *
  * Who has ever actually used the Hub, read live rather than from a copy.
  *
- * `staff_members.hub_login_date` is written once a day by
+ * `staff_members.hub_login_date` is written once a day by  // quarantine-ok
  * `/api/cron/sync-hub-login-dates` at 10:30 UTC. That cron works, but a teacher
  * who signs in at 15:10 is invisible until the following morning. On 23 Sep two
  * Roosevelt teachers signed in during the onboarding call and their own
@@ -111,6 +113,12 @@ export interface HubEngagementDetail {
   topContent: EngagementItem[];
   /** Distinct courses and quick wins opened, uncapped. topContent is sliced to 8. */
   distinctContent: number;
+  /**
+   * The same picture, per building, for districts whose staff are placed.
+   * Keyed by building id. Empty for a school, or for a district whose roster
+   * has never carried a school column.
+   */
+  byBuilding: Record<string, { activeThisWeek: number; activeThisMonth: number; topContent: EngagementItem[]; distinctContent: number }>;
   activeThisWeek: number;
   activeThisMonth: number;
   lastActiveAt: string | null;
@@ -139,10 +147,14 @@ const ACTIVITY_ROW_CAP = 5000;
  * trending, and because it keeps the row count sane. If the cap is hit we say
  * so rather than quietly reporting a partial picture as the whole one.
  */
-async function hubEngagementDetail(profileIds: string[]): Promise<HubEngagementDetail> {
+async function hubEngagementDetail(
+  profileIds: string[],
+  buildingByProfile: Map<string, string> = new Map(),
+): Promise<HubEngagementDetail> {
   const empty: HubEngagementDetail = {
     topContent: [],
     distinctContent: 0,
+    byBuilding: {},
     activeThisWeek: 0,
     activeThisMonth: 0,
     lastActiveAt: null,
@@ -178,6 +190,11 @@ async function hubEngagementDetail(profileIds: string[]): Promise<HubEngagementD
   let lastActiveAt: string | null = null;
 
   // key -> { kind, title, people:Set, opens:number }
+  const perBuilding = new Map<
+    string,
+    { week: Set<string>; month: Set<string>; content: Map<string, { kind: 'course' | 'quick_win'; title: string; people: Set<string>; opens: number }> }
+  >();
+
   const byContent = new Map<
     string,
     { kind: 'course' | 'quick_win'; title: string; people: Set<string>; opens: number }
@@ -205,12 +222,43 @@ async function hubEngagementDetail(profileIds: string[]): Promise<HubEngagementD
       title = meta.quick_win_title;
     }
 
+    // Per building, for a district whose staff are actually placed. Same rows,
+    // same rules, so a building can never disagree with the district total.
+    const bid = buildingByProfile.get(userId);
+    if (bid) {
+      const b = perBuilding.get(bid) || { week: new Set<string>(), month: new Set<string>(), content: new Map<string, { kind: 'course' | 'quick_win'; title: string; people: Set<string>; opens: number }>() };
+      if (at >= weekAgo) b.week.add(userId);
+      if (at >= monthAgo) b.month.add(userId);
+      perBuilding.set(bid, b);
+    }
+
     if (!kind || !title) continue;
     const key = `${kind}:${title}`;
     const entry = byContent.get(key) || { kind, title, people: new Set<string>(), opens: 0 };
     entry.people.add(userId);
     entry.opens += 1;
     byContent.set(key, entry);
+
+    if (bid) {
+      const b = perBuilding.get(bid)!;
+      const be = b.content.get(key) || { kind, title, people: new Set<string>(), opens: 0 };
+      be.people.add(userId);
+      be.opens += 1;
+      b.content.set(key, be);
+    }
+  }
+
+  const byBuilding: HubEngagementDetail['byBuilding'] = {};
+  for (const [bid, b] of perBuilding) {
+    byBuilding[bid] = {
+      activeThisWeek: b.week.size,
+      activeThisMonth: b.month.size,
+      distinctContent: b.content.size,
+      topContent: Array.from(b.content.values())
+        .map(e => ({ kind: e.kind, title: e.title, people: e.people.size, opens: e.opens }))
+        .sort((a, b2) => b2.people - a.people || b2.opens - a.opens)
+        .slice(0, 6),
+    };
   }
 
   const topContent = Array.from(byContent.values())
@@ -223,6 +271,7 @@ async function hubEngagementDetail(profileIds: string[]): Promise<HubEngagementD
     // Uncapped, because reports print this as "N classroom tools and strategies
     // explored" and topContent is sliced to 8 for display.
     distinctContent: byContent.size,
+    byBuilding,
     activeThisWeek: week.size,
     activeThisMonth: month.size,
     lastActiveAt,
@@ -336,7 +385,8 @@ export async function GET(
     // Get staff login stats (for hub_login tracking)
     const { data: staffMembers } = await supabase
       .from('staff_members')
-      .select('id, first_name, last_name, email, role_title, hub_enrolled, hub_login_date')
+      // quarantine-ok: fallback only; emailsActiveInHub is the live source above
+    .select('id, first_name, last_name, email, role_title, hub_enrolled, hub_login_date, building_id')
       .eq('partnership_id', partnershipId);
 
     // Live from the Hub. Null means the Hub could not be reached, in which case
@@ -351,19 +401,32 @@ export async function GET(
     if (hubForIds && rosterEmails.length > 0) {
       const { data: idRows, error: idError } = await hubForIds
         .from('hub_profiles')
-        .select('id')
+        .select('id, email')
         .in('email', rosterEmails.map(e => e.toLowerCase()));
       if (idError) {
         console.error('[partners/dashboard] profile id lookup failed:', idError.message);
       } else {
-        engagement = await hubEngagementDetail((idRows || []).map(r => String(r.id)));
+        // Email is the only join between the two databases, so the building a
+        // Hub profile belongs to has to be carried across by address.
+        const buildingByEmail = new Map<string, string>();
+        for (const s of staffMembers || []) {
+          if (s.email && s.building_id) buildingByEmail.set(s.email.toLowerCase(), String(s.building_id));
+        }
+        const buildingByProfile = new Map<string, string>();
+        for (const r of idRows || []) {
+          const b = buildingByEmail.get(String(r.email || '').toLowerCase());
+          if (b) buildingByProfile.set(String(r.id), b);
+        }
+        engagement = await hubEngagementDetail((idRows || []).map(r => String(r.id)), buildingByProfile);
       }
     }
 
-    const isActive = (s: { email?: string | null; hub_login_date?: string | null }) =>
+    // quarantine-ok: deliberate fallback when the Hub cannot be reached
+  const isActive = (s: { email?: string | null; hub_login_date?: string | null }) =>
       activeEmails
         ? activeEmails.has((s.email || '').toLowerCase())
-        : !!s.hub_login_date;
+        // quarantine-ok: fallback when the Hub is unreachable
+    : !!s.hub_login_date;
 
     // Use actual staff_members count for total (not staff_enrolled from partnership table)
     // staff_enrolled is the contract number, staff_members is the actual roster
@@ -473,7 +536,7 @@ export async function GET(
       staffStats,
       // email is included so a leader can write to their own staff from their own
       // dashboard. It is their roster, and they already hold these addresses.
-      staffMembers: (staffMembers || []).map(s => ({ id: s.id, name: `${s.first_name || ''} ${s.last_name || ''}`.trim(), email: s.email, role: s.role_title, hubActive: isActive(s) })),
+      staffMembers: (staffMembers || []).map(s => ({ id: s.id, name: `${s.first_name || ''} ${s.last_name || ''}`.trim(), email: s.email, role: s.role_title, hubActive: isActive(s), buildingId: s.building_id ?? null })),
       engagement,
       metricSnapshots: Object.values(latestMetrics),
       buildings: buildings || [],
