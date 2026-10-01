@@ -23,6 +23,8 @@ export interface SemesterRecordData {
   semester: string;
   semester_label: string;
   is_current?: boolean;
+  is_proposal?: boolean;
+  badge?: string | null;
   hero?: {
     eyebrow?: string;
     headline?: string;
@@ -114,6 +116,22 @@ export function SemesterRecord({
   return (
     <div className="space-y-4">
 
+      {/* A year that has not happened is not a record. Say so once, loudly, at
+          the top, because this tab sits beside two showing measured numbers and
+          a projection next to a result reads as a result. */}
+      {data.is_proposal && (
+        <div
+          className="rounded-xl px-4 py-3 flex items-start gap-3 text-sm"
+          style={{ background: '#FEF3C7', border: '1px solid #FDE68A', color: '#92400E' }}
+        >
+          <span className="w-2 h-2 rounded-full shrink-0 mt-1.5" style={{ background: '#D97706' }} />
+          <span>
+            This year has not happened. Every figure below is a target we are proposing, not something measured,
+            and each names the baseline it was built from.
+          </span>
+        </div>
+      )}
+
       {/* ─── THE RESULT, FIRST ─── */}
       {hero?.headline && (
         <div
@@ -142,6 +160,11 @@ export function SemesterRecord({
                   className="rounded-xl p-4"
                   style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)' }}
                 >
+                  {data.is_proposal && (
+                    <p className="text-[9px] font-bold uppercase tracking-[0.1em] mb-1" style={{ color: 'rgba(255,255,255,0.45)' }}>
+                      Target
+                    </p>
+                  )}
                   <p className="text-2xl font-bold leading-none tabular-nums" style={{ color: '#E8B84B' }}>{s.value}</p>
                   <p className="text-[11.5px] leading-snug mt-1.5" style={{ color: 'rgba(255,255,255,0.72)' }}>{s.label}</p>
                 </div>
@@ -164,7 +187,9 @@ export function SemesterRecord({
       {/* ─── THE NUMBERS BEHIND IT ─── */}
       {metricEntries.length > 0 && (
         <div className="bg-white rounded-2xl p-6 md:p-7 shadow-sm border border-gray-100">
-          <h2 className="text-[15px] font-bold text-[#1e2749] tracking-tight">{data.semester_label} in numbers</h2>
+          <h2 className="text-[15px] font-bold text-[#1e2749] tracking-tight">
+            {data.is_proposal ? `What ${data.semester_label} would include` : `${data.semester_label} in numbers`}
+          </h2>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4">
             {metricEntries.map(([key, m]) => (
               <div key={key} className="bg-gray-50 rounded-xl p-4">
@@ -178,7 +203,9 @@ export function SemesterRecord({
 
       {highlights.length > 0 && (
         <div className="bg-white rounded-2xl p-6 md:p-7 shadow-sm border border-gray-100">
-          <h2 className="text-[15px] font-bold text-[#1e2749] tracking-tight mb-4">What stood out</h2>
+          <h2 className="text-[15px] font-bold text-[#1e2749] tracking-tight mb-4">
+            {data.is_proposal ? 'Why this shape' : 'What stood out'}
+          </h2>
           <ul className="flex flex-col gap-2.5">
             {highlights.map((h, i) => (
               <li key={i} className="flex gap-3 text-sm text-[#1e2749] leading-relaxed">

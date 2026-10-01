@@ -47,9 +47,12 @@ export async function GET(request: NextRequest) {
     // Fetch all semesters for this partnership (for the toggle list)
     const { data: allSemesters, error: semestersError } = await supabase
       .from('partnership_semester_data')
-      .select('id, semester, semester_label, is_current, created_at')
+      .select('id, semester, semester_label, is_current, is_proposal, badge, sort_order, created_at')
       .eq('partnership_id', partnershipId)
-      .order('created_at', { ascending: false });
+      // Chronological, oldest first. Three year tabs read left to right as a
+      // story: what happened, what is happening, what we are proposing.
+      .order('sort_order', { ascending: true })
+      .order('created_at', { ascending: true });
 
     if (semestersError) {
       console.error('Error fetching semesters:', semestersError);

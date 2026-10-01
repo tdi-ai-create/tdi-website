@@ -557,7 +557,7 @@ export default function PartnerDashboard() {
   ]);
 
   // Semester toggle state
-  const [semesterList, setSemesterList] = useState<{ id: string; semester: string; semester_label: string; is_current: boolean }[]>([]);
+  const [semesterList, setSemesterList] = useState<{ id: string; semester: string; semester_label: string; is_current: boolean; is_proposal?: boolean; badge?: string | null }[]>([]);
   const [activeSemester, setActiveSemester] = useState<string>('fall-2026'); // default to current
   const [semesterData, setSemesterData] = useState<{
     id: string;
@@ -1593,7 +1593,7 @@ export default function PartnerDashboard() {
      * invisible to them.
      */
     ...(semesterList.length > 0
-      ? semesterList.map(sem => ({ id: `year-${sem.semester}`, label: sem.semester_label }))
+      ? semesterList.map(sem => ({ id: `year-${sem.semester}`, label: sem.semester_label, badgeText: sem.badge || undefined }))
       // A school with no year record keeps Your Plan. Addison is the only
       // partnership that has records, and replacing the tab unconditionally
       // would take the approach, the contract and the offering cards away from
@@ -3125,14 +3125,29 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                 }}
               >
                 {tab.label}
-                {tab.badge && (
+                {/* A year tab carries its own word: Complete, Live, Proposed.
+                    Everything else keeps the legacy "New" badge. */}
+                {('badgeText' in tab && tab.badgeText) ? (
+                  <span
+                    className="text-[10px] px-1.5 py-0.5 rounded-full font-bold uppercase tracking-wide"
+                    style={
+                      tab.badgeText === 'Live'
+                        ? { background: 'rgba(42,157,143,0.14)', color: '#2A9D8F' }
+                        : tab.badgeText === 'Proposed'
+                          ? { background: 'rgba(232,184,75,0.20)', color: '#8a6d1f' }
+                          : { background: '#EEF0F4', color: '#6b7280' }
+                    }
+                  >
+                    {tab.badgeText}
+                  </span>
+                ) : ('badge' in tab && tab.badge) ? (
                   <span
                     className="text-xs px-1.5 py-0.5 rounded-full font-bold"
                     style={{ background: '#DBEAFE', color: '#1D4ED8' }}
                   >
                     New
                   </span>
-                )}
+                ) : null}
               </button>
             ))}
           </div>
