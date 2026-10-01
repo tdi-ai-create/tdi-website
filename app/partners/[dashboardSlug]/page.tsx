@@ -1637,7 +1637,21 @@ export default function PartnerDashboard() {
   // Deliberately NOT staffStats.hubLoggedIn. That reads staff_members.hub_login_date,
   // which nothing in the codebase ever writes, so it is 0 for every partnership and
   // would keep reports permanently locked. Real engagement comes from the Hub itself.
-  const reportActiveStaff = hubStats?.logins_this_month ?? 0;
+  //
+  // And deliberately NOT hubStats.logins_this_month, which was this gate until
+  // 30 September 2026. That counts distinct users since the first of the CALENDAR
+  // month, so at 01:47 UTC on 1 October it covered about two hours and returned 0,
+  // while the same dashboard printed "28 Active this month" one tab away. Six
+  // reports locked themselves on every partner dashboard at midnight on the first
+  // of every month, and the locked panel told the leader "No staff have logged
+  // into the Hub this month", which was false.
+  //
+  // engagement.activeThisMonth is the rolling 30 day count the dashboard already
+  // shows, so the gate and the number a leader reads cannot disagree again. The
+  // fallback is the other rolling figure, never the calendar one.
+  const reportActiveStaff = engagement && !engagement.unknown
+    ? engagement.activeThisMonth
+    : (hubStats?.active_users_7d ?? 0);
   const reportSeatCount = hubStats?.member_count ?? staffStats.total;
   const reportDataReady = reportActiveStaff >= REPORT_MIN_ACTIVE_STAFF;
 
@@ -6419,8 +6433,8 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                     <h3 className="text-sm font-bold text-[#1e2749]">Reports aren&apos;t ready yet</h3>
                     <p className="text-xs text-gray-500">
                       {reportActiveStaff === 0
-                        ? 'No staff have logged into the Hub this month.'
-                        : `${reportActiveStaff} of ${reportSeatCount} staff have logged in this month.`}
+                        ? 'No staff activity in the Hub in the last 30 days.'
+                        : `${reportActiveStaff} of ${reportSeatCount} staff active in the last 30 days.`}
                     </p>
                   </div>
                 </div>
