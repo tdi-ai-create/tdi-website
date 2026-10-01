@@ -109,6 +109,8 @@ export interface EngagementItem {
 
 export interface HubEngagementDetail {
   topContent: EngagementItem[];
+  /** Distinct courses and quick wins opened, uncapped. topContent is sliced to 8. */
+  distinctContent: number;
   activeThisWeek: number;
   activeThisMonth: number;
   lastActiveAt: string | null;
@@ -140,6 +142,7 @@ const ACTIVITY_ROW_CAP = 5000;
 async function hubEngagementDetail(profileIds: string[]): Promise<HubEngagementDetail> {
   const empty: HubEngagementDetail = {
     topContent: [],
+    distinctContent: 0,
     activeThisWeek: 0,
     activeThisMonth: 0,
     lastActiveAt: null,
@@ -217,6 +220,9 @@ async function hubEngagementDetail(profileIds: string[]): Promise<HubEngagementD
 
   return {
     topContent,
+    // Uncapped, because reports print this as "N classroom tools and strategies
+    // explored" and topContent is sliced to 8 for display.
+    distinctContent: byContent.size,
     activeThisWeek: week.size,
     activeThisMonth: month.size,
     lastActiveAt,
