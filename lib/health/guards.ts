@@ -34,7 +34,7 @@ import { isPersonOwned, isSchoolOwned } from '../funding-ownership';
 import { planAfterAnswer } from '../funding-answer-actions';
 import { canAgentDraft, stalledDraftMessage } from '../funding-offerable';
 import { hasFunderDecided, isLive, isOver, isWithFunder } from '../funding-status';
-import { objectsToAnApprovedClaim, retiredClaimsIn } from '../approved-claims';
+import { approvedClaimsIn, objectsToAnApprovedClaim, retiredClaimsIn } from '../approved-claims';
 import { allowlistProblems, isOnAllowlist, SEND_ALLOWLIST, ALLOWLIST_ENABLED } from '../send-allowlist';
 import { computeNextActions } from '../funding-next-actions';
 import { awardLabel, awardedSummary, awardedAmountOf, awardedTotal } from '../funding-award';
@@ -870,6 +870,25 @@ export const GUARDS: Guard[] = [
         holds: () =>
           retiredClaimsIn('the draft cites a 94% success rate').length > 0 &&
           retiredClaimsIn('the draft cites a 74% success rate').length === 0,
+      },
+      {
+        name: 'the approved 94% recommendation rate is not refused',
+        holds: () =>
+          retiredClaimsIn('94% of educators would recommend TDI to a colleague.').length === 0 &&
+          approvedClaimsIn('94% of educators would recommend TDI to a colleague.').some(
+            (c) => c.id === 'recommend-rate-94',
+          ),
+      },
+      {
+        name: 'a draft making both 94% claims still trips on the retired one',
+        holds: () =>
+          retiredClaimsIn('Our 94% would recommend us. Also a 94% success rate.').length > 0,
+      },
+      {
+        name: 'the approved reading cannot borrow a word from the next sentence',
+        holds: () =>
+          retiredClaimsIn('a 94% success rate. We recommend it.').length > 0 &&
+          approvedClaimsIn('a 94% success rate. We recommend it.').length === 0,
       },
       {
         name: 'empty text claims nothing',
