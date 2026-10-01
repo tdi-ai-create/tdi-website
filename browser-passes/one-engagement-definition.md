@@ -162,3 +162,44 @@ caused by this change and not fixed by it. Raised separately.
 
 Whether any other partnership has a seat holder with a null email doing the same
 thing. Only Addison was checked at that level of detail.
+
+## Production pass, 30 September 2026
+
+Driven through Rae's signed-in session straight after deploy.
+
+**The list page is unchanged, which was the main risk.** Opened
+https://www.teachersdeserveit.com/tdi-admin/leadership and read every seat
+subtitle: Allenwood "0 of 13", Glen Ellyn "9 of 9", Oak Grove "2 of 20",
+Roosevelt "17 of 17", St. Mary "12 of 12", St. Peter Chanel "30 of 30", all
+identical to before the change, with the same cell states.
+
+Two rows moved and both moved because the data moved, not the code. Saunemin now
+reads "26 of 25 seats" and Addison "149 of 144": eight seats were provisioned to
+Saunemin at 18:01 today and five to Addison. Re-measured in the Hub project after
+the deploy and the database agrees with the screen exactly, 26 seats and 149
+seats, 11 and 51 of them active.
+
+**Addison, the case this change existed for.** Header now reads
+**"Using the Hub 51 of 149"**. The flag directly beneath it reads
+**"51 of 149 educators are using the Hub"** and the second flag reads
+**"Use is at 34%, below the 40% mark"**. Before today that header said
+"Hub Login 19%" above a flag saying "34%... 50 of 148". Three numbers, now one.
+
+**Saunemin, the sign-in case.** Header reads "Last Login 63d" and the alert reads
+**"Nobody at this school has signed in for 63 days."** 63 days back is 29 July,
+which is the `auth.users.last_sign_in_at` this now reads. The old page said
+"0d" from an activity_log row while the flag underneath said never.
+
+## Found while verifying, not fixed here
+
+The Provisioned tile renders a red **"0/144"** for the first few seconds of every
+load, before the hub-stats call resolves, then settles to "149/144". An unknown
+drawn as a failure, which is the same family of problem as the rest of this
+change and worth its own fix.
+
+## Still stale until the cron runs
+
+Saunemin and Glen Ellyn still show the old "principal has still not logged in"
+sentence, because a flag row is only cleared when the cron next runs and the
+live renderer falls back to the stored message for a flag whose condition it can
+no longer phrase. The dry run says that run clears exactly those two.
