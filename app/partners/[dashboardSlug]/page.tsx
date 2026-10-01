@@ -7946,6 +7946,42 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                   copy and a draft written. It comes from them rather than from
                   us, which is the version that worked on the previous platform
                   and never got rebuilt here. */}
+              {/* ─── NO ROSTER YET ───
+                  Rae, 1 October 2026, on Allenwood: "we should email her a
+                  reminder but then we can just update the design so when we
+                  have the roster, we can easily update it".
+
+                  So this is derived, never written by hand. A partnership with
+                  nobody on its roster has no numbers to show and the reason is
+                  always the same, so the page says so itself and says what it
+                  unlocks. The moment a roster lands this disappears and the
+                  activation block below takes over, with no record to rewrite
+                  and nobody to remember to do it.
+
+                  Allenwood is the live case: eleven contracted sessions, a visit
+                  booked for 18 November, and a dashboard its principal has
+                  already been sent a link to. */}
+              {sem.is_current && staffStats.total === 0 && (
+                <div className="rounded-2xl p-6 md:p-7" style={{ background: '#E8F0FD' }}>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-[#1e2749]/60 mb-1.5">
+                    Waiting on one thing from you
+                  </p>
+                  <h2 className="text-[15px] font-bold text-[#1e2749] tracking-tight mb-2">
+                    Your educator roster
+                  </h2>
+                  <p className="text-[13.5px] leading-relaxed text-[#1e2749] max-w-[68ch]">
+                    Names, roles and email addresses, in whatever format you already keep it. It is the
+                    only thing between this page and your own numbers. It switches on Hub access for
+                    your staff, it lets us write to people by name after a visit rather than writing to
+                    a room, and every figure here starts filling in from the day it lands.
+                  </p>
+                  <p className="text-[12.5px] leading-relaxed text-gray-600 mt-3 max-w-[68ch]">
+                    Nothing else is waiting on it. Your dates are booked and your sessions are yours
+                    whether or not the roster arrives first.
+                  </p>
+                </div>
+              )}
+
               {sem.is_current && staffStats.total > 0 && staffStats.hubLoggedIn < staffStats.total && (
                 <div className="bg-white rounded-2xl p-6 md:p-7 shadow-sm border border-gray-100">
                   <h2 className="text-[15px] font-bold text-[#1e2749] tracking-tight">
