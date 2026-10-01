@@ -202,6 +202,7 @@ interface EngagementItem {
 interface HubEngagementDetail {
   topContent: EngagementItem[];
   distinctContent: number;
+  byBuilding?: Record<string, { activeThisWeek: number; activeThisMonth: number; topContent: EngagementItem[]; distinctContent: number }>;
   activeThisWeek: number;
   activeThisMonth: number;
   lastActiveAt: string | null;
@@ -444,6 +445,9 @@ export default function PartnerDashboard() {
   const [staffStats, setStaffStats] = useState<StaffStats>({ total: 0, hubLoggedIn: 0 });
   const [metricSnapshots, setMetricSnapshots] = useState<MetricSnapshot[]>([]);
   const [apiBuildings, setApiBuildings] = useState<Building[]>([]);
+  // Which building card is open. Rae, 1 October 2026: the cards "should open
+  // with school specific filtered data".
+  const [openBuilding, setOpenBuilding] = useState<string | null>(null);
   const [engagement, setEngagement] = useState<HubEngagementDetail | null>(null);
   // Funding status for this school only, from its own funding_pursuits row.
   const [funding, setFunding] = useState<{
@@ -8278,11 +8282,20 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                     const placed = inBuilding.length > 0;
                     const pctHere = placed ? Math.round((activeHere / inBuilding.length) * 100) : null;
 
+                    const isOpen = openBuilding === building.id;
+                    const bEng = engagement?.byBuilding?.[building.id];
+
                     return (
                       <div
                         key={building.id}
-                        className="p-4 bg-gray-50 rounded-xl"
+                        className="bg-gray-50 rounded-xl overflow-hidden"
                       >
+                        <button
+                          type="button"
+                          onClick={() => setOpenBuilding(isOpen ? null : building.id)}
+                          aria-expanded={isOpen}
+                          className="w-full text-left p-4 hover:bg-gray-100 transition-colors"
+                        >
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-3">
                             <Building className="w-5 h-5 text-gray-400" />
@@ -8313,8 +8326,89 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                                 Nobody is placed in this building yet, so we cannot show its own figures.
                               </p>
                             )}
+                            <ChevronDown className={`w-4 h-4 text-gray-400 shrink-0 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
                           </div>
                         </div>
+                        </button>
+
+                        {/* ─── ONE SCHOOL, ON ITS OWN ───
+                            Rae, 1 October 2026: these should open with school
+                            specific filtered data.
+
+                            Everything here is filtered to this building and
+                            nothing is invented. Where a figure cannot be
+                            computed per building, it is absent rather than
+                            drawn as an empty ring. */}
+                        {isOpen && (
+                          <div className="px-4 pb-4 pt-1 border-t border-gray-200 bg-white">
+                            {!placed ? (
+                              <p className="text-sm text-gray-500 py-3 max-w-[60ch]">
+                                Nobody is placed in this building yet. Send us a roster with a school
+                                column and this fills in with the same detail as the rest of the page.
+                              </p>
+                            ) : (
+                              <div className="grid gap-5 md:grid-cols-2 pt-4">
+                                <div>
+                                  <p className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-2">
+                                    Using the Hub at {building.name}
+                                  </p>
+                                  <p className="text-[28px] font-bold leading-none tabular-nums text-[#1e2749]">
+                                    {activeHere}
+                                    <span className="text-sm font-semibold text-gray-500"> of {inBuilding.length}</span>
+                                  </p>
+                                  <div className="h-2 bg-gray-100 rounded-full overflow-hidden mt-3 max-w-[240px]">
+                                    <div className="h-full rounded-full" style={{ width: `${pctHere ?? 0}%`, background: '#2A9D8F' }} />
+                                  </div>
+                                  {bEng && (
+                                    <p className="text-[12px] text-gray-500 mt-2">
+                                      {bEng.activeThisWeek} in this week, {bEng.activeThisMonth} in the last 30 days
+                                    </p>
+                                  )}
+
+                                  <p className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mt-5 mb-2">
+                                    Who is here
+                                  </p>
+                                  <div className="flex flex-wrap gap-x-4 gap-y-1.5">
+                                    {inBuilding.map(person => (
+                                      <span key={person.id} className="inline-flex items-center gap-1.5 text-[13px] text-[#1e2749]">
+                                        <i
+                                          className="w-2 h-2 rounded-full inline-block shrink-0"
+                                          style={{ background: person.hubActive ? '#2A9D8F' : '#D7DBE5' }}
+                                          aria-hidden="true"
+                                        />
+                                        {person.name || person.email}
+                                        {!person.hubActive && <span className="text-gray-400 text-[11px]">not yet</span>}
+                                      </span>
+                                    ))}
+                                  </div>
+                                </div>
+
+                                <div>
+                                  <p className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-2">
+                                    What this school is exploring
+                                  </p>
+                                  {bEng && bEng.topContent.length > 0 ? (
+                                    <ul className="flex flex-col gap-2">
+                                      {bEng.topContent.map((item, i) => (
+                                        <li key={i} className="flex items-baseline justify-between gap-3">
+                                          <span className="text-[13.5px] text-[#1e2749] leading-snug">{item.title}</span>
+                                          <span className="text-[12px] text-gray-500 tabular-nums whitespace-nowrap">
+                                            {item.people} {item.people === 1 ? 'person' : 'people'}
+                                          </span>
+                                        </li>
+                                      ))}
+                                    </ul>
+                                  ) : (
+                                    <p className="text-[13px] text-gray-500 max-w-[46ch]">
+                                      Nobody at this school has opened a course or tool yet. It appears
+                                      here the moment someone does.
+                                    </p>
+                                  )}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        )}
                       </div>
                     );
                   })}

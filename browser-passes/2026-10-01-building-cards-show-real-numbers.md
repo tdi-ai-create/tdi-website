@@ -53,3 +53,48 @@ there after deploy.
 The visual rendering. The dashboard waits on an intro animation whose timer does
 not fire in a backgrounded automated tab, so every figure above was read from the
 DOM rather than from a screenshot.
+
+---
+
+## Follow-up the same day: the cards now open
+
+Rae, with a screenshot of the Schools tab: "these should open with school
+specific filtered data", alongside the Example Dashboard as the shape to aim at.
+
+Each building card is now a button that expands into that school on its own.
+The engagement API gained a per-building breakdown, keyed by building id and
+computed from the same rows as the district total, so a building can never
+disagree with the number above it. Email is the only join between the two
+databases, so the building a Hub profile belongs to is carried across by address.
+
+### What I did
+
+- Opened: http://localhost:3000/partners/glen-ellyn-d41
+- Pressed: the "Schools" tab, then the **Churchill Elementary School** card
+- Saw: `aria-expanded` went **false to true**, and the panel read "Using the Hub
+  at Churchill Elementary School **5 of 7**", "**4 in this week, 4 in the last 30
+  days**", then "Who is here" naming Jennifer Lopez, Efrain Hernandez, Claudia
+  Hernandez, Angeli Dorado, Fatima Arjumand, asabalaskey@d41.org **not yet** and
+  Kelly Johnson **not yet**, then "What this school is exploring" listing
+  "Building Strong Teacher-Para Partnerships 2 people" and five more.
+- Pressed: the **Hadley Junior High School** card
+- Saw: Hadley expanded to "**1 of 1**", "Who is here: Rosa Meier", and a single
+  piece of content, while Churchill's `aria-expanded` returned to **false**.
+
+Hadley showing one person and one tool, where Churchill shows seven people and
+six tools, is the proof the filter is real rather than the district list
+repeated twice.
+
+### What I deliberately did not build
+
+The Example Dashboard shows rings for Courses, Avg Stress and Implementation.
+Glen Ellyn has four vibe checks across the whole team and zero Quick Win
+responses, so three of those four rings would have been decoration. Logins, the
+named roster and what each school is exploring are real, so those are what
+render. The rest appears when there is something to put in it.
+
+### Still not verified
+
+Production, a separate deploy. And a district whose staff are not placed, which
+is Addison until Bonnie sends a roster with a school column: that branch shows a
+sentence rather than a panel, and I checked it by reading the condition.
