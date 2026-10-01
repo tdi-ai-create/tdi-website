@@ -202,6 +202,7 @@ interface EngagementItem {
 
 interface HubEngagementDetail {
   topContent: EngagementItem[];
+  distinctContent: number;
   activeThisWeek: number;
   activeThisMonth: number;
   lastActiveAt: string | null;
@@ -1674,7 +1675,21 @@ export default function PartnerDashboard() {
     setGeneratedReport(null);
 
     const schoolName = partnership.org_name || partnership.contact_name || 'Your School';
-    const hubPctVal = hubStats?.hub_login_pct ?? (staffStats.total > 0 ? Math.round((staffStats.hubLoggedIn / staffStats.total) * 100) : 0);
+    // Deliberately NOT hubStats.hub_login_pct, and this one goes in front of a
+    // school board.
+    //
+    // That field is distinct sign ins since the first of the CALENDAR month over
+    // provisioned seats. Generated at 01:47 on 1 October 2026 it covered about
+    // two hours, so every report template below would have printed "0% are
+    // actively engaged, 0 tools explored" for a district with 51 active staff
+    // and 87 lesson views in the last 30 days.
+    //
+    // This is the same arithmetic as the Team Activation card and the Overview
+    // summary, so a leader quoting the report and a leader quoting the screen
+    // say the same number.
+    const hubPctVal = staffStats.total > 0
+      ? Math.round((staffStats.hubLoggedIn / staffStats.total) * 100)
+      : 0;
     const totalDel = (partnership.observation_days_total || 0) + (partnership.virtual_sessions_total || 0);
     const completedDel = (partnership.observation_days_completed || 0) + (partnership.virtual_sessions_completed || 0);
 
@@ -1714,9 +1729,12 @@ export default function PartnerDashboard() {
       // 23 Sep two teachers signed in during a call and the column still said
       // never. Reports read it in nine places, which produced lines like
       // "0 of 16 educators actively using the Learning Hub (25%)". Use the real Hub count.
-      staffLoggedIn: hubStats?.logins_this_month ?? staffStats.hubLoggedIn,
+      staffLoggedIn: staffStats.hubLoggedIn,
       hubLoginPct: hubPctVal,
-      toolsExplored: hubStats?.quick_wins_completed ?? 0,
+      // quick_wins_completed counted an action the Hub has never written, so
+      // every report said "0 tools explored". This counts the distinct courses
+      // and quick wins the team actually opened.
+      toolsExplored: engagement && !engagement.unknown ? engagement.distinctContent : 0,
       courseCompletions: hubStats?.course_completions ?? 0,
       wellnessScore: hubStats?.mood_avg_7d ?? null,
       totalDeliverables: totalDel,
@@ -2253,11 +2271,11 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
   const printReport = (title: string, content: string, existingWindow?: Window | null) => {
     const schoolName = partnership?.org_name || partnership?.contact_name || 'School';
     const date = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
-    const hubPctVal = hubStats?.hub_login_pct ?? (staffStats.total > 0 ? Math.round((staffStats.hubLoggedIn / staffStats.total) * 100) : 0);
+    const hubPctVal = staffStats.total > 0 ? Math.round((staffStats.hubLoggedIn / staffStats.total) * 100) : 0;
     const totalDel = (partnership?.observation_days_total || 0) + (partnership?.virtual_sessions_total || 0);
     const completedDel = (partnership?.observation_days_completed || 0) + (partnership?.virtual_sessions_completed || 0);
     const wellness = hubStats?.mood_avg_7d;
-    const tools = hubStats?.quick_wins_completed ?? 0;
+    const tools = engagement && !engagement.unknown ? engagement.distinctContent : 0;
     const courses = hubStats?.course_completions ?? 0;
 
     // Reuse the window opened during the click when we have one. Opening here after
@@ -4034,9 +4052,14 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                * beneath.
                */
               const hubPct = staffStats.total > 0 ? Math.round((staffStats.hubLoggedIn / staffStats.total) * 100) : 0;
-              const toolsExplored = hubStats?.quick_wins_completed ?? 0;
+              const toolsExplored = engagement && !engagement.unknown ? engagement.distinctContent : 0;
               const wellnessScore = metricsRange === 'month' ? (hubStats?.mood_avg_30d ?? hubStats?.mood_avg_7d ?? null) : (hubStats?.mood_avg_7d ?? null);
-              const activeUsers = metricsRange === 'month' ? (hubStats?.logins_this_month ?? hubStats?.active_users_7d ?? 0) : (hubStats?.active_users_7d ?? 0);
+              // Rolling both ways. logins_this_month is calendar-to-date and made
+              // the month tile smaller than the week tile beside it every time a
+              // new month began.
+              const activeUsers = metricsRange === 'month'
+                ? (engagement && !engagement.unknown ? engagement.activeThisMonth : (hubStats?.active_users_7d ?? 0))
+                : (engagement && !engagement.unknown ? engagement.activeThisWeek : (hubStats?.active_users_7d ?? 0));
               const totalDeliverables = (partnership.observation_days_total || 0) + (partnership.virtual_sessions_total || 0);
               const completedDeliverables = (partnership.observation_days_completed || 0) + (partnership.virtual_sessions_completed || 0);
 
@@ -6871,7 +6894,7 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 {[
                   { label: 'Engagement Summary', icon: Users, action: () => {
-                    const csv = `Metric,Value\nTotal Staff,${staffStats.total}\nHub Active,${staffStats.hubLoggedIn}\nHub Login %,${staffStats.total > 0 ? Math.round((staffStats.hubLoggedIn / staffStats.total) * 100) : 0}%\nTools Explored,${hubStats?.quick_wins_completed ?? 0}\nCourse Completions,${hubStats?.course_completions ?? 0}\nWellness Score,${hubStats?.mood_avg_7d ?? 'N/A'}`;
+                    const csv = `Metric,Value\nTotal Staff,${staffStats.total}\nHub Active,${staffStats.hubLoggedIn}\nHub Login %,${staffStats.total > 0 ? Math.round((staffStats.hubLoggedIn / staffStats.total) * 100) : 0}%\nTools Explored,${engagement && !engagement.unknown ? engagement.distinctContent : 0}\nCourse Completions,${hubStats?.course_completions ?? 0}\nWellness Score,${hubStats?.mood_avg_7d ?? 'N/A'}`;
                     const blob = new Blob([csv], { type: 'text/csv' });
                     const link = document.createElement('a'); link.href = URL.createObjectURL(blob);
                     link.download = `engagement-summary-${new Date().toISOString().slice(0,10)}.csv`; link.click();
