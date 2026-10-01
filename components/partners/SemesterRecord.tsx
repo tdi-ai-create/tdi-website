@@ -55,6 +55,8 @@ export interface SemesterRecordData {
     date?: string;
     title?: string;
     label?: string;
+    /** What we saw. This is the field the data actually uses. */
+    notes?: string;
     note?: string;
     body?: string;
     text?: string;
@@ -124,8 +126,13 @@ export function SemesterRecord({
   const hero = data.hero || null;
   const highlights = (data.highlights || []).filter(h => typeof h === 'string') as string[];
   const quotes = (data.para_quotes || []).filter(q => quoteText(q));
-  const obsNoteText = (n: { note?: string; body?: string; text?: string }) =>
-    (n.note || n.body || n.text || '').trim();
+  // The live data uses `notes`, plural. An earlier version of this read note,
+  // body and text, none of which any row has ever carried, so every visit
+  // rendered its title and its date above nothing at all. The only four keys
+  // present in observation_notes are date, notes, title and love_notes.
+  // Verified against all 22 semester records, 1 October 2026.
+  const obsNoteText = (n: { notes?: string; note?: string; body?: string; text?: string }) =>
+    (n.notes || n.note || n.body || n.text || '').trim();
   const observations = (data.observation_notes || []).filter(n => obsNoteText(n) || n.title || n.label);
   const timeline = data.timeline_events || [];
   const included = (data.solutions || []).filter(s => s.kind === 'included');
