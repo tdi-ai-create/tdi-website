@@ -609,7 +609,7 @@ export async function GET(
       hubLoginSource: activeEmails ? 'live' : 'daily_sync',
     };
 
-    /* ─── WHERE THIS SCHOOL SITS AMONG OURS ───
+    /* ─── WHAT ACTIVATION LOOKS LIKE AT A TYPICAL PARTNER SCHOOL ───
        Rae, 1 October 2026. Every dashboard quoted the 10% industry average from
        research and never our own fleet, which is the more credible number and
        was already in the database. Saunemin saw 44% with no idea that is
@@ -621,7 +621,19 @@ export async function GET(
        median to nothing and say more about our onboarding than about anyone's
        engagement. Suppressed below four schools: a median of two is not a
        benchmark, it is a coin toss. */
-    let cohort: { median: number; schools: number; best: number; rank: number } | null = null;
+    /* What activation looks like at a typical partner school.
+       Named typicalActivation and not "cohort", because Cohort is the name of a
+       TDI offering and reusing it for a statistic made Rae think a client had
+       bought one. Nothing here touches that product.
+
+       Only the median leaves this function.
+       Rae, 1 October 2026: "we should not say the # of schools at all! we do not
+       tell other school buildings how many other schools we work with or their
+       names". My first version printed "across the 8 schools we run", which is
+       an internal figure. The school count, the ranking and the best performer
+       are all computed below because the median needs them, and none of them is
+       returned, so a future change cannot surface one by accident. */
+    let typicalActivation: { median: number } | null = null;
     try {
       const { data: peers } = await supabase
         .from('partnerships')
@@ -657,17 +669,14 @@ export async function GET(
               ? sorted[mid].rate
               : Math.round((sorted[mid - 1].rate + sorted[mid].rate) / 2);
             const ranked = [...rates].sort((a, b) => b.rate - a.rate);
-            cohort = {
-              median,
-              schools: rates.length,
-              best: ranked[0].rate,
-              rank: Math.max(1, ranked.findIndex(r => r.id === partnershipId) + 1),
-            };
+            // Deliberately median only. See the note above.
+            void ranked;
+            typicalActivation = { median };
           }
         }
       }
     } catch (err) {
-      console.error('[partners/dashboard] cohort benchmark failed:', err);
+      console.error('[partners/dashboard] typical activation failed:', err);
     }
 
     // Get latest metric snapshots
@@ -771,7 +780,7 @@ export async function GET(
       staffMembers: (staffMembers || []).map(s => ({ id: s.id, name: `${s.first_name || ''} ${s.last_name || ''}`.trim(), email: s.email, role: s.role_title, hubActive: isActive(s), buildingId: s.building_id ?? null })),
       engagement,
       vibe,
-      cohort,
+      typicalActivation,
       metricSnapshots: Object.values(latestMetrics),
       buildings: buildings || [],
       activityLog: activityLog || [],

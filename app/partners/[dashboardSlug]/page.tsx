@@ -452,7 +452,10 @@ export default function PartnerDashboard() {
   const [engagement, setEngagement] = useState<HubEngagementDetail | null>(null);
   // Where this school sits among ours. Computed server side, so no school has to
   // enter anything and it keeps working as the fleet grows.
-  const [cohort, setCohort] = useState<{ median: number; schools: number; best: number; rank: number } | null>(null);
+  // Median only, on purpose. A client is never told how many other schools we
+  // work with, nor who they are. Not called "cohort" because Cohort is an
+  // offering name and the overlap was genuinely confusing.
+  const [typicalActivation, setTypicalActivation] = useState<{ median: number } | null>(null);
   const [vibe, setVibe] = useState<VibeCheckData | null>(null);
   // Funding status for this school only, from its own funding_pursuits row.
   const [funding, setFunding] = useState<{
@@ -796,7 +799,7 @@ export default function PartnerDashboard() {
           setActionItems(updatedItems);
           setStaffStats(data.staffStats || { total: 0, hubLoggedIn: 0 });
           setEngagement(data.engagement ?? null);
-          setCohort(data.cohort ?? null);
+          setTypicalActivation(data.typicalActivation ?? null);
           setVibe(data.vibe ?? null);
           setMetricSnapshots(data.metricSnapshots || []);
           setApiBuildings(data.buildings || []);
@@ -1760,6 +1763,15 @@ export default function PartnerDashboard() {
       // Only ever the real contracted figure. Null means we do not know what they paid,
       // and a report must not put a number in front of a school board that we invented.
       costPerEducator: partnership.cost_per_educator ?? null,
+      // The same rule, applied to the peer comparison. Until today this report
+      // asserted "the typical TDI partner benchmark of 60% in the first quarter"
+      // and "30-40% adoption in the first two weeks", neither of which anyone
+      // has ever measured, both hardcoded, and both printed into a document a
+      // principal hands to a school board. The real median is computed from
+      // live rosters and is 56%, so the invented figure was also wrong.
+      // Null when there are too few schools to publish a median, in which case
+      // the report makes no comparison at all rather than inventing one.
+      typicalPct: typicalActivation?.median ?? null,
       observationDays: partnership.observation_days_total || 0,
       kpis: partnershipKpis.map(k => ({ label: k.kpi_label, current: k.current_value, target: k.target_value, unit: k.target_unit })),
       quotes: teacherQuotes.slice(0, 5).map(q => ({ text: q.quote_text, role: q.teacher_role })),
@@ -1807,7 +1819,21 @@ export default function PartnerDashboard() {
             ...dataContext,
           }),
           data: {
-            prompt: reportType === 'board'
+            // Every report prompt carries this. The dollar figures already had a
+            // guard of this shape and the peer comparison did not, so a model
+            // handed a percentage could write "above the national average" and a
+            // principal would read it to a school board. Two rules, because the
+            // model can fail in both directions: do not invent a comparison, and
+            // if you use the one real figure, carry its caveat with it.
+            //
+            // Deliberately not a blanket ban on the phrase "national average".
+            // TDI's own 74% against 10% claim is written into eight of these
+            // report templates on purpose, and a guard that forbade it would
+            // contradict the text the model is being asked to work from. The
+            // line between them is authorship: a figure already in the data or
+            // the template may be repeated, and nothing new may be made up.
+            prompt:
+              (reportType === 'board'
               ? `Write a professional board presentation report for ${schoolName}'s TDI partnership. Include: executive summary, key metrics, educator testimonials, and recommendations. Data: ${JSON.stringify(dataContext)}. Format with clear sections. No emojis. Professional tone.${dataContext.costPerEducator === null ? ' CRITICAL: no contract value is on file for this partnership. Do not state, estimate, or imply any dollar amount, cost per educator, or ROI figure. Do not reference services the data does not show, such as observation days when observationDays is 0.' : ''}`
               : reportType === 'engagement'
               ? `Write a detailed staff engagement analysis for ${schoolName}. Cover: Hub adoption rates, most-used tools, engagement trends, educator feedback, and specific recommendations to increase participation. Data: ${JSON.stringify(dataContext)}. Be specific and actionable.`
@@ -1819,7 +1845,11 @@ export default function PartnerDashboard() {
               ? `Write a celebratory staff highlights summary for ${schoolName}'s teachers. Include: most popular Hub tools, educator quotes and shout-outs, courses completed, and fun engagement stats. Tone: warm, encouraging, celebratory. Perfect for a staff newsletter or PLC agenda. Data: ${JSON.stringify(dataContext)}.`
               : reportType === 'community'
               ? `Write a parent-friendly community update about ${schoolName}'s professional development investment through TDI. Explain in plain language: what teachers are learning, how it benefits students, popular topics (stress management, classroom strategies, communication), and the school's commitment to educator growth. Tone: positive, accessible, no jargon. Suitable for a school newsletter or website. Data: ${JSON.stringify(dataContext)}.`
-              : `Write a comprehensive partnership summary for ${schoolName}. Data: ${JSON.stringify(dataContext)}.`,
+              : `Write a comprehensive partnership summary for ${schoolName}. Data: ${JSON.stringify(dataContext)}.`) +
+              ' CRITICAL: do not invent a statistic of any kind, and never compare this school to other TDI schools except by using the typicalPct field below. Use only figures present in the data above. Do not estimate, round up, project, or describe a trend the data does not contain.' +
+              (dataContext.typicalPct !== null
+                ? ` typicalPct is ${dataContext.typicalPct} and is the median activation across the schools in our community. If you use it, say "in our community", never how many schools there are and never a school name, and state plainly in the same paragraph that it is a rough bearing rather than a league table because buildings differ a lot in size and in how long they have been with us, and that they should ask the TDI team for context.`
+                : ' No peer comparison figure is available for this school, so make no comparison to other schools at all.'),
           },
         }),
       });
@@ -1951,7 +1981,7 @@ Not Yet Logged In: ${data.staffTotal - data.staffLoggedIn}
 Tools Explored: ${data.toolsExplored}
 Courses Completed: ${data.courseCompletions}
 
-${hasEngagement ? `Your adoption rate of ${data.hubLoginPct}% ${data.hubLoginPct >= 60 ? 'exceeds the typical TDI partner benchmark of 60% in the first quarter.' : data.hubLoginPct >= 30 ? 'is building steadily. Most TDI partners reach 60%+ within the first quarter.' : 'has room to grow. Here are strategies that work for other schools.'}` : 'Typical TDI partners see 30-40% adoption in the first two weeks and 60%+ by the end of the first month.'}
+${hasEngagement && data.typicalPct !== null ? `Your adoption rate of ${data.hubLoginPct}% ${data.hubLoginPct > data.typicalPct ? `sits above the ${data.typicalPct}% typical in our community.` : data.hubLoginPct === data.typicalPct ? 'is about typical in our community.' : `sits below the ${data.typicalPct}% typical in our community.`} Treat that as a rough bearing rather than a league table. Buildings in our community differ a lot in size and in how long they have been with us, so a small school and a large district move the figure very differently. Ask the TDI team if you want it put in context for a school like yours.` : ''}
 
 POPULAR HUB CONTENT
 
@@ -8010,18 +8040,41 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                       more credible number and was already in the database.
                       Suppressed below four schools, because a median of two is
                       not a benchmark. */}
-                  {cohort && staffStats.total > 0 && (() => {
+                  {typicalActivation && staffStats.total > 0 && (() => {
                     const mine = Math.round((staffStats.hubLoggedIn / staffStats.total) * 100);
-                    const ahead = mine > cohort.median;
-                    const level = mine === cohort.median;
+                    const ahead = mine > typicalActivation.median;
+                    const level = mine === typicalActivation.median;
                     return (
-                      <p className="text-[12.5px] leading-relaxed text-gray-600 mt-2.5 max-w-[68ch]">
-                        {ahead
-                          ? `You are at ${mine}%, against a median of ${cohort.median}% across the ${cohort.schools} schools we run. You are ahead of most of them.`
-                          : level
-                            ? `You are at ${mine}%, which is exactly the median across the ${cohort.schools} schools we run.`
-                            : `You are at ${mine}%, against a median of ${cohort.median}% across the ${cohort.schools} schools we run. What separates the schools above it is usually somebody in the building rather than anything about the staff.`}
-                      </p>
+                      <div className="mt-3 rounded-xl px-4 py-3" style={{ background: '#F8FAFC' }}>
+                        <p className="text-[13px] leading-relaxed text-[#1e2749] max-w-[68ch]">
+                          {ahead
+                            ? `Your ${mine}% sits above the ${typicalActivation.median}% typical in our community.`
+                            : level
+                              ? `Your ${mine}% is about typical in our community.`
+                              : `Your ${mine}% sits below the ${typicalActivation.median}% typical in our community.`}
+                        </p>
+                        {/* Said plainly rather than buried. Rae, 1 October 2026: she
+                            wants the comparison kept and wants the skew acknowledged,
+                            because rosters in our community run from two people to
+                            a hundred and fifty and a two person school at full
+                            activation counts the same as a large district at a third.
+                            Never a count of schools and never a name. */}
+                        <p className="text-[12px] leading-relaxed text-gray-500 mt-1.5 max-w-[68ch]">
+                          Treat that as a rough bearing rather than a league table. Buildings in
+                          our community differ a lot in size and in how long they have been with us,
+                          so a small school and a large district move the figure very differently.
+                          {' '}
+                          <a
+                            href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="font-semibold text-[#1e2749] underline underline-offset-2 hover:text-[#38618C]"
+                          >
+                            Ask the team
+                          </a>
+                          {' '}if you want it put in context for a school like yours.
+                        </p>
+                      </div>
                     );
                   })()}
 
