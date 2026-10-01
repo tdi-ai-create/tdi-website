@@ -262,7 +262,18 @@ export function SemesterRecord({
       {timeline.length > 0 && (
         <div className="bg-white rounded-2xl p-6 md:p-7 shadow-sm border border-gray-100">
           <h2 className="text-[15px] font-bold text-[#1e2749] tracking-tight mb-4">{data.semester_label} timeline</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+          {/* Only the columns that have something in them.
+              A finished year has nothing in progress and nothing coming up, so
+              the old version printed "In progress 0 Nothing here" and "Coming up
+              0 Nothing here" beneath St Peter Chanel's completed first year.
+              Two empty columns under their best record, which reads as a broken
+              feature rather than as a year that ended. Rae caught it on the live
+              page, 1 October 2026. */}
+          <div className={`grid grid-cols-1 gap-5 ${
+            (['completed', 'in_progress', 'upcoming'] as const).filter(st => timeline.some(e => e.status === st)).length > 1
+              ? 'sm:grid-cols-3'
+              : ''
+          }`}>
             {(['completed', 'in_progress', 'upcoming'] as const).map(status => {
               const cfg = {
                 completed: { label: 'Done', color: '#2A9D8F' },
@@ -270,6 +281,7 @@ export function SemesterRecord({
                 upcoming: { label: 'Coming up', color: '#3b5fa8' },
               }[status];
               const events = timeline.filter(e => e.status === status);
+              if (events.length === 0) return null;
               return (
                 <div key={status}>
                   <div className="flex items-center gap-1.5 mb-2.5">
@@ -277,9 +289,7 @@ export function SemesterRecord({
                     <span className="text-[11px] font-bold uppercase tracking-wide" style={{ color: cfg.color }}>{cfg.label}</span>
                     <span className="text-[11px] text-gray-400 ml-auto tabular-nums">{events.length}</span>
                   </div>
-                  {events.length === 0 ? (
-                    <p className="text-xs text-gray-400">Nothing here</p>
-                  ) : (
+                  {(
                     <ul className="flex flex-col gap-2">
                       {events.map((e, i) => (
                         <li key={i} className="text-[13px] text-[#1e2749] leading-snug">
