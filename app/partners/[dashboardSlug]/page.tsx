@@ -1577,10 +1577,25 @@ export default function PartnerDashboard() {
     return `${completed}/${total} complete`;
   };
 
+  // The tab for the year in progress, when there is one. Null for a school with
+  // no year record, which is every partnership except the ones we have written
+  // a record for.
+  const currentYearTabId = (() => {
+    const cur = semesterList.find(s => s.is_current);
+    return cur ? `year-${cur.semester}` : null;
+  })();
+
   // Tabs configuration - matches CCP approved structure
   const TABS = [
     { id: 'overview', label: 'Overview' },
-    { id: 'our-partnership', label: 'Our Partnership' },
+    // Our Partnership folds into the live year tab once a school has one.
+    // Rae, 30 September 2026. They were two tabs describing one thing: the
+    // partnership carried a "Partnership Timeline" while the year carried a
+    // "2026-2027 timeline", and the live engagement panel sat on the tab that
+    // otherwise described the contract. What a school bought and what a school
+    // could add next were a tab apart, when a leader reads those as one
+    // decision.
+    ...(currentYearTabId ? [] : [{ id: 'our-partnership', label: 'Our Partnership' }]),
     /**
      * A tab per school year, newest first, built from partnership_semester_data.
      *
@@ -2562,6 +2577,364 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
     w.document.close();
     setTimeout(() => w.print(), 500);
   };
+
+  /**
+   * What the partnership is, as opposed to what this year produced.
+   *
+   * Rae, 30 September 2026: Our Partnership and the live year were two tabs
+   * describing one thing. The partnership carried a "Partnership Timeline"
+   * while the year carried a "2026-2027 timeline", and the live engagement
+   * panel sat on the tab that otherwise described the contract.
+   *
+   * Defined once and rendered in two places so the content cannot drift: inside
+   * the live year record for a school that has one, and as its own tab for a
+   * school that does not.
+   */
+  const partnershipContext = (
+    <>
+
+            {/* ─── WHAT YOUR TEAM IS WORKING ON ───
+                Bonnie Osborne, 30 September 2026: she could see that staff had
+                signed in and nothing about what they did next. Every ingredient
+                was already recorded and never shown to the client.
+
+                Ranked by distinct people rather than opens, because eight paras
+                in one course says something about the school and one para
+                opening it thirty times says something about one para. */}
+            {engagement && !engagement.unknown && engagement.topContent.length > 0 && (
+              <div className="bg-white rounded-2xl p-6 md:p-7 shadow-sm border border-gray-100">
+                <div className="flex items-baseline justify-between gap-4 flex-wrap mb-1">
+                  <h2 className="text-[17px] font-bold text-[#1e2749] tracking-tight">
+                    What your team is working on
+                  </h2>
+                  <span className="text-xs text-gray-400">
+                    Last {engagement.windowDays} days
+                  </span>
+                </div>
+                <p className="text-xs text-gray-500 mb-5">
+                  Nobody assigned these. Your staff chose them.
+                </p>
+
+                <div className="grid grid-cols-3 gap-2 md:gap-4 mb-6">
+                  <div className="p-3 md:p-4 bg-gray-50 rounded-xl text-center">
+                    <p className="text-xl md:text-2xl font-bold text-[#1e2749]">{engagement.activeThisWeek}</p>
+                    <p className="text-xs md:text-sm text-gray-500">Active this week</p>
+                  </div>
+                  <div className="p-3 md:p-4 bg-gray-50 rounded-xl text-center">
+                    <p className="text-xl md:text-2xl font-bold text-[#1e2749]">{engagement.activeThisMonth}</p>
+                    <p className="text-xs md:text-sm text-gray-500">Active this month</p>
+                  </div>
+                  <div className="p-3 md:p-4 bg-gray-50 rounded-xl text-center">
+                    <p className="text-xl md:text-2xl font-bold text-[#1e2749]">
+                      {engagement.lastActiveAt
+                        ? new Date(engagement.lastActiveAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
+                        : '—'}
+                    </p>
+                    <p className="text-xs md:text-sm text-gray-500">Most recent sign in</p>
+                  </div>
+                </div>
+
+                <div className="space-y-2.5">
+                  {engagement.topContent.map((item, i) => (
+                    <div key={`${item.kind}-${i}`} className="flex items-center gap-3">
+                      <span
+                        className="px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wide shrink-0"
+                        style={
+                          item.kind === 'course'
+                            ? { background: '#E8F0FD', color: '#1e2749' }
+                            : { background: '#FFF8E7', color: '#8a6d1f' }
+                        }
+                      >
+                        {item.kind === 'course' ? 'Course' : 'Quick Win'}
+                      </span>
+                      <span className="text-sm text-[#1e2749] flex-1 min-w-0 truncate" title={item.title}>
+                        {item.title}
+                      </span>
+                      <span className="text-sm font-semibold text-[#1e2749] shrink-0">
+                        {item.people}
+                      </span>
+                      <span className="text-xs text-gray-400 shrink-0 w-24 text-right">
+                        {item.people === 1 ? 'person' : 'people'}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
+                {engagement.truncated && (
+                  <p className="text-[11px] text-gray-400 mt-4">
+                    Your team is busy enough that this is based on the most recent activity rather than every record in the window.
+                  </p>
+                )}
+              </div>
+            )}
+
+            {/* Welcome / Context Section.
+                "This is where your year with TDI comes to life. As we work
+                together, this page will fill with..." is the right thing to
+                show a school in month one and the wrong thing to show a school
+                that already has a stored year record, which read as us not
+                having started. */}
+            {semesterList.length === 0 && (
+            <div className="bg-gradient-to-br from-[#1B2A4A] to-[#38618C] rounded-2xl p-6 md:p-8 text-white">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center flex-shrink-0">
+                  <Handshake className="w-6 h-6 text-[#E8B84B]" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-bold mb-2" style={{ color: '#FFFFFF' }}>Your Partnership Story</h2>
+                  <p className="text-sm text-white/70 leading-relaxed mb-4">
+                    This is where your year with TDI comes to life. As we work together, this page will fill with session notes, teacher feedback, milestone celebrations, and the data that tells your school&apos;s growth story. Everything you need for board presentations, grant reporting, or just remembering how far your team has come.
+                  </p>
+                  <div className="flex flex-wrap gap-3">
+                    <button
+                      onClick={() => { setActiveTab('blueprint'); }}
+                      className="text-xs font-semibold px-4 py-2 rounded-lg bg-white/10 text-white hover:bg-white/20 transition-colors flex items-center gap-1.5"
+                    >
+                      <FileText className="w-3.5 h-3.5" />
+                      View Your Plan
+                    </button>
+                    <button
+                      onClick={() => { setActiveTab('reporting'); }}
+                      className="text-xs font-semibold px-4 py-2 rounded-lg bg-white/10 text-white hover:bg-white/20 transition-colors flex items-center gap-1.5"
+                    >
+                      <BarChart3 className="w-3.5 h-3.5" />
+                      Generate Reports
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            )}
+
+            {/* The semester toggle and the historical record that sat here moved to
+                their own year tabs on 30 September 2026. A school's first year was
+                reachable only by pressing a toggle most people never noticed. */}
+
+            {/* Current semester content - only shown when viewing the current semester (or no semesters configured) */}
+            {(semesterList.length <= 1 || !!semesterList.find((s) => s.semester === activeSemester)?.is_current) && (
+              <>
+
+            {/* What's Included Summary */}
+            <div className="bg-white rounded-xl border border-gray-100 p-6" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+              <h2 className="text-base font-semibold text-gray-900 mb-4">What Your Partnership Includes</h2>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                {[
+                  { value: staffStats.total, label: 'Hub Memberships', icon: Users, color: '#8B5CF6' },
+                  { value: partnership?.observation_days_total || 0, label: 'Observation Days', icon: Eye, color: '#D97706' },
+                  { value: partnership?.executive_sessions_total || 0, label: 'Executive Sessions', icon: GraduationCap, color: '#2563EB' },
+                  { value: partnership?.virtual_sessions_total || 0, label: 'Virtual Sessions', icon: Headphones, color: '#2A9D8F' },
+                ].filter(item => item.value > 0).map((item, i) => {
+                  const Icon = item.icon;
+                  return (
+                    <div key={i} className="rounded-xl bg-gray-50 p-4 text-center">
+                      <Icon className="w-5 h-5 mx-auto mb-2" style={{ color: item.color }} />
+                      <p className="text-2xl font-bold text-[#1e2749]">{item.value}</p>
+                      <p className="text-[10px] text-gray-500 font-medium">{item.label}</p>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Partnership Goal. Hidden once real goals exist, because this
+                card says "Your partnership goal will be set during your
+                onboarding call" and the Your Goals card on Overview was
+                already showing three of them. Two answers to one question on
+                one dashboard. */}
+            {partnershipKpis.length === 0 && (
+            <div className="bg-white rounded-xl border border-gray-100 p-6"
+              style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-2 h-2 rounded-full" style={{ background: '#2D7D78' }} />
+                <h2 className="text-base font-semibold text-gray-900">Our Partnership Goal</h2>
+              </div>
+              <p className="text-base text-gray-700 leading-relaxed font-medium">
+                {partnership?.partnership_goal ||
+                  'Your partnership goal will be set during your onboarding call with our team.'}
+              </p>
+            </div>
+            )}
+
+
+            {/* Phase Timeline */}
+            <div className="bg-white rounded-xl border border-gray-100 p-6"
+              style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+              <h2 className="text-base font-semibold text-gray-900 mb-5">Your TDI Journey</h2>
+              <div className="flex items-start">
+                {(['IGNITE', 'ACCELERATE', 'SUSTAIN'] as const).map((p, i) => {
+                  const phases = ['IGNITE', 'ACCELERATE', 'SUSTAIN']
+                  const currentIndex = phases.indexOf(partnership?.contract_phase || 'IGNITE')
+                  const thisIndex = phases.indexOf(p)
+                  const isCurrent = p === (partnership?.contract_phase || 'IGNITE')
+                  const isComplete = thisIndex < currentIndex
+                  const phaseColors = ['#D97706', '#2D7D78', '#16A34A']
+                  const color = phaseColors[i]
+                  return (
+                    <div key={p} className="flex items-start flex-1">
+                      <div className="flex-1 text-center">
+                        <div className="flex justify-center mb-2">
+                          <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold"
+                            style={{
+                              background: isCurrent ? color : isComplete ? '#E5E7EB' : '#F3F4F6',
+                              color: isCurrent ? '#fff' : isComplete ? '#6B7280' : '#9CA3AF',
+                              border: isCurrent ? `2px solid ${color}` : '2px solid #E5E7EB',
+                            }}>
+                            {isComplete ? '✓' : i + 1}
+                          </div>
+                        </div>
+                        <p className="text-xs font-bold mb-0.5"
+                          style={{ color: isCurrent ? color : isComplete ? '#6B7280' : '#9CA3AF' }}>
+                          Phase {i + 1}
+                        </p>
+                        <p className="text-xs font-semibold"
+                          style={{ color: isCurrent ? '#1B2A4A' : '#9CA3AF' }}>
+                          {p}
+                        </p>
+                        {isCurrent && (
+                          <div className="mt-1 text-xs font-bold px-2 py-0.5 rounded-full inline-block"
+                            style={{ background: `${color}15`, color }}>
+                            You Are Here
+                          </div>
+                        )}
+                      </div>
+                      {i < 2 && (
+                        <div className="flex-shrink-0 w-8 h-0.5 mt-5"
+                          style={{ background: isComplete ? '#2D7D78' : '#E5E7EB' }} />
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+
+            {/* Partnership Timeline. A school with year records has a
+                timeline per year inside the record itself, so showing this one
+                beside it printed two timelines for one partnership. */}
+            {semesterList.length === 0 && (
+            <div className="bg-white rounded-xl border border-gray-100 p-6"
+              style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+              <h2 className="text-base font-semibold text-gray-900 mb-5">Partnership Timeline</h2>
+              {timelineEvents.length === 0 ? (
+                <p className="text-sm text-gray-400 text-center py-4">
+                  Your timeline will fill in as we deliver sessions and reach milestones together.
+                </p>
+              ) : (
+                <div className="grid grid-cols-3 gap-6">
+                  {(['completed', 'in_progress', 'upcoming'] as const).map(status => {
+                    const config = {
+                      completed: { label: 'Done', color: '#16A34A', bg: '#DCFCE7' },
+                      in_progress: { label: 'In Progress', color: '#D97706', bg: '#FEF3C7' },
+                      upcoming: { label: 'Coming Soon', color: '#2563EB', bg: '#EFF6FF' },
+                    }[status]
+                    const events = timelineEvents.filter(e => e.status === status)
+                    return (
+                      <div key={status}>
+                        <div className="flex items-center gap-1.5 mb-3">
+                          <div className="w-2 h-2 rounded-full" style={{ background: config.color }} />
+                          <span className="text-xs font-bold uppercase tracking-wide"
+                            style={{ color: config.color }}>
+                            {config.label}
+                          </span>
+                          <span className="text-xs text-gray-400 ml-auto">{events.length}</span>
+                        </div>
+                        {events.length === 0 ? (
+                          <p className="text-xs text-gray-300 italic">Nothing here yet</p>
+                        ) : (
+                          events.map(event => (
+                            <div key={event.id} className="flex items-start gap-2 mb-3">
+                              <div className="w-1.5 h-1.5 rounded-full flex-shrink-0 mt-1.5"
+                                style={{ background: config.color }} />
+                              <div>
+                                <p className="text-sm text-gray-700 leading-snug">{event.title}</p>
+                                {event.date && (
+                                  <p className="text-xs text-gray-400 mt-0.5">
+                                    {new Date(event.date).toLocaleDateString('en-US', {
+                                      month: 'short', day: 'numeric', year: 'numeric'
+                                    })}
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
+            </div>
+            )}
+
+            {/* Session Records */}
+            {sessionRecords && sessionRecords.length > 0 && (
+              <div className="bg-white rounded-xl border border-gray-100 p-6"
+                style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+                <h2 className="text-base font-semibold text-gray-900 mb-4">Sessions Completed</h2>
+                <div className="space-y-3">
+                  {sessionRecords.map((record) => (
+                    <div key={record.id}
+                      className="flex items-start justify-between p-3 rounded-lg bg-gray-50 border border-gray-100">
+                      <div className="flex items-center gap-3">
+                        <div className="w-2 h-2 rounded-full bg-green-500 flex-shrink-0 mt-1" />
+                        <div>
+                          <p className="text-sm font-semibold text-gray-800">
+                            {record.session_type === 'observation' ? 'Observation Day' :
+                             record.session_type === 'virtual_session' ? 'Virtual Session' :
+                             record.session_type === 'executive_session' ? 'Executive Session' :
+                             'Session'} {record.session_number}
+                          </p>
+                          {record.session_date && (
+                            <p className="text-xs text-gray-400 mt-0.5">
+                              {new Date(record.session_date).toLocaleDateString('en-US', {
+                                month: 'long', day: 'numeric', year: 'numeric'
+                              })}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                      {record.love_notes_count > 0 && (
+                        <span className="text-xs font-semibold px-2 py-1 rounded-full flex-shrink-0"
+                          style={{ background: '#FEF3C7', color: '#92400E' }}>
+                          {record.love_notes_count} Love Notes
+                        </span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Teacher Quotes */}
+            {teacherQuotes && teacherQuotes.length > 0 && (
+              <div className="bg-white rounded-xl border border-gray-100 p-6"
+                style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+                <h2 className="text-base font-semibold text-gray-900 mb-4">
+                  Voices From Your School
+                </h2>
+                <div className="space-y-3">
+                  {teacherQuotes.map((quote) => (
+                    <div key={quote.id}
+                      className="p-4 rounded-xl border-l-4"
+                      style={{ background: '#F9FAFB', borderLeftColor: '#2D7D78' }}>
+                      <p className="text-sm text-gray-700 italic leading-relaxed">
+                        &ldquo;{quote.quote_text}&rdquo;
+                      </p>
+                      {quote.teacher_role && (
+                        <p className="text-xs text-gray-400 mt-2 font-medium">
+                          - {quote.teacher_role}
+                        </p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+              </>
+            )}
+
+    </>
+  );
 
   return (
     <>
@@ -7714,334 +8087,6 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
         )}
 
         {/* OUR PARTNERSHIP TAB */}
-        {activeTab === 'our-partnership' && (
-          <div className="py-6 space-y-4">
-
-            {/* ─── WHAT YOUR TEAM IS WORKING ON ───
-                Bonnie Osborne, 30 September 2026: she could see that staff had
-                signed in and nothing about what they did next. Every ingredient
-                was already recorded and never shown to the client.
-
-                Ranked by distinct people rather than opens, because eight paras
-                in one course says something about the school and one para
-                opening it thirty times says something about one para. */}
-            {engagement && !engagement.unknown && engagement.topContent.length > 0 && (
-              <div className="bg-white rounded-2xl p-6 md:p-7 shadow-sm border border-gray-100">
-                <div className="flex items-baseline justify-between gap-4 flex-wrap mb-1">
-                  <h2 className="text-[17px] font-bold text-[#1e2749] tracking-tight">
-                    What your team is working on
-                  </h2>
-                  <span className="text-xs text-gray-400">
-                    Last {engagement.windowDays} days
-                  </span>
-                </div>
-                <p className="text-xs text-gray-500 mb-5">
-                  Nobody assigned these. Your staff chose them.
-                </p>
-
-                <div className="grid grid-cols-3 gap-2 md:gap-4 mb-6">
-                  <div className="p-3 md:p-4 bg-gray-50 rounded-xl text-center">
-                    <p className="text-xl md:text-2xl font-bold text-[#1e2749]">{engagement.activeThisWeek}</p>
-                    <p className="text-xs md:text-sm text-gray-500">Active this week</p>
-                  </div>
-                  <div className="p-3 md:p-4 bg-gray-50 rounded-xl text-center">
-                    <p className="text-xl md:text-2xl font-bold text-[#1e2749]">{engagement.activeThisMonth}</p>
-                    <p className="text-xs md:text-sm text-gray-500">Active this month</p>
-                  </div>
-                  <div className="p-3 md:p-4 bg-gray-50 rounded-xl text-center">
-                    <p className="text-xl md:text-2xl font-bold text-[#1e2749]">
-                      {engagement.lastActiveAt
-                        ? new Date(engagement.lastActiveAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
-                        : '—'}
-                    </p>
-                    <p className="text-xs md:text-sm text-gray-500">Most recent sign in</p>
-                  </div>
-                </div>
-
-                <div className="space-y-2.5">
-                  {engagement.topContent.map((item, i) => (
-                    <div key={`${item.kind}-${i}`} className="flex items-center gap-3">
-                      <span
-                        className="px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wide shrink-0"
-                        style={
-                          item.kind === 'course'
-                            ? { background: '#E8F0FD', color: '#1e2749' }
-                            : { background: '#FFF8E7', color: '#8a6d1f' }
-                        }
-                      >
-                        {item.kind === 'course' ? 'Course' : 'Quick Win'}
-                      </span>
-                      <span className="text-sm text-[#1e2749] flex-1 min-w-0 truncate" title={item.title}>
-                        {item.title}
-                      </span>
-                      <span className="text-sm font-semibold text-[#1e2749] shrink-0">
-                        {item.people}
-                      </span>
-                      <span className="text-xs text-gray-400 shrink-0 w-24 text-right">
-                        {item.people === 1 ? 'person' : 'people'}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-
-                {engagement.truncated && (
-                  <p className="text-[11px] text-gray-400 mt-4">
-                    Your team is busy enough that this is based on the most recent activity rather than every record in the window.
-                  </p>
-                )}
-              </div>
-            )}
-
-            {/* Welcome / Context Section */}
-            <div className="bg-gradient-to-br from-[#1B2A4A] to-[#38618C] rounded-2xl p-6 md:p-8 text-white">
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center flex-shrink-0">
-                  <Handshake className="w-6 h-6 text-[#E8B84B]" />
-                </div>
-                <div>
-                  <h2 className="text-lg font-bold mb-2" style={{ color: '#FFFFFF' }}>Your Partnership Story</h2>
-                  <p className="text-sm text-white/70 leading-relaxed mb-4">
-                    This is where your year with TDI comes to life. As we work together, this page will fill with session notes, teacher feedback, milestone celebrations, and the data that tells your school&apos;s growth story. Everything you need for board presentations, grant reporting, or just remembering how far your team has come.
-                  </p>
-                  <div className="flex flex-wrap gap-3">
-                    <button
-                      onClick={() => { setActiveTab('blueprint'); }}
-                      className="text-xs font-semibold px-4 py-2 rounded-lg bg-white/10 text-white hover:bg-white/20 transition-colors flex items-center gap-1.5"
-                    >
-                      <FileText className="w-3.5 h-3.5" />
-                      View Your Plan
-                    </button>
-                    <button
-                      onClick={() => { setActiveTab('reporting'); }}
-                      className="text-xs font-semibold px-4 py-2 rounded-lg bg-white/10 text-white hover:bg-white/20 transition-colors flex items-center gap-1.5"
-                    >
-                      <BarChart3 className="w-3.5 h-3.5" />
-                      Generate Reports
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* The semester toggle and the historical record that sat here moved to
-                their own year tabs on 30 September 2026. A school's first year was
-                reachable only by pressing a toggle most people never noticed. */}
-
-            {/* Current semester content - only shown when viewing the current semester (or no semesters configured) */}
-            {(semesterList.length <= 1 || !!semesterList.find((s) => s.semester === activeSemester)?.is_current) && (
-              <>
-
-            {/* What's Included Summary */}
-            <div className="bg-white rounded-xl border border-gray-100 p-6" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-              <h2 className="text-base font-semibold text-gray-900 mb-4">What Your Partnership Includes</h2>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                {[
-                  { value: staffStats.total, label: 'Hub Memberships', icon: Users, color: '#8B5CF6' },
-                  { value: partnership?.observation_days_total || 0, label: 'Observation Days', icon: Eye, color: '#D97706' },
-                  { value: partnership?.executive_sessions_total || 0, label: 'Executive Sessions', icon: GraduationCap, color: '#2563EB' },
-                  { value: partnership?.virtual_sessions_total || 0, label: 'Virtual Sessions', icon: Headphones, color: '#2A9D8F' },
-                ].filter(item => item.value > 0).map((item, i) => {
-                  const Icon = item.icon;
-                  return (
-                    <div key={i} className="rounded-xl bg-gray-50 p-4 text-center">
-                      <Icon className="w-5 h-5 mx-auto mb-2" style={{ color: item.color }} />
-                      <p className="text-2xl font-bold text-[#1e2749]">{item.value}</p>
-                      <p className="text-[10px] text-gray-500 font-medium">{item.label}</p>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Partnership Goal */}
-            <div className="bg-white rounded-xl border border-gray-100 p-6"
-              style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-              <div className="flex items-center gap-2 mb-3">
-                <div className="w-2 h-2 rounded-full" style={{ background: '#2D7D78' }} />
-                <h2 className="text-base font-semibold text-gray-900">Our Partnership Goal</h2>
-              </div>
-              <p className="text-base text-gray-700 leading-relaxed font-medium">
-                {partnership?.partnership_goal ||
-                  'Your partnership goal will be set during your onboarding call with our team.'}
-              </p>
-            </div>
-
-
-            {/* Phase Timeline */}
-            <div className="bg-white rounded-xl border border-gray-100 p-6"
-              style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-              <h2 className="text-base font-semibold text-gray-900 mb-5">Your TDI Journey</h2>
-              <div className="flex items-start">
-                {(['IGNITE', 'ACCELERATE', 'SUSTAIN'] as const).map((p, i) => {
-                  const phases = ['IGNITE', 'ACCELERATE', 'SUSTAIN']
-                  const currentIndex = phases.indexOf(partnership?.contract_phase || 'IGNITE')
-                  const thisIndex = phases.indexOf(p)
-                  const isCurrent = p === (partnership?.contract_phase || 'IGNITE')
-                  const isComplete = thisIndex < currentIndex
-                  const phaseColors = ['#D97706', '#2D7D78', '#16A34A']
-                  const color = phaseColors[i]
-                  return (
-                    <div key={p} className="flex items-start flex-1">
-                      <div className="flex-1 text-center">
-                        <div className="flex justify-center mb-2">
-                          <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold"
-                            style={{
-                              background: isCurrent ? color : isComplete ? '#E5E7EB' : '#F3F4F6',
-                              color: isCurrent ? '#fff' : isComplete ? '#6B7280' : '#9CA3AF',
-                              border: isCurrent ? `2px solid ${color}` : '2px solid #E5E7EB',
-                            }}>
-                            {isComplete ? '✓' : i + 1}
-                          </div>
-                        </div>
-                        <p className="text-xs font-bold mb-0.5"
-                          style={{ color: isCurrent ? color : isComplete ? '#6B7280' : '#9CA3AF' }}>
-                          Phase {i + 1}
-                        </p>
-                        <p className="text-xs font-semibold"
-                          style={{ color: isCurrent ? '#1B2A4A' : '#9CA3AF' }}>
-                          {p}
-                        </p>
-                        {isCurrent && (
-                          <div className="mt-1 text-xs font-bold px-2 py-0.5 rounded-full inline-block"
-                            style={{ background: `${color}15`, color }}>
-                            You Are Here
-                          </div>
-                        )}
-                      </div>
-                      {i < 2 && (
-                        <div className="flex-shrink-0 w-8 h-0.5 mt-5"
-                          style={{ background: isComplete ? '#2D7D78' : '#E5E7EB' }} />
-                      )}
-                    </div>
-                  )
-                })}
-              </div>
-            </div>
-
-            {/* Partnership Timeline */}
-            <div className="bg-white rounded-xl border border-gray-100 p-6"
-              style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-              <h2 className="text-base font-semibold text-gray-900 mb-5">Partnership Timeline</h2>
-              {timelineEvents.length === 0 ? (
-                <p className="text-sm text-gray-400 text-center py-4">
-                  Your timeline will fill in as we deliver sessions and reach milestones together.
-                </p>
-              ) : (
-                <div className="grid grid-cols-3 gap-6">
-                  {(['completed', 'in_progress', 'upcoming'] as const).map(status => {
-                    const config = {
-                      completed: { label: 'Done', color: '#16A34A', bg: '#DCFCE7' },
-                      in_progress: { label: 'In Progress', color: '#D97706', bg: '#FEF3C7' },
-                      upcoming: { label: 'Coming Soon', color: '#2563EB', bg: '#EFF6FF' },
-                    }[status]
-                    const events = timelineEvents.filter(e => e.status === status)
-                    return (
-                      <div key={status}>
-                        <div className="flex items-center gap-1.5 mb-3">
-                          <div className="w-2 h-2 rounded-full" style={{ background: config.color }} />
-                          <span className="text-xs font-bold uppercase tracking-wide"
-                            style={{ color: config.color }}>
-                            {config.label}
-                          </span>
-                          <span className="text-xs text-gray-400 ml-auto">{events.length}</span>
-                        </div>
-                        {events.length === 0 ? (
-                          <p className="text-xs text-gray-300 italic">Nothing here yet</p>
-                        ) : (
-                          events.map(event => (
-                            <div key={event.id} className="flex items-start gap-2 mb-3">
-                              <div className="w-1.5 h-1.5 rounded-full flex-shrink-0 mt-1.5"
-                                style={{ background: config.color }} />
-                              <div>
-                                <p className="text-sm text-gray-700 leading-snug">{event.title}</p>
-                                {event.date && (
-                                  <p className="text-xs text-gray-400 mt-0.5">
-                                    {new Date(event.date).toLocaleDateString('en-US', {
-                                      month: 'short', day: 'numeric', year: 'numeric'
-                                    })}
-                                  </p>
-                                )}
-                              </div>
-                            </div>
-                          ))
-                        )}
-                      </div>
-                    )
-                  })}
-                </div>
-              )}
-            </div>
-
-            {/* Session Records */}
-            {sessionRecords && sessionRecords.length > 0 && (
-              <div className="bg-white rounded-xl border border-gray-100 p-6"
-                style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-                <h2 className="text-base font-semibold text-gray-900 mb-4">Sessions Completed</h2>
-                <div className="space-y-3">
-                  {sessionRecords.map((record) => (
-                    <div key={record.id}
-                      className="flex items-start justify-between p-3 rounded-lg bg-gray-50 border border-gray-100">
-                      <div className="flex items-center gap-3">
-                        <div className="w-2 h-2 rounded-full bg-green-500 flex-shrink-0 mt-1" />
-                        <div>
-                          <p className="text-sm font-semibold text-gray-800">
-                            {record.session_type === 'observation' ? 'Observation Day' :
-                             record.session_type === 'virtual_session' ? 'Virtual Session' :
-                             record.session_type === 'executive_session' ? 'Executive Session' :
-                             'Session'} {record.session_number}
-                          </p>
-                          {record.session_date && (
-                            <p className="text-xs text-gray-400 mt-0.5">
-                              {new Date(record.session_date).toLocaleDateString('en-US', {
-                                month: 'long', day: 'numeric', year: 'numeric'
-                              })}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                      {record.love_notes_count > 0 && (
-                        <span className="text-xs font-semibold px-2 py-1 rounded-full flex-shrink-0"
-                          style={{ background: '#FEF3C7', color: '#92400E' }}>
-                          {record.love_notes_count} Love Notes
-                        </span>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Teacher Quotes */}
-            {teacherQuotes && teacherQuotes.length > 0 && (
-              <div className="bg-white rounded-xl border border-gray-100 p-6"
-                style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-                <h2 className="text-base font-semibold text-gray-900 mb-4">
-                  Voices From Your School
-                </h2>
-                <div className="space-y-3">
-                  {teacherQuotes.map((quote) => (
-                    <div key={quote.id}
-                      className="p-4 rounded-xl border-l-4"
-                      style={{ background: '#F9FAFB', borderLeftColor: '#2D7D78' }}>
-                      <p className="text-sm text-gray-700 italic leading-relaxed">
-                        &ldquo;{quote.quote_text}&rdquo;
-                      </p>
-                      {quote.teacher_role && (
-                        <p className="text-xs text-gray-400 mt-2 font-medium">
-                          - {quote.teacher_role}
-                        </p>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-              </>
-            )}
-
-          </div>
-        )}
 
         {/* SCHOOLS TAB (District Only) */}
         {/* ─── ONE TAB PER SCHOOL YEAR ───
@@ -8140,9 +8185,26 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                   )}
                 </div>
               )}
+
+              {/* What the partnership is, under what this year produced. The
+                  record leads, the context follows, and both sit above the
+                  solutions block so a leader meets their own team's activity
+                  before anything we could sell them. */}
+              {sem.is_current && partnershipContext}
             </SemesterRecord>
           </div>
         ))}
+
+        {/* This block sits below the year panel deliberately. On the live year
+            the record leads: the hero, the numbers and what stood out come
+            first, and the partnership context follows. A leader opening their
+            current year should meet the result before the contract. */}
+        {/* Only a school with no year record still has this as its own tab. */}
+        {activeTab === 'our-partnership' && (
+          <div className="py-6 space-y-4">
+            {partnershipContext}
+          </div>
+        )}
 
         {activeTab === 'schools' && partnership?.partnership_type === 'district' && (
           <div role="tabpanel" id="panel-schools" aria-labelledby="tab-schools" className="space-y-4 md:space-y-6">
