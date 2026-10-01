@@ -153,6 +153,22 @@ Schools, Team. The story, then the people.
 - **L4.9** Every write takes its error; no success message precedes a confirmed
   write.
 - **L4.10** Dates are built from their parts, never parsed from a string.
+- **L4.11** No comparative statistic is ever hand written. A figure describing
+  other schools, a national average, an industry benchmark or a typical partner
+  is computed from live data or it does not appear. Until 1 October 2026 the
+  engagement report asserted "the typical TDI partner benchmark of 60% in the
+  first quarter", plus two more invented adoption figures, hardcoded into a
+  document a principal hands to a school board. The measured median is 56%, so
+  the invented number was also wrong. The same rule governs a model: every
+  report prompt forbids inventing a statistic, and permits only repeating
+  figures already in the data or the template.
+- **L4.12** A peer comparison carries its own distortion. Rosters in our
+  community run from two people to a hundred and fifty, so a median of per
+  school percentages weighs a two person school at full activation the same as
+  a large district at a third. Rae's decision, 1 October 2026, was to keep the
+  comparison and say so on the page rather than hide it or imply precision, and
+  to point the reader at the team. A comparison that cannot carry that sentence
+  does not ship.
 
 ---
 
@@ -165,6 +181,11 @@ Schools, Team. The story, then the people.
 - **L5.4** Never display total course time, difficulty labels, or PD hours.
 - **L5.5** Quotes are attributed by school, never by person.
 - **L5.6** Every reader-facing string goes through `tUI()`.
+- **L5.7** Our schools are "in our community". Never "the schools we work with",
+  never a count of them, never a name. Rae, 1 October 2026, on both the wording
+  and the disclosure: we do not tell one school building how many others we work
+  with. The count, the ranking and the strongest performer are computed because
+  the median needs them, and none of the three is returned to the browser.
 
 ---
 
