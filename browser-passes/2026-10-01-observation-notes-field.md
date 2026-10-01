@@ -33,7 +33,11 @@ keys present in `observation_notes` are `date`, `notes`, `title` and
 - Saw: "Observation Day 1 Feb 24, 2026 **Classroom walk-throughs across all 9
   buildings to see teaching moves in action. Goal was 100% Hub logins before
   this date.**"
-- Verify after deploy: https://www.teachersdeserveit.com/partners/addison-sd4
+- Pressed: the **2025-2026** tab on https://www.teachersdeserveit.com/partners/addison-sd4
+  after the deploy.
+- Saw: the note rendering in production, "Observation Day 1 Feb 24, 2026
+  **Classroom walk-throughs across all 9 buildings to see teaching moves in
+  action. Goal was 100% Hub logins before this date.**"
 
 ## Also checked, and not a bug
 
