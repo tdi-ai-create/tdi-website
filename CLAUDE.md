@@ -290,7 +290,14 @@ Three things in it are load bearing and are the cause of most dashboard bugs:
   counter produced three separate client-facing bugs in one day, the worst of
   which would have told a school board "0% are actively engaged".
 - **A field may not be read unless something writes it.** The quarantined field
-  list in L8 names the ones that return a confident, meaningless number.
+  list in L8 names the ones that return a confident, meaningless number, and
+  `npm run check:quarantine` fails the build if changed code reads one.
+- **Every roster read filters `is_active`.** Without it, departed staff are
+  counted as staff and every percentage is deflated forever. 21 files still omit
+  it, listed in the standard's Appendix C.
+
+Building a new partner dashboard is L10. The order of its steps matters: the
+roster is the denominator of everything after it.
 
 ---
 

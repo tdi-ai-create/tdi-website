@@ -1,16 +1,18 @@
 # Leadership Dashboard Standard
 
-First draft, 30 September 2026. Canonical copy. The readable version is published
+Second draft, 1 October 2026. Canonical copy. The readable version is published
 at https://claude.ai/code/artifact/56c3c43c-77f2-410e-80de-90d58221b245 and must
 be republished from this file's content when this changes.
 
 What every partner dashboard must contain, how it must be laid out, which numbers
 it is allowed to show, and what must be answered before one can be built.
 
-Written from a full audit of Addison SD4, where roughly a dozen distinct failures
-were found on one live dashboard in a single day. Every rule cites the failure
-that produced it. **Report findings by rule ID**, for example "glen-ellyn fails
-L4.1".
+Written from a full audit of Addison SD4, then revised after bringing all nine
+live dashboards to standard on 1 October. Every rule cites the failure that
+produced it. **Report findings by rule ID**, for example "glen-ellyn fails L4.1".
+
+L10 is how a new dashboard gets built. Read it before starting one, because the
+order of its steps is the order the failures happened in when it was skipped.
 
 ---
 
@@ -89,12 +91,39 @@ Schools, Team. The story, then the people.
   measured, where the number comes from, and what TDI is doing about it.
 - **L3.3** A goal without a baseline shows a dashed bar and the target.
 - **L3.4** Three to four goals, and no goal we cannot measure.
+- **L3.4a** **A target must exceed the baseline.** Saunemin's "Hub PD applied in
+  the classroom" carried a 50% target against 100% achieved last year, so the goal
+  asked for half of what they had already delivered and would have rendered as
+  achieved. Check every target against the prior year before it ships.
+- **L3.4b** **Last year's figure is never this year's current value.** Saunemin hit
+  100% with 12 paras; this year the population is 27 including teachers new to us.
+  The bar stays unmeasured and the card explains why holding it is harder.
+- **L3.4c** **For a tiny staff, count people rather than percent.** With two
+  para-educators a percentage is noise, because one person is 50%. Tidioute's
+  targets read "2 of 2".
+- **L3.4d** **A goal may be suggested before it is agreed.** Where a school has had
+  no onboarding meeting, propose goals from what their own staff are already doing,
+  store them as `status = 'suggested'`, and badge the card. The badge is derived, so
+  marking them active clears it with no copy to rewrite.
 - **L3.5** A year record opens with a sentence, not a number.
 - **L3.6** Years are mirrored in shape so they read against each other.
+- **L3.6a** **Year labels follow the contract, not the calendar.** Roosevelt runs
+  11 March to 11 March, so its first phase is labelled "Spring 2026" rather than
+  forced into a school year that would be wrong.
+- **L3.6b** **A reconstructed year says it is reconstructed.** Where last year ran
+  on the previous platform, the record is built from files and correspondence and
+  the hero says so. Prior-year data lives in three places and they disagree:
+  `partnership_year_snapshots` (Addison, St Peter Chanel, Tidioute, WEGO),
+  `timeline_events` (Saunemin), and email only (Allenwood). Check all three before
+  concluding nothing was saved.
 - **L3.7** A proposed year is visibly a proposal.
 - **L3.8** Engagement ranks content by distinct people, not events, and says
   nobody assigned it.
 - **L3.9** The roster is the denominator and reconciles to the seat list both ways.
+- **L3.9a** **Deduplicate people before counting them.** One person with two
+  addresses inflates the denominator and halves the percentage. Tidioute carried
+  "Jim Guerra" and "James Guerra", and only one had a Hub account. St Peter Chanel
+  carried five duplicates in a second email format, already deactivated.
 - **L3.10** A building with no staff mapping says so and says what would fix it.
   A building with a mapping shows its own figures, and opens into its own people
   and its own content. Never an indicator fed a hardcoded null: every building on
@@ -206,8 +235,20 @@ These return a number and must never reach a client-facing figure.
 | `staff_members.hub_login_date` | Written daily by a cron, so it lags up to 24 hours. Two teachers signed in during their own onboarding call and showed as never having logged in | Hub activity read live, this only as a fallback |
 | `hub_user_goals` | Dead table | `hub_profiles.onboarding_data` |
 
+Enforced by `npm run check:quarantine`, which fails when changed code reads one
+without a `quarantine-ok` comment.
+
 - **L8.1** Cross-database facts join on lowercased email, in code, never as an
   embed.
+- **L8.1a** **Match on the roster, never on the email domain.** A client's domain
+  is often district wide. `lodi.k12.nj.us` holds 29 Hub profiles and Roosevelt is
+  one school with 17 staff; `pgcps.org` holds 806 and Allenwood is one school with
+  14. Reading a domain gives you a different school's numbers.
+- **L8.1b** **Every roster read filters `is_active`.** Omitted, departed staff are
+  counted as staff. Saunemin's setup card read 29 while its own year tab read 27,
+  and Tidioute read 3 for a two person school. It also deflates every percentage
+  forever, because activation is active people over roster size. Two routes had
+  this missing and 21 files still do.
 - **L8.2** A quarantined field is deleted or commented at its definition, never
   just avoided.
 - **L8.3** When a figure is fixed, every other consumer of the same source is
@@ -232,9 +273,100 @@ A component is not specified until all five states are.
 - **L9.2** A silent fallback is an error state wearing the populated state's
   clothes.
 - **L9.3** A disabled control explains itself truthfully.
-- **L9.4** Badges carry one meaning each and a fixed colour.
+- **L9.4** Badges carry one meaning each and a fixed colour. `Complete` grey,
+  `Live` teal, `Proposed` gold, `Suggested` gold.
+- **L9.5** **A column or tile with nothing in it does not render.** A finished year
+  has nothing in progress, so printing "Nothing here" twice under St Peter
+  Chanel's completed record read as a broken feature rather than a year that
+  ended.
+- **L9.6** **A count that clamps at zero lies.** `max(0, contracted - assigned)`
+  told Saunemin it had "0 of 23 remaining" when 27 people had access. Show the
+  real state in all three directions: under, exactly at, and over. Over is good
+  news and reads as such: "all 23 assigned, plus 4 more at no extra cost".
+- **L9.7** **Internal naming never reaches the client.** Allenwood's dashboard
+  called them "Allenwood Elementary (2026-27)", which is our contract-year
+  bookkeeping shown to their principal.
 
 ---
+
+## L10. Creating a new dashboard
+
+The spec above judges a dashboard. This builds one. The order matters, because
+each step is the denominator of the next, and the whole fleet audit on 1 October
+went wrong wherever this order was skipped.
+
+Nine dashboards were brought to standard this way. Expect three hours for the
+first of a new shape and under an hour once the shape is known.
+
+### 1. Establish who the people are, before anything else
+
+Pull the roster. Reconcile it against live Hub seats in **both** directions:
+seat holders missing from the roster, and roster members with no seat. Match on
+lowercased email and never on the email domain (L8.1a). Deduplicate humans
+(L3.9a). Confirm `is_active` is honest.
+
+Nothing downstream is trustworthy until this number is right, because it is the
+denominator of every percentage on the page.
+
+### 2. Establish what they bought
+
+Line items with counts, dates, and what has actually been delivered. Check
+`contract_deliverables` for delivered-and-invoiced rows, which is how we found
+that Allenwood had been invoiced for 13 memberships that were never switched on.
+
+### 3. Find last year
+
+Check all three sources (L3.6b). A partnership in ACCELERATE or with a year
+suffix in its name almost certainly has a prior year even when no record exists.
+Ask Rae before concluding there is nothing; on Allenwood the answer was in email
+and on Saunemin it was in `timeline_events`.
+
+### 4. Set or propose the goals
+
+Three to four, each measurable with the instruments this contract actually has
+(L3.4). Where there has been no onboarding meeting, propose from what their staff
+are already doing and mark them suggested (L3.4d). Check every target against the
+prior year (L3.4a).
+
+Ask for baselines one at a time. A baseline can be a stated figure rather than a
+measured one, labelled as stated, the way Saunemin's four were.
+
+### 5. Build the year records
+
+One per year, oldest first, badged. Results before context, context before
+anything we sell (L2.4). The live year leads with its strongest true fact.
+
+### 6. Say the unfavourable thing, with the fix beside it
+
+Every dashboard has one. Addison's 34% activation, St Peter Chanel's drop from
+100% to 10 of 30, Roosevelt's 4 of 17. In each case the page states it plainly
+and names the cause, and where the cause is ours it says so. Roosevelt's reads
+"That is ours to fix, not yours".
+
+### 7. Walk every tab and sweep
+
+Load the page. Press the controls. Check every tab for em dashes, double hyphens,
+zeros, placeholders, empty columns and leaked internal naming. Verify outbound
+recipient lists by decoding the link rather than reading the label, and never
+press a control that emails real staff.
+
+This step is not optional and it is where the real defects were found. Saunemin
+looked finished twice before a sweep found departed staff in its denominators and
+a seat count clamped to zero.
+
+### 8. Record what you could not verify
+
+Production if it has not deployed. Any branch verified by reading a condition
+rather than loading it. Any figure stated rather than measured.
+
+### The gate before it goes to a client
+
+- Roster reconciles both ways, zero drift
+- No zero on the page that is not a real measurement
+- Every goal has an instrument that exists, and a target above its baseline
+- Every unfavourable number carries its solution
+- No placeholder tab, no internal naming, no em dash
+- A browser pass recorded with a figure and a pressed control
 
 ## Appendix A. The Addison audit
 
@@ -261,34 +393,49 @@ were never asked; the Reports tab advertises a panel id that does not exist
 
 ## Appendix B. Fleet scorecard
 
-Measured from the database, 30 September 2026. Every dashboard except Addison
-still shows the generic plan tab and the Next Year placeholder.
+All nine brought to standard on 1 October 2026, except Oak Grove which Rae
+parked. Each has its year tabs, no placeholder tabs, and no zero that is not a
+real measurement.
 
-| Partnership | Type | Goals | Years | Roster | Known failures | Priority |
-|---|---|---|---|---|---|---|
-| st-mary-catholic-school | School | 4 | 0 | 12 | **Three goals render 0%** | 1 |
-| allenwood-elementary | School | 4 | 0 | 0 | **Roster empty.** Every denominator zero | 2 |
-| glen-ellyn-d41 | District | 4 | **2** | 9 | **Resolved 1 Oct.** Churchill and Hadley created and staffed, roster verified at 9 against 9 working accounts, roles corrected, zero cleared, both year tabs built. One para still has no name on file | Done |
-| st-peter-chanel | School | 4 | 0 | 30 | One goal renders 0% | 4 |
-| saunemin-ccsd-438 | School | 4 | 0 | 25 | Two seat holders on no roster | 5 |
-| tidioute-community-charter | School | 0 | 0 | 3 | No goals at all | 6 |
-| oak-grove-sd-68 | School | 0 | 0 | 2 | No goals. Paused, confirm before touching | 7 |
-| roosevelt-school | School | 4 | 0 | 17 | Fleet-wide placeholder tabs only | 8 |
-| addison-sd4 | District | 3 | 3 | 149 | Reference implementation | Ref |
+| Partnership | Years built | Roster | Goals | Note |
+|---|---|---|---|---|
+| addison-sd4 | 3 | 149 | 3 | Reference implementation. Schools tab waits on a roster with a school column |
+| glen-ellyn-d41 | 2 | 9 | 4 | Churchill and Hadley staffed and clickable. One para still has no name on file |
+| st-mary-catholic-school | 2 | 12 | 4 | Strongest activation in the fleet at 83%, and 9 of 12 doing vibe checks |
+| allenwood-elementary | 3 | 0 | 4 | Roster never arrived, so the page derives the ask. 14 staff sit on free tier despite 13 paid memberships |
+| st-peter-chanel | 3 | 30 | 4 | Year one from the snapshot table. Visit 30 November, prep received |
+| tidioute-community-charter | 3 | 2 | 3 suggested | Goals proposed from 18 opens of one de-escalation resource, awaiting their onboarding meeting |
+| saunemin-ccsd-438 | 3 | 27 | 4 | Only dashboard with real baselines on three goals: 44%, 15%, 10% |
+| roosevelt-school | 3 | 17 | 4 | Quietest in the fleet at 4 of 17. Hub only, no date in the calendar, and the page says that is ours to fix |
+| oak-grove-sd-68 | 0 | 2 | 0 | **Parked by Rae.** Partnership paused 7 September |
 
-Glen Ellyn was resolved on 1 October and is the worked example of the loop. Four
-of the remaining eight have a goal rendering a literal zero to a client, or no
-goals at all.
-The rendering code deliberately distinguishes unmeasured from zero; these rows
-were stored as zero by hand. It is a data edit, not a deploy.
+### Shared defects fixed, all of which were reaching clients
+
+| Defect | Where it showed |
+|---|---|
+| Calendar-month window used as "recent" | Three separate places, including a board report that would have said "0% are actively engaged" |
+| `how_tdi_delivers` and `data_source` rendered nowhere | All 27 KPI rows, on every dashboard |
+| Four building health dots fed a hardcoded null | Every building on every dashboard read "Awaiting Data" |
+| Empty timeline columns | "Nothing here" twice under a completed year |
+| Departed staff counted in every denominator | Two unfiltered routes, 21 files still unfiltered |
+| Seat count clamped at zero | A school with 27 of 23 told it had none left |
+| Suggested goals could not reach the page | API filtered to `status = 'active'` |
+| Placeholder tabs shown to year-two clients | "Next Year", and two goal cards promising onboarding |
+| Internal naming leaked | "Allenwood Elementary (2026-27)" |
 
 ## Appendix C. Decisions needed
 
-1. Do the four remaining zero-value goals become empty, or do we take real
-   baselines first? Glen Ellyn's was cleared by checking the instrument: its
-   target reads Quick Win responses and the team has submitted none, so nobody
-   had been measured and the stored zero was never a reading.
-2. Does every partnership get year tabs, or only those with a stored prior year?
-3. Is the proposed-year tab standard in every renewal window, or only where we
-   intend to pitch?
-4. Which L7.6 candidates become gates this week?
+1. **14 Allenwood staff sit on the free tier**, including their principal, while
+   the school was invoiced for 13 Learning Hub memberships marked delivered. They
+   have paid for access they have never had. Switching them on is a billing and
+   access decision.
+2. **21 files read `staff_members` with no `is_active` filter.** Two were fixed
+   because the dashboard reads them. The rest include `cron/update-kpis`, which
+   computes and stores KPI values, and the principal and weekly digest emails.
+3. **Melissa Mahaney at Tidioute** is on the free tier, same pattern as Allenwood
+   but smaller.
+4. **Oak Grove** stays parked until its paused status is resolved.
+5. **Which remaining L7.6 candidates become gates.** `check:quarantine` is built.
+   Candidates: tab and panel parity, no stored zero without a measurement date, no
+   calendar-to-date window in a client-facing figure, no em dash in client-facing
+   copy.
