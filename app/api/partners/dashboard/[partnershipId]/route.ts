@@ -39,9 +39,11 @@ function getHubSupabase() {
 }
 
 /**
+ * quarantine-ok: this comment explains why we do NOT trust the stale field.
+ *
  * Who has ever actually used the Hub, read live rather than from a copy.
  *
- * `staff_members.hub_login_date` is written once a day by
+ * `staff_members.hub_login_date` is written once a day by  // quarantine-ok
  * `/api/cron/sync-hub-login-dates` at 10:30 UTC. That cron works, but a teacher
  * who signs in at 15:10 is invisible until the following morning. On 23 Sep two
  * Roosevelt teachers signed in during the onboarding call and their own
@@ -336,7 +338,8 @@ export async function GET(
     // Get staff login stats (for hub_login tracking)
     const { data: staffMembers } = await supabase
       .from('staff_members')
-      .select('id, first_name, last_name, email, role_title, hub_enrolled, hub_login_date')
+      // quarantine-ok: fallback only; emailsActiveInHub is the live source above
+    .select('id, first_name, last_name, email, role_title, hub_enrolled, hub_login_date, building_id')
       .eq('partnership_id', partnershipId);
 
     // Live from the Hub. Null means the Hub could not be reached, in which case
@@ -360,10 +363,12 @@ export async function GET(
       }
     }
 
-    const isActive = (s: { email?: string | null; hub_login_date?: string | null }) =>
+    // quarantine-ok: deliberate fallback when the Hub cannot be reached
+  const isActive = (s: { email?: string | null; hub_login_date?: string | null }) =>
       activeEmails
         ? activeEmails.has((s.email || '').toLowerCase())
-        : !!s.hub_login_date;
+        // quarantine-ok: fallback when the Hub is unreachable
+    : !!s.hub_login_date;
 
     // Use actual staff_members count for total (not staff_enrolled from partnership table)
     // staff_enrolled is the contract number, staff_members is the actual roster
@@ -473,7 +478,7 @@ export async function GET(
       staffStats,
       // email is included so a leader can write to their own staff from their own
       // dashboard. It is their roster, and they already hold these addresses.
-      staffMembers: (staffMembers || []).map(s => ({ id: s.id, name: `${s.first_name || ''} ${s.last_name || ''}`.trim(), email: s.email, role: s.role_title, hubActive: isActive(s) })),
+      staffMembers: (staffMembers || []).map(s => ({ id: s.id, name: `${s.first_name || ''} ${s.last_name || ''}`.trim(), email: s.email, role: s.role_title, hubActive: isActive(s), buildingId: s.building_id ?? null })),
       engagement,
       metricSnapshots: Object.values(latestMetrics),
       buildings: buildings || [],

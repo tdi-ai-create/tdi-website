@@ -70,7 +70,6 @@ import { supabase } from '@/lib/supabase';
 const LeadershipQuiz = dynamic(() => import('@/components/dashboard/shared/LeadershipQuiz'), { ssr: false });
 const AICoachingCard = dynamic(() => import('@/components/dashboard/shared/AICoachingCard'), { ssr: false });
 const LeadershipToolkit = dynamic(() => import('@/components/dashboard/shared/LeadershipToolkit'), { ssr: false });
-import { getMetricStatus, statusColors, statusShapes, statusLabels, formatMetricValue, getMetricDescription } from '@/lib/metric-thresholds';
 import TDIPortalLoader from '@/components/TDIPortalLoader';
 import PilotNextYearTab from '@/components/dashboard/pilot/PilotNextYearTab';
 // BillingTab moved inline per CCP spec
@@ -457,15 +456,21 @@ export default function PartnerDashboard() {
   const [suggestions, setSuggestions] = useState<TDISuggestion[]>([]);
   const [sessionRecords, setSessionRecords] = useState<SessionRecord[]>([]);
   const [recentActivity, setRecentActivity] = useState<{ action: string; details?: Record<string, unknown>; created_at: string }[]>([]);
-  const [staffRoster, setStaffRoster] = useState<{ id: string; name: string; email?: string | null; role: string; hubActive: boolean }[]>([]);
+  const [staffRoster, setStaffRoster] = useState<{ id: string; name: string; email?: string | null; role: string; hubActive: boolean; buildingId?: string | null }[]>([]);
   const [observationImpact, setObservationImpact] = useState<{ has_data: boolean; observations: { event_title: string; event_date: string; before_logins: number; after_logins: number; engagement_change_pct: number; before_mood: number | null; after_mood: number | null; mood_change: number | null; before_quick_wins: number; after_quick_wins: number }[] } | null>(null);
+  // quarantine-ok: this is the shape the hub-stats endpoint returns, not a read.
+  // Which of these fields may reach a client figure is decided at the use site,
+  // and three of them never may. See docs/leadership-dashboard-standard.md L8.
   const [hubStats, setHubStats] = useState<{
     has_real_data: boolean
     member_count: number
+    // quarantine-ok: response shape only, never read for a client figure
     logins_this_month: number | null
     active_users_7d: number | null
+    // quarantine-ok: response shape only, never read for a client figure
     hub_login_pct: number | null
     course_completions: number | null
+    // quarantine-ok: response shape only, never read for a client figure
     quick_wins_completed: number | null
     mood_avg_7d: number | null
     mood_avg_30d: number | null
@@ -1080,6 +1085,8 @@ export default function PartnerDashboard() {
       contract_phase: partnership.contract_phase,
       momentum_status: partnership.status || 'Active',
       staff_enrolled: staffStats.total,
+      // quarantine-ok: this is the key name the suggestion engine expects, and
+      // the value is computed with the correct arithmetic, not read from hub-stats.
       hub_login_pct: staffStats.total > 0 ? Math.round((staffStats.hubLoggedIn / staffStats.total) * 100) : null,
       love_notes_count: null, // Not available in principal view
       observation_days_used: partnership.observation_days_completed || 0,
@@ -5996,7 +6003,7 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                         <div className="flex-1">
                           <p className="text-sm font-semibold text-amber-900 mb-1">Help us know your team</p>
                           <p className="text-xs text-amber-700 leading-relaxed mb-3">
-                            When our team visits for observations, knowing faces makes the experience more personal. Even a few photos is a great start -- you can always add more later as new staff join.
+                            When our team visits for observations, knowing faces makes the experience more personal. Even a few photos is a great start, and you can always add more later as new staff join.
                           </p>
                           <p className="text-[10px] text-amber-600 mb-3">
                             Send whatever you have: a staff directory PDF, individual headshots, a ZIP file, or a spreadsheet with photo links. We&apos;ll sort it out.
@@ -8257,10 +8264,19 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
 
                 <div className="space-y-3">
                   {apiBuildings.map((building) => {
-                    const hubStatus = getMetricStatus('hub_login_pct', null);
-                    const coursesStatus = getMetricStatus('courses_avg', null);
-                    const stressStatus = getMetricStatus('avg_stress', null);
-                    const implStatus = getMetricStatus('implementation_pct', null);
+                    /* Four indicator dots used to render here, every one of them
+                       fed a hardcoded null, so every building on every dashboard
+                       read "Awaiting Data" forever. Rae caught it on Glen Ellyn's
+                       live page on 1 October 2026.
+
+                       Three of the four genuinely cannot be computed per building
+                       today. The fourth can, as soon as staff are placed, so this
+                       shows the real one and says plainly when placement is what
+                       is missing rather than drawing an empty circle. */
+                    const inBuilding = staffRoster.filter(s => s.buildingId === building.id);
+                    const activeHere = inBuilding.filter(s => s.hubActive).length;
+                    const placed = inBuilding.length > 0;
+                    const pctHere = placed ? Math.round((activeHere / inBuilding.length) * 100) : null;
 
                     return (
                       <div
@@ -8282,30 +8298,21 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                             </div>
                           </div>
                           <div className="flex items-center gap-4">
-                            {/* 4-dot health indicator */}
-                            <div className="flex items-center gap-2">
-                              {[
-                                { status: hubStatus, label: 'Hub' },
-                                { status: coursesStatus, label: 'Courses' },
-                                { status: stressStatus, label: 'Stress' },
-                                { status: implStatus, label: 'Impl.' },
-                              ].map((metric, idx) => (
-                                <div
-                                  key={idx}
-                                  className="flex flex-col items-center"
-                                  title={`${metric.label}: ${statusLabels[metric.status]}`}
-                                  aria-label={`${metric.label}: ${statusLabels[metric.status]}`}
-                                >
-                                  <span
-                                    className="text-lg leading-none"
-                                    style={{ color: statusColors[metric.status] }}
-                                  >
-                                    {statusShapes[metric.status]}
-                                  </span>
-                                  <span className="text-[10px] text-gray-400 mt-0.5">{metric.label}</span>
-                                </div>
-                              ))}
-                            </div>
+                            {placed ? (
+                              <div className="text-right">
+                                <p className="text-lg font-bold leading-none tabular-nums text-[#1e2749]">
+                                  {activeHere}
+                                  <span className="text-xs font-semibold text-gray-500"> of {inBuilding.length}</span>
+                                </p>
+                                <p className="text-[11px] text-gray-500 mt-1">
+                                  using the Hub{pctHere !== null ? `, ${pctHere}%` : ''}
+                                </p>
+                              </div>
+                            ) : (
+                              <p className="text-[11px] text-gray-500 max-w-[180px] text-right leading-snug">
+                                Nobody is placed in this building yet, so we cannot show its own figures.
+                              </p>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -8315,18 +8322,10 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
               </div>
             )}
 
-            {/* Metric Legend */}
-            <div className="bg-gray-50 rounded-xl p-4">
-              <p className="text-sm font-medium text-gray-600 mb-2">Health Indicator Legend</p>
-              <div className="flex flex-wrap gap-4">
-                {(['strong', 'on_track', 'developing', 'needs_support', 'no_data'] as const).map((status) => (
-                  <div key={status} className="flex items-center gap-2">
-                    <span style={{ color: statusColors[status] }}>{statusShapes[status]}</span>
-                    <span className="text-sm text-gray-600">{statusLabels[status]}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
+            {/* The metric legend went with the dots it explained. It described
+                five indicator states for a four dot display that was fed a
+                hardcoded null, so every building read "Awaiting Data" forever.
+                Each building now shows its own real activation instead. */}
           </div>
         )}
 
