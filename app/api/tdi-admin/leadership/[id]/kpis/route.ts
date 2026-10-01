@@ -73,7 +73,7 @@ export const KPI_MENU = [
     benchmarkHigh: 4.2,
     benchmarkLabel: 'TDI partners average 3.8-4.2 out of 5',
     dataSource: 'Hub Vibe Check across 5 dimensions: energy, stress, connection, purpose, balance (automatic, private)',
-    howTdiDelivers: 'Daily private Vibe Checks. Personal outreach from Rae when individual scores trend low (names never shared). Moment Mode resets. Community support from 100,000+ educators.',
+    howTdiDelivers: 'Daily private Vibe Checks. Personal outreach from the team when individual scores trend low, with names never shared. Moment Mode resets. Community support from more than 100,000 educators.',
     suggestedTarget: 4.0,
     category: 'wellness',
   },

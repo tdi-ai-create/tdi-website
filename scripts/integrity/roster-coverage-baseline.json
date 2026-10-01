@@ -1,6 +1,15 @@
 {
   "_comment": "Seat holders who are not on their school roster, and so are invisible to the Team tab, every report and every goal denominator. Fix a school and drop its entry. Regenerate with: node scripts/integrity/verify-roster-coverage.mjs --update-baseline",
-  "generated_at": "2026-09-23",
-  "total_missing": 0,
-  "partnerships": {}
+  "generated_at": "2026-09-30",
+  "total_missing": 2,
+  "partnerships": {
+    "02f4b713-f258-4dff-a526-91565ff9a8e6": {
+      "org_name": "Saunemin CCSD #438",
+      "missing_count": 2,
+      "missing": [
+        "mcdermaidm@saunemin.org",
+        "palenc@saunemin.org"
+      ]
+    }
+  }
 }

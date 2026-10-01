@@ -5,6 +5,7 @@ import { useRouter, useParams } from 'next/navigation';
 import Image from 'next/image';
 import InviteLeader from '@/components/partners/InviteLeader';
 import RosterAccessManager from '@/components/partners/RosterAccessManager';
+import { SemesterRecord } from '@/components/partners/SemesterRecord';
 import Link from 'next/link';
 import FooterSymbol from '@/components/FooterSymbol';
 import { offeringLabel } from '@/lib/partnerships/offerings';
@@ -88,7 +89,19 @@ interface Partnership {
   contact_email: string;
   phone?: string | null;
   contract_phase: 'IGNITE' | 'ACCELERATE' | 'SUSTAIN';
-  offering: 'PULSE' | 'FOCUS' | 'COHORT' | 'BLUEPRINT' | null;
+  /**
+   * Typed from the shared list rather than inlined, because the inline union
+   * here was missing PILOT, which exists in the database and is what Roosevelt
+   * carries. See lib/partnerships/offerings.ts.
+   */
+  offering: Offering | null;
+  /**
+   * The school's own next step, shown as a second badge on their offering card.
+   * Null means no badge, which is correct for a school that already has every
+   * component of its offering. Deliberately per partnership rather than derived
+   * from contract_phase: a phase default is wrong more often than right.
+   */
+  next_step_suggestion: string | null;
   contract_start: string | null;
   contract_end: string | null;
   building_count: number;
@@ -185,35 +198,6 @@ interface EngagementItem {
   title: string;
   people: number;
   opens: number;
-}
-
-/**
- * A completed year, stored rather than derived.
- *
- * Addison's first year ran on the previous platform, so none of it can be
- * recomputed from the Hub. Every field here is a stated fact somebody wrote
- * down, which is why the shape is generous: a school's year does not reduce
- * neatly to one set of columns.
- */
-interface YearRecord {
-  id: string;
-  year_label: string;
-  headline: string | null;
-  summary: string | null;
-  stats: { value: string; label: string }[] | null;
-  change: {
-    label?: string;
-    before?: string;
-    after?: string;
-    beforeLabel?: string;
-    afterLabel?: string;
-    delta?: string;
-    note?: string;
-  } | null;
-  themes: { title: string; body: string }[] | null;
-  lists: { title: string; subtitle?: string; unit?: string; items: { label: string; count: number }[] }[] | null;
-  quotes: { text: string; attribution?: string }[] | null;
-  footnote: string | null;
 }
 
 interface HubEngagementDetail {
@@ -461,7 +445,6 @@ export default function PartnerDashboard() {
   const [metricSnapshots, setMetricSnapshots] = useState<MetricSnapshot[]>([]);
   const [apiBuildings, setApiBuildings] = useState<Building[]>([]);
   const [engagement, setEngagement] = useState<HubEngagementDetail | null>(null);
-  const [yearRecords, setYearRecords] = useState<YearRecord[]>([]);
   // Funding status for this school only, from its own funding_pursuits row.
   const [funding, setFunding] = useState<{
     hasFunding: boolean;
@@ -473,7 +456,7 @@ export default function PartnerDashboard() {
   const [suggestions, setSuggestions] = useState<TDISuggestion[]>([]);
   const [sessionRecords, setSessionRecords] = useState<SessionRecord[]>([]);
   const [recentActivity, setRecentActivity] = useState<{ action: string; details?: Record<string, unknown>; created_at: string }[]>([]);
-  const [staffRoster, setStaffRoster] = useState<{ id: string; name: string; role: string; hubActive: boolean }[]>([]);
+  const [staffRoster, setStaffRoster] = useState<{ id: string; name: string; email?: string | null; role: string; hubActive: boolean }[]>([]);
   const [hubIntel, setHubIntel] = useState<Record<string, unknown> | null>(null);
   const [observationImpact, setObservationImpact] = useState<{ has_data: boolean; observations: { event_title: string; event_date: string; before_logins: number; after_logins: number; engagement_change_pct: number; before_mood: number | null; after_mood: number | null; mood_change: number | null; before_quick_wins: number; after_quick_wins: number }[] } | null>(null);
   const [hubStats, setHubStats] = useState<{
@@ -574,7 +557,7 @@ export default function PartnerDashboard() {
   ]);
 
   // Semester toggle state
-  const [semesterList, setSemesterList] = useState<{ id: string; semester: string; semester_label: string; is_current: boolean }[]>([]);
+  const [semesterList, setSemesterList] = useState<{ id: string; semester: string; semester_label: string; is_current: boolean; is_proposal?: boolean; badge?: string | null }[]>([]);
   const [activeSemester, setActiveSemester] = useState<string>('fall-2026'); // default to current
   const [semesterData, setSemesterData] = useState<{
     id: string;
@@ -600,9 +583,11 @@ export default function PartnerDashboard() {
     return () => clearTimeout(timer);
   }, []);
 
-  // Fetch semester list when our-partnership tab is activated
+  // Fetch the semester list as soon as we have a partnership. The year tabs are
+  // built from it, so waiting for a tab activation would mean the tabs never
+  // appear until you visited the tab that builds them.
   useEffect(() => {
-    if (activeTab !== 'our-partnership' || !partnership?.id) return;
+    if (!partnership?.id) return;
     const fetchSemesters = async () => {
       try {
         const res = await fetch(`/api/partners/semester-data?partnershipId=${partnership.id}`);
@@ -620,11 +605,11 @@ export default function PartnerDashboard() {
       }
     };
     fetchSemesters();
-  }, [activeTab, partnership?.id]);
+  }, [partnership?.id]);
 
   // Fetch specific semester data when activeSemester changes (and partnership exists)
   useEffect(() => {
-    if (activeTab !== 'our-partnership' || !partnership?.id || semesterList.length === 0) return;
+    if (!partnership?.id || semesterList.length === 0) return;
     const target = semesterList.find((s) => s.semester === activeSemester);
     if (!target) return;
     const fetchSemesterData = async () => {
@@ -644,7 +629,51 @@ export default function PartnerDashboard() {
     };
     fetchSemesterData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeSemester]);
+  }, [activeSemester, semesterList.length]);
+
+  /**
+   * Pressing a year tab is what selects the year. The old toggle lived inside
+   * Our Partnership and set this directly; the tabs do it now.
+   */
+  useEffect(() => {
+    if (!activeTab.startsWith('year-')) return;
+    const semester = activeTab.slice('year-'.length);
+    if (semester && semester !== activeSemester) setActiveSemester(semester);
+  }, [activeTab, activeSemester]);
+
+  /**
+   * Nudge, rebuilt as a mailto.
+   *
+   * The previous platform had this and it was used often: one link that opened
+   * the leader's own email with everyone filled in and a draft ready. It never
+   * got carried across, and the only trace left in this codebase is a disabled
+   * button in the demo dashboard that still tells prospects it is "available in
+   * active partnerships".
+   *
+   * Addresses go in blind copy so a hundred paras do not see each other or hit
+   * reply all. The draft is written for the leader to send as their own, because
+   * a message from their Associate Superintendent lands differently than one
+   * from a vendor.
+   */
+  const notStartedMailto = (() => {
+    const emails = staffRoster
+      .filter(s => !s.hubActive && s.email)
+      .map(s => s.email as string);
+    if (emails.length === 0) return '';
+    const subject = 'A few minutes on the Learning Hub this week';
+    const body = [
+      'Hi,',
+      '',
+      'You have full access to the TDI Learning Hub, and I would like us to make use of it.',
+      '',
+      'Signing in takes about ten seconds. Go to teachersdeserveit.com/hub/login, enter your district email, and choose the option to have a sign in link emailed to you. There is no password to set up.',
+      '',
+      'If you are not sure where to start, try "What should I be doing right now? A Para Guide for Teacher Support". It is short and it is written for your role.',
+      '',
+      'Thank you,',
+    ].join('\n');
+    return `mailto:?bcc=${encodeURIComponent(emails.join(','))}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  })();
 
   // Triple gate: ALL THREE must be true before showing dashboard
   const showDashboard = animationComplete && timerDone && dataReady;
@@ -753,7 +782,6 @@ export default function PartnerDashboard() {
           setActionItems(updatedItems);
           setStaffStats(data.staffStats || { total: 0, hubLoggedIn: 0 });
           setEngagement(data.engagement ?? null);
-          setYearRecords(data.yearRecords || []);
           setMetricSnapshots(data.metricSnapshots || []);
           setApiBuildings(data.buildings || []);
           // The timeline_events table stores event_title and event_date, but this
@@ -1553,22 +1581,45 @@ export default function PartnerDashboard() {
   const TABS = [
     { id: 'overview', label: 'Overview' },
     { id: 'our-partnership', label: 'Our Partnership' },
-    { id: 'blueprint', label: 'Your Plan' },
+    /**
+     * A tab per school year, newest first, built from partnership_semester_data.
+     *
+     * This replaced "Your Plan". Rae, 30 September 2026: each year should carry
+     * its own goals, metrics and standing, in the same shape, so the two can be
+     * read against each other. The record for a year in progress is the plan.
+     *
+     * These were previously reachable only behind a toggle inside Our
+     * Partnership, which is why a school's own first year was effectively
+     * invisible to them.
+     */
+    ...(semesterList.length > 0
+      ? semesterList.map(sem => ({ id: `year-${sem.semester}`, label: sem.semester_label, badgeText: sem.badge || undefined }))
+      // A school with no year record keeps Your Plan. Addison is the only
+      // partnership that has records, and replacing the tab unconditionally
+      // would take the approach, the contract and the offering cards away from
+      // the other eight and give them nothing back.
+      : [{ id: 'blueprint', label: 'Your Plan' }]),
     { id: 'reporting', label: 'Reports' },
     // Funding only appears when this school actually has a live pursuit.
     // It used to live inside Our Partnership, which Rae wants kept on goals.
     ...(funding?.hasFunding ? [{ id: 'funding', label: 'Funding' }] : []),
-    { id: 'next-year', label: 'Next Year', badge: true },
+    // Next Year is a placeholder that says "once your partnership is underway
+    // and we've collected baseline data, this space will transform into your
+    // personalized growth plan". It is the right thing to show a school in
+    // month one and the wrong thing to show a school in year two, which read
+    // as us not having started. It also wore the only "New" badge on the strip,
+    // so it pulled the eye to the emptiest tab on the page.
+    //
+    // A school that has a proposal year already has that content for real, with
+    // its own tab and its own badge, so the placeholder is retired the moment
+    // the real thing exists. Rae, 30 September 2026.
+    ...(semesterList.some(sem => sem.is_proposal) ? [] : [{ id: 'next-year', label: 'Next Year', badge: true }]),
     // Districts only. The panel this selects has existed for months and was
     // unreachable the entire time, because TABS never carried a 'schools'
     // entry and activeTab could therefore never hold that value. Every
     // building card, the per-building engagement breakdown and the district
     // overview row rendered for nobody. Found on 30 Sep 2026 by opening
     // Addison's live dashboard and counting six tabs.
-    // One tab per completed year we hold a record for, newest first. Only
-    // records marked visible_to_partner reach the client, so this is empty for
-    // a school whose record is still being written.
-    ...yearRecords.map(r => ({ id: `year-${r.id}`, label: r.year_label })),
     ...(partnership?.partnership_type === 'district' ? [{ id: 'schools', label: 'Schools' }] : []),
     { id: 'team', label: 'Team' },
   ];
@@ -3084,14 +3135,29 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                 }}
               >
                 {tab.label}
-                {tab.badge && (
+                {/* A year tab carries its own word: Complete, Live, Proposed.
+                    Everything else keeps the legacy "New" badge. */}
+                {('badgeText' in tab && tab.badgeText) ? (
+                  <span
+                    className="text-[10px] px-1.5 py-0.5 rounded-full font-bold uppercase tracking-wide"
+                    style={
+                      tab.badgeText === 'Live'
+                        ? { background: 'rgba(42,157,143,0.14)', color: '#2A9D8F' }
+                        : tab.badgeText === 'Proposed'
+                          ? { background: 'rgba(232,184,75,0.20)', color: '#8a6d1f' }
+                          : { background: '#EEF0F4', color: '#6b7280' }
+                    }
+                  >
+                    {tab.badgeText}
+                  </span>
+                ) : ('badge' in tab && tab.badge) ? (
                   <span
                     className="text-xs px-1.5 py-0.5 rounded-full font-bold"
                     style={{ background: '#DBEAFE', color: '#1D4ED8' }}
                   >
                     New
                   </span>
-                )}
+                ) : null}
               </button>
             ))}
           </div>
@@ -3184,7 +3250,20 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                         </p>
                       )}
 
-                      {paragraphs.length > 0 && (
+                      {/* The TDI work sits above the fold, not inside the
+                          collapsed panel. Rae's rule is that an unfavourable
+                          number never renders without the work beside it, and a
+                          leader scanning a 34% bar does not open a disclosure
+                          labelled "How we measure this" to find out we are doing
+                          something about it. */}
+                      {measure.doing && (
+                        <div className="mt-3 rounded-xl bg-[#E8F0FD] px-4 py-3">
+                          <p className="text-[10px] font-bold uppercase tracking-wider text-[#1e2749]/60 mb-1">What we are doing about this</p>
+                          <p className="text-[13.5px] leading-relaxed text-[#1e2749] max-w-[68ch]">{measure.doing}</p>
+                        </div>
+                      )}
+
+                      {(paragraphs.length > 0 || measure.source) && (
                         <details className="mt-2.5 group">
                           <summary className="cursor-pointer list-none [&::-webkit-details-marker]:hidden inline-flex items-center gap-1.5 text-xs font-semibold text-[#1e2749]">
                             <ChevronDown className="w-3.5 h-3.5 text-gray-400 transition-transform group-open:rotate-180" />
@@ -3194,6 +3273,16 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                             {paragraphs.map((para, i) => (
                               <p key={i} className="text-[13.5px] leading-relaxed text-gray-600 mb-2.5 last:mb-0 max-w-[68ch]">{para}</p>
                             ))}
+                            {/* Where the figure actually comes from. Written on
+                                every KPI row and, until now, printed only when
+                                there was no benchmark label to crowd it out,
+                                which on a real partnership is never. */}
+                            {measure.source && (
+                              <div className="mt-3 pt-3 border-t border-gray-200">
+                                <p className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1">Where the number comes from</p>
+                                <p className="text-[13.5px] leading-relaxed text-gray-600 max-w-[68ch]">{measure.source}</p>
+                              </div>
+                            )}
                             <div className="mt-3 pt-3 border-t border-gray-200">
                               <p className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1">{measure.deeperHeading}</p>
                               <p className="text-[13.5px] leading-relaxed text-gray-600 max-w-[68ch]">{measure.deeper}</p>
@@ -6798,190 +6887,158 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                 switch (blueprintSubTab) {
                   case 'approach':
                     return (
-                      <div className="space-y-8">
+                      <div className="space-y-6">
                         <div>
                           <h2 className="text-lg font-bold text-gray-900 mb-3">
-                            A Phased Journey,<br />Not a One-Time Event
+                            The Supports We Offer
                           </h2>
-                          <p className="text-lg text-[#1e2749]/80">
-                            Real change takes time. Our three-phase model meets your school where you are and grows with you.
+                          <p className="text-[15px] leading-relaxed text-[#1e2749]/80 max-w-[68ch]">
+                            Four ways we work with schools. Yours is marked below. The others are here so you
+                            can see what else exists, not because anything is missing.
                           </p>
                         </div>
 
-                        {/* Vertical Timeline */}
-                        <div className="py-4">
-                          <div className="space-y-0">
-                            {/* Phase 1: IGNITE */}
-                            {(() => {
-                              const isActive = partnership?.contract_phase === 'IGNITE';
-                              const isPast = partnership?.contract_phase === 'ACCELERATE' || partnership?.contract_phase === 'SUSTAIN';
-                              return (
-                                <div className="flex gap-4 md:gap-6">
-                                  <div className="flex flex-col items-center">
-                                    <div
-                                      className={`w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center text-xl font-bold flex-shrink-0 shadow-md ${isPast ? 'bg-[#4ecdc4] text-white' : ''}`}
-                                      style={!isPast ? { backgroundColor: '#ffba06', color: '#1e2749' } : undefined}
-                                    >
-                                      {isPast ? <Check className="w-6 h-6" /> : '1'}
-                                    </div>
-                                    <div className="w-1 flex-1 mt-2" style={{ backgroundColor: isPast ? '#4ecdc4' : '#ffba06' }} />
-                                  </div>
-                                  <div className="flex-1 pb-8">
-                                    <div
-                                      className={`bg-white rounded-xl p-5 md:p-6 shadow-md ${isActive ? 'ring-2 ring-[#4ecdc4]' : ''}`}
-                                      style={{ border: `2px solid ${isActive ? '#4ecdc4' : '#ffba06'}` }}
-                                    >
-                                      <div className="flex flex-wrap items-center gap-2 mb-2">
-                                        <span className="inline-block px-3 py-1 text-xs font-bold rounded-full" style={{ backgroundColor: '#ffba06', color: '#1e2749' }}>
-                                          Start Here
-                                        </span>
-                                        <h3 className="text-base font-bold text-[#1e2749]">IGNITE</h3>
-                                        {isActive && <span className="ml-auto px-2 py-0.5 bg-[#4ecdc4] text-white text-xs font-bold rounded">YOU ARE HERE</span>}
-                                        {isPast && <span className="ml-auto px-2 py-0.5 bg-[#4ecdc4]/20 text-[#4ecdc4] text-xs font-bold rounded flex items-center gap-1"><Check className="w-3 h-3" /> Complete</span>}
-                                      </div>
-                                      <p className="text-sm font-medium mb-3" style={{ color: '#80a4ed' }}>Leadership + Pilot Group</p>
-                                      <div className="inline-flex items-center gap-2 mb-3 py-2 px-3 rounded-lg" style={{ backgroundColor: '#fffbeb' }}>
-                                        <span className="text-xs font-medium text-[#1e2749]">Awareness</span>
-                                        <ArrowRight className="w-4 h-4" style={{ color: '#ffba06' }} />
-                                        <span className="text-xs font-bold" style={{ color: '#ffba06' }}>Buy-in</span>
-                                      </div>
-                                      <p className="text-sm mb-3 text-[#1e2749]/70">
-                                        Build buy-in with your leadership team and a pilot group of 10-25 educators. See early wins. Lay the foundation for school-wide change.
-                                      </p>
-                                      <div className="mb-3 pt-3 border-t border-gray-200">
-                                        <p className="text-xs font-bold mb-2 text-[#1e2749]">What&apos;s Included:</p>
-                                        <ul className="space-y-1">
-                                          {['2 On-Campus Observation Days', '4 Virtual Strategy Sessions', '2 Executive Impact Sessions', 'Learning Hub access for pilot group', 'Leadership Dashboard'].map((item) => (
-                                            <li key={item} className="flex items-center gap-1.5 text-xs text-[#1e2749]/70">
-                                              <Check className="w-3 h-3 flex-shrink-0" style={{ color: '#ffba06' }} />
-                                              {item}
-                                            </li>
-                                          ))}
-                                        </ul>
-                                      </div>
-                                      <p className="text-xs text-[#1e2749]/50">Typical timeline: One semester to one year</p>
-                                    </div>
-                                  </div>
-                                </div>
-                              );
-                            })()}
+                        {/*
+                          Offering cards.
 
-                            {/* Phase 2: ACCELERATE */}
-                            {(() => {
-                              const isActive = partnership?.contract_phase === 'ACCELERATE';
-                              const isPast = partnership?.contract_phase === 'SUSTAIN';
-                              const isFuture = partnership?.contract_phase === 'IGNITE';
-                              return (
-                                <div className="flex gap-4 md:gap-6">
-                                  <div className="flex flex-col items-center">
-                                    <div
-                                      className={`w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center text-xl font-bold flex-shrink-0 shadow-md ${isPast ? 'bg-[#4ecdc4] text-white' : isFuture ? 'bg-gray-200 text-gray-500' : ''}`}
-                                      style={!isPast && !isFuture ? { backgroundColor: '#80a4ed', color: '#ffffff' } : undefined}
-                                    >
-                                      {isPast ? <Check className="w-6 h-6" /> : '2'}
-                                    </div>
-                                    <div className="w-1 flex-1 mt-2" style={{ backgroundColor: isPast ? '#4ecdc4' : isFuture ? '#e5e7eb' : '#80a4ed' }} />
-                                  </div>
-                                  <div className="flex-1 pb-8">
-                                    <div
-                                      className={`bg-white rounded-xl p-5 md:p-6 shadow-md ${isActive ? 'ring-2 ring-[#4ecdc4]' : ''} ${isFuture ? 'opacity-75' : ''}`}
-                                      style={{ border: `2px solid ${isFuture ? '#e5e7eb' : '#80a4ed'}` }}
-                                    >
-                                      <div className="flex flex-wrap items-center gap-2 mb-2">
-                                        <span className="inline-block px-3 py-1 text-xs font-bold rounded-full" style={{ backgroundColor: isFuture ? '#e5e7eb' : '#80a4ed', color: isFuture ? '#6b7280' : '#ffffff' }}>
-                                          Scale
-                                        </span>
-                                        <h3 className="text-base font-bold text-[#1e2749]">ACCELERATE</h3>
-                                        {isActive && <span className="ml-auto px-2 py-0.5 bg-[#4ecdc4] text-white text-xs font-bold rounded">YOU ARE HERE</span>}
-                                        {isPast && <span className="ml-auto px-2 py-0.5 bg-[#4ecdc4]/20 text-[#4ecdc4] text-xs font-bold rounded flex items-center gap-1"><Check className="w-3 h-3" /> Complete</span>}
-                                      </div>
-                                      <p className="text-sm font-medium mb-3" style={{ color: '#80a4ed' }}>Full Staff</p>
-                                      <div className="inline-flex items-center gap-2 mb-3 py-2 px-3 rounded-lg" style={{ backgroundColor: '#f0f9ff' }}>
-                                        <span className="text-xs font-medium text-[#1e2749]">Buy-in</span>
-                                        <ArrowRight className="w-4 h-4" style={{ color: '#80a4ed' }} />
-                                        <span className="text-xs font-bold" style={{ color: '#80a4ed' }}>Action</span>
-                                      </div>
-                                      <p className="text-sm mb-3 text-[#1e2749]/70">
-                                        Expand support to your full staff. Every teacher, para, and coach gets access. Strategies get implemented school-wide, not just talked about.
-                                      </p>
-                                      <div className="mb-3 pt-3 border-t border-gray-200">
-                                        <p className="text-xs font-bold mb-2 text-[#1e2749]">What&apos;s Included:</p>
-                                        <p className="text-xs italic mb-1.5" style={{ color: '#80a4ed' }}>Everything in IGNITE, plus:</p>
-                                        <ul className="space-y-1">
-                                          {['Learning Hub access for ALL staff', '4 Executive Impact Sessions', 'Teachers Deserve It book for every educator', 'Retention tracking tools'].map((item) => (
-                                            <li key={item} className="flex items-center gap-1.5 text-xs text-[#1e2749]/70">
-                                              <Check className="w-3 h-3 flex-shrink-0" style={{ color: '#80a4ed' }} />
-                                              {item}
-                                            </li>
-                                          ))}
-                                        </ul>
-                                      </div>
-                                      <p className="text-xs text-[#1e2749]/50">Typical timeline: 1-3 years (many schools stay here)</p>
-                                    </div>
-                                  </div>
-                                </div>
-                              );
-                            })()}
+                          These describe what each support IS. They deliberately carry no
+                          counts, because this panel used to print a fixed package list
+                          ("2 On-Campus Observation Days, 4 Virtual Strategy Sessions...")
+                          against a "YOU ARE HERE" badge, and not one of the nine live
+                          partnerships actually matched it. Four schools with zero
+                          observation days were being shown two. What a school actually
+                          bought lives on Your Plan, driven by the contract, and must stay
+                          the only place a number appears.
 
-                            {/* Phase 3: SUSTAIN */}
-                            {(() => {
-                              const isActive = partnership?.contract_phase === 'SUSTAIN';
-                              const isFuture = partnership?.contract_phase === 'IGNITE' || partnership?.contract_phase === 'ACCELERATE';
-                              return (
-                                <div className="flex gap-4 md:gap-6">
-                                  <div className="flex flex-col items-center">
-                                    <div
-                                      className={`w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center text-xl font-bold flex-shrink-0 shadow-md ${isFuture ? 'bg-gray-200 text-gray-500' : ''}`}
-                                      style={!isFuture ? { backgroundColor: '#abc4ab', color: '#1e2749' } : undefined}
-                                    >
-                                      3
-                                    </div>
-                                  </div>
-                                  <div className="flex-1">
-                                    <div
-                                      className={`bg-white rounded-xl p-5 md:p-6 shadow-md ${isActive ? 'ring-2 ring-[#4ecdc4]' : ''} ${isFuture ? 'opacity-75' : ''}`}
-                                      style={{ border: `2px solid ${isFuture ? '#e5e7eb' : '#abc4ab'}` }}
-                                    >
-                                      <div className="flex flex-wrap items-center gap-2 mb-2">
-                                        <span className="inline-block px-3 py-1 text-xs font-bold rounded-full" style={{ backgroundColor: isFuture ? '#e5e7eb' : '#abc4ab', color: isFuture ? '#6b7280' : '#1e2749' }}>
-                                          Embed
-                                        </span>
-                                        <h3 className="text-base font-bold text-[#1e2749]">SUSTAIN</h3>
-                                        {isActive && <span className="ml-auto px-2 py-0.5 bg-[#4ecdc4] text-white text-xs font-bold rounded">YOU ARE HERE</span>}
-                                      </div>
-                                      <p className="text-sm font-medium mb-3" style={{ color: '#80a4ed' }}>Embedded Systems</p>
-                                      <div className="inline-flex items-center gap-2 mb-3 py-2 px-3 rounded-lg" style={{ backgroundColor: '#f0fff4' }}>
-                                        <span className="text-xs font-medium text-[#1e2749]">Action</span>
-                                        <ArrowRight className="w-4 h-4" style={{ color: '#abc4ab' }} />
-                                        <span className="text-xs font-bold" style={{ color: '#22c55e' }}>Identity</span>
-                                      </div>
-                                      <p className="text-sm mb-3 text-[#1e2749]/70">
-                                        Wellness becomes part of your school&apos;s identity. Systems sustain through staff turnover. Your school becomes a model for others.
-                                      </p>
-                                      <div className="mb-3 pt-3 border-t border-gray-200">
-                                        <p className="text-xs font-bold mb-2 text-[#1e2749]">What&apos;s Included:</p>
-                                        <p className="text-xs italic mb-1.5" style={{ color: '#abc4ab' }}>Everything in ACCELERATE, plus:</p>
-                                        <ul className="space-y-1">
-                                          {['Desi AI Assistant (24/7 support)', 'Advanced analytics', 'Ongoing partnership support'].map((item) => (
-                                            <li key={item} className="flex items-center gap-1.5 text-xs text-[#1e2749]/70">
-                                              <Check className="w-3 h-3 flex-shrink-0" style={{ color: '#abc4ab' }} />
-                                              {item}
-                                            </li>
-                                          ))}
-                                        </ul>
-                                      </div>
-                                      <p className="text-xs text-[#1e2749]/50">Typical timeline: Ongoing partnership</p>
-                                    </div>
-                                  </div>
+                          The second badge is the school's own next step. It is stored per
+                          partnership rather than derived from the phase, because a phase
+                          default is wrong more often than it is right: Oak Grove is Ignite
+                          with three observation days already bought and nothing scheduled,
+                          so "add a visit" would be the wrong thing to say to them.
+                          Null means no badge, which is the correct output for a school
+                          that already has every component.
+                        */}
+                        {(() => {
+                          const offerings = [
+                            {
+                              key: 'PULSE',
+                              name: 'The Pulse',
+                              line: 'Before the music.',
+                              body: 'For leaders who cannot see how staff are really doing until someone resigns. Short check-ins that rotate through mood, energy, belonging, purpose and needs, and a monthly read on what changed and what to do about it.',
+                              note: 'It teaches nobody anything, and it never names an individual.',
+                              icon: <TrendingUp className="w-5 h-5" />,
+                            },
+                            {
+                              key: 'FOCUS',
+                              name: 'The Focus',
+                              line: 'The marching band.',
+                              body: 'For schools already committed to an initiative but short on practical resources. Ready built tools released across the year, plus short leadership sessions to keep the work moving and tracking so you can see it land.',
+                              note: 'One vocabulary across the building. Nobody gets an arrangement written for them.',
+                              icon: <BookOpen className="w-5 h-5" />,
+                            },
+                            {
+                              key: 'COHORT',
+                              name: 'The Cohort',
+                              line: 'The a cappella group.',
+                              body: 'For the group carrying the most and getting the least, whether that is paras, new teachers or a specific role. Virtual sessions built around a named group, with full Hub and blog access, office hours and direct email support.',
+                              note: 'It reaches the people in the room, and only them.',
+                              icon: <Users className="w-5 h-5" />,
+                            },
+                            {
+                              key: 'BLUEPRINT',
+                              name: 'The Blueprint',
+                              line: 'The jazz ensemble.',
+                              body: 'Full partnership across the system. The Hub for your staff, leadership coaching, classroom observations while students are present, staff check-ins, and your own dashboard. It runs in phases, Ignite then Accelerate then Sustain, so it meets you where you are.',
+                              note: 'Every line is different, and it only works because someone is listening to each of them.',
+                              icon: <Target className="w-5 h-5" />,
+                            },
+                          ];
+
+                          const phase = partnership?.contract_phase || null;
+                          const current = (partnership?.offering || '').toUpperCase();
+                          const nextStep = partnership?.next_step_suggestion || null;
+                          // PILOT is a legacy Hub-only contract, not one of the four, so
+                          // nothing below gets badged. Say so plainly rather than showing
+                          // a school four cards with no mark and letting them wonder.
+                          const isLegacyPilot = current === 'PILOT';
+
+                          return (
+                            <div className="space-y-4">
+                              {isLegacyPilot && (
+                                <div
+                                  className="rounded-xl px-4 py-3"
+                                  style={{ background: '#f8fafc', border: '1px solid #e5e7eb' }}
+                                >
+                                  <p className="text-sm leading-relaxed text-[#1e2749]/80">
+                                    Your partnership is a Learning Hub pilot, agreed before these four
+                                    supports were set out. Everything in your contract continues as it is.
+                                    These are here so you can see what else we offer.
+                                  </p>
                                 </div>
-                              );
-                            })()}
-                          </div>
-                        </div>
+                              )}
+                              {offerings.map((o) => {
+                                const isYours = o.key === current;
+                                return (
+                                  <div
+                                    key={o.key}
+                                    className="rounded-2xl p-5 md:p-6 bg-white transition-colors"
+                                    style={{
+                                      border: isYours ? '2px solid #2A9D8F' : '1px solid #e5e7eb',
+                                      boxShadow: isYours
+                                        ? '0 2px 12px rgba(42,157,143,0.10)'
+                                        : '0 1px 3px rgba(0,0,0,0.04)',
+                                    }}
+                                  >
+                                    <div className="flex flex-wrap items-center gap-2.5 mb-2">
+                                      <span
+                                        className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+                                        style={{
+                                          background: isYours ? 'rgba(42,157,143,0.12)' : '#f3f4f6',
+                                          color: isYours ? '#2A9D8F' : '#9ca3af',
+                                        }}
+                                      >
+                                        {o.icon}
+                                      </span>
+                                      <h3 className="text-base font-bold text-[#1e2749]">{o.name}</h3>
+                                      {isYours && (
+                                        <span
+                                          className="text-[11px] font-bold uppercase tracking-wide px-2.5 py-1 rounded-full"
+                                          style={{ background: '#2A9D8F', color: '#FFFFFF' }}
+                                        >
+                                          {phase ? `You are here · ${phase}` : 'You are here'}
+                                        </span>
+                                      )}
+                                    </div>
+
+                                    <p className="text-sm font-semibold text-[#1e2749]/70 mb-1.5">{o.line}</p>
+                                    <p className="text-sm leading-relaxed text-[#1e2749]/80 mb-2">{o.body}</p>
+                                    <p className="text-xs italic text-[#1e2749]/55">{o.note}</p>
+
+                                    {isYours && nextStep && (
+                                      <div
+                                        className="mt-4 flex items-start gap-2.5 rounded-xl px-4 py-3"
+                                        style={{ background: '#fff8e6', border: '1px solid #f0d089' }}
+                                      >
+                                        <Sparkles
+                                          className="w-4 h-4 flex-shrink-0 mt-0.5"
+                                          style={{ color: '#b98900' }}
+                                        />
+                                        <p className="text-sm leading-relaxed text-[#1e2749]">
+                                          <span className="font-semibold">To get the most from this: </span>
+                                          {nextStep}
+                                        </p>
+                                      </div>
+                                    )}
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          );
+                        })()}
 
                         <div className="p-4 rounded-lg" style={{ backgroundColor: '#f0f9ff', border: '1px solid #80a4ed' }}>
                           <p className="text-sm text-[#1e2749]">
-                            <strong>Every phase</strong> includes support for teachers, paraprofessionals, instructional coaches, and administrators. We meet each role where they are.
+                            <strong>Every one of these</strong> supports teachers, paraprofessionals, instructional coaches and administrators. We meet each role where they are.
                           </p>
                         </div>
                       </div>
@@ -7752,256 +7809,9 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
               </div>
             </div>
 
-            {/* Semester Toggle - only shown when there are multiple semesters */}
-            {semesterList.length > 1 && (
-              <div className="flex flex-wrap items-center gap-2">
-                {semesterList.map((s) => (
-                  <button
-                    key={s.semester}
-                    onClick={() => setActiveSemester(s.semester)}
-                    className="text-sm font-semibold px-4 py-2 rounded-full transition-colors"
-                    style={
-                      activeSemester === s.semester
-                        ? { background: '#1e2749', color: '#ffffff' }
-                        : { background: '#F3F4F6', color: '#6B7280' }
-                    }
-                  >
-                    {s.semester_label}
-                    {s.is_current && (
-                      <span className="ml-1.5 text-[10px] font-bold uppercase tracking-wide opacity-60">Current</span>
-                    )}
-                  </button>
-                ))}
-              </div>
-            )}
-
-            {/* Historical semester view */}
-            {semesterList.length > 1 && !semesterList.find((s) => s.semester === activeSemester)?.is_current && (
-              <>
-                {/* "Viewing past semester" banner */}
-                <div
-                  className="rounded-xl px-4 py-3 flex items-center gap-3 text-sm"
-                  style={{ background: '#FEF3C7', border: '1px solid #FDE68A', color: '#92400E' }}
-                >
-                  <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: '#D97706' }} />
-                  <span>
-                    Viewing {semesterList.find((s) => s.semester === activeSemester)?.semester_label} data. This semester has ended.
-                  </span>
-                </div>
-
-                {semesterLoading ? (
-                  <div className="flex items-center justify-center py-12">
-                    <Loader2 className="w-6 h-6 animate-spin text-gray-300" />
-                  </div>
-                ) : semesterData ? (
-                  <div className="space-y-4">
-
-                    {/* Historical Metrics */}
-                    {semesterData.metrics && Object.keys(semesterData.metrics).length > 0 && (
-                      <div className="bg-white rounded-xl border border-gray-100 p-6" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-                        <h2 className="text-base font-semibold text-gray-900 mb-4">
-                          {semesterData.semester_label} Metrics
-                        </h2>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                          {Object.entries(semesterData.metrics as Record<string, { label: string; value: string | number; color?: string }>).map(([key, metric]) => (
-                            <div key={key} className="rounded-xl bg-gray-50 p-4 text-center">
-                              <p className="text-2xl font-bold" style={{ color: metric.color || '#1e2749' }}>
-                                {metric.value}
-                              </p>
-                              <p className="text-[10px] text-gray-500 font-medium mt-1">{metric.label}</p>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Historical Highlights */}
-                    {semesterData.highlights && (semesterData.highlights as string[]).length > 0 && (
-                      <div className="bg-white rounded-xl border border-gray-100 p-6" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-                        <h2 className="text-base font-semibold text-gray-900 mb-4">Semester Highlights</h2>
-                        <div className="space-y-2">
-                          {(semesterData.highlights as string[]).map((h, i) => (
-                            <div key={i} className="flex items-start gap-2.5">
-                              <div className="w-2 h-2 rounded-full flex-shrink-0 mt-1.5" style={{ background: '#2A9D8F' }} />
-                              <p className="text-sm text-gray-700 leading-relaxed">{h}</p>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Historical Building Data */}
-                    {semesterData.building_data && semesterData.building_data.length > 0 && (
-                      <div className="bg-white rounded-xl border border-gray-100 p-6" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-                        <h2 className="text-base font-semibold text-gray-900 mb-4">Building Spotlight</h2>
-                        <div className="overflow-x-auto">
-                          <table className="w-full text-sm">
-                            <thead>
-                              <tr className="border-b border-gray-100">
-                                <th className="text-left text-xs font-semibold text-gray-500 pb-2 pr-4">Building</th>
-                                <th className="text-right text-xs font-semibold text-gray-500 pb-2 px-4">Paras</th>
-                                <th className="text-right text-xs font-semibold text-gray-500 pb-2 px-4">Login %</th>
-                                <th className="text-left text-xs font-semibold text-gray-500 pb-2 pl-4">Recognition</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {semesterData.building_data.map((b: Record<string, unknown>, i: number) => (
-                                <tr key={i} className="border-b border-gray-50">
-                                  <td className="py-2.5 pr-4 font-medium text-[#1e2749]">{b.name as string}</td>
-                                  <td className="py-2.5 px-4 text-right text-gray-600">{(b.staff_count as number) ?? '—'}</td>
-                                  <td className="py-2.5 px-4 text-right text-gray-600">{b.login_pct ? `${b.login_pct}%` : '—'}</td>
-                                  <td className="py-2.5 pl-4 text-left">
-                                    {(b.awards as string[])?.length > 0 ? (
-                                      <div className="flex flex-wrap gap-1">
-                                        {(b.awards as string[]).map((award: string, j: number) => (
-                                          <span key={j} className="inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold" style={{ background: '#FFF7ED', color: '#C2410C', border: '1px solid #FDBA74' }}>
-                                            {award}
-                                          </span>
-                                        ))}
-                                      </div>
-                                    ) : '—'}
-                                  </td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Historical Observation Notes */}
-                    {semesterData.observation_notes && (semesterData.observation_notes as { title: string; date?: string; notes?: string; love_notes?: { para: string; school: string; highlights: string; para_replied?: boolean; reply_summary?: string }[] }[]).length > 0 && (
-                      <div className="bg-white rounded-xl border border-gray-100 p-6" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-                        <h2 className="text-base font-semibold text-gray-900 mb-4">Observation Notes</h2>
-                        <div className="space-y-6">
-                          {(semesterData.observation_notes as { title: string; date?: string; notes?: string; love_notes?: { para: string; school: string; highlights: string; para_replied?: boolean; reply_summary?: string }[] }[]).map((note, i) => (
-                            <div key={i}>
-                              <div className="flex items-start gap-3">
-                                <div className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5" style={{ background: '#EFF6FF' }}>
-                                  <Eye className="w-3.5 h-3.5" style={{ color: '#2563EB' }} />
-                                </div>
-                                <div className="flex-1">
-                                  <p className="text-sm font-semibold text-[#1e2749]">{note.title}</p>
-                                  {note.date && (
-                                    <p className="text-xs text-gray-400 mt-0.5">
-                                      {new Date(note.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
-                                    </p>
-                                  )}
-                                  {note.notes && (
-                                    <p className="text-sm text-gray-600 mt-1 leading-relaxed">{note.notes}</p>
-                                  )}
-                                </div>
-                              </div>
-                              {/* Individual Love Notes */}
-                              {note.love_notes && note.love_notes.length > 0 && (
-                                <div className="mt-4 ml-9 space-y-3">
-                                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Individual Feedback Sent</p>
-                                  {note.love_notes.map((ln, j) => (
-                                    <div key={j} className="rounded-lg p-3" style={{ background: '#F8FAFC', border: '1px solid #E2E8F0' }}>
-                                      <div className="flex items-center gap-2 mb-1">
-                                        <span className="text-sm font-semibold text-[#1e2749]">{ln.para}</span>
-                                        <span className="text-[10px] px-1.5 py-0.5 rounded-full font-medium" style={{ background: '#EFF6FF', color: '#2563EB' }}>{ln.school}</span>
-                                        {ln.para_replied && (
-                                          <span className="text-[10px] px-1.5 py-0.5 rounded-full font-medium" style={{ background: '#ECFDF5', color: '#059669' }}>replied</span>
-                                        )}
-                                      </div>
-                                      <p className="text-xs text-gray-600 leading-relaxed">{ln.highlights}</p>
-                                      {ln.reply_summary && (
-                                        <p className="text-xs text-gray-500 mt-1.5 pl-3 italic" style={{ borderLeft: '2px solid #D1D5DB' }}>{ln.reply_summary}</p>
-                                      )}
-                                    </div>
-                                  ))}
-                                </div>
-                              )}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Historical Para Quotes */}
-                    {semesterData.para_quotes && semesterData.para_quotes.length > 0 && (
-                      <div className="bg-white rounded-xl border border-gray-100 p-6" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-                        <h2 className="text-base font-semibold text-gray-900 mb-4">Voices From Your School</h2>
-                        <div className="space-y-3">
-                          {semesterData.para_quotes.map((q, i) => (
-                            <div
-                              key={i}
-                              className="p-4 rounded-xl border-l-4"
-                              style={{ background: '#F9FAFB', borderLeftColor: '#2A9D8F' }}
-                            >
-                              <p className="text-sm text-gray-700 italic leading-relaxed">
-                                &ldquo;{q.text}&rdquo;
-                              </p>
-                              {(q.role || q.building) && (
-                                <p className="text-xs text-gray-400 mt-2 font-medium">
-                                  {[q.role, q.building].filter(Boolean).join(', ')}
-                                </p>
-                              )}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Historical Timeline */}
-                    {semesterData.timeline_events && semesterData.timeline_events.length > 0 && (
-                      <div className="bg-white rounded-xl border border-gray-100 p-6" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-                        <h2 className="text-base font-semibold text-gray-900 mb-5">
-                          {semesterData.semester_label} Timeline
-                        </h2>
-                        <div className="grid grid-cols-3 gap-6">
-                          {(['completed', 'in_progress', 'upcoming'] as const).map((status) => {
-                            const cfg = {
-                              completed: { label: 'Done', color: '#16A34A' },
-                              in_progress: { label: 'In Progress', color: '#D97706' },
-                              upcoming: { label: 'Coming Soon', color: '#2563EB' },
-                            }[status];
-                            const events = semesterData.timeline_events.filter((e) => e.status === status);
-                            return (
-                              <div key={status}>
-                                <div className="flex items-center gap-1.5 mb-3">
-                                  <div className="w-2 h-2 rounded-full" style={{ background: cfg.color }} />
-                                  <span className="text-xs font-bold uppercase tracking-wide" style={{ color: cfg.color }}>
-                                    {cfg.label}
-                                  </span>
-                                  <span className="text-xs text-gray-400 ml-auto">{events.length}</span>
-                                </div>
-                                {events.length === 0 ? (
-                                  <p className="text-xs text-gray-300 italic">Nothing here</p>
-                                ) : (
-                                  events.map((ev, j) => (
-                                    <div key={j} className="flex items-start gap-2 mb-3">
-                                      <div className="w-1.5 h-1.5 rounded-full flex-shrink-0 mt-1.5" style={{ background: cfg.color }} />
-                                      <div>
-                                        <p className="text-sm text-gray-700 leading-snug">{ev.title}</p>
-                                        {ev.date && (
-                                          <p className="text-xs text-gray-400 mt-0.5">
-                                            {new Date(ev.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                                          </p>
-                                        )}
-                                        {ev.notes && (
-                                          <p className="text-xs text-gray-500 mt-0.5">{ev.notes}</p>
-                                        )}
-                                      </div>
-                                    </div>
-                                  ))
-                                )}
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    )}
-
-                  </div>
-                ) : (
-                  <div className="bg-white rounded-xl border border-gray-100 p-8 text-center" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-                    <p className="text-sm text-gray-400">No data has been recorded for this semester yet.</p>
-                  </div>
-                )}
-              </>
-            )}
+            {/* The semester toggle and the historical record that sat here moved to
+                their own year tabs on 30 September 2026. A school's first year was
+                reachable only by pressing a toggle most people never noticed. */}
 
             {/* Current semester content - only shown when viewing the current semester (or no semesters configured) */}
             {(semesterList.length <= 1 || !!semesterList.find((s) => s.semester === activeSemester)?.is_current) && (
@@ -8220,133 +8030,103 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
         )}
 
         {/* SCHOOLS TAB (District Only) */}
-        {/* ─── A COMPLETED YEAR ───
-            Stored rather than derived. Addison's first year ran Jan to May 2026
-            on the previous platform and the Hub holds none of it, so every
-            figure here is a stated fact somebody wrote down.
+        {/* ─── ONE TAB PER SCHOOL YEAR ───
+            Rae, 30 September 2026: each year carries its own goals, metrics and
+            standing, in the same shape, so the two read against each other.
 
-            Quotes carry a school rather than a person. A first name plus a small
-            building identifies someone, and these were written in a survey about
-            the sessions, not for a leadership screen. */}
-        {yearRecords.map(record => activeTab === `year-${record.id}` && (
+            The record itself is `partnership_semester_data`, which already held
+            a far better Spring 2026 record than anything derived: nine para
+            quotes, two observation days, ten love notes with replies. It was
+            reachable only behind a toggle inside Our Partnership, so a school's
+            own first year was effectively invisible to them.
+
+            The current year additionally carries the plan, because for a year
+            in progress the plan is the record. */}
+        {semesterList.map(sem => activeTab === `year-${sem.semester}` && (
           <div
-            key={record.id}
+            key={sem.semester}
             role="tabpanel"
-            id={`panel-year-${record.id}`}
-            aria-labelledby={`tab-year-${record.id}`}
-            className="py-6 space-y-5"
+            id={`panel-year-${sem.semester}`}
+            aria-labelledby={`tab-year-${sem.semester}`}
+            className="py-6"
           >
-            <div className="bg-white rounded-2xl p-6 md:p-7 shadow-sm border border-gray-100">
-              <div className="flex items-baseline justify-between gap-4 flex-wrap">
-                <h2 className="text-[17px] font-bold text-[#1e2749] tracking-tight">
-                  {record.headline || record.year_label}
-                </h2>
-                <span className="text-xs text-gray-400">{record.year_label}</span>
-              </div>
-              {record.summary && (
-                <p className="text-xs text-gray-500 mt-2 leading-relaxed max-w-3xl">{record.summary}</p>
-              )}
-              {!!record.stats?.length && (
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 md:gap-4 mt-5">
-                  {record.stats.map((s, i) => (
-                    <div key={i} className="p-3 md:p-4 bg-gray-50 rounded-xl text-center">
-                      <p className="text-xl md:text-2xl font-bold text-[#1e2749]">{s.value}</p>
-                      <p className="text-xs md:text-sm text-gray-500">{s.label}</p>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+            <SemesterRecord
+              data={semesterData && semesterData.semester === sem.semester ? semesterData : null}
+              loading={semesterLoading}
+            >
+              {/* Live, and only for the year in progress: who is still to reach,
+                  and the way to reach them. A past year has no one left to nudge.
 
-            {record.change && (
-              <div className="bg-white rounded-2xl p-6 md:p-7 shadow-sm border border-gray-100">
-                <h2 className="text-[17px] font-bold text-[#1e2749] tracking-tight">{record.change.label}</h2>
-                {record.change.note && (
-                  <p className="text-xs text-gray-500 mt-2 leading-relaxed max-w-3xl">{record.change.note}</p>
-                )}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-center mt-5 p-5 bg-gray-50 rounded-xl">
-                  <div className="text-center">
-                    <p className="text-3xl font-bold text-gray-400">{record.change.before}</p>
-                    <p className="text-xs text-gray-500 mt-1">{record.change.beforeLabel}</p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-sm font-bold text-[#1e2749]">{record.change.delta}</p>
-                    <div className="h-2 bg-gray-200 rounded-full overflow-hidden mt-2.5">
-                      <div className="h-full rounded-full bg-[#E8B84B]" style={{ width: '64%' }} />
-                    </div>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-3xl font-bold text-[#E8B84B]">{record.change.after}</p>
-                    <p className="text-xs text-gray-500 mt-1">{record.change.afterLabel}</p>
-                  </div>
-                </div>
-              </div>
-            )}
+                  Nudge opens the leader's own email with the addresses in blind
+                  copy and a draft written. It comes from them rather than from
+                  us, which is the version that worked on the previous platform
+                  and never got rebuilt here. */}
+              {sem.is_current && staffStats.total > 0 && staffStats.hubLoggedIn < staffStats.total && (
+                <div className="bg-white rounded-2xl p-6 md:p-7 shadow-sm border border-gray-100">
+                  <h2 className="text-[15px] font-bold text-[#1e2749] tracking-tight">
+                    Your next {staffStats.total - staffStats.hubLoggedIn}
+                  </h2>
+                  <p className="text-xs text-gray-500 mt-1.5">
+                    The rest of your team, and the fastest way to reach them.
+                  </p>
 
-            {!!record.themes?.length && (
-              <div className="bg-white rounded-2xl p-6 md:p-7 shadow-sm border border-gray-100">
-                <h2 className="text-[17px] font-bold text-[#1e2749] tracking-tight mb-4">What they came back to</h2>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
-                  {record.themes.map((t, i) => (
-                    <div key={i} className="border border-gray-200 rounded-xl p-4">
-                      <h3 className="text-sm font-bold text-[#1e2749] mb-1.5">{t.title}</h3>
-                      <p className="text-[13px] text-gray-500 leading-relaxed">{t.body}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {record.lists?.map((list, li) => {
-              const max = Math.max(...list.items.map(i => i.count), 1);
-              return (
-                <div key={li} className="bg-white rounded-2xl p-6 md:p-7 shadow-sm border border-gray-100">
-                  <h2 className="text-[17px] font-bold text-[#1e2749] tracking-tight">{list.title}</h2>
-                  {list.subtitle && <p className="text-xs text-gray-500 mt-2">{list.subtitle}</p>}
-                  <div className="flex flex-col gap-3.5 mt-5">
-                    {list.items.map((item, i) => (
-                      <div key={i}>
-                        <div className="flex justify-between text-sm mb-1.5">
-                          <span className="text-[#1e2749]">{item.label}</span>
-                          <span className="text-gray-500 tabular-nums">{item.count}</span>
-                        </div>
-                        <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                          <div
-                            className={`h-full rounded-full ${i === 0 ? 'bg-[#E8B84B]' : 'bg-[#80a4ed]'}`}
-                            style={{ width: `${Math.round((item.count / max) * 100)}%` }}
-                          />
-                        </div>
+                  <div className="flex items-center gap-5 flex-wrap mt-4">
+                    <p className="text-[34px] font-bold leading-none tabular-nums text-[#1e2749]">
+                      {staffStats.hubLoggedIn}
+                      <span className="text-sm font-semibold text-gray-500"> of {staffStats.total}</span>
+                    </p>
+                    <div className="flex-1 min-w-[220px]">
+                      <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden flex">
+                        <span
+                          className="block h-full"
+                          style={{
+                            width: `${Math.round(((engagement?.activeThisWeek ?? 0) / staffStats.total) * 100)}%`,
+                            background: '#2A9D8F',
+                          }}
+                        />
+                        <span
+                          className="block h-full"
+                          style={{
+                            width: `${Math.round(((staffStats.hubLoggedIn - (engagement?.activeThisWeek ?? 0)) / staffStats.total) * 100)}%`,
+                            background: '#80a4ed',
+                          }}
+                        />
                       </div>
-                    ))}
-                  </div>
-                </div>
-              );
-            })}
-
-            {!!record.quotes?.length && (
-              <div className="bg-white rounded-2xl p-6 md:p-7 shadow-sm border border-gray-100">
-                <h2 className="text-[17px] font-bold text-[#1e2749] tracking-tight">In their own words</h2>
-                <p className="text-xs text-gray-500 mt-2">
-                  Unedited, from the survey your staff filled in themselves.
-                </p>
-                <div className="flex flex-col gap-3 mt-5">
-                  {record.quotes.map((q, i) => (
-                    <div key={i} className="pl-4 py-3 bg-gray-50 rounded-r-xl border-l-[3px] border-[#80a4ed]">
-                      <p className="text-sm text-[#1e2749] leading-relaxed">{q.text}</p>
-                      {q.attribution && (
-                        <span className="block text-xs text-gray-400 mt-2">{q.attribution}</span>
-                      )}
+                      <div className="flex gap-4 flex-wrap mt-2">
+                        <span className="text-[11.5px] text-gray-500 flex items-center gap-1.5">
+                          <i className="w-2 h-2 rounded-full inline-block" style={{ background: '#2A9D8F' }} />
+                          {engagement?.activeThisWeek ?? 0} in this week
+                        </span>
+                        <span className="text-[11.5px] text-gray-500 flex items-center gap-1.5">
+                          <i className="w-2 h-2 rounded-full inline-block" style={{ background: '#80a4ed' }} />
+                          {staffStats.hubLoggedIn - (engagement?.activeThisWeek ?? 0)} started
+                        </span>
+                        <span className="text-[11.5px] text-gray-500 flex items-center gap-1.5">
+                          <i className="w-2 h-2 rounded-full inline-block bg-gray-200" />
+                          {staffStats.total - staffStats.hubLoggedIn} still to reach
+                        </span>
+                      </div>
                     </div>
-                  ))}
-                </div>
-              </div>
-            )}
+                  </div>
 
-            {record.footnote && (
-              <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-                <p className="text-xs text-gray-500 leading-relaxed">{record.footnote}</p>
-              </div>
-            )}
+                  {notStartedMailto && (
+                    <div className="mt-5 flex items-center justify-between gap-3 flex-wrap">
+                      <p className="text-[12.5px] text-gray-500 leading-relaxed max-w-xl">
+                        Nudge opens your own email with the addresses in blind copy and a draft already written.
+                        It comes from you rather than from us.
+                      </p>
+                      <a
+                        href={notStartedMailto}
+                        className="text-[13px] font-bold rounded-full px-4 py-2 shrink-0"
+                        style={{ background: '#E8B84B', color: '#1e2749' }}
+                      >
+                        Nudge all {staffStats.total - staffStats.hubLoggedIn}
+                      </a>
+                    </div>
+                  )}
+                </div>
+              )}
+            </SemesterRecord>
           </div>
         ))}
 
