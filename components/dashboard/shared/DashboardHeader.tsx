@@ -65,10 +65,30 @@ export function DashboardHeader({
 }: DashboardHeaderProps) {
   const phaseConfig = PHASE_CONFIG[phase] || PHASE_CONFIG.IGNITE
 
-  // Format year range
-  const yearBadge = contractStart
-    ? `${new Date(contractStart).getFullYear()}-${contractEnd ? new Date(contractEnd).getFullYear() : 'Present'}`
-    : null
+  // Format year range.
+  //
+  // This used to print the two calendar years unconditionally, so Addison's
+  // July to December 2026 contract rendered as "2026-2026" in the header, two
+  // inches from tabs reading "2026-2027". Literally accurate and unreadable.
+  //
+  // A contract inside one calendar year now shows its months instead. Dates are
+  // built from their parts rather than parsed, because new Date('2026-07-01')
+  // is UTC midnight and renders as June in Chicago.
+  const yearBadge = (() => {
+    if (!contractStart) return null
+    const parse = (s: string) => {
+      const [y, m, d] = s.slice(0, 10).split('-').map(Number)
+      return new Date(y, (m || 1) - 1, d || 1)
+    }
+    const start = parse(contractStart)
+    if (!contractEnd) return `${start.getFullYear()}-Present`
+    const end = parse(contractEnd)
+    if (start.getFullYear() === end.getFullYear()) {
+      const month = (dt: Date) => dt.toLocaleDateString('en-US', { month: 'short' })
+      return `${month(start)} to ${month(end)} ${end.getFullYear()}`
+    }
+    return `${start.getFullYear()}-${end.getFullYear()}`
+  })()
 
   return (
     <section className="relative text-white overflow-hidden">
