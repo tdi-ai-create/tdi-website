@@ -37,6 +37,8 @@ export interface GoalMeasurementInput {
   benchmark_label?: string | null;
   /** Where the number comes from. Falls back to this when no benchmark label. */
   data_source?: string | null;
+  /** What TDI is doing about this goal. Written per goal. */
+  how_tdi_delivers?: string | null;
   /** Per goal override for the asterisk body. Null means derive it. */
   deeper_measurement?: string | null;
   /** Per goal override for which offering to point at. Null means derive it. */
@@ -52,6 +54,22 @@ export interface ContractShape {
 export interface GoalMeasurement {
   /** How this goal is measured. Null when nothing was ever written. */
   how: string | null;
+  /**
+   * The instrument behind the number. Null when there is nothing to add,
+   * meaning it was never written or it is already carrying the `how` body.
+   */
+  source: string | null;
+  /**
+   * What TDI is doing about this goal. Null when nothing was written.
+   *
+   * Rae's rule, 30 September 2026: an unfavourable number never renders
+   * without the TDI work beside it. This field held that answer on every KPI
+   * row since the leadership menu was built and was displayed on no screen at
+   * all, client facing or internal. A 34% activation bar read as a school
+   * failing, with the nudge, the role based content and the goal prompt fix
+   * all sitting unread in the database.
+   */
+  doing: string | null;
   /** Heading above the asterisk. */
   deeperHeading: string;
   /** The honest statement of what the current instrument cannot see. */
@@ -197,8 +215,16 @@ export function goalMeasurement(
   const override = kpi.deeper_measurement?.trim();
   const offering = suggestOffering(kpi, contract);
 
+  const benchmark = kpi.benchmark_label?.trim() || null;
+  const dataSource = kpi.data_source?.trim() || null;
+
   return {
-    how: kpi.benchmark_label?.trim() || kpi.data_source?.trim() || null,
+    how: benchmark || dataSource,
+    // When there is no benchmark label the data source is already serving as
+    // the body above, so returning it here too would print the same sentences
+    // twice under two different headings.
+    source: benchmark ? dataSource : null,
+    doing: kpi.how_tdi_delivers?.trim() || null,
     deeperHeading: derived.heading,
     deeper: override || derived.text,
     offer: offering ? OFFERINGS[offering] : null,

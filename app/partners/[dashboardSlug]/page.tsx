@@ -3240,7 +3240,20 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                         </p>
                       )}
 
-                      {paragraphs.length > 0 && (
+                      {/* The TDI work sits above the fold, not inside the
+                          collapsed panel. Rae's rule is that an unfavourable
+                          number never renders without the work beside it, and a
+                          leader scanning a 34% bar does not open a disclosure
+                          labelled "How we measure this" to find out we are doing
+                          something about it. */}
+                      {measure.doing && (
+                        <div className="mt-3 rounded-xl bg-[#E8F0FD] px-4 py-3">
+                          <p className="text-[10px] font-bold uppercase tracking-wider text-[#1e2749]/60 mb-1">What we are doing about this</p>
+                          <p className="text-[13.5px] leading-relaxed text-[#1e2749] max-w-[68ch]">{measure.doing}</p>
+                        </div>
+                      )}
+
+                      {(paragraphs.length > 0 || measure.source) && (
                         <details className="mt-2.5 group">
                           <summary className="cursor-pointer list-none [&::-webkit-details-marker]:hidden inline-flex items-center gap-1.5 text-xs font-semibold text-[#1e2749]">
                             <ChevronDown className="w-3.5 h-3.5 text-gray-400 transition-transform group-open:rotate-180" />
@@ -3250,6 +3263,16 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                             {paragraphs.map((para, i) => (
                               <p key={i} className="text-[13.5px] leading-relaxed text-gray-600 mb-2.5 last:mb-0 max-w-[68ch]">{para}</p>
                             ))}
+                            {/* Where the figure actually comes from. Written on
+                                every KPI row and, until now, printed only when
+                                there was no benchmark label to crowd it out,
+                                which on a real partnership is never. */}
+                            {measure.source && (
+                              <div className="mt-3 pt-3 border-t border-gray-200">
+                                <p className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1">Where the number comes from</p>
+                                <p className="text-[13.5px] leading-relaxed text-gray-600 max-w-[68ch]">{measure.source}</p>
+                              </div>
+                            )}
                             <div className="mt-3 pt-3 border-t border-gray-200">
                               <p className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1">{measure.deeperHeading}</p>
                               <p className="text-[13.5px] leading-relaxed text-gray-600 max-w-[68ch]">{measure.deeper}</p>
