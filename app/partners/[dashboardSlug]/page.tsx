@@ -457,7 +457,6 @@ export default function PartnerDashboard() {
   const [sessionRecords, setSessionRecords] = useState<SessionRecord[]>([]);
   const [recentActivity, setRecentActivity] = useState<{ action: string; details?: Record<string, unknown>; created_at: string }[]>([]);
   const [staffRoster, setStaffRoster] = useState<{ id: string; name: string; email?: string | null; role: string; hubActive: boolean }[]>([]);
-  const [hubIntel, setHubIntel] = useState<Record<string, unknown> | null>(null);
   const [observationImpact, setObservationImpact] = useState<{ has_data: boolean; observations: { event_title: string; event_date: string; before_logins: number; after_logins: number; engagement_change_pct: number; before_mood: number | null; after_mood: number | null; mood_change: number | null; before_quick_wins: number; after_quick_wins: number }[] } | null>(null);
   const [hubStats, setHubStats] = useState<{
     has_real_data: boolean
@@ -829,17 +828,6 @@ export default function PartnerDashboard() {
         }
       } catch (hubError) {
         console.error('Error fetching hub stats:', hubError);
-      }
-
-      // Fetch Hub Intelligence (rich data for leadership view)
-      try {
-        const intelResponse = await fetch(`/api/partnerships/${partnershipId}/hub-intelligence`);
-        if (intelResponse.ok) {
-          const intelData = await intelResponse.json();
-          if (intelData.hasData) setHubIntel(intelData);
-        }
-      } catch (intelError) {
-        console.error('Error fetching hub intelligence:', intelError);
       }
 
       // Fetch Observation Impact (before/after metrics around visits)
@@ -4299,257 +4287,23 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
               </>
             )}
 
-            {/* ─── COLLAPSIBLE: Hub Intelligence ─── */}
-            {hubIntel && (
-              <>
-                <button
-                  onClick={() => toggleOverviewSection('hub-activity')}
-                  className="w-full bg-white rounded-2xl px-5 py-4 shadow-sm border border-gray-100 flex items-center justify-between hover:bg-gray-50 transition-colors"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: '#FFF8E7' }}>
-                      <Sparkles className="w-4 h-4" style={{ color: '#E8B84B' }} />
-                    </div>
-                    <div className="text-left">
-                      <p className="text-sm font-semibold text-[#1e2749]">Hub Intelligence</p>
-                      <p className="text-xs text-gray-500">Popular tools, educator types, community activity, teacher quotes</p>
-                    </div>
-                  </div>
-                  <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${overviewSections['hub-activity'] ? 'rotate-180' : ''}`} />
-                </button>
-                {overviewSections['hub-activity'] && (
-                  <div className="-mt-4">
+            {/* Hub Intelligence was removed 30 September 2026. Four of its
+                seven figures were wrong and the rest duplicated a panel that
+                already works.
 
-            {/* Partnership Momentum Bar -- hidden, replaced by visual-first health bar above */}
-            <div className="hidden">
-            <div
-              className="rounded-2xl p-5 md:p-6"
-              style={{
-                background: 'linear-gradient(135deg, #1B2A4A 0%, #2d3a5c 50%, #38618C 100%)',
-                boxShadow: '0 4px 24px rgba(27,42,74,0.2)',
-              }}
-            >
-              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                <div className="flex items-center gap-4">
-                  <div
-                    className="w-14 h-14 rounded-2xl flex items-center justify-center"
-                    style={{ background: 'rgba(255,255,255,0.1)' }}
-                  >
-                    <Sparkles className="w-7 h-7 text-[#FFBA06]" />
-                  </div>
-                  <div>
-                    <p className="text-white/60 text-xs uppercase tracking-wider mb-1">Partnership Momentum</p>
-                    <p className="text-white text-xl md:text-2xl font-bold">
-                      {(() => {
-                        // Calculate momentum score based on completed items
-                        const totalDeliverables = (partnership.observation_days_total || 0) + (partnership.virtual_sessions_total || 0);
-                        const completedDeliverables = (partnership.observation_days_completed || 0) + (partnership.virtual_sessions_completed || 0);
-                        const deliverableScore = totalDeliverables > 0 ? (completedDeliverables / totalDeliverables) * 100 : 0;
-                        const hubScore = staffStats.total > 0 ? (staffStats.hubLoggedIn / staffStats.total) * 100 : 0;
-                        const actionScore = pendingItems.length === 0 ? 100 : Math.max(0, 100 - (pendingItems.length * 10));
-                        const momentum = Math.round((deliverableScore + hubScore + actionScore) / 3);
-                        return `${momentum}%`;
-                      })()}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex-1 max-w-md">
-                  <div className="flex justify-between text-xs text-white/60 mb-2">
-                    <span>Starting Out</span>
-                    <span>Building</span>
-                    <span>Thriving</span>
-                  </div>
-                  <div className="h-3 bg-white/10 rounded-full overflow-hidden">
-                    <div
-                      className="h-full rounded-full transition-all duration-700"
-                      style={{
-                        width: (() => {
-                          const totalDeliverables = (partnership.observation_days_total || 0) + (partnership.virtual_sessions_total || 0);
-                          const completedDeliverables = (partnership.observation_days_completed || 0) + (partnership.virtual_sessions_completed || 0);
-                          const deliverableScore = totalDeliverables > 0 ? (completedDeliverables / totalDeliverables) * 100 : 0;
-                          const hubScore = staffStats.total > 0 ? (staffStats.hubLoggedIn / staffStats.total) * 100 : 0;
-                          const actionScore = pendingItems.length === 0 ? 100 : Math.max(0, 100 - (pendingItems.length * 10));
-                          return `${Math.round((deliverableScore + hubScore + actionScore) / 3)}%`;
-                        })(),
-                        background: 'linear-gradient(90deg, #4ecdc4, #FFBA06, #F59E0B)',
-                      }}
-                    />
-                  </div>
-                </div>
-                <button
-                  onClick={() => navigateToTab('blueprint', 'contract-deliverables')}
-                  className="px-4 py-2 rounded-xl text-sm font-semibold flex items-center gap-2 transition-all hover:scale-105"
-                  style={{
-                    background: 'rgba(255,255,255,0.1)',
-                    color: '#FFFFFF',
-                    border: '1px solid rgba(255,255,255,0.2)',
-                  }}
-                >
-                  View Blueprint
-                  <ArrowRight className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-            </div>{/* end hidden momentum bar */}
+                "0% of your team logged in this month" was the calendar month
+                bug, rendering beside "20 active in the last 7 days" on the same
+                card. "0 tools explored" counted an action named
+                quick_win_completed that the Hub has never written; the real
+                actions are quick_win_viewed, 28 events by 11 people, and
+                lesson_viewed, 87 by 22. "Popular in your building" and "your
+                building's most common educator type" called a nine school
+                district a building, and derived that type from two people. The
+                4.5/5 wellness score came from three check-ins and contradicted
+                the 3.71 vibe check average across 35 people behind the goals.
 
-            {/* Hub Activity -- What your teachers are doing on the Hub (inside collapsible wrapper) */}
-            {hubStats && hubStats.has_real_data && (
-              <div
-                className="bg-white rounded-2xl p-5 md:p-6"
-                style={{ boxShadow: '0 4px 24px rgba(0,0,0,0.06)', border: '1px solid rgba(0,0,0,0.04)' }}
-              >
-                <div className="flex items-center gap-3 mb-5">
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'rgba(232,184,75,0.12)' }}>
-                    <Sparkles className="w-5 h-5" style={{ color: '#E8B84B' }} />
-                  </div>
-                  <div>
-                    <h3 className="text-base font-bold" style={{ color: '#1B2A4A' }}>Learning Hub Activity</h3>
-                    <p className="text-xs text-gray-500">What your team is doing on the TDI Learning Hub this month</p>
-                  </div>
-                </div>
-
-                {/* Core metrics */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-5">
-                  <div className="rounded-xl p-4" style={{ background: '#F9FAFB' }}>
-                    <p className="text-2xl font-bold" style={{ color: '#E8B84B' }}>{hubStats.hub_login_pct ?? 0}%</p>
-                    <p className="text-xs text-gray-500 mt-1">of your team logged in this month</p>
-                  </div>
-                  <div className="rounded-xl p-4" style={{ background: '#F9FAFB' }}>
-                    <p className="text-2xl font-bold" style={{ color: '#2A9D8F' }}>{hubStats.quick_wins_completed ?? 0}</p>
-                    <p className="text-xs text-gray-500 mt-1">tools explored by your educators</p>
-                  </div>
-                  <div className="rounded-xl p-4" style={{ background: '#F9FAFB' }}>
-                    <p className="text-2xl font-bold" style={{ color: '#2563EB' }}>{hubStats.active_users_7d ?? 0}</p>
-                    <p className="text-xs text-gray-500 mt-1">active in the last 7 days</p>
-                  </div>
-                  <div className="rounded-xl p-4" style={{ background: '#F9FAFB' }}>
-                    {hubStats.mood_avg_7d !== null ? (
-                      <>
-                        <p className="text-2xl font-bold" style={{ color: hubStats.mood_avg_7d >= 4 ? '#2A9D8F' : hubStats.mood_avg_7d >= 3 ? '#EAB308' : '#EF4444' }}>{hubStats.mood_avg_7d}/5</p>
-                        <p className="text-xs text-gray-500 mt-1">avg team wellness score</p>
-                      </>
-                    ) : (
-                      <>
-                        <p className="text-2xl font-bold" style={{ color: '#8B5CF6' }}>{hubStats.moment_mode_uses_7d ?? 0}</p>
-                        <p className="text-xs text-gray-500 mt-1">wellness resets this week</p>
-                      </>
-                    )}
-                  </div>
-                </div>
-
-                {/* Rich intelligence data */}
-                {hubIntel && (() => {
-                  const intel = hubIntel as {
-                    popularTools?: { title: string; views: number }[];
-                    mostCommonType?: { type: string; count: number } | null;
-                    quizBreakdown?: Record<string, number>;
-                    communityPostCount?: number;
-                    qaThreadCount?: number;
-                    communityHighlights?: { quote: string; type: string }[];
-                    fieldNotesEarned?: number;
-                    educatorsNeedingSupport?: number;
-                    testimonials?: string[];
-                  };
-                  return (
-                  <div className="space-y-4 pt-4" style={{ borderTop: '1px solid #F3F4F6' }}>
-
-                    {/* Popular tools in your building */}
-                    {(intel.popularTools as { title: string; views: number }[])?.length > 0 && (
-                      <div>
-                        <p className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Popular in Your Building</p>
-                        <div className="flex flex-wrap gap-2">
-                          {(intel.popularTools as { title: string; views: number }[]).slice(0, 4).map((tool, i) => (
-                            <span key={i} className="text-xs px-3 py-1.5 rounded-full" style={{ background: '#FFF8E7', color: '#92400E' }}>
-                              {tool.title}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Educator quiz breakdown */}
-                    {intel.mostCommonType && (
-                      <div className="flex items-center gap-3 p-3 rounded-xl" style={{ background: '#F9FAFB' }}>
-                        <span className="text-lg">&#9734;</span>
-                        <div>
-                          <p className="text-sm font-medium" style={{ color: '#1B2A4A' }}>
-                            Your building&apos;s most common educator type: <strong>The {(intel.mostCommonType as { type: string; count: number }).type}</strong>
-                          </p>
-                          {Object.keys(intel.quizBreakdown as Record<string, number>).length > 1 && (
-                            <p className="text-xs text-gray-500 mt-0.5">
-                              {Object.entries(intel.quizBreakdown as Record<string, number>).map(([type, count]) => `${count} ${type}${(count as number) !== 1 ? 's' : ''}`).join(', ')}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Community engagement */}
-                    {((intel.communityPostCount as number) > 0 || (intel.qaThreadCount as number) > 0) && (
-                      <div className="flex items-center gap-3 p-3 rounded-xl" style={{ background: '#F0FDF4' }}>
-                        <span className="text-lg">&#128172;</span>
-                        <p className="text-sm" style={{ color: '#374151' }}>
-                          Your team contributed <strong>{intel.communityPostCount as number} posts</strong> and engaged in <strong>{intel.qaThreadCount as number} Q&A threads</strong>, helping other educators across the country.
-                        </p>
-                      </div>
-                    )}
-
-                    {/* Community highlight (anonymized) */}
-                    {(intel.communityHighlights as { quote: string; type: string }[])?.length > 0 && (
-                      <div className="p-4 rounded-xl" style={{ background: '#FFFBEB', borderLeft: '3px solid #E8B84B' }}>
-                        <p className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">From Your Team</p>
-                        <p className="text-sm italic" style={{ color: '#374151', lineHeight: 1.6 }}>
-                          &ldquo;{(intel.communityHighlights as { quote: string }[])[0].quote}&rdquo;
-                        </p>
-                        <p className="text-[10px] text-gray-400 mt-1">An educator in your building</p>
-                      </div>
-                    )}
-
-                    {/* Field Notes earned */}
-                    {(intel.fieldNotesEarned as number) > 0 && (
-                      <div className="flex items-center gap-3 p-3 rounded-xl" style={{ background: '#F9FAFB' }}>
-                        <span className="text-lg">&#127942;</span>
-                        <p className="text-sm" style={{ color: '#374151' }}>
-                          Your team earned <strong>{intel.fieldNotesEarned as number} Field Notes</strong> -- recognitions for showing up and doing the work.
-                        </p>
-                      </div>
-                    )}
-
-                    {/* TDI wellness outreach */}
-                    {(intel.educatorsNeedingSupport as number) > 0 && (
-                      <div className="flex items-center gap-3 p-3 rounded-xl" style={{ background: '#EFF6FF' }}>
-                        <span className="text-lg">&#128153;</span>
-                        <p className="text-sm" style={{ color: '#374151' }}>
-                          TDI personally reached out to <strong>{intel.educatorsNeedingSupport as number}</strong> team member{(intel.educatorsNeedingSupport as number) !== 1 ? 's' : ''} this week for a wellness check-in.
-                        </p>
-                      </div>
-                    )}
-
-                    {/* Broader community testimonial */}
-                    {(intel.testimonials as string[])?.length > 0 && (
-                      <div className="pt-3" style={{ borderTop: '1px solid #F3F4F6' }}>
-                        <p className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">From the TDI Community</p>
-                        <p className="text-sm italic text-gray-500" style={{ lineHeight: 1.6 }}>
-                          &ldquo;{(intel.testimonials as string[])[0]}&rdquo;
-                        </p>
-                        <p className="text-[10px] text-gray-400 mt-1">-- TDI Hub educator</p>
-                      </div>
-                    )}
-                  </div>
-                  );
-                })()}
-
-                {hubStats.course_completions && hubStats.course_completions > 0 && (
-                  <p className="text-xs text-gray-500 mt-4 pt-3" style={{ borderTop: '1px solid #F3F4F6' }}>
-                    {hubStats.course_completions} course{hubStats.course_completions !== 1 ? 's' : ''} completed by your team -- PD credit they can show you.
-                  </p>
-                )}
-              </div>
-            )}
-                  </div>
-                )}
-              </>
-            )}
+                What your team is working on, on the live year tab, shows the
+                same ground truthfully. */}
 
             {/* ─── COLLAPSIBLE: Partnership Timeline ─── */}
             {timelineEvents.length > 0 && (
@@ -6129,7 +5883,7 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                 ].map(({ label, value }) => (
                   <div key={label}>
                     <p className="text-xs text-gray-400 uppercase tracking-wide font-semibold mb-0.5">{label}</p>
-                    <p className="text-sm font-medium text-gray-800">{value || '—'}</p>
+                    <p className="text-sm font-medium text-gray-800">{value || 'Not on file'}</p>
                   </div>
                 ))}
               </div>
@@ -8226,10 +7980,6 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                   </p>
                   <p className="text-xs md:text-sm text-gray-500">Avg Hub Login</p>
                 </div>
-                <div className="p-3 md:p-4 bg-gray-50 rounded-xl text-center">
-                  <p className="text-xl md:text-2xl font-bold text-[#1e2749]">—</p>
-                  <p className="text-xs md:text-sm text-gray-500">Need Attention</p>
-                </div>
               </div>
             </div>
 
@@ -8463,6 +8213,25 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
             ) : (
               <div id="buildings-list" className="bg-white rounded-2xl p-4 md:p-6 shadow-sm border border-gray-100">
                 <h2 className="text-base md:text-lg font-bold text-gray-900 mb-4">Buildings</h2>
+
+                {/* Nine buildings reading "0 staff" with four empty dots each is
+                    not a district where nobody is working. It is a district
+                    whose roster we have never been given with a school column.
+                    Rae's rule, 30 September 2026: a number we cannot justify
+                    never renders, and a blank names what would fill it and what
+                    we will do about it. */}
+                {apiBuildings.length > 0 && apiBuildings.every(b => !b.estimated_staff_count) && (
+                  <div className="mb-4 rounded-xl px-4 py-3" style={{ background: '#E8F0FD' }}>
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-[#1e2749]/60 mb-1">Waiting on one thing from you</p>
+                    <p className="text-[13.5px] leading-relaxed text-[#1e2749] max-w-[68ch]">
+                      Your {apiBuildings.length} buildings are set up and all {staffStats.total} of your staff have Hub
+                      access, but we have not been told who works where. Send us a roster with a school column, in
+                      whatever format you already keep it, and every figure on this page splits by building. Until
+                      then these read at the district level.
+                    </p>
+                  </div>
+                )}
+
                 <div className="space-y-3">
                   {apiBuildings.map((building) => {
                     const hubStatus = getMetricStatus('hub_login_pct', null);
@@ -8481,7 +8250,10 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                             <div>
                               <h3 className="font-medium text-[#1e2749]">{building.name}</h3>
                               <p className="text-sm text-gray-500">
-                                {building.building_type} · {building.estimated_staff_count || 0} staff
+                                {building.building_type}
+                                {building.estimated_staff_count
+                                  ? ` · ${building.estimated_staff_count} staff`
+                                  : ' · staff list not received yet'}
                                 {building.lead_name && ` · ${building.lead_name}`}
                               </p>
                             </div>
