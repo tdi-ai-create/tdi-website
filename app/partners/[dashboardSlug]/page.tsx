@@ -8392,8 +8392,15 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                                       {bEng.topContent.map((item, i) => (
                                         <li key={i} className="flex items-baseline justify-between gap-3">
                                           <span className="text-[13.5px] text-[#1e2749] leading-snug">{item.title}</span>
+                                          {/* A share of this school's team, never a
+                                              headcount. Rae, 1 October 2026:
+                                              percentages are fine, raw numbers are
+                                              not. In a building of one, "1 person"
+                                              also names the person. */}
                                           <span className="text-[12px] text-gray-500 tabular-nums whitespace-nowrap">
-                                            {item.people} {item.people === 1 ? 'person' : 'people'}
+                                            {inBuilding.length > 0
+                                              ? `${Math.round((item.people / inBuilding.length) * 100)}%`
+                                              : ''}
                                           </span>
                                         </li>
                                       ))}
