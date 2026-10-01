@@ -272,6 +272,28 @@ Run it after any change that touches a query.
 
 ---
 
+---
+
+## 5b. The dashboard standard
+
+Partner dashboards have their own specification at
+`docs/leadership-dashboard-standard.md`. Read it before changing anything under
+`app/partners/`, and report findings by rule ID rather than prose, for example
+"glen-ellyn fails L4.1".
+
+Three things in it are load bearing and are the cause of most dashboard bugs:
+
+- **Empty and zero are different.** Null means nobody measured. Zero means
+  someone measured and got zero. Five goals across three live dashboards print a
+  literal 0% to a client today because somebody typed zero as a placeholder.
+- **Activity windows are rolling, never calendar-to-date.** One calendar-month
+  counter produced three separate client-facing bugs in one day, the worst of
+  which would have told a school board "0% are actively engaged".
+- **A field may not be read unless something writes it.** The quarantined field
+  list in L8 names the ones that return a confident, meaningless number.
+
+---
+
 ## 6. Voice and UI
 
 These are absolute, and they apply to code, UI copy, emails, PDFs, commit
