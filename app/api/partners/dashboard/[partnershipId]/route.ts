@@ -391,7 +391,17 @@ export async function GET(
       .from('staff_members')
       // quarantine-ok: fallback only; emailsActiveInHub is the live source above
     .select('id, first_name, last_name, email, role_title, hub_enrolled, hub_login_date, building_id')
-      .eq('partnership_id', partnershipId);
+      .eq('partnership_id', partnershipId)
+      // Only people who still work there.
+      //
+      // Without this, every denominator on the dashboard counted departed staff.
+      // Saunemin's setup card read "29 educators on your roster" while its year
+      // tab read 27, because two rows are deactivated. Tidioute read 3 after a
+      // duplicate was removed, when the school has two para-educators.
+      //
+      // It also quietly deflates every percentage: activation is active people
+      // over roster size, so a leaver makes a school look worse forever.
+      .eq('is_active', true);
 
     // Live from the Hub. Null means the Hub could not be reached, in which case
     // we fall back to the once-a-day column rather than claiming nobody is active.
