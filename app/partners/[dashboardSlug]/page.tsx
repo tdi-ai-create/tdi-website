@@ -1603,7 +1603,17 @@ export default function PartnerDashboard() {
     // Funding only appears when this school actually has a live pursuit.
     // It used to live inside Our Partnership, which Rae wants kept on goals.
     ...(funding?.hasFunding ? [{ id: 'funding', label: 'Funding' }] : []),
-    { id: 'next-year', label: 'Next Year', badge: true },
+    // Next Year is a placeholder that says "once your partnership is underway
+    // and we've collected baseline data, this space will transform into your
+    // personalized growth plan". It is the right thing to show a school in
+    // month one and the wrong thing to show a school in year two, which read
+    // as us not having started. It also wore the only "New" badge on the strip,
+    // so it pulled the eye to the emptiest tab on the page.
+    //
+    // A school that has a proposal year already has that content for real, with
+    // its own tab and its own badge, so the placeholder is retired the moment
+    // the real thing exists. Rae, 30 September 2026.
+    ...(semesterList.some(sem => sem.is_proposal) ? [] : [{ id: 'next-year', label: 'Next Year', badge: true }]),
     // Districts only. The panel this selects has existed for months and was
     // unreachable the entire time, because TABS never carried a 'schools'
     // entry and activeTab could therefore never hold that value. Every
