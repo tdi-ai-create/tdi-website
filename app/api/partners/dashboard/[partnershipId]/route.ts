@@ -129,6 +129,160 @@ export interface HubEngagementDetail {
 }
 
 const ENGAGEMENT_WINDOW_DAYS = 90;
+
+/**
+ * The five areas a Vibe Check asks about.
+ *
+ * Four are scored 1 to 5 and higher is better. `needs` is not scored at all: it
+ * is a word choice, and it is arguably the most useful of the five to a leader
+ * because it is the only one where staff say what they want rather than how
+ * they feel.
+ *
+ * Never "Wellbeing" in anything a person reads. Always Vibe Check.
+ */
+const VIBE_AREAS = [
+  { key: 'mood', label: 'Mood', blurb: 'How the day is actually going' },
+  { key: 'energy', label: 'Energy', blurb: 'What is left in the tank' },
+  { key: 'belonging', label: 'Belonging', blurb: 'Whether this feels like their place' },
+  { key: 'purpose', label: 'Purpose', blurb: 'Whether the work still means something' },
+] as const;
+
+/**
+ * Below this many people, an area reports no average.
+ *
+ * Two reasons, and the second is the one that matters. A mean of one answer is
+ * not a measurement. And in a school where the leader knows everybody, a single
+ * response is that person's private answer with a number on it, which breaks
+ * the promise that a leader sees the school and never the individual.
+ */
+const VIBE_MIN_PEOPLE = 3;
+
+export interface VibeArea {
+  key: string;
+  label: string;
+  blurb: string;
+  /** Average out of 5. Null when fewer than VIBE_MIN_PEOPLE have answered. */
+  avg: number | null;
+  people: number;
+  responses: number;
+  /** Month by month, oldest first, for the trend line. */
+  trend: { month: string; avg: number; responses: number }[];
+}
+
+export interface VibeCheckDetail {
+  areas: VibeArea[];
+  /** What staff said they need, most chosen first. Never scored. */
+  needs: { word: string; count: number }[];
+  /** Distinct people who have completed any check, across all five areas. */
+  people: number;
+  responses: number;
+  lastAt: string | null;
+  /** True when the Hub could not be reached, so a zero is not read as a real zero. */
+  unknown: boolean;
+}
+
+/**
+ * Every Vibe Check this school's staff have completed, by area and by month.
+ *
+ * Rae, 1 October 2026: all five areas on the current year tab, with quick
+ * insight and progress across the year.
+ *
+ * Aggregate only. Individual results are private to the educator and no name
+ * leaves this function, because the moment a leader can read one person's score
+ * the staff stop answering honestly and the number stops being worth having.
+ */
+async function vibeCheckDetail(profileIds: string[]): Promise<VibeCheckDetail> {
+  const empty: VibeCheckDetail = {
+    areas: VIBE_AREAS.map(a => ({ ...a, avg: null, people: 0, responses: 0, trend: [] })),
+    needs: [],
+    people: 0,
+    responses: 0,
+    lastAt: null,
+    unknown: false,
+  };
+  if (profileIds.length === 0) return empty;
+
+  const hub = getHubSupabase();
+  if (!hub) return { ...empty, unknown: true };
+
+  const { data: rows, error } = await hub
+    .from('hub_assessments')
+    .select('user_id, question_category, stress_score, response_text, created_at')
+    .in('user_id', profileIds)
+    .eq('type', 'daily_check_in')
+    .order('created_at', { ascending: true });
+
+  if (error) {
+    console.error('[partners/dashboard] vibe check detail failed:', error.message);
+    return { ...empty, unknown: true };
+  }
+
+  const everyone = new Set<string>();
+  let lastAt: string | null = null;
+  const needCounts = new Map<string, number>();
+  const byArea = new Map<string, { scores: number[]; people: Set<string>; months: Map<string, number[]> }>();
+
+  for (const row of rows || []) {
+    const uid = String(row.user_id);
+    everyone.add(uid);
+    lastAt = row.created_at as string;
+
+    const cat = String(row.question_category || '');
+
+    if (cat === 'needs') {
+      const word = (row.response_text || '').trim().toLowerCase();
+      if (word) needCounts.set(word, (needCounts.get(word) || 0) + 1);
+      continue;
+    }
+
+    const score = typeof row.stress_score === 'number' ? row.stress_score : null;
+    if (score === null) continue;
+
+    const entry = byArea.get(cat) || { scores: [], people: new Set<string>(), months: new Map<string, number[]>() };
+    entry.scores.push(score);
+    entry.people.add(uid);
+    // Month key built from the parts, never parsed, so a check-in on the first
+    // of a month is not filed under the previous one in a western timezone.
+    const d = new Date(row.created_at as string);
+    const mk = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    if (!entry.months.has(mk)) entry.months.set(mk, []);
+    entry.months.get(mk)!.push(score);
+    byArea.set(cat, entry);
+  }
+
+  const round1 = (n: number) => Math.round(n * 10) / 10;
+
+  const areas: VibeArea[] = VIBE_AREAS.map(a => {
+    const e = byArea.get(a.key);
+    if (!e || e.scores.length === 0) return { ...a, avg: null, people: 0, responses: 0, trend: [] };
+    const enough = e.people.size >= VIBE_MIN_PEOPLE;
+    return {
+      ...a,
+      avg: enough ? round1(e.scores.reduce((x, y) => x + y, 0) / e.scores.length) : null,
+      people: e.people.size,
+      responses: e.scores.length,
+      trend: (enough ? [...e.months.entries()] : [])
+        .sort((x, y) => x[0].localeCompare(y[0]))
+        .map(([month, scores]) => ({
+          month,
+          avg: round1(scores.reduce((x, y) => x + y, 0) / scores.length),
+          responses: scores.length,
+        })),
+    };
+  });
+
+  return {
+    areas,
+    needs: [...needCounts.entries()]
+      .map(([word, count]) => ({ word, count }))
+      .sort((a, b) => b.count - a.count || a.word.localeCompare(b.word))
+      .slice(0, 10),
+    people: everyone.size,
+    responses: (rows || []).length,
+    lastAt,
+    unknown: false,
+  };
+}
 const ACTIVITY_ROW_CAP = 5000;
 
 /**
@@ -411,6 +565,7 @@ export async function GET(
     // What the team is actually working on. Same roster, same matching by email,
     // so this panel can never disagree with the login count above it.
     let engagement: HubEngagementDetail | null = null;
+    let vibe: VibeCheckDetail | null = null;
     const hubForIds = getHubSupabase();
     if (hubForIds && rosterEmails.length > 0) {
       const { data: idRows, error: idError } = await hubForIds
@@ -431,7 +586,9 @@ export async function GET(
           const b = buildingByEmail.get(String(r.email || '').toLowerCase());
           if (b) buildingByProfile.set(String(r.id), b);
         }
-        engagement = await hubEngagementDetail((idRows || []).map(r => String(r.id)), buildingByProfile);
+        const ids = (idRows || []).map(r => String(r.id));
+        engagement = await hubEngagementDetail(ids, buildingByProfile);
+        vibe = await vibeCheckDetail(ids);
       }
     }
 
@@ -451,6 +608,76 @@ export async function GET(
       // So a reader can tell a real zero from the Hub being unreachable.
       hubLoginSource: activeEmails ? 'live' : 'daily_sync',
     };
+
+    /* ─── WHAT ACTIVATION LOOKS LIKE AT A TYPICAL PARTNER SCHOOL ───
+       Rae, 1 October 2026. Every dashboard quoted the 10% industry average from
+       research and never our own fleet, which is the more credible number and
+       was already in the database. Saunemin saw 44% with no idea that is
+       mid-pack; St Mary saw 83% with no idea it is the best we have.
+
+       Computed here rather than stored, so it needs no data entry per client and
+       keeps working as the fleet grows. Counted across partnerships with a real
+       roster only, because a school with nobody on its roster would drag the
+       median to nothing and say more about our onboarding than about anyone's
+       engagement. Suppressed below four schools: a median of two is not a
+       benchmark, it is a coin toss. */
+    /* What activation looks like at a typical partner school.
+       Named typicalActivation and not "cohort", because Cohort is the name of a
+       TDI offering and reusing it for a statistic made Rae think a client had
+       bought one. Nothing here touches that product.
+
+       Only the median leaves this function.
+       Rae, 1 October 2026: "we should not say the # of schools at all! we do not
+       tell other school buildings how many other schools we work with or their
+       names". My first version printed "across the 8 schools we run", which is
+       an internal figure. The school count, the ranking and the best performer
+       are all computed below because the median needs them, and none of them is
+       returned, so a future change cannot surface one by accident. */
+    let typicalActivation: { median: number } | null = null;
+    try {
+      const { data: peers } = await supabase
+        .from('partnerships')
+        .select('id, status')
+        .neq('status', 'completed');
+      const peerIds = (peers || []).map(p => String(p.id));
+      if (peerIds.length > 0) {
+        const { data: peerStaff } = await supabase
+          .from('staff_members')
+          .select('partnership_id, email')
+          .in('partnership_id', peerIds)
+          .eq('is_active', true);
+        const rosterByPartnership = new Map<string, string[]>();
+        for (const r of peerStaff || []) {
+          if (!r.email) continue;
+          const k = String(r.partnership_id);
+          if (!rosterByPartnership.has(k)) rosterByPartnership.set(k, []);
+          rosterByPartnership.get(k)!.push(r.email.toLowerCase());
+        }
+        const allEmails = [...rosterByPartnership.values()].flat();
+        const activeAcrossFleet = await emailsActiveInHub(allEmails);
+        if (activeAcrossFleet) {
+          const rates: { id: string; rate: number }[] = [];
+          for (const [pid, emails] of rosterByPartnership) {
+            if (emails.length === 0) continue;
+            const live = emails.filter(e => activeAcrossFleet.has(e)).length;
+            rates.push({ id: pid, rate: Math.round((live / emails.length) * 100) });
+          }
+          if (rates.length >= 4) {
+            const sorted = [...rates].sort((a, b) => a.rate - b.rate);
+            const mid = Math.floor(sorted.length / 2);
+            const median = sorted.length % 2
+              ? sorted[mid].rate
+              : Math.round((sorted[mid - 1].rate + sorted[mid].rate) / 2);
+            const ranked = [...rates].sort((a, b) => b.rate - a.rate);
+            // Deliberately median only. See the note above.
+            void ranked;
+            typicalActivation = { median };
+          }
+        }
+      }
+    } catch (err) {
+      console.error('[partners/dashboard] typical activation failed:', err);
+    }
 
     // Get latest metric snapshots
     const { data: metricSnapshots } = await supabase
@@ -552,6 +779,8 @@ export async function GET(
       // dashboard. It is their roster, and they already hold these addresses.
       staffMembers: (staffMembers || []).map(s => ({ id: s.id, name: `${s.first_name || ''} ${s.last_name || ''}`.trim(), email: s.email, role: s.role_title, hubActive: isActive(s), buildingId: s.building_id ?? null })),
       engagement,
+      vibe,
+      typicalActivation,
       metricSnapshots: Object.values(latestMetrics),
       buildings: buildings || [],
       activityLog: activityLog || [],

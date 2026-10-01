@@ -43,7 +43,26 @@ export interface SemesterRecordData {
   metrics?: Record<string, unknown> | null;
   highlights?: unknown[] | null;
   para_quotes?: { quote?: string; text?: string; para?: string; school?: string; building?: string; role?: string }[] | null;
-  observation_notes?: unknown[] | null;
+  /**
+   * What we saw on the days we were in the building.
+   *
+   * Declared and typed since the record was built, and rendered nowhere until
+   * 1 October 2026. Across the fleet roughly 44 Love Notes have been written,
+   * 25 at St Peter Chanel in a single day, and none of it reached a dashboard.
+   * The strongest craft TDI produces was the least visible part of the product.
+   */
+  observation_notes?: {
+    date?: string;
+    title?: string;
+    label?: string;
+    note?: string;
+    body?: string;
+    text?: string;
+    building?: string;
+    school?: string;
+    observed?: number;
+    love_notes?: number;
+  }[] | null;
   timeline_events?: { date?: string; label?: string; title?: string; notes?: string; status?: string }[] | null;
 }
 
@@ -105,6 +124,9 @@ export function SemesterRecord({
   const hero = data.hero || null;
   const highlights = (data.highlights || []).filter(h => typeof h === 'string') as string[];
   const quotes = (data.para_quotes || []).filter(q => quoteText(q));
+  const obsNoteText = (n: { note?: string; body?: string; text?: string }) =>
+    (n.note || n.body || n.text || '').trim();
+  const observations = (data.observation_notes || []).filter(n => obsNoteText(n) || n.title || n.label);
   const timeline = data.timeline_events || [];
   const included = (data.solutions || []).filter(s => s.kind === 'included');
   const addons = (data.solutions || []).filter(s => s.kind !== 'included');
@@ -241,6 +263,44 @@ export function SemesterRecord({
           )}
         </div>
       ))}
+
+      {observations.length > 0 && (
+        <div className="bg-white rounded-2xl p-6 md:p-7 shadow-sm border border-gray-100">
+          <h2 className="text-[15px] font-bold text-[#1e2749] tracking-tight">What we saw in your building</h2>
+          <p className="text-xs text-gray-500 mt-1.5">
+            From the days we were on site. Nothing here is evaluation and none of it sits in anyone&apos;s file.
+          </p>
+          <div className="flex flex-col gap-3 mt-4">
+            {observations.map((n, i) => {
+              const where = n.building || n.school;
+              const counts = [
+                typeof n.observed === 'number' ? `${n.observed} observed` : null,
+                typeof n.love_notes === 'number' ? `${n.love_notes} Love Notes` : null,
+              ].filter(Boolean).join(' · ');
+              return (
+                <div key={i} className="rounded-xl p-4" style={{ background: '#E8F0FD' }}>
+                  <div className="flex items-baseline justify-between gap-3 flex-wrap">
+                    <p className="text-[13.5px] font-bold text-[#1e2749]">{n.title || n.label}</p>
+                    {n.date && (
+                      <span className="text-[11.5px] text-gray-500 tabular-nums whitespace-nowrap">
+                        {formatRecordDate(n.date, { month: 'short', day: 'numeric', year: 'numeric' })}
+                      </span>
+                    )}
+                  </div>
+                  {(where || counts) && (
+                    <p className="text-[11.5px] text-gray-500 mt-0.5">
+                      {[where, counts].filter(Boolean).join(' · ')}
+                    </p>
+                  )}
+                  {obsNoteText(n) && (
+                    <p className="text-[13.5px] text-[#1e2749] leading-relaxed mt-2 max-w-[72ch]">{obsNoteText(n)}</p>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {quotes.length > 0 && (
         <div className="bg-white rounded-2xl p-6 md:p-7 shadow-sm border border-gray-100">
