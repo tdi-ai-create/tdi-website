@@ -96,6 +96,11 @@ Schools, Team. The story, then the people.
   nobody assigned it.
 - **L3.9** The roster is the denominator and reconciles to the seat list both ways.
 - **L3.10** A building with no staff mapping says so and says what would fix it.
+  A building with a mapping shows its own figures, and opens into its own people
+  and its own content. Never an indicator fed a hardcoded null: every building on
+  every dashboard read "Awaiting Data" for months because of exactly that.
+- **L3.10a** Content inside a school panel is reported as a share of that
+  school's team, never a headcount. In a building of one, "1 person" names them.
 - **L3.11** A report is locked only by a rolling measure, and the lock tells the
   truth.
 - **L3.12** Every offer is a real TDI service. An unused contracted deliverable
@@ -156,7 +161,10 @@ Schools, Team. The story, then the people.
 - **L7.3** Label every claim measured, derived, or unverified.
 - **L7.4** Sweep the whole surface, not only the reported defect.
 - **L7.5** Deploy names the project explicitly.
-- **L7.6** A rule worth keeping becomes a gate.
+- **L7.6** A rule worth keeping becomes a gate. `npm run check:quarantine` is
+  the first one built from this document: it fails when changed code reads a
+  quarantined field without a `quarantine-ok` comment. It caught two real errors
+  within an hour of existing, one of them mine.
 
 ---
 
@@ -191,10 +199,11 @@ These return a number and must never reach a client-facing figure.
 
 | Field | What it actually is | Use instead |
 |---|---|---|
+| `hub_profiles.partnership_slug` | Not the link between a person and a partnership. Filled in inconsistently, nothing keeps it current | The roster table, matched on lowercased email |
 | `hubStats.logins_this_month` | Sign ins since the first of the calendar month | `engagement.activeThisMonth` |
 | `hubStats.hub_login_pct` | The above over provisioned seats | Same arithmetic as Team Activation |
 | `hubStats.quick_wins_completed` | An action the Hub never writes. Always 0 | `engagement.distinctContent` |
-| `staff_members.hub_login_date` | Nothing writes it. Always empty | Hub activity, read live |
+| `staff_members.hub_login_date` | Written daily by a cron, so it lags up to 24 hours. Two teachers signed in during their own onboarding call and showed as never having logged in | Hub activity read live, this only as a fallback |
 | `hub_user_goals` | Dead table | `hub_profiles.onboarding_data` |
 
 - **L8.1** Cross-database facts join on lowercased email, in code, never as an
@@ -259,7 +268,7 @@ still shows the generic plan tab and the Next Year placeholder.
 |---|---|---|---|---|---|---|
 | st-mary-catholic-school | School | 4 | 0 | 12 | **Three goals render 0%** | 1 |
 | allenwood-elementary | School | 4 | 0 | 0 | **Roster empty.** Every denominator zero | 2 |
-| glen-ellyn-d41 | District | 4 | 0 | 9 | One goal 0%. Roster 9 vs 19 known accounts. District with no buildings | 3 |
+| glen-ellyn-d41 | District | 4 | **2** | 9 | **Resolved 1 Oct.** Churchill and Hadley created and staffed, roster verified at 9 against 9 working accounts, roles corrected, zero cleared, both year tabs built. One para still has no name on file | Done |
 | st-peter-chanel | School | 4 | 0 | 30 | One goal renders 0% | 4 |
 | saunemin-ccsd-438 | School | 4 | 0 | 25 | Two seat holders on no roster | 5 |
 | tidioute-community-charter | School | 0 | 0 | 3 | No goals at all | 6 |
@@ -267,13 +276,18 @@ still shows the generic plan tab and the Next Year placeholder.
 | roosevelt-school | School | 4 | 0 | 17 | Fleet-wide placeholder tabs only | 8 |
 | addison-sd4 | District | 3 | 3 | 149 | Reference implementation | Ref |
 
-Five of nine have a goal rendering a literal zero to a client, or no goals at all.
+Glen Ellyn was resolved on 1 October and is the worked example of the loop. Four
+of the remaining eight have a goal rendering a literal zero to a client, or no
+goals at all.
 The rendering code deliberately distinguishes unmeasured from zero; these rows
 were stored as zero by hand. It is a data edit, not a deploy.
 
 ## Appendix C. Decisions needed
 
-1. Do the five zero-value goals become empty, or do we take real baselines first?
+1. Do the four remaining zero-value goals become empty, or do we take real
+   baselines first? Glen Ellyn's was cleared by checking the instrument: its
+   target reads Quick Win responses and the team has submitted none, so nobody
+   had been measured and the stored zero was never a reading.
 2. Does every partnership get year tabs, or only those with a stored prior year?
 3. Is the proposed-year tab standard in every renewal window, or only where we
    intend to pitch?
