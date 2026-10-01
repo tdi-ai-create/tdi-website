@@ -3588,10 +3588,48 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                 agrees with the export. Rae approved 27 September 2026. */}
             {partnershipKpis.length > 0 ? (
               <div className="bg-white rounded-2xl px-5 py-5 md:px-7 md:py-6 shadow-sm border border-gray-100">
-                <div className="flex items-baseline justify-between gap-4 flex-wrap pb-3.5 border-b border-gray-200">
-                  <h2 className="text-[17px] font-bold text-[#1e2749] tracking-tight">Your Goals</h2>
-                  <span className="text-xs text-gray-400">Written with you on your onboarding call</span>
-                </div>
+                {/* A goal can be a suggestion before it is a commitment.
+                    Rae, 1 October 2026, on Tidioute: their onboarding meeting has
+                    not been booked, so they had no goals and an empty card. Rather
+                    than wait on a calendar gap, we propose goals from what their
+                    own staff are already doing and say plainly that they are
+                    proposals.
+
+                    Derived from the stored status, never set by hand here, so the
+                    moment the meeting happens and the goals are marked active this
+                    whole banner disappears with no copy to rewrite. */}
+                {(() => {
+                  const suggested = partnershipKpis.filter(k => k.status === 'suggested').length;
+                  const allSuggested = suggested > 0 && suggested === partnershipKpis.length;
+                  return (
+                    <>
+                      <div className="flex items-baseline justify-between gap-4 flex-wrap pb-3.5 border-b border-gray-200">
+                        <div className="flex items-center gap-2.5 flex-wrap">
+                          <h2 className="text-[17px] font-bold text-[#1e2749] tracking-tight">Your Goals</h2>
+                          {suggested > 0 && (
+                            <span
+                              className="text-[10px] font-bold uppercase tracking-[0.07em] px-2 py-1 rounded-full"
+                              style={{ background: 'rgba(232,184,75,0.22)', color: '#7a5600' }}
+                            >
+                              {allSuggested ? 'Suggested' : `${suggested} suggested`}
+                            </span>
+                          )}
+                        </div>
+                        <span className="text-xs text-gray-400">
+                          {allSuggested ? 'Yours to confirm at your onboarding meeting' : 'Written with you on your onboarding call'}
+                        </span>
+                      </div>
+
+                      {suggested > 0 && (
+                        <p className="text-[13px] leading-relaxed text-gray-600 max-w-[72ch] mt-3.5">
+                          {allSuggested
+                            ? 'Nothing here is decided. These are what we would propose, based on what your team has already been doing in the Hub rather than on what we think a school like yours should want. Bring them to your onboarding meeting, change any of them, and we will set the numbers together.'
+                            : 'The goals marked as suggestions are proposals rather than commitments, based on what your team has already been doing. Confirm or change them whenever suits you.'}
+                        </p>
+                      )}
+                    </>
+                  );
+                })()}
 
                 {partnershipKpis.map((kpi) => {
                   const progress = goalProgress(kpi);

@@ -330,7 +330,11 @@ export async function GET(
       .from('partnership_kpis')
       .select('kpi_key, kpi_label, target_value, target_unit, current_value, benchmark_low, benchmark_high, benchmark_label, data_source, how_tdi_delivers, deeper_measurement, suggested_offering, status')
       .eq('partnership_id', partnershipId)
-      .eq('status', 'active')
+      // Suggestions reach the page too. A goal proposed before a school's
+      // onboarding meeting is still something they should be able to read and
+      // argue with, and the card badges it as a suggestion rather than showing
+      // it as a commitment. Paused, achieved and at_risk stay out.
+      .in('status', ['active', 'suggested'])
       .order('sort_order');
 
     // Check-ins feeding those goals, with how many people have answered.
