@@ -30,6 +30,17 @@ export default function RosterAccessManager({ partnershipId, baseStaffEnrolled, 
   const contractedSeats = baseStaffEnrolled || 999;
   const hubCount = hubChecked.size;
   const seatsRemaining = Math.max(0, contractedSeats - hubCount);
+  // How many people have access beyond the contracted number.
+  //
+  // The clamp above means a school over its number computed to a negative and
+  // displayed as zero, so Saunemin, with 27 assigned against 23 contracted, was
+  // told it had "0 of 23 remaining". That reads as a hard cap and as a refusal,
+  // and TDI's policy is not to ration against the contracted figure.
+  //
+  // It is also the wrong way round. A school that gave access to more people
+  // than it paid for is a school leaning in, and St Peter Chanel's own record
+  // calls exactly that "3 above contracted" as a point of pride.
+  const seatsBeyondContract = Math.max(0, hubCount - contractedSeats);
   const overContract = hubCount > contractedSeats;
 
   useEffect(() => {
@@ -157,7 +168,15 @@ export default function RosterAccessManager({ partnershipId, baseStaffEnrolled, 
           )}
         </div>
         <p className="text-xs text-gray-500">
-          Assign Hub memberships ({contractedSeats === 999 ? 'unlimited' : `${seatsRemaining} of ${contractedSeats} remaining`}) and complimentary blog access for your team.
+          Assign Hub memberships ({
+            contractedSeats === 999
+              ? 'unlimited'
+              : seatsBeyondContract > 0
+                ? `all ${contractedSeats} assigned, plus ${seatsBeyondContract} more at no extra cost`
+                : seatsRemaining === 0
+                  ? `all ${contractedSeats} assigned`
+                  : `${seatsRemaining} of ${contractedSeats} remaining`
+          }) and complimentary blog access for your team.
         </p>
         {overContract && (
           <p className="text-xs text-amber-700 bg-amber-50 px-3 py-1.5 rounded-lg mt-2">
