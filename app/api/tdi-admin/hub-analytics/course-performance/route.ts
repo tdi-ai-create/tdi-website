@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { requireAdminAuth } from '@/lib/tdi-admin/auth';
+import { testAccountIds } from '@/lib/hub/reporting-accounts';
 
 let cachedSupabase: ReturnType<typeof createClient> | null = null;
 
@@ -16,10 +17,6 @@ function getSupabaseAdmin() {
 }
 
 // Filter out test accounts by email pattern
-function isTestAccount(email: string | null): boolean {
-  if (!email) return false;
-  return /test|demo|example\.com|@tdi\.internal/i.test(email);
-}
 
 interface Enrollment {
   id: string;
@@ -91,13 +88,6 @@ export async function GET(request: NextRequest) {
       supabase.from('hub_lesson_progress').select('*').limit(50000),
     ]);
 
-    // Get user emails for filtering test accounts
-    const { data: authUsers } = await supabase.auth.admin.listUsers({ perPage: 5000 });
-    const userEmailMap = new Map<string, string>();
-    authUsers?.users?.forEach(u => {
-      if (u.email) userEmailMap.set(u.id, u.email);
-    });
-
     const allEnrollments = (enrollmentsRes.data || []) as Enrollment[];
     const courses = (coursesRes.data || []) as Course[];
     const allProfiles = (profilesRes.data || []) as Profile[];
@@ -107,10 +97,12 @@ export async function GET(request: NextRequest) {
 
     const courseMap = new Map(courses.map(c => [c.id, c]));
 
-    // Filter out test accounts
+    // Exclude internal accounts. See lib/hub/reporting-accounts.
+    const testAccounts = await testAccountIds(supabase);
+
     const validUserIds = new Set(
       allProfiles
-        .filter(p => !isTestAccount(userEmailMap.get(p.id) || null))
+        .filter(p => !testAccounts.has(p.id))
         .map(p => p.id)
     );
 

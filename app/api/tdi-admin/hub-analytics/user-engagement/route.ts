@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { requireAdminAuth } from '@/lib/tdi-admin/auth';
+import { testAccountIds } from '@/lib/hub/reporting-accounts';
 
 let cachedSupabase: ReturnType<typeof createClient> | null = null;
 
@@ -15,10 +16,6 @@ function getSupabaseAdmin() {
   return cachedSupabase;
 }
 
-function isTestAccount(email: string | null): boolean {
-  if (!email) return false;
-  return /test|demo|example\.com|@tdi\.internal/i.test(email);
-}
 
 interface Profile {
   id: string;
@@ -106,10 +103,12 @@ export async function GET(request: NextRequest) {
     const organizations = (orgsRes.data || []) as Organization[];
     const staffMembers = (staffRes.data || []) as StaffMember[];
 
-    // Filter out test accounts
+    // Exclude internal accounts. See lib/hub/reporting-accounts.
+    const testAccounts = await testAccountIds(supabase);
+
     const validUserIds = new Set(
       allProfiles
-        .filter(p => !isTestAccount(userEmailMap.get(p.id) || null))
+        .filter(p => !testAccounts.has(p.id))
         .map(p => p.id)
     );
 

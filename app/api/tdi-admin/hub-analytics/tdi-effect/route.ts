@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { requireAdminAuth } from '@/lib/tdi-admin/auth';
+import { testAccountIds } from '@/lib/hub/reporting-accounts';
 
 let cachedSupabase: ReturnType<typeof createClient> | null = null;
 
@@ -15,10 +16,6 @@ function getSupabaseAdmin() {
   return cachedSupabase;
 }
 
-function isTestAccount(email: string | null): boolean {
-  if (!email) return false;
-  return /test|demo|example\.com|@tdi\.internal/i.test(email);
-}
 
 interface SurveyResponse {
   id: string;
@@ -84,23 +81,18 @@ export async function GET(request: NextRequest) {
       supabase.from('hub_profiles').select('id, onboarding_data').limit(5000),
     ]);
 
-    // Get user emails for filtering test accounts
-    const { data: authUsers } = await supabase.auth.admin.listUsers({ perPage: 5000 });
-    const userEmailMap = new Map<string, string>();
-    authUsers?.users?.forEach(u => {
-      if (u.email) userEmailMap.set(u.id, u.email);
-    });
-
     const allSurveys = (surveysRes.data || []) as SurveyResponse[];
     const allSnapshots = (snapshotsRes.data || []) as MetricSnapshot[];
     const partnerships = (partnershipsRes.data || []) as Partnership[];
     const organizations = (orgsRes.data || []) as Organization[];
     const allProfiles = (profilesRes.data || []) as Profile[];
 
-    // Filter out test accounts from profiles
+    // Exclude internal accounts. See lib/hub/reporting-accounts.
+    const testAccounts = await testAccountIds(supabase);
+
     const validUserIds = new Set(
       allProfiles
-        .filter(p => !isTestAccount(userEmailMap.get(p.id) || null))
+        .filter(p => !testAccounts.has(p.id))
         .map(p => p.id)
     );
 
