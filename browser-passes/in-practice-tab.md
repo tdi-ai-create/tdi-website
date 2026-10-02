@@ -6,7 +6,41 @@ A new In Practice tab on the partner dashboard, behind `IN_PRACTICE_TAB`, where
 a leader assigns a Hub tool to named staff and has to name the goal it serves.
 Plus two new API routes and three new Hub tables.
 
-## The screen was not driven
+## Opened on production by Rae, 2 October 2026
+
+The flag was set on the `teachersdeserveit` project and production redeployed.
+Rae opened her own dashboard signed in as a TDI admin and sent screenshots. These
+are her observations, recorded by me, because the Chrome session available to me
+is not authenticated and I could not open the page myself.
+
+- Opened: https://www.teachersdeserveit.com/partners/addison-sd4
+- Saw: the tab strip reading "Overview, 2025-2026 COMPLETE, 2026-2027 LIVE,
+  2027-2028 PROPOSED, In Practice, Reports, Schools, Team". In Practice sits
+  between 2027-2028 and Reports, which is where the TABS entry puts it.
+- Pressed: the "In Practice" tab
+- Saw: the panel headed "Where things stand" with the line "Nothing has been
+  assigned yet. Once something is, every goal you assign against shows how far
+  your team has got with it, from read it to using it regularly."
+- Saw: three goals listed, each with a count and a target read from the live
+  database. "Staff actively using the Hub", 0 assigned, target 100%.
+  "De-escalation strategies in practice", 0 assigned, target 85%. "Para and
+  teacher working relationship", 0 assigned and no target shown, which is correct
+  because that goal has no target value.
+- Saw: all three carrying "Assignments do not move this number. It is measured
+  another way." That is A9.4 rendering correctly, and it is correct for all three
+  today because `measured_by_assignment` defaults to false and no goal has been
+  turned on yet.
+
+A defect Rae found immediately, which the deferred pass existed to catch: the
+assign panel shipped without the three doors, and with a placeholder tool
+hardcoded in the request body, so pressing Assign would have assigned
+"No-Hands-Up Help Systems" whatever the leader intended. Nothing was assigned.
+Fixed in the same session by adding the three doors and a real picker over all
+four content types.
+
+## Still not seen
+
+
 
 Nobody has rendered the panel. Not the tab, not the three blocked states, not the
 goal readings, not the people picker at Addison's 149 names. No control on it has
@@ -20,14 +54,13 @@ into a live service from here. The login form is in the DOM, two inputs and one
 form, and does not paint at any scroll position locally, so credentials would not
 have helped either.
 
-- Deferred: the partner dashboard cannot be signed in to locally, and the local
-  login form does not render.
-- Verify after deploy: open a real partner dashboard with `IN_PRACTICE_TAB` set,
-  starting with https://www.teachersdeserveit.com/partners/tidioute-community-charter
-  because its blocked state has the most on screen, then
-  `/partners/allenwood-elementary-2627`, `/partners/oak-grove-sd-68` and
-  `/partners/addison-sd4` for the 149 name picker. Write the `Pressed:` and
-  `Saw:` lines into this file.
+Three screens remain unobserved, all of them blocked states that only appear at
+particular schools:
+https://www.teachersdeserveit.com/partners/tidioute-community-charter (three
+unaccepted goals with accept buttons), `/partners/allenwood-elementary-2627`
+(nobody on the roster) and `/partners/oak-grove-sd-68` (no goals at all). So is
+the three door picker added after this pass, and the 149 name search at
+`/partners/addison-sd4`.
 
 ## What was driven instead, which is not the screen
 
