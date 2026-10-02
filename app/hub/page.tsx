@@ -17,6 +17,7 @@ import CommunityBookmarks from '@/components/hub/CommunityBookmarks';
 import DashboardInsight from '@/components/hub/DashboardInsight';
 import AchievementInsights from '@/components/hub/AchievementInsights';
 import { QuizResultBadge } from '@/components/hub/QuizEngine';
+import { categoryLabel } from '@/lib/hub/categories';
 // PolaroidCard shelved for now
 // import SortableDashboardSection from '@/components/hub/SortableDashboardSection';
 // dnd-kit imports shelved for draggable sections feature
@@ -1236,7 +1237,7 @@ export default function HubDashboard() {
                         "CLASSROOM-MANAGEMENT" directly above a band showing
                         "CLASSROOM MANAGEMENT". Quick Wins store prose, which is
                         why only this band had the problem. */}
-                    {tUI(course.category.replace(/-/g, ' '))}
+                    {tUI(categoryLabel(course.category))}
                   </span>
                   <span style={{ fontSize: 14.5, fontWeight: 700, color: '#1e2749', lineHeight: 1.3 }}>
                     {course.title}

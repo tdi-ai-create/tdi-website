@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { Check, Lock, Sparkles, Heart } from 'lucide-react';
 import { useMembership, ContentAccess } from '@/lib/hub/use-membership';
 import { useTranslation } from '@/lib/hub/useTranslation';
+import { categoryLabel } from '@/lib/hub/categories';
 
 // Category colors - elevated design
 const CATEGORY_COLORS: Record<string, { bar: string; bg: string; text: string }> = {
@@ -185,7 +186,7 @@ export default function CourseCard({
             fontFamily: "'DM Sans', sans-serif",
           }}
         >
-          {(course.category || 'General').replace(/-/g, ' ').replace(/&/g, '&').replace(/\b\w/g, c => c.toUpperCase())}
+          {categoryLabel(course.category) || 'General'}
         </span>
 
         {/* Title */}
