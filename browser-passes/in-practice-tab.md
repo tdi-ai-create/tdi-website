@@ -6,78 +6,64 @@ A new In Practice tab on the partner dashboard, behind `IN_PRACTICE_TAB`, where
 a leader assigns a Hub tool to named staff and has to name the goal it serves.
 Plus two new API routes and three new Hub tables.
 
-## What I did
+## The screen was not driven
 
-Local dev server, this worktree, `IN_PRACTICE_TAB` unset:
+Nobody has rendered the panel. Not the tab, not the three blocked states, not the
+goal readings, not the people picker at Addison's 149 names. No control on it has
+been pressed, so this record carries no `Pressed:` or `Saw:` lines, because
+writing one would be inventing it.
 
-- Opened: http://127.0.0.1:8799/api/hub/my-assignments
-- Saw: HTTP 404 and the body `{"error":"Not enabled"}`
-- Opened: http://127.0.0.1:8799/api/partners/assignments?partnershipId=x
-- Saw: HTTP 404
-
-Restarted with `IN_PRACTICE_TAB=true` in `.env.local`:
-
-- Opened: http://127.0.0.1:8799/api/hub/my-assignments
-- Saw: HTTP 401 and the body `{"error":"Not signed in"}`
-- Opened: http://127.0.0.1:8799/api/partners/assignments?partnershipId=x
-- Saw: `{"error":"Not signed in"}`
-
-So the flag gates both routes, and with it on they refuse an unauthenticated
-caller rather than answering.
-
-- Opened: http://127.0.0.1:8799/partners/saunemin-ccsd-438
-- Saw: redirected to `/partners/login`, title "Partner Portal | Teachers Deserve It"
-
-Against the live databases, after applying both migrations:
-
-- Ran: a count of `hub_assignment%` tables, indexes and RLS in the Hub project
-- Saw: `tables 3, indexes 8, rls_on 3, rows_in_assignments 0, rows_in_answers 0,
-  rows_in_followups 0`
-- Ran: the same for the new column in the portal project
-- Saw: `column_exists 1, goals_total 30, turned_on 0, accepted_goals 27`
-
-Before applying, inside a transaction with no commit:
-
-- Ran: the portal migration, then a check that the column had gone after rollback
-- Saw: `column_exists_after_rollback 0`, so the dry run was genuinely a dry run
-- Ran: `insert into _probe values ('Marcy.Ellison@School.ORG')` against the same
-  check constraint the real table carries
-- Saw: `ERROR: 23514 ... violates check constraint "_probe_recipient_email_check"`,
-  so A7.3 is enforced by the database rather than only by the route
-
-## What I did not press
-
-Nothing was assigned to anybody. Creating an assignment writes a row naming a
-real member of staff at a real school and is the thing the email path will later
-read, so it waits until there is a dry run output to read first.
-
-No goal had `measured_by_assignment` turned on. That is twenty minutes of
-judgement per A9.3 and it is Rae's call which goals qualify, not a side effect of
-a browser pass.
-
-## What I could not verify
-
-**The panel itself has not been rendered.** The partner dashboard redirects to
-`/partners/login` and authenticates against the live Supabase project, so there
-is no account I can use locally, and I will not enter real credentials for a live
-service. The login form is present in the DOM, two inputs and one form, but does
-not paint at any scroll position locally, so even with credentials the page is
-not usable here.
-
-That means none of the following has been seen by anybody:
-
-- the tab appearing in the strip with the flag on
-- Allenwood's no-roster state
-- Oak Grove's no-goals state
-- Tidioute's three unaccepted goals with their accept buttons
-- the goal readings, the sample size beside each percentage, and the
-  "measured another way" line for a goal A9.3 has not turned on
-- the people picker at Addison's 149 names
+The partner dashboard at http://127.0.0.1:8799/partners/saunemin-ccsd-438
+redirects to `/partners/login` and authenticates against the live Supabase
+project. There is no account to use locally and real credentials are not going
+into a live service from here. The login form is in the DOM, two inputs and one
+form, and does not paint at any scroll position locally, so credentials would not
+have helped either.
 
 - Deferred: the partner dashboard cannot be signed in to locally, and the local
   login form does not render.
 - Verify after deploy: open a real partner dashboard with `IN_PRACTICE_TAB` set,
   starting with https://www.teachersdeserveit.com/partners/tidioute-community-charter
-  because its blocked state is the one with the most on screen, then
-  allenwood-elementary-2627, oak-grove-sd-68 and addison-sd4. Write the
-  `Pressed:` and `Saw:` lines into this file.
+  because its blocked state has the most on screen, then
+  `/partners/allenwood-elementary-2627`, `/partners/oak-grove-sd-68` and
+  `/partners/addison-sd4` for the 149 name picker. Write the `Pressed:` and
+  `Saw:` lines into this file.
+
+## What was driven instead, which is not the screen
+
+Written down because it narrows what the deferred pass still has to find, not
+because it substitutes for it.
+
+The flag gates both routes, watched with curl against the local dev server. With
+`IN_PRACTICE_TAB` unset, `/api/hub/my-assignments` answered HTTP 404 with the
+body `{"error":"Not enabled"}` and `/api/partners/assignments` answered 404. With
+it set, both answered 401 with `{"error":"Not signed in"}` rather than returning
+data.
+
+Both migrations are applied and were checked against the live databases
+afterwards. The Hub project reported 3 tables, 8 indexes, row level security on
+all three and zero rows in each. The portal project reported the new column
+present, 30 goals, 0 turned on, and 27 accepted goals untouched.
+
+The dry run was proved rather than assumed. After rolling the portal migration
+back, a query for the column returned 0. And
+`insert into _probe values ('Marcy.Ellison@School.ORG')` against the same check
+constraint the real table carries was refused with
+`ERROR: 23514 ... violates check constraint "_probe_recipient_email_check"`, so
+A7.3 is enforced in Postgres and not only in the route.
+
+`next build` exited 0, `tsc --noEmit` exited 0, eslint clean, and
+`check:writes`, `check:reachable` and `check:assignments` all pass, 27 of 27.
+None of that is evidence a person can use the tab. Two fixes in September
+typechecked, deployed and did nothing, which is why this section is explicitly
+not the pass.
+
+## What I did not press
+
+Nothing was assigned to anybody. Creating an assignment writes a row naming a
+real member of staff at a real school and is what the email path will later read,
+so it waits until there is a dry run output to read first.
+
+No goal had `measured_by_assignment` turned on. Which goals qualify is twenty
+minutes of judgement under A9.3 and it is Rae's call, not a side effect of a
+browser pass.
