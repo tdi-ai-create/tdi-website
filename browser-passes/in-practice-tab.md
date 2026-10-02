@@ -38,7 +38,22 @@ hardcoded in the request body, so pressing Assign would have assigned
 Fixed in the same session by adding the three doors and a real picker over all
 four content types.
 
+## Second look on production, same day
+
+- Opened: https://www.teachersdeserveit.com/partners/addison-sd4, In Practice
+- Saw: "Where things stand" rendering first with nothing assigned, showing three
+  goals each followed by "Assignments do not move this number. It is measured
+  another way." Three identical caveats above the assign panel, before a leader
+  could do anything.
+- Saw: the three doors rendering below it, "Start from a goal", "Start from a
+  person", "Start from shared time", with the first selected and its What this
+  encourages and What it risks panels open.
+- Rae: "i dont think we need this top section." Where things stand now sits
+  below the assign panel and only renders once something has been assigned.
+
 ## Still not seen
+
+
 
 
 
