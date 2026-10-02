@@ -411,7 +411,7 @@ export default function ForSchoolsPage() {
                   <text x="63" y="208">SEP</text><text x="113" y="208">OCT</text><text x="163" y="208">NOV</text><text x="213" y="208">DEC</text>
                   <text x="263" y="208">JAN</text><text x="313" y="208">FEB</text><text x="363" y="208">MAR</text><text x="413" y="208">APR</text>
                 </g>
-                <text x="44" y="230" fill="#5A6273" fontFamily="Inter, sans-serif" fontSize="11.5">42 of 51 staff responded in November.</text>
+                <text x="44" y="230" fill="#5A6273" fontFamily="Inter, sans-serif" fontSize="11.5">82% of staff responded in November.</text>
               </svg>
             </div>
           </div>

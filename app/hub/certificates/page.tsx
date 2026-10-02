@@ -1261,7 +1261,11 @@ ${displayName}</div>
                           className="text-[11px]"
                           style={{ fontFamily: "'DM Sans', sans-serif", color: '#9ca3af' }}
                         >
-                          Earned by {socialCount} educators
+                          {/* Everyone in the Hub across every school, not a count of
+                          anybody's own team. The rule exists because a small roster
+                          makes a count identifying, and this denominator is everyone.
+                          headcount-ok: community-wide. */}
+                      Earned by {socialCount} educators
                         </span>
                       </div>
                       <div className="flex flex-wrap items-center gap-3">

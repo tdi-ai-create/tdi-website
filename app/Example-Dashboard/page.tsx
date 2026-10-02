@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
+import { sharePct, remainderPct } from '@/lib/partners/popularity';
 import Image from 'next/image';
 import { HowWePartnerTabs } from '@/components/HowWePartnerTabs';
 import { DashboardHeader } from '@/components/dashboard/shared/DashboardHeader';
@@ -1224,7 +1225,7 @@ export default function ExampleDashboard() {
                 <span className="text-[10px] font-bold text-[#E8B84B] uppercase tracking-widest">Partnership Intelligence</span>
               </div>
               <p className="text-base md:text-lg leading-relaxed text-gray-700" style={{ fontFamily: 'Georgia, serif' }}>
-                Your team is engaged. {overviewData.stats.hubEngagement.percent}% of {overviewData.stats.educatorsEnrolled.total} educators logged into the Hub this month, exploring 342 tools across {districtSchools.length} buildings. Strategy implementation is at 62% district-wide, 6x the national average. Your educators&apos; average wellness score is 4.5 out of 5, stronger than the national average.
+                Your team is engaged. {overviewData.stats.hubEngagement.percent}% of your educators logged into the Hub this month, exploring 342 tools across {districtSchools.length} buildings. Strategy implementation is at 62% district-wide, 6x the national average. Your educators&apos; average wellness score is 4.5 out of 5, stronger than the national average.
               </p>
               <button
                 onClick={() => setOpenSections(prev => ({ ...prev, 'overview-hub-detail': !prev['overview-hub-detail'] }))}
@@ -1332,11 +1333,11 @@ export default function ExampleDashboard() {
                 </div>
                 <div className="flex-1">
                   <div className="flex items-baseline gap-2">
-                    <span className="text-2xl font-bold text-[#1B2A4A]">{overviewData.stats.hubEngagement.active}</span>
-                    <span className="text-sm text-gray-500">of {overviewData.stats.educatorsEnrolled.total} educators active on Hub</span>
+                    <span className="text-2xl font-bold text-[#1B2A4A]">{overviewData.stats.hubEngagement.percent}%</span>
+                    <span className="text-sm text-gray-500">of your educators active on Hub</span>
                   </div>
                   <p className="text-xs text-gray-400 mt-1">
-                    {overviewData.stats.educatorsEnrolled.total - overviewData.stats.hubEngagement.active} educators haven&apos;t logged in yet. A quick reminder can help.
+                    {remainderPct(overviewData.stats.hubEngagement.percent)}% of your team haven&apos;t logged in yet. A quick reminder can help.
                   </p>
                 </div>
               </div>
@@ -2293,7 +2294,7 @@ export default function ExampleDashboard() {
                                 Teachers
                               </h4>
                               <span className="text-sm text-gray-600">
-                                {school.teachers.loggedIn}/{school.teachers.total} logged in ({Math.round((school.teachers.loggedIn / school.teachers.total) * 100)}%)
+                                {sharePct(school.teachers.loggedIn, school.teachers.total) ?? 0}% logged in
                               </span>
                             </div>
                             {/* Progress Bar */}

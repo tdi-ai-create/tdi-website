@@ -528,7 +528,9 @@ export default function ExampleLessonPage() {
                         What teachers are doing with this lesson
                       </div>
                       <div style={{ fontSize: 12, color: T.g400, marginBottom: 16 }}>
-                        {EXAMPLE_LESSON.totalContributions} teachers in the conversation
+                        {/* headcount-ok: sample copy on the public course preview, and a
+                  community-wide figure rather than one school's. */}
+              {EXAMPLE_LESSON.totalContributions} teachers in the conversation
                       </div>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                         {CONTRIBUTION_TYPES.map((type, idx) => {
