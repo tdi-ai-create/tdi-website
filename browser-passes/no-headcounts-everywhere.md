@@ -56,3 +56,54 @@ partnership_semester_data, written per school by us. Saunemin's reads "12 people
 are already active" and "9 of your staff are completing vibe checks" today, and
 no code change touches either. Converting the code without editing those records
 leaves one dashboard saying both things.
+
+## Production observations, 2 October 2026
+
+Recorded after #712, #714 and #715 merged and the production build went live at
+17:13 UTC.
+
+- Opened: https://www.teachersdeserveit.com/for-schools
+- Saw: the dashboard illustration reading "82% of staff responded in November."
+  It read "42 of 51 staff responded in November." this morning, drawn into the
+  SVG on the page a prospect sees first.
+
+- Opened: https://www.teachersdeserveit.com/Example-Dashboard
+- Saw: the Team Activation card reading "87%" beside "of your educators active
+  on Hub", and under it "13% of your team haven't logged in yet. A quick
+  reminder can help."
+- Those two read "223" beside "of 255 educators active on Hub" and "32 educators
+  haven't logged in yet" before this work. Both the headline figure and the one
+  derived by subtraction are gone, which was the point: a count reached by
+  subtraction names people just as precisely as a count printed directly.
+
+- Opened: https://www.teachersdeserveit.com/partners/saunemin-ccsd-438-dashboard
+- Saw: "Access Denied". The browser holds no partner session for the live
+  domain, and I did not sign in as Rae to get one.
+
+## What is still unverified in production
+
+The authenticated partner dashboard, which is the largest surface in this work.
+Everything on it was verified against a local server running the same commit,
+recorded in popularity-not-headcount.md, including the engagement panel reading
+"26% Active this week" and "41% Active this month" with its arrows and legend.
+The screens behind the partner login have not been read on the live domain.
+
+The three client emails. They send on cron and no cron was triggered.
+
+### The authenticated dashboard, observed by Rae
+
+Rae opened https://www.teachersdeserveit.com/partners/addison-sd4 on 2 October
+2026 and sent a screenshot, which closes the gap this record listed as
+unverified. "What your team is working on" reads "13% Active this week", "19%
+Active this month" and "Oct 1 Most recent sign in", above eight rows carrying a
+share and a direction, with the legend beneath them. The nudge control reads
+"Nudge the rest".
+
+It is also the first sighting of a downward arrow on a real dashboard. Every row
+on Saunemin pointed up or flat, so the grey chosen for "down" had never been
+read in production. Addison shows six of eight pointing down, and the grey reads
+as calm rather than as an error state, which is what it was chosen for.
+
+Worth separating from the display question: Addison at 13% this week against 19%
+this month, with six of eight rows falling, is a school easing off. The panel is
+now capable of saying that, which it was not when it printed headcounts.
