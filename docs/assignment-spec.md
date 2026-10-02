@@ -98,6 +98,39 @@ met by design teaches everyone to ignore dates.
   an export. If that is ever loosened the teacher has been lied to.
 - **A4.5** A teacher who never answers is never marked as having failed. The
   absence of an answer is reported as no answer, never as "not implemented".
+- **A4.6** The answer is a position, not a submission. A teacher can change it
+  whenever they like, as many times as they like.
+- **A4.7** It can move **down**. Somebody who was using something regularly and
+  stopped is telling us something true, and the goal number follows the truth
+  rather than ratcheting upward. A number on a leader's dashboard can therefore
+  fall, which is uncomfortable and correct.
+- **A4.8** Every change is kept. The current position drives the number per A5,
+  and the trail is what shows a teacher moving from read-it to using-regularly
+  across five weeks. The movement is the part worth looking at and it is what
+  lets this show progress across a year.
+- **A4.9** Ten days after a teacher answers, they are asked once more: have you
+  used it with students yet. Not from the date it was assigned, from the date
+  they answered, so the follow up is relative to their own engagement.
+- **A4.10** "Not yet" is followed by one question about what is in the way, from
+  a fixed list: it does not fit my students or my subject, I have not had the
+  time yet, I tried it and it did not work, I am already doing something like
+  it, I would need help to get started. Optional words alongside.
+- **A4.11** Nobody is asked a third time. Two prompts per assignment, ever.
+
+A4.6 to A4.8 exist because the four steps are a ladder rather than a survey
+question. The natural answer three days in is "not yet", and a frozen answer
+would mean the goal number permanently reflected first impressions.
+
+A4.9 and A4.10 are Rae's design, 2 October 2026, and they replaced a worse idea
+of mine that asked the teacher to commit to a date upfront. Asking again later
+is lighter on the teacher and the reasons are the valuable part, because "it
+does not fit my students" and "I would need help to get started" are completely
+different problems that a leader currently cannot tell apart. One is a signal
+about the tool, the other is a request for support.
+
+The reason list is fixed rather than free text on purpose. Free text cannot be
+counted, and the whole point is that a leader can see three of seven saying the
+same thing.
 
 Rae's design, and better than either option offered to her: a small mandatory
 part that can carry a metric, with the reflection staying the teacher's to give.
@@ -130,7 +163,8 @@ number in this codebase has eventually disagreed with the thing it mirrored.
   assigned, what it is for, and what they answered.
 - **A6.2** Email is consolidated on the recipient. One message per teacher per
   run, carrying everything currently outstanding for them: anything newly
-  assigned and anything whose planned date is approaching.
+  assigned, anything whose planned date is approaching, and any ten day follow
+  up now due under A4.9.
 - **A6.3** Never one email per assignment. Three active assignments must never
   mean three emails, or six.
 - **A6.4** Built with `?dryRun=1` in the route itself, modelled in SQL first,
