@@ -1,358 +1,328 @@
 <title>In Practice</title>
 <style>
+  /* Deliberately light only. This reproduces the partner dashboard, which is a
+     light surface (bg-gray-50 with white cards) and has no dark mode, so every
+     colour here is painted explicitly rather than inherited. Values below are
+     the real ones: tab #1B2A4A on #9CA3AF, cards rounded-2xl shadow-sm with a
+     #F3F4F6 border, headings 16px semibold #111827, primary button #FFBA06 on
+     #1e2749, container max-w-5xl with px-6. */
   :root {
+    --page: #F9FAFB;
+    --card: #FFFFFF;
+    --border: #F3F4F6;
+    --border-mid: #E5E7EB;
+    --g900: #111827;
+    --g700: #374151;
+    --g600: #4B5563;
+    --g500: #6B7280;
+    --g400: #9CA3AF;
     --navy: #1e2749;
-    --ink: #1e2749;
-    --ink-soft: #5a6478;
-    --ink-faint: #8a93a5;
-    --page: #eef0f5;
-    --ground: #f5f6f9;
-    --card: #ffffff;
-    --rule: #e4e7f0;
-    --rule-soft: #eef0f6;
+    --tabnavy: #1B2A4A;
+    --gold: #FFBA06;
+    --gold-hover: #e5a805;
     --blue: #38618C;
-    --blue-light: #80a4ed;
+    --bluelight: #80a4ed;
     --wash: #E8F0FD;
-    --gold: #ffba06;
-    --gold-ink: #6b4e00;
-    --green: #2f8f5b;
-    --amber-ink: #8a5a12;
-    --chip: #eff2f8;
-    --step2: #cfd6e6;
-    --step2-ink: #3f4a63;
-    --btn-ink: #ffffff;
-    --shadow: 0 1px 2px rgba(30,39,73,.04), 0 10px 30px -22px rgba(30,39,73,.3);
-  }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-      --navy: #c6d1ec; --ink: #e7eaf3; --ink-soft: #a4aec4; --ink-faint: #7b849a;
-      --page: #0b0e15; --ground: #0f131c; --card: #171c28; --rule: #272e3e;
-      --rule-soft: #1f2532; --blue: #9cb8e4; --blue-light: #80a4ed; --wash: #1a2232;
-      --gold: #ffba06; --gold-ink: #241a00; --green: #4cb77e; --amber-ink: #e0a845;
-      --chip: #1e2533; --step2: #39425a; --step2-ink: #cdd5e8; --btn-ink: #0f131c;
-      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 30px -22px rgba(0,0,0,.8);
-    }
-  }
-  :root[data-theme="dark"] {
-    --navy: #c6d1ec; --ink: #e7eaf3; --ink-soft: #a4aec4; --ink-faint: #7b849a;
-    --page: #0b0e15; --ground: #0f131c; --card: #171c28; --rule: #272e3e;
-    --rule-soft: #1f2532; --blue: #9cb8e4; --blue-light: #80a4ed; --wash: #1a2232;
-    --gold: #ffba06; --gold-ink: #241a00; --green: #4cb77e; --amber-ink: #e0a845;
-    --chip: #1e2533; --step2: #39425a; --step2-ink: #cdd5e8; --btn-ink: #0f131c;
-    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 30px -22px rgba(0,0,0,.8);
+    --teal: #2A9D8F;
+    --amber: #8a6d1f;
+    --amberwash: #FFF8E7;
+    --shadow: 0 1px 2px 0 rgba(0,0,0,.05);
   }
 
   body {
-    background: var(--page); color: var(--ink);
+    background: var(--page); color: var(--g900);
     font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    font-size: 15px; line-height: 1.55; -webkit-font-smoothing: antialiased;
+    font-size: 16px; line-height: 1.5; -webkit-font-smoothing: antialiased;
   }
-  .wrap { max-width: 1010px; margin: 0 auto; padding: 32px 20px 100px; }
+  .shell { max-width: 1024px; margin: 0 auto; padding: 0 24px; }
 
-  .preamble { margin-bottom: 22px; }
-  .eyebrow {
-    font-size: 11.5px; letter-spacing: .13em; text-transform: uppercase;
-    color: var(--ink-faint); font-weight: 680;
-  }
-  .preamble p { margin-top: 9px; font-size: 15px; color: var(--ink-soft); max-width: 64ch; }
-
-  /* chrome */
-  .chrome {
-    background: var(--card); border: 1px solid var(--rule);
-    border-radius: 14px 14px 0 0; border-bottom: none; padding: 16px 20px 0;
-  }
-  .chrome .school { font-size: 12.5px; color: var(--ink-faint); font-weight: 620; }
-  .tabstrip {
-    display: flex; gap: 2px; margin-top: 12px; overflow-x: auto;
-    border-bottom: 1px solid var(--rule); margin-left: -20px; margin-right: -20px; padding: 0 20px;
-  }
-  .tabstrip span {
-    font-size: 13px; font-weight: 620; color: var(--ink-faint);
-    padding: 9px 12px 11px; border-bottom: 2.5px solid transparent; white-space: nowrap;
-  }
-  .tabstrip span.on { color: var(--navy); border-bottom-color: var(--gold); }
-  .mockbody {
-    background: var(--card); border: 1px solid var(--rule); border-top: none;
-    border-radius: 0 0 14px 14px; padding: 26px 20px 30px;
+  /* ---- header ---- */
+  .dashhead { background: var(--card); border-bottom: 1px solid var(--border-mid); }
+  .dashhead .inner { padding: 22px 0 18px; display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+  .dashhead .org { font-size: 20px; font-weight: 700; letter-spacing: -.01em; color: var(--navy); }
+  .dashhead .sub { font-size: 13px; color: var(--g500); margin-top: 3px; }
+  .yearbadge {
+    font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em;
+    padding: 5px 10px; border-radius: 999px;
+    background: rgba(42,157,143,.14); color: var(--teal);
   }
 
-  h1.t { font-size: 21px; font-weight: 700; letter-spacing: -.014em; color: var(--navy); }
-  .frame { margin-top: 7px; font-size: 14.2px; color: var(--ink-soft); max-width: 66ch; }
-
-  h2.sec {
-    font-size: 11px; letter-spacing: .12em; text-transform: uppercase;
-    color: var(--ink-faint); font-weight: 680; margin-top: 36px;
-    padding-top: 22px; border-top: 1px solid var(--rule);
+  /* ---- tabs ---- */
+  .tabbar { background: var(--card); border-bottom: 1px solid var(--border-mid); }
+  .tabs { display: flex; align-items: center; gap: 4px; overflow-x: auto; }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tabs button {
+    font: inherit; font-size: 14px; font-weight: 600; background: none; cursor: pointer;
+    display: flex; align-items: center; gap: 6px; padding: 16px; white-space: nowrap;
+    border: none; border-bottom: 2px solid transparent; color: var(--g400); flex-shrink: 0;
   }
-  h2.sec:first-of-type { border-top: none; padding-top: 0; }
-  .secnote { margin-top: 7px; font-size: 13.4px; color: var(--ink-soft); max-width: 64ch; }
-
-  /* shared */
-  .btn {
-    font: inherit; font-size: 13px; font-weight: 660; border-radius: 8px;
-    padding: 8px 14px; cursor: pointer; background: var(--navy);
-    color: var(--btn-ink); border: none; white-space: nowrap;
+  .tabs button.on { color: var(--tabnavy); border-bottom-color: var(--tabnavy); }
+  .tabs .tb {
+    font-size: 10px; padding: 2px 6px; border-radius: 999px;
+    font-weight: 700; text-transform: uppercase; letter-spacing: .04em;
   }
-  .btn:hover { filter: brightness(1.12); }
-  .btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
-  .btn:disabled { opacity: .42; cursor: not-allowed; }
-  .btn.ghost { background: none; color: var(--blue); border: 1px solid var(--rule); }
-  .btn.ghost:hover { background: var(--chip); filter: none; }
-  .btn.sm { font-size: 12.2px; padding: 6px 11px; }
+  .tb.live { background: rgba(42,157,143,.14); color: var(--teal); }
+  .tb.proposed { background: rgba(232,184,75,.20); color: var(--amber); }
+  .tb.complete { background: #EEF0F4; color: var(--g500); }
 
-  .bar { display: flex; height: 24px; border-radius: 7px; overflow: hidden; background: var(--rule-soft); }
-  .seg { display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 680; }
-  .s1 { background: var(--rule-soft); color: var(--ink-faint); }
-  .s2 { background: var(--step2); color: var(--step2-ink); }
-  .s3 { background: var(--blue-light); color: #12223d; }
-  .s4 { background: var(--blue); color: #fff; }
-  .markwrap { position: relative; }
-  .mark { position: absolute; top: -5px; bottom: -5px; width: 0; border-left: 2.5px dashed var(--gold); }
-  .marklabel {
+  /* ---- cards ---- */
+  main { padding: 28px 0 80px; display: flex; flex-direction: column; gap: 20px; }
+  .card {
+    background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+    box-shadow: var(--shadow); padding: 24px;
+  }
+  @media (min-width: 768px) { .card { padding: 28px; } }
+  h2 { font-size: 16px; font-weight: 600; color: var(--g900); }
+  .csub { font-size: 13.5px; color: var(--g500); margin-top: 5px; max-width: 70ch; }
+
+  /* ---- goal rows ---- */
+  .goal { padding: 16px 0; border-top: 1px solid var(--border); }
+  .goal:first-of-type { border-top: none; padding-top: 18px; }
+  .ghead { display: flex; gap: 14px; align-items: baseline; flex-wrap: wrap; }
+  .gname { font-size: 14.5px; font-weight: 600; color: var(--g900); flex: 1 1 240px; }
+  .gtarget { font-size: 12.5px; color: var(--g500); font-variant-numeric: tabular-nums; }
+
+  .barwrap { position: relative; margin-top: 11px; }
+  .bar { display: flex; height: 22px; border-radius: 6px; overflow: hidden; background: #F1F3F7; }
+  .seg { display: flex; align-items: center; justify-content: center; font-size: 10.5px; font-weight: 700; }
+  .s1 { background: #F1F3F7; color: var(--g400); }
+  .s2 { background: #CFD6E6; color: #3F4A63; }
+  .s3 { background: var(--bluelight); color: #12223D; }
+  .s4 { background: var(--blue); color: #FFFFFF; }
+  .mark { position: absolute; top: -4px; bottom: -4px; width: 0; border-left: 2px dashed var(--gold); }
+  .barfoot {
     display: flex; justify-content: space-between; gap: 14px; margin-top: 8px;
-    font-size: 12px; color: var(--ink-faint); flex-wrap: wrap;
+    font-size: 12px; color: var(--g500); flex-wrap: wrap;
   }
-  .marklabel .right { color: var(--ink); font-weight: 660; }
-  .legend { display: flex; flex-wrap: wrap; gap: 13px; margin-top: 10px; font-size: 11.8px; color: var(--ink-soft); }
+  .barfoot b { color: var(--g900); font-weight: 600; font-variant-numeric: tabular-nums; }
+  .legend { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 12px; font-size: 11.5px; color: var(--g600); }
   .legend span { display: flex; align-items: center; gap: 6px; }
   .legend i { width: 10px; height: 10px; border-radius: 3px; display: block; }
 
-  .load { display: flex; gap: 3px; flex: none; }
-  .load i { width: 7px; height: 7px; border-radius: 999px; display: block; border: 1px solid var(--ink-faint); }
-  .load i.full { background: var(--ink-faint); }
-  .load.maxed i { border-color: var(--gold); }
-  .load.maxed i.full { background: var(--gold); }
+  .goalempty {
+    margin-top: 10px; font-size: 13px; color: var(--g500);
+    background: var(--page); border-radius: 10px; padding: 11px 13px;
+    display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap;
+  }
 
-  /* goals */
-  .goal { margin-top: 10px; border: 1px solid var(--rule); border-radius: 12px; padding: 15px 16px; }
-  .goalhead { display: flex; gap: 14px; align-items: flex-start; flex-wrap: wrap; }
-  .goalname { font-size: 15.4px; font-weight: 660; }
-  .goalmeta { font-size: 12.5px; color: var(--ink-faint); margin-top: 3px; }
+  /* ---- buttons ---- */
+  .btn {
+    font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; border: none;
+    border-radius: 8px; padding: 8px 16px; background: var(--gold); color: var(--navy);
+    white-space: nowrap;
+  }
+  .btn:hover { background: var(--gold-hover); }
+  .btn:focus-visible { outline: 2px solid var(--navy); outline-offset: 2px; }
+  .btn:disabled { opacity: .45; cursor: not-allowed; }
+  .btn.sm { font-size: 13px; padding: 6px 13px; }
+  .btn.sec {
+    background: var(--card); color: var(--g700); border: 1px solid var(--border-mid);
+  }
+  .btn.sec:hover { background: var(--page); }
 
-  /* ===== the three doors ===== */
-  .doors { display: grid; gap: 9px; margin-top: 14px; grid-template-columns: 1fr; }
-  @media (min-width: 790px) { .doors { grid-template-columns: repeat(3, 1fr); } }
+  /* ---- doors ---- */
+  .doors { display: grid; gap: 12px; margin-top: 16px; grid-template-columns: 1fr; }
+  @media (min-width: 800px) { .doors { grid-template-columns: repeat(3, 1fr); } }
   .door {
-    font: inherit; text-align: left; cursor: pointer; color: var(--ink);
-    background: var(--card); border: 1.5px solid var(--rule); border-radius: 12px;
-    padding: 15px 15px 16px; display: flex; flex-direction: column; gap: 8px;
+    font: inherit; text-align: left; cursor: pointer; color: var(--g900);
+    background: var(--card); border: 1px solid var(--border-mid); border-radius: 12px;
+    padding: 16px; display: flex; flex-direction: column; gap: 8px;
   }
-  .door:hover { border-color: var(--blue-light); }
-  .door:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+  .door:hover { border-color: var(--bluelight); }
+  .door:focus-visible { outline: 2px solid var(--navy); outline-offset: 2px; }
   .door.on { border-color: var(--navy); background: var(--wash); }
-  .door .dname { font-size: 15.4px; font-weight: 690; letter-spacing: -.008em; }
-  .door .dwhen { font-size: 13px; color: var(--ink-soft); }
-  .door .drisk {
-    font-size: 12.2px; color: var(--amber-ink); line-height: 1.5;
-    border-top: 1px dashed var(--rule); padding-top: 9px; margin-top: auto;
+  .door .dn { font-size: 14.5px; font-weight: 650; }
+  .door .dw { font-size: 13px; color: var(--g600); }
+  .door .dr {
+    font-size: 12px; color: var(--amber); line-height: 1.5; margin-top: auto;
+    background: var(--amberwash); border-radius: 8px; padding: 9px 10px;
   }
-  .door .drisk b {
-    display: block; font-size: 10.2px; letter-spacing: .1em; text-transform: uppercase;
+  .door .dr b {
+    display: block; font-size: 9.5px; letter-spacing: .09em; text-transform: uppercase;
     font-weight: 700; margin-bottom: 3px;
   }
 
-  .flowbox {
-    margin-top: 12px; border: 1px solid var(--blue-light); border-radius: 12px;
-    padding: 18px 17px 19px; box-shadow: var(--shadow); display: none;
+  .flow {
+    margin-top: 16px; border: 1px solid var(--bluelight); border-radius: 12px;
+    padding: 20px; display: none; background: #FCFDFF;
   }
-  .flowbox.on { display: block; }
-  .flowhead { font-size: 14.6px; font-weight: 680; color: var(--navy); }
-  .flowhead span { font-weight: 500; color: var(--ink-faint); }
+  .flow.on { display: block; }
+  .flowtitle { font-size: 14.5px; font-weight: 650; color: var(--navy); }
 
-  .step { margin-top: 19px; }
-  .steplab { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--blue); font-weight: 680; }
-  .stepnote { font-size: 12.8px; color: var(--ink-faint); margin-top: 4px; max-width: 62ch; }
+  .step { margin-top: 20px; }
+  .sl { font-size: 11px; letter-spacing: .09em; text-transform: uppercase; color: var(--blue); font-weight: 700; }
+  .sn { font-size: 12.5px; color: var(--g500); margin-top: 4px; max-width: 64ch; }
 
-  .pickgrid { display: grid; gap: 7px; margin-top: 10px; grid-template-columns: 1fr; }
-  @media (min-width: 620px) { .pickgrid { grid-template-columns: 1fr 1fr; } }
-  .pick {
-    text-align: left; font: inherit; cursor: pointer; color: var(--ink);
-    border: 1px solid var(--rule); background: var(--card); border-radius: 9px; padding: 11px 12px;
+  .grid2 { display: grid; gap: 8px; margin-top: 10px; grid-template-columns: 1fr; }
+  @media (min-width: 640px) { .grid2 { grid-template-columns: 1fr 1fr; } }
+  .opt {
+    text-align: left; font: inherit; cursor: pointer; color: var(--g900);
+    border: 1px solid var(--border-mid); background: var(--card);
+    border-radius: 10px; padding: 11px 13px;
   }
-  .pick:hover:not(:disabled) { border-color: var(--blue-light); }
-  .pick:focus-visible { outline: 2px solid var(--gold); outline-offset: 1px; }
-  .pick.on { border-color: var(--blue); background: var(--wash); }
-  .pick:disabled { cursor: not-allowed; background: var(--ground); color: var(--ink-faint); }
-  .pick .pt { font-size: 14px; font-weight: 650; }
-  .pick .pk { font-size: 10px; letter-spacing: .07em; text-transform: uppercase; color: var(--ink-faint); font-weight: 680; margin-top: 3px; }
-  .pick .ps { font-size: 12.3px; color: var(--ink-soft); margin-top: 5px; }
+  .opt:hover:not(:disabled) { border-color: var(--bluelight); }
+  .opt:focus-visible { outline: 2px solid var(--navy); outline-offset: 1px; }
+  .opt.on { border-color: var(--blue); background: var(--wash); }
+  .opt:disabled { cursor: not-allowed; background: var(--page); color: var(--g400); }
+  .opt .ot { font-size: 14px; font-weight: 600; }
+  .opt .ok { font-size: 9.5px; letter-spacing: .07em; text-transform: uppercase; color: var(--g400); font-weight: 700; margin-top: 3px; }
+  .opt .os { font-size: 12.5px; color: var(--g600); margin-top: 5px; }
 
-  .personrow { display: flex; align-items: center; gap: 10px; }
-  .box { width: 16px; height: 16px; border-radius: 4px; flex: none; border: 1.5px solid var(--ink-faint); display: grid; place-items: center; }
-  .pick.on .box { border-color: var(--blue); background: var(--blue); }
-  .pick.on .box::after { content: ""; width: 7px; height: 4px; border-left: 2px solid #fff; border-bottom: 2px solid #fff; transform: rotate(-45deg) translate(1px,-1px); }
-  .pname { font-size: 13.8px; font-weight: 620; flex: 1; min-width: 0; }
-  .pname small { display: block; font-weight: 500; font-size: 11.5px; color: var(--ink-faint); }
+  .prow { display: flex; align-items: center; gap: 10px; }
+  .cb { width: 16px; height: 16px; border-radius: 4px; flex: none; border: 1.5px solid var(--g400); display: grid; place-items: center; }
+  .opt.on .cb { border-color: var(--blue); background: var(--blue); }
+  .opt.on .cb::after { content: ""; width: 7px; height: 4px; border-left: 2px solid #fff; border-bottom: 2px solid #fff; transform: rotate(-45deg) translate(1px,-1px); }
+  .pn { font-size: 13.5px; font-weight: 600; flex: 1; min-width: 0; }
+  .pn small { display: block; font-weight: 400; font-size: 11.5px; color: var(--g400); }
+  .dots { display: flex; gap: 3px; flex: none; }
+  .dots i { width: 7px; height: 7px; border-radius: 999px; display: block; border: 1px solid var(--g400); }
+  .dots i.f { background: var(--g400); }
+  .dots.max i { border-color: var(--gold); }
+  .dots.max i.f { background: var(--gold); }
 
-  .capnote {
-    margin-top: 9px; font-size: 12.3px; color: var(--ink-soft);
-    background: var(--chip); border-radius: 8px; padding: 9px 11px; max-width: 62ch;
-  }
-  .datewrap { margin-top: 10px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-  .datewrap input {
-    font: inherit; font-size: 13.2px; padding: 7px 10px; border: 1px solid var(--rule);
-    border-radius: 8px; background: var(--card); color: var(--ink);
-  }
-  .datewrap input:focus-visible { outline: 2px solid var(--gold); outline-offset: 1px; }
-  .hint { font-size: 12.4px; color: var(--ink-faint); }
-
-  .summary { margin-top: 21px; background: var(--wash); border-radius: 11px; padding: 15px 16px; }
-  .summary .slab { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--blue); font-weight: 680; }
-  .summary p { margin-top: 7px; font-size: 14.5px; line-height: 1.6; max-width: 64ch; }
-  .summary .actions { margin-top: 14px; display: flex; gap: 9px; flex-wrap: wrap; }
-  .sent { margin-top: 12px; font-size: 13.2px; color: var(--green); font-weight: 630; display: none; }
-  .sent.show { display: block; }
-
-  /* slots, used inside the person door */
   .slots { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 9px; }
   .slot {
-    flex: 1 1 100px; min-width: 100px; border-radius: 8px; padding: 7px 9px;
-    border: 1px dashed var(--rule); font-size: 11.8px; color: var(--ink-faint);
-    display: flex; flex-direction: column; gap: 3px;
+    flex: 1 1 102px; min-width: 102px; border-radius: 8px; padding: 7px 9px;
+    border: 1px dashed var(--border-mid); font-size: 11.5px; color: var(--g400);
+    display: flex; flex-direction: column; gap: 2px;
   }
-  .slot.filled { border-style: solid; background: var(--ground); color: var(--ink); }
-  .slot .stool { font-weight: 640; font-size: 12.2px; line-height: 1.25; }
-  .slot .srung { font-size: 10.5px; font-weight: 660; }
-  .srung.r1 { color: var(--ink-faint); } .srung.r2 { color: var(--step2-ink); }
-  .srung.r3 { color: var(--blue); } .srung.r4 { color: var(--green); }
+  .slot.f { border-style: solid; background: var(--page); color: var(--g900); }
+  .slot .st { font-weight: 600; font-size: 12px; line-height: 1.25; }
+  .slot .sr { font-size: 10.5px; font-weight: 650; }
+  .sr.r1 { color: var(--g400); } .sr.r2 { color: #3F4A63; }
+  .sr.r3 { color: var(--blue); } .sr.r4 { color: var(--teal); }
 
-  /* ===== what came back ===== */
-  .whynot { margin-top: 12px; border: 1px solid var(--rule); border-radius: 12px; padding: 16px 17px; }
-  .whynot h3 { font-size: 14.4px; font-weight: 680; }
-  .whynot .sub { font-size: 12.8px; color: var(--ink-faint); margin-top: 3px; }
-  .reason { display: flex; align-items: center; gap: 12px; margin-top: 12px; }
-  .reason .rtext { font-size: 13.8px; flex: 1 1 200px; min-width: 0; }
-  .reason .rtext small { display: block; font-size: 11.8px; color: var(--ink-faint); margin-top: 2px; }
-  .reason .rbar { flex: 1 1 110px; height: 8px; border-radius: 99px; background: var(--rule-soft); overflow: hidden; min-width: 70px; }
-  .reason .rbar i { display: block; height: 100%; background: var(--blue-light); }
-  .reason .rbar i.flag { background: var(--gold); }
-  .reason .rn { font-size: 13px; font-weight: 680; font-variant-numeric: tabular-nums; flex: none; width: 56px; text-align: right; color: var(--ink-soft); }
-
-  .actionable {
-    margin-top: 15px; background: var(--wash); border-radius: 9px; padding: 12px 13px;
-    font-size: 13.2px; color: var(--ink); max-width: 66ch;
+  .inlinenote {
+    margin-top: 10px; font-size: 12.5px; color: var(--g600);
+    background: var(--page); border-radius: 8px; padding: 10px 12px; max-width: 64ch;
   }
-  .actionable b { font-weight: 680; }
-
-  .reflect { margin-top: 10px; border: 1px solid var(--rule); border-radius: 12px; padding: 15px 16px; }
-  .quote { border-left: 3px solid var(--blue-light); padding: 2px 0 2px 13px; margin-top: 13px; }
-  .quote:first-of-type { margin-top: 8px; }
-  .quote p { font-size: 14px; line-height: 1.58; }
-  .quote .who { margin-top: 5px; font-size: 12.1px; color: var(--ink-faint); }
-  .quote.anon { border-left-color: var(--ink-faint); }
-  .private {
-    margin-top: 15px; font-size: 12.8px; color: var(--ink-soft);
-    background: var(--chip); border-radius: 8px; padding: 10px 12px; max-width: 64ch;
+  .dateline { margin-top: 10px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .dateline input {
+    font: inherit; font-size: 13.5px; padding: 7px 11px; border: 1px solid var(--border-mid);
+    border-radius: 8px; background: var(--card); color: var(--g900);
   }
+  .dateline input:focus-visible { outline: 2px solid var(--navy); outline-offset: 1px; }
+  .dh { font-size: 12.5px; color: var(--g500); }
 
-  /* ===== teacher side ===== */
-  .teacher { display: grid; gap: 12px; margin-top: 12px; grid-template-columns: 1fr; }
-  @media (min-width: 740px) { .teacher { grid-template-columns: 1fr 1fr; } }
-  .tcard { border: 1px solid var(--rule); border-radius: 12px; padding: 16px 16px 17px; background: var(--ground); }
-  .tcard .twhen {
-    font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase;
-    color: var(--blue); font-weight: 700;
+  .confirm { margin-top: 22px; background: var(--wash); border-radius: 11px; padding: 16px; }
+  .confirm .cl { font-size: 11px; letter-spacing: .09em; text-transform: uppercase; color: var(--blue); font-weight: 700; }
+  .confirm p { margin-top: 8px; font-size: 14.5px; line-height: 1.6; max-width: 66ch; color: var(--g900); }
+  .confirm .ca { margin-top: 15px; display: flex; gap: 9px; flex-wrap: wrap; }
+  .done { margin-top: 12px; font-size: 13.5px; color: var(--teal); font-weight: 600; display: none; }
+  .done.on { display: block; }
+
+  /* ---- reasons ---- */
+  .reason { display: flex; align-items: center; gap: 14px; padding: 13px 0; border-top: 1px solid var(--border); }
+  .reason:first-of-type { border-top: none; }
+  .rl { font-size: 13.5px; flex: 1 1 210px; min-width: 0; color: var(--g900); }
+  .rl small { display: block; font-size: 12px; color: var(--g500); margin-top: 2px; }
+  .rtrack { flex: 1 1 110px; height: 8px; border-radius: 999px; background: #F1F3F7; overflow: hidden; min-width: 70px; }
+  .rtrack i { display: block; height: 100%; background: var(--bluelight); }
+  .rtrack i.hot { background: var(--gold); }
+  .rn { font-size: 13px; font-weight: 650; font-variant-numeric: tabular-nums; flex: none; width: 54px; text-align: right; color: var(--g600); }
+
+  .callout {
+    margin-top: 16px; background: var(--wash); border-radius: 10px; padding: 14px 15px;
+    font-size: 13.5px; line-height: 1.6; color: var(--g900); max-width: 70ch;
   }
-  .tcard .tq { font-size: 14.8px; font-weight: 660; margin-top: 7px; }
-  .tcard .tsub { font-size: 12.5px; color: var(--ink-faint); margin-top: 4px; }
-  .opt { display: flex; gap: 9px; align-items: flex-start; font-size: 13.6px; color: var(--ink-soft); margin-top: 9px; }
-  .opt .dot { width: 13px; height: 13px; border-radius: 99px; flex: none; border: 1.5px solid var(--ink-faint); margin-top: 3px; }
-  .opt.key { color: var(--ink); font-weight: 620; }
-  .opt.key .dot { border-color: var(--blue); box-shadow: inset 0 0 0 3px var(--blue); }
-  .ta { margin-top: 11px; height: 44px; border-radius: 8px; border: 1px dashed var(--rule); background: var(--card); }
-  .shareline { margin-top: 10px; font-size: 12.2px; color: var(--ink-faint); }
-  .shareopts { margin-top: 7px; display: flex; flex-wrap: wrap; gap: 6px; }
-  .so { font-size: 12px; padding: 5px 9px; border-radius: 99px; background: var(--chip); color: var(--ink-soft); }
-  .movednote {
-    margin-top: 12px; font-size: 12.3px; color: var(--ink-soft);
-    border-top: 1px dashed var(--rule); padding-top: 10px;
+  .callout b { font-weight: 650; }
+
+  /* ---- quotes ---- */
+  .quote { border-left: 3px solid var(--bluelight); padding: 2px 0 2px 14px; margin-top: 16px; }
+  .quote:first-of-type { margin-top: 14px; }
+  .quote p { font-size: 14px; line-height: 1.6; color: var(--g700); }
+  .quote .attr { margin-top: 6px; font-size: 12px; color: var(--g500); }
+  .quote.anon { border-left-color: var(--g400); }
+  .kept {
+    margin-top: 16px; font-size: 12.5px; color: var(--g600);
+    background: var(--page); border-radius: 8px; padding: 11px 13px; max-width: 66ch;
   }
 
-  footer {
-    margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--rule);
-    font-size: 13px; color: var(--ink-faint); max-width: 70ch;
-  }
-  footer b { color: var(--ink-soft); }
-  code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12.5px; }
+  /* ---- asked ---- */
+  .asked { display: grid; gap: 10px; margin-top: 16px; grid-template-columns: 1fr; }
+  @media (min-width: 760px) { .asked { grid-template-columns: repeat(3, 1fr); } }
+  .ask { border: 1px solid var(--border-mid); border-radius: 12px; padding: 14px 15px; }
+  .ask .aw { font-size: 10px; letter-spacing: .09em; text-transform: uppercase; color: var(--blue); font-weight: 700; }
+  .ask .aq { font-size: 13.8px; font-weight: 650; margin-top: 6px; color: var(--g900); }
+  .ask ul { list-style: none; margin-top: 9px; display: flex; flex-direction: column; gap: 5px; }
+  .ask li { font-size: 12.5px; color: var(--g600); display: flex; gap: 7px; }
+  .ask li::before { content: ""; width: 5px; height: 5px; border-radius: 999px; background: var(--g400); flex: none; margin-top: 7px; }
+  .ask .an { margin-top: 10px; font-size: 12px; color: var(--g500); border-top: 1px dashed var(--border-mid); padding-top: 9px; }
+  .ask.third { border-color: var(--bluelight); background: #FCFDFF; }
+
+  footer { padding: 0 0 56px; }
+  .fnote { font-size: 12.5px; color: var(--g400); max-width: 72ch; }
 </style>
 
-<div class="wrap">
-
-  <div class="preamble">
-    <div class="eyebrow">Mock of one dashboard tab, nothing built</div>
-    <p>
-      All three ways to assign live in the one tab, each saying plainly when to use it and
-      what it risks. They converge on the same confirmation sentence, so it reads as three
-      doors into one room rather than three different products.
-    </p>
-  </div>
-
-  <div class="chrome">
-    <div class="school">Saunemin CCSD #438</div>
-    <div class="tabstrip">
-      <span>Overview</span><span>2025-2026</span><span>2026-2027</span><span>2027-2028</span>
-      <span class="on">In Practice</span><span>Reports</span><span>Team</span>
+<div class="dashhead">
+  <div class="shell">
+    <div class="inner">
+      <div style="flex:1 1 260px">
+        <div class="org">Saunemin CCSD #438</div>
+        <div class="sub">27 educators on the roster</div>
+      </div>
+      <span class="yearbadge">2026-2027</span>
     </div>
   </div>
+</div>
 
-  <div class="mockbody">
-    <h1 class="t">In Practice</h1>
-    <p class="frame">
-      Put a tool in someone's hands and see what happens in their classroom. Every
-      assignment names the goal it serves, because that is the reason it is worth
-      anyone's time.
-    </p>
+<div class="tabbar">
+  <div class="shell">
+    <div class="tabs" role="tablist">
+      <button role="tab">Overview</button>
+      <button role="tab">2025-2026<span class="tb complete">Complete</span></button>
+      <button role="tab">2026-2027<span class="tb live">Live</span></button>
+      <button role="tab">2027-2028<span class="tb proposed">Proposed</span></button>
+      <button role="tab" class="on" aria-selected="true">In Practice</button>
+      <button role="tab">Reports</button>
+      <button role="tab">Team</button>
+    </div>
+  </div>
+</div>
 
-    <!-- ========== 1. where things stand ========== -->
-    <h2 class="sec">Where things stand</h2>
-    <p class="secnote">
-      The dashed line is where a classroom starts. Everything left of it has been read but
-      not used, which is the difference between finishing something and doing something.
-    </p>
+<div class="shell">
+  <main>
 
-    <div class="goal">
-      <div class="goalhead">
-        <div style="flex:1 1 240px">
-          <div class="goalname">Student engagement practices in use</div>
-          <div class="goalmeta">6 people have something assigned for this goal</div>
+    <!-- ===== where things stand ===== -->
+    <section class="card">
+      <h2>Where things stand</h2>
+      <p class="csub">
+        The dashed line is where a classroom starts. Anything to the left of it has been
+        read but not used yet.
+      </p>
+
+      <div class="goal">
+        <div class="ghead">
+          <div class="gname">Student engagement practices in use</div>
+          <div class="gtarget">6 assigned &middot; target 75%</div>
         </div>
-        <div style="font-size:12.8px;color:var(--ink-faint);text-align:right">
-          Target 75%
-        </div>
-      </div>
-      <div style="margin-top:13px">
-        <div class="markwrap">
+        <div class="barwrap">
           <div class="bar">
-            <div class="seg s1" style="width:17%">1</div>
-            <div class="seg s2" style="width:33%">2</div>
-            <div class="seg s3" style="width:33%">2</div>
-            <div class="seg s4" style="width:17%">1</div>
+            <div class="seg s1" style="width:16.67%">1</div>
+            <div class="seg s2" style="width:33.33%">2</div>
+            <div class="seg s3" style="width:33.33%">2</div>
+            <div class="seg s4" style="width:16.67%">1</div>
           </div>
           <div class="mark" style="left:50%"></div>
         </div>
-        <div class="marklabel">
-          <span>Read but not used, on the left</span>
-          <span class="right">3 of 6 in practice</span>
+        <div class="barfoot">
+          <span>1 has not started, 2 have read it without using it</span>
+          <span><b>3 of 6</b> in practice</span>
         </div>
         <div class="legend">
-          <span><i class="s1" style="border:1px solid var(--ink-faint)"></i>Not yet</span>
+          <span><i class="s1" style="border:1px solid #CBD2DE"></i>Not yet</span>
           <span><i class="s2"></i>Read it, not used it</span>
           <span><i class="s3"></i>Used it with students</span>
           <span><i class="s4"></i>Using it regularly</span>
         </div>
       </div>
-    </div>
 
-    <div class="goal">
-      <div class="goalhead">
-        <div style="flex:1 1 240px">
-          <div class="goalname">Trauma informed practice in classrooms</div>
-          <div class="goalmeta">4 people have something assigned for this goal</div>
+      <div class="goal">
+        <div class="ghead">
+          <div class="gname">Trauma informed practice in classrooms</div>
+          <div class="gtarget">4 assigned &middot; target 65%</div>
         </div>
-        <div style="font-size:12.8px;color:var(--ink-faint);text-align:right">Target 65%</div>
-      </div>
-      <div style="margin-top:13px">
-        <div class="markwrap">
+        <div class="barwrap">
           <div class="bar">
             <div class="seg s1" style="width:50%">2</div>
             <div class="seg s2" style="width:25%">1</div>
@@ -360,426 +330,436 @@
           </div>
           <div class="mark" style="left:75%"></div>
         </div>
-        <div class="marklabel">
-          <span>Read but not used, on the left</span>
-          <span class="right">1 of 4 in practice</span>
+        <div class="barfoot">
+          <span>2 have not started</span>
+          <span><b>1 of 4</b> in practice</span>
         </div>
       </div>
-    </div>
 
-    <div class="goal" style="border-style:dashed;background:var(--ground)">
-      <div class="goalhead">
-        <div style="flex:1 1 240px">
-          <div class="goalname" style="color:var(--ink-soft)">Hub PD applied in the classroom</div>
-          <div class="goalmeta">
-            Nothing assigned, so this has never been measured. It reads as "Soon" on your
-            dashboard today.
+      <div class="goal">
+        <div class="ghead">
+          <div class="gname">Paraprofessionals in instructional roles</div>
+          <div class="gtarget">at 44% &middot; target 70%</div>
+        </div>
+        <div class="goalempty">
+          <span>No tools assigned for this goal yet, so this reading comes from elsewhere.</span>
+          <button class="btn sm sec" data-door="goal">Assign one</button>
+        </div>
+      </div>
+
+      <div class="goal">
+        <div class="ghead">
+          <div class="gname">Hub PD applied in the classroom</div>
+          <div class="gtarget">target 100%</div>
+        </div>
+        <div class="goalempty">
+          <span>Never measured. It reads as "Soon" on your dashboard until something is assigned.</span>
+          <button class="btn sm" data-door="goal">Assign the first tool</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== assign ===== -->
+    <section class="card">
+      <h2>Assign a tool</h2>
+      <p class="csub">
+        Three ways in, and they end in the same place. Pick whichever matches what you are
+        already thinking about.
+      </p>
+
+      <div class="doors">
+        <button class="door" data-door="goal">
+          <div class="dn">Start from a goal</div>
+          <div class="dw">You know which goal you are pushing on. Shows the tools that speak to it.</div>
+          <div class="dr">
+            <b>Watch for</b>
+            You cannot see how much one person already carries until you reach the names.
+          </div>
+        </button>
+        <button class="door" data-door="person">
+          <div class="dn">Start from a person</div>
+          <div class="dw">You are thinking about one teacher. Shows what they already have open.</div>
+          <div class="dr">
+            <b>Watch for</b>
+            It is easy to pick a goal just to get past the question. If none fits, that is
+            worth noticing.
+          </div>
+        </button>
+        <button class="door" data-door="move">
+          <div class="dn">Start from shared time</div>
+          <div class="dw">A group will work on the same thing in the same meeting. One tool, one date.</div>
+          <div class="dr">
+            <b>Watch for</b>
+            Harder to tailor. If one teacher needs something else, do that one separately.
+          </div>
+        </button>
+      </div>
+
+      <!-- goal door -->
+      <div class="flow" id="f-goal">
+        <div class="flowtitle">Starting from a goal</div>
+        <div class="step">
+          <div class="sl">The goal</div>
+          <div class="grid2" data-goals="goal">
+            <button class="opt" data-goal="Student engagement practices in use">
+              <div class="ot">Student engagement practices in use</div>
+              <div class="os">At 10%, target 75%</div>
+            </button>
+            <button class="opt" data-goal="Hub PD applied in the classroom">
+              <div class="ot">Hub PD applied in the classroom</div>
+              <div class="os">Never measured. This would be its first reading.</div>
+            </button>
           </div>
         </div>
-      </div>
-    </div>
-
-    <!-- ========== 2. assign something ========== -->
-    <h2 class="sec">Assign something</h2>
-    <p class="secnote">
-      Three ways in. They end up in the same place, so pick whichever matches what you are
-      actually thinking about right now.
-    </p>
-
-    <div class="doors">
-      <button class="door" data-door="goal">
-        <div class="dname">Start from a goal</div>
-        <div class="dwhen">
-          Best when you know which goal you are pushing on. Shows the tools that speak to
-          it.
+        <div class="step">
+          <div class="sl">The tool</div>
+          <div class="sn">These speak to the goal you picked. You can search the whole Hub as well.</div>
+          <div class="grid2" data-tools="goal">
+            <button class="opt" data-tool="The Shift Kit">
+              <div class="ot">The Shift Kit</div><div class="ok">Quick win</div>
+              <div class="os">Changing what happens in the first four minutes of a lesson.</div>
+            </button>
+            <button class="opt" data-tool="Lesson Flow Checklist">
+              <div class="ot">Lesson Flow Checklist</div><div class="ok">Quick win</div>
+              <div class="os">A checklist a teacher marks up while planning, not after.</div>
+            </button>
+          </div>
         </div>
-        <div class="drisk">
-          <b>Watch for</b>
-          You cannot see how much any one person is already carrying until you reach the
-          list of names.
+        <div class="step">
+          <div class="sl">Who</div>
+          <div class="sn">The dots are what each person already has open. Three is the ceiling.</div>
+          <div class="grid2" data-people="goal">
+            <button class="opt" data-name="Marcy Ellison">
+              <span class="prow"><span class="cb"></span>
+              <span class="pn">Marcy Ellison<small>Grade 4</small></span>
+              <span class="dots"><i class="f"></i><i></i><i></i></span></span>
+            </button>
+            <button class="opt" data-name="Dan Reyes">
+              <span class="prow"><span class="cb"></span>
+              <span class="pn">Dan Reyes<small>Grade 2</small></span>
+              <span class="dots"><i></i><i></i><i></i></span></span>
+            </button>
+            <button class="opt" data-name="Tom Whitfield">
+              <span class="prow"><span class="cb"></span>
+              <span class="pn">Tom Whitfield<small>Grade 5</small></span>
+              <span class="dots"><i></i><i></i><i></i></span></span>
+            </button>
+            <button class="opt" data-name="Alice Bowen" disabled>
+              <span class="prow"><span class="cb"></span>
+              <span class="pn">Alice Bowen<small>Three open already</small></span>
+              <span class="dots max"><i class="f"></i><i class="f"></i><i class="f"></i></span></span>
+            </button>
+          </div>
+          <div class="inlinenote">
+            Alice Bowen has three open and none has reached a classroom. Closing one out is
+            probably better than adding a fourth.
+          </div>
         </div>
-      </button>
-
-      <button class="door" data-door="person">
-        <div class="dname">Start from a person</div>
-        <div class="dwhen">
-          Best when you are thinking about one teacher. Shows what they already have open.
+        <div class="step">
+          <div class="sl">Shared time, optional</div>
+          <div class="sn">Not a deadline. Nobody is marked late and nobody is chased.</div>
+          <div class="dateline">
+            <input type="date" value="2026-10-14" id="date-goal" aria-label="Day the team plans to work on this together">
+            <span class="dh">Your next PLC is 14 October</span>
+          </div>
         </div>
-        <div class="drisk">
-          <b>Watch for</b>
-          It is easy to pick a goal just to get past the question. If none of them really
-          fits, that is worth noticing rather than working around.
+        <div class="confirm">
+          <div class="cl">Before you send</div>
+          <p id="sum-goal"></p>
+          <div class="ca">
+            <button class="btn" id="send-goal" disabled>Assign</button>
+            <button class="btn sec" data-shut="goal">Cancel</button>
+          </div>
+          <div class="done" id="done-goal"></div>
         </div>
-      </button>
-
-      <button class="door" data-door="move">
-        <div class="dname">Start from shared time</div>
-        <div class="dwhen">
-          Best when a group will work on the same thing in the same meeting. One tool, one
-          group, one date.
-        </div>
-        <div class="drisk">
-          <b>Watch for</b>
-          Harder to tailor. If one teacher needs something different, do that one
-          separately rather than widening the group.
-        </div>
-      </button>
-    </div>
-
-    <!-- door: goal -->
-    <div class="flowbox" id="f-goal">
-      <div class="flowhead">Starting from a goal</div>
-      <div class="step">
-        <div class="steplab">The goal</div>
-        <div class="pickgrid" data-goals="goal">
-          <button class="pick" data-goal="Student engagement practices in use">
-            <div class="pt">Student engagement practices in use</div>
-            <div class="ps">At 10%, target 75%</div>
-          </button>
-          <button class="pick" data-goal="Hub PD applied in the classroom">
-            <div class="pt">Hub PD applied in the classroom</div>
-            <div class="ps">Never measured. This would be its first reading.</div>
-          </button>
-        </div>
-      </div>
-      <div class="step">
-        <div class="steplab">The tool</div>
-        <div class="stepnote">These speak to the goal you picked. You can search the whole Hub as well.</div>
-        <div class="pickgrid" data-tools="goal">
-          <button class="pick" data-tool="The Shift Kit">
-            <div class="pt">The Shift Kit</div><div class="pk">Quick win</div>
-            <div class="ps">Changing what happens in the first four minutes of a lesson.</div>
-          </button>
-          <button class="pick" data-tool="Lesson Flow Checklist">
-            <div class="pt">Lesson Flow Checklist</div><div class="pk">Quick win</div>
-            <div class="ps">A checklist a teacher marks up while planning, not after.</div>
-          </button>
-        </div>
-      </div>
-      <div class="step">
-        <div class="steplab">Who</div>
-        <div class="stepnote">The dots are what each person already has open. Three is the ceiling.</div>
-        <div class="pickgrid" data-people="goal">
-          <button class="pick" data-name="Marcy Ellison">
-            <span class="personrow"><span class="box"></span>
-            <span class="pname">Marcy Ellison<small>Grade 4</small></span>
-            <span class="load"><i class="full"></i><i></i><i></i></span></span>
-          </button>
-          <button class="pick" data-name="Dan Reyes">
-            <span class="personrow"><span class="box"></span>
-            <span class="pname">Dan Reyes<small>Grade 2</small></span>
-            <span class="load"><i></i><i></i><i></i></span></span>
-          </button>
-          <button class="pick" data-name="Tom Whitfield">
-            <span class="personrow"><span class="box"></span>
-            <span class="pname">Tom Whitfield<small>Grade 5</small></span>
-            <span class="load"><i></i><i></i><i></i></span></span>
-          </button>
-          <button class="pick" data-name="Alice Bowen" disabled>
-            <span class="personrow"><span class="box"></span>
-            <span class="pname">Alice Bowen<small>Three open already</small></span>
-            <span class="load maxed"><i class="full"></i><i class="full"></i><i class="full"></i></span></span>
-          </button>
-        </div>
-        <div class="capnote">
-          Alice Bowen has three open and none has reached a classroom. Closing one out is
-          probably better than adding a fourth.
-        </div>
-      </div>
-      <div class="step">
-        <div class="steplab">Shared time, optional</div>
-        <div class="stepnote">Not a deadline. Nobody is marked late and nobody is chased.</div>
-        <div class="datewrap">
-          <input type="date" value="2026-10-14" id="date-goal" aria-label="Day the team plans to work on this together">
-          <span class="hint">Your next PLC is 14 October</span>
-        </div>
-      </div>
-      <div class="summary">
-        <div class="slab">Before you send</div>
-        <p id="sum-goal"></p>
-        <div class="actions">
-          <button class="btn" id="send-goal" disabled>Assign</button>
-          <button class="btn ghost" data-shut="goal">Cancel</button>
-        </div>
-        <div class="sent" id="sent-goal"></div>
-      </div>
-    </div>
-
-    <!-- door: person -->
-    <div class="flowbox" id="f-person">
-      <div class="flowhead">Starting from a person</div>
-      <div class="step">
-        <div class="steplab">Who</div>
-        <div class="pickgrid" data-oneperson="person">
-          <button class="pick" data-name="Marcy Ellison">
-            <div class="pt">Marcy Ellison <span style="font-weight:500;color:var(--ink-faint);font-size:12px">Grade 4</span></div>
-            <div class="slots">
-              <div class="slot filled"><span class="stool">The Shift Kit</span><span class="srung r3">Used with students</span></div>
-              <div class="slot">Open</div><div class="slot">Open</div>
-            </div>
-          </button>
-          <button class="pick" data-name="Priya Raman">
-            <div class="pt">Priya Raman <span style="font-weight:500;color:var(--ink-faint);font-size:12px">Interventionist</span></div>
-            <div class="slots">
-              <div class="slot filled"><span class="stool">Reset Without the Guilt</span><span class="srung r4">Using regularly</span></div>
-              <div class="slot filled"><span class="stool">The Shift Kit</span><span class="srung r2">Read it, not used</span></div>
-              <div class="slot">Open</div>
-            </div>
-          </button>
-        </div>
-      </div>
-      <div class="step">
-        <div class="steplab">The goal this serves</div>
-        <div class="stepnote">Required. If none of these really fits, write a new goal rather than picking the nearest one.</div>
-        <div class="pickgrid" data-goals="person">
-          <button class="pick" data-goal="Student engagement practices in use">
-            <div class="pt">Student engagement practices in use</div><div class="ps">At 10%, target 75%</div>
-          </button>
-          <button class="pick" data-goal="Trauma informed practice in classrooms">
-            <div class="pt">Trauma informed practice in classrooms</div><div class="ps">At 15%, target 65%</div>
-          </button>
-        </div>
-      </div>
-      <div class="step">
-        <div class="steplab">The tool</div>
-        <div class="pickgrid" data-tools="person">
-          <button class="pick" data-tool="Lesson Flow Checklist">
-            <div class="pt">Lesson Flow Checklist</div><div class="pk">Quick win</div>
-          </button>
-          <button class="pick" data-tool="The Differentiation Fix">
-            <div class="pt">The Differentiation Fix</div><div class="pk">Course</div>
-          </button>
-        </div>
-      </div>
-      <div class="step">
-        <div class="steplab">Shared time, optional</div>
-        <div class="datewrap">
-          <input type="date" id="date-person" aria-label="Day the team plans to work on this together">
-          <span class="hint">Leave it blank and nothing is scheduled</span>
-        </div>
-      </div>
-      <div class="summary">
-        <div class="slab">Before you send</div>
-        <p id="sum-person"></p>
-        <div class="actions">
-          <button class="btn" id="send-person" disabled>Assign</button>
-          <button class="btn ghost" data-shut="person">Cancel</button>
-        </div>
-        <div class="sent" id="sent-person"></div>
-      </div>
-    </div>
-
-    <!-- door: move -->
-    <div class="flowbox" id="f-move">
-      <div class="flowhead">Starting from shared time</div>
-      <div class="step">
-        <div class="steplab">The day you are already together</div>
-        <div class="stepnote">This door starts here on purpose, because the meeting is the thing you are planning around.</div>
-        <div class="datewrap">
-          <input type="date" value="2026-11-04" id="date-move" aria-label="Day the team plans to work on this together">
-          <span class="hint">Still not a deadline</span>
-        </div>
-      </div>
-      <div class="step">
-        <div class="steplab">The goal</div>
-        <div class="pickgrid" data-goals="move">
-          <button class="pick" data-goal="Hub PD applied in the classroom">
-            <div class="pt">Hub PD applied in the classroom</div>
-            <div class="ps">Never measured. This would be its first reading.</div>
-          </button>
-          <button class="pick" data-goal="Trauma informed practice in classrooms">
-            <div class="pt">Trauma informed practice in classrooms</div><div class="ps">At 15%, target 65%</div>
-          </button>
-        </div>
-      </div>
-      <div class="step">
-        <div class="steplab">The tool everyone works on</div>
-        <div class="pickgrid" data-tools="move">
-          <button class="pick" data-tool="Communication that Clicks">
-            <div class="pt">Communication that Clicks</div><div class="pk">Course</div>
-          </button>
-          <button class="pick" data-tool="Reset Without the Guilt">
-            <div class="pt">Reset Without the Guilt</div><div class="pk">Quick win</div>
-          </button>
-        </div>
-      </div>
-      <div class="step">
-        <div class="steplab">Who is in it</div>
-        <div class="pickgrid" data-people="move">
-          <button class="pick" data-name="Dan Reyes">
-            <span class="personrow"><span class="box"></span>
-            <span class="pname">Dan Reyes<small>Grade 2</small></span>
-            <span class="load"><i></i><i></i><i></i></span></span>
-          </button>
-          <button class="pick" data-name="Tom Whitfield">
-            <span class="personrow"><span class="box"></span>
-            <span class="pname">Tom Whitfield<small>Grade 5</small></span>
-            <span class="load"><i></i><i></i><i></i></span></span>
-          </button>
-          <button class="pick" data-name="Priya Raman">
-            <span class="personrow"><span class="box"></span>
-            <span class="pname">Priya Raman<small>One slot left</small></span>
-            <span class="load"><i class="full"></i><i class="full"></i><i></i></span></span>
-          </button>
-          <button class="pick" data-name="Joe Kaminski">
-            <span class="personrow"><span class="box"></span>
-            <span class="pname">Joe Kaminski<small>Para</small></span>
-            <span class="load"><i class="full"></i><i></i><i></i></span></span>
-          </button>
-        </div>
-      </div>
-      <div class="summary">
-        <div class="slab">Before you send</div>
-        <p id="sum-move"></p>
-        <div class="actions">
-          <button class="btn" id="send-move" disabled>Assign to the group</button>
-          <button class="btn ghost" data-shut="move">Cancel</button>
-        </div>
-        <div class="sent" id="sent-move"></div>
-      </div>
-    </div>
-
-    <!-- ========== 3. what came back ========== -->
-    <h2 class="sec">What came back</h2>
-    <p class="secnote">
-      Ten days after someone answers, they are asked once more whether they have used it,
-      and if not, what is in the way. Those answers are below.
-    </p>
-
-    <div class="whynot">
-      <h3>Why it has not been used yet</h3>
-      <div class="sub">Across everything assigned for Student engagement practices in use. 7 answers.</div>
-
-      <div class="reason">
-        <div class="rtext">It does not fit my students or my subject
-          <small>Not resistance. The tool is wrong for the room.</small>
-        </div>
-        <div class="rbar"><i class="flag" style="width:43%"></i></div>
-        <div class="rn">3 of 7</div>
-      </div>
-      <div class="reason">
-        <div class="rtext">I would need help to get started
-          <small>A request, and the one you can act on fastest.</small>
-        </div>
-        <div class="rbar"><i class="flag" style="width:29%"></i></div>
-        <div class="rn">2 of 7</div>
-      </div>
-      <div class="reason">
-        <div class="rtext">I have not had the time yet</div>
-        <div class="rbar"><i style="width:14%"></i></div>
-        <div class="rn">1 of 7</div>
-      </div>
-      <div class="reason">
-        <div class="rtext">I am already doing something like it</div>
-        <div class="rbar"><i style="width:14%"></i></div>
-        <div class="rn">1 of 7</div>
       </div>
 
-      <div class="actionable">
-        <b>Three of seven say the tool is wrong for their room.</b> That is a signal about
-        the tool rather than the staff, and it is worth a different one for those three
-        before anybody is asked again. Two more said they would need help to start, which
-        is the fastest thing on this list to fix.
+      <!-- person door -->
+      <div class="flow" id="f-person">
+        <div class="flowtitle">Starting from a person</div>
+        <div class="step">
+          <div class="sl">Who</div>
+          <div class="grid2" data-one="person">
+            <button class="opt" data-name="Marcy Ellison">
+              <div class="ot">Marcy Ellison <span style="font-weight:400;color:#9CA3AF;font-size:12px">Grade 4</span></div>
+              <div class="slots">
+                <div class="slot f"><span class="st">The Shift Kit</span><span class="sr r3">Used with students</span></div>
+                <div class="slot">Open</div><div class="slot">Open</div>
+              </div>
+            </button>
+            <button class="opt" data-name="Priya Raman">
+              <div class="ot">Priya Raman <span style="font-weight:400;color:#9CA3AF;font-size:12px">Interventionist</span></div>
+              <div class="slots">
+                <div class="slot f"><span class="st">Reset Without the Guilt</span><span class="sr r4">Using regularly</span></div>
+                <div class="slot f"><span class="st">The Shift Kit</span><span class="sr r2">Read it, not used</span></div>
+                <div class="slot">Open</div>
+              </div>
+            </button>
+          </div>
+        </div>
+        <div class="step">
+          <div class="sl">The goal this serves</div>
+          <div class="sn">Required. If none of these really fits, write a new goal rather than picking the nearest one.</div>
+          <div class="grid2" data-goals="person">
+            <button class="opt" data-goal="Student engagement practices in use">
+              <div class="ot">Student engagement practices in use</div><div class="os">At 10%, target 75%</div>
+            </button>
+            <button class="opt" data-goal="Trauma informed practice in classrooms">
+              <div class="ot">Trauma informed practice in classrooms</div><div class="os">At 15%, target 65%</div>
+            </button>
+          </div>
+        </div>
+        <div class="step">
+          <div class="sl">The tool</div>
+          <div class="grid2" data-tools="person">
+            <button class="opt" data-tool="Lesson Flow Checklist">
+              <div class="ot">Lesson Flow Checklist</div><div class="ok">Quick win</div>
+            </button>
+            <button class="opt" data-tool="The Differentiation Fix">
+              <div class="ot">The Differentiation Fix</div><div class="ok">Course</div>
+            </button>
+          </div>
+        </div>
+        <div class="step">
+          <div class="sl">Shared time, optional</div>
+          <div class="dateline">
+            <input type="date" id="date-person" aria-label="Day the team plans to work on this together">
+            <span class="dh">Leave it blank and nothing is scheduled</span>
+          </div>
+        </div>
+        <div class="confirm">
+          <div class="cl">Before you send</div>
+          <p id="sum-person"></p>
+          <div class="ca">
+            <button class="btn" id="send-person" disabled>Assign</button>
+            <button class="btn sec" data-shut="person">Cancel</button>
+          </div>
+          <div class="done" id="done-person"></div>
+        </div>
       </div>
-    </div>
 
-    <div class="reflect">
+      <!-- move door -->
+      <div class="flow" id="f-move">
+        <div class="flowtitle">Starting from shared time</div>
+        <div class="step">
+          <div class="sl">The day you are already together</div>
+          <div class="sn">This one starts here, because the meeting is the thing you are planning around.</div>
+          <div class="dateline">
+            <input type="date" value="2026-11-04" id="date-move" aria-label="Day the team plans to work on this together">
+            <span class="dh">Still not a deadline</span>
+          </div>
+        </div>
+        <div class="step">
+          <div class="sl">The goal</div>
+          <div class="grid2" data-goals="move">
+            <button class="opt" data-goal="Hub PD applied in the classroom">
+              <div class="ot">Hub PD applied in the classroom</div>
+              <div class="os">Never measured. This would be its first reading.</div>
+            </button>
+            <button class="opt" data-goal="Paraprofessionals in instructional roles">
+              <div class="ot">Paraprofessionals in instructional roles</div><div class="os">At 44%, target 70%</div>
+            </button>
+          </div>
+        </div>
+        <div class="step">
+          <div class="sl">The tool everyone works on</div>
+          <div class="grid2" data-tools="move">
+            <button class="opt" data-tool="Building Strong Teacher-Para Partnerships">
+              <div class="ot">Building Strong Teacher-Para Partnerships</div><div class="ok">Course</div>
+            </button>
+            <button class="opt" data-tool="Communication that Clicks">
+              <div class="ot">Communication that Clicks</div><div class="ok">Course</div>
+            </button>
+          </div>
+        </div>
+        <div class="step">
+          <div class="sl">Who is in it</div>
+          <div class="grid2" data-people="move">
+            <button class="opt" data-name="Dan Reyes">
+              <span class="prow"><span class="cb"></span>
+              <span class="pn">Dan Reyes<small>Grade 2</small></span>
+              <span class="dots"><i></i><i></i><i></i></span></span>
+            </button>
+            <button class="opt" data-name="Tom Whitfield">
+              <span class="prow"><span class="cb"></span>
+              <span class="pn">Tom Whitfield<small>Grade 5</small></span>
+              <span class="dots"><i></i><i></i><i></i></span></span>
+            </button>
+            <button class="opt" data-name="Joe Kaminski">
+              <span class="prow"><span class="cb"></span>
+              <span class="pn">Joe Kaminski<small>Para</small></span>
+              <span class="dots"><i class="f"></i><i></i><i></i></span></span>
+            </button>
+            <button class="opt" data-name="Priya Raman">
+              <span class="prow"><span class="cb"></span>
+              <span class="pn">Priya Raman<small>One slot left</small></span>
+              <span class="dots"><i class="f"></i><i class="f"></i><i></i></span></span>
+            </button>
+          </div>
+        </div>
+        <div class="confirm">
+          <div class="cl">Before you send</div>
+          <p id="sum-move"></p>
+          <div class="ca">
+            <button class="btn" id="send-move" disabled>Assign to the group</button>
+            <button class="btn sec" data-shut="move">Cancel</button>
+          </div>
+          <div class="done" id="done-move"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== why not ===== -->
+    <section class="card">
+      <h2>Why it has not been used yet</h2>
+      <p class="csub">
+        From the question your team is asked ten days after they answer. Across everything
+        assigned for Student engagement practices in use, 7 answers.
+      </p>
+
+      <div style="margin-top:16px">
+        <div class="reason">
+          <div class="rl">It does not fit my students or my subject
+            <small>A signal about the tool rather than the person.</small>
+          </div>
+          <div class="rtrack"><i class="hot" style="width:43%"></i></div>
+          <div class="rn">3 of 7</div>
+        </div>
+        <div class="reason">
+          <div class="rl">I would need help to get started
+            <small>A request. The fastest thing on this list to fix.</small>
+          </div>
+          <div class="rtrack"><i class="hot" style="width:29%"></i></div>
+          <div class="rn">2 of 7</div>
+        </div>
+        <div class="reason">
+          <div class="rl">I have not had the time yet</div>
+          <div class="rtrack"><i style="width:14%"></i></div>
+          <div class="rn">1 of 7</div>
+        </div>
+        <div class="reason">
+          <div class="rl">I am already doing something like it</div>
+          <div class="rtrack"><i style="width:14%"></i></div>
+          <div class="rn">1 of 7</div>
+        </div>
+      </div>
+
+      <div class="callout">
+        <b>Three of seven say the tool is wrong for their room.</b> Worth a different one
+        for those three rather than asking again. Two more would need help to start, and
+        neither of those five will be reminded, because they answered rather than stayed
+        quiet. The one who has not had time will be, once.
+      </div>
+    </section>
+
+    <!-- ===== quotes ===== -->
+    <section class="card">
+      <h2>In their own words</h2>
+      <p class="csub">Unedited, from the people who chose to share them.</p>
+
       <div class="quote">
         <p>
           I used the first four minutes idea with my afternoon group and it was the calmest
           start we have had. It did not work with my morning class at all and I am still
           thinking about why.
         </p>
-        <div class="who">Marcy Ellison, Grade 4, on The Shift Kit. Shared with you.</div>
+        <div class="attr">Marcy Ellison, Grade 4, on The Shift Kit</div>
       </div>
       <div class="quote anon">
         <p>
           Honestly I read it and it is not for my room. I teach eleven year olds who
           already know each other well and this felt written for a September classroom.
         </p>
-        <div class="who">Shared with the school without a name, on The Shift Kit.</div>
+        <div class="attr">Shared without a name, on The Shift Kit</div>
       </div>
-      <div class="private">
-        Two people answered and kept their notes to themselves. That is their choice and
-        it is not a gap. You can still see where they sit on the bar above.
+      <div class="kept">
+        Two people answered the question and kept their notes to themselves. That is their
+        choice and it is not a gap. You can still see where they sit on the bar above.
       </div>
-    </div>
+    </section>
 
-    <!-- ========== 4. teacher side ========== -->
-    <h2 class="sec">What your team is asked</h2>
-    <p class="secnote">
-      Two prompts, ever. The first when they open it, the second ten days after they
-      answer. An answer is a position they can move, not a form they file, so it can go up
-      and it can come back down.
-    </p>
+    <!-- ===== what your team is asked ===== -->
+    <section class="card">
+      <h2>What your team is asked</h2>
+      <p class="csub">
+        Three things at most, and the third only reaches the people it would help. An
+        answer is a position they can move, so it can go up and it can come back down.
+      </p>
 
-    <div class="teacher">
-      <div class="tcard">
-        <div class="twhen">When they open it</div>
-        <div class="tq">What happened with this one?</div>
-        <div class="tsub">The Shift Kit, for Student engagement practices in use</div>
-        <div class="opt"><span class="dot"></span>Not yet</div>
-        <div class="opt key"><span class="dot"></span>I read it, I have not used it</div>
-        <div class="opt"><span class="dot"></span>I used it with students</div>
-        <div class="opt"><span class="dot"></span>I am using it regularly</div>
-        <div class="ta"></div>
-        <div class="shareline">Anything you want to add is optional. Share it with</div>
-        <div class="shareopts">
-          <span class="so">Just me</span><span class="so">My leader</span>
-          <span class="so">My school, without my name</span>
+      <div class="asked">
+        <div class="ask">
+          <div class="aw">When they open it</div>
+          <div class="aq">What happened with this one?</div>
+          <ul>
+            <li>Not yet</li>
+            <li>I read it, I have not used it</li>
+            <li>I used it with students</li>
+            <li>I am using it regularly</li>
+          </ul>
+          <div class="an">
+            Anything they add is optional, and they choose whether it stays with them,
+            comes to you, or goes to the school without their name.
+          </div>
+        </div>
+
+        <div class="ask">
+          <div class="aw">Ten days after they answer</div>
+          <div class="aq">Have you used it with students yet?</div>
+          <ul>
+            <li>It does not fit my students or my subject</li>
+            <li>I have not had the time yet</li>
+            <li>I tried it and it did not work</li>
+            <li>I am already doing something like it</li>
+            <li>I would need help to get started</li>
+          </ul>
+          <div class="an">
+            Asked only if they have not used it. These are the answers in the panel above.
+          </div>
+        </div>
+
+        <div class="ask third">
+          <div class="aw">One reminder, for some</div>
+          <div class="aq">Still want to try this?</div>
+          <ul>
+            <li>Sent to anyone who said they have not had the time</li>
+            <li>Sent to anyone who never answered at all</li>
+            <li>Never sent to someone who said it does not fit their room, that they tried it, or that they already do something like it</li>
+          </ul>
+          <div class="an">
+            Sent once, never twice. "I would need help to get started" comes to you instead
+            of going back to them.
+          </div>
         </div>
       </div>
+    </section>
 
-      <div class="tcard">
-        <div class="twhen">Ten days after that answer</div>
-        <div class="tq">Have you used The Shift Kit with students yet?</div>
-        <div class="tsub">One question. Either answer is fine.</div>
-        <div class="opt"><span class="dot"></span>Yes, I have used it</div>
-        <div class="opt key"><span class="dot"></span>Not yet</div>
-        <div class="shareline" style="margin-top:13px">Because, and this is the useful part</div>
-        <div class="opt"><span class="dot"></span>It does not fit my students or my subject</div>
-        <div class="opt"><span class="dot"></span>I have not had the time yet</div>
-        <div class="opt"><span class="dot"></span>I tried it and it did not work</div>
-        <div class="opt"><span class="dot"></span>I am already doing something like it</div>
-        <div class="opt"><span class="dot"></span>I would need help to get started</div>
-        <div class="movednote">
-          Answering "Yes" moves them to the right of the line and the goal number follows.
-          Nobody is asked a third time.
-        </div>
-      </div>
-    </div>
-  </div>
+  </main>
 
   <footer>
-    <b>Mock, nothing built.</b> Staff names are invented. The goals, their current
-    readings, the tool names and the "never measured" state are real, read from live data
-    on 2 October 2026. Follows <code>docs/assignment-spec.md</code> A1 to A6, with A4
-    still to be updated to cover the ten day follow up and the fact that an answer can
-    move in both directions.
+    <p class="fnote">
+      Mock of a proposed tab. Goals, their readings, the roster count and the tool names
+      are real. Staff names are invented and the assignment data is illustrative, because
+      nothing has been built yet.
+    </p>
   </footer>
 </div>
 
 <script>
   (function () {
     const st = {};
-    function g(k) { st[k] = st[k] || { people: [] }; return st[k]; }
-
-    function join(n) {
-      if (n.length === 1) return n[0];
-      if (n.length === 2) return n[0] + ' and ' + n[1];
-      return n.slice(0, -1).join(', ') + ' and ' + n[n.length - 1];
-    }
-    function fmt(v) {
-      if (!v) return null;
-      return new Date(v + 'T12:00:00').toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
-    }
+    const g = k => (st[k] = st[k] || { people: [] });
+    const join = n => n.length === 1 ? n[0]
+      : n.length === 2 ? n[0] + ' and ' + n[1]
+      : n.slice(0, -1).join(', ') + ' and ' + n[n.length - 1];
+    const fmt = v => v ? new Date(v + 'T12:00:00')
+      .toLocaleDateString('en-US', { month: 'long', day: 'numeric' }) : null;
 
     function build(k) {
       const s = g(k);
-      const one = document.querySelector('[data-oneperson="' + k + '"]');
+      const one = document.querySelector('[data-one="' + k + '"]');
       const names = one ? (s.one ? [s.one] : []) : s.people;
       const miss = [];
-      if (names.length === 0) miss.push(one ? 'a person' : 'at least one person');
+      if (!names.length) miss.push(one ? 'a person' : 'at least one person');
       if (!s.goal) miss.push('a goal');
       if (!s.tool) miss.push('a tool');
       if (miss.length) return { text: 'Still to pick: ' + join(miss) + '.', ok: false };
@@ -791,8 +771,8 @@
         ? ' They will be told the team plans to work on it around ' + when + ', and that it is not a deadline.'
         : ' No shared date, so nothing is scheduled and nothing comes due.';
       out += names.length === 1
-        ? ' They get this in the Hub, and one email that also carries anything else already waiting on them.'
-        : ' Each of them gets this in the Hub, and one email that also carries anything else already waiting on them.';
+        ? ' They get it in the Hub, and one email that also carries anything else already waiting on them.'
+        : ' Each of them gets it in the Hub, and one email that also carries anything else already waiting on them.';
       out += ' Ten days after they answer, they are asked once whether they have used it.';
       return { text: out, ok: true };
     }
@@ -803,69 +783,71 @@
       document.getElementById('send-' + k).disabled = !r.ok;
     }
 
-    function single(sel, k, prop) {
-      const grid = document.querySelector('[' + sel + '="' + k + '"]');
+    function pickOne(attr, k, prop, dataAttr) {
+      const grid = document.querySelector('[' + attr + '="' + k + '"]');
       if (!grid) return;
-      grid.querySelectorAll('.pick').forEach(function (b) {
-        b.addEventListener('click', function () {
+      grid.querySelectorAll('.opt').forEach(b => {
+        b.addEventListener('click', () => {
           if (b.disabled) return;
-          grid.querySelectorAll('.pick').forEach(function (x) { x.classList.remove('on'); });
+          grid.querySelectorAll('.opt').forEach(x => x.classList.remove('on'));
           b.classList.add('on');
-          g(k)[prop] = b.getAttribute(prop === 'tool' ? 'data-tool' : prop === 'goal' ? 'data-goal' : 'data-name');
+          g(k)[prop] = b.getAttribute(dataAttr);
           refresh(k);
         });
       });
     }
 
-    ['goal', 'person', 'move'].forEach(function (k) {
-      single('data-goals', k, 'goal');
-      single('data-tools', k, 'tool');
-      single('data-oneperson', k, 'one');
+    ['goal', 'person', 'move'].forEach(k => {
+      pickOne('data-goals', k, 'goal', 'data-goal');
+      pickOne('data-tools', k, 'tool', 'data-tool');
+      pickOne('data-one', k, 'one', 'data-name');
 
       const many = document.querySelector('[data-people="' + k + '"]');
-      if (many) many.querySelectorAll('.pick').forEach(function (b) {
-        b.addEventListener('click', function () {
+      if (many) many.querySelectorAll('.opt').forEach(b => {
+        b.addEventListener('click', () => {
           if (b.disabled) return;
           b.classList.toggle('on');
           g(k).people = Array.prototype.map.call(
-            many.querySelectorAll('.pick.on'), function (x) { return x.getAttribute('data-name'); });
+            many.querySelectorAll('.opt.on'), x => x.getAttribute('data-name'));
           refresh(k);
         });
       });
 
       const d = document.getElementById('date-' + k);
-      if (d) d.addEventListener('change', function () { refresh(k); });
+      if (d) d.addEventListener('change', () => refresh(k));
 
       const send = document.getElementById('send-' + k);
-      if (send) send.addEventListener('click', function () {
+      if (send) send.addEventListener('click', () => {
         const s = g(k);
-        const one = document.querySelector('[data-oneperson="' + k + '"]');
-        const n = one ? 1 : s.people.length;
-        const el = document.getElementById('sent-' + k);
+        const n = document.querySelector('[data-one="' + k + '"]') ? 1 : s.people.length;
+        const el = document.getElementById('done-' + k);
         el.textContent = 'Assigned to ' + n + (n === 1 ? ' person' : ' people') +
-          '. It shows under Where things stand, on the left of the line until somebody uses it.';
-        el.classList.add('show');
+          '. It appears under Where things stand, left of the line until somebody uses it.';
+        el.classList.add('on');
         send.disabled = true;
       });
 
       refresh(k);
     });
 
-    document.querySelectorAll('[data-door]').forEach(function (b) {
-      b.addEventListener('click', function () {
+    document.querySelectorAll('[data-door]').forEach(b => {
+      b.addEventListener('click', () => {
         const k = b.getAttribute('data-door');
-        const already = b.classList.contains('on');
-        document.querySelectorAll('[data-door]').forEach(function (x) { x.classList.remove('on'); });
-        document.querySelectorAll('.flowbox').forEach(function (x) { x.classList.remove('on'); });
-        if (already) return;
-        b.classList.add('on');
-        document.getElementById('f-' + k).classList.add('on');
+        const open = document.getElementById('f-' + k).classList.contains('on');
+        document.querySelectorAll('.door').forEach(x => x.classList.remove('on'));
+        document.querySelectorAll('.flow').forEach(x => x.classList.remove('on'));
+        if (open) return;
+        const door = document.querySelector('.door[data-door="' + k + '"]');
+        if (door) door.classList.add('on');
+        const f = document.getElementById('f-' + k);
+        f.classList.add('on');
+        f.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       });
     });
-    document.querySelectorAll('[data-shut]').forEach(function (b) {
-      b.addEventListener('click', function () {
+    document.querySelectorAll('[data-shut]').forEach(b => {
+      b.addEventListener('click', () => {
         document.getElementById('f-' + b.getAttribute('data-shut')).classList.remove('on');
-        document.querySelectorAll('[data-door]').forEach(function (x) { x.classList.remove('on'); });
+        document.querySelectorAll('.door').forEach(x => x.classList.remove('on'));
       });
     });
   })();
