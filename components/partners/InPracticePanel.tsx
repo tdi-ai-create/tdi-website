@@ -145,20 +145,23 @@ export default function InPracticePanel({
 
   const open = assignments.filter(a => !a.closed_at);
 
-  return (
-    <div className="space-y-6">
+  /**
+   * Where things stand sits below the assign panel, and only once something has
+   * been assigned.
+   *
+   * Rae, 2 October 2026, on seeing it live: we do not need this top section. She
+   * was right, and emptier than unnecessary. With nothing assigned it rendered
+   * three goals in a row each saying "Assignments do not move this number",
+   * which is three identical caveats standing between a leader and the only
+   * thing they opened the tab to do. A panel that reports on work nobody has
+   * started is not a report, it is an obstacle.
+   */
+  const stand = open.length === 0 ? null : (
       <Card>
         <h3 style={h}>Where things stand</h3>
-        {open.length === 0 ? (
-          <p style={sub}>
-            Nothing has been assigned yet. Once something is, every goal you assign against shows
-            how far your team has got with it, from read it to using it regularly.
-          </p>
-        ) : (
-          <p style={sub}>
-            Anything left of the dashed line has been read but not used with students yet.
-          </p>
-        )}
+        <p style={sub}>
+          Anything left of the dashed line has been read but not used with students yet.
+        </p>
 
         {accepted.map(goal => {
           const mine = open.filter(a => a.goal_id === goal.id);
@@ -216,7 +219,10 @@ export default function InPracticePanel({
           );
         })}
       </Card>
+  );
 
+  return (
+    <div className="space-y-6">
       <Assign
         partnershipId={partnershipId}
         userId={userId}
@@ -226,6 +232,8 @@ export default function InPracticePanel({
         openByEmail={countOpenByEmail(open)}
         onAssigned={a => setAssignments(prev => [...a, ...prev])}
       />
+
+      {stand}
 
       <Card>
         <h3 style={h}>What your team is asked</h3>
