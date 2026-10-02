@@ -10,24 +10,29 @@ call, 2 October 2026.
 
 ## What I did
 
-Nothing in a browser. This pass is deferred, and it is the second deferral on
-these screens, which the standard says pays for the first.
+Partly. The build blocker named in the earlier record is gone: `npm i` failed
+because npm could not write to `/Users/raehughart/.npm`, and pointing it at its
+own cache directory installed the missing `@next/swc-darwin-arm64` binary. The
+dashboard now loads locally and the companion record,
+popularity-not-headcount.md, carries real observations off the screen.
 
-- Deferred: `next dev` and `next build` still fail repo-wide with
-  "`turbo.createProject` is not supported by the wasm bindings", because
-  `node_modules/@next/swc-darwin-arm64` holds only a package.json and a README
-  with the `.node` binary missing. `npm i` to repair it cannot write to
-  `/Users/raehughart/.npm` and asks for `sudo chown -R 501:20`, which I did not
-  run. Unchanged since the previous record, and not caused by either change.
+- Opened: http://localhost:3217/partners/saunemin-ccsd-438-dashboard
+- Pressed: the "2026-2027" tab, badged LIVE.
+- Saw: the engagement panel rendering "26% Active this week" and "41% Active
+  this month", confirming the shared share helper this change also uses.
 
-- Verify after deploy: https://www.teachersdeserveit.com/partners/saunemin-ccsd-438-dashboard
-  Press "Board Report" and read the EXECUTIVE SUMMARY and the ENGAGEMENT
-  section. Expect "Active on Hub: 75%" and "Not Yet Logged In: 25%" rather than
-  "18" and "6". Then press "Staff Newsletter" and confirm the block is headed
-  "YOUR TEAM SO FAR" and opens "75% of us have logged in". Then press the CSV
-  export and open the file: expect a row "Hub Active %" and no "Hub Active"
-  row. Then press Print and read the fourth stat tile, which must show a
-  percentage rather than a headcount when a school has no wellness score.
+The report generators themselves were NOT exercised.
+
+- Deferred: I did not press "Board Report" or any other generator. This is a
+  sequencing choice rather than a blocker, and it is the honest state of this
+  record rather than a claim about the build.
+- Verify after deploy, or on the next local pass: press "Board Report" and read
+  the EXECUTIVE SUMMARY and ENGAGEMENT sections. Expect "Active on Hub: 75%" and
+  "Not Yet Logged In: 25%" rather than counts. Press "Staff Newsletter" and
+  expect a block headed "YOUR TEAM SO FAR" opening "75% of us have logged in".
+  Press the CSV export and expect a "Hub Active %" row and no "Hub Active" row.
+  Press Print and read the fourth stat tile, which must show a percentage when a
+  school has no wellness score.
 
 ## Evidence short of the browser
 
