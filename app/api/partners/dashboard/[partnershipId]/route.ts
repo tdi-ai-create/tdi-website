@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { clientFacingServiceName, plannedDateNote } from '@/lib/partnerships/service-names';
 import { engagementTrend, type EngagementTrend } from '@/lib/partners/popularity';
 import { createClient } from '@supabase/supabase-js';
+import { isAssignTabOn } from '@/lib/hub/assignment-flag';
 
 // Service Supabase client
 function getServiceSupabase() {
@@ -523,7 +524,7 @@ export async function GET(
     // Get partnership KPIs (if set)
     const { data: kpis } = await supabase
       .from('partnership_kpis')
-      .select('kpi_key, kpi_label, target_value, target_unit, current_value, benchmark_low, benchmark_high, benchmark_label, data_source, how_tdi_delivers, deeper_measurement, suggested_offering, status')
+      .select('id, kpi_key, kpi_label, target_value, target_unit, current_value, benchmark_low, benchmark_high, benchmark_label, data_source, how_tdi_delivers, deeper_measurement, suggested_offering, status, measured_by_assignment')
       .eq('partnership_id', partnershipId)
       // Suggestions reach the page too. A goal proposed before a school's
       // onboarding meeting is still something they should be able to read and
@@ -813,6 +814,11 @@ export async function GET(
 
     return NextResponse.json({
       success: true,
+      // Whether the In Practice tab is reachable. Server side, so the dashboard
+      // is told rather than reading the flag itself: a NEXT_PUBLIC_ variable
+      // would put the switch in the browser bundle and make it one deploy to
+      // change rather than one environment variable.
+      inPracticeTab: isAssignTabOn(),
       organization,
       actionItems: actionItems || [],
       staffStats,
