@@ -14,6 +14,7 @@ import { BookOpen, CheckCircle, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
 import QuizNudge from '@/components/hub/QuizNudge';
 import HubFilterBar from '@/components/hub/HubFilterBar';
+import { categoryMatches } from '@/lib/hub/categories';
 import QuickWinCard from '@/components/hub/QuickWinCard';
 
 // Filter categories
@@ -235,9 +236,7 @@ export default function CourseCatalogPage() {
       if (activeFilter === 'All') return true;
       if (activeFilter === 'Saved') return isFavorite(course.id);
       if (activeFilter === 'In Progress') return !!enrollments[course.id];
-      // Match kebab-case DB values against Title Case filter labels
-      const normalizedCategory = course.category?.replace(/-/g, ' ').replace(/&/g, '&').replace(/\b\w/g, c => c.toUpperCase());
-      return normalizedCategory === activeFilter || course.category === activeFilter;
+      return categoryMatches(course.category, activeFilter);
     })();
     const capacityMatch = capacityFilter === 'all' || course.capacity === capacityFilter;
     const danielsonMatch = danielsonFilter.length === 0 || danielsonFilter.some(d => course.danielson_domains?.includes(d));
