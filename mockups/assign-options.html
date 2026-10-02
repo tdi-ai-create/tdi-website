@@ -1,0 +1,1152 @@
+<title>Three Ways to Assign</title>
+<style>
+  :root {
+    --navy: #1e2749;
+    --ink: #1e2749;
+    --ink-soft: #5a6478;
+    --ink-faint: #8a93a5;
+    --page: #eef0f5;
+    --ground: #f5f6f9;
+    --card: #ffffff;
+    --rule: #e4e7f0;
+    --rule-soft: #eef0f6;
+    --blue: #38618C;
+    --blue-light: #80a4ed;
+    --wash: #E8F0FD;
+    --gold: #ffba06;
+    --gold-ink: #6b4e00;
+    --green: #2f8f5b;
+    --chip: #eff2f8;
+    --step2: #cfd6e6;
+    --step2-ink: #3f4a63;
+    --btn-ink: #ffffff;
+    --shadow: 0 1px 2px rgba(30,39,73,.04), 0 10px 30px -22px rgba(30,39,73,.3);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --navy: #c6d1ec;
+      --ink: #e7eaf3;
+      --ink-soft: #a4aec4;
+      --ink-faint: #7b849a;
+      --page: #0b0e15;
+      --ground: #0f131c;
+      --card: #171c28;
+      --rule: #272e3e;
+      --rule-soft: #1f2532;
+      --blue: #9cb8e4;
+      --blue-light: #80a4ed;
+      --wash: #1a2232;
+      --gold: #ffba06;
+      --gold-ink: #241a00;
+      --green: #4cb77e;
+      --chip: #1e2533;
+      --step2: #39425a;
+      --step2-ink: #cdd5e8;
+      --btn-ink: #0f131c;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 30px -22px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="dark"] {
+    --navy: #c6d1ec;
+    --ink: #e7eaf3;
+    --ink-soft: #a4aec4;
+    --ink-faint: #7b849a;
+    --page: #0b0e15;
+    --ground: #0f131c;
+    --card: #171c28;
+    --rule: #272e3e;
+    --rule-soft: #1f2532;
+    --blue: #9cb8e4;
+    --blue-light: #80a4ed;
+    --wash: #1a2232;
+    --gold: #ffba06;
+    --gold-ink: #241a00;
+    --green: #4cb77e;
+    --chip: #1e2533;
+    --step2: #39425a;
+    --step2-ink: #cdd5e8;
+    --btn-ink: #0f131c;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 30px -22px rgba(0,0,0,.8);
+  }
+
+  body {
+    background: var(--page);
+    color: var(--ink);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 15px; line-height: 1.55; -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 1010px; margin: 0 auto; padding: 36px 20px 100px; }
+
+  /* ===== page head ===== */
+  .eyebrow {
+    font-size: 11.5px; letter-spacing: .13em; text-transform: uppercase;
+    color: var(--ink-faint); font-weight: 680;
+  }
+  h1 {
+    font-size: clamp(27px, 4.6vw, 36px); line-height: 1.12; font-weight: 700;
+    letter-spacing: -.018em; color: var(--navy); margin-top: 10px; text-wrap: balance;
+  }
+  .standfirst {
+    margin-top: 13px; font-size: 16.5px; color: var(--ink-soft); max-width: 62ch;
+  }
+
+  /* ===== switcher ===== */
+  .switch {
+    margin-top: 26px; display: grid; gap: 8px; grid-template-columns: 1fr;
+  }
+  @media (min-width: 760px) { .switch { grid-template-columns: repeat(3, 1fr); } }
+  .switch button {
+    font: inherit; text-align: left; cursor: pointer;
+    background: var(--card); border: 1.5px solid var(--rule);
+    border-radius: 11px; padding: 13px 14px; color: var(--ink);
+  }
+  .switch button:hover { border-color: var(--blue-light); }
+  .switch button:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+  .switch button.on { border-color: var(--navy); background: var(--wash); }
+  .switch .oid {
+    font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--ink-faint); font-weight: 680;
+  }
+  .switch .oname { font-size: 15.5px; font-weight: 680; margin-top: 4px; }
+  .switch .osub { font-size: 12.8px; color: var(--ink-soft); margin-top: 4px; }
+
+  /* ===== trade-off block ===== */
+  .tradeoff {
+    margin-top: 26px; background: var(--card); border-radius: 13px;
+    border: 1px solid var(--rule); padding: 19px 20px; box-shadow: var(--shadow);
+  }
+  .tradeoff .cols { display: grid; gap: 18px; grid-template-columns: 1fr; }
+  @media (min-width: 680px) { .tradeoff .cols { grid-template-columns: 1fr 1fr; } }
+  .tradeoff h3 {
+    font-size: 11px; letter-spacing: .12em; text-transform: uppercase; font-weight: 680;
+  }
+  .tradeoff .good h3 { color: var(--green); }
+  .tradeoff .bad h3 { color: #b4762a; }
+  :root[data-theme="dark"] .tradeoff .bad h3 { color: var(--gold); }
+  .tradeoff p { margin-top: 7px; font-size: 14.2px; line-height: 1.6; color: var(--ink-soft); }
+  .tradeoff p b { color: var(--ink); font-weight: 650; }
+
+  /* ===== dashboard chrome ===== */
+  .chrome {
+    margin-top: 22px; background: var(--card); border: 1px solid var(--rule);
+    border-radius: 14px 14px 0 0; border-bottom: none; padding: 16px 20px 0;
+  }
+  .chrome .school { font-size: 12.5px; color: var(--ink-faint); font-weight: 620; }
+  .tabstrip {
+    display: flex; gap: 2px; margin-top: 12px; overflow-x: auto;
+    border-bottom: 1px solid var(--rule);
+    margin-left: -20px; margin-right: -20px; padding: 0 20px;
+  }
+  .tabstrip span {
+    font-size: 13px; font-weight: 620; color: var(--ink-faint);
+    padding: 9px 12px 11px; border-bottom: 2.5px solid transparent; white-space: nowrap;
+  }
+  .tabstrip span.on { color: var(--navy); border-bottom-color: var(--gold); }
+  .mockbody {
+    background: var(--card); border: 1px solid var(--rule); border-top: none;
+    border-radius: 0 0 14px 14px; padding: 24px 20px 28px;
+  }
+  .mockbody h2.t {
+    font-size: 20px; font-weight: 690; letter-spacing: -.012em; color: var(--navy);
+  }
+  .frame { margin-top: 6px; font-size: 14px; color: var(--ink-soft); max-width: 66ch; }
+  h3.sec {
+    font-size: 11px; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--ink-faint); font-weight: 680; margin-top: 28px;
+  }
+
+  /* ===== shared bits ===== */
+  .btn {
+    font: inherit; font-size: 13px; font-weight: 660; border-radius: 8px;
+    padding: 8px 14px; cursor: pointer; background: var(--navy);
+    color: var(--btn-ink); border: none; white-space: nowrap;
+  }
+  .btn:hover { filter: brightness(1.12); }
+  .btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+  .btn:disabled { opacity: .42; cursor: not-allowed; }
+  .btn.ghost { background: none; color: var(--blue); border: 1px solid var(--rule); }
+  .btn.ghost:hover { background: var(--chip); filter: none; }
+  .btn.sm { font-size: 12.2px; padding: 6px 11px; }
+
+  .bar {
+    display: flex; height: 24px; border-radius: 7px; overflow: hidden; background: var(--rule-soft);
+  }
+  .seg { display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 680; }
+  .s1 { background: var(--rule-soft); color: var(--ink-faint); }
+  .s2 { background: var(--step2); color: var(--step2-ink); }
+  .s3 { background: var(--blue-light); color: #12223d; }
+  .s4 { background: var(--blue); color: #fff; }
+  .markwrap { position: relative; }
+  .mark { position: absolute; top: -5px; bottom: -5px; width: 0; border-left: 2.5px dashed var(--gold); }
+  .marklabel {
+    display: flex; justify-content: space-between; gap: 14px; margin-top: 8px;
+    font-size: 12px; color: var(--ink-faint); flex-wrap: wrap;
+  }
+  .marklabel .right { color: var(--ink); font-weight: 660; }
+  .legend { display: flex; flex-wrap: wrap; gap: 13px; margin-top: 10px; font-size: 11.8px; color: var(--ink-soft); }
+  .legend span { display: flex; align-items: center; gap: 6px; }
+  .legend i { width: 10px; height: 10px; border-radius: 3px; display: block; }
+
+  .load { display: flex; gap: 3px; flex: none; }
+  .load i { width: 7px; height: 7px; border-radius: 999px; display: block; border: 1px solid var(--ink-faint); }
+  .load i.full { background: var(--ink-faint); }
+  .load.maxed i { border-color: var(--gold); }
+  .load.maxed i.full { background: var(--gold); }
+
+  .summary { margin-top: 20px; background: var(--wash); border-radius: 11px; padding: 15px 16px; }
+  .summary .slab {
+    font-size: 11px; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--blue); font-weight: 680;
+  }
+  .summary p { margin-top: 7px; font-size: 14.5px; line-height: 1.6; max-width: 64ch; }
+  .summary .actions { margin-top: 14px; display: flex; gap: 9px; flex-wrap: wrap; }
+  .sent { margin-top: 12px; font-size: 13.2px; color: var(--green); font-weight: 630; display: none; }
+  .sent.show { display: block; }
+
+  .steplab { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--blue); font-weight: 680; }
+  .stepnote { font-size: 12.8px; color: var(--ink-faint); margin-top: 4px; max-width: 62ch; }
+  .step { margin-top: 19px; }
+  .step:first-child { margin-top: 0; }
+
+  .tools { display: grid; gap: 8px; margin-top: 10px; grid-template-columns: 1fr; }
+  @media (min-width: 620px) { .tools { grid-template-columns: 1fr 1fr; } }
+  .tool {
+    text-align: left; font: inherit; cursor: pointer; color: var(--ink);
+    border: 1px solid var(--rule); background: var(--card); border-radius: 10px; padding: 11px 12px;
+  }
+  .tool:hover { border-color: var(--blue-light); }
+  .tool:focus-visible { outline: 2px solid var(--gold); outline-offset: 1px; }
+  .tool.on { border-color: var(--blue); background: var(--wash); }
+  .tool .tname { font-size: 14px; font-weight: 660; }
+  .tool .tkind { font-size: 10px; letter-spacing: .07em; text-transform: uppercase; color: var(--ink-faint); font-weight: 680; margin-top: 3px; }
+  .tool .twhy { font-size: 12.4px; color: var(--ink-soft); margin-top: 5px; }
+
+  .people { margin-top: 10px; display: grid; gap: 7px; grid-template-columns: 1fr; }
+  @media (min-width: 620px) { .people { grid-template-columns: 1fr 1fr; } }
+  .person {
+    display: flex; align-items: center; gap: 10px; text-align: left; font: inherit;
+    cursor: pointer; background: var(--card); color: var(--ink);
+    border: 1px solid var(--rule); border-radius: 9px; padding: 9px 11px;
+  }
+  .person:hover:not(:disabled) { border-color: var(--blue-light); }
+  .person:focus-visible { outline: 2px solid var(--gold); outline-offset: 1px; }
+  .person.on { border-color: var(--blue); background: var(--wash); }
+  .person:disabled { cursor: not-allowed; background: var(--ground); color: var(--ink-faint); }
+  .box { width: 16px; height: 16px; border-radius: 4px; flex: none; border: 1.5px solid var(--ink-faint); display: grid; place-items: center; }
+  .person.on .box { border-color: var(--blue); background: var(--blue); }
+  .person.on .box::after { content: ""; width: 7px; height: 4px; border-left: 2px solid #fff; border-bottom: 2px solid #fff; transform: rotate(-45deg) translate(1px,-1px); }
+  .pname { font-size: 13.8px; font-weight: 620; flex: 1; min-width: 0; }
+  .pname small { display: block; font-weight: 500; font-size: 11.5px; color: var(--ink-faint); }
+
+  .capnote {
+    margin-top: 9px; font-size: 12.3px; color: var(--ink-soft);
+    background: var(--chip); border-radius: 8px; padding: 9px 11px; max-width: 62ch;
+  }
+  .datewrap { margin-top: 10px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .datewrap input {
+    font: inherit; font-size: 13.2px; padding: 7px 10px; border: 1px solid var(--rule);
+    border-radius: 8px; background: var(--card); color: var(--ink);
+  }
+  .datewrap input:focus-visible { outline: 2px solid var(--gold); outline-offset: 1px; }
+  .hint { font-size: 12.4px; color: var(--ink-faint); }
+
+  /* ===== option A ===== */
+  .goal { margin-top: 10px; border: 1px solid var(--rule); border-radius: 12px; padding: 15px 16px; }
+  .goal.open { border-color: var(--blue-light); box-shadow: var(--shadow); }
+  .goalhead { display: flex; gap: 14px; align-items: flex-start; flex-wrap: wrap; }
+  .goalname { font-size: 15.4px; font-weight: 660; flex: 1 1 250px; }
+  .goalmeta { font-size: 12.5px; color: var(--ink-faint); margin-top: 3px; }
+  .flow { margin-top: 17px; border-top: 1px dashed var(--rule); padding-top: 17px; display: none; }
+  .goal.open .flow { display: block; }
+
+  /* ===== option B ===== */
+  .rosterrow {
+    margin-top: 8px; border: 1px solid var(--rule); border-radius: 11px; padding: 13px 15px;
+  }
+  .rosterrow.open { border-color: var(--blue-light); box-shadow: var(--shadow); }
+  .rhead { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+  .rname { font-size: 15px; font-weight: 660; flex: 1 1 180px; }
+  .rname small { display: block; font-weight: 500; font-size: 11.8px; color: var(--ink-faint); }
+  .slots { display: flex; gap: 6px; flex-wrap: wrap; flex: 2 1 320px; }
+  .slot {
+    flex: 1 1 96px; min-width: 96px; border-radius: 8px; padding: 7px 9px;
+    border: 1px dashed var(--rule); font-size: 11.8px; color: var(--ink-faint);
+    display: flex; flex-direction: column; gap: 3px;
+  }
+  .slot.filled { border-style: solid; background: var(--ground); color: var(--ink); }
+  .slot .stool { font-weight: 640; font-size: 12.2px; line-height: 1.25; }
+  .slot .srung { font-size: 10.5px; font-weight: 660; letter-spacing: .03em; }
+  .slot .srung.r1 { color: var(--ink-faint); }
+  .slot .srung.r2 { color: var(--step2-ink); }
+  :root[data-theme="dark"] .slot .srung.r2 { color: var(--step2-ink); }
+  .slot .srung.r3 { color: var(--blue); }
+  .slot .srung.r4 { color: var(--green); }
+  .rflow { margin-top: 16px; border-top: 1px dashed var(--rule); padding-top: 16px; display: none; }
+  .rosterrow.open .rflow { display: block; }
+  .goalpick { display: grid; gap: 7px; margin-top: 10px; grid-template-columns: 1fr; }
+  @media (min-width: 620px) { .goalpick { grid-template-columns: 1fr 1fr; } }
+  .gp {
+    text-align: left; font: inherit; cursor: pointer; color: var(--ink);
+    border: 1px solid var(--rule); background: var(--card); border-radius: 9px;
+    padding: 10px 12px; font-size: 13.6px; font-weight: 600;
+  }
+  .gp:hover { border-color: var(--blue-light); }
+  .gp:focus-visible { outline: 2px solid var(--gold); outline-offset: 1px; }
+  .gp.on { border-color: var(--blue); background: var(--wash); }
+  .gp small { display: block; font-weight: 500; font-size: 11.6px; color: var(--ink-faint); margin-top: 2px; }
+
+  /* ===== option C ===== */
+  .move {
+    margin-top: 11px; border: 1px solid var(--rule); border-radius: 13px; padding: 17px 18px;
+    background: var(--card);
+  }
+  .move.highlight { border-color: var(--blue-light); box-shadow: var(--shadow); }
+  .movetop { display: flex; gap: 14px; align-items: flex-start; flex-wrap: wrap; }
+  .movetool { font-size: 17px; font-weight: 690; letter-spacing: -.01em; flex: 1 1 240px; }
+  .movegoal {
+    font-size: 12.5px; color: var(--blue); font-weight: 640; margin-top: 4px;
+  }
+  .movewhen {
+    font-size: 12.4px; color: var(--ink-soft); background: var(--chip);
+    border-radius: 7px; padding: 6px 10px; white-space: nowrap;
+  }
+  .movewho { margin-top: 13px; display: flex; gap: 6px; flex-wrap: wrap; }
+  .chipp {
+    font-size: 12.2px; padding: 5px 10px; border-radius: 999px;
+    background: var(--ground); border: 1px solid var(--rule); color: var(--ink-soft);
+  }
+  .chipp.inpractice { background: var(--wash); border-color: var(--blue-light); color: var(--ink); font-weight: 600; }
+  .emptymove {
+    margin-top: 11px; border: 1px dashed var(--rule); border-radius: 13px;
+    padding: 20px 18px; text-align: center; color: var(--ink-soft);
+  }
+  .emptymove p { font-size: 13.8px; max-width: 50ch; margin: 0 auto 13px; }
+
+  /* ===== reflections ===== */
+  .reflect { margin-top: 10px; border: 1px solid var(--rule); border-radius: 12px; padding: 15px 16px; }
+  .quote { border-left: 3px solid var(--blue-light); padding: 2px 0 2px 13px; margin-top: 13px; }
+  .quote:first-of-type { margin-top: 8px; }
+  .quote p { font-size: 14px; line-height: 1.58; }
+  .quote .who { margin-top: 5px; font-size: 12.1px; color: var(--ink-faint); }
+  .quote.anon { border-left-color: var(--ink-faint); }
+  .private {
+    margin-top: 15px; font-size: 12.8px; color: var(--ink-soft);
+    background: var(--chip); border-radius: 8px; padding: 10px 12px; max-width: 64ch;
+  }
+
+  .panel { display: none; }
+  .panel.on { display: block; }
+
+  footer {
+    margin-top: 44px; padding-top: 20px; border-top: 1px solid var(--rule);
+    font-size: 13px; color: var(--ink-faint); max-width: 70ch;
+  }
+  footer b { color: var(--ink-soft); }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12.5px; }
+</style>
+
+<div class="wrap">
+
+  <div class="eyebrow">Interface options, nothing built</div>
+  <h1>Three Ways to Assign</h1>
+  <p class="standfirst">
+    Same school, same goals, same six people in all three. What changes is where a
+    leader enters, and that changes what they end up doing.
+  </p>
+
+  <div class="switch" role="tablist">
+    <button class="on" data-panel="pa" role="tab" aria-selected="true">
+      <div class="oid">Option A</div>
+      <div class="oname">Start from the goal</div>
+      <div class="osub">The page is your goals. Pick one, then a tool, then people.</div>
+    </button>
+    <button data-panel="pb" role="tab" aria-selected="false">
+      <div class="oid">Option B</div>
+      <div class="oname">Start from the person</div>
+      <div class="osub">The page is your roster, with three visible slots each.</div>
+    </button>
+    <button data-panel="pc" role="tab" aria-selected="false">
+      <div class="oid">Option C</div>
+      <div class="oname">Start from the shared move</div>
+      <div class="osub">One tool, one group, one date. A few running at a time.</div>
+    </button>
+  </div>
+
+  <!-- ================= OPTION A ================= -->
+  <div class="panel on" id="pa" role="tabpanel">
+    <div class="tradeoff">
+      <div class="cols">
+        <div class="good">
+          <h3>What this encourages</h3>
+          <p>
+            A leader cannot reach a tool without passing through a goal, so <b>the why is
+            structural rather than a field on a form</b>. The goals that have never been
+            measured are visible as empty, which is a standing invitation to fix them.
+          </p>
+        </div>
+        <div class="bad">
+          <h3>What it risks</h3>
+          <p>
+            A principal who already knows the tool they want has to go and find the right
+            goal first, which can feel like paperwork. And <b>nothing shows one person's
+            total load</b> until you are deep in the picker, so it is the easiest of the
+            three in which to overload somebody.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="chrome">
+      <div class="school">Saunemin CCSD #438</div>
+      <div class="tabstrip">
+        <span>Overview</span><span>2025-2026</span><span>2026-2027</span>
+        <span class="on">In Practice</span><span>Reports</span><span>Team</span>
+      </div>
+    </div>
+    <div class="mockbody">
+      <h2 class="t">In Practice</h2>
+      <p class="frame">
+        Put a tool in someone's hands and see what happens in their classroom. Every
+        assignment starts from a goal, because the goal is the reason it is worth
+        anyone's time.
+      </p>
+
+      <h3 class="sec">Your goals</h3>
+
+      <div class="goal" id="g1">
+        <div class="goalhead">
+          <div style="flex:1 1 250px">
+            <div class="goalname">Student engagement practices in use</div>
+            <div class="goalmeta">9 on staff. 6 have something assigned for this goal.</div>
+          </div>
+          <button class="btn" data-open="g1">Assign a tool</button>
+        </div>
+        <div style="margin-top:13px">
+          <div class="markwrap">
+            <div class="bar">
+              <div class="seg s1" style="width:17%">1</div>
+              <div class="seg s2" style="width:33%">2</div>
+              <div class="seg s3" style="width:33%">2</div>
+              <div class="seg s4" style="width:17%">1</div>
+            </div>
+            <div class="mark" style="left:50%"></div>
+          </div>
+          <div class="marklabel">
+            <span>Left of the line, nothing has reached a classroom yet</span>
+            <span class="right">3 of 6 in practice</span>
+          </div>
+          <div class="legend">
+            <span><i class="s1" style="border:1px solid var(--ink-faint)"></i>Not yet</span>
+            <span><i class="s2"></i>Read it, not used it</span>
+            <span><i class="s3"></i>Used it with students</span>
+            <span><i class="s4"></i>Using it regularly</span>
+          </div>
+        </div>
+
+        <div class="flow">
+          <div class="step">
+            <div class="steplab">Step 1. Pick the tool</div>
+            <div class="stepnote">These speak to this goal. You can search the whole Hub as well.</div>
+            <div class="tools" data-tools="g1">
+              <button class="tool" data-tool="The Shift Kit">
+                <div class="tname">The Shift Kit</div><div class="tkind">Quick win</div>
+                <div class="twhy">Changing what happens in the first four minutes of a lesson.</div>
+              </button>
+              <button class="tool" data-tool="Lesson Flow Checklist">
+                <div class="tname">Lesson Flow Checklist</div><div class="tkind">Quick win</div>
+                <div class="twhy">A checklist a teacher marks up while planning, not after.</div>
+              </button>
+              <button class="tool" data-tool="Calm Classrooms, Not Chaos">
+                <div class="tname">Calm Classrooms, Not Chaos</div><div class="tkind">Course</div>
+                <div class="twhy">Longer. Worth it when engagement is really about climate.</div>
+              </button>
+              <button class="tool" data-tool="The Differentiation Fix">
+                <div class="tname">The Differentiation Fix</div><div class="tkind">Course</div>
+                <div class="twhy">For when the same lesson lands differently across a room.</div>
+              </button>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="steplab">Step 2. Pick who</div>
+            <div class="stepnote">
+              The dots show what each person already has open. Three is the ceiling.
+            </div>
+            <div class="people" data-people="g1">
+              <button class="person" data-name="Marcy Ellison">
+                <span class="box"></span><span class="pname">Marcy Ellison<small>Grade 4</small></span>
+                <span class="load"><i class="full"></i><i></i><i></i></span>
+              </button>
+              <button class="person" data-name="Dan Reyes">
+                <span class="box"></span><span class="pname">Dan Reyes<small>Grade 2</small></span>
+                <span class="load"><i></i><i></i><i></i></span>
+              </button>
+              <button class="person" data-name="Priya Raman">
+                <span class="box"></span><span class="pname">Priya Raman<small>Interventionist</small></span>
+                <span class="load"><i class="full"></i><i class="full"></i><i></i></span>
+              </button>
+              <button class="person" data-name="Tom Whitfield">
+                <span class="box"></span><span class="pname">Tom Whitfield<small>Grade 5</small></span>
+                <span class="load"><i></i><i></i><i></i></span>
+              </button>
+              <button class="person" data-name="Alice Bowen" disabled>
+                <span class="box"></span><span class="pname">Alice Bowen<small>Grade 1, three open already</small></span>
+                <span class="load maxed"><i class="full"></i><i class="full"></i><i class="full"></i></span>
+              </button>
+              <button class="person" data-name="Joe Kaminski">
+                <span class="box"></span><span class="pname">Joe Kaminski<small>Para</small></span>
+                <span class="load"><i class="full"></i><i></i><i></i></span>
+              </button>
+            </div>
+            <div class="capnote">
+              Alice Bowen already has three open. Open her row on the Team tab to see them
+              and close one out if this matters more.
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="steplab">Step 3. When will the team work on this together?</div>
+            <div class="stepnote">
+              Optional, and not a deadline. Nobody is marked late and nobody is chased. It
+              exists so the tool lands on a day you have already set aside.
+            </div>
+            <div class="datewrap">
+              <input type="date" value="2026-10-14" id="date-g1" aria-label="Day the team plans to work on this together">
+              <span class="hint">Your next PLC is 14 October</span>
+            </div>
+          </div>
+
+          <div class="summary">
+            <div class="slab">Before you send</div>
+            <p id="sum-g1">Pick a tool and at least one person.</p>
+            <div class="actions">
+              <button class="btn" id="send-g1" disabled>Assign</button>
+              <button class="btn ghost" data-close="g1">Cancel</button>
+            </div>
+            <div class="sent" id="sent-g1"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="goal" id="g2">
+        <div class="goalhead">
+          <div style="flex:1 1 250px">
+            <div class="goalname">Trauma informed practice in classrooms</div>
+            <div class="goalmeta">9 on staff. 4 have something assigned for this goal.</div>
+          </div>
+          <button class="btn" data-open="g2">Assign a tool</button>
+        </div>
+        <div style="margin-top:13px">
+          <div class="markwrap">
+            <div class="bar">
+              <div class="seg s1" style="width:50%">2</div>
+              <div class="seg s2" style="width:25%">1</div>
+              <div class="seg s3" style="width:25%">1</div>
+            </div>
+            <div class="mark" style="left:75%"></div>
+          </div>
+          <div class="marklabel">
+            <span>Left of the line, nothing has reached a classroom yet</span>
+            <span class="right">1 of 4 in practice</span>
+          </div>
+        </div>
+        <div class="flow">
+          <div class="step">
+            <div class="steplab">Step 1. Pick the tool</div>
+            <div class="tools" data-tools="g2">
+              <button class="tool" data-tool="Reset Without the Guilt">
+                <div class="tname">Reset Without the Guilt</div><div class="tkind">Quick win</div>
+                <div class="twhy">What to do after a hard moment, for the adult as much as the child.</div>
+              </button>
+              <button class="tool" data-tool="Class Skipping Intervention Plan">
+                <div class="tname">Class Skipping Intervention Plan</div><div class="tkind">Quick win</div>
+                <div class="twhy">A plan for one student, written in one sitting.</div>
+              </button>
+            </div>
+          </div>
+          <div class="step">
+            <div class="steplab">Step 2. Pick who</div>
+            <div class="people" data-people="g2">
+              <button class="person" data-name="Dan Reyes">
+                <span class="box"></span><span class="pname">Dan Reyes<small>Grade 2</small></span>
+                <span class="load"><i></i><i></i><i></i></span>
+              </button>
+              <button class="person" data-name="Priya Raman">
+                <span class="box"></span><span class="pname">Priya Raman<small>Interventionist</small></span>
+                <span class="load"><i class="full"></i><i class="full"></i><i></i></span>
+              </button>
+            </div>
+          </div>
+          <div class="step">
+            <div class="steplab">Step 3. When will the team work on this together?</div>
+            <div class="datewrap">
+              <input type="date" id="date-g2" aria-label="Day the team plans to work on this together">
+              <span class="hint">Leave it blank and nothing is scheduled</span>
+            </div>
+          </div>
+          <div class="summary">
+            <div class="slab">Before you send</div>
+            <p id="sum-g2">Pick a tool and at least one person.</p>
+            <div class="actions">
+              <button class="btn" id="send-g2" disabled>Assign</button>
+              <button class="btn ghost" data-close="g2">Cancel</button>
+            </div>
+            <div class="sent" id="sent-g2"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="goal" style="border-style:dashed;background:var(--ground)">
+        <div class="goalhead">
+          <div style="flex:1 1 250px">
+            <div class="goalname" style="color:var(--ink-soft)">Hub PD applied in the classroom</div>
+            <div class="goalmeta">
+              Nothing assigned, so this has never been measured. It reads as "Soon" on your
+              dashboard today.
+            </div>
+          </div>
+          <button class="btn">Assign the first tool</button>
+        </div>
+      </div>
+
+      <h3 class="sec">What came back</h3>
+      <div class="reflect">
+        <div class="quote">
+          <p>
+            I used the first four minutes idea with my afternoon group and it was the
+            calmest start we have had. It did not work with my morning class at all and I
+            am still thinking about why.
+          </p>
+          <div class="who">Marcy Ellison, Grade 4, on The Shift Kit. Shared with you.</div>
+        </div>
+        <div class="quote anon">
+          <p>
+            Honestly I read it and it is not for my room. I teach eleven year olds who
+            already know each other well and this felt written for a September classroom.
+          </p>
+          <div class="who">Shared with the school without a name, on The Shift Kit.</div>
+        </div>
+        <div class="private">
+          Two people answered the question and kept their notes to themselves. That is
+          their choice and it is not a gap. You can still see where they sit on the bar.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= OPTION B ================= -->
+  <div class="panel" id="pb" role="tabpanel">
+    <div class="tradeoff">
+      <div class="cols">
+        <div class="good">
+          <h3>What this encourages</h3>
+          <p>
+            It matches how a principal actually thinks, which is person by person. <b>The
+            cap is impossible to miss</b> because the three slots are the interface, so
+            nobody gets overloaded and you can see at a glance who is carrying nothing.
+          </p>
+        </div>
+        <div class="bad">
+          <h3>What it risks</h3>
+          <p>
+            The goal becomes a dropdown again. <b>Picking a goal to satisfy the form is
+            exactly what the rule exists to prevent</b>, and this layout invites it. It
+            also reads as a management view of staff, which is the wrong note for the one
+            tab meant to be about practice rather than compliance.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="chrome">
+      <div class="school">Saunemin CCSD #438</div>
+      <div class="tabstrip">
+        <span>Overview</span><span>2025-2026</span><span>2026-2027</span>
+        <span class="on">In Practice</span><span>Reports</span><span>Team</span>
+      </div>
+    </div>
+    <div class="mockbody">
+      <h2 class="t">In Practice</h2>
+      <p class="frame">
+        Three slots each, never more. What is in them, and what has actually reached a
+        classroom.
+      </p>
+
+      <h3 class="sec">Your team</h3>
+
+      <div class="rosterrow" id="r1">
+        <div class="rhead">
+          <div class="rname">Marcy Ellison<small>Grade 4</small></div>
+          <div class="slots">
+            <div class="slot filled">
+              <span class="stool">The Shift Kit</span>
+              <span class="srung r3">Used with students</span>
+            </div>
+            <div class="slot">Open</div>
+            <div class="slot">Open</div>
+          </div>
+          <button class="btn sm" data-ropen="r1">Assign</button>
+        </div>
+        <div class="rflow">
+          <div class="step">
+            <div class="steplab">Which goal is this for?</div>
+            <div class="stepnote">Required. If none of these fit, write a new goal first.</div>
+            <div class="goalpick" data-goals="r1">
+              <button class="gp" data-goal="Student engagement practices in use">
+                Student engagement practices in use<small>At 10%, target 75%</small>
+              </button>
+              <button class="gp" data-goal="Trauma informed practice in classrooms">
+                Trauma informed practice in classrooms<small>At 15%, target 65%</small>
+              </button>
+              <button class="gp" data-goal="Hub PD applied in the classroom">
+                Hub PD applied in the classroom<small>Never measured</small>
+              </button>
+              <button class="gp" data-goal="">Write a new goal<small>Opens the goal editor</small></button>
+            </div>
+          </div>
+          <div class="step">
+            <div class="steplab">Which tool?</div>
+            <div class="tools" data-tools="r1">
+              <button class="tool" data-tool="Lesson Flow Checklist">
+                <div class="tname">Lesson Flow Checklist</div><div class="tkind">Quick win</div>
+              </button>
+              <button class="tool" data-tool="The Differentiation Fix">
+                <div class="tname">The Differentiation Fix</div><div class="tkind">Course</div>
+              </button>
+            </div>
+          </div>
+          <div class="step">
+            <div class="steplab">Shared time, optional</div>
+            <div class="datewrap">
+              <input type="date" value="2026-10-14" id="date-r1" aria-label="Day the team plans to work on this together">
+              <span class="hint">Not a deadline</span>
+            </div>
+          </div>
+          <div class="summary">
+            <div class="slab">Before you send</div>
+            <p id="sum-r1">Pick a goal and a tool.</p>
+            <div class="actions">
+              <button class="btn" id="send-r1" disabled>Assign to Marcy</button>
+              <button class="btn ghost" data-rclose="r1">Cancel</button>
+            </div>
+            <div class="sent" id="sent-r1"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="rosterrow">
+        <div class="rhead">
+          <div class="rname">Dan Reyes<small>Grade 2</small></div>
+          <div class="slots">
+            <div class="slot">Open</div><div class="slot">Open</div><div class="slot">Open</div>
+          </div>
+          <button class="btn sm">Assign</button>
+        </div>
+      </div>
+
+      <div class="rosterrow">
+        <div class="rhead">
+          <div class="rname">Priya Raman<small>Interventionist</small></div>
+          <div class="slots">
+            <div class="slot filled">
+              <span class="stool">Reset Without the Guilt</span>
+              <span class="srung r4">Using regularly</span>
+            </div>
+            <div class="slot filled">
+              <span class="stool">The Shift Kit</span>
+              <span class="srung r2">Read it, not used</span>
+            </div>
+            <div class="slot">Open</div>
+          </div>
+          <button class="btn sm">Assign</button>
+        </div>
+      </div>
+
+      <div class="rosterrow">
+        <div class="rhead">
+          <div class="rname">Alice Bowen<small>Grade 1</small></div>
+          <div class="slots">
+            <div class="slot filled">
+              <span class="stool">Calm Classrooms</span>
+              <span class="srung r1">Not yet</span>
+            </div>
+            <div class="slot filled">
+              <span class="stool">Lesson Flow Checklist</span>
+              <span class="srung r1">Not yet</span>
+            </div>
+            <div class="slot filled">
+              <span class="stool">The Shift Kit</span>
+              <span class="srung r2">Read it, not used</span>
+            </div>
+          </div>
+          <button class="btn sm" disabled>Full</button>
+        </div>
+        <div class="capnote">
+          All three slots are full and none has reached a classroom. This is the signal
+          this layout is best at: the answer here is probably to close one, not add a fourth.
+        </div>
+      </div>
+
+      <div class="rosterrow">
+        <div class="rhead">
+          <div class="rname">Joe Kaminski<small>Para</small></div>
+          <div class="slots">
+            <div class="slot filled">
+              <span class="stool">Teacher and Para Partnerships</span>
+              <span class="srung r3">Used with students</span>
+            </div>
+            <div class="slot">Open</div><div class="slot">Open</div>
+          </div>
+          <button class="btn sm">Assign</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= OPTION C ================= -->
+  <div class="panel" id="pc" role="tabpanel">
+    <div class="tradeoff">
+      <div class="cols">
+        <div class="good">
+          <h3>What this encourages</h3>
+          <p>
+            It is the only one of the three that models <b>collaborative time rather than
+            individual homework</b>. One tool, one group, one date everybody shares, so the
+            thing being discussed in a staff meeting is the same thing. Volume stays low
+            without a cap doing the work.
+          </p>
+        </div>
+        <div class="bad">
+          <h3>What it risks</h3>
+          <p>
+            Hardest to differentiate. A leader who wants one teacher on one thing has to
+            make a group of one, which feels odd. And <b>the per person ceiling of three
+            becomes invisible</b>, so you can hit it by accident from the group side.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="chrome">
+      <div class="school">Saunemin CCSD #438</div>
+      <div class="tabstrip">
+        <span>Overview</span><span>2025-2026</span><span>2026-2027</span>
+        <span class="on">In Practice</span><span>Reports</span><span>Team</span>
+      </div>
+    </div>
+    <div class="mockbody">
+      <h2 class="t">In Practice</h2>
+      <p class="frame">
+        One tool, one group, one date. A move is something a staff works on together, and
+        a few are running at any time.
+      </p>
+
+      <h3 class="sec">Running now</h3>
+
+      <div class="move highlight">
+        <div class="movetop">
+          <div style="flex:1 1 240px">
+            <div class="movetool">The Shift Kit</div>
+            <div class="movegoal">For: Student engagement practices in use</div>
+          </div>
+          <div class="movewhen">Together on 14 October</div>
+        </div>
+        <div style="margin-top:14px">
+          <div class="markwrap">
+            <div class="bar">
+              <div class="seg s1" style="width:17%">1</div>
+              <div class="seg s2" style="width:33%">2</div>
+              <div class="seg s3" style="width:33%">2</div>
+              <div class="seg s4" style="width:17%">1</div>
+            </div>
+            <div class="mark" style="left:50%"></div>
+          </div>
+          <div class="marklabel">
+            <span>Six people. The line is where a classroom starts.</span>
+            <span class="right">3 of 6 in practice</span>
+          </div>
+        </div>
+        <div class="movewho">
+          <span class="chipp inpractice">Marcy Ellison</span>
+          <span class="chipp inpractice">Tom Whitfield</span>
+          <span class="chipp inpractice">Joe Kaminski</span>
+          <span class="chipp">Priya Raman</span>
+          <span class="chipp">Alice Bowen</span>
+          <span class="chipp">Dan Reyes</span>
+        </div>
+        <div class="private" style="margin-top:14px">
+          Two of them kept their notes private. One shared with you, one shared with the
+          school without their name.
+        </div>
+      </div>
+
+      <div class="move">
+        <div class="movetop">
+          <div style="flex:1 1 240px">
+            <div class="movetool">Reset Without the Guilt</div>
+            <div class="movegoal">For: Trauma informed practice in classrooms</div>
+          </div>
+          <div class="movewhen">No shared date</div>
+        </div>
+        <div style="margin-top:14px">
+          <div class="markwrap">
+            <div class="bar">
+              <div class="seg s1" style="width:50%">2</div>
+              <div class="seg s2" style="width:25%">1</div>
+              <div class="seg s3" style="width:25%">1</div>
+            </div>
+            <div class="mark" style="left:75%"></div>
+          </div>
+          <div class="marklabel">
+            <span>Four people, and no date was set.</span>
+            <span class="right">1 of 4 in practice</span>
+          </div>
+        </div>
+        <div class="movewho">
+          <span class="chipp inpractice">Priya Raman</span>
+          <span class="chipp">Dan Reyes</span>
+          <span class="chipp">Alice Bowen</span>
+          <span class="chipp">Marcy Ellison</span>
+        </div>
+      </div>
+
+      <h3 class="sec">Start another</h3>
+      <div class="emptymove" id="mc">
+        <p>
+          A move needs a goal, a tool, the people who will work on it, and ideally a day
+          you already have together.
+        </p>
+        <button class="btn" data-mopen="mc">Start a move</button>
+        <div class="rflow" style="text-align:left" id="mcflow">
+          <div class="step">
+            <div class="steplab">The goal this serves</div>
+            <div class="goalpick" data-goals="mc">
+              <button class="gp" data-goal="Hub PD applied in the classroom">
+                Hub PD applied in the classroom<small>Never measured. This would be its first reading.</small>
+              </button>
+              <button class="gp" data-goal="Student engagement practices in use">
+                Student engagement practices in use<small>At 10%, target 75%</small>
+              </button>
+            </div>
+          </div>
+          <div class="step">
+            <div class="steplab">The tool</div>
+            <div class="tools" data-tools="mc">
+              <button class="tool" data-tool="Lesson Flow Checklist">
+                <div class="tname">Lesson Flow Checklist</div><div class="tkind">Quick win</div>
+              </button>
+              <button class="tool" data-tool="Communication that Clicks">
+                <div class="tname">Communication that Clicks</div><div class="tkind">Course</div>
+              </button>
+            </div>
+          </div>
+          <div class="step">
+            <div class="steplab">Who is in it</div>
+            <div class="stepnote">Two people are near their ceiling of three.</div>
+            <div class="people" data-people="mc">
+              <button class="person" data-name="Dan Reyes">
+                <span class="box"></span><span class="pname">Dan Reyes<small>Grade 2</small></span>
+                <span class="load"><i></i><i></i><i></i></span>
+              </button>
+              <button class="person" data-name="Tom Whitfield">
+                <span class="box"></span><span class="pname">Tom Whitfield<small>Grade 5</small></span>
+                <span class="load"><i></i><i></i><i></i></span>
+              </button>
+              <button class="person" data-name="Priya Raman">
+                <span class="box"></span><span class="pname">Priya Raman<small>One slot left</small></span>
+                <span class="load"><i class="full"></i><i class="full"></i><i></i></span>
+              </button>
+              <button class="person" data-name="Alice Bowen" disabled>
+                <span class="box"></span><span class="pname">Alice Bowen<small>Three open already</small></span>
+                <span class="load maxed"><i class="full"></i><i class="full"></i><i class="full"></i></span>
+              </button>
+            </div>
+          </div>
+          <div class="step">
+            <div class="steplab">The day you are already together</div>
+            <div class="datewrap">
+              <input type="date" value="2026-11-04" id="date-mc" aria-label="Day the team plans to work on this together">
+              <span class="hint">Not a deadline, and nobody is chased</span>
+            </div>
+          </div>
+          <div class="summary">
+            <div class="slab">Before you start it</div>
+            <p id="sum-mc">Pick a goal, a tool and at least one person.</p>
+            <div class="actions">
+              <button class="btn" id="send-mc" disabled>Start the move</button>
+              <button class="btn ghost" data-mclose="mc">Cancel</button>
+            </div>
+            <div class="sent" id="sent-mc"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <b>Mocks, nothing built.</b> Staff names are invented. The goals, their current
+    readings, the tool names and the "never measured" state are real, read from live data
+    on 2 October 2026. All three obey <code>docs/assignment-spec.md</code> A1 to A5: three
+    per person, a goal behind every assignment, a date that schedules shared time rather
+    than a deadline, and the teacher deciding who reads their words.
+  </footer>
+</div>
+
+<script>
+  (function () {
+    const st = {};
+
+    function get(id) { st[id] = st[id] || { people: [] }; return st[id]; }
+
+    function joinNames(n) {
+      if (n.length === 1) return n[0];
+      if (n.length === 2) return n[0] + ' and ' + n[1];
+      return n.slice(0, -1).join(', ') + ' and ' + n[n.length - 1];
+    }
+
+    function fmt(v) {
+      if (!v) return null;
+      return new Date(v + 'T12:00:00').toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
+    }
+
+    function needsGoal(id) { return !!document.querySelector('[data-goals="' + id + '"]'); }
+
+    function sentence(id, goalFallback, singlePerson) {
+      const s = get(id);
+      const d = document.getElementById('date-' + id);
+      const goal = needsGoal(id) ? s.goal : goalFallback;
+      const missing = [];
+      if (needsGoal(id) && !s.goal) missing.push('a goal');
+      if (!s.tool) missing.push('a tool');
+      if (!singlePerson && s.people.length === 0) missing.push('at least one person');
+      if (missing.length) return 'Pick ' + joinNames(missing) + '.';
+
+      const who = singlePerson ? singlePerson : joinNames(s.people);
+      let out = 'You are assigning <b>' + s.tool + '</b> to ' + who +
+        ', because of your goal <b>' + goal + '</b>.';
+      const when = d ? fmt(d.value) : null;
+      out += when
+        ? ' They will be told the team plans to work on it around ' + when + ', and that it is not a deadline.'
+        : ' No shared date, so nothing is scheduled and nothing comes due.';
+      out += s.people.length === 1 || singlePerson
+        ? ' They get this in the Hub, and one email that also carries anything else already waiting on them.'
+        : ' Each of them gets this in the Hub, and one email that also carries anything else already waiting on them.';
+      return out;
+    }
+
+    function wire(id, goalFallback, singlePerson, sentLine) {
+      function refresh() {
+        const s = get(id);
+        document.getElementById('sum-' + id).innerHTML = sentence(id, goalFallback, singlePerson);
+        const ok = !!s.tool && (!needsGoal(id) || !!s.goal) && (!!singlePerson || s.people.length > 0);
+        document.getElementById('send-' + id).disabled = !ok;
+      }
+
+      const tools = document.querySelector('[data-tools="' + id + '"]');
+      if (tools) tools.querySelectorAll('.tool').forEach(function (t) {
+        t.addEventListener('click', function () {
+          tools.querySelectorAll('.tool').forEach(function (x) { x.classList.remove('on'); });
+          t.classList.add('on'); get(id).tool = t.getAttribute('data-tool'); refresh();
+        });
+      });
+
+      const goals = document.querySelector('[data-goals="' + id + '"]');
+      if (goals) goals.querySelectorAll('.gp').forEach(function (g) {
+        g.addEventListener('click', function () {
+          const v = g.getAttribute('data-goal');
+          if (!v) { get(id).goal = null; goals.querySelectorAll('.gp').forEach(function (x) { x.classList.remove('on'); }); refresh(); return; }
+          goals.querySelectorAll('.gp').forEach(function (x) { x.classList.remove('on'); });
+          g.classList.add('on'); get(id).goal = v; refresh();
+        });
+      });
+
+      const ppl = document.querySelector('[data-people="' + id + '"]');
+      if (ppl) ppl.querySelectorAll('.person').forEach(function (p) {
+        p.addEventListener('click', function () {
+          if (p.disabled) return;
+          p.classList.toggle('on');
+          get(id).people = Array.prototype.map.call(
+            ppl.querySelectorAll('.person.on'), function (x) { return x.getAttribute('data-name'); });
+          refresh();
+        });
+      });
+
+      const d = document.getElementById('date-' + id);
+      if (d) d.addEventListener('change', refresh);
+
+      const send = document.getElementById('send-' + id);
+      if (send) send.addEventListener('click', function () {
+        const s = get(id);
+        const n = singlePerson ? 1 : s.people.length;
+        const el = document.getElementById('sent-' + id);
+        el.textContent = sentLine(n);
+        el.classList.add('show');
+        send.disabled = true;
+      });
+
+      refresh();
+    }
+
+    // open and close
+    document.querySelectorAll('[data-open]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        document.getElementById(b.getAttribute('data-open')).classList.add('open');
+      });
+    });
+    document.querySelectorAll('[data-close]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        document.getElementById(b.getAttribute('data-close')).classList.remove('open');
+      });
+    });
+    document.querySelectorAll('[data-ropen]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        document.getElementById(b.getAttribute('data-ropen')).classList.add('open');
+      });
+    });
+    document.querySelectorAll('[data-rclose]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        document.getElementById(b.getAttribute('data-rclose')).classList.remove('open');
+      });
+    });
+    document.querySelectorAll('[data-mopen]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        document.getElementById('mcflow').style.display = 'block';
+        b.style.display = 'none';
+      });
+    });
+    document.querySelectorAll('[data-mclose]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        document.getElementById('mcflow').style.display = 'none';
+        document.querySelector('[data-mopen]').style.display = '';
+      });
+    });
+
+    wire('g1', 'Student engagement practices in use', null, function (n) {
+      return 'Assigned to ' + n + (n === 1 ? ' person' : ' people') +
+        '. Each of them now has one more open, which shows on their dots next time you are here.';
+    });
+    wire('g2', 'Trauma informed practice in classrooms', null, function (n) {
+      return 'Assigned to ' + n + (n === 1 ? ' person' : ' people') + '.';
+    });
+    wire('r1', null, 'Marcy Ellison', function () {
+      return 'Assigned. Marcy now has two of her three slots in use.';
+    });
+    wire('mc', null, null, function (n) {
+      return 'Move started with ' + n + (n === 1 ? ' person' : ' people') +
+        '. It appears under Running now, and this goal has a reading for the first time.';
+    });
+
+    // panel switcher
+    document.querySelectorAll('.switch button').forEach(function (b) {
+      b.addEventListener('click', function () {
+        document.querySelectorAll('.switch button').forEach(function (x) {
+          x.classList.remove('on'); x.setAttribute('aria-selected', 'false');
+        });
+        b.classList.add('on'); b.setAttribute('aria-selected', 'true');
+        document.querySelectorAll('.panel').forEach(function (p) { p.classList.remove('on'); });
+        document.getElementById(b.getAttribute('data-panel')).classList.add('on');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    });
+  })();
+</script>
