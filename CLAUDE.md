@@ -299,6 +299,13 @@ Three things in it are load bearing and are the cause of most dashboard bugs:
 Building a new partner dashboard is L10. The order of its steps matters: the
 roster is the denominator of everything after it.
 
+Leadership assignment of Hub tools to named staff is specified separately at
+`docs/assignment-spec.md`, rules A0 to A9, agreed 2 October 2026. **None of it
+is built.** Read it before designing anything that lets a leader push content at
+staff, because the cap of three per person, the mandatory goal behind every
+assignment, and the teacher's control over who reads their own reflection are
+decisions rather than details.
+
 ---
 
 ## 6. Voice and UI
