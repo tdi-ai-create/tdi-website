@@ -717,7 +717,23 @@ export async function POST(request: NextRequest) {
         tier,
         tier_source: 'agent_created',
         free_hero_candidate: false,
-        lift_uncertain: true,
+        /* The rubric in tdi-admin/docs/hub-content-standards.html says: if you
+           are uncertain, set lift_uncertain and assign your best guess, and it
+           flags the item for human review. This line hardcoded true and never
+           looked at what the caller sent, so the flag recorded who created an
+           item rather than whether anyone was unsure of its effort level. All
+           177 agent-created rows carry it and all 177 non-agent rows do not,
+           with no exceptions in either direction, which is the shape of a field
+           that means agent_created a second time.
+
+           It cost us a real signal. Agents label 87% of what they make Grab and
+           Go against 55% for human-reviewed content, so roughly 45 live tools
+           read as zero prep when they need a planning period, and nothing could
+           tell us which.
+
+           Default stays true, because a caller that says nothing has not told
+           us it checked. Confidence has to be stated. */
+        lift_uncertain: body.lift_uncertain === false ? false : true,
         created_at: now,
         updated_at: now,
       }
@@ -1364,13 +1380,28 @@ export async function POST(request: NextRequest) {
         // present, so a Spanish edition could be described in every way except
         // its objectives. Paloma filed that as a blocker and was right.
         'title_es', 'description_es', 'objectives_es',
+        /* lift sat in IDENTITY_FIELDS below, so the effort badge on a live
+           tool could never be corrected and the only route offered was
+           unpublish, edit, republish, which for a bulk re-rate means taking
+           live content down.
+
+           It fails this file's own test for identity, which is whether a
+           teacher's saved link quietly becomes a different resource. Changing
+           a slug does that. Changing Grab and Go to Short Prep does not. It is
+           the same class of thing as danielson_domains and roles, which were
+           backfillable from the start. It was swept into the identity list
+           alongside is_published and status in #188 rather than argued for.
+
+           lift_uncertain comes with it, because a re-rate nobody can mark as
+           reviewed leaves the queue exactly as full as it was. */
+        'lift', 'lift_uncertain',
       ] as const
 
       // Fields that define what the item IS. Changing these on a live item
       // silently swaps the thing a teacher already saved or linked to.
       const IDENTITY_FIELDS = [
         'title', 'slug', 'category', 'quick_win_type', 'file_url', 'tool_file_url',
-        'tool_type', 'is_published', 'status', 'reviewed_at', 'reviewed_by', 'lift',
+        'tool_type', 'is_published', 'status', 'reviewed_at', 'reviewed_by',
       ]
 
       const rejected = IDENTITY_FIELDS.filter(f => body[f] !== undefined)
@@ -1421,6 +1452,24 @@ export async function POST(request: NextRequest) {
           { error: `Nothing to backfill. Supply at least one of: ${BACKFILLABLE.join(', ')}` },
           { status: 400 },
         )
+      }
+
+      /* The draft path validates lift against VALID_LIFT because a value
+         outside it renders the badge blank. A live tool deserves the same
+         guard, and more so: this writes straight onto something educators are
+         already looking at. */
+      if (updates.lift !== undefined
+          && !VALID_LIFT.includes(updates.lift as typeof VALID_LIFT[number])) {
+        return NextResponse.json({
+          error: `lift must be exactly one of ${VALID_LIFT.join(', ')} (got "${updates.lift}"). `
+               + 'The badge renders blank otherwise.',
+        }, { status: 400 })
+      }
+      if (updates.lift_uncertain !== undefined && typeof updates.lift_uncertain !== 'boolean') {
+        return NextResponse.json({
+          error: 'lift_uncertain must be true or false. It records whether a human has judged '
+               + 'this effort level against the rubric, so a string is never an answer.',
+        }, { status: 400 })
       }
 
       const stamp = new Date().toISOString()
