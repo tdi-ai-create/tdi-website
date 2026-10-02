@@ -7,7 +7,10 @@ import { loadContactGate } from '@/lib/creator-contact-budget';
 
 // ---------------------------------------------------------------------------
 // First-Week Momentum Email
-// Runs daily at 9:30 AM. Checks for creators added 3 days ago who haven't
+// Runs daily at 14:30 UTC, which is 9:30 AM Central. The cron expression is
+// UTC, not local: it read 30 9 until 2 October 2026, so this landed at 4:30 in
+// the morning for the creator reading it. Check the clock in both zones before
+// changing it. Checks for creators added 3 days ago who haven't
 // completed any milestone yet. Sends a warm, specific "your one thing this
 // week" email from Bella with a clear next step.
 //

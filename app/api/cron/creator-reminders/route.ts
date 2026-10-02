@@ -4,6 +4,10 @@ import { logCreatorEmail, resendMessageId } from '@/lib/creator-email-log';
 import { CREATOR_STUDIO_BCC } from '@/lib/creator-notification-recipients';
 import { guardCron, checkedWrite } from '@/lib/cron-guard';
 
+// Runs daily at 14:00 UTC, which is 9 AM Central. The cron expression is UTC,
+// not local: it read 0 9 until 2 October 2026, so a creator got this at 4 in
+// the morning. Check the clock in both zones before changing it.
+
 // Reminder intervals in days before target date
 const REMINDER_INTERVALS = [
   { days: 60, type: '60_days' },
