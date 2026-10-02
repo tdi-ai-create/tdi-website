@@ -211,6 +211,8 @@ interface HubEngagementDetail {
   lastActiveAt: string | null;
   windowDays: number;
   truncated: boolean;
+  /** False when an in-service day sits in one half of the trend comparison. */
+  trendComparable: boolean;
   unknown: boolean;
 }
 
@@ -2735,7 +2737,7 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                   ))}
                 </div>
 
-                <PopularityLegend />
+                <PopularityLegend trendComparable={engagement.trendComparable} />
 
                 {engagement.truncated && (
                   <p className="text-[11px] text-gray-400 mt-4">

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { clientFacingServiceName, plannedDateNote } from '@/lib/partnerships/service-names';
-import { engagementTrend, type EngagementTrend } from '@/lib/partners/popularity';
+import { engagementTrend, windowsAreComparable, type EngagementTrend } from '@/lib/partners/popularity';
 import { createClient } from '@supabase/supabase-js';
 
 // Service Supabase client
@@ -140,6 +140,14 @@ export interface HubEngagementDetail {
   windowDays: number;
   /** True when the activity read hit the cap, so the page can say so. */
   truncated: boolean;
+  /**
+   * Whether the two 30 day halves can honestly be compared.
+   *
+   * False when either half holds an organised event, which on a school calendar
+   * is an in-service day. Every item then reports no direction and the
+   * dashboard says why, rather than drawing an arrow it cannot stand behind.
+   */
+  trendComparable: boolean;
   unknown: boolean;
 }
 
@@ -329,6 +337,7 @@ async function hubEngagementDetail(
     lastActiveAt: null,
     windowDays: ENGAGEMENT_WINDOW_DAYS,
     truncated: false,
+    trendComparable: false,
     unknown: false,
   };
   if (profileIds.length === 0) return empty;
@@ -362,6 +371,12 @@ async function hubEngagementDetail(
   const month = new Set<string>();
   let lastActiveAt: string | null = null;
 
+  // Distinct people per calendar day, split into the two halves the trend
+  // compares. An in-service day shows up here as one day towering over its
+  // neighbours, and that is the only way to tell an event from ordinary use.
+  const recentDays = new Map<string, Set<string>>();
+  const priorDays = new Map<string, Set<string>>();
+
   // key -> { kind, title, people:Set, opens:number }
   const perBuilding = new Map<
     string,
@@ -379,6 +394,17 @@ async function hubEngagementDetail(
     if (!lastActiveAt) lastActiveAt = row.created_at as string;
     if (at >= weekAgo) week.add(userId);
     if (at >= monthAgo) month.add(userId);
+
+    const day = (row.created_at as string).slice(0, 10);
+    if (at >= monthAgo) {
+      const d = recentDays.get(day) || new Set<string>();
+      d.add(userId);
+      recentDays.set(day, d);
+    } else if (at >= twoMonthsAgo) {
+      const d = priorDays.get(day) || new Set<string>();
+      d.add(userId);
+      priorDays.set(day, d);
+    }
 
     const meta = (row.metadata || {}) as Record<string, unknown>;
     let kind: 'course' | 'quick_win' | null = null;
@@ -428,6 +454,21 @@ async function hubEngagementDetail(
   const truncated = (rows?.length ?? 0) >= ACTIVITY_ROW_CAP;
 
   /**
+   * Whether an arrow would mean anything today.
+   *
+   * Addison, 2 October 2026: six of its eight rows pointed down on the day this
+   * shipped, while the school was climbing. The earlier half held both of its
+   * August in-service days, 27 people on one and 28 on another against an
+   * ordinary day of one or two. Every school on a US calendar has that shape,
+   * so in early October every prior window is August and every dashboard would
+   * point down exactly when schools are ramping up.
+   */
+  const trendComparable = windowsAreComparable(
+    Array.from(recentDays.values(), set => set.size),
+    Array.from(priorDays.values(), set => set.size),
+  );
+
+  /**
    * Turn an accumulated entry into what the dashboard renders.
    *
    * A truncated read drops the oldest rows, which are exactly the prior 30 day
@@ -440,7 +481,7 @@ async function hubEngagementDetail(
     people: e.people.size,
     opens: e.opens,
     peopleRecent: e.recent.size,
-    trend: engagementTrend(e.recent.size, e.prior.size, truncated),
+    trend: trendComparable ? engagementTrend(e.recent.size, e.prior.size, truncated) : null,
   });
 
   const byBuilding: HubEngagementDetail['byBuilding'] = {};
@@ -472,6 +513,7 @@ async function hubEngagementDetail(
     lastActiveAt,
     windowDays: ENGAGEMENT_WINDOW_DAYS,
     truncated,
+    trendComparable,
     unknown: false,
   };
 }
