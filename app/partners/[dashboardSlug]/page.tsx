@@ -10,6 +10,7 @@ import VibeCheckPanel, { type VibeCheckData } from '@/components/partners/VibeCh
 import { PopularityIndicator, PopularityLegend } from '@/components/partners/Popularity';
 import { remainderPct, sharePct } from '@/lib/partners/popularity';
 import type { EngagementItem as ApiEngagementItem } from '@/app/api/partners/dashboard/[partnershipId]/route';
+import InPracticePanel from '@/components/partners/InPracticePanel';
 import Link from 'next/link';
 import FooterSymbol from '@/components/FooterSymbol';
 import { offeringLabel } from '@/lib/partnerships/offerings';
@@ -440,12 +441,15 @@ export default function PartnerDashboard() {
   const [actionItems, setActionItems] = useState<ActionItem[]>([]);
   // Staff check-ins feeding the goals below, and how many people have answered.
   const [checkins, setCheckins] = useState<CheckinProgress[]>([]);
-  const [partnershipKpis, setPartnershipKpis] = useState<{ kpi_key: string; kpi_label: string; target_value: number | null; target_unit: string; current_value: number; benchmark_low: number; benchmark_high: number; benchmark_label: string | null; data_source: string | null; how_tdi_delivers: string; deeper_measurement: string | null; suggested_offering: Offering | null; status: string }[]>([]);
+  const [partnershipKpis, setPartnershipKpis] = useState<{ id: string; kpi_key: string; kpi_label: string; target_value: number | null; target_unit: string; current_value: number; benchmark_low: number; benchmark_high: number; benchmark_label: string | null; data_source: string | null; how_tdi_delivers: string; deeper_measurement: string | null; suggested_offering: Offering | null; status: string; measured_by_assignment?: boolean }[]>([]);
   // What this school bought, which is what decides the sharper measurement each
   // goal card offers. Defaults to zeros so a school reads as unobserved rather
   // than observed if the load fails.
   const [contract, setContract] = useState<ContractShape>({ observation_days_total: 0, virtual_sessions_total: 0, executive_sessions_total: 0 });
   const [staffStats, setStaffStats] = useState<StaffStats>({ total: 0, hubLoggedIn: 0 });
+  // A10. Off until IN_PRACTICE_TAB is set, and then on for all nine at once,
+  // because there is one dashboard component and no per-client branching.
+  const [inPracticeTab, setInPracticeTab] = useState(false);
   const [metricSnapshots, setMetricSnapshots] = useState<MetricSnapshot[]>([]);
   const [apiBuildings, setApiBuildings] = useState<Building[]>([]);
   // Which building card is open. Rae, 1 October 2026: the cards "should open
@@ -836,6 +840,7 @@ export default function PartnerDashboard() {
           setRecentActivity(data.activityLog || []);
           setStaffRoster(data.staffMembers || []);
           if (data.kpis) setPartnershipKpis(data.kpis);
+          setInPracticeTab(data.inPracticeTab === true);
           setCheckins(data.checkins || []);
           if (data.contract) setContract(data.contract);
         }
@@ -1636,6 +1641,14 @@ export default function PartnerDashboard() {
       // would take the approach, the contract and the offering cards away from
       // the other eight and give them nothing back.
       : [{ id: 'blueprint', label: 'Your Plan' }]),
+    /**
+     * A10. One entry here reaches all nine live partnerships and every future
+     * one, because this array builds itself per school and nothing about this
+     * tab is client specific. Three of the nine cannot assign on the day it
+     * goes on, and A10.1 says each is shown the one thing that unblocks it
+     * rather than an empty tab.
+     */
+    ...(inPracticeTab ? [{ id: 'in-practice', label: 'In Practice' }] : []),
     { id: 'reporting', label: 'Reports' },
     // Funding only appears when this school actually has a live pursuit.
     // It used to live inside Our Partnership, which Rae wants kept on goals.
@@ -6656,6 +6669,26 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
         )}
 
         {/* REPORTING TAB */}
+        {activeTab === 'in-practice' && partnership && (
+          <div id="panel-in-practice" role="tabpanel" className="max-w-5xl mx-auto px-6 py-8">
+            <InPracticePanel
+              partnershipId={partnership.id}
+              orgName={partnership.org_name || organization?.name || 'Your school'}
+              userId={userId || ''}
+              userEmail={userEmail || ''}
+              goals={partnershipKpis.map(k => ({
+                id: k.id,
+                kpi_label: k.kpi_label,
+                status: k.status,
+                target_value: k.target_value,
+                target_unit: k.target_unit,
+                measured_by_assignment: k.measured_by_assignment,
+              }))}
+              roster={staffRoster.map(p => ({ id: p.id, name: p.name, email: p.email, role: p.role }))}
+            />
+          </div>
+        )}
+
         {activeTab === 'reporting' && partnership && (
           <div className="py-6 space-y-6">
             {/* Header */}
