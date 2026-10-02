@@ -22,11 +22,21 @@ export const STEPS = [
 export const IN_PRACTICE_FROM = 3
 
 /**
- * A5.3. Below four answers a goal reports that it is still collecting rather
- * than printing a percentage, which is L4.8: a sample too small to mean
- * anything is reported as a sample. One answer out of one is not 100%.
+ * A5.3, revised by Rae on 2 October 2026: the number shows right away.
+ *
+ * It used to wait for four answers before printing a percentage. It no longer
+ * waits for any, because a principal who assigns something on Monday and has
+ * one answer by Wednesday should see that answer, and a panel that says
+ * "collecting" for a fortnight is the dashboard going quiet at exactly the
+ * moment somebody is paying attention to it.
+ *
+ * L4.8 still has to be satisfied, and it is satisfied a different way: a sample
+ * too small to mean anything is reported as a sample. So the reading always
+ * carries `answered` and `assigned` alongside the percentage, and the panel is
+ * required to show them. "100%" alone is a lie at one answer. "100%, 1 of 6
+ * answered" is not.
  */
-export const GOAL_MIN_ANSWERS = 4
+export const GOAL_MIN_ANSWERS = 1
 
 /**
  * A4.14. Nothing is reported to anyone below three people.
@@ -146,6 +156,8 @@ export function goalReading(
   if (answeredSteps.length < GOAL_MIN_ANSWERS) {
     return { state: 'collecting', answered: answeredSteps.length, assigned }
   }
+  // Unreachable while GOAL_MIN_ANSWERS is 1, and kept deliberately: the gate is
+  // one constant away from returning, and the state it produces is still drawn.
 
   const inPractice = answeredSteps.filter(s => s >= IN_PRACTICE_FROM).length
   return {

@@ -49,12 +49,21 @@ check('A4.8', 'an assignment with no answer is absent, not zero',
     M.goalReading(a, s, true), { state: 'measured', percent: 50, inPractice: 2, answered: 4, assigned: 4 })
 }
 
-// ── A5.3. Below four answers, no percentage ──────────────────────────────────
+// ── A5.3, revised. The number shows from the first answer ────────────────────
 {
-  const a = [asn('1'), asn('2'), asn('3')]
-  const s = M.currentSteps([ans('1', 4, 'x'), ans('2', 4, 'x'), ans('3', 4, 'x')])
-  check('A5.3', 'three answers reports as collecting, not 100%',
-    M.goalReading(a, s, true), { state: 'collecting', answered: 3, assigned: 3 })
+  const a = [asn('1'), asn('2'), asn('3'), asn('4'), asn('5'), asn('6')]
+  const s = M.currentSteps([ans('1', 3, 'x')])
+  check('A5.3', 'one answer out of six assigned already reads',
+    M.goalReading(a, s, true), { state: 'measured', percent: 100, inPractice: 1, answered: 1, assigned: 6 })
+}
+{
+  // L4.8 is satisfied by the sample travelling with the number, not by hiding
+  // it. A panel that prints the percentage without `answered` and `assigned`
+  // is the bug this guards against.
+  const a = [asn('1'), asn('2'), asn('3'), asn('4'), asn('5'), asn('6')]
+  const r = M.goalReading(a, M.currentSteps([ans('1', 3, 'x')]), true)
+  check('L4.8', 'the reading carries its own sample size so a panel cannot hide it',
+    [typeof r.answered, typeof r.assigned], ['number', 'number'])
 }
 
 // ── A5.4. Nobody answering is unmeasured, never zero percent ─────────────────
