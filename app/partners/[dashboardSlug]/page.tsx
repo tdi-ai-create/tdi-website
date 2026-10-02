@@ -7,6 +7,9 @@ import InviteLeader from '@/components/partners/InviteLeader';
 import RosterAccessManager from '@/components/partners/RosterAccessManager';
 import { SemesterRecord } from '@/components/partners/SemesterRecord';
 import VibeCheckPanel, { type VibeCheckData } from '@/components/partners/VibeCheckPanel';
+import { PopularityIndicator, PopularityLegend } from '@/components/partners/Popularity';
+import { sharePct } from '@/lib/partners/popularity';
+import type { EngagementItem as ApiEngagementItem } from '@/app/api/partners/dashboard/[partnershipId]/route';
 import Link from 'next/link';
 import FooterSymbol from '@/components/FooterSymbol';
 import { offeringLabel } from '@/lib/partnerships/offerings';
@@ -192,13 +195,12 @@ interface StaffStats {
  * Ranked by distinct people, not opens. Bonnie Osborne asked for this on
  * 30 September 2026: she could see that staff had signed in and nothing about
  * what they did next.
+ *
+ * The shape is imported rather than re-declared. This page carried its own copy
+ * until 2 October 2026, which is how one list ended up printing headcounts
+ * while the list below it printed percentages.
  */
-interface EngagementItem {
-  kind: 'course' | 'quick_win';
-  title: string;
-  people: number;
-  opens: number;
-}
+type EngagementItem = ApiEngagementItem;
 
 interface HubEngagementDetail {
   topContent: EngagementItem[];
@@ -1558,6 +1560,16 @@ export default function PartnerDashboard() {
     ? Math.round((staffStats.hubLoggedIn / staffStats.total) * 100)
     : 0;
 
+  /**
+   * The two activity tiles, as a share of the roster rather than a count of it.
+   *
+   * null when we hold no roster for the partnership, which renders as an absent
+   * reading. Showing 0% there would claim nobody came in, when the truth is
+   * that we have nothing to measure against.
+   */
+  const weekSharePct = sharePct(engagement?.activeThisWeek ?? 0, staffStats.total);
+  const monthSharePct = sharePct(engagement?.activeThisMonth ?? 0, staffStats.total);
+
   const getHubLoginColor = (pct: number) => {
     if (pct >= 90) return colors.teal;
     if (pct >= 70) return colors.blueAccent;
@@ -2669,13 +2681,21 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                   Nobody assigned these. Your staff chose them.
                 </p>
 
+                {/* A share of the staff, not a count of them. Rae, 2 October
+                    2026. The denominator is the roster we hold for this
+                    partnership, so these read against everyone, while the rows
+                    below read against whoever actually came in this month. */}
                 <div className="grid grid-cols-3 gap-2 md:gap-4 mb-6">
                   <div className="p-3 md:p-4 bg-gray-50 rounded-xl text-center">
-                    <p className="text-xl md:text-2xl font-bold text-[#1e2749]">{engagement.activeThisWeek}</p>
+                    <p className="text-xl md:text-2xl font-bold text-[#1e2749]">
+                      {weekSharePct === null ? '\u2014' : `${weekSharePct}%`}
+                    </p>
                     <p className="text-xs md:text-sm text-gray-500">Active this week</p>
                   </div>
                   <div className="p-3 md:p-4 bg-gray-50 rounded-xl text-center">
-                    <p className="text-xl md:text-2xl font-bold text-[#1e2749]">{engagement.activeThisMonth}</p>
+                    <p className="text-xl md:text-2xl font-bold text-[#1e2749]">
+                      {monthSharePct === null ? '\u2014' : `${monthSharePct}%`}
+                    </p>
                     <p className="text-xs md:text-sm text-gray-500">Active this month</p>
                   </div>
                   <div className="p-3 md:p-4 bg-gray-50 rounded-xl text-center">
@@ -2704,15 +2724,18 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                       <span className="text-sm text-[#1e2749] flex-1 min-w-0 truncate" title={item.title}>
                         {item.title}
                       </span>
-                      <span className="text-sm font-semibold text-[#1e2749] shrink-0">
-                        {item.people}
-                      </span>
-                      <span className="text-xs text-gray-400 shrink-0 w-24 text-right">
-                        {item.people === 1 ? 'person' : 'people'}
-                      </span>
+                      <div className="shrink-0 w-16 text-right">
+                        <PopularityIndicator
+                          people={item.peopleRecent}
+                          active={engagement.activeThisMonth}
+                          trend={item.trend}
+                        />
+                      </div>
                     </div>
                   ))}
                 </div>
+
+                <PopularityLegend />
 
                 {engagement.truncated && (
                   <p className="text-[11px] text-gray-400 mt-4">
@@ -8520,9 +8543,10 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                                   <div className="h-2 bg-gray-100 rounded-full overflow-hidden mt-3 max-w-[240px]">
                                     <div className="h-full rounded-full" style={{ width: `${pctHere ?? 0}%`, background: '#2A9D8F' }} />
                                   </div>
-                                  {bEng && (
+                                  {bEng && inBuilding.length > 0 && (
                                     <p className="text-[12px] text-gray-500 mt-2">
-                                      {bEng.activeThisWeek} in this week, {bEng.activeThisMonth} in the last 30 days
+                                      {sharePct(bEng.activeThisWeek, inBuilding.length)}% in this week,{' '}
+                                      {sharePct(bEng.activeThisMonth, inBuilding.length)}% in the last 30 days
                                     </p>
                                   )}
 
@@ -8557,12 +8581,18 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                                               headcount. Rae, 1 October 2026:
                                               percentages are fine, raw numbers are
                                               not. In a building of one, "1 person"
-                                              also names the person. */}
-                                          <span className="text-[12px] text-gray-500 tabular-nums whitespace-nowrap">
-                                            {inBuilding.length > 0
-                                              ? `${Math.round((item.people / inBuilding.length) * 100)}%`
-                                              : ''}
-                                          </span>
+                                              also names the person.
+
+                                              Divided by this school's own active
+                                              staff rather than its roster, which is
+                                              what the district list above divides
+                                              by. Same component, same reading. */}
+                                          <PopularityIndicator
+                                            people={item.peopleRecent}
+                                            active={bEng.activeThisMonth}
+                                            trend={item.trend}
+                                            size="sm"
+                                          />
                                         </li>
                                       ))}
                                     </ul>
