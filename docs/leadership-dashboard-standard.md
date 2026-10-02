@@ -208,12 +208,30 @@ Schools, Team. The story, then the people.
   `sharePct`, `contentSharePct` and `remainderPct` in `lib/partners/popularity.ts`
   are the only implementations. `npm run check:headcounts` is the gate.
 
-- **L4.14** **No trend is claimed on a truncated read.** Activity rows come back
-  newest first under a row cap, so a truncated read loses the older half of any
-  comparison and every item on the board points upward. `engagementTrend` returns
-  no direction when the read hit its cap, and the arrow is absent rather than
-  flattering. The same caution applies to any figure computed from two windows
-  where only one of them is guaranteed complete.
+- **L4.14** **No trend is claimed unless both windows can be compared.** Three
+  things break a comparison and each withholds the arrow rather than drawing a
+  misleading one.
+
+  A truncated read. Activity rows come back newest first under a row cap, so a
+  capped read loses the older half and every item points upward.
+
+  An organised event in either half. This is the one that reached a client.
+  Addison's dashboard pointed down on six of eight rows the day the arrow
+  shipped, while the school was climbing: 6, 1, 13 and 19 people over its four
+  most recent weeks. The earlier half held both of its August in-service days,
+  27 people on one and 28 on another against an ordinary day of one or two.
+  Every school on a US calendar has that shape, so for the first two months of
+  the year every prior window is August and every dashboard would point down
+  exactly when schools are ramping up. `hasSpikeDay` finds a day that towers
+  over the window's ordinary days, and `windowsAreComparable` checks both halves,
+  because an event in the newer half manufactures a rise just as readily.
+
+  When the arrow is withheld the page says why. A missing arrow with no
+  explanation reads as missing data rather than as a deliberate silence.
+
+  The general rule behind all three: a figure computed from two windows is only
+  as honest as the claim that the windows are alike. Check that they are before
+  drawing the difference.
 
 ---
 

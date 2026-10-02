@@ -79,11 +79,24 @@ export function PopularityIndicator({
  * the reader to guess its denominator, and the obvious guess (the whole staff)
  * is the wrong one.
  */
-export function PopularityLegend({ showTrend = true }: { showTrend?: boolean }) {
+export function PopularityLegend({
+  showTrend = true,
+  trendComparable = true,
+}: {
+  showTrend?: boolean;
+  /**
+   * False when an organised event sits in one half of the comparison, so no
+   * direction is being claimed. Say that plainly. A missing arrow with no
+   * explanation reads as a gap in the data rather than a deliberate silence.
+   */
+  trendComparable?: boolean;
+}) {
   return (
     <p className="text-[11px] text-gray-400 mt-4 leading-relaxed">
       Percentages are a share of the staff who signed in this month.
-      {showTrend && ' An arrow compares the last 30 days with the 30 days before.'}
+      {showTrend && trendComparable && ' An arrow compares the last 30 days with the 30 days before.'}
+      {showTrend && !trendComparable &&
+        ' No direction is shown yet, because the 30 days before this one include a day when most of your staff were in the Hub at once, and comparing a whole-staff day against ordinary weeks would read as a decline. Arrows return once that day falls outside the window.'}
     </p>
   );
 }

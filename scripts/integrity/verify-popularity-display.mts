@@ -20,7 +20,7 @@
 
 import { createClient } from '@supabase/supabase-js';
 import { readFileSync } from 'node:fs';
-import { sharePct, contentSharePct, engagementTrend, MIN_SHARE_POPULATION } from '../../lib/partners/popularity';
+import { sharePct, contentSharePct, engagementTrend, windowsAreComparable, MIN_SHARE_POPULATION } from '../../lib/partners/popularity';
 
 for (const file of ['.env.local', '.env']) {
   try {
@@ -98,6 +98,8 @@ for (const p of partnerships || []) {
 
   const week = new Set<string>();
   const month = new Set<string>();
+  const recentDays = new Map<string, Set<string>>();
+  const priorDays = new Map<string, Set<string>>();
   const content = new Map<string, { title: string; people: Set<string>; recent: Set<string>; prior: Set<string> }>();
 
   for (const row of rows || []) {
@@ -105,6 +107,12 @@ for (const p of partnerships || []) {
     const at = new Date(row.created_at as string).getTime();
     if (at >= weekAgo) week.add(uid);
     if (at >= monthAgo) month.add(uid);
+    const day = (row.created_at as string).slice(0, 10);
+    if (at >= monthAgo) {
+      const d = recentDays.get(day) || new Set<string>(); d.add(uid); recentDays.set(day, d);
+    } else if (at >= twoMonthsAgo) {
+      const d = priorDays.get(day) || new Set<string>(); d.add(uid); priorDays.set(day, d);
+    }
 
     const meta = (row.metadata || {}) as Record<string, unknown>;
     let title: string | null = null;
@@ -120,6 +128,11 @@ for (const p of partnerships || []) {
     content.set(title, e);
   }
 
+  const comparable = windowsAreComparable(
+    Array.from(recentDays.values(), x => x.size),
+    Array.from(priorDays.values(), x => x.size),
+  );
+
   const top = Array.from(content.values()).sort((a, b) => b.people.size - a.people.size).slice(0, 8);
   if (top.length === 0) continue;
 
@@ -133,11 +146,12 @@ for (const p of partnerships || []) {
       failures++;
     }
   }
+  console.log(`${comparable ? '' : '   [no arrows: an in-service day sits in the comparison]'}`.trim() ? `\n   ${p.slug} -> arrows withheld` : '');
   console.log(`\n${p.slug}   tiles: ${weekTile}% active this week, ${monthTile}% active this month   (roster ${rosterEmails.length})`);
 
   for (const e of top) {
     const pct = contentSharePct(e.recent.size, activeThisMonth);
-    const trend = engagementTrend(e.recent.size, e.prior.size, truncated);
+    const trend = comparable ? engagementTrend(e.recent.size, e.prior.size, truncated) : null;
     const glyph = trend === 'up' ? 'up  ' : trend === 'down' ? 'down' : trend === 'flat' ? 'same' : '    ';
     console.log(`   ${glyph} ${(pct === null ? '' : pct + '%').padStart(4)}   ${e.title.slice(0, 58)}`);
     rowsShown++;

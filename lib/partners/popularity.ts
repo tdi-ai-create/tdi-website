@@ -93,3 +93,40 @@ export function remainderPct(activePct: number): number {
   if (!Number.isFinite(activePct)) return 0;
   return Math.max(0, Math.min(100, 100 - Math.round(activePct)));
 }
+
+/**
+ * A day on which an organised event happened, rather than ordinary use.
+ *
+ * Rae, 2 October 2026, from Addison. Its dashboard pointed down on six of eight
+ * rows the day this shipped, and the school was in fact climbing: 6, 1, 13 and
+ * 19 people over the four most recent weeks. The arrow was comparing the last
+ * 30 days against the 30 before, and that earlier window held both of Addison's
+ * August in-service days, 27 people on one and 28 on another against an
+ * ordinary day of one or two.
+ *
+ * This is not an Addison problem. Every school on a US calendar has the same
+ * shape, so in early October every prior window is August and every dashboard
+ * would point down exactly when schools are ramping up. A trend that is
+ * reliably backwards for two months of the year is worse than no trend.
+ *
+ * A spike is a day that towers over the window's ordinary days. Both the
+ * multiple and the floor matter: without the floor, two people on a two person
+ * roster reads as an event.
+ */
+export function hasSpikeDay(dailyPeopleCounts: number[]): boolean {
+  const active = dailyPeopleCounts.filter(n => n > 0).sort((a, b) => a - b);
+  if (active.length < 2) return false;
+  const max = active[active.length - 1];
+  const median = active[Math.floor(active.length / 2)];
+  return max >= 5 && max >= 4 * Math.max(1, median);
+}
+
+/**
+ * Whether two windows can honestly be compared.
+ *
+ * A spike in EITHER half breaks it. An in-service day in the older half
+ * manufactures a decline, and one in the newer half manufactures a rise.
+ */
+export function windowsAreComparable(recentDaily: number[], priorDaily: number[]): boolean {
+  return !hasSpikeDay(recentDaily) && !hasSpikeDay(priorDaily);
+}
