@@ -105,6 +105,36 @@
     display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap;
   }
 
+  .grouplab {
+    font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--g400); font-weight: 700; margin-top: 22px;
+    padding-top: 16px; border-top: 1px solid var(--border);
+  }
+  .grouplab:first-of-type { margin-top: 18px; padding-top: 0; border-top: none; }
+  .goal.own { background: #FCFDFF; border-radius: 12px; padding: 16px; border: 1px solid var(--border-mid); margin-top: 10px; }
+  .ownflag {
+    margin-top: 11px; display: flex; gap: 12px; align-items: center;
+    justify-content: space-between; flex-wrap: wrap;
+    font-size: 12.5px; color: var(--g600);
+  }
+
+  .writeown { margin-top: 10px; display: none; }
+  .writeown.on { display: block; }
+  .field { margin-top: 10px; }
+  .field label { display: block; font-size: 12.5px; font-weight: 600; color: var(--g700); }
+  .field .fh { font-size: 12px; color: var(--g500); margin-top: 2px; }
+  .field input[type=text], .field input[type=number] {
+    font: inherit; font-size: 14px; margin-top: 6px; width: 100%; max-width: 460px;
+    padding: 9px 11px; border: 1px solid var(--border-mid); border-radius: 8px;
+    background: var(--card); color: var(--g900);
+  }
+  .field input[type=number] { max-width: 120px; }
+  .field input:focus-visible { outline: 2px solid var(--navy); outline-offset: 1px; }
+  .ownnote {
+    margin-top: 12px; font-size: 12.5px; color: var(--g600); line-height: 1.55;
+    background: var(--wash); border-radius: 8px; padding: 11px 12px; max-width: 64ch;
+  }
+
   /* ---- buttons ---- */
   .btn {
     font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; border: none;
@@ -121,30 +151,52 @@
   .btn.sec:hover { background: var(--page); }
 
   /* ---- doors ---- */
-  .doors { display: grid; gap: 12px; margin-top: 16px; grid-template-columns: 1fr; }
-  @media (min-width: 800px) { .doors { grid-template-columns: repeat(3, 1fr); } }
+  /* Sub-tabs, in the dashboard's own sub-tab language from Your Plan:
+     white with a 2px #ffba06 border and a shadow when selected, #f5f5f5 with a
+     1px #e5e7eb border when not, rounded-xl, with a numbered chip. */
+  .doors { display: grid; gap: 10px; margin-top: 16px; grid-template-columns: 1fr; }
+  @media (min-width: 820px) { .doors { grid-template-columns: repeat(3, 1fr); } }
   .door {
-    font: inherit; text-align: left; cursor: pointer; color: var(--g900);
-    background: var(--card); border: 1px solid var(--border-mid); border-radius: 12px;
-    padding: 16px; display: flex; flex-direction: column; gap: 8px;
+    font: inherit; text-align: left; cursor: pointer; color: #1e2749;
+    background: #f5f5f5; border: 1px solid #e5e7eb; border-radius: 12px;
+    padding: 14px; display: flex; gap: 11px; align-items: flex-start;
+    transition: box-shadow .2s, border-color .2s, background .2s;
   }
-  .door:hover { border-color: var(--bluelight); }
+  .door:hover { box-shadow: 0 4px 10px -6px rgba(30,39,73,.35); }
   .door:focus-visible { outline: 2px solid var(--navy); outline-offset: 2px; }
-  .door.on { border-color: var(--navy); background: var(--wash); }
-  .door .dn { font-size: 14.5px; font-weight: 650; }
-  .door .dw { font-size: 13px; color: var(--g600); }
-  .door .dr {
-    font-size: 12px; color: var(--amber); line-height: 1.5; margin-top: auto;
-    background: var(--amberwash); border-radius: 8px; padding: 9px 10px;
+  .door.on {
+    background: #ffffff; border: 2px solid #ffba06; padding: 13px;
+    box-shadow: 0 10px 22px -14px rgba(30,39,73,.45);
   }
-  .door .dr b {
-    display: block; font-size: 9.5px; letter-spacing: .09em; text-transform: uppercase;
-    font-weight: 700; margin-bottom: 3px;
+  .door .dchip {
+    width: 30px; height: 30px; border-radius: 8px; flex: none;
+    display: grid; place-items: center; font-size: 13px; font-weight: 700;
+    background: #e5e7eb; color: #6b7280;
   }
+  .door.on .dchip { background: #ffba06; color: #1e2749; }
+  .door .dtxt { min-width: 0; }
+  .door .dn { font-size: 14px; font-weight: 600; display: block; }
+  .door.on .dn { font-weight: 700; }
+  .door .dw { font-size: 12.5px; color: var(--g600); margin-top: 3px; line-height: 1.45; display: block; }
+
+  /* benefits and risks, shown once a door is open */
+  .br { display: grid; gap: 16px; grid-template-columns: 1fr; margin-top: 4px; }
+  @media (min-width: 700px) { .br { grid-template-columns: 1fr 1fr; } }
+  .brcol { border-radius: 10px; padding: 14px 15px; }
+  .brcol.good { background: #F2FAF7; }
+  .brcol.bad { background: var(--amberwash); }
+  .brcol h4 {
+    font-size: 10px; letter-spacing: .1em; text-transform: uppercase; font-weight: 700;
+  }
+  .brcol.good h4 { color: var(--teal); }
+  .brcol.bad h4 { color: var(--amber); }
+  .brcol p { margin-top: 7px; font-size: 13.2px; line-height: 1.58; color: var(--g700); }
+  .brcol p b { font-weight: 650; color: var(--g900); }
+  .flowsplit { margin-top: 20px; padding-top: 4px; border-top: 1px solid var(--border); }
 
   .flow {
-    margin-top: 16px; border: 1px solid var(--bluelight); border-radius: 12px;
-    padding: 20px; display: none; background: #FCFDFF;
+    margin-top: 18px; padding-top: 20px; border-top: 1px solid var(--border);
+    display: none;
   }
   .flow.on { display: block; }
   .flowtitle { font-size: 14.5px; font-weight: 650; color: var(--navy); }
@@ -283,13 +335,376 @@
 <div class="shell">
   <main>
 
+    <!-- ===== assign ===== -->
+    <section class="card">
+      <h2>Assign a tool</h2>
+      <p class="csub">
+        Three ways in. Open any one to see what it is good at, what it risks, and to
+        assign from there. They all end in the same place, so pick whichever matches what
+        you are already thinking about.
+      </p>
+
+      <div class="doors" role="tablist">
+        <button class="door on" data-door="goal" role="tab" aria-selected="true">
+          <span class="dchip">1</span>
+          <span class="dtxt">
+            <span class="dn">Start from a goal</span>
+            <span class="dw">You know which goal you are pushing on</span>
+          </span>
+        </button>
+        <button class="door" data-door="person" role="tab" aria-selected="false">
+          <span class="dchip">2</span>
+          <span class="dtxt">
+            <span class="dn">Start from a person</span>
+            <span class="dw">You are thinking about one teacher</span>
+          </span>
+        </button>
+        <button class="door" data-door="move" role="tab" aria-selected="false">
+          <span class="dchip">3</span>
+          <span class="dtxt">
+            <span class="dn">Start from shared time</span>
+            <span class="dw">A group works on it in the same meeting</span>
+          </span>
+        </button>
+      </div>
+
+      <!-- goal door -->
+      <div class="flow on" id="f-goal">
+        <div class="flowtitle">Starting from a goal</div>
+        <div class="br">
+          <div class="brcol good">
+            <h4>What this encourages</h4>
+            <p>You cannot reach a tool without passing through a goal, so <b>the reason is built
+          in rather than added afterwards</b>. The goals with no reading sit in plain
+          sight, which is a standing nudge to go and fix one.</p>
+          </div>
+          <div class="brcol bad">
+            <h4>What it risks</h4>
+            <p>You cannot see how much any one person is already carrying until you reach the
+          list of names, so <b>this is the easiest of the three in which to overload
+          somebody</b>. The dots on each name are there to catch it.</p>
+          </div>
+        </div>
+        <div class="flowsplit"></div>
+        <div class="step">
+          <div class="sl">The goal</div>
+          <div class="grid2" data-goals="goal">
+            <button class="opt" data-goal="Student engagement practices in use">
+              <div class="ot">Student engagement practices in use</div>
+              <div class="os">At 10%, target 75%</div>
+            </button>
+            <button class="opt" data-goal="Hub PD applied in the classroom">
+              <div class="ot">Hub PD applied in the classroom</div>
+              <div class="os">Never measured. This would be its first reading.</div>
+            </button>
+            <button class="opt" data-own="1">
+              <div class="ot">None of these fit</div>
+              <div class="os">Write your own goal. It stays in this tab until TDI adopts it.</div>
+            </button>
+          </div>
+          <div class="writeown" id="own-goal">
+            <div class="field">
+              <label for="ownname-goal">What do you want to be true?</label>
+              <div class="fh">Plain words. This is what your team will see as the reason.</div>
+              <input type="text" id="ownname-goal" placeholder="Consistent entry routines in K-2">
+            </div>
+            <div class="field">
+              <label for="owntarget-goal">Roughly what share of staff are you aiming at?</label>
+              <div class="fh">A rough figure is fine. You can change it later.</div>
+              <input type="number" id="owntarget-goal" min="1" max="100" value="80">
+            </div>
+            <div class="ownnote">
+              Nothing else is needed. This is measured by what your team reports on the
+              four step question, so it has a reading from the first answer. It will not
+              appear among your partnership goals and will not reach a report until you
+              ask us to adopt it and we have written how it is measured and what we are
+              doing about it.
+            </div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="sl">The tool</div>
+          <div class="sn">These speak to the goal you picked. You can search the whole Hub as well.</div>
+          <div class="grid2" data-tools="goal">
+            <button class="opt" data-tool="The Shift Kit">
+              <div class="ot">The Shift Kit</div><div class="ok">Quick win</div>
+              <div class="os">Changing what happens in the first four minutes of a lesson.</div>
+            </button>
+            <button class="opt" data-tool="Lesson Flow Checklist">
+              <div class="ot">Lesson Flow Checklist</div><div class="ok">Quick win</div>
+              <div class="os">A checklist a teacher marks up while planning, not after.</div>
+            </button>
+          </div>
+        </div>
+        <div class="step">
+          <div class="sl">Who</div>
+          <div class="sn">The dots are what each person already has open. Three is the ceiling.</div>
+          <div class="grid2" data-people="goal">
+            <button class="opt" data-name="Marcy Ellison">
+              <span class="prow"><span class="cb"></span>
+              <span class="pn">Marcy Ellison<small>Grade 4</small></span>
+              <span class="dots"><i class="f"></i><i></i><i></i></span></span>
+            </button>
+            <button class="opt" data-name="Dan Reyes">
+              <span class="prow"><span class="cb"></span>
+              <span class="pn">Dan Reyes<small>Grade 2</small></span>
+              <span class="dots"><i></i><i></i><i></i></span></span>
+            </button>
+            <button class="opt" data-name="Tom Whitfield">
+              <span class="prow"><span class="cb"></span>
+              <span class="pn">Tom Whitfield<small>Grade 5</small></span>
+              <span class="dots"><i></i><i></i><i></i></span></span>
+            </button>
+            <button class="opt" data-name="Alice Bowen" disabled>
+              <span class="prow"><span class="cb"></span>
+              <span class="pn">Alice Bowen<small>Three open already</small></span>
+              <span class="dots max"><i class="f"></i><i class="f"></i><i class="f"></i></span></span>
+            </button>
+          </div>
+          <div class="inlinenote">
+            Alice Bowen has three open and none has reached a classroom. Closing one out is
+            probably better than adding a fourth.
+          </div>
+        </div>
+        <div class="step">
+          <div class="sl">Shared time, optional</div>
+          <div class="sn">Not a deadline. Nobody is marked late and nobody is chased.</div>
+          <div class="dateline">
+            <input type="date" value="2026-10-14" id="date-goal" aria-label="Day the team plans to work on this together">
+            <span class="dh">Your next PLC is 14 October</span>
+          </div>
+        </div>
+        <div class="confirm">
+          <div class="cl">Before you send</div>
+          <p id="sum-goal"></p>
+          <div class="ca">
+            <button class="btn" id="send-goal" disabled>Assign</button>
+            <button class="btn sec" data-clear="goal">Start over</button>
+          </div>
+          <div class="done" id="done-goal"></div>
+        </div>
+      </div>
+
+      <!-- person door -->
+      <div class="flow" id="f-person">
+        <div class="flowtitle">Starting from a person</div>
+        <div class="br">
+          <div class="brcol good">
+            <h4>What this encourages</h4>
+            <p>It matches how you probably already think, which is person by person. <b>The
+          three slots are visible</b>, so nobody gets quietly overloaded and you can see
+          at a glance who is carrying nothing at all.</p>
+          </div>
+          <div class="brcol bad">
+            <h4>What it risks</h4>
+            <p>The goal can turn into a question you click past. <b>If none of your goals
+          really fits, that is worth noticing rather than working around</b>, which is
+          why writing your own is offered right there.</p>
+          </div>
+        </div>
+        <div class="flowsplit"></div>
+        <div class="step">
+          <div class="sl">Who</div>
+          <div class="grid2" data-one="person">
+            <button class="opt" data-name="Marcy Ellison">
+              <div class="ot">Marcy Ellison <span style="font-weight:400;color:#9CA3AF;font-size:12px">Grade 4</span></div>
+              <div class="slots">
+                <div class="slot f"><span class="st">The Shift Kit</span><span class="sr r3">Used with students</span></div>
+                <div class="slot">Open</div><div class="slot">Open</div>
+              </div>
+            </button>
+            <button class="opt" data-name="Priya Raman">
+              <div class="ot">Priya Raman <span style="font-weight:400;color:#9CA3AF;font-size:12px">Interventionist</span></div>
+              <div class="slots">
+                <div class="slot f"><span class="st">Reset Without the Guilt</span><span class="sr r4">Using regularly</span></div>
+                <div class="slot f"><span class="st">The Shift Kit</span><span class="sr r2">Read it, not used</span></div>
+                <div class="slot">Open</div>
+              </div>
+            </button>
+          </div>
+        </div>
+        <div class="step">
+          <div class="sl">The goal this serves</div>
+          <div class="sn">Required. If none of these really fits, write a new goal rather than picking the nearest one.</div>
+          <div class="grid2" data-goals="person">
+            <button class="opt" data-goal="Student engagement practices in use">
+              <div class="ot">Student engagement practices in use</div><div class="os">At 10%, target 75%</div>
+            </button>
+            <button class="opt" data-goal="Trauma informed practice in classrooms">
+              <div class="ot">Trauma informed practice in classrooms</div><div class="os">At 15%, target 65%</div>
+            </button>
+            <button class="opt" data-own="1">
+              <div class="ot">None of these fit</div>
+              <div class="os">Write your own goal. It stays in this tab until TDI adopts it.</div>
+            </button>
+          </div>
+          <div class="writeown" id="own-person">
+            <div class="field">
+              <label for="ownname-person">What do you want to be true?</label>
+              <div class="fh">Plain words. This is what your team will see as the reason.</div>
+              <input type="text" id="ownname-person" placeholder="Consistent entry routines in K-2">
+            </div>
+            <div class="field">
+              <label for="owntarget-person">Roughly what share of staff are you aiming at?</label>
+              <div class="fh">A rough figure is fine. You can change it later.</div>
+              <input type="number" id="owntarget-person" min="1" max="100" value="80">
+            </div>
+            <div class="ownnote">
+              Nothing else is needed. This is measured by what your team reports on the
+              four step question, so it has a reading from the first answer. It will not
+              appear among your partnership goals and will not reach a report until you
+              ask us to adopt it and we have written how it is measured and what we are
+              doing about it.
+            </div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="sl">The tool</div>
+          <div class="grid2" data-tools="person">
+            <button class="opt" data-tool="Lesson Flow Checklist">
+              <div class="ot">Lesson Flow Checklist</div><div class="ok">Quick win</div>
+            </button>
+            <button class="opt" data-tool="The Differentiation Fix">
+              <div class="ot">The Differentiation Fix</div><div class="ok">Course</div>
+            </button>
+          </div>
+        </div>
+        <div class="step">
+          <div class="sl">Shared time, optional</div>
+          <div class="dateline">
+            <input type="date" id="date-person" aria-label="Day the team plans to work on this together">
+            <span class="dh">Leave it blank and nothing is scheduled</span>
+          </div>
+        </div>
+        <div class="confirm">
+          <div class="cl">Before you send</div>
+          <p id="sum-person"></p>
+          <div class="ca">
+            <button class="btn" id="send-person" disabled>Assign</button>
+            <button class="btn sec" data-clear="person">Start over</button>
+          </div>
+          <div class="done" id="done-person"></div>
+        </div>
+      </div>
+
+      <!-- move door -->
+      <div class="flow" id="f-move">
+        <div class="flowtitle">Starting from shared time</div>
+        <div class="br">
+          <div class="brcol good">
+            <h4>What this encourages</h4>
+            <p>The only one that plans around a meeting rather than around individuals.
+          Everyone works on the same thing, so <b>the conversation in the room is about
+          one tool</b> and the date is a real date you already hold.</p>
+          </div>
+          <div class="brcol bad">
+            <h4>What it risks</h4>
+            <p>Hardest to tailor. If one teacher needs something different, <b>do that one
+          separately rather than widening the group</b> until the tool fits nobody
+          particularly well.</p>
+          </div>
+        </div>
+        <div class="flowsplit"></div>
+        <div class="step">
+          <div class="sl">The day you are already together</div>
+          <div class="sn">This one starts here, because the meeting is the thing you are planning around.</div>
+          <div class="dateline">
+            <input type="date" value="2026-11-04" id="date-move" aria-label="Day the team plans to work on this together">
+            <span class="dh">Still not a deadline</span>
+          </div>
+        </div>
+        <div class="step">
+          <div class="sl">The goal</div>
+          <div class="grid2" data-goals="move">
+            <button class="opt" data-goal="Hub PD applied in the classroom">
+              <div class="ot">Hub PD applied in the classroom</div>
+              <div class="os">Never measured. This would be its first reading.</div>
+            </button>
+            <button class="opt" data-goal="Paraprofessionals in instructional roles">
+              <div class="ot">Paraprofessionals in instructional roles</div><div class="os">At 44%, target 70%</div>
+            </button>
+            <button class="opt" data-own="1">
+              <div class="ot">None of these fit</div>
+              <div class="os">Write your own goal. It stays in this tab until TDI adopts it.</div>
+            </button>
+          </div>
+          <div class="writeown" id="own-move">
+            <div class="field">
+              <label for="ownname-move">What do you want to be true?</label>
+              <div class="fh">Plain words. This is what your team will see as the reason.</div>
+              <input type="text" id="ownname-move" placeholder="Consistent entry routines in K-2">
+            </div>
+            <div class="field">
+              <label for="owntarget-move">Roughly what share of staff are you aiming at?</label>
+              <div class="fh">A rough figure is fine. You can change it later.</div>
+              <input type="number" id="owntarget-move" min="1" max="100" value="80">
+            </div>
+            <div class="ownnote">
+              Nothing else is needed. This is measured by what your team reports on the
+              four step question, so it has a reading from the first answer. It will not
+              appear among your partnership goals and will not reach a report until you
+              ask us to adopt it and we have written how it is measured and what we are
+              doing about it.
+            </div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="sl">The tool everyone works on</div>
+          <div class="grid2" data-tools="move">
+            <button class="opt" data-tool="Building Strong Teacher-Para Partnerships">
+              <div class="ot">Building Strong Teacher-Para Partnerships</div><div class="ok">Course</div>
+            </button>
+            <button class="opt" data-tool="Communication that Clicks">
+              <div class="ot">Communication that Clicks</div><div class="ok">Course</div>
+            </button>
+          </div>
+        </div>
+        <div class="step">
+          <div class="sl">Who is in it</div>
+          <div class="grid2" data-people="move">
+            <button class="opt" data-name="Dan Reyes">
+              <span class="prow"><span class="cb"></span>
+              <span class="pn">Dan Reyes<small>Grade 2</small></span>
+              <span class="dots"><i></i><i></i><i></i></span></span>
+            </button>
+            <button class="opt" data-name="Tom Whitfield">
+              <span class="prow"><span class="cb"></span>
+              <span class="pn">Tom Whitfield<small>Grade 5</small></span>
+              <span class="dots"><i></i><i></i><i></i></span></span>
+            </button>
+            <button class="opt" data-name="Joe Kaminski">
+              <span class="prow"><span class="cb"></span>
+              <span class="pn">Joe Kaminski<small>Para</small></span>
+              <span class="dots"><i class="f"></i><i></i><i></i></span></span>
+            </button>
+            <button class="opt" data-name="Priya Raman">
+              <span class="prow"><span class="cb"></span>
+              <span class="pn">Priya Raman<small>One slot left</small></span>
+              <span class="dots"><i class="f"></i><i class="f"></i><i></i></span></span>
+            </button>
+          </div>
+        </div>
+        <div class="confirm">
+          <div class="cl">Before you send</div>
+          <p id="sum-move"></p>
+          <div class="ca">
+            <button class="btn" id="send-move" disabled>Assign to the group</button>
+            <button class="btn sec" data-clear="move">Start over</button>
+          </div>
+          <div class="done" id="done-move"></div>
+        </div>
+      </div>
+    </section>
+
     <!-- ===== where things stand ===== -->
     <section class="card">
       <h2>Where things stand</h2>
       <p class="csub">
-        The dashed line is where a classroom starts. Anything to the left of it has been
-        read but not used yet.
+        What is already out there. The dashed line is where a classroom starts, so
+        anything to the left of it has been read but not used yet.
       </p>
+
+      <div class="grouplab">Partnership goals</div>
 
       <div class="goal">
         <div class="ghead">
@@ -357,254 +772,29 @@
           <button class="btn sm" data-door="goal">Assign the first tool</button>
         </div>
       </div>
-    </section>
 
-    <!-- ===== assign ===== -->
-    <section class="card">
-      <h2>Assign a tool</h2>
-      <p class="csub">
-        Three ways in, and they end in the same place. Pick whichever matches what you are
-        already thinking about.
-      </p>
+      <div class="grouplab">Your school's own</div>
 
-      <div class="doors">
-        <button class="door" data-door="goal">
-          <div class="dn">Start from a goal</div>
-          <div class="dw">You know which goal you are pushing on. Shows the tools that speak to it.</div>
-          <div class="dr">
-            <b>Watch for</b>
-            You cannot see how much one person already carries until you reach the names.
-          </div>
-        </button>
-        <button class="door" data-door="person">
-          <div class="dn">Start from a person</div>
-          <div class="dw">You are thinking about one teacher. Shows what they already have open.</div>
-          <div class="dr">
-            <b>Watch for</b>
-            It is easy to pick a goal just to get past the question. If none fits, that is
-            worth noticing.
-          </div>
-        </button>
-        <button class="door" data-door="move">
-          <div class="dn">Start from shared time</div>
-          <div class="dw">A group will work on the same thing in the same meeting. One tool, one date.</div>
-          <div class="dr">
-            <b>Watch for</b>
-            Harder to tailor. If one teacher needs something else, do that one separately.
-          </div>
-        </button>
-      </div>
-
-      <!-- goal door -->
-      <div class="flow" id="f-goal">
-        <div class="flowtitle">Starting from a goal</div>
-        <div class="step">
-          <div class="sl">The goal</div>
-          <div class="grid2" data-goals="goal">
-            <button class="opt" data-goal="Student engagement practices in use">
-              <div class="ot">Student engagement practices in use</div>
-              <div class="os">At 10%, target 75%</div>
-            </button>
-            <button class="opt" data-goal="Hub PD applied in the classroom">
-              <div class="ot">Hub PD applied in the classroom</div>
-              <div class="os">Never measured. This would be its first reading.</div>
-            </button>
-          </div>
+      <div class="goal own">
+        <div class="ghead">
+          <div class="gname">Consistent entry routines in K-2</div>
+          <div class="gtarget">5 assigned &middot; aiming at 80%</div>
         </div>
-        <div class="step">
-          <div class="sl">The tool</div>
-          <div class="sn">These speak to the goal you picked. You can search the whole Hub as well.</div>
-          <div class="grid2" data-tools="goal">
-            <button class="opt" data-tool="The Shift Kit">
-              <div class="ot">The Shift Kit</div><div class="ok">Quick win</div>
-              <div class="os">Changing what happens in the first four minutes of a lesson.</div>
-            </button>
-            <button class="opt" data-tool="Lesson Flow Checklist">
-              <div class="ot">Lesson Flow Checklist</div><div class="ok">Quick win</div>
-              <div class="os">A checklist a teacher marks up while planning, not after.</div>
-            </button>
+        <div class="barwrap">
+          <div class="bar">
+            <div class="seg s1" style="width:20%">1</div>
+            <div class="seg s2" style="width:40%">2</div>
+            <div class="seg s3" style="width:40%">2</div>
           </div>
+          <div class="mark" style="left:60%"></div>
         </div>
-        <div class="step">
-          <div class="sl">Who</div>
-          <div class="sn">The dots are what each person already has open. Three is the ceiling.</div>
-          <div class="grid2" data-people="goal">
-            <button class="opt" data-name="Marcy Ellison">
-              <span class="prow"><span class="cb"></span>
-              <span class="pn">Marcy Ellison<small>Grade 4</small></span>
-              <span class="dots"><i class="f"></i><i></i><i></i></span></span>
-            </button>
-            <button class="opt" data-name="Dan Reyes">
-              <span class="prow"><span class="cb"></span>
-              <span class="pn">Dan Reyes<small>Grade 2</small></span>
-              <span class="dots"><i></i><i></i><i></i></span></span>
-            </button>
-            <button class="opt" data-name="Tom Whitfield">
-              <span class="prow"><span class="cb"></span>
-              <span class="pn">Tom Whitfield<small>Grade 5</small></span>
-              <span class="dots"><i></i><i></i><i></i></span></span>
-            </button>
-            <button class="opt" data-name="Alice Bowen" disabled>
-              <span class="prow"><span class="cb"></span>
-              <span class="pn">Alice Bowen<small>Three open already</small></span>
-              <span class="dots max"><i class="f"></i><i class="f"></i><i class="f"></i></span></span>
-            </button>
-          </div>
-          <div class="inlinenote">
-            Alice Bowen has three open and none has reached a classroom. Closing one out is
-            probably better than adding a fourth.
-          </div>
+        <div class="barfoot">
+          <span>Measured by what your team reports, from the day you added it</span>
+          <span><b>2 of 5</b> in practice</span>
         </div>
-        <div class="step">
-          <div class="sl">Shared time, optional</div>
-          <div class="sn">Not a deadline. Nobody is marked late and nobody is chased.</div>
-          <div class="dateline">
-            <input type="date" value="2026-10-14" id="date-goal" aria-label="Day the team plans to work on this together">
-            <span class="dh">Your next PLC is 14 October</span>
-          </div>
-        </div>
-        <div class="confirm">
-          <div class="cl">Before you send</div>
-          <p id="sum-goal"></p>
-          <div class="ca">
-            <button class="btn" id="send-goal" disabled>Assign</button>
-            <button class="btn sec" data-shut="goal">Cancel</button>
-          </div>
-          <div class="done" id="done-goal"></div>
-        </div>
-      </div>
-
-      <!-- person door -->
-      <div class="flow" id="f-person">
-        <div class="flowtitle">Starting from a person</div>
-        <div class="step">
-          <div class="sl">Who</div>
-          <div class="grid2" data-one="person">
-            <button class="opt" data-name="Marcy Ellison">
-              <div class="ot">Marcy Ellison <span style="font-weight:400;color:#9CA3AF;font-size:12px">Grade 4</span></div>
-              <div class="slots">
-                <div class="slot f"><span class="st">The Shift Kit</span><span class="sr r3">Used with students</span></div>
-                <div class="slot">Open</div><div class="slot">Open</div>
-              </div>
-            </button>
-            <button class="opt" data-name="Priya Raman">
-              <div class="ot">Priya Raman <span style="font-weight:400;color:#9CA3AF;font-size:12px">Interventionist</span></div>
-              <div class="slots">
-                <div class="slot f"><span class="st">Reset Without the Guilt</span><span class="sr r4">Using regularly</span></div>
-                <div class="slot f"><span class="st">The Shift Kit</span><span class="sr r2">Read it, not used</span></div>
-                <div class="slot">Open</div>
-              </div>
-            </button>
-          </div>
-        </div>
-        <div class="step">
-          <div class="sl">The goal this serves</div>
-          <div class="sn">Required. If none of these really fits, write a new goal rather than picking the nearest one.</div>
-          <div class="grid2" data-goals="person">
-            <button class="opt" data-goal="Student engagement practices in use">
-              <div class="ot">Student engagement practices in use</div><div class="os">At 10%, target 75%</div>
-            </button>
-            <button class="opt" data-goal="Trauma informed practice in classrooms">
-              <div class="ot">Trauma informed practice in classrooms</div><div class="os">At 15%, target 65%</div>
-            </button>
-          </div>
-        </div>
-        <div class="step">
-          <div class="sl">The tool</div>
-          <div class="grid2" data-tools="person">
-            <button class="opt" data-tool="Lesson Flow Checklist">
-              <div class="ot">Lesson Flow Checklist</div><div class="ok">Quick win</div>
-            </button>
-            <button class="opt" data-tool="The Differentiation Fix">
-              <div class="ot">The Differentiation Fix</div><div class="ok">Course</div>
-            </button>
-          </div>
-        </div>
-        <div class="step">
-          <div class="sl">Shared time, optional</div>
-          <div class="dateline">
-            <input type="date" id="date-person" aria-label="Day the team plans to work on this together">
-            <span class="dh">Leave it blank and nothing is scheduled</span>
-          </div>
-        </div>
-        <div class="confirm">
-          <div class="cl">Before you send</div>
-          <p id="sum-person"></p>
-          <div class="ca">
-            <button class="btn" id="send-person" disabled>Assign</button>
-            <button class="btn sec" data-shut="person">Cancel</button>
-          </div>
-          <div class="done" id="done-person"></div>
-        </div>
-      </div>
-
-      <!-- move door -->
-      <div class="flow" id="f-move">
-        <div class="flowtitle">Starting from shared time</div>
-        <div class="step">
-          <div class="sl">The day you are already together</div>
-          <div class="sn">This one starts here, because the meeting is the thing you are planning around.</div>
-          <div class="dateline">
-            <input type="date" value="2026-11-04" id="date-move" aria-label="Day the team plans to work on this together">
-            <span class="dh">Still not a deadline</span>
-          </div>
-        </div>
-        <div class="step">
-          <div class="sl">The goal</div>
-          <div class="grid2" data-goals="move">
-            <button class="opt" data-goal="Hub PD applied in the classroom">
-              <div class="ot">Hub PD applied in the classroom</div>
-              <div class="os">Never measured. This would be its first reading.</div>
-            </button>
-            <button class="opt" data-goal="Paraprofessionals in instructional roles">
-              <div class="ot">Paraprofessionals in instructional roles</div><div class="os">At 44%, target 70%</div>
-            </button>
-          </div>
-        </div>
-        <div class="step">
-          <div class="sl">The tool everyone works on</div>
-          <div class="grid2" data-tools="move">
-            <button class="opt" data-tool="Building Strong Teacher-Para Partnerships">
-              <div class="ot">Building Strong Teacher-Para Partnerships</div><div class="ok">Course</div>
-            </button>
-            <button class="opt" data-tool="Communication that Clicks">
-              <div class="ot">Communication that Clicks</div><div class="ok">Course</div>
-            </button>
-          </div>
-        </div>
-        <div class="step">
-          <div class="sl">Who is in it</div>
-          <div class="grid2" data-people="move">
-            <button class="opt" data-name="Dan Reyes">
-              <span class="prow"><span class="cb"></span>
-              <span class="pn">Dan Reyes<small>Grade 2</small></span>
-              <span class="dots"><i></i><i></i><i></i></span></span>
-            </button>
-            <button class="opt" data-name="Tom Whitfield">
-              <span class="prow"><span class="cb"></span>
-              <span class="pn">Tom Whitfield<small>Grade 5</small></span>
-              <span class="dots"><i></i><i></i><i></i></span></span>
-            </button>
-            <button class="opt" data-name="Joe Kaminski">
-              <span class="prow"><span class="cb"></span>
-              <span class="pn">Joe Kaminski<small>Para</small></span>
-              <span class="dots"><i class="f"></i><i></i><i></i></span></span>
-            </button>
-            <button class="opt" data-name="Priya Raman">
-              <span class="prow"><span class="cb"></span>
-              <span class="pn">Priya Raman<small>One slot left</small></span>
-              <span class="dots"><i class="f"></i><i class="f"></i><i></i></span></span>
-            </button>
-          </div>
-        </div>
-        <div class="confirm">
-          <div class="cl">Before you send</div>
-          <p id="sum-move"></p>
-          <div class="ca">
-            <button class="btn" id="send-move" disabled>Assign to the group</button>
-            <button class="btn sec" data-shut="move">Cancel</button>
-          </div>
-          <div class="done" id="done-move"></div>
+        <div class="ownflag">
+          <span>Added by you. Not on your reports yet.</span>
+          <button class="btn sm sec">Ask TDI to adopt this</button>
         </div>
       </div>
     </section>
@@ -760,13 +950,18 @@
       const names = one ? (s.one ? [s.one] : []) : s.people;
       const miss = [];
       if (!names.length) miss.push(one ? 'a person' : 'at least one person');
-      if (!s.goal) miss.push('a goal');
+      if (!s.goal) miss.push(s.ownGoal ? 'what you want to be true' : 'a goal');
       if (!s.tool) miss.push('a tool');
       if (miss.length) return { text: 'Still to pick: ' + join(miss) + '.', ok: false };
 
       const when = fmt((document.getElementById('date-' + k) || {}).value);
       let out = 'You are assigning <b>' + s.tool + '</b> to ' + join(names) +
         ', because of your goal <b>' + s.goal + '</b>.';
+      if (s.ownGoal) {
+        const t = (document.getElementById('owntarget-' + k) || {}).value;
+        out += ' That is a new goal of your own' + (t ? ', aiming at ' + t + '% of staff' : '') +
+          '. It stays in this tab, measured by what your team reports, and reaches no report until TDI adopts it.';
+      }
       out += when
         ? ' They will be told the team plans to work on it around ' + when + ', and that it is not a deadline.'
         : ' No shared date, so nothing is scheduled and nothing comes due.';
@@ -791,10 +986,38 @@
           if (b.disabled) return;
           grid.querySelectorAll('.opt').forEach(x => x.classList.remove('on'));
           b.classList.add('on');
+
+          // "None of these fit" opens two fields and the goal becomes whatever
+          // they type. Everything else behaves as before.
+          const own = document.getElementById('own-' + k);
+          if (attr === 'data-goals' && own) {
+            const writing = b.hasAttribute('data-own');
+            own.classList.toggle('on', writing);
+            if (writing) {
+              g(k).ownGoal = true;
+              g(k).goal = (document.getElementById('ownname-' + k).value || '').trim();
+              refresh(k);
+              return;
+            }
+            g(k).ownGoal = false;
+          }
+
           g(k)[prop] = b.getAttribute(dataAttr);
           refresh(k);
         });
       });
+
+      // Typing in the two fields updates the sentence live.
+      if (attr === 'data-goals') {
+        const nameEl = document.getElementById('ownname-' + k);
+        const tgtEl = document.getElementById('owntarget-' + k);
+        if (nameEl) nameEl.addEventListener('input', () => {
+          if (!g(k).ownGoal) return;
+          g(k).goal = nameEl.value.trim();
+          refresh(k);
+        });
+        if (tgtEl) tgtEl.addEventListener('input', () => { if (g(k).ownGoal) refresh(k); });
+      }
     }
 
     ['goal', 'person', 'move'].forEach(k => {
@@ -830,24 +1053,38 @@
       refresh(k);
     });
 
+    // Sub-tabs. One is always selected, so there is no closed state.
+    function show(k) {
+      document.querySelectorAll('.door').forEach(x => {
+        const on = x.getAttribute('data-door') === k;
+        x.classList.toggle('on', on);
+        x.setAttribute('aria-selected', on ? 'true' : 'false');
+      });
+      document.querySelectorAll('.flow').forEach(x => {
+        x.classList.toggle('on', x.id === 'f-' + k);
+      });
+    }
     document.querySelectorAll('[data-door]').forEach(b => {
       b.addEventListener('click', () => {
         const k = b.getAttribute('data-door');
-        const open = document.getElementById('f-' + k).classList.contains('on');
-        document.querySelectorAll('.door').forEach(x => x.classList.remove('on'));
-        document.querySelectorAll('.flow').forEach(x => x.classList.remove('on'));
-        if (open) return;
-        const door = document.querySelector('.door[data-door="' + k + '"]');
-        if (door) door.classList.add('on');
-        const f = document.getElementById('f-' + k);
-        f.classList.add('on');
-        f.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        show(k);
+        // Buttons elsewhere on the tab jump here; the sub-tabs themselves should not.
+        if (!b.classList.contains('door')) {
+          document.querySelector('.doors').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
       });
     });
-    document.querySelectorAll('[data-shut]').forEach(b => {
+
+    document.querySelectorAll('[data-clear]').forEach(b => {
       b.addEventListener('click', () => {
-        document.getElementById('f-' + b.getAttribute('data-shut')).classList.remove('on');
-        document.querySelectorAll('.door').forEach(x => x.classList.remove('on'));
+        const k = b.getAttribute('data-clear');
+        st[k] = { people: [] };
+        document.querySelectorAll('#f-' + k + ' .opt.on').forEach(x => x.classList.remove('on'));
+        const own = document.getElementById('own-' + k);
+        if (own) own.classList.remove('on');
+        const done = document.getElementById('done-' + k);
+        if (done) { done.classList.remove('on'); done.textContent = ''; }
+        refresh(k);
       });
     });
   })();

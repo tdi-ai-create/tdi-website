@@ -55,6 +55,39 @@ rather than a focus, so it is a ceiling and not a target.
   be asked to accept one first.
 - **A2.3** The goal is shown to the assigned teacher. A teacher is told why this
   landed on them, in the leader's own goal wording.
+- **A2.4** A leader may write their own goal when none of the partnership goals
+  fit. Two fields only: what they want to be true, and roughly what share of
+  staff they are aiming at. Nothing else is asked of them.
+- **A2.5** A school-authored goal is measured by the ladder from the moment it
+  exists, per A5.1, and needs no baseline, data source or measurement plan. This
+  is the only kind of goal on this dashboard that can be created without someone
+  first building an instrument for it, and it is why A2.4 is safe to allow.
+- **A2.6** It lives in the In Practice tab only. It does not join the partnership
+  goals, it does not appear on the Overview, and **it never reaches a report**.
+  It is labelled as the school's own with the reason stated plainly: added by
+  you, not on your reports yet.
+- **A2.7** A leader can ask TDI to adopt one. Adoption is what turns it into a
+  partnership goal, and it is not complete until the three TDI-authored fields
+  are written: how it is measured, where the number comes from, and what TDI is
+  doing about it.
+
+A2.6 exists because of what a goal carries. All thirty partnership goals today
+have `benchmark_label`, `data_source` and `how_tdi_delivers` written, and the
+last of those is a commitment by us. It is the thing placed above every
+unfavourable number so a school never reads a bad figure without our work beside
+it. The board report reads the goal list, and there is no column distinguishing
+who wrote a goal, so without A2.6 a school-authored goal would appear in a
+document handed to a school board looking exactly like a TDI commitment nobody
+at TDI ever made.
+
+Adding a school-authored goal therefore needs a new column recording who wrote
+it, and per the shipping rules that goes out behind a flag with the reading code
+deployed first. Until that column exists, A2.4 cannot ship, because nothing
+could keep these goals out of the report.
+
+What schools choose to write their own goals about is also the most direct
+signal we will ever get about what our own goal library does not cover, and it
+is worth reading as a set.
 
 Rae: "If they want to assign, they should also have to show how it aligns to a
 current kpi and/or create a kpi to help identify the why behind this decision."
@@ -115,7 +148,30 @@ met by design teaches everyone to ignore dates.
   a fixed list: it does not fit my students or my subject, I have not had the
   time yet, I tried it and it did not work, I am already doing something like
   it, I would need help to get started. Optional words alongside.
-- **A4.11** Nobody is asked a third time. Two prompts per assignment, ever.
+- **A4.11** One reminder, and only for the people a reminder would help. Rae,
+  2 October 2026: "a reminder is helpful if they have not finished it". It is
+  routed by the teacher's own answer, never sent on a timer alone, and there is
+  never a second one.
+
+  A reminder is sent when, and only when:
+  - they never answered at all, ten days after the assignment, or
+  - their reason under A4.10 was "I have not had the time yet".
+
+  No reminder is ever sent when their reason was "it does not fit my students or
+  my subject", "I tried it and it did not work", or "I am already doing
+  something like it". Those are answers, not silence. Reminding somebody who
+  has told us the tool is wrong for their room tells them we were not listening,
+  and it is the fastest way to make this feel like compliance.
+
+  "I would need help to get started" produces no reminder to the teacher at all.
+  It is a request, and it surfaces to the leader as something to act on.
+- **A4.12** After the reminder nothing further is sent, in any circumstance. The
+  assignment simply stays where it is and the leader can see it. The product
+  never chases a teacher twice.
+
+A4.11 is the one place where the reason list earns its keep twice over. It was
+introduced so a leader could count the answers, and it turns out to be the only
+thing that makes a reminder safe to send, because free text could not be routed.
 
 A4.6 to A4.8 exist because the four steps are a ladder rather than a survey
 question. The natural answer three days in is "not yet", and a frozen answer
@@ -163,8 +219,10 @@ number in this codebase has eventually disagreed with the thing it mirrored.
   assigned, what it is for, and what they answered.
 - **A6.2** Email is consolidated on the recipient. One message per teacher per
   run, carrying everything currently outstanding for them: anything newly
-  assigned, anything whose planned date is approaching, and any ten day follow
-  up now due under A4.9.
+  assigned, anything whose planned date is approaching, any ten day follow up
+  now due under A4.9, and any reminder owed under A4.11. A teacher with three
+  assignments, a follow up and a reminder all due still receives exactly one
+  message.
 - **A6.3** Never one email per assignment. Three active assignments must never
   mean three emails, or six.
 - **A6.4** Built with `?dryRun=1` in the route itself, modelled in SQL first,
