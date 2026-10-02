@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { clientFacingServiceName, plannedDateNote } from '@/lib/partnerships/service-names';
+import { engagementTrend, type EngagementTrend } from '@/lib/partners/popularity';
 import { createClient } from '@supabase/supabase-js';
 
 // Service Supabase client
@@ -104,9 +105,23 @@ async function emailsActiveInHub(emails: string[]): Promise<Set<string> | null> 
 export interface EngagementItem {
   kind: 'course' | 'quick_win';
   title: string;
-  /** Distinct people, which is the number that means something. */
+  /**
+   * Distinct people across the whole window. Ranks the list and feeds reports.
+   *
+   * The partner dashboard stopped printing this on 2 October 2026. A school
+   * sees a share, never a headcount.
+   */
   people: number;
   opens: number;
+  /**
+   * Distinct people in the last 30 days.
+   *
+   * The numerator the dashboard divides by `activeThisMonth`, so both halves of
+   * that share describe the same 30 days. Pairing the 90 day `people` with a 30
+   * day denominator would read over 100% for anything popular last quarter.
+   */
+  peopleRecent: number;
+  trend: EngagementTrend;
 }
 
 export interface HubEngagementDetail {
@@ -339,6 +354,10 @@ async function hubEngagementDetail(
 
   const weekAgo = Date.now() - 7 * 86400000;
   const monthAgo = Date.now() - 30 * 86400000;
+  // The 30 days before the last 30, which is what a trend compares against.
+  // Inside the 90 day read, so the older half is always fully present unless
+  // the row cap truncated it.
+  const twoMonthsAgo = Date.now() - 60 * 86400000;
   const week = new Set<string>();
   const month = new Set<string>();
   let lastActiveAt: string | null = null;
@@ -346,12 +365,12 @@ async function hubEngagementDetail(
   // key -> { kind, title, people:Set, opens:number }
   const perBuilding = new Map<
     string,
-    { week: Set<string>; month: Set<string>; content: Map<string, { kind: 'course' | 'quick_win'; title: string; people: Set<string>; opens: number }> }
+    { week: Set<string>; month: Set<string>; content: Map<string, { kind: 'course' | 'quick_win'; title: string; people: Set<string>; recent: Set<string>; prior: Set<string>; opens: number }> }
   >();
 
   const byContent = new Map<
     string,
-    { kind: 'course' | 'quick_win'; title: string; people: Set<string>; opens: number }
+    { kind: 'course' | 'quick_win'; title: string; people: Set<string>; recent: Set<string>; prior: Set<string>; opens: number }
   >();
 
   for (const row of rows || []) {
@@ -380,7 +399,7 @@ async function hubEngagementDetail(
     // same rules, so a building can never disagree with the district total.
     const bid = buildingByProfile.get(userId);
     if (bid) {
-      const b = perBuilding.get(bid) || { week: new Set<string>(), month: new Set<string>(), content: new Map<string, { kind: 'course' | 'quick_win'; title: string; people: Set<string>; opens: number }>() };
+      const b = perBuilding.get(bid) || { week: new Set<string>(), month: new Set<string>(), content: new Map<string, { kind: 'course' | 'quick_win'; title: string; people: Set<string>; recent: Set<string>; prior: Set<string>; opens: number }>() };
       if (at >= weekAgo) b.week.add(userId);
       if (at >= monthAgo) b.month.add(userId);
       perBuilding.set(bid, b);
@@ -388,19 +407,41 @@ async function hubEngagementDetail(
 
     if (!kind || !title) continue;
     const key = `${kind}:${title}`;
-    const entry = byContent.get(key) || { kind, title, people: new Set<string>(), opens: 0 };
+    const entry = byContent.get(key) || { kind, title, people: new Set<string>(), recent: new Set<string>(), prior: new Set<string>(), opens: 0 };
     entry.people.add(userId);
+    if (at >= monthAgo) entry.recent.add(userId);
+    else if (at >= twoMonthsAgo) entry.prior.add(userId);
     entry.opens += 1;
     byContent.set(key, entry);
 
     if (bid) {
       const b = perBuilding.get(bid)!;
-      const be = b.content.get(key) || { kind, title, people: new Set<string>(), opens: 0 };
+      const be = b.content.get(key) || { kind, title, people: new Set<string>(), recent: new Set<string>(), prior: new Set<string>(), opens: 0 };
       be.people.add(userId);
+      if (at >= monthAgo) be.recent.add(userId);
+      else if (at >= twoMonthsAgo) be.prior.add(userId);
       be.opens += 1;
       b.content.set(key, be);
     }
   }
+
+  const truncated = (rows?.length ?? 0) >= ACTIVITY_ROW_CAP;
+
+  /**
+   * Turn an accumulated entry into what the dashboard renders.
+   *
+   * A truncated read drops the oldest rows, which are exactly the prior 30 day
+   * half, so every item would read as rising. We return no direction at all
+   * rather than a flattering one.
+   */
+  const shape = (e: { kind: 'course' | 'quick_win'; title: string; people: Set<string>; recent: Set<string>; prior: Set<string>; opens: number }): EngagementItem => ({
+    kind: e.kind,
+    title: e.title,
+    people: e.people.size,
+    opens: e.opens,
+    peopleRecent: e.recent.size,
+    trend: engagementTrend(e.recent.size, e.prior.size, truncated),
+  });
 
   const byBuilding: HubEngagementDetail['byBuilding'] = {};
   for (const [bid, b] of perBuilding) {
@@ -409,14 +450,14 @@ async function hubEngagementDetail(
       activeThisMonth: b.month.size,
       distinctContent: b.content.size,
       topContent: Array.from(b.content.values())
-        .map(e => ({ kind: e.kind, title: e.title, people: e.people.size, opens: e.opens }))
+        .map(shape)
         .sort((a, b2) => b2.people - a.people || b2.opens - a.opens)
         .slice(0, 6),
     };
   }
 
   const topContent = Array.from(byContent.values())
-    .map(e => ({ kind: e.kind, title: e.title, people: e.people.size, opens: e.opens }))
+    .map(shape)
     .sort((a, b) => b.people - a.people || b.opens - a.opens)
     .slice(0, 8);
 
@@ -430,7 +471,7 @@ async function hubEngagementDetail(
     activeThisMonth: month.size,
     lastActiveAt,
     windowDays: ENGAGEMENT_WINDOW_DAYS,
-    truncated: (rows?.length ?? 0) >= ACTIVITY_ROW_CAP,
+    truncated,
     unknown: false,
   };
 }
