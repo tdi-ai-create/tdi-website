@@ -135,6 +135,90 @@
     background: var(--wash); border-radius: 8px; padding: 11px 12px; max-width: 64ch;
   }
 
+  /* ===== tool picker: the Hub's own filter bar, same values =====
+     category pill selected #1a1f4e on white text, unselected #EEF1F5 on #475569
+     with a 1px rgba(0,0,0,.04) border, px-4 py-2 rounded-full text-sm.
+     Effort pills: Grab & Go #6BA368, Short Prep #E8B84B, Deep Dive #E8927C. */
+  .findmode { display: flex; gap: 6px; margin-top: 10px; }
+  .fm {
+    font: inherit; font-size: 12.5px; font-weight: 600; cursor: pointer;
+    padding: 7px 13px; border-radius: 999px; border: 1px solid var(--border-mid);
+    background: var(--card); color: var(--g600);
+  }
+  .fm.on { background: #1a1f4e; color: #fff; border-color: #1a1f4e; }
+  .fm:focus-visible { outline: 2px solid var(--navy); outline-offset: 2px; }
+  .fmpanel { display: none; margin-top: 12px; }
+  .fmpanel.on { display: block; }
+
+  .filterbar { background: var(--page); border-radius: 12px; padding: 12px; }
+  .fbtop { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .rolesel {
+    font: inherit; font-size: 13.5px; font-weight: 500; cursor: pointer;
+    padding: 8px 12px; border-radius: 999px; border: 1px solid var(--border-mid);
+    background: var(--card); color: var(--g700);
+  }
+  .fbdiv { width: 1px; height: 24px; background: var(--border-mid); }
+  .pills { display: flex; gap: 8px; flex-wrap: wrap; flex: 1 1 auto; min-width: 0; }
+  .cp {
+    font: inherit; font-size: 13.5px; font-weight: 500; cursor: pointer;
+    padding: 8px 16px; border-radius: 999px; white-space: nowrap;
+    background: #EEF1F5; color: #475569; border: 1px solid rgba(0,0,0,.04);
+  }
+  .cp.on { background: #1a1f4e; color: #fff; border: none; }
+  .cp:focus-visible, .ep:focus-visible, .dp:focus-visible { outline: 2px solid var(--navy); outline-offset: 2px; }
+  .heart {
+    font: inherit; width: 36px; height: 36px; border-radius: 999px; cursor: pointer;
+    background: var(--card); border: 1px dashed var(--g400); color: var(--g500);
+    font-size: 15px; flex: none;
+  }
+  .morefilters {
+    font: inherit; font-size: 13.5px; font-weight: 600; cursor: pointer;
+    padding: 8px 16px; border-radius: 999px; background: #1a1f4e; color: #fff;
+    border: none; white-space: nowrap; flex: none;
+  }
+  .fbmore { display: none; margin-top: 12px; border-top: 1px solid var(--border-mid); padding-top: 12px; }
+  .fbmore.on { display: block; }
+  .fbrow { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+  .fbrow:first-child { margin-top: 0; }
+  .fblab {
+    font-size: 10.5px; letter-spacing: .09em; text-transform: uppercase;
+    color: var(--g500); font-weight: 700; flex: 0 0 auto; width: 128px;
+  }
+  .ep, .dp {
+    font: inherit; font-size: 12px; font-weight: 500; cursor: pointer;
+    padding: 6px 12px; border-radius: 999px; white-space: nowrap;
+    background: var(--card); border: 1px solid var(--border-mid); color: var(--g600);
+  }
+  .ep.on { color: #fff; border-color: transparent; }
+  .ep.on[data-eff="all"] { background: #1B2A4A; }
+  .ep.on.low { background: #6BA368; }
+  .ep.on.med { background: #E8B84B; color: #42340c; }
+  .ep.on.high { background: #E8927C; color: #4a1f14; }
+  .dp.on { background: #1a1f4e; color: #fff; border-color: #1a1f4e; }
+  .effnote { margin-top: 11px; font-size: 11.8px; color: var(--g500); max-width: 66ch; }
+
+  .rescount { margin-top: 12px; font-size: 12.5px; color: var(--g500); font-variant-numeric: tabular-nums; }
+  .results .doms { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 7px; }
+  .results .doms span {
+    font-size: 10px; font-weight: 700; letter-spacing: .03em;
+    padding: 2px 7px; border-radius: 999px; background: #EEF1F5; color: #475569;
+  }
+  .results .doms span.eff.low { background: #EAF3E9; color: #3c6239; }
+  .results .doms span.eff.med { background: #FDF3DC; color: #6b5319; }
+  .opt.tool.hide { display: none; }
+  .nores { display: none; margin-top: 12px; font-size: 13px; color: var(--g600); max-width: 60ch; }
+  .nores.on { display: block; }
+
+  .resolved { display: none; margin-top: 12px; font-size: 13.5px; }
+  .resolved.on { display: block; }
+  .resolved .okbox {
+    background: var(--wash); border-radius: 10px; padding: 12px 13px; color: var(--g900);
+  }
+  .resolved .badbox {
+    background: var(--amberwash); border-radius: 10px; padding: 12px 13px; color: #6b4e00;
+  }
+  .resolved b { font-weight: 650; }
+
   /* ---- buttons ---- */
   .btn {
     font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; border: none;
@@ -425,15 +509,121 @@
         <div class="step">
           <div class="sl">The tool</div>
           <div class="sn">These speak to the goal you picked. You can search the whole Hub as well.</div>
-          <div class="grid2" data-tools="goal">
-            <button class="opt" data-tool="The Shift Kit">
-              <div class="ot">The Shift Kit</div><div class="ok">Quick win</div>
-              <div class="os">Changing what happens in the first four minutes of a lesson.</div>
-            </button>
-            <button class="opt" data-tool="Lesson Flow Checklist">
-              <div class="ot">Lesson Flow Checklist</div><div class="ok">Quick win</div>
-              <div class="os">A checklist a teacher marks up while planning, not after.</div>
-            </button>
+          <div class="findmode" data-mode="goal">
+            <button class="fm on" data-fm="browse">Browse the Hub</button>
+            <button class="fm" data-fm="link">I already have a link</button>
+          </div>
+
+          <div class="fmpanel on" id="browse-goal">
+            <div class="filterbar">
+              <div class="fbtop">
+                <select class="rolesel" aria-label="Filter by role">
+                  <option>For any role</option>
+                  <option>Teacher</option>
+                  <option>Paraprofessional</option>
+                  <option>Leader / Admin</option>
+                  <option>Coach</option>
+                </select>
+                <span class="fbdiv"></span>
+                <div class="pills" data-cats="goal">
+                  <button class="cp on" data-cat="all">All</button>
+                  <button class="cp" data-cat="Working Together">Working Together</button>
+                  <button class="cp" data-cat="Instructional Strategies">Instructional Strategies</button>
+                  <button class="cp" data-cat="Lesson Planning">Lesson Planning</button>
+                  <button class="cp" data-cat="Assessment">Assessment</button>
+                  <button class="cp" data-cat="Classroom Setup">Classroom Setup</button>
+                  <button class="cp" data-cat="Classroom Management">Classroom Management</button>
+                </div>
+                <button class="heart" aria-label="Saved only" title="Saved only">&#9825;</button>
+                <button class="morefilters" data-more="goal">More Filters</button>
+              </div>
+              <div class="fbmore" id="more-goal">
+                <div class="fbrow">
+                  <span class="fblab">Effort level</span>
+                  <button class="ep on" data-eff="all">All</button>
+                  <button class="ep low" data-eff="low">Grab &amp; Go</button>
+                  <button class="ep med" data-eff="medium">Short Prep</button>
+                  <button class="ep high" data-eff="high">Deep Dive</button>
+                </div>
+                <div class="fbrow">
+                  <span class="fblab">Danielson framework</span>
+                  <button class="dp" data-dom="1-planning">Planning &amp; Prep (D1)</button>
+                  <button class="dp" data-dom="2-environment">Classroom Environment (D2)</button>
+                  <button class="dp" data-dom="3-instruction">Instruction (D3)</button>
+                  <button class="dp" data-dom="4-professional">Professional Responsibilities (D4)</button>
+                </div>
+                <p class="effnote">
+                  Effort level is set on 77 of the 303 published quick wins, so filtering by
+                  it hides anything we have not labelled yet.
+                </p>
+              </div>
+            </div>
+
+            <div class="rescount" id="count-goal"></div>
+
+            <div class="grid2 results" data-tools="goal">
+              <button class="opt tool" data-tool="New Teacher Check-in Protocol" data-cat="Instructional Strategies" data-eff="" data-dom="3-instruction,4-professional">
+                <div class="ot">New Teacher Check-in Protocol</div>
+                <div class="ok">Quick win &middot; Instructional Strategies</div>
+                <div class="doms"><span>D3</span><span>D4</span></div>
+              </button>
+              <button class="opt tool" data-tool="No-Hands-Up Help Systems" data-cat="Instructional Strategies" data-eff="" data-dom="3-instruction">
+                <div class="ot">No-Hands-Up Help Systems</div>
+                <div class="ok">Quick win &middot; Instructional Strategies</div>
+                <div class="doms"><span>D3</span></div>
+              </button>
+              <button class="opt tool" data-tool="Substitute Teacher Day Plan Template" data-cat="Lesson Planning" data-eff="low" data-dom="1-planning">
+                <div class="ot">Substitute Teacher Day Plan Template</div>
+                <div class="ok">Quick win &middot; Lesson Planning</div>
+                <div class="doms"><span>D1</span><span class="eff low">Grab &amp; Go</span></div>
+              </button>
+              <button class="opt tool" data-tool="Accommodation vs. Modification Quick-Guide" data-cat="Lesson Planning" data-eff="" data-dom="1-planning,3-instruction">
+                <div class="ot">Accommodation vs. Modification Quick-Guide</div>
+                <div class="ok">Quick win &middot; Lesson Planning</div>
+                <div class="doms"><span>D1</span><span>D3</span></div>
+              </button>
+              <button class="opt tool" data-tool="The Assessment Audit" data-cat="Assessment" data-eff="" data-dom="1-planning">
+                <div class="ot">The Assessment Audit</div>
+                <div class="ok">Quick win &middot; Assessment</div>
+                <div class="doms"><span>D1</span></div>
+              </button>
+              <button class="opt tool" data-tool="Real-Time Checks: Reading the Room Mid-Lesson" data-cat="Assessment" data-eff="" data-dom="3-instruction">
+                <div class="ot">Real-Time Checks: Reading the Room Mid-Lesson</div>
+                <div class="ok">Quick win &middot; Assessment</div>
+                <div class="doms"><span>D3</span></div>
+              </button>
+              <button class="opt tool" data-tool="Creative Ideas for Working With Rigid Seating" data-cat="Classroom Setup" data-eff="" data-dom="2-environment,3-instruction">
+                <div class="ot">Creative Ideas for Working With Rigid Seating</div>
+                <div class="ok">Quick win &middot; Classroom Setup</div>
+                <div class="doms"><span>D2</span><span>D3</span></div>
+              </button>
+              <button class="opt tool" data-tool="The Art Room Reset Plan" data-cat="Classroom Management" data-eff="medium" data-dom="2-environment">
+                <div class="ot">The Art Room Reset Plan</div>
+                <div class="ok">Quick win &middot; Classroom Management</div>
+                <div class="doms"><span>D2</span><span class="eff med">Short Prep</span></div>
+              </button>
+              <button class="opt tool" data-tool="End-of-Day Classroom Closing Checklist" data-cat="Classroom Management" data-eff="" data-dom="2-environment">
+                <div class="ot">End-of-Day Classroom Closing Checklist</div>
+                <div class="ok">Quick win &middot; Classroom Management</div>
+                <div class="doms"><span>D2</span></div>
+              </button>
+            </div>
+            <p class="nores" id="nores-goal">
+              Nothing matches those filters. Clear one, or paste a link if you already know
+              what you want.
+            </p>
+          </div>
+
+          <div class="fmpanel" id="link-goal">
+            <div class="field">
+              <label for="url-goal">Paste the link to the tool</label>
+              <div class="fh">
+                A Learning Hub link, the kind you get from the address bar on a quick win or
+                a course.
+              </div>
+              <input type="text" id="url-goal" placeholder="https://www.teachersdeserveit.com/hub/quick-wins/...">
+            </div>
+            <div class="resolved" id="res-goal"></div>
           </div>
         </div>
         <div class="step">
@@ -560,13 +750,121 @@
         </div>
         <div class="step">
           <div class="sl">The tool</div>
-          <div class="grid2" data-tools="person">
-            <button class="opt" data-tool="Lesson Flow Checklist">
-              <div class="ot">Lesson Flow Checklist</div><div class="ok">Quick win</div>
-            </button>
-            <button class="opt" data-tool="The Differentiation Fix">
-              <div class="ot">The Differentiation Fix</div><div class="ok">Course</div>
-            </button>
+          <div class="findmode" data-mode="person">
+            <button class="fm on" data-fm="browse">Browse the Hub</button>
+            <button class="fm" data-fm="link">I already have a link</button>
+          </div>
+
+          <div class="fmpanel on" id="browse-person">
+            <div class="filterbar">
+              <div class="fbtop">
+                <select class="rolesel" aria-label="Filter by role">
+                  <option>For any role</option>
+                  <option>Teacher</option>
+                  <option>Paraprofessional</option>
+                  <option>Leader / Admin</option>
+                  <option>Coach</option>
+                </select>
+                <span class="fbdiv"></span>
+                <div class="pills" data-cats="person">
+                  <button class="cp on" data-cat="all">All</button>
+                  <button class="cp" data-cat="Working Together">Working Together</button>
+                  <button class="cp" data-cat="Instructional Strategies">Instructional Strategies</button>
+                  <button class="cp" data-cat="Lesson Planning">Lesson Planning</button>
+                  <button class="cp" data-cat="Assessment">Assessment</button>
+                  <button class="cp" data-cat="Classroom Setup">Classroom Setup</button>
+                  <button class="cp" data-cat="Classroom Management">Classroom Management</button>
+                </div>
+                <button class="heart" aria-label="Saved only" title="Saved only">&#9825;</button>
+                <button class="morefilters" data-more="person">More Filters</button>
+              </div>
+              <div class="fbmore" id="more-person">
+                <div class="fbrow">
+                  <span class="fblab">Effort level</span>
+                  <button class="ep on" data-eff="all">All</button>
+                  <button class="ep low" data-eff="low">Grab &amp; Go</button>
+                  <button class="ep med" data-eff="medium">Short Prep</button>
+                  <button class="ep high" data-eff="high">Deep Dive</button>
+                </div>
+                <div class="fbrow">
+                  <span class="fblab">Danielson framework</span>
+                  <button class="dp" data-dom="1-planning">Planning &amp; Prep (D1)</button>
+                  <button class="dp" data-dom="2-environment">Classroom Environment (D2)</button>
+                  <button class="dp" data-dom="3-instruction">Instruction (D3)</button>
+                  <button class="dp" data-dom="4-professional">Professional Responsibilities (D4)</button>
+                </div>
+                <p class="effnote">
+                  Effort level is set on 77 of the 303 published quick wins, so filtering by
+                  it hides anything we have not labelled yet.
+                </p>
+              </div>
+            </div>
+
+            <div class="rescount" id="count-person"></div>
+
+            <div class="grid2 results" data-tools="person">
+              <button class="opt tool" data-tool="New Teacher Check-in Protocol" data-cat="Instructional Strategies" data-eff="" data-dom="3-instruction,4-professional">
+                <div class="ot">New Teacher Check-in Protocol</div>
+                <div class="ok">Quick win &middot; Instructional Strategies</div>
+                <div class="doms"><span>D3</span><span>D4</span></div>
+              </button>
+              <button class="opt tool" data-tool="No-Hands-Up Help Systems" data-cat="Instructional Strategies" data-eff="" data-dom="3-instruction">
+                <div class="ot">No-Hands-Up Help Systems</div>
+                <div class="ok">Quick win &middot; Instructional Strategies</div>
+                <div class="doms"><span>D3</span></div>
+              </button>
+              <button class="opt tool" data-tool="Substitute Teacher Day Plan Template" data-cat="Lesson Planning" data-eff="low" data-dom="1-planning">
+                <div class="ot">Substitute Teacher Day Plan Template</div>
+                <div class="ok">Quick win &middot; Lesson Planning</div>
+                <div class="doms"><span>D1</span><span class="eff low">Grab &amp; Go</span></div>
+              </button>
+              <button class="opt tool" data-tool="Accommodation vs. Modification Quick-Guide" data-cat="Lesson Planning" data-eff="" data-dom="1-planning,3-instruction">
+                <div class="ot">Accommodation vs. Modification Quick-Guide</div>
+                <div class="ok">Quick win &middot; Lesson Planning</div>
+                <div class="doms"><span>D1</span><span>D3</span></div>
+              </button>
+              <button class="opt tool" data-tool="The Assessment Audit" data-cat="Assessment" data-eff="" data-dom="1-planning">
+                <div class="ot">The Assessment Audit</div>
+                <div class="ok">Quick win &middot; Assessment</div>
+                <div class="doms"><span>D1</span></div>
+              </button>
+              <button class="opt tool" data-tool="Real-Time Checks: Reading the Room Mid-Lesson" data-cat="Assessment" data-eff="" data-dom="3-instruction">
+                <div class="ot">Real-Time Checks: Reading the Room Mid-Lesson</div>
+                <div class="ok">Quick win &middot; Assessment</div>
+                <div class="doms"><span>D3</span></div>
+              </button>
+              <button class="opt tool" data-tool="Creative Ideas for Working With Rigid Seating" data-cat="Classroom Setup" data-eff="" data-dom="2-environment,3-instruction">
+                <div class="ot">Creative Ideas for Working With Rigid Seating</div>
+                <div class="ok">Quick win &middot; Classroom Setup</div>
+                <div class="doms"><span>D2</span><span>D3</span></div>
+              </button>
+              <button class="opt tool" data-tool="The Art Room Reset Plan" data-cat="Classroom Management" data-eff="medium" data-dom="2-environment">
+                <div class="ot">The Art Room Reset Plan</div>
+                <div class="ok">Quick win &middot; Classroom Management</div>
+                <div class="doms"><span>D2</span><span class="eff med">Short Prep</span></div>
+              </button>
+              <button class="opt tool" data-tool="End-of-Day Classroom Closing Checklist" data-cat="Classroom Management" data-eff="" data-dom="2-environment">
+                <div class="ot">End-of-Day Classroom Closing Checklist</div>
+                <div class="ok">Quick win &middot; Classroom Management</div>
+                <div class="doms"><span>D2</span></div>
+              </button>
+            </div>
+            <p class="nores" id="nores-person">
+              Nothing matches those filters. Clear one, or paste a link if you already know
+              what you want.
+            </p>
+          </div>
+
+          <div class="fmpanel" id="link-person">
+            <div class="field">
+              <label for="url-person">Paste the link to the tool</label>
+              <div class="fh">
+                A Learning Hub link, the kind you get from the address bar on a quick win or
+                a course.
+              </div>
+              <input type="text" id="url-person" placeholder="https://www.teachersdeserveit.com/hub/quick-wins/...">
+            </div>
+            <div class="resolved" id="res-person"></div>
           </div>
         </div>
         <div class="step">
@@ -650,13 +948,121 @@
         </div>
         <div class="step">
           <div class="sl">The tool everyone works on</div>
-          <div class="grid2" data-tools="move">
-            <button class="opt" data-tool="Building Strong Teacher-Para Partnerships">
-              <div class="ot">Building Strong Teacher-Para Partnerships</div><div class="ok">Course</div>
-            </button>
-            <button class="opt" data-tool="Communication that Clicks">
-              <div class="ot">Communication that Clicks</div><div class="ok">Course</div>
-            </button>
+          <div class="findmode" data-mode="move">
+            <button class="fm on" data-fm="browse">Browse the Hub</button>
+            <button class="fm" data-fm="link">I already have a link</button>
+          </div>
+
+          <div class="fmpanel on" id="browse-move">
+            <div class="filterbar">
+              <div class="fbtop">
+                <select class="rolesel" aria-label="Filter by role">
+                  <option>For any role</option>
+                  <option>Teacher</option>
+                  <option>Paraprofessional</option>
+                  <option>Leader / Admin</option>
+                  <option>Coach</option>
+                </select>
+                <span class="fbdiv"></span>
+                <div class="pills" data-cats="move">
+                  <button class="cp on" data-cat="all">All</button>
+                  <button class="cp" data-cat="Working Together">Working Together</button>
+                  <button class="cp" data-cat="Instructional Strategies">Instructional Strategies</button>
+                  <button class="cp" data-cat="Lesson Planning">Lesson Planning</button>
+                  <button class="cp" data-cat="Assessment">Assessment</button>
+                  <button class="cp" data-cat="Classroom Setup">Classroom Setup</button>
+                  <button class="cp" data-cat="Classroom Management">Classroom Management</button>
+                </div>
+                <button class="heart" aria-label="Saved only" title="Saved only">&#9825;</button>
+                <button class="morefilters" data-more="move">More Filters</button>
+              </div>
+              <div class="fbmore" id="more-move">
+                <div class="fbrow">
+                  <span class="fblab">Effort level</span>
+                  <button class="ep on" data-eff="all">All</button>
+                  <button class="ep low" data-eff="low">Grab &amp; Go</button>
+                  <button class="ep med" data-eff="medium">Short Prep</button>
+                  <button class="ep high" data-eff="high">Deep Dive</button>
+                </div>
+                <div class="fbrow">
+                  <span class="fblab">Danielson framework</span>
+                  <button class="dp" data-dom="1-planning">Planning &amp; Prep (D1)</button>
+                  <button class="dp" data-dom="2-environment">Classroom Environment (D2)</button>
+                  <button class="dp" data-dom="3-instruction">Instruction (D3)</button>
+                  <button class="dp" data-dom="4-professional">Professional Responsibilities (D4)</button>
+                </div>
+                <p class="effnote">
+                  Effort level is set on 77 of the 303 published quick wins, so filtering by
+                  it hides anything we have not labelled yet.
+                </p>
+              </div>
+            </div>
+
+            <div class="rescount" id="count-move"></div>
+
+            <div class="grid2 results" data-tools="move">
+              <button class="opt tool" data-tool="New Teacher Check-in Protocol" data-cat="Instructional Strategies" data-eff="" data-dom="3-instruction,4-professional">
+                <div class="ot">New Teacher Check-in Protocol</div>
+                <div class="ok">Quick win &middot; Instructional Strategies</div>
+                <div class="doms"><span>D3</span><span>D4</span></div>
+              </button>
+              <button class="opt tool" data-tool="No-Hands-Up Help Systems" data-cat="Instructional Strategies" data-eff="" data-dom="3-instruction">
+                <div class="ot">No-Hands-Up Help Systems</div>
+                <div class="ok">Quick win &middot; Instructional Strategies</div>
+                <div class="doms"><span>D3</span></div>
+              </button>
+              <button class="opt tool" data-tool="Substitute Teacher Day Plan Template" data-cat="Lesson Planning" data-eff="low" data-dom="1-planning">
+                <div class="ot">Substitute Teacher Day Plan Template</div>
+                <div class="ok">Quick win &middot; Lesson Planning</div>
+                <div class="doms"><span>D1</span><span class="eff low">Grab &amp; Go</span></div>
+              </button>
+              <button class="opt tool" data-tool="Accommodation vs. Modification Quick-Guide" data-cat="Lesson Planning" data-eff="" data-dom="1-planning,3-instruction">
+                <div class="ot">Accommodation vs. Modification Quick-Guide</div>
+                <div class="ok">Quick win &middot; Lesson Planning</div>
+                <div class="doms"><span>D1</span><span>D3</span></div>
+              </button>
+              <button class="opt tool" data-tool="The Assessment Audit" data-cat="Assessment" data-eff="" data-dom="1-planning">
+                <div class="ot">The Assessment Audit</div>
+                <div class="ok">Quick win &middot; Assessment</div>
+                <div class="doms"><span>D1</span></div>
+              </button>
+              <button class="opt tool" data-tool="Real-Time Checks: Reading the Room Mid-Lesson" data-cat="Assessment" data-eff="" data-dom="3-instruction">
+                <div class="ot">Real-Time Checks: Reading the Room Mid-Lesson</div>
+                <div class="ok">Quick win &middot; Assessment</div>
+                <div class="doms"><span>D3</span></div>
+              </button>
+              <button class="opt tool" data-tool="Creative Ideas for Working With Rigid Seating" data-cat="Classroom Setup" data-eff="" data-dom="2-environment,3-instruction">
+                <div class="ot">Creative Ideas for Working With Rigid Seating</div>
+                <div class="ok">Quick win &middot; Classroom Setup</div>
+                <div class="doms"><span>D2</span><span>D3</span></div>
+              </button>
+              <button class="opt tool" data-tool="The Art Room Reset Plan" data-cat="Classroom Management" data-eff="medium" data-dom="2-environment">
+                <div class="ot">The Art Room Reset Plan</div>
+                <div class="ok">Quick win &middot; Classroom Management</div>
+                <div class="doms"><span>D2</span><span class="eff med">Short Prep</span></div>
+              </button>
+              <button class="opt tool" data-tool="End-of-Day Classroom Closing Checklist" data-cat="Classroom Management" data-eff="" data-dom="2-environment">
+                <div class="ot">End-of-Day Classroom Closing Checklist</div>
+                <div class="ok">Quick win &middot; Classroom Management</div>
+                <div class="doms"><span>D2</span></div>
+              </button>
+            </div>
+            <p class="nores" id="nores-move">
+              Nothing matches those filters. Clear one, or paste a link if you already know
+              what you want.
+            </p>
+          </div>
+
+          <div class="fmpanel" id="link-move">
+            <div class="field">
+              <label for="url-move">Paste the link to the tool</label>
+              <div class="fh">
+                A Learning Hub link, the kind you get from the address bar on a quick win or
+                a course.
+              </div>
+              <input type="text" id="url-move" placeholder="https://www.teachersdeserveit.com/hub/quick-wins/...">
+            </div>
+            <div class="resolved" id="res-move"></div>
           </div>
         </div>
         <div class="step">
@@ -1051,6 +1457,95 @@
       });
 
       refresh(k);
+    });
+
+    // ===== tool picker: browse with filters, or paste a Hub link =====
+    const HUB_HOST = 'www.teachersdeserveit.com';
+
+    function applyFilters(k) {
+      const panel = document.getElementById('browse-' + k);
+      if (!panel) return;
+      const cat = (panel.querySelector('.cp.on') || {}).dataset?.cat || 'all';
+      const eff = (panel.querySelector('.ep.on') || {}).dataset?.eff || 'all';
+      const doms = Array.prototype.map.call(panel.querySelectorAll('.dp.on'), d => d.dataset.dom);
+      const cards = panel.querySelectorAll('.opt.tool');
+      let shown = 0;
+      cards.forEach(c => {
+        const cardDoms = (c.dataset.dom || '').split(',').filter(Boolean);
+        const ok =
+          (cat === 'all' || c.dataset.cat === cat) &&
+          (eff === 'all' || c.dataset.eff === eff) &&
+          (doms.length === 0 || doms.some(d => cardDoms.includes(d)));
+        c.classList.toggle('hide', !ok);
+        if (ok) shown++;
+        // A hidden card must not stay selected, or you assign something you cannot see.
+        if (!ok && c.classList.contains('on')) {
+          c.classList.remove('on');
+          g(k).tool = null;
+          refresh(k);
+        }
+      });
+      document.getElementById('count-' + k).textContent =
+        shown === 303 ? 'Showing all 303 quick wins'
+          : 'Showing ' + shown + ' of 303 quick wins';
+      document.getElementById('nores-' + k).classList.toggle('on', shown === 0);
+    }
+
+    ['goal', 'person', 'move'].forEach(k => {
+      // browse or paste
+      const modes = document.querySelector('[data-mode="' + k + '"]');
+      if (modes) modes.querySelectorAll('.fm').forEach(b => {
+        b.addEventListener('click', () => {
+          modes.querySelectorAll('.fm').forEach(x => x.classList.remove('on'));
+          b.classList.add('on');
+          const which = b.dataset.fm;
+          document.getElementById('browse-' + k).classList.toggle('on', which === 'browse');
+          document.getElementById('link-' + k).classList.toggle('on', which === 'link');
+        });
+      });
+
+      const panel = document.getElementById('browse-' + k);
+      if (panel) {
+        panel.querySelectorAll('.cp').forEach(b => b.addEventListener('click', () => {
+          panel.querySelectorAll('.cp').forEach(x => x.classList.remove('on'));
+          b.classList.add('on'); applyFilters(k);
+        }));
+        panel.querySelectorAll('.ep').forEach(b => b.addEventListener('click', () => {
+          panel.querySelectorAll('.ep').forEach(x => x.classList.remove('on'));
+          b.classList.add('on'); applyFilters(k);
+        }));
+        panel.querySelectorAll('.dp').forEach(b => b.addEventListener('click', () => {
+          b.classList.toggle('on'); applyFilters(k);
+        }));
+        const more = panel.querySelector('[data-more="' + k + '"]');
+        if (more) more.addEventListener('click', () => {
+          document.getElementById('more-' + k).classList.toggle('on');
+        });
+        applyFilters(k);
+      }
+
+      // paste a link
+      const url = document.getElementById('url-' + k);
+      if (url) url.addEventListener('input', () => {
+        const box = document.getElementById('res-' + k);
+        const v = url.value.trim();
+        if (!v) { box.classList.remove('on'); g(k).tool = null; refresh(k); return; }
+        box.classList.add('on');
+        let host = null, path = '';
+        try { const u = new URL(v); host = u.host; path = u.pathname; } catch { host = null; }
+        const isHub = host === HUB_HOST && /^\/hub\/(quick-wins|courses)\/[^/]+/.test(path);
+        if (!isHub) {
+          box.innerHTML = '<div class="badbox">That is not a Learning Hub link. ' +
+            'Assignments have to point at something in the Hub, because that is where your ' +
+            'team answers and where the goal reading comes from.</div>';
+          g(k).tool = null; refresh(k); return;
+        }
+        const slug = path.split('/').filter(Boolean).pop();
+        const name = slug.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+        box.innerHTML = '<div class="okbox">Found <b>' + name + '</b> in the Hub. ' +
+          'That is what will be assigned.</div>';
+        g(k).tool = name; refresh(k);
+      });
     });
 
     // Sub-tabs. One is always selected, so there is no closed state.
