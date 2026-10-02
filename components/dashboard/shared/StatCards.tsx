@@ -1,11 +1,20 @@
 'use client'
 import { Users, Eye, CheckCircle, AlertCircle, Zap, Rocket, Target, ArrowRight } from 'lucide-react'
+import { sharePct } from '@/lib/partners/popularity';
 
+/**
+ * The shape the Hub stats endpoint returns, declared rather than read.
+ *
+ * quarantine-ok: naming logins_this_month and hub_login_pct in a type is not
+ * reading them. Both are calendar-month-to-date and neither is rendered here.
+ */
 interface HubStats {
   has_real_data: boolean
   member_count: number
+  // quarantine-ok: part of the endpoint's shape. Nothing here reads it.
   logins_this_month: number | null
   active_users_7d: number | null
+  // quarantine-ok: part of the endpoint's shape. Nothing here reads it.
   hub_login_pct: number | null
   course_completions: number | null
   quick_wins_completed: number | null
@@ -118,10 +127,22 @@ export function StatCards({
   // Support legacy props for backward compatibility
   const staff = staffTotal ?? staffEnrolled ?? 0
 
-  // Use real Hub data when available, otherwise fall back to manual/legacy values
-  const hubLogins = hubStats?.has_real_data
-    ? (hubStats.logins_this_month ?? 0)
-    : (staffHubLoggedIn ?? (hubLoginPct && staffEnrolled ? Math.round((hubLoginPct / 100) * staffEnrolled) : 0))
+  /**
+   * How many of this roster are actually using the Hub.
+   *
+   * Deliberately NOT hubStats.logins_this_month, which is distinct sign ins
+   * since the first of the CALENDAR month. Generated in the small hours of the
+   * first it covers a couple of hours, and it is quarantined in the dashboard
+   * standard for exactly that reason. It was the source here, and this card now
+   * renders the figure as a share, which would have published the wrong one
+   * more prominently than before.
+   *
+   * The roster-derived count is the same arithmetic the Team Activation card
+   * uses, so this card and that one agree.
+   */
+  const hubLogins =
+    staffHubLoggedIn ??
+    (hubLoginPct && staffEnrolled ? Math.round((hubLoginPct / 100) * staffEnrolled) : 0)
   const obsUsed = observationsUsed ?? 0
   const obsTotal = observationsTotal ?? 0
 
@@ -152,6 +173,8 @@ export function StatCards({
               <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-[#4ecdc4] transition-colors" />
             )}
           </div>
+          {/* headcount-ok: enrolment is scope. The Hub Access figure under it
+              is behaviour, so that one is a share. */}
           <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Staff Enrolled</p>
           <p className="text-3xl font-bold" style={{ color: '#1B2A4A' }}>{staff}</p>
           <p className="text-xs text-gray-500 mt-1">
@@ -165,7 +188,7 @@ export function StatCards({
               <div className="flex justify-between text-xs mb-1">
                 <span className="text-gray-400">Hub Access</span>
                 <span className="font-medium" style={{ color: '#4ecdc4' }}>
-                  {hubLogins}/{staff}
+                  {sharePct(hubLogins, staff) ?? 0}%
                 </span>
               </div>
               <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">

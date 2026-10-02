@@ -1,5 +1,7 @@
 "use client";
 
+import { sharePct } from '@/lib/partners/popularity';
+
 interface PhaseStats {
   phase: string;
   month: string;
@@ -116,7 +118,7 @@ function PhaseCard({ phase }: { phase: PhaseStats }) {
       {/* Behind pace count */}
       {phase.behindPaceCount > 0 && phase.actual > 0 && (
         <div className="text-sm text-yellow-700 bg-yellow-50 rounded px-3 py-2 mb-4">
-          {phase.behindPaceCount} of {phase.total} educators behind pace in
+          {sharePct(phase.behindPaceCount, phase.total) ?? 0}% of educators behind pace in
           this phase
         </div>
       )}

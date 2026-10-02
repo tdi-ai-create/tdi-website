@@ -96,7 +96,10 @@ export default function ObservationImpactScorecard({ observations }: Props) {
                 <ChangeCell value={obs.engagement_change_pct} />
                 <p className="text-xs text-gray-400 mt-0.5">Hub engagement</p>
                 <p className="text-xs text-gray-300 mt-0.5">
-                  {obs.active_users_before} → {obs.active_users_after} active users
+                  {/* headcount-ok: internal. Only /tdi-admin/leadership renders this, where
+            raw counts are correct. It falls outside the written path exemption
+            because the component lives under components/dashboard. */}
+        {obs.active_users_before} → {obs.active_users_after} active users
                 </p>
               </div>
 

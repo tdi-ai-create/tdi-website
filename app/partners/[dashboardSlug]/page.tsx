@@ -4042,14 +4042,14 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                   </div>
                   <div className="flex-1">
                     <div className="flex items-baseline gap-2">
-                      <span className="text-2xl font-bold text-[#1e2749]">{staffStats.hubLoggedIn}</span>
-                      <span className="text-sm text-gray-500">of {staffStats.total} educators active on Hub</span>
+                      <span className="text-2xl font-bold text-[#1e2749]">{hubLoginPct}%</span>
+                      <span className="text-sm text-gray-500">of your educators active on Hub</span>
                     </div>
                     <p className="text-xs text-gray-400 mt-1">
                       {staffStats.hubLoggedIn === 0
                         ? 'Your team hasn\'t logged in yet. They\'ll receive an email invite shortly.'
                         : staffStats.hubLoggedIn < staffStats.total
-                          ? `${staffStats.total - staffStats.hubLoggedIn} educators haven't logged in yet. A quick reminder can help.`
+                          ? `${remainderPct(hubLoginPct)}% of your team hasn't logged in yet. A quick reminder can help.`
                           : 'Your entire team is active on the Hub!'}
                     </p>
                   </div>
@@ -4183,7 +4183,7 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                     </div>
                     <p className="text-base md:text-lg leading-relaxed text-gray-700" style={{ fontFamily: 'Georgia, serif' }}>
                       {hubPct > 0 ? (
-                        <>Your team is {hubPct >= 70 ? 'engaged' : hubPct >= 40 ? 'building momentum' : 'getting started'}. {hubPct}% of {staffStats.total} educators logged into the Hub this month{toolsExplored > 0 ? `, exploring ${toolsExplored} tools` : ''}{partnership.partnership_type === 'district' ? ` across ${apiBuildings.length} buildings` : ''}. {completedDeliverables > 0 ? `${completedDeliverables} of ${totalDeliverables} deliverables are complete.` : ''} {wellnessScore ? `Your educators' average wellness score is ${wellnessScore} out of 5${wellnessScore >= 4 ? ', stronger than the national average' : ''}.` : ''}</>
+                        <>Your team is {hubPct >= 70 ? 'engaged' : hubPct >= 40 ? 'building momentum' : 'getting started'}. {hubPct}% of your educators logged into the Hub this month{toolsExplored > 0 ? `, exploring ${toolsExplored} tools` : ''}{partnership.partnership_type === 'district' ? ` across ${apiBuildings.length} buildings` : ''}. {completedDeliverables > 0 ? `${completedDeliverables} of ${totalDeliverables} deliverables are complete.` : ''} {wellnessScore ? `Your educators' average wellness score is ${wellnessScore} out of 5${wellnessScore >= 4 ? ', stronger than the national average' : ''}.` : ''}</>
                       ) : (
                         <>Your partnership is active with {staffStats.total} educators enrolled. {completedDeliverables} of {totalDeliverables} deliverables completed so far. As your team engages with the Hub, this summary will update with real-time insights.</>
                       )}
@@ -4888,6 +4888,8 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                       <div key={building.id} className="p-4 bg-gray-50 rounded-lg border border-gray-100">
                         <div className="flex items-center gap-2">
                           <span className="font-medium text-[#1e2749]">{building.name}</span>
+                          {/* headcount-ok: the roster this building reports, which is
+                              scope rather than anything anybody did. */}
                           <span className="text-xs text-gray-400">· {building.estimated_staff_count || 0} staff</span>
                         </div>
                         <p className="text-xs text-gray-500 mt-1">
@@ -4979,7 +4981,7 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                     </div>
                     <div className="mt-3 text-center">
                       <p className="text-sm font-semibold text-[#1e2749]">Hub Logins</p>
-                      <p className="text-xs text-gray-500">{staffStats.hubLoggedIn} of {staffStats.total} staff</p>
+                      <p className="text-xs text-gray-500">across your roster</p>
                       <p className="text-xs text-[#4ecdc4] font-medium mt-1">Goal: 100% by Observation Day</p>
                     </div>
                   </div>
@@ -6169,16 +6171,18 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                     </div>
                   )}
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                    {/* headcount-ok: the roster is scope. The two tiles beside it
+                        describe what people did, so they are shares. */}
                     <div className="rounded-xl bg-gray-50 p-3 text-center">
                       <p className="text-lg font-bold text-[#1e2749]">{staffStats.total}</p>
                       <p className="text-[10px] text-gray-500">Total Staff</p>
                     </div>
                     <div className="rounded-xl bg-gray-50 p-3 text-center">
-                      <p className="text-lg font-bold text-green-600">{staffStats.hubLoggedIn}</p>
+                      <p className="text-lg font-bold text-green-600">{hubLoginPct}%</p>
                       <p className="text-[10px] text-gray-500">Hub Active</p>
                     </div>
                     <div className="rounded-xl bg-gray-50 p-3 text-center">
-                      <p className="text-lg font-bold text-amber-600">{staffStats.total - staffStats.hubLoggedIn}</p>
+                      <p className="text-lg font-bold text-amber-600">{remainderPct(hubLoginPct)}%</p>
                       <p className="text-[10px] text-gray-500">Not Yet Active</p>
                     </div>
                   </div>
@@ -6456,6 +6460,7 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                       <Upload className="w-7 h-7 mx-auto mb-2 text-gray-300" />
                       {rosterUpdateFile ? (
                         <div>
+                          {/* headcount-ok: the leader is editing their own roster, names on screen. */}
                           <p className="text-sm font-semibold text-[#1e2749]">{rosterUpdateFile.name}</p>
                           {rosterUpdateParsed && (
                             <p className="text-xs text-gray-500 mt-1">{rosterUpdateParsed.length} staff rows detected</p>
@@ -6528,6 +6533,8 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                       <div>
                         <p className="text-xs font-semibold text-gray-700 mb-1.5 flex items-center gap-1.5">
                           <span className="inline-block w-2 h-2 rounded-full bg-blue-400" />
+                          {/* headcount-ok: a confirmation of an edit the leader is
+                              about to make, with the names listed underneath. */}
                           Adding {rosterUpdatePreview.addedList.length} new staff
                         </p>
                         <div className="rounded-xl border border-blue-100 bg-blue-50/40 divide-y divide-blue-100 max-h-36 overflow-y-auto">
@@ -6548,6 +6555,8 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                       <div>
                         <p className="text-xs font-semibold text-gray-700 mb-1.5 flex items-center gap-1.5">
                           <span className="inline-block w-2 h-2 rounded-full bg-amber-400" />
+                          {/* headcount-ok: a confirmation of an edit the leader is
+                              about to make, with the names listed underneath. */}
                           Marking {rosterUpdatePreview.removedList.length} staff inactive
                         </p>
                         <div className="rounded-xl border border-amber-100 bg-amber-50/40 divide-y divide-amber-100 max-h-36 overflow-y-auto">
@@ -6693,7 +6702,7 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                     <p className="text-xs text-gray-500">
                       {reportActiveStaff === 0
                         ? 'No staff activity in the Hub in the last 30 days.'
-                        : `${reportActiveStaff} of ${reportSeatCount} staff active in the last 30 days.`}
+                        : `${sharePct(reportActiveStaff, reportSeatCount) ?? 0}% of your staff active in the last 30 days.`}
                     </p>
                   </div>
                 </div>
@@ -6702,6 +6711,8 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                   tools your team opens, courses they finish, and how participation moves over time. There isn&apos;t
                   enough activity collected yet to produce a report that would tell you anything real, so we&apos;re
                   holding these back rather than handing you a document built on empty numbers. Once at least{' '}
+                  {/* headcount-ok: the threshold a report unlocks at, not a count
+                      of anybody. Naming it is how a school knows what to aim for. */}
                   {REPORT_MIN_ACTIVE_STAFF} staff members are using the Hub, these unlock automatically.
                 </p>
 
@@ -8103,8 +8114,8 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
 
                   <div className="flex items-center gap-5 flex-wrap mt-4">
                     <p className="text-[34px] font-bold leading-none tabular-nums text-[#1e2749]">
-                      {staffStats.hubLoggedIn}
-                      <span className="text-sm font-semibold text-gray-500"> of {staffStats.total}</span>
+                      {hubLoginPct}%
+                      <span className="text-sm font-semibold text-gray-500"> of your team</span>
                     </p>
                     <div className="flex-1 min-w-[220px]">
                       <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden flex">
@@ -8130,11 +8141,11 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                         </span>
                         <span className="text-[11.5px] text-gray-500 flex items-center gap-1.5">
                           <i className="w-2 h-2 rounded-full inline-block" style={{ background: '#80a4ed' }} />
-                          {staffStats.hubLoggedIn - (engagement?.activeThisWeek ?? 0)} started
+                          {sharePct(staffStats.hubLoggedIn - (engagement?.activeThisWeek ?? 0), staffStats.total) ?? 0}% started
                         </span>
                         <span className="text-[11.5px] text-gray-500 flex items-center gap-1.5">
                           <i className="w-2 h-2 rounded-full inline-block bg-gray-200" />
-                          {staffStats.total - staffStats.hubLoggedIn} still to reach
+                          {remainderPct(hubLoginPct)}% still to reach
                         </span>
                       </div>
                     </div>
@@ -8151,7 +8162,7 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                         className="text-[13px] font-bold rounded-full px-4 py-2 shrink-0"
                         style={{ background: '#E8B84B', color: '#1e2749' }}
                       >
-                        Nudge all {staffStats.total - staffStats.hubLoggedIn}
+                        Nudge the rest
                       </a>
                     </div>
                   )}
@@ -8188,6 +8199,8 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                   <p className="text-xl md:text-2xl font-bold text-[#1e2749]">{apiBuildings.length}</p>
                   <p className="text-xs md:text-sm text-gray-500">Buildings</p>
                 </div>
+                {/* headcount-ok: the roster is scope, and it is the denominator
+                    the two figures beside it are read against. */}
                 <div className="p-3 md:p-4 bg-gray-50 rounded-xl text-center">
                   <p className="text-xl md:text-2xl font-bold text-[#1e2749]">{staffStats.total}</p>
                   <p className="text-xs md:text-sm text-gray-500">Total Staff</p>
@@ -8442,6 +8455,7 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                   <div className="mb-4 rounded-xl px-4 py-3" style={{ background: '#E8F0FD' }}>
                     <p className="text-[10px] font-bold uppercase tracking-wider text-[#1e2749]/60 mb-1">Waiting on one thing from you</p>
                     <p className="text-[13.5px] leading-relaxed text-[#1e2749] max-w-[68ch]">
+                      {/* headcount-ok: buildings and enrolment, both scope. */}
                       Your {apiBuildings.length} buildings are set up and all {staffStats.total} of your staff have Hub
                       access, but we have not been told who works where. Send us a roster with a school column, in
                       whatever format you already keep it, and every figure on this page splits by building. Until

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
+import { sharePct } from '@/lib/partners/popularity';
 import { useRouter } from 'next/navigation';
 import {
   Users,
@@ -49,7 +50,8 @@ function StatCard({
 }: {
   icon: React.ElementType;
   label: string;
-  value: number;
+  /** A share for anything people did. A count only for roster size. */
+  value: number | string;
   color: string;
 }) {
   return (
@@ -241,6 +243,10 @@ export default function ChampionPage() {
         {/* Stats Cards */}
         {stats && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            {/* The roster is scope and stays a count. The three beside it
+                describe what people did, so they are shares. This page promises
+                "Individual progress is private" in its own subtitle, and three
+                headcounts over a named table is not that. */}
             <StatCard
               icon={Users}
               label={tUI('Total team members')}
@@ -250,19 +256,19 @@ export default function ChampionPage() {
             <StatCard
               icon={UserCheck}
               label={tUI('Enrolled')}
-              value={stats.enrolled}
+              value={`${sharePct(stats.enrolled, stats.totalMembers) ?? 0}%`}
               color="#22C55E"
             />
             <StatCard
               icon={UserX}
               label={tUI('Not yet enrolled')}
-              value={stats.notEnrolled}
+              value={`${sharePct(stats.notEnrolled, stats.totalMembers) ?? 0}%`}
               color="#EAB308"
             />
             <StatCard
               icon={Award}
               label={tUI('Completed 1+ course')}
-              value={stats.completedAtLeastOne}
+              value={`${sharePct(stats.completedAtLeastOne, stats.totalMembers) ?? 0}%`}
               color="#8B5CF6"
             />
           </div>

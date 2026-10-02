@@ -1,5 +1,7 @@
 'use client';
 
+import { sharePct } from '@/lib/partners/popularity';
+
 /**
  * All five Vibe Check areas on one card, with progress across the year.
  *
@@ -64,10 +66,22 @@ function movement(trend: { avg: number }[]): { dir: 'up' | 'down' | 'flat'; delt
   return { dir: 'flat', delta: 0 };
 }
 
+/**
+ * How much of the team answered this area, as words or a share.
+ *
+ * Never a count. An area can sit below the reporting floor and still have had
+ * someone answer it, and in a small school "2 people" names them.
+ */
+function areaShare(people: number, staffTotal: number): string {
+  const pct = sharePct(people, staffTotal);
+  if (pct === null) return 'Your team';
+  return `${pct}% of your team`;
+}
+
 export default function VibeCheckPanel({ data, staffTotal }: { data: VibeCheckData; staffTotal: number }) {
   const scored = data.areas.filter(a => a.avg !== null);
   const waiting = data.areas.filter(a => a.avg === null);
-  const share = staffTotal > 0 ? Math.round((data.people / staffTotal) * 100) : null;
+  const share = sharePct(data.people, staffTotal);
 
   // Nothing at all yet. Say what it is and what fills it, rather than drawing
   // four empty bars.
@@ -88,9 +102,12 @@ export default function VibeCheckPanel({ data, staffTotal }: { data: VibeCheckDa
     <div className="bg-white rounded-2xl p-6 md:p-7 shadow-sm border border-gray-100">
       <div className="flex items-baseline justify-between gap-4 flex-wrap">
         <h2 className="text-[15px] font-bold text-[#1e2749] tracking-tight">Vibe Check</h2>
+        {/* A share of the team, never a count of it. The file already promised
+            "aggregate only, never a name" and applied its three person floor to
+            the averages but not to this line, so a one person area printed
+            "1 person" above an answer only that person gave. */}
         <span className="text-[11.5px] text-gray-500 tabular-nums">
-          {data.people} {data.people === 1 ? 'person' : 'people'}
-          {share !== null ? `, ${share}% of your team` : ''}
+          {share !== null ? `${share}% of your team` : 'Your team'}
         </span>
       </div>
       <p className="text-[12.5px] text-gray-500 mt-1.5 max-w-[70ch] leading-relaxed">
@@ -138,7 +155,7 @@ export default function VibeCheckPanel({ data, staffTotal }: { data: VibeCheckDa
               )}
 
               <p className="text-[11px] text-gray-500 mt-2 tabular-nums">
-                {area.people} {area.people === 1 ? 'person' : 'people'}
+                {areaShare(area.people, staffTotal)}
                 {move && move.dir !== 'flat' && (
                   <span style={{ color: move.dir === 'up' ? '#14594f' : '#7a5600' }}>
                     {' '}· {move.dir === 'up' ? 'up' : 'down'} {Math.abs(move.delta).toFixed(1)} since {monthLabel(area.trend[0].month)}

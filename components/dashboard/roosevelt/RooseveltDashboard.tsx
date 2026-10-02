@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { sharePct, remainderPct } from '@/lib/partners/popularity';
 import {
   Users, CheckCircle, Activity, Target, Calendar, Clock,
   MapPin, Mail, Phone, ArrowRight, ChevronDown, ChevronRight,
@@ -157,10 +158,12 @@ function OverviewTab({ onTabChange }: { onTabChange: (tab: string) => void }) {
       <section>
         <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-4">How We&apos;re Doing</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {/* headcount-ok on the roster itself, which is scope. What anybody
+              did is a share, here and in the Hub Engagement card below. */}
           <StatCard
             label="Educators Enrolled"
-            value={`${PILOT.hubLoggedIn}/${PILOT.staffCount}`}
-            sub="logged in to Hub"
+            value={`${PILOT.staffCount}`}
+            sub="on your roster"
             onClick={() => onTabChange("partnership")}
           />
           <StatCard
@@ -172,7 +175,7 @@ function OverviewTab({ onTabChange }: { onTabChange: (tab: string) => void }) {
           <StatCard
             label="Hub Engagement"
             value={`${hubPct}%`}
-            sub={`${PILOT.hubLoggedIn} of ${PILOT.staffCount} active`}
+            sub="of your team active"
             onClick={() => onTabChange("partnership")}
           />
           <StatCard
@@ -281,7 +284,7 @@ function OverviewTab({ onTabChange }: { onTabChange: (tab: string) => void }) {
             <span className="absolute text-xl font-bold" style={{ color: hubColor }}>{hubPct}%</span>
           </div>
           <p className="text-xs font-semibold text-center" style={{ color: COLORS.navy }}>Hub Logins</p>
-          <p className="text-xs text-gray-500 text-center mt-0.5">{PILOT.hubLoggedIn}/{PILOT.staffCount} logged in</p>
+          <p className="text-xs text-gray-500 text-center mt-0.5">{hubPct}% logged in</p>
           <p className="text-xs text-gray-400 text-center mt-1">Goal: 100% by Observation Day</p>
         </div>
 

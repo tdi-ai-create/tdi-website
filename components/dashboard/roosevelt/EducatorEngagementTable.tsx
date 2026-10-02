@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { sharePct, remainderPct } from '@/lib/partners/popularity';
 
 interface Educator {
   id: string;
@@ -174,11 +175,13 @@ export default function EducatorEngagementTable({
     <div className="space-y-4">
       {/* Summary bar */}
       <div className="flex gap-4 text-sm text-gray-600">
+        {/* headcount-ok: the roster is scope. Enrolment and its remainder
+            describe what people did, so both are shares. */}
         <span><strong>{total}</strong> total educators</span>
         <span className="text-gray-300">|</span>
-        <span><strong className="text-green-600">{enrolledCount}</strong> Hub-enrolled</span>
+        <span><strong className="text-green-600">{sharePct(enrolledCount, total) ?? 0}%</strong> Hub-enrolled</span>
         <span className="text-gray-300">|</span>
-        <span><strong className="text-red-500">{total - enrolledCount}</strong> not yet enrolled</span>
+        <span><strong className="text-red-500">{remainderPct(sharePct(enrolledCount, total) ?? 0)}%</strong> not yet enrolled</span>
       </div>
 
       {/* Controls */}

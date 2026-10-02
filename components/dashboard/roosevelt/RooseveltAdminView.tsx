@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { sharePct, remainderPct } from '@/lib/partners/popularity';
 
 // Roosevelt admin sees a simplified, scoped view of their staff only
 // No PII beyond what Roosevelt admin already has access to
@@ -141,13 +142,15 @@ export default function RooseveltAdminView({ schoolId }: { schoolId?: string }) 
           <div className="text-xs text-gray-500 mb-1">Total Staff</div>
           <div className="text-2xl font-bold text-gray-900">{stats.totalStaff}</div>
         </div>
+        {/* Behaviour is a share. "At Risk 3" over a named table below is a
+            list of three people the reader can then pick out. */}
         <div className="bg-green-50 border border-green-200 rounded-lg p-4">
           <div className="text-xs text-gray-500 mb-1">Active This Week</div>
-          <div className="text-2xl font-bold text-green-700">{stats.activeLastWeek}</div>
+          <div className="text-2xl font-bold text-green-700">{sharePct(stats.activeLastWeek, stats.totalStaff) ?? 0}%</div>
         </div>
         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
           <div className="text-xs text-gray-500 mb-1">At Risk</div>
-          <div className="text-2xl font-bold text-yellow-700">{stats.atRiskCount}</div>
+          <div className="text-2xl font-bold text-yellow-700">{sharePct(stats.atRiskCount, stats.totalStaff) ?? 0}%</div>
         </div>
         <div className="bg-white border border-gray-200 rounded-lg p-4">
           <div className="text-xs text-gray-500 mb-1">Overall Progress</div>
