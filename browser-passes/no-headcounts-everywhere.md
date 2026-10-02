@@ -89,3 +89,21 @@ recorded in popularity-not-headcount.md, including the engagement panel reading
 The screens behind the partner login have not been read on the live domain.
 
 The three client emails. They send on cron and no cron was triggered.
+
+### The authenticated dashboard, observed by Rae
+
+Rae opened https://www.teachersdeserveit.com/partners/addison-sd4 on 2 October
+2026 and sent a screenshot, which closes the gap this record listed as
+unverified. "What your team is working on" reads "13% Active this week", "19%
+Active this month" and "Oct 1 Most recent sign in", above eight rows carrying a
+share and a direction, with the legend beneath them. The nudge control reads
+"Nudge the rest".
+
+It is also the first sighting of a downward arrow on a real dashboard. Every row
+on Saunemin pointed up or flat, so the grey chosen for "down" had never been
+read in production. Addison shows six of eight pointing down, and the grey reads
+as calm rather than as an error state, which is what it was chosen for.
+
+Worth separating from the display question: Addison at 13% this week against 19%
+this month, with six of eight rows falling, is a school easing off. The panel is
+now capable of saying that, which it was not when it printed headcounts.
