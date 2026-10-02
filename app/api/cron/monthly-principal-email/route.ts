@@ -113,10 +113,20 @@ export async function GET(request: NextRequest) {
       // Get engagement data
       const { data: staff } = await supabase
         .from('staff_members')
+        // This cron has no Hub client, so the once-a-day column is all it can
+        // read. The figure can lag reality by up to 24 hours, which is why the
+        // dashboard reads Hub activity live and why the two can disagree.
+        // Converting this cron is real work, deliberately not done here.
+        // quarantine-ok: flagged, not fixed. The allow comment must sit within
+        // three lines of the read, so the reasoning is above it rather than here.
         .select('hub_login_date')
         .eq('partnership_id', p.id);
 
+      // A share of the roster, never a count of who signed in. A principal
+      // reading "3 of 5" in a small school knows which three. Enrolment stays,
+      // because that is what they bought rather than what anyone did.
       const totalStaff = staff?.length || p.staff_enrolled || 0;
+      // quarantine-ok: same once-a-day column as the select above.
       const loggedIn = staff?.filter(s => s.hub_login_date).length || 0;
       const loginPct = totalStaff > 0 ? Math.round((loggedIn / totalStaff) * 100) : 0;
 
@@ -133,7 +143,7 @@ export async function GET(request: NextRequest) {
 Just wanted to share a quick update on your team's TDI partnership.
 
 ${loginPct > 0
-  ? `${loggedIn} of ${totalStaff} staff have logged into the Hub so far (${loginPct}%). ${loginPct >= 60 ? 'That is solid engagement. Your team is showing up.' : 'There is room to grow here, and we can help with that.'}`
+  ? `${loginPct}% of your staff have logged into the Hub so far. ${loginPct >= 60 ? 'That is solid engagement. Your team is showing up.' : 'There is room to grow here, and we can help with that.'}`
   : `Your team has ${totalStaff} staff enrolled. Once they start logging into the Hub, you will see their activity reflected on your dashboard in real time.`}
 
 ${kpis && kpis.length > 0

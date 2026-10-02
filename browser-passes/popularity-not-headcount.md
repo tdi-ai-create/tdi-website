@@ -10,24 +10,28 @@ count of it.
 
 ## What I did
 
-Nothing in a browser. This pass is deferred, see below.
+Opened it locally after repairing the build. `npm i` failed earlier because npm
+could not write to `/Users/raehughart/.npm`; pointing it at its own cache
+directory avoided that entirely and installed the missing
+`@next/swc-darwin-arm64` binary into the worktree. `next dev` then started.
 
-- Deferred: `next dev` and `next build` both fail here with "`turbo.createProject`
-  is not supported by the wasm bindings". `node_modules/@next/swc-darwin-arm64`
-  contains only a package.json and a README, with the `.node` binary missing, so
-  Next falls back to WASM and the fallback cannot build. Installing it fails too:
-  npm cannot write to `/Users/raehughart/.npm` and asks for
-  `sudo chown -R 501:20`, which I did not run. This is a pre-existing broken
-  install affecting the whole repo, not something this change caused, and it
-  means the page cannot be reached locally at all.
-
-- Verify after deploy: https://www.teachersdeserveit.com/partners/saunemin-ccsd-438-dashboard
-  Read the three tiles at the top of "What your team is working on", then press
-  a building row open and read the list inside it. Expect percentages in the
-  first two tiles, an arrow and a percentage on each content row, and the line
-  "Percentages are a share of the staff who signed in this month" beneath the
-  district list. Then open the Tidioute dashboard, a school of two, and confirm
-  its rows show arrows and no percentages at all.
+- Opened: http://localhost:3217/partners/saunemin-ccsd-438-dashboard
+- Saw: an onboarding modal headed "Welcome to Your Dashboard" covering the page,
+  which is why two earlier screenshots looked blank.
+- Pressed: the modal's close control.
+- Pressed: the "2026-2027" tab, badged LIVE.
+- Saw: "What your team is working on", with the three tiles reading "26% Active
+  this week", "41% Active this month" and "Oct 2 Most recent sign in". Those
+  first two read 6 and 10 before this change.
+- Saw: eight content rows. The first is "Two Students, One Fight: What a Teacher
+  Does Right Now" at "18%" with an upward arrow. Six more read "9%" with an
+  upward arrow. "Boundaries Without Backlash" reads "9%" with a flat dash rather
+  than an arrow, which is the steady case rendering as intended.
+- Saw: beneath the list, "Percentages are a share of the staff who signed in this
+  month. An arrow compares the last 30 days with the 30 days before."
+- Cross-checked: these are the same figures `npm run check:popularity` printed
+  for saunemin-ccsd-438, "tiles: 26% active this week, 41% active this month
+  (roster 27)" and a top row of 18%. The screen and the check agree.
 
 ## Evidence short of the browser
 
@@ -59,6 +63,11 @@ rewrites.
 
 ## What I could not verify
 
-Everything visual. Whether the arrow and the percentage sit correctly against a
-long title, whether the fixed 4rem column wraps on a phone, and whether the grey
-chosen for a downward arrow reads as calm rather than as an error state.
+A downward arrow. Every row on this school reads up or steady, so the grey I
+chose for "down" has not been seen on a real dashboard. `check:popularity`
+reports 11 downward rows across the fleet, so another school would show it.
+
+Narrow screens. The column is fixed at 4rem and I viewed this at 1440 wide only.
+
+The per school lists inside the building rows. Saunemin is a single school
+partnership, so it has no building panel to open.

@@ -220,7 +220,7 @@ export async function GET(request: NextRequest) {
             <td style="padding:24px;background:white;border-radius:12px;border:1px solid #E5E7EB;">
               <p style="margin:0 0 4px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#E8B84B;">Most Helpful This Month</p>
               <p style="margin:0 0 8px;font-size:15px;color:#334155;line-height:1.6;font-style:italic;">"${bestPostSnippet}"</p>
-              <p style="margin:0;font-size:13px;color:#94A3B8;">${bestPost?.helpful_count || 0} educators found this helpful</p>
+              <p style="margin:0;font-size:13px;color:#94A3B8;">Educators found this the most helpful post this month</p>
             </td>
           </tr>
         </table>
@@ -312,12 +312,23 @@ export async function GET(request: NextRequest) {
       await Promise.all(emailPromises);
     }
 
-    // Log that we sent this month
-    await hubSupabase.from('hub_activity_log').insert({
+    // Log that we sent this month.
+    //
+    // This row is how the next run knows not to send twice. It was written
+    // without taking the error, so a failed insert would have reported success
+    // and the whole community would have received the digest again.
+    const { error: logError } = await hubSupabase.from('hub_activity_log').insert({
       user_id: '00000000-0000-0000-0000-000000000000',
       action: `community_digest_${monthKey}`,
       metadata: { sent, total_profiles: profiles.length, month: monthKey },
     });
+    if (logError) {
+      console.error('[community-monthly-digest] send log failed, a rerun would send again:', logError.message);
+      return NextResponse.json(
+        { success: false, sent, total: profiles.length, month: monthKey, error: `sent but not logged: ${logError.message}` },
+        { status: 500 },
+      );
+    }
 
     return NextResponse.json({ success: true, sent, total: profiles.length, month: monthKey });
   } catch (error) {

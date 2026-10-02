@@ -80,3 +80,16 @@ export function contentSharePct(people: number, active: number): number | null {
   if (!Number.isFinite(active) || active < MIN_SHARE_POPULATION) return null;
   return sharePct(people, active);
 }
+
+/**
+ * The share of a team that has NOT done something, as a whole percent.
+ *
+ * Reports kept printing "6 educators have not yet logged in", which is a
+ * headcount of people arrived at by subtraction, and in a small school it names
+ * them. Derived from the activation percentage rather than from two counts, so
+ * it can never disagree with the figure printed beside it.
+ */
+export function remainderPct(activePct: number): number {
+  if (!Number.isFinite(activePct)) return 0;
+  return Math.max(0, Math.min(100, 100 - Math.round(activePct)));
+}
