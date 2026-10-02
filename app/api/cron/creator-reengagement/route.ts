@@ -9,7 +9,9 @@ import { loadContactGate, type ContactGate } from '@/lib/creator-contact-budget'
 
 // ---------------------------------------------------------------------------
 // Creator Re-engagement Cron
-// Runs daily at 10 AM. Manages a state machine for stalled creators:
+// Runs daily at 15:00 UTC, which is 10 AM Central. The cron expression is UTC,
+// not local: it read 0 10 until 2 October 2026, so Bella's warmest mail went
+// out at 5 in the morning. Manages a state machine for stalled creators:
 //   Step 0: Initial warm check-in (after 15 days inactive)
 //   Steps 1-5: Weekly nudge emails
 //   Step 6: Pause notice → auto-pause account

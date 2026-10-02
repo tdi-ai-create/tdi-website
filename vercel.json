@@ -2,7 +2,7 @@
   "crons": [
     {
       "path": "/api/cron/creator-reminders",
-      "schedule": "0 9 * * *"
+      "schedule": "0 14 * * *"
     },
     {
       "path": "/api/cron/daily-alerts",
@@ -70,7 +70,7 @@
     },
     {
       "path": "/api/cron/creator-reengagement",
-      "schedule": "0 10 * * *"
+      "schedule": "0 15 * * *"
     },
     {
       "path": "/api/cron/creator-agreement-gate",
@@ -110,11 +110,11 @@
     },
     {
       "path": "/api/cron/creator-first-week",
-      "schedule": "30 9 * * *"
+      "schedule": "30 14 * * *"
     },
     {
       "path": "/api/cron/creator-monthly-newsletter",
-      "schedule": "0 10 1 * *"
+      "schedule": "0 15 1 * *"
     },
     {
       "path": "/api/cron/stripe-health",

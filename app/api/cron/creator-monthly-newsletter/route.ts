@@ -8,7 +8,9 @@ import Anthropic from '@anthropic-ai/sdk';
 
 // ---------------------------------------------------------------------------
 // Monthly Creator Newsletter
-// Runs 1st of each month at 10 AM. Sends a valuable newsletter to all
+// Runs the 1st of each month at 15:00 UTC, which is 10 AM Central. The cron
+// expression is UTC, not local: it read 0 10 until 2 October 2026, so the
+// newsletter arrived at 5 in the morning. Sends a valuable newsletter to all
 // active creators. Smart content that adapts:
 //   - Spotlight a creator if someone published recently
 //   - If no spotlight, feature what TDI is building or an educator content tip

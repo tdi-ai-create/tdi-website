@@ -317,8 +317,18 @@ export async function GET(request: NextRequest) {
     // This row is how the next run knows not to send twice. It was written
     // without taking the error, so a failed insert would have reported success
     // and the whole community would have received the digest again.
+    //
+    // user_id is null because this row is about the whole send, not a person.
+    // It used to be an all zeros uuid, and hub_activity_log.user_id carries a
+    // foreign key to hub_profiles, so every insert failed with 23503 and no
+    // marker row has ever existed. The guard above reads these rows, so it
+    // could never find one and could never stop a second send. The column is
+    // nullable and the foreign key permits null, which was confirmed against
+    // the live Hub database on 2 October 2026 by inserting both values inside
+    // a transaction and rolling it back: the zeros uuid raised 23503, null
+    // succeeded.
     const { error: logError } = await hubSupabase.from('hub_activity_log').insert({
-      user_id: '00000000-0000-0000-0000-000000000000',
+      user_id: null,
       action: `community_digest_${monthKey}`,
       metadata: { sent, total_profiles: profiles.length, month: monthKey },
     });
