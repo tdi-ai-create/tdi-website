@@ -378,8 +378,11 @@ The TDI Team`;
       // Check if any staff have logged in
       const { data: staffWithLogins } = await supabase
         .from('staff_members')
+        // quarantine-ok: this reminder only asks whether anyone has ever signed
+        // in, not how recently, so a column that lags a day still answers it.
         .select('first_name, last_name, hub_login_date')
         .eq('partnership_id', p.id)
+        // quarantine-ok: as above, an ever-signed-in test rather than a live one.
         .not('hub_login_date', 'is', null)
         .limit(5);
 
@@ -407,7 +410,7 @@ The TDI Team`;
             subject: `${firstName}, your team has started exploring the Hub`,
             html: wrapEmail(`${firstName},
 
-Your team is in. ${loginCount} educator${loginCount > 1 ? 's have' : ' has'} logged into the Learning Hub and started exploring.
+Your team is in. ${loginCount > 1 ? 'Educators have' : 'Someone has'} logged into the Learning Hub and started exploring.
 
 This is the beginning. Your dashboard is now showing real engagement data. Check the Overview tab to see who is active and what tools they are using.
 

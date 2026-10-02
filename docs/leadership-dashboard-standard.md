@@ -98,9 +98,13 @@ Schools, Team. The story, then the people.
 - **L3.4b** **Last year's figure is never this year's current value.** Saunemin hit
   100% with 12 paras; this year the population is 27 including teachers new to us.
   The bar stays unmeasured and the card explains why holding it is harder.
-- **L3.4c** **For a tiny staff, count people rather than percent.** With two
-  para-educators a percentage is noise, because one person is 50%. Tidioute's
-  targets read "2 of 2".
+- **L3.4c** **For a tiny staff, a goal target counts people rather than percent.**
+  With two para-educators a percentage is noise, because one person is 50%.
+  Tidioute's targets read "2 of 2". This covers goal targets and nothing else. A
+  target is what the school agreed to, read back to them. Behaviour is not, and
+  L4.13 governs it: in the same school, content a person opened shows a
+  direction and no number at all, because "1 of 2" there says which of the two.
+  Rae resolved the collision on 2 October 2026.
 - **L3.4d** **A goal may be suggested before it is agreed.** Where a school has had
   no onboarding meeting, propose goals from what their own staff are already doing,
   store them as `status = 'suggested'`, and badge the card. The badge is derived, so
@@ -118,7 +122,7 @@ Schools, Team. The story, then the people.
   concluding nothing was saved.
 - **L3.7** A proposed year is visibly a proposal.
 - **L3.8** Engagement ranks content by distinct people, not events, and says
-  nobody assigned it.
+  nobody assigned it. It ranks by that count and never prints it. See L4.13.
 - **L3.9** The roster is the denominator and reconciles to the seat list both ways.
 - **L3.9a** **Deduplicate people before counting them.** One person with two
   addresses inflates the denominator and halves the percentage. Tidioute carried
@@ -128,8 +132,13 @@ Schools, Team. The story, then the people.
   A building with a mapping shows its own figures, and opens into its own people
   and its own content. Never an indicator fed a hardcoded null: every building on
   every dashboard read "Awaiting Data" for months because of exactly that.
-- **L3.10a** Content inside a school panel is reported as a share of that
-  school's team, never a headcount. In a building of one, "1 person" names them.
+- **L3.10a** Content is reported as a share, never a headcount, in the district
+  list and the school panel alike. In a building of one, "1 person" names them.
+  Both lists render `PopularityIndicator`, and both divide by the people who
+  actually signed in during the window rather than by the roster, so a share
+  cannot exceed 100% when half a roster has been dormant since last term. One
+  component, because the two lists disagreed for two days in October 2026: the
+  district list printed "8 people" while the panel below it printed "33%".
 - **L3.11** A report is locked only by a rolling measure, and the lock tells the
   truth.
 - **L3.12** Every offer is a real TDI service. An unused contracted deliverable
@@ -169,6 +178,42 @@ Schools, Team. The story, then the people.
   comparison and say so on the page rather than hide it or imply precision, and
   to point the reader at the team. A comparison that cannot carry that sentence
   does not ship.
+
+- **L4.13** **A client-facing surface shows a share of people, never a count of
+  them.** Rae, 2 October 2026: a leadership dashboard does not need to say how
+  many people, it needs to say that something is catching on. This governs the
+  screen, the printable report, the CSV export, every generated report a leader
+  forwards, and every email we send a school. It does not govern `/tdi-admin`,
+  where raw counts are correct.
+
+  Three parts, and the third is the one that gets forgotten.
+
+  Enrolment is not activity and stays. "Learning Hub access for 24 educators" is
+  what a school bought, and a board reading a funding document needs it. "18
+  educators have logged in" is behaviour and becomes a share. A denominator
+  inside an activity sentence counts as behaviour, because "75% of 24 educators
+  are engaging" hands back the 18 by multiplication.
+
+  A derived count is still a count. "6 educators have not yet logged in" was
+  reached by subtraction and names them just as precisely in a school of eight.
+  Use `remainderPct`.
+
+  Below `MIN_SHARE_POPULATION`, which is 3 and the same floor and the same
+  reason as `VIBE_MIN_PEOPLE`, no number is printed at all. Converting counts to
+  percentages does not protect a small school on its own: the arithmetic is
+  reversible whenever the denominator is small enough to hold in your head, and
+  most of our community is that small. Tidioute has a roster of two, and its
+  dashboard printed "100%" against a tool one person opened.
+
+  `sharePct`, `contentSharePct` and `remainderPct` in `lib/partners/popularity.ts`
+  are the only implementations. `npm run check:headcounts` is the gate.
+
+- **L4.14** **No trend is claimed on a truncated read.** Activity rows come back
+  newest first under a row cap, so a truncated read loses the older half of any
+  comparison and every item on the board points upward. `engagementTrend` returns
+  no direction when the read hit its cap, and the arrow is absent rather than
+  flattering. The same caution applies to any figure computed from two windows
+  where only one of them is guaranteed complete.
 
 ---
 
@@ -211,10 +256,26 @@ Schools, Team. The story, then the people.
 - **L7.3** Label every claim measured, derived, or unverified.
 - **L7.4** Sweep the whole surface, not only the reported defect.
 - **L7.5** Deploy names the project explicitly.
-- **L7.6** A rule worth keeping becomes a gate. `npm run check:quarantine` is
+- **L7.6** A rule worth keeping becomes a gate. `npm run check:quarantine` was
   the first one built from this document: it fails when changed code reads a
   quarantined field without a `quarantine-ok` comment. It caught two real errors
   within an hour of existing, one of them mine.
+
+  `npm run check:headcounts` enforces L4.13. It judges the lines a change wrote
+  rather than the files it touched, because the partner dashboard is nine
+  thousand lines and a file-level ratchet drops its whole backlog on whoever
+  edits it. Around twenty-two renders predate the rule and `-- --all` lists them.
+  Escape with `headcount-ok` and a reason.
+
+  `npm run check:popularity` replays real activity rows for every live
+  partnership through the exported rules and asserts that no share exceeds 100%,
+  that no real activity reads as zero, and that no direction is claimed on a
+  truncated read. It is what found Tidioute.
+
+  Both were written with a deliberate violation planted first, to confirm they
+  fail. `check:headcounts` passed that planted violation on the first attempt,
+  because a case-sensitive pattern missed `staffLoggedIn`, and it would have
+  shipped guarding nothing.
 
 ---
 

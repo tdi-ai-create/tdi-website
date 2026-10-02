@@ -8,7 +8,7 @@ import RosterAccessManager from '@/components/partners/RosterAccessManager';
 import { SemesterRecord } from '@/components/partners/SemesterRecord';
 import VibeCheckPanel, { type VibeCheckData } from '@/components/partners/VibeCheckPanel';
 import { PopularityIndicator, PopularityLegend } from '@/components/partners/Popularity';
-import { sharePct } from '@/lib/partners/popularity';
+import { remainderPct, sharePct } from '@/lib/partners/popularity';
 import type { EngagementItem as ApiEngagementItem } from '@/app/api/partners/dashboard/[partnershipId]/route';
 import Link from 'next/link';
 import FooterSymbol from '@/components/FooterSymbol';
@@ -1921,7 +1921,7 @@ ${s} has ${data.staffTotal} educators with TDI Learning Hub access. ${hasEngagem
 
 EXECUTIVE SUMMARY
 
-${s} ${hasEngagement ? `is ${data.hubLoginPct >= 60 ? 'thriving' : 'building momentum'} in Phase ${data.phase} of its TDI partnership.` : `has launched its TDI partnership with ${data.staffTotal} educators enrolled in Phase ${data.phase}.`} ${hasEngagement ? `${data.hubLoginPct}% of ${data.staffTotal} educators are actively engaging with the Learning Hub, exploring ${data.toolsExplored} classroom tools and strategies.` : `As staff begin engaging with the Learning Hub, this report will reflect real-time data on adoption, engagement, and classroom impact.`}
+${s} ${hasEngagement ? `is ${data.hubLoginPct >= 60 ? 'thriving' : 'building momentum'} in Phase ${data.phase} of its TDI partnership.` : `has launched its TDI partnership with ${data.staffTotal} educators enrolled in Phase ${data.phase}.`} ${hasEngagement ? `${data.hubLoginPct}% of your educators are actively engaging with the Learning Hub, exploring ${data.toolsExplored} classroom tools and strategies.` : `As staff begin engaging with the Learning Hub, this report will reflect real-time data on adoption, engagement, and classroom impact.`}
 
 TDI partners with schools to build sustainable, educator-centered professional development. Unlike traditional PD, which has a 10% classroom implementation rate nationally, TDI's approach achieves 74% implementation because every course includes action steps, not just information. This is a school-year partnership, not a one-day event.
 
@@ -1950,7 +1950,7 @@ ${quotesBlock}
 
 ${hasEngagement && data.hubLoginPct > 0 ? `EDUCATOR CHAMPIONS
 
-${data.staffLoggedIn > 0 ? `${data.staffLoggedIn} educator${data.staffLoggedIn > 1 ? 's have' : ' has'} already engaged with the Hub. These early adopters are your implementation champions. Research shows that peer influence is the strongest driver of PD adoption. When teachers see a colleague using a tool and getting results, they follow. Consider recognizing these educators at your next staff meeting.` : ''}` : ''}
+${data.staffLoggedIn > 0 ? `${data.hubLoginPct}% of your team has already engaged with the Hub. These early adopters are your implementation champions. Research shows that peer influence is the strongest driver of PD adoption. When teachers see a colleague using a tool and getting results, they follow. Consider recognizing these educators at your next staff meeting.` : ''}` : ''}
 
 PARTNERSHIP CALENDAR
 
@@ -1983,13 +1983,13 @@ TDI has partnered with schools across all 50 states, supporting over 100,000 edu
       case 'engagement':
         return `STAFF ENGAGEMENT ANALYSIS
 
-${hasEngagement ? `${data.hubLoginPct}% of ${s}'s ${data.staffTotal} educators have logged into the TDI Learning Hub. Here is what the data shows about how your team is engaging.` : `${s} has ${data.staffTotal} educators enrolled in the TDI Learning Hub. As your team begins exploring, this report will show adoption rates, popular content, and engagement trends.`}
+${hasEngagement ? `${data.hubLoginPct}% of ${s}'s educators have logged into the TDI Learning Hub. Here is what the data shows about how your team is engaging.` : `${s} has ${data.staffTotal} educators enrolled in the TDI Learning Hub. As your team begins exploring, this report will show adoption rates, popular content, and engagement trends.`}
 
 ADOPTION OVERVIEW
 
 Total Staff Enrolled: ${data.staffTotal}
-Active on Hub: ${data.staffLoggedIn} (${data.hubLoginPct}%)
-Not Yet Logged In: ${data.staffTotal - data.staffLoggedIn}
+Active on Hub: ${data.hubLoginPct}%
+Not Yet Logged In: ${remainderPct(data.hubLoginPct)}%
 Tools Explored: ${data.toolsExplored}
 Courses Completed: ${data.courseCompletions}
 
@@ -2009,13 +2009,13 @@ Each tool takes 5-15 minutes and includes a specific classroom action step. This
 
 RECOMMENDATIONS FOR YOUR NEXT PLC
 
-${hasEngagement ? `1. Celebrate early adopters. Recognize the ${data.staffLoggedIn} educators who have already engaged.
+${hasEngagement ? `1. Celebrate early adopters. Recognize the educators who have already engaged.
 2. Start a staff meeting with a 5-minute Quick Win. The Lesson Flow Checklist or Professional Email Practices guide are great starters.
 3. Ask your team: "What is one classroom challenge you are facing this week?" Then point them to a specific Hub tool that addresses it.` : `1. Send a brief email letting your staff know they have Hub access. We provide a template you can copy and paste.
 2. Start your next staff meeting with a 5-minute Quick Win from the Hub. Screen-share it so the team sees how easy it is.
 3. Identify 2-3 early adopters who can champion the Hub in your building.`}
 
-${data.staffTotal - data.staffLoggedIn > 0 ? `\nREACHING INACTIVE STAFF\n\n${data.staffTotal - data.staffLoggedIn} educators have not yet logged in. This is normal in the first weeks. Research shows that peer influence is the strongest driver of PD adoption. When teachers see colleagues using a tool and getting results, they follow. Focus on your early adopters first.` : ''}
+${data.staffTotal - data.staffLoggedIn > 0 ? `\nREACHING INACTIVE STAFF\n\n${remainderPct(data.hubLoginPct)}% of your team has not yet logged in. This is normal in the first weeks. Research shows that peer influence is the strongest driver of PD adoption. When teachers see colleagues using a tool and getting results, they follow. Focus on your early adopters first.` : ''}
 ${quotesBlock}
 
 TRENDING ACROSS TDI SCHOOLS RIGHT NOW
@@ -2102,7 +2102,7 @@ Phase progression is milestone-based. When your team demonstrates consistent eng
 
 QUARTER HIGHLIGHTS
 
-${hasEngagement ? `${s} has ${data.staffLoggedIn} of ${data.staffTotal} educators actively using the Learning Hub (${data.hubLoginPct}%). ${data.toolsExplored > 0 ? `The team has explored ${data.toolsExplored} classroom tools and strategies.` : ''} ${!hasServices ? '' : data.completedDeliverables > 0 ? `${data.completedDeliverables} of ${data.totalDeliverables} contracted deliverables are complete.` : 'Deliverables are scheduled and upcoming.'}` : `${s} launched its TDI partnership this quarter with ${data.staffTotal} educators enrolled. The team is in the onboarding phase with Hub access being activated.`}
+${hasEngagement ? `${data.hubLoginPct}% of ${s}'s educators are actively using the Learning Hub. ${data.toolsExplored > 0 ? `The team has explored ${data.toolsExplored} classroom tools and strategies.` : ''} ${!hasServices ? '' : data.completedDeliverables > 0 ? `${data.completedDeliverables} of ${data.totalDeliverables} contracted deliverables are complete.` : 'Deliverables are scheduled and upcoming.'}` : `${s} launched its TDI partnership this quarter with ${data.staffTotal} educators enrolled. The team is in the onboarding phase with Hub access being activated.`}
 ${kpiBlock}
 
 METRICS VS TARGETS
@@ -2152,7 +2152,7 @@ ${data.popularCourses.slice(0, 4).map((c: string) => `- ${c}`).join('\n')}
 
 Every tool includes a specific action step for your classroom. This is not theory. It is "try this tomorrow" practical.
 
-${data.toolsExplored > 0 ? `YOUR TEAM BY THE NUMBERS\n\n${data.staffLoggedIn} educators have logged in\n${data.toolsExplored} tools explored\n${data.courseCompletions} courses completed` : 'Once your team starts exploring, we will track tools used, courses completed, and how your team is engaging right here.'}
+${data.toolsExplored > 0 ? `YOUR TEAM SO FAR\n\n${data.hubLoginPct}% of us have logged in\n${data.toolsExplored} tools explored\n${data.courseCompletions} courses completed` : 'Once your team starts exploring, we will track tools used, courses completed, and how your team is engaging right here.'}
 ${quotesBlock}
 
 SHARE THIS WITH YOUR TEAM
@@ -2246,7 +2246,7 @@ WEEK 4: TEAM CELEBRATION
 
 Subject line suggestion: "Look what our team is doing"
 
-${hasEngagement ? `So far, ${data.staffLoggedIn} of us have explored the Learning Hub. ${data.toolsExplored > 0 ? `We have collectively tried ${data.toolsExplored} classroom tools and strategies.` : ''} That is real engagement, not just clicking through slides.` : `Our team now has access to the TDI Learning Hub with 100+ hours of practical tools and strategies. This is not sit-and-get PD. Everything is designed to be used in your classroom the next day.`}
+${hasEngagement ? `So far, ${data.hubLoginPct}% of us have explored the Learning Hub. ${data.toolsExplored > 0 ? `We have collectively tried ${data.toolsExplored} classroom tools and strategies.` : ''} That is real engagement, not just clicking through slides.` : `Our team now has access to the TDI Learning Hub with 100+ hours of practical tools and strategies. This is not sit-and-get PD. Everything is designed to be used in your classroom the next day.`}
 
 If you have not logged in yet, give it 5 minutes this week. Start with a Quick Win. I think you will be surprised.
 
@@ -2324,7 +2324,7 @@ The research is clear: specific, personal recognition is one of the strongest dr
 Want custom certificates with your school logo? Contact hello@teachersdeserveit.com and we will create them for you.`;
 
       default:
-        return `${s} Partnership Report\n\nStaff: ${data.staffTotal} enrolled, ${data.staffLoggedIn} active (${data.hubLoginPct}%)\nTools explored: ${data.toolsExplored}\nDeliverables: ${data.completedDeliverables}/${data.totalDeliverables}`;
+        return `${s} Partnership Report\n\nStaff: ${data.staffTotal} enrolled, ${data.hubLoginPct}% active\nTools explored: ${data.toolsExplored}\nDeliverables: ${data.completedDeliverables}/${data.totalDeliverables}`;
     }
   };
 
@@ -4275,13 +4275,13 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
                             <div class="stat"><div class="stat-value">${staffStats.total}</div><div class="stat-label">Educators Enrolled</div></div>
                             <div class="stat"><div class="stat-value">${hubPct}%</div><div class="stat-label">Hub Engagement</div></div>
                             <div class="stat"><div class="stat-value">${completedDeliverables}/${totalDeliverables}</div><div class="stat-label">Deliverables</div></div>
-                            <div class="stat"><div class="stat-value">${wellnessScore ? wellnessScore + '/5' : staffStats.hubLoggedIn}</div><div class="stat-label">${wellnessScore ? 'Wellness Score' : 'Staff Active'}</div></div>
+                            <div class="stat"><div class="stat-value">${wellnessScore ? wellnessScore + '/5' : hubPct + '%'}</div><div class="stat-label">${wellnessScore ? 'Wellness Score' : 'Staff Active'}</div></div>
                           </div>
                           <div class="section">
                             <div class="section-title">Partnership Summary</div>
                             <p style="font-size:14px;line-height:1.7;color:#374151;">
                               ${hubPct > 0
-                                ? `${hubPct}% of ${staffStats.total} educators are actively engaging with the TDI Learning Hub. ${toolsExplored > 0 ? `The team has explored ${toolsExplored} classroom tools. ` : ''}${completedDeliverables > 0 ? `${completedDeliverables} of ${totalDeliverables} contracted deliverables are complete.` : ''}`
+                                ? `${hubPct}% of your educators are actively engaging with the TDI Learning Hub. ${toolsExplored > 0 ? `The team has explored ${toolsExplored} classroom tools. ` : ''}${completedDeliverables > 0 ? `${completedDeliverables} of ${totalDeliverables} contracted deliverables are complete.` : ''}`
                                 : `${staffStats.total} educators are enrolled in the TDI Learning Hub with access to courses, tools, and PD resources. The partnership is in the onboarding phase.`
                               }
                             </p>
@@ -7003,7 +7003,7 @@ Want custom certificates with your school logo? Contact hello@teachersdeserveit.
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 {[
                   { label: 'Engagement Summary', icon: Users, action: () => {
-                    const csv = `Metric,Value\nTotal Staff,${staffStats.total}\nHub Active,${staffStats.hubLoggedIn}\nHub Login %,${staffStats.total > 0 ? Math.round((staffStats.hubLoggedIn / staffStats.total) * 100) : 0}%\nTools Explored,${engagement && !engagement.unknown ? engagement.distinctContent : 0}\nCourse Completions,${hubStats?.course_completions ?? 0}\nWellness Score,${hubStats?.mood_avg_7d ?? 'N/A'}`;
+                    const csv = `Metric,Value\nTotal Staff Enrolled,${staffStats.total}\nHub Active %,${staffStats.total > 0 ? Math.round((staffStats.hubLoggedIn / staffStats.total) * 100) : 0}%\nTools Explored,${engagement && !engagement.unknown ? engagement.distinctContent : 0}\nCourse Completions,${hubStats?.course_completions ?? 0}\nWellness Score,${hubStats?.mood_avg_7d ?? 'N/A'}`;
                     const blob = new Blob([csv], { type: 'text/csv' });
                     const link = document.createElement('a'); link.href = URL.createObjectURL(blob);
                     link.download = `engagement-summary-${new Date().toISOString().slice(0,10)}.csv`; link.click();
